@@ -2,7 +2,7 @@
 
 本应用程序由BegCode8.1.0-beta.0生成, 你可以在 [https://www.begcode.com/documentation-archive/v8.1.0-beta.0](https://www.begcode.com/documentation-archive/v8.1.0-beta.0) 找到文档和帮助。
 
-## Project Structure
+## 项目结构
 
 生成时需要 Node，并建议在开发过程中使用它。package.json 文件始终会生成，以提供更好的开发体验，包括 prettier、commit hooks、脚本等等。
 
@@ -20,39 +20,38 @@
   JHipster默认使用构建工具在本地安装Node和npm。此包装器确保本地安装npm并使用它，避免了不同版本可能引起的一些差异。通过使用./npmw而不是传统的npm，您可以配置一个无需Node的环境来开发或测试您的应用程序。
 - `/src/main/docker` - 应用程序及其依赖的服务的Docker配置
 
-## Development
+## 开发
 
-Before you can build this project, you must install and configure the following dependencies on your machine:
+在构建此项目之前，您必须在计算机上安装并配置以下依赖项：
 
-1. [Node.js][]: We use Node to run a development web server and build the project.
-   Depending on your system, you can install Node either from source or as a pre-packaged bundle.
+1. [Node.js][]: 我们使用 Node 来运行开发 Web 服务器并构建项目。
+   根据您的系统，您可以从源代码安装 Node，也可以将 Node 安装为预打包的捆绑包。
 
-After installing Node, you should be able to run the following command to install development tools.
-You will only need to run this command when dependencies change in [package.json](package.json).
+安装 Node 后，您应该能够运行以下命令来安装开发工具。
+仅当 [package.json](package.json) 中的依赖项发生更改时，您才需要再次运行此命令。
 
 ```
 pnpm install
 ```
 
-We use pnpm scripts and [Webpack][] as our build system.
+我们使用 pnpm 脚本和 [Vite][] 作为我们的构建系统。
 
-Run the following commands in two separate terminals to create a blissful development experience where your browser
-auto-refreshes when files change on your hard drive.
+在两个单独的终端中运行以下命令，以创建更好的开发体验，其中当硬盘上的文件发生更改时您的浏览器自动刷新。
 
 ```
 ./mvnw
 pnpm start
 ```
 
-Npm is also used to manage CSS and JavaScript dependencies used in this application. You can upgrade dependencies by
-specifying a newer version in [package.json](package.json). You can also run `pnpm update` and `pnpm install` to manage dependencies.
-Add the `help` flag on any command to see how you can use it. For example, `pnpm help update`.
+Npm 还用于管理此应用程序中使用的 CSS 和 JavaScript 依赖项。 您可以通过以下方式升级依赖项
+在 [package.json](package.json) 中指定较新版本。 您还可以运行`pnpm update`和`pnpm install`来管理依赖项。
+在任何命令上添加`help`标志以查看如何使用它。 例如，`pnpm help update`。
 
-The `pnpm run` command will list all of the scripts available to run for this project.
+`pnpm run` 命令将列出可用于该项目运行的所有脚本。
 
-### PWA Support
+### PWA支持
 
-JHipster ships with PWA (Progressive Web App) support, and it's turned off by default. One of the main components of a PWA is a service worker.
+BegCode 附带 PWA（渐进式 Web 应用程序）支持，并且默认情况下处于关闭状态。 PWA 的主要组件之一是 Service Worker。
 
 The service worker initialization code is commented out by default. To enable it, uncomment the following code in `front/src/index.html`:
 
@@ -68,9 +67,9 @@ The service worker initialization code is commented out by default. To enable it
 
 Note: [Workbox](https://developers.google.com/web/tools/workbox/) powers JHipster's service worker. It dynamically generates the `service-worker.js` file.
 
-### Managing dependencies
+### 依赖管理
 
-For example, to add [Leaflet][] library as a runtime dependency of your application, you would run following command:
+例如，要将 [Leaflet][] 库添加为应用程序的运行时依赖项，您可以运行以下命令：
 
 ```
 pnpm install --save --save-exact leaflet
@@ -87,18 +86,18 @@ Note: There are still a few other things remaining to do for Leaflet that we won
 
 For further instructions on how to develop with JHipster, have a look at [Using JHipster in development][].
 
-## Building for production
+## 系统构建
 
-### Packaging as jar
+### 创建Jar包
 
-To build the final jar and optimize the monolithMybatis application for production, run:
+要优化monolithMybatis应用程序创建Jar包并进行生产部署，请运行：
 
 ```
 ./mvnw -Pprod clean verify
 ```
 
-This will concatenate and minify the client CSS and JavaScript files. It will also modify `index.html` so it references these new files.
-To ensure everything worked, run:
+这将压缩客户端和重新打包CSS和JavaScript文件。 它还将修改`index.html`，以便引用这些新文件。
+为了确保一切正常，请运行：
 
 ```
 java -jar target/*.jar
@@ -108,9 +107,9 @@ Then navigate to [http://localhost:8080](http://localhost:8080) in your browser.
 
 Refer to [Using JHipster in production][] for more details.
 
-### Packaging as war
+### 创建War包
 
-To package your application as a war in order to deploy it to an application server, run:
+要将您的应用程序打包为 war 以便将其部署到应用程序服务器，请运行：
 
 ```
 ./mvnw -Pprod,war clean verify
@@ -118,13 +117,13 @@ To package your application as a war in order to deploy it to an application ser
 
 ### JHipster Control Center
 
-JHipster Control Center can help you manage and control your application(s). You can start a local control center server (accessible on http://localhost:7419) with:
+JHipster Control Center 可以帮助您管理和控制您的应用程序。 您可以使用以下命令启动本地控制中心服务器（可通过 http://localhost:7419 访问）：
 
 ```
 docker compose -f src/main/docker/jhipster-control-center.yml up
 ```
 
-## Testing
+## 测试
 
 ### Spring Boot tests
 
@@ -142,11 +141,11 @@ Unit tests are run by [Jest][]. They're located in [front/src/test/javascript/](
 pnpm test
 ```
 
-## Others
+## 其他
 
-### Code quality using Sonar
+### 使用Sonar进行代码质量控制
 
-Sonar is used to analyse code quality. You can start a local Sonar server (accessible on http://localhost:9001) with:
+Sonar用于分析代码质量。 您可以使用以下命令启动本地 Sonar 服务器（可通过 http://localhost:9001 访问）：
 
 ```
 docker compose -f src/main/docker/sonar.yml up -d
@@ -220,7 +219,7 @@ For more information refer to [Using Docker and Docker-Compose][], this page als
 
 To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`), this will let you generate configuration files for a number of Continuous Integration systems. Consult the [Setting up Continuous Integration][] page for more information.
 
-[JHipster Homepage and latest documentation]: https://www.begcode.com
+[JHipster官网和最新文档]: https://www.begcode.com
 [JHipster 8.1.0-beta.0 archive]: https://www.begcode.com/documentation-archive/v8.1.0-beta.0
 [Using JHipster in development]: https://www.begcode.com/documentation-archive/v8.1.0-beta.0/development/
 [Using Docker and Docker-Compose]: https://www.begcode.com/documentation-archive/v8.1.0-beta.0/docker-compose

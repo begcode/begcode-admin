@@ -13,7 +13,16 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @MapperScan(
-    basePackages = { "com.diboot.core", "com.begcode.monolith.**.repository", "com.begcode.monolith.**.repository" },
+    basePackages = {
+        "com.diboot.core",
+        "com.begcode.monolith.**.repository",
+        "com.begcode.monolith.system.**.repository",
+        "com.begcode.monolith.oss.**.repository",
+        "com.begcode.monolith.settings.**.repository",
+        "com.begcode.monolith.taskjob.**.repository",
+        "com.begcode.monolith.log.**.repository",
+        "com.begcode.monolith.**.repository",
+    },
     annotationClass = Mapper.class
 )
 @ComponentScan(
