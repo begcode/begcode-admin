@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.begcode.monolith.log.repository.SysLogRepository">
+
+    <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="baseResultMap" type="com.begcode.monolith.log.domain.SysLog">
+        <id column="id" property="id"/>
+        <id column="id" property="id" />
+        <result column="log_type" property="logType" />
+        <result column="log_content" property="logContent" />
+        <result column="operate_type" property="operateType" />
+        <result column="userid" property="userid" />
+        <result column="username" property="username" />
+        <result column="ip" property="ip" />
+        <result column="method" property="method" />
+        <result column="request_url" property="requestUrl" />
+        <result column="request_param" property="requestParam" />
+        <result column="request_type" property="requestType" />
+        <result column="cost_time" property="costTime" />
+        <result column="created_by" property="createdBy" />
+        <result column="created_date" property="createdDate" />
+        <result column="last_modified_by" property="lastModifiedBy" />
+        <result column="last_modified_date" property="lastModifiedDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="baseColumnList">
+        id,
+        log_type,
+        log_content,
+        operate_type,
+        userid,
+        username,
+        ip,
+        method,
+        request_url,
+        request_param,
+        request_type,
+        cost_time,
+        created_by,
+        created_date,
+        last_modified_by,
+        last_modified_date
+    </sql>
+
+</mapper>

@@ -1,0 +1,45 @@
+{
+  "monolithMybatisApp": {
+    "settingsCommonFieldData": {
+      "home": {
+        "title": "Common Field Data",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "创建新 Common Field Data",
+        "createOrEditLabel": "创建或编辑 Common Field Data",
+        "notFound": "No Common Field Data found"
+      },
+      "created": "Common Field Data { param } 创建成功",
+      "updated": "Common Field Data { param } 更新成功",
+      "deleted": "Common Field Data { param } 删除成功",
+      "delete": {
+        "question": "你确定要删除 Common Field Data { id } 吗？"
+      },
+      "detail": {
+        "title": "Common Field Data"
+      },
+      "id": "ID",
+      "name": "Name",
+      "value": "Value",
+      "label": "Label",
+      "valueType": "Value Type",
+      "remark": "Remark",
+      "sortValue": "Sort Value",
+      "disabled": "Disabled",
+      "ownerEntityName": "Owner Entity Name",
+      "ownerEntityId": "Owner Entity Id",
+      "siteConfig": "Site Config",
+      "dictionary": "Dictionary",
+      "help": {
+        "name": "名称",
+        "value": "字段值",
+        "label": "字段标题",
+        "valueType": "字段类型",
+        "remark": "说明",
+        "sortValue": "排序",
+        "disabled": "是否禁用",
+        "ownerEntityName": "实体名称",
+        "ownerEntityId": "使用实体ID"
+      }
+    }
+  }
+}

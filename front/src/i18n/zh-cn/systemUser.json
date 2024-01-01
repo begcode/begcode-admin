@@ -1,0 +1,63 @@
+{
+  "monolithMybatisApp": {
+    "systemUser": {
+      "home": {
+        "title": "Users",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "创建新 User",
+        "createOrEditLabel": "创建或编辑 User",
+        "notFound": "No Users found"
+      },
+      "created": "User { param } 创建成功",
+      "updated": "User { param } 更新成功",
+      "deleted": "User { param } 删除成功",
+      "delete": {
+        "question": "你确定要删除 User { id } 吗？"
+      },
+      "detail": {
+        "title": "User"
+      },
+      "id": "Id",
+      "login": "Login",
+      "password": "Password",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "mobile": "Mobile",
+      "birthday": "Birthday",
+      "activated": "Activated",
+      "langKey": "Lang Key",
+      "imageUrl": "Image Url",
+      "activationKey": "Activation Key",
+      "resetKey": "Reset Key",
+      "resetDate": "Reset Date",
+      "createdBy": "Created By",
+      "createdDate": "Created Date",
+      "lastModifiedBy": "Last Modified By",
+      "lastModifiedDate": "Last Modified Date",
+      "department": "Department",
+      "position": "Position",
+      "authorities": "Authorities",
+      "help": {
+        "id": "用户ID",
+        "login": "账户名",
+        "password": "密码",
+        "firstName": "名字",
+        "lastName": "姓氏",
+        "email": "电子邮箱",
+        "mobile": "手机号码",
+        "birthday": "出生日期",
+        "activated": "激活状态",
+        "langKey": "语言Key",
+        "imageUrl": "头像地址",
+        "activationKey": "激活Key",
+        "resetKey": "重置码",
+        "resetDate": "重置时间",
+        "createdBy": "创建者Id",
+        "createdDate": "创建时间",
+        "lastModifiedBy": "修改者Id",
+        "lastModifiedDate": "修改时间"
+      }
+    }
+  }
+}

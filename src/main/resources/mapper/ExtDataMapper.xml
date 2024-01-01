@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.begcode.monolith.repository.ExtDataRepository">
+
+    <!-- 保存map形式的记录 -->
+    <insert id="insertByMap">
+        insert into ${tableName}
+        <foreach collection="fieldsMap.keys" item="key" separator="," open="(" close=")" >
+            ${key}
+        </foreach>
+        values
+        <foreach collection="fieldsMap.values" item="value" separator="," open="(" close=")" >
+            #{value}
+        </foreach>
+    </insert>
+
+    <select id="selectByTableAndId" resultType="Integer">
+        select 1
+        from ${tableName}
+        where id = #{id}
+    </select>
+
+    <select id="selectMapByIdAndColumns" resultType="map">
+        select
+        <foreach collection="fieldsMap" index="key" item="value" separator="," >
+            ${key} ${value}
+        </foreach>
+        from ${tableName}
+        where id = #{id}
+    </select>
+
+    <update id="updateToManyRelationById">
+        update ${tableName}
+        set
+        <foreach collection="fieldsMap" index="key" item="value" separator="," >
+            ${key} = #{value}
+        </foreach>
+        where id = #{id}
+    </update>
+
+    <insert id="insertToManyRelation">
+        insert ${tableName}
+        <foreach collection="fieldsMap.keys" item="key" separator="," open="(" close=")" >
+            ${key}
+        </foreach>
+        values
+        <foreach collection="fieldsMap.values" item="value" separator="," open="(" close=")" >
+            #{value}
+        </foreach>
+    </insert>
+
+    <select id="selectMapByTableAndIdAndColumns" resultType="map">
+        select
+        <foreach collection="fieldsMap" index="key" item="value" separator="," >
+            ${key} ${value}
+        </foreach>
+        from ${table} a left join ${joinTable} b on a.${relationIdName} = b.id
+        where a.id = #{id}
+        limit 1
+    </select>
+
+    <select id="selectMapsByTableAndIdAndColumns" resultType="map">
+        select
+        <foreach collection="fieldsMap" index="key" item="value" separator="," >
+            ${key} ${value}
+        </foreach>
+        from ${joinTable} a left join ${otherTable} b on a.${otherIdName} = b.id
+        where a.${relationIdName} = #{id}
+    </select>
+
+</mapper>

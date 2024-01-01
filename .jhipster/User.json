@@ -1,0 +1,184 @@
+{
+  "annotations": {
+    "addCustomMethod": "queryService",
+    "adminUserDto": "AdminUserDTO",
+    "builtInUser": true,
+    "changelogDate": "20240101061506",
+    "extendAbstractAuditingEntity": true,
+    "importData": true,
+    "importDataFile": "jhi_user-rel_jhi_user__authorities",
+    "moduleName": "system",
+    "publicDto": "id-login-firstName-lastName-email-mobile-birthday-langKey-imageUrl",
+    "publicDtoFile": true,
+    "skipComponent": "domain-mapper-repository-controllerTest-serviceClass-restController",
+    "skipFakeData": true,
+    "skipWebsite": true
+  },
+  "applications": "*",
+  "clientRootFolder": "system",
+  "documentation": "用户",
+  "dto": "mapstruct",
+  "entityTableName": "jhi_user",
+  "fields": [
+    {
+      "documentation": "用户ID",
+      "fieldName": "id",
+      "fieldType": "Long",
+      "fieldValidateRules": ["required"],
+      "options": {
+        "id": true,
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "账户名",
+      "fieldName": "login",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"],
+      "options": {
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "密码",
+      "fieldName": "password",
+      "fieldType": "String",
+      "options": {
+        "fieldColumnName": "password_hash",
+        "importDataField": true,
+        "skipCriteria": true,
+        "skipDto": true
+      }
+    },
+    {
+      "documentation": "名字",
+      "fieldName": "firstName",
+      "fieldType": "String",
+      "options": {
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "姓氏",
+      "fieldName": "lastName",
+      "fieldType": "String",
+      "options": {
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "电子邮箱",
+      "fieldName": "email",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"],
+      "options": {
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "手机号码",
+      "fieldName": "mobile",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "出生日期",
+      "fieldName": "birthday",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "documentation": "激活状态",
+      "fieldName": "activated",
+      "fieldType": "Boolean",
+      "options": {
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "语言Key",
+      "fieldName": "langKey",
+      "fieldType": "String",
+      "options": {
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "头像地址",
+      "fieldName": "imageUrl",
+      "fieldType": "String",
+      "options": {
+        "endUsed": "avatar",
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "激活Key",
+      "fieldName": "activationKey",
+      "fieldType": "String",
+      "options": {
+        "skipCriteria": true,
+        "skipDto": true
+      }
+    },
+    {
+      "documentation": "重置码",
+      "fieldName": "resetKey",
+      "fieldType": "String",
+      "options": {
+        "skipCriteria": true,
+        "skipDto": true
+      }
+    },
+    {
+      "documentation": "重置时间",
+      "fieldName": "resetDate",
+      "fieldType": "Instant",
+      "options": {
+        "skipCriteria": true,
+        "skipDto": true
+      }
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "User",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "documentation": "部门",
+      "otherEntityField": "name",
+      "otherEntityName": "department",
+      "otherEntityRelationshipName": "users",
+      "relationshipName": "department",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "documentation": "岗位",
+      "otherEntityField": "name",
+      "otherEntityName": "position",
+      "otherEntityRelationshipName": "users",
+      "relationshipName": "position",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "documentation": "角色列表",
+      "options": {
+        "annotationOnDestination": "editInList-editByTableModal",
+        "destination": {
+          "annotationOnDestination": "editInList-editByTableModal"
+        },
+        "source": {
+          "annotationOnSource": "importData"
+        }
+      },
+      "otherEntityField": "name",
+      "otherEntityName": "authority",
+      "otherEntityRelationshipName": "users",
+      "relationshipName": "authorities",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

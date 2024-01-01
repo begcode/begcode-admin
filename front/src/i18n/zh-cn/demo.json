@@ -1,0 +1,86 @@
+{
+  "routes": {
+    "demo": {
+      "basic": {
+        "button": "按钮组件"
+      },
+      "editor": {
+        "editor": "编辑器",
+        "jsonEditor": "Json编辑器",
+        "markdown": "markdown编辑器",
+        "tinymce": "富文本",
+        "tinymceBasic": "基础使用",
+        "tinymceForm": "嵌入form"
+      },
+      "excel": {
+        "excel": "Excel",
+        "customExport": "选择导出格式",
+        "jsonExport": "JSON数据导出",
+        "arrayExport": "Array数据导出",
+        "importExcel": "导入"
+      },
+      "form": {
+        "form": "Form",
+        "basic": "基础表单",
+        "useForm": "useForm",
+        "refForm": "RefForm",
+        "advancedForm": "可收缩表单",
+        "ruleForm": "表单验证",
+        "dynamicForm": "动态表单",
+        "customerForm": "自定义组件",
+        "appendForm": "表单增删示例",
+        "tabsForm": "标签页+多级field"
+      },
+      "modal": {
+        "basic": "弹窗扩展",
+        "drawer": "抽屉扩展"
+      },
+      "permission": {
+        "permission": "权限管理",
+        "front": "基于前端权限",
+        "frontPage": "页面权限",
+        "frontBtn": "按钮权限",
+        "frontTestA": "权限测试页A",
+        "frontTestB": "权限测试页B",
+        "back": "基于后台权限",
+        "backPage": "页面权限",
+        "backBtn": "按钮权限"
+      },
+      "system": {
+        "moduleName": "系统管理",
+        "account": "账号管理",
+        "account_detail": "账号详情",
+        "password": "修改密码",
+        "dept": "部门管理",
+        "menu": "菜单管理",
+        "test": "测试功能",
+        "role": "角色管理"
+      },
+      "table": {
+        "table": "Table",
+        "basic": "基础表格",
+        "treeTable": "树形表格",
+        "fetchTable": "远程加载示例",
+        "fixedColumn": "固定列",
+        "customerCell": "自定义列",
+        "formTable": "开启搜索区域",
+        "useTable": "UseTable",
+        "refTable": "RefTable",
+        "multipleHeader": "多级表头",
+        "mergeHeader": "合并单元格",
+        "nestedTable": "嵌套子表格",
+        "expandTable": "可展开表格",
+        "fixedHeight": "定高/头部自定义",
+        "footerTable": "表尾行合计",
+        "editCellTable": "可编辑单元格",
+        "editRowTable": "可编辑行",
+        "authColumn": "权限列",
+        "resizeParentHeightTable": "继承父元素高度",
+        "vxeTable": "VxeTable"
+      },
+      "jeecg": {
+        "JAreaLinkage": "区域选择"
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "monolithMybatisApp": {
+    "CommonFieldType": {
+      "null": "",
+      "INTEGER": "整数",
+      "LONG": "长整数",
+      "BOOLEAN": "布尔",
+      "STRING": "字符串",
+      "FLOAT": "单精度",
+      "DOUBLE": "双精度",
+      "ZONED_DATE_TIME": "日期时间",
+      "LOCATE_DATE": "本地日期",
+      "BIG_DECIMA": "大数字",
+      "L": "L",
+      "TEXTBLOB": "大文本",
+      "IMAGEBLOB": "大图片",
+      "ARRAY": "数组",
+      "ENUM": "枚举",
+      "UPLOAD_IMAGE": "上传图片",
+      "UPLOAD_FILE": "上传文件",
+      "ENTITY": "实体",
+      "RADIO": "单选",
+      "MULTI_SELECT": "多选",
+      "DATA_DICTIONARY": "数据字典",
+      "UUID": "UUID",
+      "INSTANT": "时间戳"
+    }
+  }
+}

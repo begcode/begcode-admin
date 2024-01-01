@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity FillRuleItem.
+    -->
+        <changeSet id="20240101063106-1" author="jhipster">
+        <createTable tableName="fill_rule_item" remarks="填充规则条目">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="sort_value" type="integer" remarks="排序值">
+                <constraints nullable="true" />
+            </column>
+            <column name="field_param_type" type="varchar(255)" remarks="字段参数类型">
+                <constraints nullable="true" />
+            </column>
+            <column name="field_param_value" type="varchar(255)" remarks="字段参数值">
+                <constraints nullable="true" />
+            </column>
+            <column name="date_pattern" type="varchar(255)" remarks="日期格式">
+                <constraints nullable="true" />
+            </column>
+            <column name="seq_length" type="integer" remarks="序列长度">
+                <constraints nullable="true" />
+            </column>
+            <column name="seq_increment" type="integer" remarks="序列增量">
+                <constraints nullable="true" />
+            </column>
+            <column name="seq_start_value" type="integer" remarks="序列起始值">
+                <constraints nullable="true" />
+            </column>
+            <column name="fill_rule_id" type="bigint" remarks="填充规则">
+                <constraints nullable="true" />
+            </column>
+            <column name="fill_rule_name" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+    </changeSet>
+    
+    
+    
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

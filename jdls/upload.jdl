@@ -1,0 +1,169 @@
+/** 资源分类 */
+@skipFakeData
+@moduleName(oss)
+entity ResourceCategory {
+    title String maxlength(40) /** 标题 */
+    code String maxlength(20) /** 代码 */
+    orderNumber Integer /** 排序 */
+}
+/** 上传文件 */
+@skipFakeData
+@addCustomMethod(service-rest-dto-listComponent-clientService-editComponent)
+@replaceServiceMethod(save)
+@skipRestApi(create)
+@moduleName(oss)
+@extendAbstractAuditingEntity
+@skipWebButton(listAdd-listEdit-listModalEdit)
+@replaceListComponentMethod(newEntity)
+@listBy(list)
+entity UploadFile {
+    /**
+     * 完整文件名
+     * 不含路径
+     */
+    @fieldConfig(hideInForm)
+    fullName String
+    /**
+     * 文件名
+     * 不含扩展名
+     */
+    @fieldConfig(hideInForm)
+    name String
+    @fieldConfig(hideInForm)
+    thumb String /** 缩略图Url地址 */
+    @fieldConfig(hideInForm)
+    ext String /** 扩展名 */
+    @fieldConfig(hideInForm)
+    type String /** 文件类型 */
+    @fieldConfig(hideInForm)
+    url String /** Url地址 */
+    @fieldConfig(hideInForm)
+    path String /** 本地路径 */
+    @fieldConfig(hideInForm)
+    folder String /** 存储目录 */
+    @ownerEntityName
+    @fieldConfig(hideInList-hideInForm)
+    ownerEntityName String /** 实体名称 */
+    @ownerEntityId
+    @fieldConfig(hideInList-hideInForm)
+    ownerEntityId String /** 使用实体ID */
+    businessTitle String /** 业务标题 */
+    businessDesc String /** 业务自定义描述内容 */
+    businessStatus String /** 业务状态 */
+    @fieldConfig(hideInForm)
+    createAt ZonedDateTime /** 创建时间 */
+    @fieldConfig(hideInForm)
+    fileSize Long /** 文件大小 */
+    @fieldConfig(hideInForm)
+    referenceCount Long /** 被引次数 */
+}
+/** 上传图片 */
+@skipFakeData
+@addCustomMethod(service-rest-dto-listComponent-clientService-editComponent)
+@replaceServiceMethod(save)
+@skipRestApi(create)
+@moduleName(oss)
+@extendAbstractAuditingEntity
+@skipWebButton(listAdd-listEdit-listModalEdit)
+@replaceListComponentMethod(newEntity)
+@listBy(list)
+entity UploadImage {
+    /**
+     * 完整文件名
+     * 不含路径
+     */
+    @fieldConfig(hideInForm)
+    fullName String
+    /**
+     * 文件名
+     * 不含扩展名
+     */
+    @fieldConfig(hideInForm)
+    name String
+    @fieldConfig(hideInForm)
+    ext String /** 扩展名 */
+    @fieldConfig(hideInForm)
+    type String /** 文件类型 */
+    @fieldConfig(hideInForm)
+    url String /** Web Url地址 */
+    @fieldConfig(hideInForm)
+    path String /** 本地路径 */
+    @fieldConfig(hideInForm)
+    folder String /** 本地存储目录 */
+    @fieldConfig(hideInForm)
+    ownerEntityName String /** 使用实体名称 */
+    ownerEntityId String /** 使用实体ID */
+    businessTitle String /** 业务标题 */
+    businessDesc String /** 业务自定义描述内容 */
+    businessStatus String /** 业务状态 */
+    @fieldConfig(hideInForm)
+    createAt ZonedDateTime /** 创建时间 */
+    @fieldConfig(hideInForm)
+    fileSize Long /** 文件大小 */
+    @fieldConfig(hideInForm)
+    smartUrl String /** 小图Url */
+    @fieldConfig(hideInForm)
+    mediumUrl String /** 中等图Url */
+    @fieldConfig(hideInForm)
+    referenceCount Long /** 文件被引用次数 */
+}
+
+
+relationship OneToMany {
+
+    /** 下级列表 */
+    ResourceCategory{children(title)}
+    to
+    /** 上级 */
+    ResourceCategory{parent(title)}
+
+}
+
+relationship ManyToOne {
+    /** 所属分类 */
+    UploadImage{category(title)}
+    to
+    @annotationOnDestination(countByPrimaryKey)
+    /** 图片列表 */
+    ResourceCategory{images(url)}
+
+    /** 所属分类 */
+    UploadFile{category(title)}
+    to
+    @annotationOnDestination(countByPrimaryKey)
+    /** 文件列表 */
+    ResourceCategory{files(url)}
+}
+
+/**
+ * 对象存储配置
+ */
+@skipFakeData
+@moduleName(oss)
+@entityPackage(oss)
+@addCustomMethod(service)
+@skipWebsite
+entity OssConfig {
+    provider OssProvider required /** 提供商 */
+    platform String required maxlength(40) unique /** 平台 */
+    enabled Boolean /** 启用 */
+    remark String /** 备注 */
+    @endUsed(codeEditor)
+    configData String /** 配置数据 */
+}
+
+/** OSS提供商 */
+enum OssProvider {
+    LOCAL ("本地"),
+    MINIO ("MINIO"),
+    QINIU ("七牛云"),
+    ALI ("阿里云"),
+    TENCENT ("腾讯云")
+}
+
+service all with serviceClass
+filter *
+dto UploadFile, UploadImage, ResourceCategory, OssConfig with mapstruct
+paginate UploadFile, UploadImage, ResourceCategory, OssConfig with pagination
+clientRootFolder UploadFile, UploadImage, ResourceCategory, OssConfig with files
+//

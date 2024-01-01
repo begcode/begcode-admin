@@ -1,0 +1,53 @@
+{
+  "monolithMybatisApp": {
+    "systemSmsMessage": {
+      "home": {
+        "title": "Sms Messages",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Sms Message",
+        "createOrEditLabel": "Create or edit a Sms Message",
+        "notFound": "No Sms Messages found"
+      },
+      "created": "A new Sms Message is created with identifier { param }",
+      "updated": "A Sms Message is updated with identifier { param }",
+      "deleted": "A Sms Message is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Sms Message { id }?"
+      },
+      "detail": {
+        "title": "Sms Message"
+      },
+      "id": "ID",
+      "title": "Title",
+      "sendType": "Send Type",
+      "receiver": "Receiver",
+      "params": "Params",
+      "content": "Content",
+      "sendTime": "Send Time",
+      "sendStatus": "Send Status",
+      "retryNum": "Retry Num",
+      "failResult": "Fail Result",
+      "remark": "Remark",
+      "createdBy": "Created By",
+      "createdDate": "Created Date",
+      "lastModifiedBy": "Last Modified By",
+      "lastModifiedDate": "Last Modified Date",
+      "help": {
+        "title": "消息标题",
+        "sendType": "发送方式",
+        "receiver": "接收人",
+        "params": "发送所需参数\nJson格式",
+        "content": "推送内容",
+        "sendTime": "推送时间",
+        "sendStatus": "推送状态",
+        "retryNum": "发送次数 超过5次不再发送",
+        "failResult": "推送失败原因",
+        "remark": "备注",
+        "createdBy": "创建者Id",
+        "createdDate": "创建时间",
+        "lastModifiedBy": "修改者Id",
+        "lastModifiedDate": "修改时间"
+      }
+    }
+  }
+}

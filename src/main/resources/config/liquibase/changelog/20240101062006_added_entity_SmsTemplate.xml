@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity SmsTemplate.
+    -->
+        <changeSet id="20240101062006-1" author="jhipster">
+        <createTable tableName="sms_template" remarks="消息模板">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)" remarks="模板标题">
+                <constraints nullable="true" />
+            </column>
+            <column name="code" type="varchar(255)" remarks="模板CODE">
+                <constraints nullable="true" />
+            </column>
+            <column name="send_type" type="varchar(255)" remarks="通知类型">
+                <constraints nullable="true" />
+            </column>
+            <column name="content" type="varchar(255)" remarks="模板内容">
+                <constraints nullable="true" />
+            </column>
+            <column name="test_json" type="varchar(255)" remarks="模板测试json">
+                <constraints nullable="true" />
+            </column>
+            <column name="type" type="varchar(255)" remarks="模板类型">
+                <constraints nullable="true" />
+            </column>
+            <column name="remark" type="varchar(255)" remarks="备注">
+                <constraints nullable="true" />
+            </column>
+            <column name="enabled" type="boolean" remarks="启用">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_by" type="bigint" remarks="创建者Id">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_date" type="${datetimeType}" remarks="创建时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_modified_by" type="bigint" remarks="修改者Id">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_modified_date" type="${datetimeType}" remarks="修改时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="supplier_id" type="bigint" remarks="短信服务商配置">
+                <constraints nullable="true" />
+            </column>
+            <column name="supplier_sign_name" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="sms_template" columnName="created_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="sms_template" columnName="last_modified_date" columnDataType="${datetimeType}"/>
+    </changeSet>
+    
+    
+    
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

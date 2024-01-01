@@ -1,0 +1,10 @@
+{
+  "monolithMybatisApp": {
+    "AnnoSendStatus": {
+      "null": "",
+      "NOT_RELEASE": "未发布",
+      "RELEASED": "已发布",
+      "CANCELED": "已取消"
+    }
+  }
+}

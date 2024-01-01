@@ -1,0 +1,56 @@
+/** 统计Api */
+@microServiceCore
+@skipFakeData
+@addCustomMethod(rest-queryService-clientService-updateTemplate)
+@skipRestApi(dataExport-dataImport)
+entity StatisticsApi {
+    title String maxlength(60) /** 标题 */
+    apiKey String maxlength(80) unique /** ApiKey */
+    @createdDate
+    createAt ZonedDateTime /** 创建时间  */
+    @lastModifiedDate
+    updateAt ZonedDateTime /** 更新时间  */
+    sourceType StatSourceType /** 来源类型 */
+    @endUsed(codeEditor)
+    apiBody TextBlob /** 主体内容 */
+    result TextBlob /** 可能存放的结果 */
+    updateInterval Integer /** 更新间隔(秒) */
+    lastSQLRunTime ZonedDateTime /** 最新运行时间 */
+    enable Boolean /** 是否可用 */
+    //
+    //
+}
+
+enum StatSourceType {
+    HTTP,
+    SQL,
+    JSON,
+    EXCEL
+}
+
+/**
+ * Many to one relationship.
+ */
+relationship ManyToOne {
+    //
+
+    /** 创建人 */
+    StatisticsApi{creator(firstName)}
+    to
+    User
+    //
+    //
+
+    /** 修改人 */
+    StatisticsApi{modifier(firstName)}
+    to
+    User
+    //
+}
+
+service all with serviceClass
+filter *
+dto StatisticsApi with mapstruct
+paginate StatisticsApi with pagination
+clientRootFolder StatisticsApi with report
+//

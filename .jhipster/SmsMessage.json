@@ -1,0 +1,77 @@
+{
+  "annotations": {
+    "changelogDate": "20240101063306",
+    "entityPackage": "system",
+    "extendAbstractAuditingEntity": true,
+    "moduleName": "system",
+    "skipFakeData": true
+  },
+  "applications": "*",
+  "clientRootFolder": "system",
+  "documentation": "短信消息",
+  "dto": "mapstruct",
+  "entityTableName": "sms_message",
+  "fields": [
+    {
+      "documentation": "消息标题",
+      "fieldName": "title",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "发送方式",
+      "fieldName": "sendType",
+      "fieldType": "MessageSendType",
+      "fieldTypeDocumentation": "通知类型",
+      "fieldValues": "EMAIL (邮件),SMS (短信),WECHAT (微信)"
+    },
+    {
+      "documentation": "接收人",
+      "fieldName": "receiver",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "发送所需参数\\nJson格式",
+      "fieldName": "params",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "推送内容",
+      "fieldName": "content",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "text"
+    },
+    {
+      "documentation": "推送时间",
+      "fieldName": "sendTime",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "documentation": "推送状态",
+      "fieldName": "sendStatus",
+      "fieldType": "SendStatus",
+      "fieldTypeDocumentation": "推送状态",
+      "fieldValues": "WAITING (未推送),SUCCESS (推送成功),FAILURE (推送失败),NOT_TRY (失败不再发送)"
+    },
+    {
+      "documentation": "发送次数 超过5次不再发送",
+      "fieldName": "retryNum",
+      "fieldType": "Integer"
+    },
+    {
+      "documentation": "推送失败原因",
+      "fieldName": "failResult",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "备注",
+      "fieldName": "remark",
+      "fieldType": "String"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "SmsMessage",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

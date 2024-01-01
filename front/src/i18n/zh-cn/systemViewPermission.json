@@ -1,0 +1,67 @@
+{
+  "monolithMybatisApp": {
+    "systemViewPermission": {
+      "home": {
+        "title": "View Permissions",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "创建新 View Permission",
+        "createOrEditLabel": "创建或编辑 View Permission",
+        "notFound": "No View Permissions found"
+      },
+      "created": "View Permission { param } 创建成功",
+      "updated": "View Permission { param } 更新成功",
+      "deleted": "View Permission { param } 删除成功",
+      "delete": {
+        "question": "你确定要删除 View Permission { id } 吗？"
+      },
+      "detail": {
+        "title": "View Permission"
+      },
+      "id": "ID",
+      "text": "Text",
+      "type": "Type",
+      "i18n": "I 18 N",
+      "group": "Group",
+      "link": "Link",
+      "externalLink": "External Link",
+      "target": "Target",
+      "icon": "Icon",
+      "disabled": "Disabled",
+      "hide": "Hide",
+      "hideInBreadcrumb": "Hide In Breadcrumb",
+      "shortcut": "Shortcut",
+      "shortcutRoot": "Shortcut Root",
+      "reuse": "Reuse",
+      "code": "Code",
+      "description": "Description",
+      "order": "Order",
+      "apiPermissionCodes": "Api Permission Codes",
+      "componentFile": "Component File",
+      "redirect": "Redirect",
+      "children": "Children",
+      "parent": "Parent",
+      "help": {
+        "text": "权限名称",
+        "type": "权限类型",
+        "i18n": "i18n主键",
+        "group": "显示分组名",
+        "link": "路由",
+        "externalLink": "外部链接",
+        "target": "链接目标",
+        "icon": "图标",
+        "disabled": "禁用菜单",
+        "hide": "隐藏菜单",
+        "hideInBreadcrumb": "隐藏面包屑",
+        "shortcut": "快捷菜单项",
+        "shortcutRoot": "菜单根节点",
+        "reuse": "允许复用",
+        "code": "权限代码\n(ROLE_开头)",
+        "description": "权限描述",
+        "order": "排序",
+        "apiPermissionCodes": "api权限标识串",
+        "componentFile": "组件名称",
+        "redirect": "重定向路径"
+      }
+    }
+  }
+}

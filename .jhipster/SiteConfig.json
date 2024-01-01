@@ -1,0 +1,67 @@
+{
+  "annotations": {
+    "changelogDate": "20240101062706",
+    "entityPackage": "settings",
+    "extendAbstractAuditingEntity": true,
+    "moduleName": "system",
+    "skipFakeData": true,
+    "skipWebsite": true
+  },
+  "applications": "*",
+  "clientRootFolder": "settings",
+  "documentation": "网站配置",
+  "dto": "mapstruct",
+  "entityTableName": "site_config",
+  "fields": [
+    {
+      "documentation": "分类名称",
+      "fieldName": "categoryName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "documentation": "分类Key",
+      "fieldName": "categoryKey",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "documentation": "是否禁用",
+      "fieldName": "disabled",
+      "fieldType": "Boolean"
+    },
+    {
+      "documentation": "排序",
+      "fieldName": "sortValue",
+      "fieldType": "Integer",
+      "options": {
+        "sortField": "asc"
+      }
+    },
+    {
+      "documentation": "是否内置",
+      "fieldName": "builtIn",
+      "fieldType": "Boolean"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "SiteConfig",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "documentation": "配置项列表",
+      "options": {
+        "source": {
+          "annotationOnSource": "editInForm-editByTable-unidirectional-relateByIdEntity"
+        }
+      },
+      "otherEntityField": "name",
+      "otherEntityName": "commonFieldData",
+      "relationshipName": "items",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

@@ -1,0 +1,11 @@
+{
+  "monolithMybatisApp": {
+    "TargetType": {
+      "null": "",
+      "BLANK": "新窗口",
+      "SELF": "当前窗口",
+      "PARENT": "父窗口",
+      "TOP": "顶层窗口"
+    }
+  }
+}

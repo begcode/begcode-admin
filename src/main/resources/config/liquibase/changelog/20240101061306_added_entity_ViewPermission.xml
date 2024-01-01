@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity ViewPermission.
+    -->
+        <changeSet id="20240101061306-1" author="jhipster">
+        <createTable tableName="view_permission" remarks="可视权限\n权限分为菜单权限、按钮权限等\n">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="text" type="varchar(255)" remarks="权限名称">
+                <constraints nullable="false" />
+            </column>
+            <column name="type" type="varchar(255)" remarks="权限类型">
+                <constraints nullable="true" />
+            </column>
+            <column name="i_18_n" type="varchar(255)" remarks="i18n主键">
+                <constraints nullable="true" />
+            </column>
+            <column name="group" type="boolean" remarks="显示分组名">
+                <constraints nullable="true" />
+            </column>
+            <column name="link" type="varchar(255)" remarks="路由">
+                <constraints nullable="true" />
+            </column>
+            <column name="external_link" type="varchar(255)" remarks="外部链接">
+                <constraints nullable="true" />
+            </column>
+            <column name="target" type="varchar(255)" remarks="链接目标">
+                <constraints nullable="true" />
+            </column>
+            <column name="icon" type="varchar(255)" remarks="图标">
+                <constraints nullable="true" />
+            </column>
+            <column name="disabled" type="boolean" remarks="禁用菜单">
+                <constraints nullable="true" />
+            </column>
+            <column name="hide" type="boolean" remarks="隐藏菜单">
+                <constraints nullable="true" />
+            </column>
+            <column name="hide_in_breadcrumb" type="boolean" remarks="隐藏面包屑">
+                <constraints nullable="true" />
+            </column>
+            <column name="shortcut" type="boolean" remarks="快捷菜单项">
+                <constraints nullable="true" />
+            </column>
+            <column name="shortcut_root" type="boolean" remarks="菜单根节点">
+                <constraints nullable="true" />
+            </column>
+            <column name="reuse" type="boolean" remarks="允许复用">
+                <constraints nullable="true" />
+            </column>
+            <column name="code" type="varchar(255)" remarks="权限代码\n(ROLE_开头)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(255)" remarks="权限描述">
+                <constraints nullable="true" />
+            </column>
+            <column name="order" type="integer" remarks="排序">
+                <constraints nullable="true" />
+            </column>
+            <column name="api_permission_codes" type="varchar(255)" remarks="api权限标识串">
+                <constraints nullable="true" />
+            </column>
+            <column name="component_file" type="varchar(255)" remarks="组件名称">
+                <constraints nullable="true" />
+            </column>
+            <column name="redirect" type="varchar(255)" remarks="重定向路径">
+                <constraints nullable="true" />
+            </column>
+            <column name="parent_id" type="bigint" remarks="可视权限">
+                <constraints nullable="true" />
+            </column>
+            <column name="parent_text" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+    </changeSet>
+    
+    
+    
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
+    <!--
+        Load sample data generated with Faker.js
+        - This data can be easily edited using a CSV editor (or even MS Excel) and
+          is located in the 'src/main/resources/config/liquibase/fake-data' directory
+        - By default this data is applied when running with the JHipster 'dev' profile.
+          This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
+          Spring Boot configuration key.
+    -->
+    <changeSet id="20240101061306-1-data" author="jhipster">
+        <loadData
+                  file="config/liquibase/data/view_permission.csv"
+                  separator=";"
+                  tableName="view_permission"
+                  usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="text" type="string"/>
+            <column name="type" type="string"/>
+            <column name="i_18_n" type="string"/>
+            <column name="group" type="boolean"/>
+            <column name="link" type="string"/>
+            <column name="external_link" type="string"/>
+            <column name="target" type="string"/>
+            <column name="icon" type="string"/>
+            <column name="disabled" type="boolean"/>
+            <column name="hide" type="boolean"/>
+            <column name="hide_in_breadcrumb" type="boolean"/>
+            <column name="shortcut" type="boolean"/>
+            <column name="shortcut_root" type="boolean"/>
+            <column name="reuse" type="boolean"/>
+            <column name="code" type="string"/>
+            <column name="description" type="string"/>
+            <column name="order" type="numeric"/>
+            <column name="api_permission_codes" type="string"/>
+            <column name="component_file" type="string"/>
+            <column name="redirect" type="string"/>
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+        </loadData>
+        
+
+    </changeSet>
+</databaseChangeLog>

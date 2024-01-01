@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.begcode.monolith.repository.ApiPermissionRepository">
+
+    <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="baseResultMap" type="com.begcode.monolith.domain.ApiPermission">
+        <id column="id" property="id"/>
+        <id column="id" property="id" />
+        <result column="service_name" property="serviceName" />
+        <result column="name" property="name" />
+        <result column="code" property="code" />
+        <result column="description" property="description" />
+        <result column="type" property="type" />
+        <result column="method" property="method" />
+        <result column="url" property="url" />
+        <result column="status" property="status" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="baseColumnList">
+        id,
+        service_name,
+        name,
+        code,
+        description,
+        type,
+        method,
+        url,
+        status
+    </sql>
+
+</mapper>

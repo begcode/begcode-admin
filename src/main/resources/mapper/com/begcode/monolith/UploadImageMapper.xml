@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.begcode.monolith.repository.UploadImageRepository">
+
+    <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="baseResultMap" type="com.begcode.monolith.domain.UploadImage">
+        <id column="id" property="id"/>
+        <id column="id" property="id" />
+        <result column="full_name" property="fullName" />
+        <result column="name" property="name" />
+        <result column="ext" property="ext" />
+        <result column="type" property="type" />
+        <result column="url" property="url" />
+        <result column="path" property="path" />
+        <result column="folder" property="folder" />
+        <result column="owner_entity_name" property="ownerEntityName" />
+        <result column="owner_entity_id" property="ownerEntityId" />
+        <result column="business_title" property="businessTitle" />
+        <result column="business_desc" property="businessDesc" />
+        <result column="business_status" property="businessStatus" />
+        <result column="create_at" property="createAt" />
+        <result column="file_size" property="fileSize" />
+        <result column="smart_url" property="smartUrl" />
+        <result column="medium_url" property="mediumUrl" />
+        <result column="reference_count" property="referenceCount" />
+        <result column="created_by" property="createdBy" />
+        <result column="created_date" property="createdDate" />
+        <result column="last_modified_by" property="lastModifiedBy" />
+        <result column="last_modified_date" property="lastModifiedDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="baseColumnList">
+        id,
+        full_name,
+        name,
+        ext,
+        type,
+        url,
+        path,
+        folder,
+        owner_entity_name,
+        owner_entity_id,
+        business_title,
+        business_desc,
+        business_status,
+        create_at,
+        file_size,
+        smart_url,
+        medium_url,
+        reference_count,
+        created_by,
+        created_date,
+        last_modified_by,
+        last_modified_date
+    </sql>
+
+</mapper>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity UploadImage.
+    -->
+        <changeSet id="20240101062406-1" author="jhipster">
+        <createTable tableName="upload_image" remarks="上传图片">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="full_name" type="varchar(255)" remarks="完整文件名\n不含路径">
+                <constraints nullable="true" />
+            </column>
+            <column name="name" type="varchar(255)" remarks="文件名\n不含扩展名">
+                <constraints nullable="true" />
+            </column>
+            <column name="ext" type="varchar(255)" remarks="扩展名">
+                <constraints nullable="true" />
+            </column>
+            <column name="type" type="varchar(255)" remarks="文件类型">
+                <constraints nullable="true" />
+            </column>
+            <column name="url" type="varchar(255)" remarks="Web Url地址">
+                <constraints nullable="true" />
+            </column>
+            <column name="path" type="varchar(255)" remarks="本地路径">
+                <constraints nullable="true" />
+            </column>
+            <column name="folder" type="varchar(255)" remarks="本地存储目录">
+                <constraints nullable="true" />
+            </column>
+            <column name="owner_entity_name" type="varchar(255)" remarks="使用实体名称">
+                <constraints nullable="true" />
+            </column>
+            <column name="owner_entity_id" type="varchar(255)" remarks="使用实体ID">
+                <constraints nullable="true" />
+            </column>
+            <column name="business_title" type="varchar(255)" remarks="业务标题">
+                <constraints nullable="true" />
+            </column>
+            <column name="business_desc" type="varchar(255)" remarks="业务自定义描述内容">
+                <constraints nullable="true" />
+            </column>
+            <column name="business_status" type="varchar(255)" remarks="业务状态">
+                <constraints nullable="true" />
+            </column>
+            <column name="create_at" type="${datetimeType}" remarks="创建时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="file_size" type="bigint" remarks="文件大小">
+                <constraints nullable="true" />
+            </column>
+            <column name="smart_url" type="varchar(255)" remarks="小图Url">
+                <constraints nullable="true" />
+            </column>
+            <column name="medium_url" type="varchar(255)" remarks="中等图Url">
+                <constraints nullable="true" />
+            </column>
+            <column name="reference_count" type="bigint" remarks="文件被引用次数">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_by" type="bigint" remarks="创建者Id">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_date" type="${datetimeType}" remarks="创建时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_modified_by" type="bigint" remarks="修改者Id">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_modified_date" type="${datetimeType}" remarks="修改时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="category_id" type="bigint" remarks="资源分类">
+                <constraints nullable="true" />
+            </column>
+            <column name="category_title" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="upload_image" columnName="create_at" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="upload_image" columnName="created_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="upload_image" columnName="last_modified_date" columnDataType="${datetimeType}"/>
+    </changeSet>
+    
+    
+    
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

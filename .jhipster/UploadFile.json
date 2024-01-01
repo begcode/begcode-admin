@@ -1,0 +1,164 @@
+{
+  "annotations": {
+    "addCustomMethod": "service-rest-dto-listComponent-clientService-editComponent",
+    "changelogDate": "20240101062306",
+    "extendAbstractAuditingEntity": true,
+    "listBy": "list",
+    "moduleName": "oss",
+    "replaceListComponentMethod": "newEntity",
+    "replaceServiceMethod": "save",
+    "skipFakeData": true,
+    "skipRestApi": "create",
+    "skipWebButton": "listAdd-listEdit-listModalEdit"
+  },
+  "applications": "*",
+  "clientRootFolder": "files",
+  "documentation": "上传文件",
+  "dto": "mapstruct",
+  "entityTableName": "upload_file",
+  "fields": [
+    {
+      "documentation": "完整文件名\\n不含路径",
+      "fieldName": "fullName",
+      "fieldType": "String",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "文件名\\n不含扩展名",
+      "fieldName": "name",
+      "fieldType": "String",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "缩略图Url地址",
+      "fieldName": "thumb",
+      "fieldType": "String",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "扩展名",
+      "fieldName": "ext",
+      "fieldType": "String",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "文件类型",
+      "fieldName": "type",
+      "fieldType": "String",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "Url地址",
+      "fieldName": "url",
+      "fieldType": "String",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "本地路径",
+      "fieldName": "path",
+      "fieldType": "String",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "存储目录",
+      "fieldName": "folder",
+      "fieldType": "String",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "实体名称",
+      "fieldName": "ownerEntityName",
+      "fieldType": "String",
+      "options": {
+        "fieldConfig": "hideInList-hideInForm",
+        "ownerEntityName": true
+      }
+    },
+    {
+      "documentation": "使用实体ID",
+      "fieldName": "ownerEntityId",
+      "fieldType": "String",
+      "options": {
+        "fieldConfig": "hideInList-hideInForm",
+        "ownerEntityId": true
+      }
+    },
+    {
+      "documentation": "业务标题",
+      "fieldName": "businessTitle",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "业务自定义描述内容",
+      "fieldName": "businessDesc",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "业务状态",
+      "fieldName": "businessStatus",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "创建时间",
+      "fieldName": "createAt",
+      "fieldType": "ZonedDateTime",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "文件大小",
+      "fieldName": "fileSize",
+      "fieldType": "Long",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "被引次数",
+      "fieldName": "referenceCount",
+      "fieldType": "Long",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "UploadFile",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "documentation": "所属分类",
+      "options": {
+        "annotationOnDestination": "countByPrimaryKey",
+        "destination": {
+          "annotationOnDestination": "countByPrimaryKey"
+        }
+      },
+      "otherEntityField": "title",
+      "otherEntityName": "resourceCategory",
+      "otherEntityRelationshipName": "files",
+      "relationshipName": "category",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

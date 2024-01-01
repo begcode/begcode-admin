@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <!--
+        Added the constraints for entity User.
+    -->
+    <changeSet id="20240101061506-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="department_id"
+                                 baseTableName="jhi_user"
+                                 constraintName="fk_jhi_user__department_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="department"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="position_id"
+                                 baseTableName="jhi_user"
+                                 constraintName="fk_jhi_user__position_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="position"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="jhi_user_id"
+                                 baseTableName="rel_jhi_user__authorities"
+                                 constraintName="fk_rel_jhi_user__authorities__jhi_user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="authorities_id"
+                                 baseTableName="rel_jhi_user__authorities"
+                                 constraintName="fk_rel_jhi_user__authorities__authorities_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_authority"
+                                 />
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,40 @@
+{
+  "annotations": {
+    "changelogDate": "20240101061206",
+    "skipClient": true,
+    "skipServer": true,
+    "skipSoftDelete": true
+  },
+  "applications": "*",
+  "documentation": "用户",
+  "dto": "mapstruct",
+  "entityTableName": "jhi_auditing",
+  "fields": [
+    {
+      "documentation": "创建者Id",
+      "fieldName": "createdBy",
+      "fieldType": "Long"
+    },
+    {
+      "documentation": "创建时间",
+      "fieldName": "createdDate",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "documentation": "修改者Id",
+      "fieldName": "lastModifiedBy",
+      "fieldType": "Long"
+    },
+    {
+      "documentation": "修改时间",
+      "fieldName": "lastModifiedDate",
+      "fieldType": "ZonedDateTime"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "AbstractAuditingEntity",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

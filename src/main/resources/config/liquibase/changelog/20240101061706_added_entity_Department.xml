@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity Department.
+    -->
+        <changeSet id="20240101061706-1" author="jhipster">
+        <createTable tableName="department" remarks="部门">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)" remarks="名称">
+                <constraints nullable="true" />
+            </column>
+            <column name="code" type="varchar(255)" remarks="代码">
+                <constraints nullable="true" />
+            </column>
+            <column name="address" type="varchar(255)" remarks="地址">
+                <constraints nullable="true" />
+            </column>
+            <column name="phone_num" type="varchar(255)" remarks="联系电话">
+                <constraints nullable="true" />
+            </column>
+            <column name="logo" type="varchar(255)" remarks="logo地址">
+                <constraints nullable="true" />
+            </column>
+            <column name="contact" type="varchar(255)" remarks="联系人">
+                <constraints nullable="true" />
+            </column>
+            <column name="create_user_id" type="bigint" remarks="创建用户 Id">
+                <constraints nullable="true" />
+            </column>
+            <column name="create_time" type="${datetimeType}" remarks="创建时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="parent_id" type="bigint" remarks="部门">
+                <constraints nullable="true" />
+            </column>
+            <column name="parent_name" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="department" columnName="create_time" columnDataType="${datetimeType}"/>
+    </changeSet>
+    
+    
+    
+    <changeSet id="20240101061706-1-relations" author="jhipster">
+
+        <createTable tableName="rel_department__authorities" remarks="角色列表关联表">
+            <column name="authorities_id" type="bigint" remarks="角色id">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_id" type="bigint" remarks="部门id">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="department_id, authorities_id" tableName="rel_department__authorities"/>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

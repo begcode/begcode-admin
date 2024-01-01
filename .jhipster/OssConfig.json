@@ -1,0 +1,56 @@
+{
+  "annotations": {
+    "addCustomMethod": "service",
+    "changelogDate": "20240101062506",
+    "entityPackage": "oss",
+    "moduleName": "oss",
+    "skipFakeData": true,
+    "skipWebsite": true
+  },
+  "applications": "*",
+  "clientRootFolder": "files",
+  "documentation": "对象存储配置",
+  "dto": "mapstruct",
+  "entityTableName": "oss_config",
+  "fields": [
+    {
+      "documentation": "提供商",
+      "fieldName": "provider",
+      "fieldType": "OssProvider",
+      "fieldTypeDocumentation": "OSS提供商",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "LOCAL (本地),MINIO (MINIO),QINIU (七牛云),ALI (阿里云),TENCENT (腾讯云)"
+    },
+    {
+      "documentation": "平台",
+      "fieldName": "platform",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "maxlength", "unique"],
+      "fieldValidateRulesMaxlength": "40"
+    },
+    {
+      "documentation": "启用",
+      "fieldName": "enabled",
+      "fieldType": "Boolean"
+    },
+    {
+      "documentation": "备注",
+      "fieldName": "remark",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "配置数据",
+      "fieldName": "configData",
+      "fieldType": "String",
+      "options": {
+        "endUsed": "codeEditor"
+      }
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "OssConfig",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

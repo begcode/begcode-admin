@@ -1,0 +1,38 @@
+{
+  "monolithMybatisApp": {
+    "settingsDictionary": {
+      "home": {
+        "title": "Dictionaries",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "创建新 Dictionary",
+        "createOrEditLabel": "创建或编辑 Dictionary",
+        "notFound": "No Dictionaries found"
+      },
+      "created": "Dictionary { param } 创建成功",
+      "updated": "Dictionary { param } 更新成功",
+      "deleted": "Dictionary { param } 删除成功",
+      "delete": {
+        "question": "你确定要删除 Dictionary { id } 吗？"
+      },
+      "detail": {
+        "title": "Dictionary"
+      },
+      "id": "ID",
+      "dictName": "Dict Name",
+      "dictKey": "Dict Key",
+      "disabled": "Disabled",
+      "sortValue": "Sort Value",
+      "builtIn": "Built In",
+      "syncEnum": "Sync Enum",
+      "items": "Items",
+      "help": {
+        "dictName": "字典名称",
+        "dictKey": "字典Key",
+        "disabled": "是否禁用",
+        "sortValue": "排序",
+        "builtIn": "是否内置",
+        "syncEnum": "更新枚举"
+      }
+    }
+  }
+}

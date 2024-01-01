@@ -1,0 +1,56 @@
+{
+  "annotations": {
+    "addCustomMethod": "service",
+    "changelogDate": "20240101063606",
+    "entityPackage": "taskjob",
+    "extendAbstractAuditingEntity": true,
+    "importData": true,
+    "moduleName": "taskjob",
+    "skipFakeData": true
+  },
+  "applications": "*",
+  "clientRootFolder": "taskjob",
+  "documentation": "定时任务",
+  "dto": "mapstruct",
+  "entityTableName": "task_job_config",
+  "fields": [
+    {
+      "documentation": "任务名称",
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "任务类名",
+      "fieldName": "jobClassName",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "cron表达式",
+      "fieldName": "cronExpression",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "参数",
+      "fieldName": "parameter",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "描述",
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "任务状态",
+      "fieldName": "jobStatus",
+      "fieldType": "JobStatus",
+      "fieldTypeDocumentation": "任务状态",
+      "fieldValues": "NORMAL (正常),PAUSED (暂停),COMPLETE (完成),ERROR (错误),BLOCKED (阻塞)"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "TaskJobConfig",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

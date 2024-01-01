@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity SysFillRule.
+    -->
+        <changeSet id="20240101063006-1" author="jhipster">
+        <createTable tableName="sys_fill_rule" remarks="填充规则">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)" remarks="规则名称">
+                <constraints nullable="true" />
+            </column>
+            <column name="code" type="varchar(255)" remarks="规则Code">
+                <constraints nullable="true" />
+            </column>
+            <column name="desc" type="varchar(255)" remarks="规则描述">
+                <constraints nullable="true" />
+            </column>
+            <column name="enabled" type="boolean" remarks="是否启用">
+                <constraints nullable="true" />
+            </column>
+            <column name="reset_frequency" type="varchar(255)" remarks="重置频率">
+                <constraints nullable="true" />
+            </column>
+            <column name="seq_value" type="bigint" remarks="序列值">
+                <constraints nullable="true" />
+            </column>
+            <column name="fill_value" type="varchar(255)" remarks="生成值">
+                <constraints nullable="true" />
+            </column>
+            <column name="impl_class" type="varchar(255)" remarks="规则实现类">
+                <constraints nullable="true" />
+            </column>
+            <column name="params" type="varchar(255)" remarks="规则参数">
+                <constraints nullable="true" />
+            </column>
+            <column name="reset_start_time" type="${datetimeType}" remarks="重置开始日期">
+                <constraints nullable="true" />
+            </column>
+            <column name="reset_end_time" type="${datetimeType}" remarks="重置结束日期">
+                <constraints nullable="true" />
+            </column>
+            <column name="reset_time" type="${datetimeType}" remarks="重置时间">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="sys_fill_rule" columnName="reset_start_time" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="sys_fill_rule" columnName="reset_end_time" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="sys_fill_rule" columnName="reset_time" columnDataType="${datetimeType}"/>
+    </changeSet>
+    
+    
+    
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

@@ -1,0 +1,106 @@
+{
+  "annotations": {
+    "changelogDate": "20240101061706",
+    "moduleName": "system",
+    "skipFakeData": true,
+    "skipWebsite": true
+  },
+  "applications": "*",
+  "clientRootFolder": "settings",
+  "documentation": "部门",
+  "dto": "mapstruct",
+  "entityTableName": "department",
+  "fields": [
+    {
+      "documentation": "名称",
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "代码",
+      "fieldName": "code",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "地址",
+      "fieldName": "address",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "联系电话",
+      "fieldName": "phoneNum",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "logo地址",
+      "fieldName": "logo",
+      "fieldType": "String",
+      "options": {
+        "endUsed": "imageUrl"
+      }
+    },
+    {
+      "documentation": "联系人",
+      "fieldName": "contact",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "创建用户 Id",
+      "fieldName": "createUserId",
+      "fieldType": "Long"
+    },
+    {
+      "documentation": "创建时间",
+      "fieldName": "createTime",
+      "fieldType": "ZonedDateTime"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "Department",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "documentation": "下级部门",
+      "otherEntityField": "name",
+      "otherEntityName": "department",
+      "otherEntityRelationshipName": "parent",
+      "relationshipName": "children",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "documentation": "角色列表",
+      "options": {
+        "source": {
+          "annotationOnSource": "editInForm-editInList-editBySelectDrawer-unidirectional"
+        }
+      },
+      "otherEntityField": "name",
+      "otherEntityName": "authority",
+      "otherEntityRelationshipName": "department",
+      "relationshipName": "authorities",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "documentation": "上级",
+      "otherEntityField": "name",
+      "otherEntityName": "department",
+      "otherEntityRelationshipName": "children",
+      "relationshipName": "parent",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "documentation": "用户列表",
+      "otherEntityField": "firstName",
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "department",
+      "relationshipName": "users",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

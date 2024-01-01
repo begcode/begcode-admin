@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity Position.
+    -->
+        <changeSet id="20240101061806-1" author="jhipster">
+        <createTable tableName="position" remarks="岗位\n">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="code" type="varchar(50)" remarks="岗位代码">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_position__code" />
+            </column>
+            <column name="name" type="varchar(50)" remarks="名称">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_position__name" />
+            </column>
+            <column name="sort_no" type="integer" remarks="排序">
+                <constraints nullable="true" />
+            </column>
+            <column name="description" type="varchar(200)" remarks="描述">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+    </changeSet>
+    
+    
+    
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

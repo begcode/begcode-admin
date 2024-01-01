@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.begcode.monolith.repository.ViewPermissionRepository">
+
+    <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="baseResultMap" type="com.begcode.monolith.domain.ViewPermission">
+        <id column="id" property="id"/>
+        <id column="id" property="id" />
+        <result column="text" property="text" />
+        <result column="type" property="type" />
+        <result column="i_18_n" property="i18n" />
+        <result column="`group`" property="group" />
+        <result column="`link`" property="link" />
+        <result column="external_link" property="externalLink" />
+        <result column="target" property="target" />
+        <result column="icon" property="icon" />
+        <result column="disabled" property="disabled" />
+        <result column="hide" property="hide" />
+        <result column="hide_in_breadcrumb" property="hideInBreadcrumb" />
+        <result column="shortcut" property="shortcut" />
+        <result column="shortcut_root" property="shortcutRoot" />
+        <result column="reuse" property="reuse" />
+        <result column="code" property="code" />
+        <result column="description" property="description" />
+        <result column="`order`" property="order" />
+        <result column="api_permission_codes" property="apiPermissionCodes" />
+        <result column="component_file" property="componentFile" />
+        <result column="redirect" property="redirect" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="baseColumnList">
+        id,
+        text,
+        type,
+        i_18_n,
+        `group`,
+        `link`,
+        external_link,
+        target,
+        icon,
+        disabled,
+        hide,
+        hide_in_breadcrumb,
+        shortcut,
+        shortcut_root,
+        reuse,
+        code,
+        description,
+        `order`,
+        api_permission_codes,
+        component_file,
+        redirect
+    </sql>
+
+</mapper>

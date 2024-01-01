@@ -1,0 +1,50 @@
+{
+  "monolithMybatisApp": {
+    "settingsSysFillRule": {
+      "home": {
+        "title": "Sys Fill Rules",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Sys Fill Rule",
+        "createOrEditLabel": "Create or edit a Sys Fill Rule",
+        "notFound": "No Sys Fill Rules found"
+      },
+      "created": "A new Sys Fill Rule is created with identifier { param }",
+      "updated": "A Sys Fill Rule is updated with identifier { param }",
+      "deleted": "A Sys Fill Rule is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Sys Fill Rule { id }?"
+      },
+      "detail": {
+        "title": "Sys Fill Rule"
+      },
+      "id": "ID",
+      "name": "Name",
+      "code": "Code",
+      "desc": "Desc",
+      "enabled": "Enabled",
+      "resetFrequency": "Reset Frequency",
+      "seqValue": "Seq Value",
+      "fillValue": "Fill Value",
+      "implClass": "Impl Class",
+      "params": "Params",
+      "resetStartTime": "Reset Start Time",
+      "resetEndTime": "Reset End Time",
+      "resetTime": "Reset Time",
+      "ruleItems": "Rule Items",
+      "help": {
+        "name": "规则名称",
+        "code": "规则Code",
+        "desc": "规则描述",
+        "enabled": "是否启用",
+        "resetFrequency": "重置频率",
+        "seqValue": "序列值",
+        "fillValue": "生成值",
+        "implClass": "规则实现类",
+        "params": "规则参数",
+        "resetStartTime": "重置开始日期",
+        "resetEndTime": "重置结束日期",
+        "resetTime": "重置时间"
+      }
+    }
+  }
+}

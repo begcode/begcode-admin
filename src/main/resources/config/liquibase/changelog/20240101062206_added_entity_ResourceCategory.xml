@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity ResourceCategory.
+    -->
+        <changeSet id="20240101062206-1" author="jhipster">
+        <createTable tableName="resource_category" remarks="资源分类">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="varchar(40)" remarks="标题">
+                <constraints nullable="true" />
+            </column>
+            <column name="code" type="varchar(20)" remarks="代码">
+                <constraints nullable="true" />
+            </column>
+            <column name="order_number" type="integer" remarks="排序">
+                <constraints nullable="true" />
+            </column>
+            <column name="parent_id" type="bigint" remarks="资源分类">
+                <constraints nullable="true" />
+            </column>
+            <column name="parent_title" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+    </changeSet>
+    
+    
+    
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

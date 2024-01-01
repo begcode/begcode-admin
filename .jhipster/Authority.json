@@ -1,0 +1,151 @@
+{
+  "annotations": {
+    "addCustomMethod": "repository-service-queryService-updateComponent",
+    "changelogDate": "20240101061406",
+    "importData": true,
+    "importDataFile": "jhi_authority-rel_jhi_authority__view_permissions",
+    "moduleName": "system",
+    "skipFakeData": true,
+    "skipWebsite": true
+  },
+  "applications": "*",
+  "clientRootFolder": "system",
+  "documentation": "角色",
+  "dto": "mapstruct",
+  "entityTableName": "jhi_authority",
+  "fields": [
+    {
+      "documentation": "角色名称",
+      "fieldName": "name",
+      "fieldType": "String",
+      "options": {
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "角色代号",
+      "fieldName": "code",
+      "fieldType": "String",
+      "options": {
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "信息",
+      "fieldName": "info",
+      "fieldType": "String",
+      "options": {
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "排序",
+      "fieldName": "order",
+      "fieldType": "Integer",
+      "options": {
+        "importDataField": true,
+        "sortField": "asc"
+      }
+    },
+    {
+      "documentation": "展示",
+      "fieldName": "display",
+      "fieldType": "Boolean",
+      "options": {
+        "importDataField": true
+      }
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "Authority",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "documentation": "子节点",
+      "otherEntityField": "name",
+      "otherEntityName": "authority",
+      "otherEntityRelationshipName": "parent",
+      "relationshipName": "children",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "documentation": "菜单列表",
+      "options": {
+        "annotationOnDestination": "editInList-editBySelectDrawer",
+        "destination": {
+          "annotationOnDestination": "editInList-editBySelectDrawer"
+        },
+        "source": {
+          "annotationOnSource": "importData-editInList-editBySelectDrawer-unidirectional"
+        }
+      },
+      "otherEntityField": "text",
+      "otherEntityName": "viewPermission",
+      "otherEntityRelationshipName": "authorities",
+      "relationshipName": "viewPermissions",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "documentation": "Api权限列表",
+      "options": {
+        "annotationOnDestination": "editInList-editBySelectDrawer",
+        "destination": {
+          "annotationOnDestination": "editInList-editBySelectDrawer"
+        },
+        "source": {
+          "annotationOnSource": "editInList-editBySelectDrawer"
+        }
+      },
+      "otherEntityField": "name",
+      "otherEntityName": "apiPermission",
+      "otherEntityRelationshipName": "authorities",
+      "relationshipName": "apiPermissions",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "documentation": "上级",
+      "otherEntityField": "name",
+      "otherEntityName": "authority",
+      "otherEntityRelationshipName": "children",
+      "relationshipName": "parent",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "documentation": "用户列表",
+      "options": {
+        "annotationOnSource": "importData",
+        "destination": {
+          "annotationOnDestination": "editInList-editByTableModal"
+        },
+        "source": {
+          "annotationOnSource": "importData"
+        }
+      },
+      "otherEntityField": "firstName",
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "authorities",
+      "relationshipName": "users",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "options": {
+        "annotationOnSource": "editInForm-editInList-editBySelectDrawer-unidirectional",
+        "source": {
+          "annotationOnSource": "editInForm-editInList-editBySelectDrawer-unidirectional"
+        }
+      },
+      "otherEntityName": "department",
+      "otherEntityRelationshipName": "authorities",
+      "relationshipName": "department",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

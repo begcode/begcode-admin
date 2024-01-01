@@ -1,0 +1,45 @@
+#!/bin/sh
+basedir=`dirname "$0"`
+
+if [ -f "$basedir/mvnw" ]; then
+  bindir="$basedir/target/node"
+  repodir="$basedir/target/node/node_modules"
+  installCommand="$basedir/mvnw -Pwebapp frontend:install-node-and-pnpm@install-node-and-pnpm"
+
+  PATH="$basedir/$builddir/:$PATH"
+  NPM_EXE="$basedir/$builddir/node_modules/pnpm/bin/pnpm.cjs"
+  NODE_EXE="$basedir/$builddir/node"
+elif [ -f "$basedir/gradlew" ]; then
+  bindir="$basedir/build/node/bin"
+  repodir="$basedir/build/node/lib/node_modules"
+  installCommand="$basedir/gradlew npmSetup"
+else
+  echo "Using pnpm installed globally"
+  exec pnpm "$@"
+fi
+
+NPM_EXE="$repodir/pnpm/bin/pnpm.cjs"
+NODE_EXE="$bindir/node"
+
+if [ ! -x "$NPM_EXE" ] || [ ! -x "$NODE_EXE" ]; then
+  $installCommand || true
+fi
+
+if [ -x "$NODE_EXE" ]; then
+  echo "Using node installed locally $($NODE_EXE --version)"
+  PATH="$bindir:$PATH"
+else
+  NODE_EXE='node'
+fi
+
+if [ ! -x "$NPM_EXE" ]; then
+  echo "Local pnpm not found, using pnpm installed globally"
+  pnpm config set auto-install-peers true --location project
+  pnpm config set strict-peer-dependencies false --location project
+  pnpm "$@"
+else
+  echo "Using pnpm installed locally $($NODE_EXE $NPM_EXE --version)"
+  $NODE_EXE $NPM_EXE config set auto-install-peers true --location project
+  $NODE_EXE $NPM_EXE config set strict-peer-dependencies false --location project
+  $NODE_EXE $NPM_EXE "$@"
+fi

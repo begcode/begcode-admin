@@ -1,0 +1,80 @@
+{
+  "annotations": {
+    "addCustomMethod": "service",
+    "changelogDate": "20240101062606",
+    "entityPackage": "settings",
+    "importData": true,
+    "microServiceCore": true,
+    "moduleName": "system",
+    "skipFakeData": true,
+    "skipWebsite": true
+  },
+  "applications": "*",
+  "clientRootFolder": "settings",
+  "documentation": "数据字典",
+  "dto": "mapstruct",
+  "entityTableName": "dictionary",
+  "fields": [
+    {
+      "documentation": "字典名称",
+      "fieldName": "dictName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "documentation": "字典Key",
+      "fieldName": "dictKey",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "documentation": "是否禁用",
+      "fieldName": "disabled",
+      "fieldType": "Boolean"
+    },
+    {
+      "documentation": "排序",
+      "fieldName": "sortValue",
+      "fieldType": "Integer",
+      "options": {
+        "sortField": "asc"
+      }
+    },
+    {
+      "documentation": "是否内置",
+      "fieldName": "builtIn",
+      "fieldType": "Boolean",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "更新枚举",
+      "fieldName": "syncEnum",
+      "fieldType": "Boolean",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "Dictionary",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "documentation": "字典项列表",
+      "options": {
+        "source": {
+          "annotationOnSource": "editInForm-editByTable-unidirectional-relateByIdEntity"
+        }
+      },
+      "otherEntityField": "name",
+      "otherEntityName": "commonFieldData",
+      "relationshipName": "items",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

@@ -1,0 +1,40 @@
+{
+  "monolithMybatisApp": {
+    "systemAuthority": {
+      "home": {
+        "title": "Authorities",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Authority",
+        "createOrEditLabel": "Create or edit a Authority",
+        "notFound": "No Authorities found"
+      },
+      "created": "A new Authority is created with identifier { param }",
+      "updated": "A Authority is updated with identifier { param }",
+      "deleted": "A Authority is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Authority { id }?"
+      },
+      "detail": {
+        "title": "Authority"
+      },
+      "id": "ID",
+      "name": "Name",
+      "code": "Code",
+      "info": "Info",
+      "order": "Order",
+      "display": "Display",
+      "children": "Children",
+      "viewPermissions": "View Permissions",
+      "apiPermissions": "Api Permissions",
+      "parent": "Parent",
+      "users": "Users",
+      "help": {
+        "name": "角色名称",
+        "code": "角色代号",
+        "info": "信息",
+        "order": "排序",
+        "display": "展示"
+      }
+    }
+  }
+}

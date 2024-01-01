@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity TaskJobConfig.
+    -->
+        <changeSet id="20240101063606-1" author="jhipster">
+        <createTable tableName="task_job_config" remarks="定时任务">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)" remarks="任务名称">
+                <constraints nullable="true" />
+            </column>
+            <column name="job_class_name" type="varchar(255)" remarks="任务类名">
+                <constraints nullable="true" />
+            </column>
+            <column name="cron_expression" type="varchar(255)" remarks="cron表达式">
+                <constraints nullable="true" />
+            </column>
+            <column name="parameter" type="varchar(255)" remarks="参数">
+                <constraints nullable="true" />
+            </column>
+            <column name="description" type="varchar(255)" remarks="描述">
+                <constraints nullable="true" />
+            </column>
+            <column name="job_status" type="varchar(255)" remarks="任务状态">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_by" type="bigint" remarks="创建者Id">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_date" type="${datetimeType}" remarks="创建时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_modified_by" type="bigint" remarks="修改者Id">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_modified_date" type="${datetimeType}" remarks="修改时间">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="task_job_config" columnName="created_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="task_job_config" columnName="last_modified_date" columnDataType="${datetimeType}"/>
+    </changeSet>
+    
+    
+    
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
+    <!--
+        Load sample data generated with Faker.js
+        - This data can be easily edited using a CSV editor (or even MS Excel) and
+          is located in the 'src/main/resources/config/liquibase/fake-data' directory
+        - By default this data is applied when running with the JHipster 'dev' profile.
+          This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
+          Spring Boot configuration key.
+    -->
+    <changeSet id="20240101063606-1-data" author="jhipster">
+        <loadData
+                  file="config/liquibase/data/task_job_config.csv"
+                  separator=";"
+                  tableName="task_job_config"
+                  usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+        </loadData>
+        
+
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,105 @@
+/**
+ * 用户
+ */
+@skipServer
+@skipClient
+@skipSoftDelete
+entity AbstractAuditingEntity (jhi_auditing) {
+  /**
+   * 创建者Id
+   */
+  createdBy Long
+  /**
+   * 创建时间
+   */
+  createdDate ZonedDateTime
+  /**
+   * 修改者Id
+   */
+  lastModifiedBy Long
+  /**
+   * 修改时间
+   */
+  lastModifiedDate ZonedDateTime
+}
+enum FixedType {
+	LEFT ("左侧"),
+    RIGHT ("右侧")
+}
+enum EndUsedType {
+	FILE_URL ("文件地址"),
+    IMAGE_URL ("图片地址"),
+    VIDEO_URL ("视频地址"),
+    AUDIO_URL ("音频地址"),
+    EDITOR ("编辑器"),
+    CODE_EDITOR ("代码编辑器"),
+    SELECT ("下拉框"),
+    SELECT_MODAL ("弹窗复合选择"),
+    CHECKBOX ("复选框"),
+    RADIO ("单选框"),
+    RADIO_BUTTON ("单选按钮"),
+    RATE ("评分"),
+    SLIDER ("滑块"),
+    SWITCH ("开关"),
+    TEXT_AREA ("文本域"),
+    AVATAR ("头像"),
+    ICON_PICKER ("图标选择器"),
+    COLOR_PICKER ("图标选择器")
+}
+/** 来源，实体或数据字典 */
+enum SourceType {
+	ENTITY ("实体"),
+    DATA_DICTIONARY ("数据字典"),
+    SERVICE_ENTITY ("微服务实体")
+}
+enum RelationshipType {
+	ONE_TO_MANY ("一对多"),
+    MANY_TO_ONE ("多对一"),
+    MANY_TO_MANY ("多对多"),
+    ONE_TO_ONE ("一对一")
+}
+enum DictType {
+    NUMBER ("数字"),
+    STRING ("字符串")
+}
+
+/**
+ * 字段类型
+ */
+enum CommonFieldType {
+	INTEGER ("整数"),
+    LONG ("长整数"),
+    BOOLEAN ("布尔"),
+    STRING ("字符串"),
+    FLOAT ("单精度"),
+    DOUBLE ("双精度"),
+    ZONED_DATE_TIME ("日期时间"),
+    LOCATE_DATE ("本地日期"),
+    BIG_DECIMA ("大数字")L,
+    TEXTBLOB ("大文本"),
+    IMAGEBLOB ("大图片"),
+    ARRAY ("数组"),
+    ENUM ("枚举"),
+    UPLOAD_IMAGE ("上传图片"),
+    UPLOAD_FILE ("上传文件"),
+    ENTITY ("实体"),
+    RADIO ("单选"),
+    MULTI_SELECT ("多选"),
+    DATA_DICTIONARY ("数据字典"),
+    UUID ("UUID"),
+    INSTANT ("时间戳")
+}
+/** Api权限类型 */
+enum ApiPermissionType {
+    BUSINESS ("业务"),
+    API ("API接口"),
+    ENTITY ("实体"),
+    MICRO_SERVICE ("微服务")
+}
+/** Api权限状态 */
+enum ApiPermissionState {
+    CONFIGURABLE ("可配置"),
+    PERMIT_ALL ("允许所有"),
+    UNREACHABLE ("不可达"),
+    AUTHENTICATE ("认证")
+}

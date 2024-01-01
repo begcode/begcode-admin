@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.begcode.monolith.settings.repository.SysFillRuleRepository">
+
+    <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="baseResultMap" type="com.begcode.monolith.settings.domain.SysFillRule">
+        <id column="id" property="id"/>
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="code" property="code" />
+        <result column="`desc`" property="desc" />
+        <result column="enabled" property="enabled" />
+        <result column="reset_frequency" property="resetFrequency" />
+        <result column="seq_value" property="seqValue" />
+        <result column="fill_value" property="fillValue" />
+        <result column="impl_class" property="implClass" />
+        <result column="params" property="params" />
+        <result column="reset_start_time" property="resetStartTime" />
+        <result column="reset_end_time" property="resetEndTime" />
+        <result column="reset_time" property="resetTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="baseColumnList">
+        id,
+        name,
+        code,
+        `desc`,
+        enabled,
+        reset_frequency,
+        seq_value,
+        fill_value,
+        impl_class,
+        params,
+        reset_start_time,
+        reset_end_time,
+        reset_time
+    </sql>
+
+</mapper>

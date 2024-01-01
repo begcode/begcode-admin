@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.begcode.monolith.system.repository.SmsSupplierRepository">
+
+    <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="baseResultMap" type="com.begcode.monolith.system.domain.SmsSupplier">
+        <id column="id" property="id"/>
+        <id column="id" property="id" />
+        <result column="provider" property="provider" />
+        <result column="config_data" property="configData" />
+        <result column="sign_name" property="signName" />
+        <result column="remark" property="remark" />
+        <result column="enabled" property="enabled" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="baseColumnList">
+        id,
+        provider,
+        config_data,
+        sign_name,
+        remark,
+        enabled
+    </sql>
+
+</mapper>

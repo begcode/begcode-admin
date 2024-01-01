@@ -1,0 +1,198 @@
+/**
+ * 数据字典
+ */
+@microServiceCore
+@skipFakeData
+@moduleName(system)
+@entityPackage(settings)
+@addCustomMethod(service)
+@skipWebsite
+@importData
+entity Dictionary {
+	dictName String required /** 字典名称 */
+	dictKey String required unique /** 字典Key */
+    disabled Boolean /** 是否禁用 */
+    @sortField(asc)
+    sortValue Integer /** 排序 */
+    @fieldConfig(hideInForm)
+    builtIn Boolean /** 是否内置 */
+    @fieldConfig(hideInForm)
+    syncEnum Boolean /** 更新枚举 */
+}
+
+/** 网站配置 */
+@extendAbstractAuditingEntity
+@skipFakeData
+@entityPackage(settings)
+@moduleName(system)
+@skipWebsite
+entity SiteConfig {
+    categoryName String required /** 分类名称 */
+    categoryKey String required /** 分类Key */
+    disabled Boolean /** 是否禁用 */
+    @sortField(asc)
+    sortValue Integer /** 排序 */
+    builtIn Boolean /** 是否内置 */
+}
+
+relationship OneToMany {
+    @annotationOnSource(editInForm-editByTable-unidirectional-relateByIdEntity)
+    /** 配置项列表 */
+    SiteConfig{items(name)}
+    to
+    CommonFieldData
+    @annotationOnSource(editInForm-editByTable-unidirectional-relateByIdEntity)
+    /** 字典项列表 */
+    Dictionary{items(name)}
+    to
+    CommonFieldData
+}
+/** 通用字段数据 */
+@skipFakeData
+@entityPackage(settings)
+@moduleName(system)
+@skipMenu
+@skipWebsite
+@importData
+entity CommonFieldData {
+    name String /** 名称 */
+    value String /** 字段值 */
+    label String /** 字段标题 */
+    valueType CommonFieldType /** 字段类型 */
+    remark String /** 说明 */
+    @sortField(asc)
+    sortValue Integer /** 排序 */
+    disabled Boolean /** 是否禁用 */
+    @fieldConfig(hideInList-hideInForm)
+    @ownerEntityName
+    ownerEntityName String /** 实体名称 */
+    @fieldConfig(hideInList-hideInForm)
+    @ownerEntityId
+    ownerEntityId String /** 使用实体ID */
+}
+
+/**
+ * 行政区划码
+ */
+@microServiceCore
+@moduleName(system)
+@entityPackage(settings)
+@skipFakeData
+@skipWebsite
+entity RegionCode {
+	name String /** 名称 */
+	areaCode String /** 地区代码 */
+	cityCode String /** 城市代码 */
+	mergerName String /** 全名 */
+	shortName String /** 短名称 */
+	zipCode String /** 邮政编码 */
+	level RegionCodeLevel /** 等级 */
+	lng Double /** 经度 */
+	lat Double /** 纬度 */
+}
+enum GpsType {
+	BAIDU,
+    GOOGLE_MAP,
+    GOOGLE_EART,AMAP
+}
+/**
+ * 区域等级
+ */
+enum RegionCodeLevel {
+	PROVINCE ("省"),
+    CITY ("市"),
+    COUNTY ("区"),
+    TOWN ("镇"),
+    VILLAGE ("村")
+}
+
+/** 填充规则 */
+@microServiceCore
+@moduleName(system)
+@skipFakeData
+@entityPackage(settings)
+@addCustomMethod(service)
+@skipWebsite
+entity SysFillRule {
+  name String /** 规则名称 */
+  code String /** 规则Code */
+  desc String /** 规则描述 */
+  enabled Boolean /** 是否启用 */
+  resetFrequency ResetFrequency /** 重置频率 */
+  seqValue Long /** 序列值 */
+  fillValue String /** 生成值 */
+  implClass String /** 规则实现类 */
+  params String /** 规则参数 */
+  resetStartTime ZonedDateTime /** 重置开始日期 */
+  resetEndTime ZonedDateTime /** 重置结束日期 */
+  resetTime ZonedDateTime /** 重置时间 */
+}
+
+/** 填充规则条目 */
+@moduleName(system)
+@skipFakeData
+@skipMenu
+@entityPackage(settings)
+@skipWebsite
+entity FillRuleItem {
+  @sortField(asc)
+  sortValue Integer /** 排序值 */
+  @dict
+  fieldParamType FieldParamType /** 字段参数类型 */
+  fieldParamValue String /** 字段参数值 */
+  datePattern String /** 日期格式 */
+  seqLength Integer /** 序列长度 */
+  seqIncrement Integer /** 序列增量 */
+  seqStartValue Integer /** 序列起始值 */
+}
+
+/** 字段参数类型 */
+enum FieldParamType {
+  DATETIME ("日期时间"),
+  NUMBER ("数字序列"),
+  FIXED_CHAR ("固定字符"),
+  PARAM ("参数")
+}
+/**
+ * 重置频率
+ */
+enum ResetFrequency {
+  NONE ("不重置"),
+  DAILY ("每天重置"),
+  WEEKLY ("每周重置"),
+  MONTHLY ("每月重置"),
+  YEARLY ("每年重置"),
+  CUSTOM ("自定义重置")
+}
+
+relationship OneToMany {
+
+	/**
+	 * 子节点
+	 */
+	RegionCode{children(name)}
+	to
+	/**
+	 * 上级节点
+	 */
+	RegionCode{parent(name)}
+
+    @annotationOnSource(editInForm-editByTable-unidirectional)
+    /**
+    * 配置项列表
+    */
+    SysFillRule{ruleItems(datePattern)}
+    to
+    /**
+    * 填充规则
+    */
+    FillRuleItem{fillRule(name)}
+}
+
+
+service all with serviceClass
+filter *
+dto all with mapstruct
+paginate all with pagination
+clientRootFolder Dictionary, SysFillRule, FillRuleItem, RegionCode, SiteConfig, CommonFieldData with settings
+//

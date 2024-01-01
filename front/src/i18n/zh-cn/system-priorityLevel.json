@@ -1,0 +1,10 @@
+{
+  "monolithMybatisApp": {
+    "PriorityLevel": {
+      "null": "",
+      "HIGH": "高",
+      "MEDIUM": "中",
+      "LOW": "低"
+    }
+  }
+}

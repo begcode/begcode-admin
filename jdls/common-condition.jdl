@@ -1,0 +1,74 @@
+/** 通用条件 */
+@microServiceCore
+@replaceUpdateComponentMethod(save)
+@addCustomMethod(queryService-updateTemplate)
+@skipFakeData
+@skipWebsite
+entity CommonCondition {
+    name String required maxlength(50) /** 名称 */
+    description String /** 描述 */
+    @lastModifiedDate
+    lastModifiedTime ZonedDateTime /** 最后更新时间 */
+    clazzName String required /** 对应的实体类名 */
+    //
+}
+
+/** 通用条件条目 */
+@skipMenu
+@skipFakeData
+@microServiceCore
+@addCustomMethod(listComponent)
+@replaceListComponentMethod(getCommonTableData)
+entity CommonConditionItem {
+    prefix String /** 前置符号 */
+    fieldName String /** 字段名称 */
+    fieldType String /** 字段类型 */
+    operator String /** 运算符号 */
+    value String /** 比较值 */
+    suffix String /** 后缀 */
+    order Integer /** 顺序 */
+}
+
+/** 数据权限规则 */
+@entityPackage(system)
+@extendAbstractAuditingEntity
+@skipFakeData
+@moduleName(system)
+entity DataPermissionRule {
+  permissionId String /** 菜单ID */
+  name String /** 规则名称 */
+  column String /** 字段 */
+  conditions String /** 条件 */
+  value String /** 规则值 */
+  disabled Boolean /** 禁用状态 */
+}
+
+/**
+ * One to many relationship.
+ */
+relationship OneToMany {
+    @annotationOnSource(editInForm-editByTable-unidirectional)
+    /** 条件项目 */
+    CommonCondition{items(fieldName)}
+    to
+    /** 查询 */
+    CommonConditionItem{commonCondition(name)}
+}
+
+/**
+ * Many to one relationship.
+ */
+relationship ManyToOne {
+    //
+    /** 编辑人 config: {"lastModifiedBy": true} */
+    CommonCondition{modifier(firstName)}
+    to
+    User
+    //
+}
+service all with serviceClass
+filter *
+dto CommonCondition, CommonConditionItem, DataPermissionRule with mapstruct
+paginate CommonCondition, CommonConditionItem, DataPermissionRule with pagination
+clientRootFolder CommonCondition, CommonConditionItem with report
+clientRootFolder DataPermissionRule with system

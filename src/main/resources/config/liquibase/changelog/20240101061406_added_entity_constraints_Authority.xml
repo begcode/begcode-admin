@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <!--
+        Added the constraints for entity Authority.
+    -->
+    <changeSet id="20240101061406-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="jhi_authority_id"
+                                 baseTableName="rel_jhi_authority__view_permissions"
+                                 constraintName="fk_rel_jhi_authority__view_permissions__jhi_authority_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_authority"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="view_permissions_id"
+                                 baseTableName="rel_jhi_authority__view_permissions"
+                                 constraintName="fk_rel_jhi_authority__view_permissions__view_permissions_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="view_permission"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="jhi_authority_id"
+                                 baseTableName="rel_jhi_authority__api_permissions"
+                                 constraintName="fk_rel_jhi_authority__api_permissions__jhi_authority_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_authority"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="api_permissions_id"
+                                 baseTableName="rel_jhi_authority__api_permissions"
+                                 constraintName="fk_rel_jhi_authority__api_permissions__api_permissions_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="api_permission"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="parent_id"
+                                 baseTableName="jhi_authority"
+                                 constraintName="fk_jhi_authority__parent_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_authority"
+                                 />
+    </changeSet>
+</databaseChangeLog>

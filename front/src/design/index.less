@@ -1,0 +1,78 @@
+@import 'transition/index.less';
+@import 'var/index.less';
+@import 'public.less';
+@import 'ant/index.less';
+@import './theme.less';
+@import './entry.css';
+@import './begcode/index.less';
+@import './begcode/vxeTable.less';
+
+.ant-col {
+  width: 100%;
+}
+
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+}
+
+:-webkit-autofill {
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+html {
+  overflow: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+html,
+body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  &.color-weak {
+    filter: invert(80%);
+  }
+
+  &.gray-mode {
+    filter: grayscale(100%);
+    filter: progid:dximagetransform.microsoft.basicimage(grayscale=1);
+  }
+}
+
+a:focus,
+a:active,
+button,
+div,
+svg,
+span {
+  outline: none !important;
+}
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+.vxe-cell--valid-msg {
+  white-space: nowrap;
+}
+.vxe-table--render-default.vaild-msg--single .vxe-body--row:last-child .vxe-cell--valid {
+  top: auto;
+}
+.vxe-cell--valid {
+  top: 100%;
+}
+.vxe-cell--valid-msg {
+  display: inline-block;
+  border-radius: 4px !important;
+  padding: 8px 12px !important;
+  color: #fff !important;
+  background-color: #f56c6c !important;
+
+}

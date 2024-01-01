@@ -1,0 +1,42 @@
+{
+  "annotations": {
+    "changelogDate": "20240101061906",
+    "importData": true,
+    "moduleName": "system",
+    "skipFakeData": true,
+    "skipWebsite": true
+  },
+  "applications": "*",
+  "clientRootFolder": "settings",
+  "documentation": "业务类型",
+  "dto": "mapstruct",
+  "entityTableName": "business_type",
+  "fields": [
+    {
+      "documentation": "名称",
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "代码",
+      "fieldName": "code",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "描述",
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "图标",
+      "fieldName": "icon",
+      "fieldType": "String"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "BusinessType",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

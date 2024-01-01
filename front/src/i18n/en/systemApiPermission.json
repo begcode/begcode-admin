@@ -1,0 +1,43 @@
+{
+  "monolithMybatisApp": {
+    "systemApiPermission": {
+      "home": {
+        "title": "Api Permissions",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Api Permission",
+        "createOrEditLabel": "Create or edit a Api Permission",
+        "notFound": "No Api Permissions found"
+      },
+      "created": "A new Api Permission is created with identifier { param }",
+      "updated": "A Api Permission is updated with identifier { param }",
+      "deleted": "A Api Permission is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Api Permission { id }?"
+      },
+      "detail": {
+        "title": "Api Permission"
+      },
+      "id": "ID",
+      "serviceName": "Service Name",
+      "name": "Name",
+      "code": "Code",
+      "description": "Description",
+      "type": "Type",
+      "method": "Method",
+      "url": "Url",
+      "status": "Status",
+      "children": "Children",
+      "parent": "Parent",
+      "authorities": "Authorities",
+      "help": {
+        "serviceName": "服务名称",
+        "name": "权限名称",
+        "description": "权限描述",
+        "type": "类型",
+        "method": "请求类型",
+        "url": "url 地址",
+        "status": "状态"
+      }
+    }
+  }
+}

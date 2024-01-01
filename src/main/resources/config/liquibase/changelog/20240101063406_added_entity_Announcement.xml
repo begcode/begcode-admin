@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity Announcement.
+    -->
+        <changeSet id="20240101063406-1" author="jhipster">
+        <createTable tableName="announcement" remarks="系统通告">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)" remarks="标题">
+                <constraints nullable="false" />
+            </column>
+            <column name="summary" type="${clobType}" remarks="摘要">
+                <constraints nullable="true" />
+            </column>
+            <column name="content" type="${clobType}" remarks="内容">
+                <constraints nullable="true" />
+            </column>
+            <column name="start_time" type="${datetimeType}" remarks="开始时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="end_time" type="${datetimeType}" remarks="结束时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="sender_id" type="bigint" remarks="发布人Id">
+                <constraints nullable="true" />
+            </column>
+            <column name="priority" type="varchar(255)" remarks="优先级\n（L低，M中，H高）">
+                <constraints nullable="true" />
+            </column>
+            <column name="category" type="varchar(255)" remarks="消息类型\n通知公告,系统消息">
+                <constraints nullable="true" />
+            </column>
+            <column name="receiver_type" type="varchar(255)" remarks="通告对象类型\n（USER:指定用户，ALL:全体用户）">
+                <constraints nullable="false" />
+            </column>
+            <column name="send_status" type="varchar(255)" remarks="发布状态\n">
+                <constraints nullable="true" />
+            </column>
+            <column name="send_time" type="${datetimeType}" remarks="发布时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="cancel_time" type="${datetimeType}" remarks="撤销时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="business_type" type="varchar(255)" remarks="业务类型\n(email:邮件 bpm:流程)">
+                <constraints nullable="true" />
+            </column>
+            <column name="business_id" type="bigint" remarks="业务id">
+                <constraints nullable="true" />
+            </column>
+            <column name="open_type" type="varchar(255)" remarks="打开方式">
+                <constraints nullable="true" />
+            </column>
+            <column name="open_page" type="varchar(255)" remarks="组件/路由 地址">
+                <constraints nullable="true" />
+            </column>
+            <column name="receiver_ids" type="${clobType}" remarks="指定接收者id">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_by" type="bigint" remarks="创建者Id">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_date" type="${datetimeType}" remarks="创建时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_modified_by" type="bigint" remarks="修改者Id">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_modified_date" type="${datetimeType}" remarks="修改时间">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="announcement" columnName="start_time" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="announcement" columnName="end_time" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="announcement" columnName="send_time" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="announcement" columnName="cancel_time" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="announcement" columnName="created_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="announcement" columnName="last_modified_date" columnDataType="${datetimeType}"/>
+    </changeSet>
+    
+    
+    
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

@@ -1,0 +1,18 @@
+/** 报表存储 */
+@skipFakeData
+@skipWebButton(listAdd)
+@addCustomMethod(repository-service-listComponent)
+@moduleName(report)
+@listBy(list)
+entity UReportFile {
+    name String required /** 名称 */
+    content TextBlob /** 内容 */
+    createAt ZonedDateTime /** 创建时间 */
+    updateAt ZonedDateTime /** 更新时间 */
+}
+
+service all with serviceClass
+filter *
+dto UReportFile with mapstruct
+paginate UReportFile with pagination
+clientRootFolder UReportFile with report

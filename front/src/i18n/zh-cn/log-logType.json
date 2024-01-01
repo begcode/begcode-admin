@@ -1,0 +1,9 @@
+{
+  "monolithMybatisApp": {
+    "LogType": {
+      "null": "",
+      "LOGIN": "登录日志",
+      "OPERATE": "操作日志"
+    }
+  }
+}

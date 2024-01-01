@@ -1,0 +1,60 @@
+{
+  "annotations": {
+    "changelogDate": "20240101061806",
+    "moduleName": "system",
+    "skipFakeData": true,
+    "skipWebsite": true
+  },
+  "applications": "*",
+  "clientRootFolder": "settings",
+  "documentation": "岗位\\n",
+  "dto": "mapstruct",
+  "entityTableName": "position",
+  "fields": [
+    {
+      "documentation": "岗位代码",
+      "fieldName": "code",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "unique", "required"],
+      "fieldValidateRulesMaxlength": "50"
+    },
+    {
+      "documentation": "名称",
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "unique", "required"],
+      "fieldValidateRulesMaxlength": "50"
+    },
+    {
+      "documentation": "排序",
+      "fieldName": "sortNo",
+      "fieldType": "Integer",
+      "options": {
+        "sortField": "asc"
+      }
+    },
+    {
+      "documentation": "描述",
+      "fieldName": "description",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "200"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "Position",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "documentation": "员工列表",
+      "otherEntityField": "firstName",
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "position",
+      "relationshipName": "users",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

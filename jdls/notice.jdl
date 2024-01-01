@@ -1,0 +1,191 @@
+/** 短信消息 */
+@extendAbstractAuditingEntity
+@skipFakeData
+@entityPackage(system)
+@moduleName(system)
+entity SmsMessage {
+  title String /** 消息标题 */
+  sendType MessageSendType /** 发送方式 */
+  receiver String /** 接收人 */
+  /**
+   * 发送所需参数
+   * Json格式
+   */
+  params String
+  content TextBlob /** 推送内容 */
+  sendTime ZonedDateTime /** 推送时间 */
+  sendStatus SendStatus /** 推送状态 */
+  /**
+   * 发送次数 超过5次不再发送
+   */
+  retryNum Integer
+  failResult String /** 推送失败原因 */
+  remark String /** 备注 */
+}
+
+/**
+ * 系统通告
+ */
+@extendAbstractAuditingEntity
+@skipFakeData
+@entityPackage(system)
+@useTemplate(edit)
+@moduleName(system)
+@addCustomMethod(repository-updateTemplate-clientService-service-listComponent-rest)
+entity Announcement {
+  title String required /** 标题 */
+  @endUsed(textArea)
+  summary TextBlob /** 摘要 */
+  content TextBlob /** 内容 */
+  startTime ZonedDateTime /** 开始时间 */
+  endTime ZonedDateTime /** 结束时间 */
+  @fieldConfig(hideInForm)
+  senderId Long /** 发布人Id */
+  /**
+   * 优先级
+   *（L低，M中，H高）
+   */
+  priority PriorityLevel
+  /**
+   * 消息类型
+   * 通知公告,系统消息
+   */
+  category AnnoCategory
+  /**
+   * 通告对象类型
+   *（USER:指定用户，ALL:全体用户）
+   */
+  receiverType ReceiverType required
+  /**
+   * 发布状态
+   *
+   */
+  @fieldConfig(hideInForm)
+  sendStatus AnnoSendStatus
+  @fieldConfig(hideInForm)
+  sendTime ZonedDateTime /** 发布时间 */
+  @fieldConfig(hideInForm)
+  cancelTime ZonedDateTime /** 撤销时间 */
+  /**
+   * 业务类型
+   * (email:邮件 bpm:流程)
+   */
+  @fieldConfig(hideInForm)
+  businessType AnnoBusinessType
+  @fieldConfig(hideInForm)
+  businessId Long /** 业务id */
+  openType AnnoOpenType /** 打开方式 */
+  openPage String /** 组件/路由 地址 */
+  // @customWrapType(Array_Long)
+  @showBy("receiverType!=ALL")
+  @endUsed(selectModal)
+  @collectIdByRelationFrom("User=receiverType")
+  receiverIds TextBlob /** 指定接收者id */
+}
+/**
+ * 发布状态
+ */
+enum AnnoSendStatus {
+    NOT_RELEASE ("未发布"),
+    RELEASED ("已发布"),
+    CANCELED ("已取消")
+}
+/**
+ * 打开方式
+ */
+enum AnnoOpenType {
+    URL ("URL地址"),
+    COMPONENT ("组件"),
+    MODAL_DETAIL ("弹窗详情")
+}
+/**
+ * 业务类型
+ */
+enum AnnoBusinessType {
+    EMAIL ("邮件"),
+    WORKFLOW ("工作流")
+}
+/**
+ * 通告对象类型
+ */
+enum ReceiverType {
+    ALL ("全部"),
+    USER ("用户"),
+    DEPARTMENT ("部门"),
+    AUTHORITY ("角色"),
+    POSITION ("岗位")
+}
+
+/**
+ * 消息类型
+ */
+enum AnnoCategory {
+    SYSTEM_INFO ("系统消息"),
+    NOTICE ("通知"),
+    TODO ("待办")
+}
+/**
+ * 优先级
+ */
+enum PriorityLevel {
+    HIGH ("高"),
+    MEDIUM ("中"),
+    LOW ("低")
+}
+
+/**
+ * 通告阅读记录
+ */
+@extendAbstractAuditingEntity
+@skipFakeData
+@entityPackage(system)
+@addCustomMethod(service)
+@skipMenu
+@moduleName(system)
+entity AnnouncementRecord {
+  anntId Long /** 通告ID */
+  userId Long /** 用户id */
+  hasRead Boolean /** 是否已读 */
+  readTime ZonedDateTime /** 阅读时间 */
+}
+/**
+ * 定时任务
+ */
+@extendAbstractAuditingEntity
+@skipFakeData
+@entityPackage(taskjob)
+@moduleName(taskjob)
+@addCustomMethod(service)
+@importData
+entity TaskJobConfig {
+    name String /** 任务名称 */
+    jobClassName String /** 任务类名 */
+    cronExpression String /** cron表达式 */
+    parameter String /** 参数 */
+    description String /** 描述 */
+    jobStatus JobStatus /** 任务状态 */
+}
+/** 任务状态 */
+enum JobStatus {
+    NORMAL ("正常"),
+    PAUSED ("暂停"),
+    COMPLETE ("完成"),
+    ERROR ("错误"),
+    BLOCKED ("阻塞")
+}
+
+/** 推送状态 */
+enum SendStatus {
+    WAITING ("未推送"),
+    SUCCESS ("推送成功"),
+    FAILURE ("推送失败"),
+    NOT_TRY ("失败不再发送")
+}
+
+service all with serviceClass
+filter *
+dto all with mapstruct
+paginate all with pagination
+clientRootFolder SmsMessage, Announcement, AnnouncementRecord, TaskJobConfig with system
+clientRootFolder TaskJobConfig with taskjob
+//

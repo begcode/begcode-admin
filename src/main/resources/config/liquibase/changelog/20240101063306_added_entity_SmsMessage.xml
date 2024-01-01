@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity SmsMessage.
+    -->
+        <changeSet id="20240101063306-1" author="jhipster">
+        <createTable tableName="sms_message" remarks="短信消息">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)" remarks="消息标题">
+                <constraints nullable="true" />
+            </column>
+            <column name="send_type" type="varchar(255)" remarks="发送方式">
+                <constraints nullable="true" />
+            </column>
+            <column name="receiver" type="varchar(255)" remarks="接收人">
+                <constraints nullable="true" />
+            </column>
+            <column name="params" type="varchar(255)" remarks="发送所需参数\nJson格式">
+                <constraints nullable="true" />
+            </column>
+            <column name="content" type="${clobType}" remarks="推送内容">
+                <constraints nullable="true" />
+            </column>
+            <column name="send_time" type="${datetimeType}" remarks="推送时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="send_status" type="varchar(255)" remarks="推送状态">
+                <constraints nullable="true" />
+            </column>
+            <column name="retry_num" type="integer" remarks="发送次数 超过5次不再发送">
+                <constraints nullable="true" />
+            </column>
+            <column name="fail_result" type="varchar(255)" remarks="推送失败原因">
+                <constraints nullable="true" />
+            </column>
+            <column name="remark" type="varchar(255)" remarks="备注">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_by" type="bigint" remarks="创建者Id">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_date" type="${datetimeType}" remarks="创建时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_modified_by" type="bigint" remarks="修改者Id">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_modified_date" type="${datetimeType}" remarks="修改时间">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="sms_message" columnName="send_time" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="sms_message" columnName="created_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="sms_message" columnName="last_modified_date" columnDataType="${datetimeType}"/>
+    </changeSet>
+    
+    
+    
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

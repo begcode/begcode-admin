@@ -1,0 +1,89 @@
+{
+  "annotations": {
+    "changelogDate": "20240101062906",
+    "entityPackage": "settings",
+    "microServiceCore": true,
+    "moduleName": "system",
+    "skipFakeData": true,
+    "skipWebsite": true
+  },
+  "applications": "*",
+  "clientRootFolder": "settings",
+  "documentation": "行政区划码",
+  "dto": "mapstruct",
+  "entityTableName": "region_code",
+  "fields": [
+    {
+      "documentation": "名称",
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "地区代码",
+      "fieldName": "areaCode",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "城市代码",
+      "fieldName": "cityCode",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "全名",
+      "fieldName": "mergerName",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "短名称",
+      "fieldName": "shortName",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "邮政编码",
+      "fieldName": "zipCode",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "等级",
+      "fieldName": "level",
+      "fieldType": "RegionCodeLevel",
+      "fieldTypeDocumentation": "区域等级",
+      "fieldValues": "PROVINCE (省),CITY (市),COUNTY (区),TOWN (镇),VILLAGE (村)"
+    },
+    {
+      "documentation": "经度",
+      "fieldName": "lng",
+      "fieldType": "Double"
+    },
+    {
+      "documentation": "纬度",
+      "fieldName": "lat",
+      "fieldType": "Double"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "RegionCode",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "documentation": "子节点",
+      "otherEntityField": "name",
+      "otherEntityName": "regionCode",
+      "otherEntityRelationshipName": "parent",
+      "relationshipName": "children",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "documentation": "上级节点",
+      "otherEntityField": "name",
+      "otherEntityName": "regionCode",
+      "otherEntityRelationshipName": "children",
+      "relationshipName": "parent",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

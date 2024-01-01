@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity AnnouncementRecord.
+    -->
+        <changeSet id="20240101063506-1" author="jhipster">
+        <createTable tableName="announcement_record" remarks="通告阅读记录">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="annt_id" type="bigint" remarks="通告ID">
+                <constraints nullable="true" />
+            </column>
+            <column name="user_id" type="bigint" remarks="用户id">
+                <constraints nullable="true" />
+            </column>
+            <column name="has_read" type="boolean" remarks="是否已读">
+                <constraints nullable="true" />
+            </column>
+            <column name="read_time" type="${datetimeType}" remarks="阅读时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_by" type="bigint" remarks="创建者Id">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_date" type="${datetimeType}" remarks="创建时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_modified_by" type="bigint" remarks="修改者Id">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_modified_date" type="${datetimeType}" remarks="修改时间">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="announcement_record" columnName="read_time" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="announcement_record" columnName="created_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="announcement_record" columnName="last_modified_date" columnDataType="${datetimeType}"/>
+    </changeSet>
+    
+    
+    
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

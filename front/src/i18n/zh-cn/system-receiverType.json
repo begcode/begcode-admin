@@ -1,0 +1,12 @@
+{
+  "monolithMybatisApp": {
+    "ReceiverType": {
+      "null": "",
+      "ALL": "全部",
+      "USER": "用户",
+      "DEPARTMENT": "部门",
+      "AUTHORITY": "角色",
+      "POSITION": "岗位"
+    }
+  }
+}

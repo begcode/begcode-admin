@@ -1,0 +1,55 @@
+{
+  "monolithMybatisApp": {
+    "logSysLog": {
+      "home": {
+        "title": "Sys Logs",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Sys Log",
+        "createOrEditLabel": "Create or edit a Sys Log",
+        "notFound": "No Sys Logs found"
+      },
+      "created": "A new Sys Log is created with identifier { param }",
+      "updated": "A Sys Log is updated with identifier { param }",
+      "deleted": "A Sys Log is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Sys Log { id }?"
+      },
+      "detail": {
+        "title": "Sys Log"
+      },
+      "id": "ID",
+      "logType": "Log Type",
+      "logContent": "Log Content",
+      "operateType": "Operate Type",
+      "userid": "Userid",
+      "username": "Username",
+      "ip": "Ip",
+      "method": "Method",
+      "requestUrl": "Request Url",
+      "requestParam": "Request Param",
+      "requestType": "Request Type",
+      "costTime": "Cost Time",
+      "createdBy": "Created By",
+      "createdDate": "Created Date",
+      "lastModifiedBy": "Last Modified By",
+      "lastModifiedDate": "Last Modified Date",
+      "help": {
+        "logType": "日志类型",
+        "logContent": "日志内容",
+        "operateType": "操作类型",
+        "userid": "操作用户账号",
+        "username": "操作用户名称",
+        "ip": "IP",
+        "method": "请求java方法",
+        "requestUrl": "请求路径",
+        "requestParam": "请求参数",
+        "requestType": "请求类型",
+        "costTime": "耗时",
+        "createdBy": "创建者Id",
+        "createdDate": "创建时间",
+        "lastModifiedBy": "修改者Id",
+        "lastModifiedDate": "修改时间"
+      }
+    }
+  }
+}

@@ -1,0 +1,152 @@
+{
+  "annotations": {
+    "addCustomMethod": "repository-updateTemplate-clientService-service-listComponent-rest",
+    "changelogDate": "20240101063406",
+    "entityPackage": "system",
+    "extendAbstractAuditingEntity": true,
+    "moduleName": "system",
+    "skipFakeData": true,
+    "useTemplate": "edit"
+  },
+  "applications": "*",
+  "clientRootFolder": "system",
+  "documentation": "系统通告",
+  "dto": "mapstruct",
+  "entityTableName": "announcement",
+  "fields": [
+    {
+      "documentation": "标题",
+      "fieldName": "title",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "documentation": "摘要",
+      "fieldName": "summary",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "text",
+      "options": {
+        "endUsed": "textArea"
+      }
+    },
+    {
+      "documentation": "内容",
+      "fieldName": "content",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "text"
+    },
+    {
+      "documentation": "开始时间",
+      "fieldName": "startTime",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "documentation": "结束时间",
+      "fieldName": "endTime",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "documentation": "发布人Id",
+      "fieldName": "senderId",
+      "fieldType": "Long",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "优先级\\n（L低，M中，H高）",
+      "fieldName": "priority",
+      "fieldType": "PriorityLevel",
+      "fieldTypeDocumentation": "优先级",
+      "fieldValues": "HIGH (高),MEDIUM (中),LOW (低)"
+    },
+    {
+      "documentation": "消息类型\\n通知公告,系统消息",
+      "fieldName": "category",
+      "fieldType": "AnnoCategory",
+      "fieldTypeDocumentation": "消息类型",
+      "fieldValues": "SYSTEM_INFO (系统消息),NOTICE (通知),TODO (待办)"
+    },
+    {
+      "documentation": "通告对象类型\\n（USER:指定用户，ALL:全体用户）",
+      "fieldName": "receiverType",
+      "fieldType": "ReceiverType",
+      "fieldTypeDocumentation": "通告对象类型",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "ALL (全部),USER (用户),DEPARTMENT (部门),AUTHORITY (角色),POSITION (岗位)"
+    },
+    {
+      "documentation": "发布状态\\n",
+      "fieldName": "sendStatus",
+      "fieldType": "AnnoSendStatus",
+      "fieldTypeDocumentation": "发布状态",
+      "fieldValues": "NOT_RELEASE (未发布),RELEASED (已发布),CANCELED (已取消)",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "发布时间",
+      "fieldName": "sendTime",
+      "fieldType": "ZonedDateTime",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "撤销时间",
+      "fieldName": "cancelTime",
+      "fieldType": "ZonedDateTime",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "业务类型\\n(email:邮件 bpm:流程)",
+      "fieldName": "businessType",
+      "fieldType": "AnnoBusinessType",
+      "fieldTypeDocumentation": "业务类型",
+      "fieldValues": "EMAIL (邮件),WORKFLOW (工作流)",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "业务id",
+      "fieldName": "businessId",
+      "fieldType": "Long",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "打开方式",
+      "fieldName": "openType",
+      "fieldType": "AnnoOpenType",
+      "fieldTypeDocumentation": "打开方式",
+      "fieldValues": "URL (URL地址),COMPONENT (组件),MODAL_DETAIL (弹窗详情)"
+    },
+    {
+      "documentation": "组件/路由 地址",
+      "fieldName": "openPage",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "指定接收者id",
+      "fieldName": "receiverIds",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "text",
+      "options": {
+        "collectIdByRelationFrom": "User=receiverType",
+        "endUsed": "selectModal",
+        "showBy": "receiverType!=ALL"
+      }
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "Announcement",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

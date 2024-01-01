@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity User.
+    -->
+        <changeSet id="20240101061506-1" author="jhipster">
+        <createTable tableName="jhi_user" remarks="用户">
+            <column name="id" type="bigint" remarks="用户ID" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="login" type="varchar(255)" remarks="账户名">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_jhi_user__login" />
+            </column>
+            <column name="password_hash" type="varchar(255)" remarks="密码">
+                <constraints nullable="true" />
+            </column>
+            <column name="first_name" type="varchar(255)" remarks="名字">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_name" type="varchar(255)" remarks="姓氏">
+                <constraints nullable="true" />
+            </column>
+            <column name="email" type="varchar(255)" remarks="电子邮箱">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_jhi_user__email" />
+            </column>
+            <column name="mobile" type="varchar(255)" remarks="手机号码">
+                <constraints nullable="true" />
+            </column>
+            <column name="birthday" type="${datetimeType}" remarks="出生日期">
+                <constraints nullable="true" />
+            </column>
+            <column name="activated" type="boolean" remarks="激活状态">
+                <constraints nullable="true" />
+            </column>
+            <column name="lang_key" type="varchar(255)" remarks="语言Key">
+                <constraints nullable="true" />
+            </column>
+            <column name="image_url" type="varchar(255)" remarks="头像地址">
+                <constraints nullable="true" />
+            </column>
+            <column name="activation_key" type="varchar(255)" remarks="激活Key">
+                <constraints nullable="true" />
+            </column>
+            <column name="reset_key" type="varchar(255)" remarks="重置码">
+                <constraints nullable="true" />
+            </column>
+            <column name="reset_date" type="${datetimeType}" remarks="重置时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_by" type="bigint" remarks="创建者Id">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_date" type="${datetimeType}" remarks="创建时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_modified_by" type="bigint" remarks="修改者Id">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_modified_date" type="${datetimeType}" remarks="修改时间">
+                <constraints nullable="true" />
+            </column>
+            <column name="department_id" type="bigint" remarks="部门">
+                <constraints nullable="true" />
+            </column>
+            <column name="department_name" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="position_id" type="bigint" remarks="岗位">
+                <constraints nullable="true" />
+            </column>
+            <column name="position_name" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="jhi_user" columnName="birthday" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="jhi_user" columnName="reset_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="jhi_user" columnName="created_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="jhi_user" columnName="last_modified_date" columnDataType="${datetimeType}"/>
+    </changeSet>
+    
+    
+    
+    <changeSet id="20240101061506-1-relations" author="jhipster">
+
+        <createTable tableName="rel_jhi_user__authorities" remarks="角色列表关联表">
+            <column name="authorities_id" type="bigint" remarks="角色id">
+                <constraints nullable="false"/>
+            </column>
+            <column name="jhi_user_id" type="bigint" remarks="用户id">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="jhi_user_id, authorities_id" tableName="rel_jhi_user__authorities"/>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
+    <!--
+        Load sample data generated with Faker.js
+        - This data can be easily edited using a CSV editor (or even MS Excel) and
+          is located in the 'src/main/resources/config/liquibase/fake-data' directory
+        - By default this data is applied when running with the JHipster 'dev' profile.
+          This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
+          Spring Boot configuration key.
+    -->
+    <changeSet id="20240101061506-1-data" author="jhipster">
+        <loadData
+                  file="config/liquibase/data/jhi_user.csv"
+                  separator=";"
+                  tableName="jhi_user"
+                  usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="login" type="string"/>
+            <column name="password" type="string"/>
+            <column name="first_name" type="string"/>
+            <column name="last_name" type="string"/>
+            <column name="email" type="string"/>
+            <column name="activated" type="boolean"/>
+            <column name="lang_key" type="string"/>
+            <column name="image_url" type="string"/>
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+        </loadData>
+        
+        <loadData
+                file="config/liquibase/data/rel_jhi_user__authorities.csv"
+                separator=";"
+                tableName="rel_jhi_user__authorities"
+                usePreparedStatements="true">
+                <column name="authorities_id" type="bigint"/>
+                <column name="jhi_user_id" type="bigint"/>
+        </loadData>
+
+    </changeSet>
+</databaseChangeLog>

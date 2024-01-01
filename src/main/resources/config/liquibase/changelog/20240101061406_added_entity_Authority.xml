@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity Authority.
+    -->
+        <changeSet id="20240101061406-1" author="jhipster">
+        <createTable tableName="jhi_authority" remarks="角色">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)" remarks="角色名称">
+                <constraints nullable="true" />
+            </column>
+            <column name="code" type="varchar(255)" remarks="角色代号">
+                <constraints nullable="true" />
+            </column>
+            <column name="info" type="varchar(255)" remarks="信息">
+                <constraints nullable="true" />
+            </column>
+            <column name="order" type="integer" remarks="排序">
+                <constraints nullable="true" />
+            </column>
+            <column name="display" type="boolean" remarks="展示">
+                <constraints nullable="true" />
+            </column>
+            <column name="parent_id" type="bigint" remarks="角色">
+                <constraints nullable="true" />
+            </column>
+            <column name="parent_name" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+    </changeSet>
+    
+    
+    
+    <changeSet id="20240101061406-1-relations" author="jhipster">
+
+        <createTable tableName="rel_jhi_authority__view_permissions" remarks="菜单列表关联表">
+            <column name="view_permissions_id" type="bigint" remarks="可视权限id">
+                <constraints nullable="false"/>
+            </column>
+            <column name="jhi_authority_id" type="bigint" remarks="角色id">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="jhi_authority_id, view_permissions_id" tableName="rel_jhi_authority__view_permissions"/>
+
+        <createTable tableName="rel_jhi_authority__api_permissions" remarks="Api权限列表关联表">
+            <column name="api_permissions_id" type="bigint" remarks="API权限id">
+                <constraints nullable="false"/>
+            </column>
+            <column name="jhi_authority_id" type="bigint" remarks="角色id">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="jhi_authority_id, api_permissions_id" tableName="rel_jhi_authority__api_permissions"/>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
+    <!--
+        Load sample data generated with Faker.js
+        - This data can be easily edited using a CSV editor (or even MS Excel) and
+          is located in the 'src/main/resources/config/liquibase/fake-data' directory
+        - By default this data is applied when running with the JHipster 'dev' profile.
+          This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
+          Spring Boot configuration key.
+    -->
+    <changeSet id="20240101061406-1-data" author="jhipster">
+        <loadData
+                  file="config/liquibase/data/jhi_authority.csv"
+                  separator=";"
+                  tableName="jhi_authority"
+                  usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="name" type="string"/>
+            <column name="code" type="string"/>
+            <column name="info" type="string"/>
+            <column name="order" type="numeric"/>
+            <column name="display" type="boolean"/>
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+        </loadData>
+        
+        <loadData
+                file="config/liquibase/data/rel_jhi_authority__view_permissions.csv"
+                separator=";"
+                tableName="rel_jhi_authority__view_permissions"
+                usePreparedStatements="true">
+                <column name="view_permissions_id" type="bigint"/>
+                <column name="jhi_authority_id" type="bigint"/>
+        </loadData>
+
+    </changeSet>
+</databaseChangeLog>

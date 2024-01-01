@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity ApiPermission.
+    -->
+        <changeSet id="20240101061606-1" author="jhipster">
+        <createTable tableName="api_permission" remarks="API权限\n菜单或按钮下有相关的api权限">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="service_name" type="varchar(255)" remarks="服务名称">
+                <constraints nullable="true" />
+            </column>
+            <column name="name" type="varchar(255)" remarks="权限名称">
+                <constraints nullable="true" />
+            </column>
+            <column name="code" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="description" type="varchar(255)" remarks="权限描述">
+                <constraints nullable="true" />
+            </column>
+            <column name="type" type="varchar(255)" remarks="类型">
+                <constraints nullable="true" />
+            </column>
+            <column name="method" type="varchar(255)" remarks="请求类型">
+                <constraints nullable="true" />
+            </column>
+            <column name="url" type="varchar(255)" remarks="url 地址">
+                <constraints nullable="true" />
+            </column>
+            <column name="status" type="varchar(255)" remarks="状态">
+                <constraints nullable="true" />
+            </column>
+            <column name="parent_id" type="bigint" remarks="API权限">
+                <constraints nullable="true" />
+            </column>
+            <column name="parent_name" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+    </changeSet>
+    
+    
+    
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

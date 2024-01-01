@@ -1,0 +1,109 @@
+{
+  "annotations": {
+    "changelogDate": "20240101062806",
+    "entityPackage": "settings",
+    "importData": true,
+    "moduleName": "system",
+    "skipFakeData": true,
+    "skipMenu": true,
+    "skipWebsite": true
+  },
+  "applications": "*",
+  "clientRootFolder": "settings",
+  "documentation": "通用字段数据",
+  "dto": "mapstruct",
+  "entityTableName": "common_field_data",
+  "fields": [
+    {
+      "documentation": "名称",
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "字段值",
+      "fieldName": "value",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "字段标题",
+      "fieldName": "label",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "字段类型",
+      "fieldName": "valueType",
+      "fieldType": "CommonFieldType",
+      "fieldTypeDocumentation": "字段类型",
+      "fieldValues": "INTEGER (整数),LONG (长整数),BOOLEAN (布尔),STRING (字符串),FLOAT (单精度),DOUBLE (双精度),ZONED_DATE_TIME (日期时间),LOCATE_DATE (本地日期),BIG_DECIMA (大数字),L,TEXTBLOB (大文本),IMAGEBLOB (大图片),ARRAY (数组),ENUM (枚举),UPLOAD_IMAGE (上传图片),UPLOAD_FILE (上传文件),ENTITY (实体),RADIO (单选),MULTI_SELECT (多选),DATA_DICTIONARY (数据字典),UUID (UUID),INSTANT (时间戳)"
+    },
+    {
+      "documentation": "说明",
+      "fieldName": "remark",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "排序",
+      "fieldName": "sortValue",
+      "fieldType": "Integer",
+      "options": {
+        "sortField": "asc"
+      }
+    },
+    {
+      "documentation": "是否禁用",
+      "fieldName": "disabled",
+      "fieldType": "Boolean"
+    },
+    {
+      "documentation": "实体名称",
+      "fieldName": "ownerEntityName",
+      "fieldType": "String",
+      "options": {
+        "fieldConfig": "hideInList-hideInForm",
+        "ownerEntityName": true
+      }
+    },
+    {
+      "documentation": "使用实体ID",
+      "fieldName": "ownerEntityId",
+      "fieldType": "String",
+      "options": {
+        "fieldConfig": "hideInList-hideInForm",
+        "ownerEntityId": true
+      }
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "CommonFieldData",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "options": {
+        "annotationOnSource": "editInForm-editByTable-unidirectional-relateByIdEntity",
+        "source": {
+          "annotationOnSource": "editInForm-editByTable-unidirectional-relateByIdEntity"
+        }
+      },
+      "otherEntityName": "siteConfig",
+      "otherEntityRelationshipName": "items",
+      "relationshipName": "siteConfig",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "options": {
+        "annotationOnSource": "editInForm-editByTable-unidirectional-relateByIdEntity",
+        "source": {
+          "annotationOnSource": "editInForm-editByTable-unidirectional-relateByIdEntity"
+        }
+      },
+      "otherEntityName": "dictionary",
+      "otherEntityRelationshipName": "items",
+      "relationshipName": "dictionary",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

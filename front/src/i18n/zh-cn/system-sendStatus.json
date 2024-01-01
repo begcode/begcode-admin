@@ -1,0 +1,11 @@
+{
+  "monolithMybatisApp": {
+    "SendStatus": {
+      "null": "",
+      "WAITING": "未推送",
+      "SUCCESS": "推送成功",
+      "FAILURE": "推送失败",
+      "NOT_TRY": "失败不再发送"
+    }
+  }
+}

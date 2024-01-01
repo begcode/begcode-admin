@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.begcode.monolith.settings.repository.RegionCodeRepository">
+
+    <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="baseResultMap" type="com.begcode.monolith.settings.domain.RegionCode">
+        <id column="id" property="id"/>
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="area_code" property="areaCode" />
+        <result column="city_code" property="cityCode" />
+        <result column="merger_name" property="mergerName" />
+        <result column="short_name" property="shortName" />
+        <result column="zip_code" property="zipCode" />
+        <result column="level" property="level" />
+        <result column="lng" property="lng" />
+        <result column="lat" property="lat" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="baseColumnList">
+        id,
+        name,
+        area_code,
+        city_code,
+        merger_name,
+        short_name,
+        zip_code,
+        level,
+        lng,
+        lat
+    </sql>
+
+</mapper>

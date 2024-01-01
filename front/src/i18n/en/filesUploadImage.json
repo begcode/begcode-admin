@@ -1,0 +1,68 @@
+{
+  "monolithMybatisApp": {
+    "filesUploadImage": {
+      "home": {
+        "title": "Upload Images",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Upload Image",
+        "createOrEditLabel": "Create or edit a Upload Image",
+        "notFound": "No Upload Images found"
+      },
+      "created": "A new Upload Image is created with identifier { param }",
+      "updated": "A Upload Image is updated with identifier { param }",
+      "deleted": "A Upload Image is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Upload Image { id }?"
+      },
+      "detail": {
+        "title": "Upload Image"
+      },
+      "id": "ID",
+      "fullName": "Full Name",
+      "name": "Name",
+      "ext": "Ext",
+      "type": "Type",
+      "url": "Url",
+      "path": "Path",
+      "folder": "Folder",
+      "ownerEntityName": "Owner Entity Name",
+      "ownerEntityId": "Owner Entity Id",
+      "businessTitle": "Business Title",
+      "businessDesc": "Business Desc",
+      "businessStatus": "Business Status",
+      "createAt": "Create At",
+      "fileSize": "File Size",
+      "smartUrl": "Smart Url",
+      "mediumUrl": "Medium Url",
+      "referenceCount": "Reference Count",
+      "createdBy": "Created By",
+      "createdDate": "Created Date",
+      "lastModifiedBy": "Last Modified By",
+      "lastModifiedDate": "Last Modified Date",
+      "category": "Category",
+      "help": {
+        "fullName": "完整文件名\n不含路径",
+        "name": "文件名\n不含扩展名",
+        "ext": "扩展名",
+        "type": "文件类型",
+        "url": "Web Url地址",
+        "path": "本地路径",
+        "folder": "本地存储目录",
+        "ownerEntityName": "使用实体名称",
+        "ownerEntityId": "使用实体ID",
+        "businessTitle": "业务标题",
+        "businessDesc": "业务自定义描述内容",
+        "businessStatus": "业务状态",
+        "createAt": "创建时间",
+        "fileSize": "文件大小",
+        "smartUrl": "小图Url",
+        "mediumUrl": "中等图Url",
+        "referenceCount": "文件被引用次数",
+        "createdBy": "创建者Id",
+        "createdDate": "创建时间",
+        "lastModifiedBy": "修改者Id",
+        "lastModifiedDate": "修改时间"
+      }
+    }
+  }
+}

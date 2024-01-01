@@ -1,0 +1,86 @@
+{
+  "annotations": {
+    "changelogDate": "20240101062206",
+    "moduleName": "oss",
+    "skipFakeData": true
+  },
+  "applications": "*",
+  "clientRootFolder": "files",
+  "documentation": "资源分类",
+  "dto": "mapstruct",
+  "entityTableName": "resource_category",
+  "fields": [
+    {
+      "documentation": "标题",
+      "fieldName": "title",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "40"
+    },
+    {
+      "documentation": "代码",
+      "fieldName": "code",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "20"
+    },
+    {
+      "documentation": "排序",
+      "fieldName": "orderNumber",
+      "fieldType": "Integer"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "ResourceCategory",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "documentation": "下级列表",
+      "otherEntityField": "title",
+      "otherEntityName": "resourceCategory",
+      "otherEntityRelationshipName": "parent",
+      "relationshipName": "children",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "documentation": "上级",
+      "otherEntityField": "title",
+      "otherEntityName": "resourceCategory",
+      "otherEntityRelationshipName": "children",
+      "relationshipName": "parent",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "documentation": "图片列表",
+      "options": {
+        "destination": {
+          "annotationOnDestination": "countByPrimaryKey"
+        }
+      },
+      "otherEntityField": "url",
+      "otherEntityName": "uploadImage",
+      "otherEntityRelationshipName": "category",
+      "relationshipName": "images",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "documentation": "文件列表",
+      "options": {
+        "destination": {
+          "annotationOnDestination": "countByPrimaryKey"
+        }
+      },
+      "otherEntityField": "url",
+      "otherEntityName": "uploadFile",
+      "otherEntityRelationshipName": "category",
+      "relationshipName": "files",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

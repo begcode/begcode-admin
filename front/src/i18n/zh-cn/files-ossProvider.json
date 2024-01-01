@@ -1,0 +1,12 @@
+{
+  "monolithMybatisApp": {
+    "OssProvider": {
+      "null": "",
+      "LOCAL": "本地",
+      "MINIO": "MINIO",
+      "QINIU": "七牛云",
+      "ALI": "阿里云",
+      "TENCENT": "腾讯云"
+    }
+  }
+}

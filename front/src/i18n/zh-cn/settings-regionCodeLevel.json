@@ -1,0 +1,12 @@
+{
+  "monolithMybatisApp": {
+    "RegionCodeLevel": {
+      "null": "",
+      "PROVINCE": "省",
+      "CITY": "市",
+      "COUNTY": "区",
+      "TOWN": "镇",
+      "VILLAGE": "村"
+    }
+  }
+}

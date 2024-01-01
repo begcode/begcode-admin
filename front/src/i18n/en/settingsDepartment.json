@@ -1,0 +1,45 @@
+{
+  "monolithMybatisApp": {
+    "settingsDepartment": {
+      "home": {
+        "title": "Departments",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Department",
+        "createOrEditLabel": "Create or edit a Department",
+        "notFound": "No Departments found"
+      },
+      "created": "A new Department is created with identifier { param }",
+      "updated": "A Department is updated with identifier { param }",
+      "deleted": "A Department is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Department { id }?"
+      },
+      "detail": {
+        "title": "Department"
+      },
+      "id": "ID",
+      "name": "Name",
+      "code": "Code",
+      "address": "Address",
+      "phoneNum": "Phone Num",
+      "logo": "Logo",
+      "contact": "Contact",
+      "createUserId": "Create User Id",
+      "createTime": "Create Time",
+      "children": "Children",
+      "authorities": "Authorities",
+      "parent": "Parent",
+      "users": "Users",
+      "help": {
+        "name": "名称",
+        "code": "代码",
+        "address": "地址",
+        "phoneNum": "联系电话",
+        "logo": "logo地址",
+        "contact": "联系人",
+        "createUserId": "创建用户 Id",
+        "createTime": "创建时间"
+      }
+    }
+  }
+}

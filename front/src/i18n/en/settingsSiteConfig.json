@@ -1,0 +1,44 @@
+{
+  "monolithMybatisApp": {
+    "settingsSiteConfig": {
+      "home": {
+        "title": "Site Configs",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Site Config",
+        "createOrEditLabel": "Create or edit a Site Config",
+        "notFound": "No Site Configs found"
+      },
+      "created": "A new Site Config is created with identifier { param }",
+      "updated": "A Site Config is updated with identifier { param }",
+      "deleted": "A Site Config is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Site Config { id }?"
+      },
+      "detail": {
+        "title": "Site Config"
+      },
+      "id": "ID",
+      "categoryName": "Category Name",
+      "categoryKey": "Category Key",
+      "disabled": "Disabled",
+      "sortValue": "Sort Value",
+      "builtIn": "Built In",
+      "createdBy": "Created By",
+      "createdDate": "Created Date",
+      "lastModifiedBy": "Last Modified By",
+      "lastModifiedDate": "Last Modified Date",
+      "items": "Items",
+      "help": {
+        "categoryName": "分类名称",
+        "categoryKey": "分类Key",
+        "disabled": "是否禁用",
+        "sortValue": "排序",
+        "builtIn": "是否内置",
+        "createdBy": "创建者Id",
+        "createdDate": "创建时间",
+        "lastModifiedBy": "修改者Id",
+        "lastModifiedDate": "修改时间"
+      }
+    }
+  }
+}

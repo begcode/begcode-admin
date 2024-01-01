@@ -1,0 +1,82 @@
+{
+  "annotations": {
+    "changelogDate": "20240101063106",
+    "entityPackage": "settings",
+    "moduleName": "system",
+    "skipFakeData": true,
+    "skipMenu": true,
+    "skipWebsite": true
+  },
+  "applications": "*",
+  "clientRootFolder": "settings",
+  "documentation": "填充规则条目",
+  "dto": "mapstruct",
+  "entityTableName": "fill_rule_item",
+  "fields": [
+    {
+      "documentation": "排序值",
+      "fieldName": "sortValue",
+      "fieldType": "Integer",
+      "options": {
+        "sortField": "asc"
+      }
+    },
+    {
+      "documentation": "字段参数类型",
+      "fieldName": "fieldParamType",
+      "fieldType": "FieldParamType",
+      "fieldTypeDocumentation": "字段参数类型",
+      "fieldValues": "DATETIME (日期时间),NUMBER (数字序列),FIXED_CHAR (固定字符),PARAM (参数)",
+      "options": {
+        "dict": true
+      }
+    },
+    {
+      "documentation": "字段参数值",
+      "fieldName": "fieldParamValue",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "日期格式",
+      "fieldName": "datePattern",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "序列长度",
+      "fieldName": "seqLength",
+      "fieldType": "Integer"
+    },
+    {
+      "documentation": "序列增量",
+      "fieldName": "seqIncrement",
+      "fieldType": "Integer"
+    },
+    {
+      "documentation": "序列起始值",
+      "fieldName": "seqStartValue",
+      "fieldType": "Integer"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "FillRuleItem",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "documentation": "填充规则",
+      "options": {
+        "annotationOnSource": "editInForm-editByTable-unidirectional",
+        "source": {
+          "annotationOnSource": "editInForm-editByTable-unidirectional"
+        }
+      },
+      "otherEntityField": "name",
+      "otherEntityName": "sysFillRule",
+      "otherEntityRelationshipName": "ruleItems",
+      "relationshipName": "fillRule",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

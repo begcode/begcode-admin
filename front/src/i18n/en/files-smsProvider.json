@@ -1,0 +1,15 @@
+{
+  "monolithMybatisApp": {
+    "SmsProvider": {
+      "null": "",
+      "ALIBABA": "阿里云",
+      "HUAWEI": "华为云",
+      "YUNPIAN": "云片",
+      "TENCENT": "腾讯云",
+      "UNI_SMS": "合一",
+      "JD_CLOUD": "京东云",
+      "CLOOPEN": "容联云",
+      "EMAY": "亿美软通"
+    }
+  }
+}

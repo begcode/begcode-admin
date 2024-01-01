@@ -1,0 +1,67 @@
+{
+  "monolithMybatisApp": {
+    "systemAnnouncement": {
+      "home": {
+        "title": "Announcements",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Announcement",
+        "createOrEditLabel": "Create or edit a Announcement",
+        "notFound": "No Announcements found"
+      },
+      "created": "A new Announcement is created with identifier { param }",
+      "updated": "A Announcement is updated with identifier { param }",
+      "deleted": "A Announcement is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Announcement { id }?"
+      },
+      "detail": {
+        "title": "Announcement"
+      },
+      "id": "ID",
+      "title": "Title",
+      "summary": "Summary",
+      "content": "Content",
+      "startTime": "Start Time",
+      "endTime": "End Time",
+      "senderId": "Sender Id",
+      "priority": "Priority",
+      "category": "Category",
+      "receiverType": "Receiver Type",
+      "sendStatus": "Send Status",
+      "sendTime": "Send Time",
+      "cancelTime": "Cancel Time",
+      "businessType": "Business Type",
+      "businessId": "Business Id",
+      "openType": "Open Type",
+      "openPage": "Open Page",
+      "receiverIds": "Receiver Ids",
+      "createdBy": "Created By",
+      "createdDate": "Created Date",
+      "lastModifiedBy": "Last Modified By",
+      "lastModifiedDate": "Last Modified Date",
+      "help": {
+        "title": "标题",
+        "summary": "摘要",
+        "content": "内容",
+        "startTime": "开始时间",
+        "endTime": "结束时间",
+        "senderId": "发布人Id",
+        "priority": "优先级\n（L低，M中，H高）",
+        "category": "消息类型\n通知公告,系统消息",
+        "receiverType": "通告对象类型\n（USER:指定用户，ALL:全体用户）",
+        "sendStatus": "发布状态\n",
+        "sendTime": "发布时间",
+        "cancelTime": "撤销时间",
+        "businessType": "业务类型\n(email:邮件 bpm:流程)",
+        "businessId": "业务id",
+        "openType": "打开方式",
+        "openPage": "组件/路由 地址",
+        "receiverIds": "指定接收者id",
+        "createdBy": "创建者Id",
+        "createdDate": "创建时间",
+        "lastModifiedBy": "修改者Id",
+        "lastModifiedDate": "修改时间"
+      }
+    }
+  }
+}

@@ -1,0 +1,243 @@
+# ===================================================================
+# Spring Boot configuration.
+#
+# This configuration will be overridden by the Spring profile you use,
+# for example application-dev.yml if you use the "dev" profile.
+#
+# More information on profiles: https://www.jhipster.tech/profiles/
+# More information on configuration properties: https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+# ===================================================================
+# Standard Spring Boot properties.
+# Full reference is available at:
+# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# ===================================================================
+
+---
+# Conditionally disable springdoc on missing api-docs profile
+spring:
+  config:
+    activate:
+      on-profile: '!api-docs'
+springdoc:
+  api-docs:
+    enabled: false
+---
+management:
+  endpoints:
+    web:
+      base-path: /management
+      exposure:
+        include:
+          - configprops
+          - env
+          - health
+          - info
+          - jhimetrics
+          - jhiopenapigroups
+          - logfile
+          - loggers
+          - prometheus
+          - threaddump
+          - caches
+          - liquibase
+  endpoint:
+    health:
+      show-details: when_authorized
+      roles: 'ROLE_ADMIN'
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState,db
+    jhimetrics:
+      enabled: true
+  info:
+    git:
+      mode: full
+    env:
+      enabled: true
+  health:
+    mail:
+      enabled: false # When using the MailService, configure an SMTP server and set this to true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+        step: 60
+  observations:
+    key-values:
+      application: ${spring.application.name}
+  metrics:
+    enable:
+      http: true
+      jvm: true
+      logback: true
+      process: true
+      system: true
+    distribution:
+      percentiles-histogram:
+        all: true
+      percentiles:
+        all: 0, 0.5, 0.75, 0.95, 0.99, 1.0
+    data:
+      repository:
+        autotime:
+          enabled: true
+
+spring:
+  application:
+    name: monolithMybatis
+  profiles:
+    # The commented value for `active` can be replaced with valid Spring profiles to load.
+    # Otherwise, it will be filled in by maven when building the JAR file
+    # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
+    active: #spring.profiles.active#
+    group:
+      dev:
+        - dev
+        - api-docs
+        # Uncomment to activate TLS for the dev profile
+        #- tls
+  jmx:
+    enabled: false
+  messages:
+    basename: i18n/messages
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+    problemdetails:
+      enabled: true
+  task:
+    execution:
+      thread-name-prefix: monolith-mybatis-task-
+      pool:
+        core-size: 2
+        max-size: 50
+        queue-capacity: 10000
+    scheduling:
+      thread-name-prefix: monolith-mybatis-scheduling-
+      pool:
+        size: 2
+  thymeleaf:
+    mode: HTML
+  output:
+    ansi:
+      console-available: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  web:
+    resources:
+      static-locations: classpath:/META-INF/resources/, classpath:/resources/, classpath:/static/, classpath:/public/, file:data/
+
+server:
+  servlet:
+    session:
+      cookie:
+        http-only: true
+
+springdoc:
+  show-actuator: true
+
+# Properties to be exposed on the /info management endpoint
+info:
+  # Comma separated list of profiles that will trigger the ribbon to show
+  display-ribbon-on-profiles: 'dev'
+
+# ===================================================================
+# JHipster specific properties
+#
+# Full reference is available at: https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+jhipster:
+  clientApp:
+    name: 'monolithMybatisApp'
+  # By default CORS is disabled. Uncomment to enable.
+  # cors:
+  #   allowed-origins: "http://localhost:8100,http://localhost:9000"
+  #   allowed-methods: "*"
+  #   allowed-headers: "*"
+  #   exposed-headers: "Authorization,Link,X-Total-Count,X-${jhipster.clientApp.name}-alert,X-${jhipster.clientApp.name}-error,X-${jhipster.clientApp.name}-params"
+  #   allow-credentials: true
+  #   max-age: 1800
+  mail:
+    from: monolithMybatis@localhost
+  api-docs:
+    default-include-pattern: /api/**
+    management-include-pattern: /management/**
+    title: Monolith Mybatis API
+    description: Monolith Mybatis API documentation
+    version: 0.0.1
+    terms-of-service-url:
+    contact-name:
+    contact-url:
+    contact-email:
+    license: unlicensed
+    license-url:
+  security:
+    content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.gstatic.com data:"
+
+# ===================================================================
+# Application specific properties
+# Add your own application properties here, see the ApplicationProperties class
+# to have type-safe configuration, like in the JHipsterProperties above
+#
+# More documentation is available at:
+# https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+application:
+  upload:
+    root-path: data
+    domainUrl: /
+    type: local
+  pay:
+    wxPay:
+      appId: xxxxxxx #微信公众号或者小程序等的appid
+      mchId: xxxx #微信支付商户号
+      mchKey: xxxxx #微信支付商户密钥
+      subAppId: #服务商模式下的子商户公众账号ID
+      subMchId: #服务商模式下的子商户号
+      keyPath: classpath:config/cert/apiclient_cert.p12 # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
+  face:
+    arcFace:
+      appId: CHuRTesMsVrfR6pZwyQt7JMkB7BSR4P5QsBxneQvsNzR
+      sdkKey: 3osgFgkF7ygzEuYnTTW99iUvks844N85f5j9Cgn6SKqm
+oauth:
+  qq:
+    client-id: 1015*****
+    client-secret: 1f7d08df55766**************
+    redirect-uri: http://oauth.xkcoding.com/demo/oauth/qq/callback
+  github:
+    client-id: 2d25a70**************
+    client-secret: 5a2919b5fe911567343**************
+    redirect-uri: http://oauth.xkcoding.com/demo/oauth/github/callback
+  wechat:
+    client-id: wxdcb31**************
+    client-secret: b4e9dc6841ef7d**************
+    redirect-uri: http://oauth.xkcoding.com/demo/oauth/wechat/callback
+  google:
+    client-id: 716518501517-6dbdkapivhia806vqcjjh9nttj3**************
+    client-secret: 9IBornd7w1A**************
+    redirect-uri: http://oauth.xkcoding.com/demo/oauth/google/callback
+  microsoft:
+    client-id: 7bdce818-2c8e-4b**************
+    client-secret: Iu0zZ43RQydo_FkD**************
+    redirect-uri: https://oauth.xkcoding.com/demo/oauth/microsoft/callback
+  mi:
+    client-id: 2882303**************
+    client-secret: nFeTt89Yn**************
+    redirect-uri: http://oauth.xkcoding.com/demo/oauth/mi/callback
+mybatis-plus:
+  config-location: classpath:/config/mybatis-config.xml
+  global-config:
+    db-config:
+      insert-strategy: ignored
+      update-strategy: ignored

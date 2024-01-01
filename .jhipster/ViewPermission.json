@@ -1,0 +1,245 @@
+{
+  "annotations": {
+    "addCustomMethod": "repository-service-rest-clientService",
+    "changelogDate": "20240101061306",
+    "importData": true,
+    "moduleName": "system",
+    "skipFakeData": true,
+    "skipWebsite": true
+  },
+  "applications": "*",
+  "clientRootFolder": "system",
+  "documentation": "可视权限\\n权限分为菜单权限、按钮权限等\\n",
+  "dto": "mapstruct",
+  "entityTableName": "view_permission",
+  "fields": [
+    {
+      "documentation": "权限名称",
+      "fieldName": "text",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"],
+      "options": {
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "权限类型",
+      "fieldName": "type",
+      "fieldType": "ViewPermissionType",
+      "fieldTypeDocumentation": "可视权限类型",
+      "fieldValues": "MENU (菜单),BUTTON (按钮)",
+      "options": {
+        "endUsed": "radioButton",
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "i18n主键",
+      "fieldName": "i18n",
+      "fieldType": "String",
+      "options": {
+        "fieldConfig": "hideInList",
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "显示分组名",
+      "fieldName": "group",
+      "fieldType": "Boolean",
+      "options": {
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "路由",
+      "fieldName": "link",
+      "fieldType": "String",
+      "options": {
+        "importDataField": true,
+        "showBy": "type=MENU"
+      }
+    },
+    {
+      "documentation": "外部链接",
+      "fieldName": "externalLink",
+      "fieldType": "String",
+      "options": {
+        "importDataField": true,
+        "showBy": "type=MENU"
+      }
+    },
+    {
+      "documentation": "链接目标",
+      "fieldName": "target",
+      "fieldType": "TargetType",
+      "fieldTypeDocumentation": "链接目标",
+      "fieldValues": "BLANK (新窗口),SELF (当前窗口),PARENT (父窗口),TOP (顶层窗口)",
+      "options": {
+        "importDataField": true,
+        "showBy": "type=MENU"
+      }
+    },
+    {
+      "documentation": "图标",
+      "fieldName": "icon",
+      "fieldType": "String",
+      "options": {
+        "columnWidth": 50,
+        "endUsed": "iconPicker",
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "禁用菜单",
+      "fieldName": "disabled",
+      "fieldType": "Boolean",
+      "options": {
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "隐藏菜单",
+      "fieldName": "hide",
+      "fieldType": "Boolean",
+      "options": {
+        "importDataField": true,
+        "showBy": "type=MENU"
+      }
+    },
+    {
+      "documentation": "隐藏面包屑",
+      "fieldName": "hideInBreadcrumb",
+      "fieldType": "Boolean",
+      "options": {
+        "importDataField": true,
+        "showBy": "type=MENU"
+      }
+    },
+    {
+      "documentation": "快捷菜单项",
+      "fieldName": "shortcut",
+      "fieldType": "Boolean",
+      "options": {
+        "importDataField": true,
+        "showBy": "type=MENU"
+      }
+    },
+    {
+      "documentation": "菜单根节点",
+      "fieldName": "shortcutRoot",
+      "fieldType": "Boolean",
+      "options": {
+        "importDataField": true,
+        "showBy": "type=MENU"
+      }
+    },
+    {
+      "documentation": "允许复用",
+      "fieldName": "reuse",
+      "fieldType": "Boolean",
+      "options": {
+        "fieldConfig": "hideInList",
+        "importDataField": true,
+        "showBy": "type=MENU"
+      }
+    },
+    {
+      "documentation": "权限代码\\n(ROLE_开头)",
+      "fieldName": "code",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"],
+      "options": {
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "权限描述",
+      "fieldName": "description",
+      "fieldType": "String",
+      "options": {
+        "fieldConfig": "hideInList",
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "排序",
+      "fieldName": "order",
+      "fieldType": "Integer",
+      "options": {
+        "columnWidth": 50,
+        "importDataField": true,
+        "sortField": "asc"
+      }
+    },
+    {
+      "documentation": "api权限标识串",
+      "fieldName": "apiPermissionCodes",
+      "fieldType": "String",
+      "options": {
+        "fieldConfig": "hideInList",
+        "importDataField": true
+      }
+    },
+    {
+      "documentation": "组件名称",
+      "fieldName": "componentFile",
+      "fieldType": "String",
+      "options": {
+        "importDataField": true,
+        "showBy": "type=MENU"
+      }
+    },
+    {
+      "documentation": "重定向路径",
+      "fieldName": "redirect",
+      "fieldType": "String",
+      "options": {
+        "importDataField": true,
+        "showBy": "type=MENU"
+      }
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "ViewPermission",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "documentation": "子节点",
+      "otherEntityField": "text",
+      "otherEntityName": "viewPermission",
+      "otherEntityRelationshipName": "parent",
+      "relationshipName": "children",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "documentation": "上级",
+      "otherEntityField": "text",
+      "otherEntityName": "viewPermission",
+      "otherEntityRelationshipName": "children",
+      "relationshipName": "parent",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "documentation": "角色列表",
+      "options": {
+        "annotationOnSource": "importData-editInList-editBySelectDrawer-unidirectional",
+        "destination": {
+          "annotationOnDestination": "editInList-editBySelectDrawer"
+        },
+        "source": {
+          "annotationOnSource": "importData-editInList-editBySelectDrawer-unidirectional"
+        }
+      },
+      "otherEntityField": "name",
+      "otherEntityName": "authority",
+      "otherEntityRelationshipName": "viewPermissions",
+      "relationshipName": "authorities",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

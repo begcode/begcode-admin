@@ -1,0 +1,45 @@
+{
+  "monolithMybatisApp": {
+    "settingsRegionCode": {
+      "home": {
+        "title": "Region Codes",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "创建新 Region Code",
+        "createOrEditLabel": "创建或编辑 Region Code",
+        "notFound": "No Region Codes found"
+      },
+      "created": "Region Code { param } 创建成功",
+      "updated": "Region Code { param } 更新成功",
+      "deleted": "Region Code { param } 删除成功",
+      "delete": {
+        "question": "你确定要删除 Region Code { id } 吗？"
+      },
+      "detail": {
+        "title": "Region Code"
+      },
+      "id": "ID",
+      "name": "Name",
+      "areaCode": "Area Code",
+      "cityCode": "City Code",
+      "mergerName": "Merger Name",
+      "shortName": "Short Name",
+      "zipCode": "Zip Code",
+      "level": "Level",
+      "lng": "Lng",
+      "lat": "Lat",
+      "children": "Children",
+      "parent": "Parent",
+      "help": {
+        "name": "名称",
+        "areaCode": "地区代码",
+        "cityCode": "城市代码",
+        "mergerName": "全名",
+        "shortName": "短名称",
+        "zipCode": "邮政编码",
+        "level": "等级",
+        "lng": "经度",
+        "lat": "纬度"
+      }
+    }
+  }
+}

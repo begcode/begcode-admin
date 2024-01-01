@@ -1,0 +1,411 @@
+/**
+ *
+ * 可视权限
+ * 权限分为菜单权限、按钮权限等
+ *
+ */
+@importData
+@skipFakeData
+@moduleName(system)
+@addCustomMethod(repository-service-rest-clientService)
+@skipWebsite
+entity ViewPermission {
+    @importDataField
+    text String required /** 权限名称 */
+    @importDataField
+    @endUsed(radioButton)
+    type ViewPermissionType /** 权限类型 */
+    @importDataField
+    @fieldConfig(hideInList)
+	i18n String /** i18n主键 */
+    @importDataField
+	group Boolean /** 显示分组名 */
+    @importDataField
+    @showBy("type=MENU")
+	link String /** 路由 */
+    @importDataField
+    @showBy("type=MENU")
+	externalLink String /** 外部链接 */
+    @importDataField
+    @showBy("type=MENU")
+	target TargetType /** 链接目标 */
+    @endUsed(iconPicker)
+    @importDataField
+    @columnWidth(50)
+	icon String /** 图标 */
+    @importDataField
+	disabled Boolean /** 禁用菜单 */
+    @importDataField
+    @showBy("type=MENU")
+	hide Boolean /** 隐藏菜单 */
+    @importDataField
+    @showBy("type=MENU")
+	hideInBreadcrumb Boolean /** 隐藏面包屑 */
+    @importDataField
+    @showBy("type=MENU")
+	shortcut Boolean /** 快捷菜单项 */
+    @importDataField
+    @showBy("type=MENU")
+	shortcutRoot Boolean /** 菜单根节点 */
+    @importDataField
+    @fieldConfig(hideInList)
+    @showBy("type=MENU")
+	reuse Boolean /** 允许复用 */
+    /**
+     * 权限代码
+     * (ROLE_开头)
+     */
+    @importDataField
+    code String required
+    @importDataField
+    @fieldConfig(hideInList)
+    description String /** 权限描述 */
+    @importDataField
+    @columnWidth(50)
+    @sortField(asc)
+    order Integer  /** 排序 */
+    @importDataField
+    @fieldConfig(hideInList)
+	apiPermissionCodes String /** api权限标识串 */
+    @importDataField
+    @showBy("type=MENU")
+	componentFile String /** 组件名称 */
+    @importDataField
+    @showBy("type=MENU")
+	redirect String /** 重定向路径 */
+}
+
+/**
+ * 角色
+ */
+@importData
+@importDataFile(jhi_authority-rel_jhi_authority__view_permissions)
+@skipFakeData
+@addCustomMethod(repository-service-queryService-updateComponent)
+@moduleName(system)
+@skipWebsite
+entity Authority (jhi_authority) {
+  @importDataField
+  name String /** 角色名称 */
+  @importDataField
+  code String /** 角色代号 */
+  @importDataField
+  info String /** 信息 */
+  @importDataField
+  @sortField(asc)
+  order Integer /** 排序 */
+  @importDataField
+  display Boolean /** 展示 */
+}
+
+/**
+ * 用户
+ */
+@skipComponent(domain-mapper-repository-controllerTest-serviceClass-restController)
+@skipFakeData
+@importData
+@importDataFile(jhi_user-rel_jhi_user__authorities)
+@builtInUser
+@addCustomMethod(queryService)
+@moduleName(system)
+@adminUserDto(AdminUserDTO)
+@extendAbstractAuditingEntity
+@publicDto(id-login-firstName-lastName-email-mobile-birthday-langKey-imageUrl)
+@publicDtoFile
+@skipWebsite
+entity User (jhi_user) {
+  @importDataField
+  @id
+  id Long required /** 用户ID */
+  @importDataField
+  login String required unique /** 账户名 */
+  @skipCriteria
+  @skipDto
+  @fieldColumnName(password_hash)
+  @importDataField
+  password String /** 密码 */
+  @importDataField
+  firstName String /** 名字 */
+  @importDataField
+  lastName String /** 姓氏 */
+  @importDataField
+  email String  required unique /** 电子邮箱 */
+  mobile String /** 手机号码 */
+  birthday ZonedDateTime /** 出生日期 */
+  @importDataField
+  activated Boolean /** 激活状态 */
+  @importDataField
+  langKey String /** 语言Key */
+  @endUsed(avatar)
+  @importDataField
+  imageUrl String /** 头像地址 */
+  @skipCriteria
+  @skipDto
+  activationKey String /** 激活Key */
+  @skipCriteria
+  @skipDto
+  resetKey String /** 重置码 */
+  @skipDto
+  @skipCriteria
+  resetDate Instant /** 重置时间 */
+}
+
+relationship OneToMany {
+
+	/** 子节点 */
+	ViewPermission{children(text)}
+	to
+	/** 上级 */
+    ViewPermission{parent(text)}
+
+    /** 子节点 */
+    Authority{children(name)}
+    to
+    /** 上级 */
+    Authority{parent(name)}
+
+}
+
+relationship ManyToOne {
+    /** 部门 */
+    User{department(name)}
+    to
+    /** 用户列表 */
+    Department{users(firstName)}
+
+    @annotationOnSource(unidirectional)
+    /** 所属岗位 */
+    User{position(name)}
+    to
+    /** 用户列表 */
+    Position{users(firstName)}
+}
+
+/** 权限与角色对应关系 */
+relationship ManyToMany {
+    @annotationOnSource(importData-editInList-editBySelectDrawer-unidirectional)
+	/** 菜单列表 */
+	Authority{viewPermissions(text)}
+	to
+    @annotationOnDestination(editInList-editBySelectDrawer)
+	/** 角色列表 */
+	ViewPermission{authorities(name)}
+
+    @annotationOnSource(editInList-editBySelectDrawer)
+    /** Api权限列表 */
+    Authority{apiPermissions(name)}
+    to
+    @annotationOnDestination(editInList-editBySelectDrawer)
+    /** 角色列表 */
+    ApiPermission{authorities(name)}
+
+    @annotationOnSource(importData)
+    /** 角色列表 */
+    User{authorities(name)}
+    to
+    @annotationOnDestination(editInList-editByTableModal)
+    /** 用户列表 */
+    Authority{users(firstName)}
+
+}
+
+/** 可视权限类型 */
+enum ViewPermissionType {
+    MENU ("菜单"),
+    BUTTON ("按钮")
+}
+
+/** 链接目标 */
+enum TargetType {
+	BLANK ("新窗口"),
+    SELF ("当前窗口"),
+    PARENT ("父窗口"),
+    TOP ("顶层窗口")
+}
+/**
+ *API权限
+ *菜单或按钮下有相关的api权限
+ */
+@skipFakeData
+@microServiceCore
+@moduleName(system)
+@addCustomMethod(repository-service-rest-clientService-listComponent)
+@skipWebsite
+entity ApiPermission {
+    serviceName String /** 服务名称 */
+    name String /** 权限名称 */
+    /*
+     * 权限代码
+     * (ROLE_开头)
+     */
+    code String
+    description String /** 权限描述 */
+    type ApiPermissionType /** 类型 */
+	method String /** 请求类型 */
+	url String /** url 地址 */
+    status ApiPermissionState /** 状态 */
+}
+
+relationship OneToMany {
+
+	/** 子节点 */
+    ApiPermission{children(name)}
+	to
+	/** 上级 */
+    ApiPermission{parent(name)}
+}
+/**
+ * 部门
+ */
+@skipFakeData
+@moduleName(system)
+@skipWebsite
+entity Department {
+    name String /** 名称 */
+    code String /** 代码 */
+    address String /** 地址 */
+    phoneNum String /** 联系电话 */
+    @endUsed(imageUrl)
+    logo String /** logo地址 */
+    contact String /** 联系人 */
+    createUserId Long /** 创建用户 Id */
+    createTime ZonedDateTime /** 创建时间 */
+}
+
+/**
+ * 岗位
+ *
+ */
+@skipFakeData
+@moduleName(system)
+@skipWebsite
+entity Position {
+    code String maxlength(50) unique required /** 岗位代码 */
+    name String maxlength(50) unique required /** 名称 */
+    @sortField(asc)
+    sortNo Integer /** 排序 */
+    description String maxlength(200) /** 描述 */
+}
+
+
+/** 业务类型 */
+@importData
+@skipFakeData
+@moduleName(system)
+@skipWebsite
+entity BusinessType {
+    name String /** 名称 */
+    code String /** 代码 */
+    description String /** 描述 */
+    icon String /** 图标 */
+}
+
+/**
+ * One to many relationship.
+ */
+relationship OneToMany {
+
+    /** 下级部门 */
+    Department{children(name)}
+    to
+    /** 上级 */
+    Department{parent(name)}
+}
+
+/**
+ * Many to one relationship.
+ */
+relationship ManyToOne {
+
+    /** 岗位 */
+    User{position(name)}
+    to
+    /** 员工列表 */
+    Position{users(firstName)}
+
+}
+
+relationship ManyToMany {
+    @annotationOnSource(editInForm-editInList-editBySelectDrawer-unidirectional)
+    /** 角色列表
+     */
+    Department{authorities(name)}
+    to
+    Authority
+}
+
+/** 消息模板 */
+@extendAbstractAuditingEntity
+@skipFakeData
+@entityPackage(system)
+@moduleName(system)
+@skipWebsite
+@addCustomMethod(service-clientService-rest)
+entity SmsTemplate {
+  name String /** 模板标题 */
+  code String /** 模板CODE */
+  sendType MessageSendType /** 通知类型 */
+  content String /** 模板内容 */
+  testJson String /** 模板测试json */
+  type SmsTemplateType /** 模板类型 */
+  remark String /** 备注 */
+  enabled Boolean /** 启用 */
+}
+
+relationship ManyToOne {
+    /** 短信服务商 */
+    SmsTemplate{supplier(signName)}
+    to
+    SmsSupplier
+}
+/** 通知类型 */
+enum MessageSendType {
+    EMAIL ("邮件"),
+    SMS ("短信"),
+    WECHAT ("微信")
+}
+
+/** 短信模板类型 */
+enum SmsTemplateType {
+    MESSAGE ("通知短信"),
+    VERIFICATION ("验证码"),
+    PROMOTION ("推广短信")
+}
+
+/**
+ * 短信服务商配置
+ */
+@skipFakeData
+@moduleName(system)
+@entityPackage(system)
+@addCustomMethod(service-listComponent)
+@skipWebsite
+entity SmsSupplier {
+    provider SmsProvider /** 提供商 */
+    @endUsed(codeEditor)
+    configData String /** 配置数据 */
+    signName String /** 短信签名 */
+    @endUsed(textArea)
+    remark String /** 备注 */
+    enabled Boolean /** 启用 */
+}
+
+/** 短信厂商 */
+enum SmsProvider {
+    ALIBABA ("阿里云"),
+    HUAWEI ("华为云"),
+    YUNPIAN ("云片"),
+    TENCENT ("腾讯云"),
+    UNI_SMS ("合一"),
+    JD_CLOUD ("京东云"),
+    CLOOPEN ("容联云"),
+    EMAY ("亿美软通")
+}
+
+service all with serviceClass
+filter *
+dto all with mapstruct
+paginate all with pagination
+clientRootFolder Department, BusinessType, Position with settings
+clientRootFolder SmsTemplate, SmsSupplier with files
+clientRootFolder ViewPermission, Authority, User, ApiPermission with system

@@ -1,0 +1,77 @@
+{
+  "annotations": {
+    "addCustomMethod": "service-clientService-rest",
+    "changelogDate": "20240101062006",
+    "entityPackage": "system",
+    "extendAbstractAuditingEntity": true,
+    "moduleName": "system",
+    "skipFakeData": true,
+    "skipWebsite": true
+  },
+  "applications": "*",
+  "clientRootFolder": "files",
+  "documentation": "消息模板",
+  "dto": "mapstruct",
+  "entityTableName": "sms_template",
+  "fields": [
+    {
+      "documentation": "模板标题",
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "模板CODE",
+      "fieldName": "code",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "通知类型",
+      "fieldName": "sendType",
+      "fieldType": "MessageSendType",
+      "fieldTypeDocumentation": "通知类型",
+      "fieldValues": "EMAIL (邮件),SMS (短信),WECHAT (微信)"
+    },
+    {
+      "documentation": "模板内容",
+      "fieldName": "content",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "模板测试json",
+      "fieldName": "testJson",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "模板类型",
+      "fieldName": "type",
+      "fieldType": "SmsTemplateType",
+      "fieldTypeDocumentation": "短信模板类型",
+      "fieldValues": "MESSAGE (通知短信),VERIFICATION (验证码),PROMOTION (推广短信)"
+    },
+    {
+      "documentation": "备注",
+      "fieldName": "remark",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "启用",
+      "fieldName": "enabled",
+      "fieldType": "Boolean"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "SmsTemplate",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "documentation": "短信服务商",
+      "otherEntityField": "signName",
+      "otherEntityName": "smsSupplier",
+      "relationshipName": "supplier",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

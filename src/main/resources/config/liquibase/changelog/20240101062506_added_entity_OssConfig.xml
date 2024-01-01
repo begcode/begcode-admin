@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity OssConfig.
+    -->
+        <changeSet id="20240101062506-1" author="jhipster">
+        <createTable tableName="oss_config" remarks="对象存储配置">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="provider" type="varchar(255)" remarks="提供商">
+                <constraints nullable="false" />
+            </column>
+            <column name="platform" type="varchar(40)" remarks="平台">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_oss_config__platform" />
+            </column>
+            <column name="enabled" type="boolean" remarks="启用">
+                <constraints nullable="true" />
+            </column>
+            <column name="remark" type="varchar(255)" remarks="备注">
+                <constraints nullable="true" />
+            </column>
+            <column name="config_data" type="varchar(255)" remarks="配置数据">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+    </changeSet>
+    
+    
+    
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity RegionCode.
+    -->
+        <changeSet id="20240101062906-1" author="jhipster">
+        <createTable tableName="region_code" remarks="行政区划码">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)" remarks="名称">
+                <constraints nullable="true" />
+            </column>
+            <column name="area_code" type="varchar(255)" remarks="地区代码">
+                <constraints nullable="true" />
+            </column>
+            <column name="city_code" type="varchar(255)" remarks="城市代码">
+                <constraints nullable="true" />
+            </column>
+            <column name="merger_name" type="varchar(255)" remarks="全名">
+                <constraints nullable="true" />
+            </column>
+            <column name="short_name" type="varchar(255)" remarks="短名称">
+                <constraints nullable="true" />
+            </column>
+            <column name="zip_code" type="varchar(255)" remarks="邮政编码">
+                <constraints nullable="true" />
+            </column>
+            <column name="level" type="varchar(255)" remarks="等级">
+                <constraints nullable="true" />
+            </column>
+            <column name="lng" type="double" remarks="经度">
+                <constraints nullable="true" />
+            </column>
+            <column name="lat" type="double" remarks="纬度">
+                <constraints nullable="true" />
+            </column>
+            <column name="parent_id" type="bigint" remarks="行政区划码">
+                <constraints nullable="true" />
+            </column>
+            <column name="parent_name" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+    </changeSet>
+    
+    
+    
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

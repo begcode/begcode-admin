@@ -1,0 +1,103 @@
+{
+  "annotations": {
+    "addCustomMethod": "repository-service-rest-clientService-listComponent",
+    "changelogDate": "20240101061606",
+    "microServiceCore": true,
+    "moduleName": "system",
+    "skipFakeData": true,
+    "skipWebsite": true
+  },
+  "applications": "*",
+  "clientRootFolder": "system",
+  "documentation": "API权限\\n菜单或按钮下有相关的api权限",
+  "dto": "mapstruct",
+  "entityTableName": "api_permission",
+  "fields": [
+    {
+      "documentation": "服务名称",
+      "fieldName": "serviceName",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "权限名称",
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "code",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "权限描述",
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "类型",
+      "fieldName": "type",
+      "fieldType": "ApiPermissionType",
+      "fieldTypeDocumentation": "Api权限类型",
+      "fieldValues": "BUSINESS (业务),API (API接口),ENTITY (实体),MICRO_SERVICE (微服务)"
+    },
+    {
+      "documentation": "请求类型",
+      "fieldName": "method",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "url 地址",
+      "fieldName": "url",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "状态",
+      "fieldName": "status",
+      "fieldType": "ApiPermissionState",
+      "fieldTypeDocumentation": "Api权限状态",
+      "fieldValues": "CONFIGURABLE (可配置),PERMIT_ALL (允许所有),UNREACHABLE (不可达),AUTHENTICATE (认证)"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "ApiPermission",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "documentation": "子节点",
+      "otherEntityField": "name",
+      "otherEntityName": "apiPermission",
+      "otherEntityRelationshipName": "parent",
+      "relationshipName": "children",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "documentation": "上级",
+      "otherEntityField": "name",
+      "otherEntityName": "apiPermission",
+      "otherEntityRelationshipName": "children",
+      "relationshipName": "parent",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "documentation": "角色列表",
+      "options": {
+        "annotationOnSource": "editInList-editBySelectDrawer",
+        "destination": {
+          "annotationOnDestination": "editInList-editBySelectDrawer"
+        },
+        "source": {
+          "annotationOnSource": "editInList-editBySelectDrawer"
+        }
+      },
+      "otherEntityField": "name",
+      "otherEntityName": "authority",
+      "otherEntityRelationshipName": "apiPermissions",
+      "relationshipName": "authorities",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

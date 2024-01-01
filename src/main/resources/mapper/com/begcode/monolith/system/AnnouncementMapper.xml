@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.begcode.monolith.system.repository.AnnouncementRepository">
+
+    <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="baseResultMap" type="com.begcode.monolith.system.domain.Announcement">
+        <id column="id" property="id"/>
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="summary" property="summary" />
+        <result column="content" property="content" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="sender_id" property="senderId" />
+        <result column="priority" property="priority" />
+        <result column="category" property="category" />
+        <result column="receiver_type" property="receiverType" />
+        <result column="send_status" property="sendStatus" />
+        <result column="send_time" property="sendTime" />
+        <result column="cancel_time" property="cancelTime" />
+        <result column="business_type" property="businessType" />
+        <result column="business_id" property="businessId" />
+        <result column="open_type" property="openType" />
+        <result column="open_page" property="openPage" />
+        <result column="receiver_ids" property="receiverIds" />
+        <result column="created_by" property="createdBy" />
+        <result column="created_date" property="createdDate" />
+        <result column="last_modified_by" property="lastModifiedBy" />
+        <result column="last_modified_date" property="lastModifiedDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="baseColumnList">
+        id,
+        title,
+        summary,
+        content,
+        start_time,
+        end_time,
+        sender_id,
+        priority,
+        category,
+        receiver_type,
+        send_status,
+        send_time,
+        cancel_time,
+        business_type,
+        business_id,
+        open_type,
+        open_page,
+        receiver_ids,
+        created_by,
+        created_date,
+        last_modified_by,
+        last_modified_date
+    </sql>
+
+</mapper>

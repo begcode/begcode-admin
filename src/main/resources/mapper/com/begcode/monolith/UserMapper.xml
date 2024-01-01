@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.begcode.monolith.repository.UserRepository">
+
+    <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="baseResultMap" type="com.begcode.monolith.domain.User">
+        <id column="id" property="id"/>
+        <id column="id" property="id" />
+        <result column="login" property="login" />
+        <result column="password" property="password" />
+        <result column="first_name" property="firstName" />
+        <result column="last_name" property="lastName" />
+        <result column="email" property="email" />
+        <result column="mobile" property="mobile" />
+        <result column="birthday" property="birthday" />
+        <result column="activated" property="activated" />
+        <result column="lang_key" property="langKey" />
+        <result column="image_url" property="imageUrl" />
+        <result column="activation_key" property="activationKey" />
+        <result column="reset_key" property="resetKey" />
+        <result column="reset_date" property="resetDate" />
+        <result column="created_by" property="createdBy" />
+        <result column="created_date" property="createdDate" />
+        <result column="last_modified_by" property="lastModifiedBy" />
+        <result column="last_modified_date" property="lastModifiedDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="baseColumnList">
+        id,
+        login,
+        password,
+        first_name,
+        last_name,
+        email,
+        mobile,
+        birthday,
+        activated,
+        lang_key,
+        image_url,
+        activation_key,
+        reset_key,
+        reset_date,
+        created_by,
+        created_date,
+        last_modified_by,
+        last_modified_date
+    </sql>
+
+</mapper>

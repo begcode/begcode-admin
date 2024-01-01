@@ -1,0 +1,56 @@
+{
+  "annotations": {
+    "addCustomMethod": "service-listComponent",
+    "changelogDate": "20240101062106",
+    "entityPackage": "system",
+    "moduleName": "system",
+    "skipFakeData": true,
+    "skipWebsite": true
+  },
+  "applications": "*",
+  "clientRootFolder": "files",
+  "documentation": "短信服务商配置",
+  "dto": "mapstruct",
+  "entityTableName": "sms_supplier",
+  "fields": [
+    {
+      "documentation": "提供商",
+      "fieldName": "provider",
+      "fieldType": "SmsProvider",
+      "fieldTypeDocumentation": "短信厂商",
+      "fieldValues": "ALIBABA (阿里云),HUAWEI (华为云),YUNPIAN (云片),TENCENT (腾讯云),UNI_SMS (合一),JD_CLOUD (京东云),CLOOPEN (容联云),EMAY (亿美软通)"
+    },
+    {
+      "documentation": "配置数据",
+      "fieldName": "configData",
+      "fieldType": "String",
+      "options": {
+        "endUsed": "codeEditor"
+      }
+    },
+    {
+      "documentation": "短信签名",
+      "fieldName": "signName",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "备注",
+      "fieldName": "remark",
+      "fieldType": "String",
+      "options": {
+        "endUsed": "textArea"
+      }
+    },
+    {
+      "documentation": "启用",
+      "fieldName": "enabled",
+      "fieldType": "Boolean"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "SmsSupplier",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}
