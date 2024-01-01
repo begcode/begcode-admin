@@ -157,7 +157,7 @@ public class AnnouncementRecordBaseService<R extends AnnouncementRecordRepositor
                 ) ==
                 0
             ) {
-                announcementRecordRepository.save(new AnnouncementRecord().anntId(anntId).userId(userId));
+                announcementRecordRepository.save(new AnnouncementRecord().anntId(anntId).userId(userId).hasRead(false));
             }
         });
     }
