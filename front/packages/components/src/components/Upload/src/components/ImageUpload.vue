@@ -185,7 +185,7 @@ function getValue() {
 }
 </script>
 
-<style lang="less">
+<style>
 .ant-upload-select-picture-card i {
   color: #999;
   font-size: 32px;

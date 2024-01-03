@@ -332,10 +332,9 @@ function getUploadingImgName(name: string) {
 .vben-tinymce-container {
   position: relative;
   line-height: normal;
-
-  textarea {
-    z-index: -1;
-    visibility: hidden;
-  }
+}
+.vben-tinymce-container textarea {
+  z-index: -1;
+  visibility: hidden;
 }
 </style>

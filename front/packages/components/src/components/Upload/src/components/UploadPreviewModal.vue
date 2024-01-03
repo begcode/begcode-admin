@@ -89,14 +89,11 @@ function handleDownload(record: PreviewFileItem) {
   downloadByUrl({ url });
 }
 </script>
-<style lang="less">
-.upload-preview-modal {
-  .ant-upload-list {
-    display: none;
-  }
-
-  .ant-table-wrapper .ant-spin-nested-loading {
-    padding: 0;
-  }
+<style>
+.upload-preview-modal .ant-upload-list {
+  display: none;
+}
+.upload-preview-modal .ant-table-wrapper .ant-spin-nested-loading {
+  padding: 0;
 }
 </style>

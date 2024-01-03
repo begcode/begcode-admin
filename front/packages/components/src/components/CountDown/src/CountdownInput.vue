@@ -30,15 +30,12 @@ const { prefixCls } = useDesign('countdown-input');
 const [state] = useRuleFormItem(props);
 </script>
 <style>
-.vben-countdown-input {
-  .ant-input-group-addon {
-    padding-right: 0;
-    background-color: transparent;
-    border: none;
-
-    button {
-      font-size: 14px;
-    }
-  }
+.vben-countdown-input .ant-input-group-addon {
+  padding-right: 0;
+  border: none;
+  background-color: transparent;
+}
+.vben-countdown-input .ant-input-group-addon button {
+  font-size: 14px;
 }
 </style>

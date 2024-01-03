@@ -170,56 +170,48 @@ export default defineComponent({
   },
 });
 </script>
-<style lang="less">
+<style>
 .ir-dv {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  &-img__wrap {
-    position: relative;
-    overflow: hidden;
-    border-radius: 50%;
-
-    img {
-      width: 100%;
-      border-radius: 50%;
-
-      &.to-origin {
-        transition: transform 0.3s;
-      }
-    }
-  }
-
-  &-img__tip {
-    position: absolute;
-    bottom: 10px;
-    left: 0;
-    z-index: 1;
-    display: block;
-    width: 100%;
-    height: 30px;
-    font-size: 12px;
-    line-height: 30px;
-    color: v-bind('token.colorWhite');
-    text-align: center;
-
-    &.success {
-      background-color: v-bind('fadeColorSet.success');
-    }
-
-    &.error {
-      background-color: v-bind('fadeColorSet.error');
-    }
-
-    &.normal {
-      background-color: rgba(0, 0, 0, 0.3);
-    }
-  }
-
-  &-drag__bar {
-    margin-top: 20px;
-  }
+}
+.ir-dv-img__wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+}
+.ir-dv-img__wrap img {
+  width: 100%;
+  border-radius: 50%;
+}
+.ir-dv-img__wrap img.to-origin {
+  transition: transform 0.3s;
+}
+.ir-dv-img__tip {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 30px;
+  font-size: 12px;
+  line-height: 30px;
+  color: v-bind('token.colorWhite');
+  text-align: center;
+}
+.ir-dv-img__tip.success {
+  background-color: v-bind('fadeColorSet.success');
+}
+.ir-dv-img__tip.error {
+  background-color: v-bind('fadeColorSet.error');
+}
+.ir-dv-img__tip.normal {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.ir-dv-drag__bar {
+  margin-top: 20px;
 }
 </style>

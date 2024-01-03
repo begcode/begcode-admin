@@ -13,14 +13,12 @@ defineProps({
 });
 </script>
 <style>
-.thumb {
-  img {
-    position: static;
-    display: block;
-    cursor: zoom-in;
-    border-radius: 4px;
-    object-fit: cover;
-  }
+.thumb img {
+  position: static;
+  display: block;
+  cursor: zoom-in;
+  border-radius: 4px;
+  object-fit: cover;
 }
 .truncate {
   overflow: hidden;

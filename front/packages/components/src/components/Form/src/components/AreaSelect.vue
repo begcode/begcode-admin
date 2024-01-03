@@ -152,13 +152,11 @@ export default defineComponent({
 <style scoped>
 .area-select {
   width: 100%;
-
-  .ant-select {
-    width: calc(33.3% - 7px);
-  }
-
-  .ant-select:not(:first-child) {
-    margin-left: 10px;
-  }
+}
+.area-select .ant-select {
+  width: calc(33.3% - 7px);
+}
+.area-select .ant-select:not(:first-child) {
+  margin-left: 10px;
 }
 </style>

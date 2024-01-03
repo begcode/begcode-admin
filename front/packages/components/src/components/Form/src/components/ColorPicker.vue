@@ -217,103 +217,99 @@ const gradient = (startColor: string, endColor: string, step: number) => {
   font-size: 14px;
   display: inline-block;
   outline: none;
-  ul,
-  li,
-  ol {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  .colorBtn {
-    width: 100%;
-    height: 20px;
-  }
-  .colorBtn.disabled {
-    cursor: no-drop;
-  }
-  .box {
-    position: absolute;
-    width: 190px;
-    background: #fff;
-    border: 1px solid #ddd;
-    visibility: hidden;
-    border-radius: 2px;
-    margin-top: 2px;
-    padding: 10px;
-    padding-bottom: 5px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
-    opacity: 0;
-    transition: all 0.3s ease;
-    box-sizing: content-box;
-    h3 {
-      margin: 0;
-      font-size: 14px;
-      font-weight: normal;
-      margin-top: 10px;
-      margin-bottom: 5px;
-      line-height: 1;
-      color: #333;
-    }
-    input {
-      visibility: hidden;
-      position: absolute;
-      left: 0;
-      bottom: 0;
-    }
-  }
-  .box.open {
-    visibility: visible;
-    opacity: 1;
-    z-index: 1;
-  }
-  .hd {
-    overflow: hidden;
-    line-height: 29px;
-    .colorView {
-      width: 100px;
-      height: 30px;
-      float: left;
-      transition: background-color 0.3s ease;
-    }
-    .defaultColor {
-      width: 80px;
-      float: right;
-      text-align: center;
-      border: 1px solid #ddd;
-      cursor: pointer;
-      color: #333;
-    }
-  }
-  .tColor {
-    li {
-      width: 15px;
-      height: 15px;
-      display: inline-block;
-      margin: 0 2px;
-      transition: all 0.3s ease;
-    }
-    li:hover {
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
-      transform: scale(1.3);
-    }
-  }
-  .bColor {
-    li {
-      width: 15px;
-      display: inline-block;
-      margin: 0 2px;
-      li {
-        display: block;
-        width: 15px;
-        height: 15px;
-        transition: all 0.3s ease;
-        margin: 0;
-      }
-      li:hover {
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
-        transform: scale(1.3);
-      }
-    }
-  }
+}
+.m-colorPicker ul,
+.m-colorPicker li,
+.m-colorPicker ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.m-colorPicker .colorBtn {
+  width: 100%;
+  height: 20px;
+}
+.m-colorPicker .colorBtn.disabled {
+  cursor: no-drop;
+}
+.m-colorPicker .box {
+  position: absolute;
+  width: 190px;
+  background: #fff;
+  border: 1px solid #ddd;
+  visibility: hidden;
+  border-radius: 2px;
+  margin-top: 2px;
+  padding: 10px;
+  padding-bottom: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transition: all 0.3s ease;
+  box-sizing: content-box;
+}
+.m-colorPicker .box h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: normal;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  line-height: 1;
+  color: #333;
+}
+.m-colorPicker .box input {
+  visibility: hidden;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+.m-colorPicker .box.open {
+  visibility: visible;
+  opacity: 1;
+  z-index: 1;
+}
+.m-colorPicker .hd {
+  overflow: hidden;
+  line-height: 29px;
+}
+.m-colorPicker .hd .colorView {
+  width: 100px;
+  height: 30px;
+  float: left;
+  transition: background-color 0.3s ease;
+}
+.m-colorPicker .hd .defaultColor {
+  width: 80px;
+  float: right;
+  text-align: center;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  color: #333;
+}
+.m-colorPicker .tColor li {
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  margin: 0 2px;
+  transition: all 0.3s ease;
+}
+.m-colorPicker .tColor li:hover {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+  transform: scale(1.3);
+}
+.m-colorPicker .bColor li {
+  width: 15px;
+  display: inline-block;
+  margin: 0 2px;
+}
+.m-colorPicker .bColor li li {
+  display: block;
+  width: 15px;
+  height: 15px;
+  transition: all 0.3s ease;
+  margin: 0;
+}
+.m-colorPicker .bColor li li:hover {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+  transform: scale(1.3);
 }
 </style>

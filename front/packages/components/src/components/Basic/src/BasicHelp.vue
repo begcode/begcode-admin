@@ -102,18 +102,14 @@ export default defineComponent({
 .vben-basic-help {
   display: inline-block;
   margin-left: 6px;
-  font-size: 14px;
   color: v-bind('token["text-color-help-dark"');
+  font-size: 14px;
   cursor: pointer;
-
-  .vben-basic-help:hover {
-    color: v-bind('token.colorPrimary');
-  }
-
-  .vben-basic-help__wrap {
-    p {
-      margin-bottom: 0;
-    }
-  }
+}
+.vben-basic-help:hover {
+  color: v-bind('token.colorPrimary');
+}
+.vben-basic-help__wrap p {
+  margin-bottom: 0;
 }
 </style>

@@ -45,34 +45,31 @@ const getClass = computed(() => [
 </script>
 <style scoped>
 .vben-basic-title {
-  position: relative;
   display: flex;
+  position: relative;
   padding-left: 7px;
+  color: v-bind('token["colorText"]');
   font-size: 16px;
   font-weight: 500;
   line-height: 24px;
-  color: v-bind('token["colorText"]');
   cursor: pointer;
   user-select: none;
-
-  .vben-basic-title-normal {
-    font-size: 14px;
-    font-weight: 500;
-  }
-
-  .vben-basic-title-show-span::before {
-    position: absolute;
-    top: 4px;
-    left: 0;
-    width: 3px;
-    height: 16px;
-    margin-right: 4px;
-    background-color: v-bind('token["colorPrimary"]');
-    content: '';
-  }
-
-  .vben-basic-title-help {
-    margin-left: 10px;
-  }
+}
+.vben-basic-title-normal {
+  font-size: 14px;
+  font-weight: 500;
+}
+.vben-basic-title-show-span::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 0;
+  width: 3px;
+  height: 16px;
+  margin-right: 4px;
+  background-color: v-bind('token.colorPrimary');
+}
+.vben-basic-title-help {
+  margin-left: 10px;
 }
 </style>

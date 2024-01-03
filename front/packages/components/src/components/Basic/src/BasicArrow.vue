@@ -50,33 +50,27 @@ const getClass = computed(() => {
 <style scoped>
 .vben-basic-arrow {
   display: inline-block;
-  cursor: pointer;
   transform: rotate(0deg);
-  transition: all 0.3s ease 0.1s;
   transform-origin: center center;
-
-  .vben-basic-arrow--active {
-    transform: rotate(90deg);
-  }
-
-  .vben-basic-arrow.inset {
-    line-height: 0;
-  }
-
-  .vben-basic-arrow.up {
-    transform: rotate(-90deg);
-  }
-
-  .vben-basic-arrow.down {
-    transform: rotate(90deg);
-  }
-
-  .vben-basic-arrow.up.vben-basic-arrow--active {
-    transform: rotate(90deg);
-  }
-
-  .vben-basic-arrow.down.vben-basic-arrow--active {
-    transform: rotate(-90deg);
-  }
+  transition: all 0.3s ease 0.1s;
+  cursor: pointer;
+}
+.vben-basic-arrow--active {
+  transform: rotate(90deg);
+}
+.vben-basic-arrow.inset {
+  line-height: 0px;
+}
+.vben-basic-arrow.up {
+  transform: rotate(-90deg);
+}
+.vben-basic-arrow.down {
+  transform: rotate(90deg);
+}
+.vben-basic-arrow.up.vben-basic-arrow--active {
+  transform: rotate(90deg);
+}
+.vben-basic-arrow.down.vben-basic-arrow--active {
+  transform: rotate(-90deg);
 }
 </style>

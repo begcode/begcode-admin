@@ -98,10 +98,9 @@ function handleChange(info: Record<string, any>) {
   top: 4px;
   right: 10px;
   z-index: 20;
-
-  &.fullscreen {
-    position: fixed;
-    z-index: 10000;
-  }
+}
+.vben-tinymce-img-upload.fullscreen {
+  position: fixed;
+  z-index: 10000;
 }
 </style>

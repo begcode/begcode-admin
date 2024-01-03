@@ -62,15 +62,13 @@ function handleClose() {
 .vben-basic-drawer-footer {
   position: absolute;
   bottom: 0;
-  left: 0;
   width: 100%;
   padding: 0 12px 0 20px;
-  text-align: right;
-  background-color: v-bind('token["component-background"]');
   border-top: 1px solid v-bind('token["colorBorder"]');
-
-  > * {
-    margin-right: 8px;
-  }
+  background-color: v-bind('token["component-background"]');
+  text-align: right;
+}
+.vben-basic-drawer-footer > * {
+  margin-right: 8px;
 }
 </style>

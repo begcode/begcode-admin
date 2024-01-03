@@ -157,63 +157,46 @@ const mergeProps = getMergeProps as any;
 const { useToken } = theme;
 const { token } = useToken();
 </script>
-<style lang="less">
-@header-height: 60px;
-@detail-header-height: 40px;
-
-.vben-basic-drawer {
-  .ant-drawer-wrapper-body {
-    overflow: hidden;
-  }
-
-  .ant-drawer-close {
-    &:hover {
-      color: v-bind('token["colorError"]');
-    }
-  }
-
-  .ant-drawer-body {
-    height: calc(100% - @header-height);
-    padding: 0;
-    background-color: v-bind('token["component-background"]');
-
-    .scrollbar__wrap {
-      padding: 16px !important;
-      margin-bottom: 0 !important;
-    }
-
-    > .scrollbar > .scrollbar__bar.is-horizontal {
-      display: none;
-    }
-  }
+<style>
+.vben-basic-drawer .ant-drawer-wrapper-body {
+  overflow: hidden;
 }
-
+.vben-basic-drawer .ant-drawer-close:hover {
+  color: v-bind('token["colorError"]');
+}
+.vben-basic-drawer .ant-drawer-body {
+  height: calc(100% - 60px);
+  padding: 0;
+  background-color: v-bind('token["component-background"]');
+}
+.vben-basic-drawer .ant-drawer-body .scrollbar__wrap {
+  margin-bottom: 0 !important;
+  padding: 16px !important;
+}
+.vben-basic-drawer .ant-drawer-body > .scrollbar > .scrollbar__bar.is-horizontal {
+  display: none;
+}
 .vben-basic-drawer__detail {
   position: absolute;
-
-  .ant-drawer-header {
-    width: 100%;
-    height: @detail-header-height;
-    padding: 0;
-    border-top: 1px solid v-bind('token.colorBorder');
-    box-sizing: border-box;
-  }
-
-  .ant-drawer-title {
-    height: 100%;
-  }
-
-  .ant-drawer-close {
-    height: @detail-header-height;
-    line-height: @detail-header-height;
-  }
-
-  .scrollbar__wrap {
-    padding: 0 !important;
-  }
-
-  .ant-drawer-body {
-    height: calc(100% - @detail-header-height);
-  }
+}
+.vben-basic-drawer__detail .ant-drawer-header {
+  box-sizing: border-box;
+  width: 100%;
+  height: 40px;
+  padding: 0;
+  border-top: 1px solid v-bind('token.colorBorder');
+}
+.vben-basic-drawer__detail .ant-drawer-title {
+  height: 100%;
+}
+.vben-basic-drawer__detail .ant-drawer-close {
+  height: 40px;
+  line-height: 40px;
+}
+.vben-basic-drawer__detail .scrollbar__wrap {
+  padding: 0 !important;
+}
+.vben-basic-drawer__detail .ant-drawer-body {
+  height: calc(100% - 40px);
 }
 </style>

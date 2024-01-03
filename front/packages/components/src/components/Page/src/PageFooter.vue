@@ -12,6 +12,10 @@
 <script lang="ts" setup>
 import { inject } from 'vue';
 import { useDesign } from '@/hooks/web/useDesign';
+import { theme } from 'ant-design-vue';
+
+const { useToken } = theme;
+const token = useToken().token;
 
 const { prefixCls } = useDesign('page-footer');
 const getCalcContentWidth = inject('CALC_CONTENT_WIDTH', '100%');
@@ -34,9 +38,8 @@ const getCalcContentWidth = inject('CALC_CONTENT_WIDTH', '100%');
     0 -9px 28px 0 rgb(0 0 0 / 5%),
     0 -12px 48px 16px rgb(0 0 0 / 3%);
   line-height: 44px;
-
-  .vben-page-footer__left {
-    flex: 1 1;
-  }
+}
+.vben-page-footer__left {
+  flex: 1 1;
 }
 </style>

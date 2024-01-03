@@ -296,64 +296,32 @@ onMounted(() => {
 });
 </script>
 <style>
-.vben-basic-form {
-  .ant-form-item {
-    .ant-form-item-label label::after {
-      margin: 0 6px 0 2px;
-    }
-
-    .ant-form-item.suffix-item {
-      .ant-form-item-children {
-        display: flex;
-      }
-
-      .ant-form-item-control {
-        margin-top: 4px;
-      }
-
-      .suffix {
-        display: inline-flex;
-        padding-left: 6px;
-        margin-top: 1px;
-        line-height: 1;
-        align-items: center;
-      }
-    }
-  }
-
-  /*【美化表单】form的字体改小一号*/
-  .ant-form-item-label > label {
-    font-size: 13px;
-  }
-  .ant-form-item .ant-select {
-    font-size: 13px;
-  }
-  .ant-select-item-option-selected {
-    font-size: 13px;
-  }
-  .ant-select-item-option-content {
-    font-size: 13px;
-  }
-  .ant-input {
-    font-size: 13px;
-  }
-  /*【美化表单】form的字体改小一号*/
-
-  .ant-form-explain {
-    font-size: 14px;
-  }
-
-  .ant-form-item--compact {
-    .ant-form-item {
-      margin-bottom: 8px !important;
-    }
-  }
-  .ant-form-item.ant-form-inline {
-    .ant-form-item > .ant-row {
-      .ant-col {
-        width: auto !important;
-      }
-    }
-  }
+.vben-basic-form .ant-form-item-label label::after {
+  margin: 0 6px 0 2px;
+}
+.vben-basic-form .ant-form-item-with-help {
+  margin-bottom: 0;
+}
+.vben-basic-form .ant-form-item:not(.ant-form-item-with-help) {
+  margin-bottom: 20px;
+}
+.vben-basic-form .ant-form-item.suffix-item .ant-form-item-children {
+  display: flex;
+}
+.vben-basic-form .ant-form-item.suffix-item .ant-form-item-control {
+  margin-top: 4px;
+}
+.vben-basic-form .ant-form-item.suffix-item .suffix {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 1px;
+  padding-left: 6px;
+  line-height: 1;
+}
+.vben-basic-form .ant-form-explain {
+  font-size: 14px;
+}
+.vben-basic-form--compact .ant-form-item {
+  margin-bottom: 8px !important;
 }
 </style>

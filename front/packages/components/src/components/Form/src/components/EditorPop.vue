@@ -1,7 +1,7 @@
 <template>
-  <a-popover
+  <Popover
     trigger="contextmenu"
-    v-model:visible="visible"
+    v-model:open="visible"
     :overlayClassName="`${prefixCls}-popover`"
     :getPopupContainer="getPopupContainer"
     :placement="position"
@@ -17,16 +17,17 @@
         <CodeEditor />
       </div>
     </template>
-    <a-input :class="`${prefixCls}-input`" :value="innerValue" :disabled="disabled" v-bind="attrs" @change="onInputChange">
+    <Input :class="`${prefixCls}-input`" :value="innerValue" :disabled="disabled" v-bind="attrs" @change="onInputChange">
       <template #suffix>
         <Icon icon="ant-design:fullscreen-outlined" @click.stop="onShowPopup" />
       </template>
-    </a-input>
-  </a-popover>
+    </Input>
+  </Popover>
 </template>
 
 <script lang="ts" setup>
 import { computed, nextTick, ref, watch } from 'vue';
+import { Input, Popover } from 'ant-design-vue';
 import Icon from '@/components/Icon/Icon.vue';
 import { useAttrs } from '@/hooks/vben/useAttrs';
 import { propTypes } from '@/utils/propTypes';
@@ -98,17 +99,12 @@ function emitValue(value) {
 </script>
 
 <style>
-.vben-j-input-popup {
-  .vben-j-input-popup-input {
-    .app-iconify {
-      cursor: pointer;
-      color: #666666;
-      transition: color 0.3s;
-
-      .vben-j-input-popup:hover {
-        color: black;
-      }
-    }
-  }
+.vben-j-input-popup-input .app-iconify {
+  cursor: pointer;
+  color: #666666;
+  transition: color 0.3s;
+}
+.vben-j-input-popup-input .app-iconify:hover {
+  color: black;
 }
 </style>

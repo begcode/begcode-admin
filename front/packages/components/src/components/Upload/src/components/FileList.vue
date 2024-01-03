@@ -1,10 +1,11 @@
 <script lang="tsx">
-import { defineComponent, CSSProperties, watch, nextTick, ref, onMounted } from 'vue';
+import { defineComponent, CSSProperties, watch, nextTick, ref, onMounted, getCurrentInstance, ComponentInternalInstance } from 'vue';
 import { fileListProps } from '../props';
 import { isFunction } from 'lodash-es';
 import { isDef } from '@/utils/is';
 import { useSortable } from '@/hooks/web/useSortable';
 import { useModalContext } from '@/components/Modal/src/hooks/useModalContext';
+import { theme } from 'ant-design-vue';
 
 export default defineComponent({
   name: 'FileList',
@@ -43,6 +44,12 @@ export default defineComponent({
           },
         }).initSortable(),
       );
+    }
+    const { useToken } = theme;
+    const { token } = useToken();
+    const { proxy } = getCurrentInstance() as ComponentInternalInstance;
+    if (proxy) {
+      proxy['token'] = token.value;
     }
     return () => {
       const { columns, actionColumn, dataSource } = props;

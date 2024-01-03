@@ -279,25 +279,20 @@ function handlePreview(record: FileItem) {
 }
 </script>
 <style>
-.upload-modal {
-  .ant-upload-list {
-    display: none;
-  }
-
-  .ant-table-wrapper .ant-spin-nested-loading {
-    padding: 0;
-  }
-
-  &-toolbar {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-
-    &__btn {
-      margin-left: 8px;
-      text-align: right;
-      flex: 1;
-    }
-  }
+.upload-modal .ant-upload-list {
+  display: none;
+}
+.upload-modal .ant-table-wrapper .ant-spin-nested-loading {
+  padding: 0;
+}
+.upload-modal-toolbar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.upload-modal-toolbar__btn {
+  margin-left: 8px;
+  text-align: right;
+  flex: 1;
 }
 </style>
