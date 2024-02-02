@@ -4,25 +4,19 @@
   </BasicModal>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
 import { useAttrs } from '@/hooks/vben/useAttrs';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import EasyCron from './EasyCronInner.vue';
 
-export default defineComponent({
+defineOptions({
   name: 'EasyCronModal',
   inheritAttrs: false,
-  components: { BasicModal, EasyCron },
-  setup() {
-    const attrs = useAttrs();
-    const [registerModal, { closeModal }] = useModalInner();
-
-    function onOk() {
-      closeModal();
-    }
-
-    return { attrs, registerModal, onOk };
-  },
 });
+const attrs = useAttrs();
+const [registerModal, { closeModal }] = useModalInner();
+
+function onOk() {
+  closeModal();
+}
 </script>

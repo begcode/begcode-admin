@@ -2,22 +2,22 @@
   <div class="p-4">
     <ChartGroupCard class="enter-y" :loading="loading" type="bdc" />
     <BdcTabCard class="!my-4 enter-y" :loading="loading" />
-    <a-row>
-      <a-col :span="24">
-        <a-card :loading="loading" :class="{ 'anty-list-cust': true }" :bordered="false">
-          <a-tabs v-model:activeKey="indexBottomTab" size="large" :tab-bar-style="{ marginBottom: '24px', paddingLeft: '16px' }">
+    <Row>
+      <Col :span="24">
+        <Card :loading="loading" :class="{ 'anty-list-cust': true }" :bordered="false">
+          <Tabs v-model:activeKey="indexBottomTab" size="large" :tab-bar-style="{ marginBottom: '24px', paddingLeft: '16px' }">
             <template #rightExtra>
               <div class="extra-wrapper">
-                <a-radio-group v-model:value="indexRegisterType" @change="changeRegisterType">
-                  <a-radio-button value="转移登记">转移登记</a-radio-button>
-                  <a-radio-button value="抵押登记">抵押登记</a-radio-button>
-                  <a-radio-button value="">所有</a-radio-button>
-                </a-radio-group>
+                <RadioGroup v-model:value="indexRegisterType" @change="changeRegisterType">
+                  <RadioButton value="转移登记">转移登记</RadioButton>
+                  <RadioButton value="抵押登记">抵押登记</RadioButton>
+                  <RadioButton value="">所有</RadioButton>
+                </RadioGroup>
               </div>
             </template>
 
-            <a-tab-pane tab="业务流程限时监管" key="1">
-              <a-table
+            <TabPane tab="业务流程限时监管" key="1">
+              <Table
                 :dataSource="dataSource"
                 size="default"
                 rowKey="reBizCode"
@@ -33,11 +33,11 @@
                     style="width: 80px"
                   />
                 </template>
-              </a-table>
-            </a-tab-pane>
+              </Table>
+            </TabPane>
 
-            <a-tab-pane loading="true" tab="业务节点限时监管" key="2">
-              <a-table
+            <TabPane loading="true" tab="业务节点限时监管" key="2">
+              <Table
                 :dataSource="dataSource1"
                 size="default"
                 rowKey="reBizCode"
@@ -48,17 +48,17 @@
                 <template #flowRate="{ text, record, index }">
                   <span style="color: red">{{ record.flowRate }}小时</span>
                 </template>
-              </a-table>
-            </a-tab-pane>
-          </a-tabs>
-        </a-card>
-      </a-col>
-    </a-row>
+              </Table>
+            </TabPane>
+          </Tabs>
+        </Card>
+      </Col>
+    </Row>
   </div>
 </template>
 <script lang="ts" setup>
 import { ref, unref } from 'vue';
-import { Progress } from 'ant-design-vue';
+import { Progress, Row, Col, Card, Tabs, TabPane, RadioGroup, RadioButton, Table } from 'ant-design-vue';
 import ChartGroupCard from '../components/ChartGroupCard.vue';
 import BdcTabCard from '../components/BdcTabCard.vue';
 import { table, table1 } from '../data';

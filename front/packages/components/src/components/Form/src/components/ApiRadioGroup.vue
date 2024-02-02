@@ -1,6 +1,3 @@
-<!--
- * @Description:It is troublesome to implement radio button group in the form. So it is extracted independently as a separate component
--->
 <template>
   <Radio.Group v-bind="attrs" v-model:value="state" button-style="solid">
     <template v-for="item in getOptions" :key="`${item.value}`">
@@ -14,20 +11,25 @@
   </Radio.Group>
 </template>
 <script lang="ts" setup>
-import { type PropType, ref, watchEffect, computed, unref, watch } from 'vue';
+import { type PropType, ref, computed, unref, watch } from 'vue';
 import { Radio } from 'ant-design-vue';
 import { useRuleFormItem } from '@/hooks/component/useFormItem';
 import { useAttrs } from '@/hooks/vben';
 import { propTypes } from '@/utils/propTypes';
-import { get, omit, isFunction } from 'lodash-es';
+import { get, omit, isFunction, isEqual } from 'lodash-es';
 
-type OptionsItem = { label: string; value: string | number | boolean; disabled?: boolean };
+type OptionsItem = {
+  label?: string;
+  value?: string | number | boolean;
+  disabled?: boolean;
+  [key: string]: any;
+};
 
 defineOptions({ name: 'ApiRadioGroup' });
 
 const props = defineProps({
   api: {
-    type: Function as PropType<(arg?: any | string) => Promise<OptionsItem[]>>,
+    type: Function as PropType<(arg?: any) => Promise<OptionsItem[]>>,
     default: null,
   },
   params: {
@@ -48,11 +50,10 @@ const props = defineProps({
   immediate: propTypes.bool.def(true),
 });
 
-const emit = defineEmits(['options-change', 'change']);
+const emit = defineEmits(['options-change', 'change', 'update:value']);
 
 const options = ref<OptionsItem[]>([]);
 const loading = ref(false);
-const isFirstLoad = ref(true);
 const emitData = ref<any[]>([]);
 const attrs = useAttrs();
 
@@ -75,16 +76,13 @@ const getOptions = computed(() => {
   }, [] as OptionsItem[]);
 });
 
-watchEffect(() => {
-  props.immediate && fetch();
-});
-
 watch(
   () => props.params,
-  () => {
-    !unref(isFirstLoad) && fetch();
+  (value, oldValue) => {
+    if (isEqual(value, oldValue)) return;
+    fetch();
   },
-  { deep: true },
+  { deep: true, immediate: props.immediate },
 );
 
 async function fetch() {

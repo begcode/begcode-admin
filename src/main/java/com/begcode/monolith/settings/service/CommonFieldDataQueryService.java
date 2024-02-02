@@ -115,13 +115,13 @@ public class CommonFieldDataQueryService implements QueryService<CommonFieldData
             if (StringUtils.isNumeric(keywords)) {
                 keywordsCriteria.id().setEquals(Long.valueOf(keywords));
                 keywordsCriteria.sortValue().setEquals(Integer.valueOf(keywords));
+                keywordsCriteria.ownerEntityId().setEquals(Long.valueOf(keywords));
             }
             keywordsCriteria.name().setContains(keywords);
             keywordsCriteria.value().setContains(keywords);
             keywordsCriteria.label().setContains(keywords);
             keywordsCriteria.remark().setContains(keywords);
             keywordsCriteria.ownerEntityName().setContains(keywords);
-            keywordsCriteria.ownerEntityId().setContains(keywords);
             CommonFieldDataCriteria tempCriteria = criteria;
             while (tempCriteria.getAnd() != null) {
                 tempCriteria = tempCriteria.getAnd();

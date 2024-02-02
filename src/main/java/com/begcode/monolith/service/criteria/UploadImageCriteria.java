@@ -25,7 +25,7 @@ public class UploadImageCriteria implements Serializable, Criteria {
     private String jhiCommonSearchKeywords;
 
     @BindQuery(ignore = true)
-    private Boolean useOr;
+    private Boolean useOr = false;
 
     @BindQuery(ignore = true)
     private UploadImageCriteria and;
@@ -37,6 +37,9 @@ public class UploadImageCriteria implements Serializable, Criteria {
 
     @BindQuery(column = "self.id")
     private LongFilter id;
+
+    @BindQuery(column = "self.url")
+    private StringFilter url;
 
     @BindQuery(column = "self.full_name")
     private StringFilter fullName;
@@ -50,9 +53,6 @@ public class UploadImageCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.type")
     private StringFilter type;
 
-    @BindQuery(column = "self.url")
-    private StringFilter url;
-
     @BindQuery(column = "self.path")
     private StringFilter path;
 
@@ -63,7 +63,7 @@ public class UploadImageCriteria implements Serializable, Criteria {
     private StringFilter ownerEntityName;
 
     @BindQuery(column = "self.owner_entity_id")
-    private StringFilter ownerEntityId;
+    private LongFilter ownerEntityId;
 
     @BindQuery(column = "self.business_title")
     private StringFilter businessTitle;
@@ -93,13 +93,13 @@ public class UploadImageCriteria implements Serializable, Criteria {
     private LongFilter createdBy;
 
     @BindQuery(column = "self.created_date")
-    private ZonedDateTimeFilter createdDate;
+    private InstantFilter createdDate;
 
     @BindQuery(column = "self.last_modified_by")
     private LongFilter lastModifiedBy;
 
     @BindQuery(column = "self.last_modified_date")
-    private ZonedDateTimeFilter lastModifiedDate;
+    private InstantFilter lastModifiedDate;
 
     @BindQuery(column = "self.category_id")
     private LongFilter categoryId;
@@ -114,11 +114,11 @@ public class UploadImageCriteria implements Serializable, Criteria {
 
     public UploadImageCriteria(UploadImageCriteria other) {
         this.id = other.id == null ? null : other.id.copy();
+        this.url = other.url == null ? null : other.url.copy();
         this.fullName = other.fullName == null ? null : other.fullName.copy();
         this.name = other.name == null ? null : other.name.copy();
         this.ext = other.ext == null ? null : other.ext.copy();
         this.type = other.type == null ? null : other.type.copy();
-        this.url = other.url == null ? null : other.url.copy();
         this.path = other.path == null ? null : other.path.copy();
         this.folder = other.folder == null ? null : other.folder.copy();
         this.ownerEntityName = other.ownerEntityName == null ? null : other.ownerEntityName.copy();
@@ -190,6 +190,21 @@ public class UploadImageCriteria implements Serializable, Criteria {
         this.id = id;
     }
 
+    public StringFilter getUrl() {
+        return url;
+    }
+
+    public StringFilter url() {
+        if (url == null) {
+            url = new StringFilter();
+        }
+        return url;
+    }
+
+    public void setUrl(StringFilter url) {
+        this.url = url;
+    }
+
     public StringFilter getFullName() {
         return fullName;
     }
@@ -250,21 +265,6 @@ public class UploadImageCriteria implements Serializable, Criteria {
         this.type = type;
     }
 
-    public StringFilter getUrl() {
-        return url;
-    }
-
-    public StringFilter url() {
-        if (url == null) {
-            url = new StringFilter();
-        }
-        return url;
-    }
-
-    public void setUrl(StringFilter url) {
-        this.url = url;
-    }
-
     public StringFilter getPath() {
         return path;
     }
@@ -310,18 +310,18 @@ public class UploadImageCriteria implements Serializable, Criteria {
         this.ownerEntityName = ownerEntityName;
     }
 
-    public StringFilter getOwnerEntityId() {
+    public LongFilter getOwnerEntityId() {
         return ownerEntityId;
     }
 
-    public StringFilter ownerEntityId() {
+    public LongFilter ownerEntityId() {
         if (ownerEntityId == null) {
-            ownerEntityId = new StringFilter();
+            ownerEntityId = new LongFilter();
         }
         return ownerEntityId;
     }
 
-    public void setOwnerEntityId(StringFilter ownerEntityId) {
+    public void setOwnerEntityId(LongFilter ownerEntityId) {
         this.ownerEntityId = ownerEntityId;
     }
 
@@ -460,18 +460,18 @@ public class UploadImageCriteria implements Serializable, Criteria {
         this.createdBy = createdBy;
     }
 
-    public ZonedDateTimeFilter getCreatedDate() {
+    public InstantFilter getCreatedDate() {
         return createdDate;
     }
 
-    public ZonedDateTimeFilter createdDate() {
+    public InstantFilter createdDate() {
         if (createdDate == null) {
-            createdDate = new ZonedDateTimeFilter();
+            createdDate = new InstantFilter();
         }
         return createdDate;
     }
 
-    public void setCreatedDate(ZonedDateTimeFilter createdDate) {
+    public void setCreatedDate(InstantFilter createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -490,18 +490,18 @@ public class UploadImageCriteria implements Serializable, Criteria {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    public ZonedDateTimeFilter getLastModifiedDate() {
+    public InstantFilter getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public ZonedDateTimeFilter lastModifiedDate() {
+    public InstantFilter lastModifiedDate() {
         if (lastModifiedDate == null) {
-            lastModifiedDate = new ZonedDateTimeFilter();
+            lastModifiedDate = new InstantFilter();
         }
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(ZonedDateTimeFilter lastModifiedDate) {
+    public void setLastModifiedDate(InstantFilter lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 
@@ -570,11 +570,11 @@ public class UploadImageCriteria implements Serializable, Criteria {
         final UploadImageCriteria that = (UploadImageCriteria) o;
         return (
             Objects.equals(id, that.id) &&
+            Objects.equals(url, that.url) &&
             Objects.equals(fullName, that.fullName) &&
             Objects.equals(name, that.name) &&
             Objects.equals(ext, that.ext) &&
             Objects.equals(type, that.type) &&
-            Objects.equals(url, that.url) &&
             Objects.equals(path, that.path) &&
             Objects.equals(folder, that.folder) &&
             Objects.equals(ownerEntityName, that.ownerEntityName) &&
@@ -601,11 +601,11 @@ public class UploadImageCriteria implements Serializable, Criteria {
     public int hashCode() {
         return Objects.hash(
             id,
+            url,
             fullName,
             name,
             ext,
             type,
-            url,
             path,
             folder,
             ownerEntityName,
@@ -633,11 +633,11 @@ public class UploadImageCriteria implements Serializable, Criteria {
     public String toString() {
         return "UploadImageCriteria{" +
             (id != null ? "id=" + id + ", " : "") +
+            (url != null ? "url=" + url + ", " : "") +
             (fullName != null ? "fullName=" + fullName + ", " : "") +
             (name != null ? "name=" + name + ", " : "") +
             (ext != null ? "ext=" + ext + ", " : "") +
             (type != null ? "type=" + type + ", " : "") +
-            (url != null ? "url=" + url + ", " : "") +
             (path != null ? "path=" + path + ", " : "") +
             (folder != null ? "folder=" + folder + ", " : "") +
             (ownerEntityName != null ? "ownerEntityName=" + ownerEntityName + ", " : "") +

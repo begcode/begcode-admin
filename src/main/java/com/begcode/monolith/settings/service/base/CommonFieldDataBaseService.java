@@ -221,6 +221,7 @@ public class CommonFieldDataBaseService<R extends CommonFieldDataRepository, E e
                         ids.add(beforeId);
                         Map<Long, Integer> idSortValueMap = listByIds(ids)
                             .stream()
+                            .filter(commonFieldData -> commonFieldData.getSortValue() != null)
                             .collect(Collectors.toMap(CommonFieldData::getId, CommonFieldData::getSortValue));
                         return (
                             lambdaUpdate()
@@ -230,6 +231,24 @@ public class CommonFieldDataBaseService<R extends CommonFieldDataRepository, E e
                             lambdaUpdate()
                                 .set(CommonFieldData::getSortValue, idSortValueMap.get(id))
                                 .eq(CommonFieldData::getId, beforeId)
+                                .update()
+                        );
+                    } else if (ObjectUtils.allNotNull(id, afterId)) {
+                        Set<Long> ids = new HashSet<>();
+                        ids.add(id);
+                        ids.add(afterId);
+                        Map<Long, Integer> idSortValueMap = listByIds(ids)
+                            .stream()
+                            .filter(commonFieldData -> commonFieldData.getSortValue() != null)
+                            .collect(Collectors.toMap(CommonFieldData::getId, CommonFieldData::getSortValue));
+                        return (
+                            lambdaUpdate()
+                                .set(CommonFieldData::getSortValue, idSortValueMap.get(afterId))
+                                .eq(CommonFieldData::getId, id)
+                                .update() &&
+                            lambdaUpdate()
+                                .set(CommonFieldData::getSortValue, idSortValueMap.get(id))
+                                .eq(CommonFieldData::getId, afterId)
                                 .update()
                         );
                     } else {
@@ -248,6 +267,7 @@ public class CommonFieldDataBaseService<R extends CommonFieldDataRepository, E e
                     }
                     Map<Long, Integer> idSortValueMap = listByIds(ids)
                         .stream()
+                        .filter(commonFieldData -> commonFieldData.getSortValue() != null)
                         .collect(Collectors.toMap(CommonFieldData::getId, CommonFieldData::getSortValue));
                     if (ObjectUtils.allNotNull(beforeId, afterId)) {
                         // 计算中间值

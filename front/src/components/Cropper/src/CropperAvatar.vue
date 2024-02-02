@@ -6,16 +6,16 @@
       </div>
       <img :src="sourceValue" v-if="sourceValue" alt="avatar" />
     </div>
-    <a-button :class="`${prefixCls}-upload-btn`" @click="openModal" v-if="showBtn" v-bind="btnProps">
+    <Button :class="`${prefixCls}-upload-btn`" @click="openModal" v-if="showBtn" v-bind="btnProps">
       {{ btnText ? btnText : t('component.cropper.selectImage') }}
-    </a-button>
+    </Button>
 
     <CropperModal @register="register" @upload-success="handleUploadSuccess" :uploadApi="uploadApi" :src="sourceValue" :size="size" />
   </div>
 </template>
 <script lang="ts" setup>
 import { computed, CSSProperties, unref, ref, watchEffect, watch, PropType } from 'vue';
-import { Icon, useModal } from '@begcode/components';
+import { Icon, useModal, Button } from '@begcode/components';
 import CropperModal from './CropperModal.vue';
 import { useDesign } from '@begcode/components';
 import { useMessage } from '@/hooks/web/useMessage';

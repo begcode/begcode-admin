@@ -7,7 +7,7 @@ import { useUserStore } from '@/store/modules/user';
 const globSetting = useGlobSetting();
 const openSso = globSetting.openSso;
 export function useSso() {
-  let locationUrl = 'http://' + window.location.host + '/';
+  let locationUrl = document.location.protocol + '//' + window.location.host + '/';
   /**
    * 单点登录
    */

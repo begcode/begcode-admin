@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { getCurrentInstance, reactive, computed, defineComponent, h, ref, resolveComponent, Component, nextTick, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { message } from 'ant-design-vue';
+import { message, Space, Tabs, TabPane, CollapsePanel, Collapse, Card } from 'ant-design-vue';
 import { isBoolean, isFunction } from 'lodash-es';
 
 import config from './config/edit-config';
@@ -11,7 +11,6 @@ import ServerProvider from '@/api-service/index';
 import { BasicForm, Button, Icon, PageWrapper } from '@begcode/components';
 import { useGo } from '@/hooks/web/usePage';
 import { useMultipleTabStore } from '@/store/modules/multipleTab';
-import { ReceiverType } from '@/models/enumerations/receiver-type.model';
 
 export default defineComponent({
   // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
@@ -240,7 +239,7 @@ export default defineComponent({
           if (componentRef.name === 'a-form') {
             if (pageConfig?.canExpand) {
               // @ts-ignore
-              return h('a-collapse-panel', {}, h(BasicForm, { ...componentRef.props, ref: componentRef.props.modelName }, formSlots));
+              return h(CollapsePanel, {}, h(BasicForm, { ...componentRef.props, ref: componentRef.props.modelName }, formSlots));
             } else {
               // @ts-ignore
               return h(BasicForm, { ...componentRef.props, ref: componentRef.props.modelName }, formSlots);
@@ -248,23 +247,20 @@ export default defineComponent({
           } else {
             const component = resolveComponent(componentRef.name);
             return h(
-              resolveComponent(pageConfig?.canExpand ? 'a-collapse-panel' : 'a-card'),
+              pageConfig?.canExpand ? CollapsePanel : Card,
               { ...wrapperPros },
               h(component, { ...componentRef.props, ref: componentRef.props.modelName }, () => []),
             );
           }
         } else if (componentRef && componentRef instanceof Array) {
-          return h(resolveComponent(pageConfig?.canExpand ? 'a-collapse-panel' : 'a-card'), { ...wrapperPros }, () =>
-            h(resolveComponent('a-tabs'), {}, () =>
+          return h(pageConfig?.canExpand ? CollapsePanel : Card, { ...wrapperPros }, () =>
+            h(Tabs, {}, () =>
               componentRef.map((child, index) => {
                 const childComponent: Component = resolveComponent(child.name) as Component;
-                return h(
-                  resolveComponent('a-tab-pane'),
-                  { tab: child.title || index, key: index, disabled: child.disabled && child.disabled() },
-                  () =>
-                    child.disabled && child.disabled()
-                      ? []
-                      : [h(childComponent, { ...child.props, ref: child.props.modelName }, () => child.slots || {})],
+                return h(TabPane, { tab: child.title || index, key: index, disabled: child.disabled && child.disabled() }, () =>
+                  child.disabled && child.disabled()
+                    ? []
+                    : [h(childComponent, { ...child.props, ref: child.props.modelName }, () => child.slots || {})],
                 );
               }),
             ),
@@ -277,7 +273,7 @@ export default defineComponent({
     const slots: any = {
       rightFooter: () => (
         <div>
-          <a-space>
+          <Space>
             {pageConfig.operations.map((operation: any) => {
               const buttonSlots: any = {};
               if (operation.icon) {
@@ -298,7 +294,7 @@ export default defineComponent({
                   return hideButton ? (
                     <span />
                   ) : (
-                    <a-button
+                    <Button
                       {...{
                         type: operation.type || 'default',
                         onClick: () => {
@@ -308,7 +304,7 @@ export default defineComponent({
                         },
                       }}
                       v-slots={buttonSlots}
-                    ></a-button>
+                    ></Button>
                   );
                 case 'update':
                   if (!buttonSlots.icon) {
@@ -320,7 +316,7 @@ export default defineComponent({
                   return hideButton ? (
                     <span />
                   ) : (
-                    <a-button
+                    <Button
                       {...{
                         type: operation.type || 'default',
                         onClick: () => {
@@ -330,13 +326,13 @@ export default defineComponent({
                         },
                       }}
                       v-slots={buttonSlots}
-                    ></a-button>
+                    ></Button>
                   );
                 default:
                   return hideButton ? (
                     <span />
                   ) : (
-                    <a-button
+                    <Button
                       {...{
                         type: operation.type || 'default',
                         onClick: () => {
@@ -351,25 +347,25 @@ export default defineComponent({
                       }}
                     >
                       {operation.title}
-                    </a-button>
+                    </Button>
                   );
               }
             })}
-          </a-space>
+          </Space>
         </div>
       ),
       default: () => {
         if (pageConfig?.canExpand) {
           return (
             <div>
-              <a-collapse value={activeNames} onchange={handleChange} v-slots={{ default: () => renderChild() }} />
+              <Collapse value={activeNames} onchange={handleChange} v-slots={{ default: () => renderChild() }} />
             </div>
           );
         } else {
           if (props.containerType === 'router') {
             return (
               <div>
-                <a-card
+                <Card
                   {...{
                     props: {
                       shadow: 'never',
@@ -384,7 +380,7 @@ export default defineComponent({
                       ]),
                     default: () => renderChild(),
                   }}
-                ></a-card>
+                ></Card>
               </div>
             );
           } else {
@@ -393,7 +389,6 @@ export default defineComponent({
         }
       },
     };
-
     return {
       // pageControl,
       announcementId,
@@ -404,61 +399,12 @@ export default defineComponent({
       announcement,
     };
   },
-  methods: {
-    receiveComponentProps() {
-      const result: any = {
-        show: false,
-        props: {
-          mode: 'multiple',
-          valueField: 'id',
-          labelField: '',
-        },
-        optionProps: {
-          value: 'id',
-          label: '',
-        },
-      };
-      switch (this.announcement.receiverType) {
-        case ReceiverType.ALL:
-          result.show = false;
-          result.selectListName = '';
-          break;
-        case ReceiverType.AUTHORITY:
-          result.show = true;
-          result.selectListName = 'jhi-authority-compact';
-          result.props.labelField = 'name';
-          result.optionProps.label = 'name';
-          break;
-        case ReceiverType.DEPARTMENT:
-          result.show = true;
-          result.selectListName = 'jhi-department-compact';
-          result.props.labelField = 'name';
-          result.optionProps.label = 'name';
-          break;
-        case ReceiverType.USER:
-          result.show = true;
-          result.selectListName = 'jhi-user-compact';
-          result.props.labelField = 'firstName';
-          result.optionProps.label = 'firstName';
-          break;
-        case ReceiverType.POSITION:
-          result.show = true;
-          result.selectListName = 'jhi-position-compact';
-          result.props.labelField = 'name';
-          result.optionProps.label = 'name';
-          break;
-        default:
-          result.show = false;
-          result.selectListName = '';
-      }
-      return result;
-    },
-  },
+  methods: {},
   render() {
     if (this.containerType === 'modal' || this.containerType === 'drawer') {
       // this.slots.actions = this.slots.rightFooter;
       delete this.slots.rightFooter;
-      return <a-card {...this.pageConfig} v-slots={this.slots} />;
+      return <Card {...this.pageConfig} v-slots={this.slots} />;
     } else {
       return (
         <PageWrapper

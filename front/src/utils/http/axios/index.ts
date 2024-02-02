@@ -4,7 +4,7 @@
 import type { AxiosInstance, AxiosResponse } from 'axios';
 import { clone, isString, isNull, isEmpty } from 'lodash-es';
 import type { RequestOptions, Result } from '/#/axios';
-import { setObjToUrlParams, deepMerge, isUnDef } from '@begcode/components';
+import { setObjToUrlParams, deepMerge } from '@begcode/components';
 import axios from 'axios';
 import type { AxiosTransform, CreateAxiosOptions } from './axiosTransform';
 import { VAxios } from './Axios';
@@ -61,7 +61,7 @@ const transform: AxiosTransform = {
     if (hasSuccess) {
       let successMsg = message;
 
-      if (isNull(successMsg) || isUnDef(successMsg) || isEmpty(successMsg)) {
+      if (isNull(successMsg) || isUndefined(successMsg) || isEmpty(successMsg)) {
         successMsg = t('sys.api.operationSuccess');
       }
 

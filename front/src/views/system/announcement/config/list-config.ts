@@ -180,15 +180,6 @@ const searchForm = (): any[] => {
       componentProps: {},
     },
     {
-      title: '创建时间',
-      field: 'createdDate',
-      componentType: 'DateTime',
-      operator: '',
-      span: 8,
-      type: 'ZonedDateTime',
-      componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
-    },
-    {
       title: '修改者Id',
       field: 'lastModifiedBy',
       componentType: 'Text',
@@ -197,15 +188,6 @@ const searchForm = (): any[] => {
       operator: '',
       span: 8,
       componentProps: {},
-    },
-    {
-      title: '修改时间',
-      field: 'lastModifiedDate',
-      componentType: 'DateTime',
-      operator: '',
-      span: 8,
-      type: 'ZonedDateTime',
-      componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
     },
   ];
 };
@@ -225,7 +207,7 @@ const columns = (): VxeGridPropTypes.Columns => {
       visible: true,
       treeNode: false,
       params: { type: 'LONG' },
-      editRender: { name: 'AInputNumber', enabled: false },
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '标题',
@@ -261,7 +243,7 @@ const columns = (): VxeGridPropTypes.Columns => {
       visible: true,
       treeNode: false,
       params: { type: 'LONG' },
-      editRender: { name: 'AInputNumber', enabled: false },
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '优先级',
@@ -348,7 +330,7 @@ const columns = (): VxeGridPropTypes.Columns => {
       visible: true,
       treeNode: false,
       params: { type: 'LONG' },
-      editRender: { name: 'AInputNumber', enabled: false },
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '打开方式',
@@ -378,16 +360,7 @@ const columns = (): VxeGridPropTypes.Columns => {
       visible: true,
       treeNode: false,
       params: { type: 'LONG' },
-      editRender: { name: 'AInputNumber', enabled: false },
-    },
-    {
-      title: '创建时间',
-      field: 'createdDate',
-      minWidth: 140,
-      visible: true,
-      treeNode: false,
-      params: { type: 'ZONED_DATE_TIME' },
-      formatter: ({ cellValue }) => (cellValue ? dayjs(cellValue).format('YYYY-MM-DD hh:mm:ss') : ''),
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '修改者Id',
@@ -396,16 +369,7 @@ const columns = (): VxeGridPropTypes.Columns => {
       visible: true,
       treeNode: false,
       params: { type: 'LONG' },
-      editRender: { name: 'AInputNumber', enabled: false },
-    },
-    {
-      title: '修改时间',
-      field: 'lastModifiedDate',
-      minWidth: 140,
-      visible: true,
-      treeNode: false,
-      params: { type: 'ZONED_DATE_TIME' },
-      formatter: ({ cellValue }) => (cellValue ? dayjs(cellValue).format('YYYY-MM-DD hh:mm:ss') : ''),
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '操作',

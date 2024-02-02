@@ -20,7 +20,7 @@ public class CommonFieldDataTestSamples {
             .remark("remark1")
             .sortValue(1)
             .ownerEntityName("ownerEntityName1")
-            .ownerEntityId("ownerEntityId1");
+            .ownerEntityId(1L);
     }
 
     public static CommonFieldData getCommonFieldDataSample2() {
@@ -32,7 +32,7 @@ public class CommonFieldDataTestSamples {
             .remark("remark2")
             .sortValue(2)
             .ownerEntityName("ownerEntityName2")
-            .ownerEntityId("ownerEntityId2");
+            .ownerEntityId(2L);
     }
 
     public static CommonFieldData getCommonFieldDataRandomSampleGenerator() {
@@ -44,6 +44,6 @@ public class CommonFieldDataTestSamples {
             .remark(UUID.randomUUID().toString())
             .sortValue(intCount.incrementAndGet())
             .ownerEntityName(UUID.randomUUID().toString())
-            .ownerEntityId(UUID.randomUUID().toString());
+            .ownerEntityId(longCount.incrementAndGet());
     }
 }

@@ -1,5 +1,5 @@
 <template>
-  <a-card :loading="loading" :body-style="{ padding: '20px 24px 8px' }" :bordered="false">
+  <Card :loading="loading" :body-style="{ padding: '20px 24px 8px' }" :bordered="false">
     <div class="chart-card-header">
       <div class="meta">
         <span class="chart-card-title">{{ title }}</span>
@@ -21,10 +21,11 @@
         <slot name="footer"></slot>
       </div>
     </div>
-  </a-card>
+  </Card>
 </template>
 
 <script lang="ts" setup>
+import { Card } from 'ant-design-vue';
 defineProps({
   title: {
     type: String,

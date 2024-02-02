@@ -4,11 +4,11 @@
       <div :class="getClass" @click.stop v-if="visible">
         <div :class="`${prefixCls}-content`" v-click-outside="handleClose">
           <div :class="`${prefixCls}-input__wrapper`">
-            <a-input :class="`${prefixCls}-input`" :placeholder="t('common.searchText')" ref="inputRef" allow-clear @change="handleSearch">
+            <Input :class="`${prefixCls}-input`" :placeholder="t('common.searchText')" ref="inputRef" allow-clear @change="handleSearch">
               <template #prefix>
                 <SearchOutlined />
               </template>
-            </a-input>
+            </Input>
             <span :class="`${prefixCls}-cancel`" @click="handleClose">
               {{ t('common.cancelText') }}
             </span>
@@ -54,6 +54,7 @@
 <script lang="ts" setup>
 import { computed, unref, ref, watch, nextTick } from 'vue';
 import { SearchOutlined } from '@ant-design/icons-vue';
+import { Input } from 'ant-design-vue';
 import AppSearchFooter from './AppSearchFooter.vue';
 import { Icon } from '@begcode/components';
 import vClickOutside from '@/directives/clickOutside';
@@ -180,7 +181,7 @@ function handleClose() {
     height: 48px;
     border-radius: 6px;
     color: #1c1e21;
-    font-size: 1.5em;
+    font-size: 1.3em;
 
     span[role='img'] {
       color: #999;
@@ -221,7 +222,6 @@ function handleClose() {
       padding-bottom: 4px;
       padding-left: 14px;
       border-radius: 4px;
-      background-color: @component-background;
       box-shadow: 0 1px 3px 0 #d4d9e1;
       color: @text-color-base;
       font-size: 14px;

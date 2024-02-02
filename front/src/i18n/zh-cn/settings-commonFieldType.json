@@ -22,7 +22,7 @@
       "RADIO": "单选",
       "MULTI_SELECT": "多选",
       "DATA_DICTIONARY": "数据字典",
-      "UUID": "UUID",
+      "UUID_STRING": "UUID",
       "INSTANT": "时间戳"
     }
   }

@@ -376,7 +376,7 @@ const config = {
         visible: false,
         treeNode: false,
         params: { type: 'LONG' },
-        editRender: { name: 'AInputNumber', enabled: false },
+        editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
       },
       {
         title: '名称',
@@ -451,7 +451,7 @@ const config = {
         visible: true,
         treeNode: false,
         params: { type: 'DOUBLE' },
-        editRender: { name: 'AInputNumber', enabled: false },
+        editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
       },
       {
         title: '纬度',
@@ -460,7 +460,7 @@ const config = {
         visible: true,
         treeNode: false,
         params: { type: 'DOUBLE' },
-        editRender: { name: 'AInputNumber', enabled: false },
+        editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
       },
       {
         title: '操作',
@@ -533,7 +533,7 @@ const config = {
       treeConfig: {
         childrenField: 'children',
         indent: 20,
-        line: false,
+        showLine: false,
         expandAll: false,
         accordion: false,
         trigger: 'default',

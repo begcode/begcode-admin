@@ -6,34 +6,33 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
 import { Icon } from '@/components/Icon';
 
-export default defineComponent({
+defineOptions({
   name: 'HeadInfo',
-  components: { Icon },
-  props: {
-    title: {
-      type: String,
-      default: '',
-    },
-    content: {
-      type: String,
-      default: '',
-    },
-    bordered: {
-      type: Boolean,
-      default: false,
-    },
-    center: {
-      type: Boolean,
-      default: true,
-    },
-    icon: {
-      type: String,
-      default: false,
-    },
+});
+
+const props = defineProps({
+  title: {
+    type: String,
+    default: '',
+  },
+  content: {
+    type: String,
+    default: '',
+  },
+  bordered: {
+    type: Boolean,
+    default: false,
+  },
+  center: {
+    type: Boolean,
+    default: true,
+  },
+  icon: {
+    type: String,
+    default: false,
   },
 });
 </script>

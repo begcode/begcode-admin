@@ -8,9 +8,7 @@ export const useGlobSetting = (): Readonly<GlobConfig> => {
     VITE_GLOB_API_URL,
     VITE_GLOB_APP_SHORT_NAME,
     VITE_GLOB_API_URL_PREFIX,
-    VITE_GLOB_APP_CAS_BASE_URL,
     VITE_GLOB_APP_OPEN_SSO,
-    VITE_GLOB_APP_OPEN_QIANKUN,
     VITE_GLOB_DOMAIN_URL,
     VITE_GLOB_ONLINE_VIEW_URL,
   } = getAppEnvConfig();
@@ -22,12 +20,10 @@ export const useGlobSetting = (): Readonly<GlobConfig> => {
     apiUrl: VITE_GLOB_API_URL,
     shortName: VITE_GLOB_APP_TITLE.replace(/\s/g, '_').replace(/-/g, '_'),
     openSso: VITE_GLOB_APP_OPEN_SSO,
-    openQianKun: VITE_GLOB_APP_OPEN_QIANKUN,
-    casBaseUrl: VITE_GLOB_APP_CAS_BASE_URL,
     urlPrefix: VITE_GLOB_API_URL_PREFIX,
     uploadUrl: VITE_GLOB_DOMAIN_URL,
     viewUrl: VITE_GLOB_ONLINE_VIEW_URL,
   };
-  window._CONFIG['domianURL'] = VITE_GLOB_DOMAIN_URL;
+  (window as any)._CONFIG['domianURL'] = VITE_GLOB_DOMAIN_URL;
   return glob as Readonly<GlobConfig>;
 };

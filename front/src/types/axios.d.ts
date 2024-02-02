@@ -54,3 +54,11 @@ export interface UploadFileParams {
   filename?: string;
   [key: string]: any;
 }
+
+//文件返回参数
+export interface UploadFileCallBack {
+  // 成功回调方法
+  success?: any;
+  // 是否返回响应头,需要获取响应头时使用此属性
+  isReturnResponse?: boolean;
+}

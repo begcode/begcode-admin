@@ -1,5 +1,5 @@
 <template>
-  <a-form-item
+  <FormItem
     :colon="!field.hideLabel"
     :labelCol="{ md: field.hideLabel ? 1 : field.labelSpan || 8, xs: field.hideLabel ? 0 : 24 }"
     :wrapperCol="{ md: 24 - (field.hideLabel ? 1 : field.labelSpan || 8), xs: 24 }"
@@ -7,47 +7,47 @@
     style="width: 100%"
   >
     <template #label @click="changeFieldValue">
-      <a-badge v-if="config.showBadge">
+      <Badge v-if="config.showBadge">
         <template #count v-if="showBadge">
           <Icon icon="ant-design:check-circle-outlined" style="color: #f5222d" />
         </template>
         <span>{{ field.title }}</span>
-      </a-badge>
+      </Badge>
       <span v-else-if="!field.hideLabel">{{ field.title }}</span>
     </template>
-    <a-row :gutter="[8, 8]">
-      <a-col :md="field.labelSpan || 8" v-if="field.showFieldNames && field.showFieldComponent === 'Select'">
-        <a-select :dropdownMatchSelectWidth="false" :showArrow="true" placeholder="字段选择" v-model:value="field.defaultFieldName">
-          <a-select-option :value="operator.value" v-for="(operator, operatorIndex) in field.fieldNames" :key="operatorIndex">
+    <Row :gutter="[8, 8]">
+      <Col :md="field.labelSpan || 8" v-if="field.showFieldNames && field.showFieldComponent === 'Select'">
+        <Select :dropdownMatchSelectWidth="false" :showArrow="true" placeholder="字段选择" v-model:value="field.defaultFieldName">
+          <SelectOption :value="operator.value" v-for="(operator, operatorIndex) in field.fieldNames" :key="operatorIndex">
             {{ operator.title }}
-          </a-select-option>
-        </a-select>
-      </a-col>
-      <a-col :md="field.showFieldNamesSpan || 8" v-if="field.showFieldNames && field.showFieldComponent === 'CheckGroup'">
-        <a-checkbox-group v-model:value="field.defaultFieldName" :options="field.fieldNames" />
-      </a-col>
-      <a-col :md="8" v-if="field.showOperator">
-        <a-select
+          </SelectOption>
+        </Select>
+      </Col>
+      <Col :md="field.showFieldNamesSpan || 8" v-if="field.showFieldNames && field.showFieldComponent === 'CheckGroup'">
+        <CheckboxGroup v-model:value="field.defaultFieldName" :options="field.fieldNames" />
+      </Col>
+      <Col :md="8" v-if="field.showOperator">
+        <Select
           :dropdownMatchSelectWidth="false"
           :showArrow="false"
           placeholder="匹配规则"
           :value="field.operator"
           @change="val => handleSelected(val, field)"
         >
-          <a-select-option :value="operator.value" v-for="(operator, operatorIndex) in operatorByType(field.type)" :key="operatorIndex"
+          <SelectOption :value="operator.value" v-for="(operator, operatorIndex) in operatorByType(field.type)" :key="operatorIndex"
             >{{ operator.title }}
-          </a-select-option>
-        </a-select>
-      </a-col>
-      <a-col :md="field.showOperator || field.showFieldNames ? 24 - (field.showFieldNamesSpan || 8) : 24">
-        <a-date-picker
+          </SelectOption>
+        </Select>
+      </Col>
+      <Col :md="field.showOperator || field.showFieldNames ? 24 - (field.showFieldNamesSpan || 8) : 24">
+        <DatePicker
           v-bind="field.componentProps"
           v-if="field.componentType === 'Date'"
           v-model="field.value"
           :placeholder="field?.componentProps?.placeholder || '请选择日期'"
           style="width: 100%"
         />
-        <a-date-picker
+        <DatePicker
           v-bind="field.componentProps"
           v-else-if="field.componentType === 'DateTime'"
           v-model:value="field.value"
@@ -56,7 +56,7 @@
           date-format="YYYY-MM-DD HH:mm:ss"
           style="width: 100%"
         />
-        <a-time-picker
+        <TimePicker
           v-bind="field.componentProps"
           v-else-if="field.componentType === 'Time'"
           v-model:value="field.value"
@@ -65,7 +65,7 @@
           style="width: 100%"
           @change="(time, value) => (field.value = value)"
         />
-        <a-range-picker
+        <RangePicker
           v-bind="field.componentProps"
           v-else-if="field.componentType === 'DateRange'"
           v-model:value="field.value"
@@ -77,48 +77,48 @@
           v-model:value="field.value"
           style="width: 100%"
         />
-        <a-range-picker
+        <RangePicker
           v-bind="field.componentProps"
           v-else-if="field.componentType === 'DateTimeRange'"
           v-model:value="field.value"
           style="width: 100%"
           show-time
         />
-        <a-range-picker
+        <RangePicker
           v-bind="field.componentProps"
           v-else-if="field.componentType === 'WeekRange'"
           v-model:value="field.value"
           style="width: 100%"
           picker="week"
         />
-        <a-range-picker
+        <RangePicker
           v-bind="field.componentProps"
           v-else-if="field.componentType === 'MonthRange'"
           v-model:value="field.value"
           style="width: 100%"
           picker="month"
         />
-        <a-range-picker
+        <RangePicker
           v-bind="field.componentProps"
           v-else-if="field.componentType === 'YearRange'"
           v-model:value="field.value"
           style="width: 100%"
           picker="year"
         />
-        <a-input-number
+        <InputNumber
           v-bind="field.componentProps"
           v-else-if="field.componentType === 'Number'"
           style="width: 100%"
           :placeholder="field?.componentProps?.placeholder || '请输入数值'"
           v-model:value="field.value"
         />
-        <a-switch v-bind="field.componentProps" v-model="field.value" v-else-if="field.componentType === 'Switch'">
+        <Switch v-bind="field.componentProps" v-model="field.value" v-else-if="field.componentType === 'Switch'">
           <Icon icon="ant-design:check-outlined" slot="checkedChildren" />
           <Icon icon="ant-design:close-outlined" slot="unCheckedChildren" />
-        </a-switch>
-        <a-radio-group v-bind="field.componentProps" v-model:value="field.value" v-else-if="field.componentType === 'RadioGroup'">
-        </a-radio-group>
-        <a-select
+        </Switch>
+        <RadioGroup v-bind="field.componentProps" v-model:value="field.value" v-else-if="field.componentType === 'RadioGroup'">
+        </RadioGroup>
+        <Select
           v-bind="field.componentProps"
           v-else-if="field.componentType === 'Select'"
           :placeholder="field?.componentProps?.placeholder || '请选择'"
@@ -126,10 +126,10 @@
           style="width: 100%"
           allowClear
         >
-          <a-select-option v-for="(item, index) in field.componentProps.options || []" :value="item.value" :key="index">
+          <SelectOption v-for="(item, index) in field.componentProps.options || []" :value="item.value" :key="index">
             {{ item.label }}
-          </a-select-option>
-        </a-select>
+          </SelectOption>
+        </Select>
         <ApiSelect
           v-else-if="field.componentType === 'ApiSelect'"
           v-bind="componentProps"
@@ -142,7 +142,7 @@
           :placeholder="field?.componentProps?.placeholder || '请选择'"
           v-model:value="field.value"
         />
-        <a-select
+        <Select
           v-bind="field.componentProps"
           v-else-if="field.componentType === 'TagsInput'"
           mode="tags"
@@ -150,7 +150,7 @@
           style="width: 100%"
           :placeholder="field?.componentProps?.placeholder || '请输入值并回车'"
         />
-        <a-input
+        <Input
           v-bind="field.componentProps"
           v-else
           v-model:value="field.value"
@@ -158,11 +158,27 @@
           allowClear
           style="width: 100%"
         />
-      </a-col>
-    </a-row>
-  </a-form-item>
+      </Col>
+    </Row>
+  </FormItem>
 </template>
 <script lang="ts">
+import {
+  FormItem,
+  Input,
+  Row,
+  Col,
+  Select,
+  SelectOption,
+  Switch,
+  Badge,
+  RadioGroup,
+  InputNumber,
+  RangePicker,
+  TimePicker,
+  DatePicker,
+  CheckboxGroup,
+} from 'ant-design-vue';
 import { TypeOperator } from './filter-operator';
 import Icon from '@/components/Icon/Icon.vue';
 import { ApiSelect } from '@/components/Form/index';
@@ -173,10 +189,24 @@ import RangeDate from '@/components/Form/src/components/RangeDate.vue';
 export default {
   name: 'SearchFormItem',
   components: {
+    Badge,
     RangeDate,
     Icon,
     ApiSelect,
     ApiTreeSelect,
+    FormItem,
+    Input,
+    Row,
+    Col,
+    Select,
+    SelectOption,
+    Switch,
+    RadioGroup,
+    InputNumber,
+    RangePicker,
+    TimePicker,
+    DatePicker,
+    CheckboxGroup,
   },
   props: {
     field: {

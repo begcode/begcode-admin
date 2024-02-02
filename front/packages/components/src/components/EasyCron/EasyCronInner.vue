@@ -89,7 +89,7 @@
         </Col>
         <Col :span="6">
           <div>近十次执行时间（不含年）</div>
-          <a-textarea type="textarea" :value="preTimeList" :rows="5" />
+          <Textarea type="textarea" :value="preTimeList" :rows="5" />
         </Col>
       </Row>
     </div>
@@ -98,7 +98,7 @@
 
 <script lang="ts" setup>
 import { computed, reactive, ref, watch, provide } from 'vue';
-import { Row, Col, Input, Tooltip, Tabs, Divider } from 'ant-design-vue';
+import { Row, Col, Input, Tooltip, Tabs, Divider, Textarea } from 'ant-design-vue';
 import { useDesign } from '@/hooks/web/useDesign';
 import CronParser from 'cron-parser';
 import SecondUI from './tabs/SecondUI.vue';

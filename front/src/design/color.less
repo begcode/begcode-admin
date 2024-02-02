@@ -1,6 +1,6 @@
 html {
   // text
-  --text-color: rgb(0 0 0 85%);
+  --text-color: rgba(0 0 0 / 85%);
 
   // border
   --border-color: #eee;
@@ -22,6 +22,27 @@ html {
 
   // app
   --app-content-background-color: #fafafa;
+
+  // custom color example
+  --custom-example-color: #ff4d4f;
+
+  // dark theme
+  &[data-theme='dark'] {
+    // text
+    --text-color: #c9d1d9;
+
+    // border
+    --border-color: #303030;
+
+    // component
+    --component-background-color: #151515;
+
+    // app
+    --app-content-background-color: #1e1e1e;
+
+    // custom color example
+    --custom-example-color: #55d187;
+  }
 }
 
 @white: #fff;
@@ -164,3 +185,8 @@ html {
 @button-cancel-hover-color: @primary-color;
 @button-cancel-hover-bg-color: @white;
 @button-cancel-hover-border-color: @primary-color;
+
+// =================================
+// =====custom color example========
+// =================================
+@custom-example-color: var(--custom-example-color);

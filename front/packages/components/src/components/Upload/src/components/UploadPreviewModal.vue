@@ -7,23 +7,25 @@
     @register="register"
     :showOkBtn="false"
   >
-    <vxe-grid ref="xGrid" :columns="columns" :data="fileListRef">
+    <Grid ref="xGrid" :columns="columns" :data="fileListRef">
       <template #recordAction="{ row }">
-        <a-button :type="'link'" status="primary" @click="handleRemove(row)">
+        <Button :type="'link'" status="primary" @click="handleRemove(row)">
           <span>删除</span>
-        </a-button>
-        <a-button :type="'link'" status="primary" @click="handlePreview(row)">
+        </Button>
+        <Button :type="'link'" status="primary" @click="handlePreview(row)">
           <span>预览</span>
-        </a-button>
-        <a-button :type="'link'" status="primary" @click="handleDownload(row)">
+        </Button>
+        <Button :type="'link'" status="primary" @click="handleDownload(row)">
           <span>下载</span>
-        </a-button>
+        </Button>
       </template>
-    </vxe-grid>
+    </Grid>
   </BasicModal>
 </template>
 <script lang="ts" setup>
 import { watch, ref } from 'vue';
+import { Button } from 'ant-design-vue';
+import { Grid } from 'vxe-table';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { previewProps } from '../props';
 import { PreviewFileItem } from '../types/typing';

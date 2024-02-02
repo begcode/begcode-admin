@@ -68,7 +68,7 @@ entity CommonFieldData {
     ownerEntityName String /** 实体名称 */
     @fieldConfig(hideInList-hideInForm)
     @ownerEntityId
-    ownerEntityId String /** 使用实体ID */
+    ownerEntityId Long /** 使用实体ID */
 }
 
 /**

@@ -1,5 +1,11 @@
 import { addClass, hasClass, removeClass } from '@begcode/components';
 
+export type CustomColorType = {
+  name: string;
+  light: string;
+  dark: string;
+};
+
 export async function updateDarkTheme(mode: string | null = 'light') {
   const htmlRoot = document.getElementById('htmlRoot');
   if (!htmlRoot) {

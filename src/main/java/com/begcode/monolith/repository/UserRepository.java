@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.begcode.monolith.domain.User;
 import com.diboot.core.mapper.BaseCrudMapper;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.apache.ibatis.annotations.Mapper;
@@ -28,7 +28,7 @@ public interface UserRepository extends BaseCrudMapper<User> {
         return Optional.ofNullable(this.selectOne(new LambdaQueryWrapper<User>().eq(User::getActivationKey, activationKey)));
     }
 
-    default List<User> findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(ZonedDateTime dateTime) {
+    default List<User> findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(Instant dateTime) {
         return this.selectList(
                 new LambdaQueryWrapper<User>()
                     .eq(User::isActivated, false)

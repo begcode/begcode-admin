@@ -1,5 +1,5 @@
 import type { RouteRecordNormalized } from 'vue-router';
-import { filter, isUrl } from '@begcode/components';
+import { filter, isHttpUrl } from '@begcode/components';
 import { pathToRegexp } from 'path-to-regexp';
 import type { Menu, MenuModule } from '@/router/types';
 
@@ -114,7 +114,7 @@ export async function getChildrenMenus(parentPath: string) {
 function basicFilter(routes: RouteRecordNormalized[]) {
   return (menu: Menu) => {
     const matchRoute = routes.find(route => {
-      if (isUrl(menu.path)) return true;
+      if (isHttpUrl(menu.path)) return true;
 
       if (route.meta?.carryParam) {
         return pathToRegexp(route.path).test(menu.path);

@@ -342,10 +342,23 @@ public class DictionaryBaseService<R extends DictionaryRepository, E extends Dic
                         ids.add(beforeId);
                         Map<Long, Integer> idSortValueMap = listByIds(ids)
                             .stream()
+                            .filter(dictionary -> dictionary.getSortValue() != null)
                             .collect(Collectors.toMap(Dictionary::getId, Dictionary::getSortValue));
                         return (
                             lambdaUpdate().set(Dictionary::getSortValue, idSortValueMap.get(beforeId)).eq(Dictionary::getId, id).update() &&
                             lambdaUpdate().set(Dictionary::getSortValue, idSortValueMap.get(id)).eq(Dictionary::getId, beforeId).update()
+                        );
+                    } else if (ObjectUtils.allNotNull(id, afterId)) {
+                        Set<Long> ids = new HashSet<>();
+                        ids.add(id);
+                        ids.add(afterId);
+                        Map<Long, Integer> idSortValueMap = listByIds(ids)
+                            .stream()
+                            .filter(dictionary -> dictionary.getSortValue() != null)
+                            .collect(Collectors.toMap(Dictionary::getId, Dictionary::getSortValue));
+                        return (
+                            lambdaUpdate().set(Dictionary::getSortValue, idSortValueMap.get(afterId)).eq(Dictionary::getId, id).update() &&
+                            lambdaUpdate().set(Dictionary::getSortValue, idSortValueMap.get(id)).eq(Dictionary::getId, afterId).update()
                         );
                     } else {
                         return false;
@@ -363,6 +376,7 @@ public class DictionaryBaseService<R extends DictionaryRepository, E extends Dic
                     }
                     Map<Long, Integer> idSortValueMap = listByIds(ids)
                         .stream()
+                        .filter(dictionary -> dictionary.getSortValue() != null)
                         .collect(Collectors.toMap(Dictionary::getId, Dictionary::getSortValue));
                     if (ObjectUtils.allNotNull(beforeId, afterId)) {
                         // 计算中间值

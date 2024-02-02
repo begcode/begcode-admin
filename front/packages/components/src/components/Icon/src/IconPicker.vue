@@ -1,11 +1,12 @@
 <template>
   <Input
-    readOnly
     :style="{ width }"
     :placeholder="t('component.icon.placeholder')"
     :class="prefixCls"
     v-model:value="currentSelect"
     @click="triggerPopover"
+    :allowClear="props.allowClear"
+    :readonly="props.readonly"
   >
     <template #addonAfter>
       <Popover placement="bottomLeft" trigger="click" v-model="visible" :overlayClassName="`${prefixCls}-popover`">
@@ -105,6 +106,8 @@ export interface Props {
   mode?: 'svg' | 'iconify';
   disabled?: boolean;
   clearSelect?: boolean;
+  allowClear?: boolean;
+  readonly?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -115,6 +118,8 @@ const props = withDefaults(defineProps<Props>(), {
   mode: 'iconify',
   disabled: true,
   clearSelect: false,
+  allowClear: true,
+  readonly: false,
 });
 
 const emit = defineEmits(['change', 'update:value']);

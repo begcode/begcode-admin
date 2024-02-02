@@ -290,12 +290,19 @@ const config = {
       {
         title: '展示',
         field: 'display',
-        componentType: 'Switch',
+        componentType: 'RadioGroup',
         value: '',
         operator: '',
         span: 8,
         type: 'Boolean',
-        componentProps: {},
+        componentProps: {
+          optionType: 'button',
+          buttonStyle: 'solid',
+          options: [
+            { label: '是', value: true },
+            { label: '否', value: false },
+          ],
+        },
       },
       {
         title: '子节点',
@@ -358,7 +365,7 @@ const config = {
         visible: false,
         treeNode: false,
         params: { type: 'LONG' },
-        editRender: { name: 'AInputNumber', enabled: false },
+        editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
       },
       {
         title: '角色名称',
@@ -394,7 +401,7 @@ const config = {
         visible: true,
         treeNode: false,
         params: { type: 'INTEGER' },
-        editRender: { name: 'AInputNumber', enabled: false },
+        editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
       },
       {
         title: '展示',
@@ -476,7 +483,7 @@ const config = {
       treeConfig: {
         childrenField: 'children',
         indent: 20,
-        line: false,
+        showLine: false,
         expandAll: false,
         accordion: false,
         trigger: 'default',

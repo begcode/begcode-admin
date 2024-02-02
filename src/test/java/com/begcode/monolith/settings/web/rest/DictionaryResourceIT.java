@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.begcode.monolith.IntegrationTest;
-import com.begcode.monolith.settings.domain.CommonFieldData;
 import com.begcode.monolith.settings.domain.Dictionary;
 import com.begcode.monolith.settings.repository.DictionaryRepository;
 import com.begcode.monolith.settings.service.dto.DictionaryDTO;
@@ -579,20 +578,6 @@ public class DictionaryResourceIT {
 
         // Get all the dictionaryList where syncEnum is null
         defaultDictionaryShouldNotBeFound("syncEnum.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllDictionariesByItemsIsEqualToSomething() throws Exception {
-        CommonFieldData items = CommonFieldDataResourceIT.createEntity();
-        // dictionary.addItems(items);
-        dictionaryRepository.insert(dictionary);
-        Long itemsId = items.getId();
-        // Get all the dictionaryList where items equals to itemsId
-        defaultDictionaryShouldBeFound("itemsId.equals=" + itemsId);
-
-        // Get all the dictionaryList where items equals to (itemsId + 1)
-        defaultDictionaryShouldNotBeFound("itemsId.equals=" + (itemsId + 1));
     }
 
     /**

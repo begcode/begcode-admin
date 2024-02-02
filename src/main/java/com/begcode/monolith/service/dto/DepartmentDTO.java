@@ -2,7 +2,7 @@ package com.begcode.monolith.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
@@ -70,7 +70,7 @@ public class DepartmentDTO implements Serializable {
      * 创建时间
      */
     @Schema(description = "创建时间")
-    private ZonedDateTime createTime;
+    private Instant createTime;
 
     /**
      * 下级部门
@@ -134,7 +134,7 @@ public class DepartmentDTO implements Serializable {
         return this;
     }
 
-    public DepartmentDTO createTime(ZonedDateTime createTime) {
+    public DepartmentDTO createTime(Instant createTime) {
         this.createTime = createTime;
         return this;
     }

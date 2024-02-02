@@ -61,13 +61,13 @@ export default {
     const queryParams = qs.stringify({ otherEntityIds, relatedIds, relationshipName }, { arrayFormat: 'repeat' });
     return defHttp.put({ url: `${apiUrl}/relations/${operateType}?${queryParams}` });
   },
-  create(uploadFile: IUploadFile, onUploadProgress?: (progressEvent: ProgressEvent) => void) {
+  create(uploadFile: IUploadFile, onUploadProgress?: (progressEvent: ProgressEvent) => void, success?) {
     const params: UploadFileParams = <UploadFileParams>{};
     params.name = 'file';
-    params.file = uploadFile.uploadFile as File;
-    params.filename = uploadFile!.uploadFile!.name;
+    params.file = uploadFile.file as File;
+    params.filename = uploadFile!.file!.name;
     const newUploadFile = { ...uploadFile };
-    delete newUploadFile.uploadFile;
+    delete newUploadFile.file;
     params.data = { uploadFileDTO: pickBy(newUploadFile, value => !!value) };
     return defHttp.uploadFile<IUploadFile>(
       {
@@ -75,7 +75,7 @@ export default {
         onUploadProgress,
       },
       params,
-      { isReturnResponse: true },
+      { isReturnResponse: true, success },
     );
   },
   uploadFileUrl: apiUrl,

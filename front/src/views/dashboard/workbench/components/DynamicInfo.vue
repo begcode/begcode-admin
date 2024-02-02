@@ -1,7 +1,7 @@
 <template>
   <Card title="最新动态" v-bind="$attrs">
     <template #extra>
-      <a-button type="link" size="small">更多</a-button>
+      <Button type="link" size="small">更多</Button>
     </template>
     <List item-layout="horizontal" :data-source="dynamicInfoItems">
       <template #renderItem="{ item }">
@@ -22,7 +22,7 @@
   </Card>
 </template>
 <script lang="ts" setup>
-import { Card, List } from 'ant-design-vue';
+import { Card, List, Button } from 'ant-design-vue';
 import { dynamicInfoItems } from './data';
 import { Icon } from '@begcode/components';
 

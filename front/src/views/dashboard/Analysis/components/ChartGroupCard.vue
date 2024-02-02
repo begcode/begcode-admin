@@ -9,9 +9,9 @@
         :class="[index + 1 < 4 && '!md:mr-4']"
       >
         <template #action>
-          <a-tooltip title="指标说明">
+          <Tooltip title="指标说明">
             <Icon :icon="item.icon" :size="20" />
-          </a-tooltip>
+          </Tooltip>
         </template>
         <div v-if="type === 'chart'">
           <Trend term="周同比" :percentage="12" v-if="index === 0" />
@@ -50,7 +50,7 @@
 </template>
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import { Progress } from 'ant-design-vue';
+import { Progress, Tooltip } from 'ant-design-vue';
 import { Icon, ChartCard, Trend, Bar, Line } from '@begcode/components';
 import { chartCardList, bdcCardList } from '../data';
 

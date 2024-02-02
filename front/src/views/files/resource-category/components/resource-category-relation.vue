@@ -328,7 +328,7 @@ const config = {
         visible: false,
         treeNode: false,
         params: { type: 'LONG' },
-        editRender: { name: 'AInputNumber', enabled: false },
+        editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
       },
       {
         title: '标题',
@@ -355,7 +355,7 @@ const config = {
         visible: true,
         treeNode: false,
         params: { type: 'INTEGER' },
-        editRender: { name: 'AInputNumber', enabled: false },
+        editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
       },
       {
         title: '操作',
@@ -428,7 +428,7 @@ const config = {
       treeConfig: {
         childrenField: 'children',
         indent: 20,
-        line: false,
+        showLine: false,
         expandAll: false,
         accordion: false,
         trigger: 'default',

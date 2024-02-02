@@ -309,7 +309,7 @@ const config = {
         visible: true,
         treeNode: false,
         params: { type: 'LONG' },
-        editRender: { name: 'AInputNumber', enabled: false },
+        editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
       },
       {
         title: '岗位代码',
@@ -336,7 +336,7 @@ const config = {
         visible: true,
         treeNode: false,
         params: { type: 'INTEGER' },
-        editRender: { name: 'AInputNumber', enabled: false },
+        editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
       },
       {
         title: '描述',

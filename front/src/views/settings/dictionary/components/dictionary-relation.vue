@@ -269,12 +269,19 @@ const config = {
       {
         title: '是否禁用',
         field: 'disabled',
-        componentType: 'Switch',
+        componentType: 'RadioGroup',
         value: '',
         operator: '',
         span: 8,
         type: 'Boolean',
-        componentProps: {},
+        componentProps: {
+          optionType: 'button',
+          buttonStyle: 'solid',
+          options: [
+            { label: '是', value: true },
+            { label: '否', value: false },
+          ],
+        },
       },
       {
         title: '排序',
@@ -289,22 +296,36 @@ const config = {
       {
         title: '是否内置',
         field: 'builtIn',
-        componentType: 'Switch',
+        componentType: 'RadioGroup',
         value: '',
         operator: '',
         span: 8,
         type: 'Boolean',
-        componentProps: {},
+        componentProps: {
+          optionType: 'button',
+          buttonStyle: 'solid',
+          options: [
+            { label: '是', value: true },
+            { label: '否', value: false },
+          ],
+        },
       },
       {
         title: '更新枚举',
         field: 'syncEnum',
-        componentType: 'Switch',
+        componentType: 'RadioGroup',
         value: '',
         operator: '',
         span: 8,
         type: 'Boolean',
-        componentProps: {},
+        componentProps: {
+          optionType: 'button',
+          buttonStyle: 'solid',
+          options: [
+            { label: '是', value: true },
+            { label: '否', value: false },
+          ],
+        },
       },
       {
         title: '字典项列表',
@@ -331,7 +352,7 @@ const config = {
         visible: true,
         treeNode: false,
         params: { type: 'LONG' },
-        editRender: { name: 'AInputNumber', enabled: false },
+        editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
       },
       {
         title: '字典名称',
@@ -367,7 +388,7 @@ const config = {
         visible: true,
         treeNode: false,
         params: { type: 'INTEGER' },
-        editRender: { name: 'AInputNumber', enabled: false },
+        editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
       },
       {
         title: '是否内置',

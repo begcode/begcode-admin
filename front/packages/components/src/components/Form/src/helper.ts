@@ -56,7 +56,7 @@ export function processDateValue(attr: Recordable, component: string) {
   }
 }
 
-export const defaultValueComponents = ['Input', 'InputPassword', 'InputNumber', 'InputSearch', 'InputTextArea'];
+export const defaultValueComponents = ['Input', 'InputPassword', 'InputSearch', 'InputTextArea'];
 
 export function handleInputNumberValue(component?: ComponentType, val?: any) {
   if (!component) return val;
@@ -84,3 +84,9 @@ export const NO_AUTO_LINK_COMPONENTS: ComponentType[] = [
   'ImageUpload',
   'ApiSelect',
 ];
+
+export const simpleComponents = ['Divider', 'BasicTitle'];
+
+export function isIncludeSimpleComponents(component?: ComponentType) {
+  return simpleComponents.includes(component || '');
+}

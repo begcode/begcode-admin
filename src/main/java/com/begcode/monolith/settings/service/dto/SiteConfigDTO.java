@@ -3,7 +3,7 @@ package com.begcode.monolith.settings.service.dto;
 import com.begcode.monolith.domain.AbstractAuditingEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
@@ -67,7 +67,7 @@ public class SiteConfigDTO extends AbstractAuditingEntity<Long, SiteConfigDTO> {
      * 创建时间
      */
     @Schema(description = "创建时间")
-    private ZonedDateTime createdDate;
+    private Instant createdDate;
 
     /**
      * 修改者Id
@@ -79,7 +79,7 @@ public class SiteConfigDTO extends AbstractAuditingEntity<Long, SiteConfigDTO> {
      * 修改时间
      */
     @Schema(description = "修改时间")
-    private ZonedDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     /**
      * 配置项列表
@@ -124,7 +124,7 @@ public class SiteConfigDTO extends AbstractAuditingEntity<Long, SiteConfigDTO> {
         return this;
     }
 
-    public SiteConfigDTO createdDate(ZonedDateTime createdDate) {
+    public SiteConfigDTO createdDate(Instant createdDate) {
         this.createdDate = createdDate;
         return this;
     }
@@ -134,7 +134,7 @@ public class SiteConfigDTO extends AbstractAuditingEntity<Long, SiteConfigDTO> {
         return this;
     }
 
-    public SiteConfigDTO lastModifiedDate(ZonedDateTime lastModifiedDate) {
+    public SiteConfigDTO lastModifiedDate(Instant lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
         return this;
     }

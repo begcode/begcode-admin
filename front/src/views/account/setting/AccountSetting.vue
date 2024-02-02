@@ -3,8 +3,9 @@
     <div class="my-account">账户</div>
     <div class="account-row-item clearfix">
       <div class="account-label gray-75">手机</div>
-      <span class="gray">{{ userDetail.mobile ? userDetail.mobile : '未填写' }}</span>
+      <span class="gray" v-if="userDetail.mobile">{{ userDetail.mobile }}</span>
       <span class="pointer blue-e5 phone-margin" @click="updatePhone" v-if="userDetail.mobile">修改</span>
+      <span class="pointer blue-e5 phone-margin" @click="bindPhone" v-else>绑定</span>
       <span class="pointer blue-e5" @click="unbindPhone" v-if="userDetail.mobile">解绑</span>
       <span class="pointer blue-e5" @click="updatePhone" v-else>绑定</span>
     </div>
@@ -87,6 +88,15 @@ function unbindEmail() {
  */
 function checkEmail() {
   console.log('邮箱验证');
+}
+
+/**
+ * 绑定手机号
+ */
+function bindPhone() {
+  openModal(true, {
+    record: { username: userDetail.value.username, id: userDetail.value.id },
+  });
 }
 
 /**

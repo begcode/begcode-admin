@@ -74,7 +74,7 @@ public class CommonFieldDataDTO implements Serializable {
      * 使用实体ID
      */
     @Schema(description = "使用实体ID")
-    private String ownerEntityId;
+    private Long ownerEntityId;
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove
 
@@ -123,7 +123,7 @@ public class CommonFieldDataDTO implements Serializable {
         return this;
     }
 
-    public CommonFieldDataDTO ownerEntityId(String ownerEntityId) {
+    public CommonFieldDataDTO ownerEntityId(Long ownerEntityId) {
         this.ownerEntityId = ownerEntityId;
         return this;
     }

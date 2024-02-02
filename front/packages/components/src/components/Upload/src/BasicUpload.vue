@@ -1,9 +1,9 @@
 <template>
   <div>
-    <a-button-group>
-      <a-button type="primary" @click="openUploadModal" preIcon="carbon:cloud-upload">
+    <ButtonGroup>
+      <Button type="primary" @click="openUploadModal" preIcon="carbon:cloud-upload">
         {{ t('component.upload.upload') }}
-      </a-button>
+      </Button>
       <Tooltip placement="bottom" v-if="showPreview">
         <template #title>
           {{ t('component.upload.uploaded') }}
@@ -11,14 +11,14 @@
             {{ fileList.length }}
           </template>
         </template>
-        <a-button @click="openPreviewModal">
+        <Button @click="openPreviewModal">
           <Icon icon="bi:eye" />
           <template v-if="fileList.length && showPreviewNumber">
             {{ fileList.length }}
           </template>
-        </a-button>
+        </Button>
       </Tooltip>
-    </a-button-group>
+    </ButtonGroup>
     <UploadModal
       v-bind="bindValue"
       :previewFileList="fileList"
@@ -40,8 +40,9 @@
 <script lang="ts" setup>
 import { ref, watch, unref, computed, useAttrs } from 'vue';
 import { Recordable } from '#/utils.d';
+import { ButtonGroup, Tooltip } from 'ant-design-vue';
+import { Button } from '@/components/Button';
 import Icon from '@/components/Icon/Icon.vue';
-import { Tooltip } from 'ant-design-vue';
 import { useModal } from '@/components/Modal';
 import { uploadContainerProps } from './props';
 import { omit } from 'lodash-es';

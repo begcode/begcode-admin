@@ -6,54 +6,51 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, computed } from 'vue';
+<script lang="ts" setup>
+import { computed } from 'vue';
+import Icon from '@/components/Icon/Icon.vue';
 
-export default defineComponent({
+defineOptions({
   name: 'Trend',
-  props: {
-    // 同title
-    term: {
-      type: String,
-      default: '',
-      required: true,
-    },
-    // 百分比
-    percentage: {
-      type: Number,
-      default: null,
-    },
-    type: {
-      type: Boolean,
-      default: null,
-    },
-    target: {
-      type: Number,
-      default: 0,
-    },
-    value: {
-      type: Number,
-      default: 0,
-    },
-    fixed: {
-      type: Number,
-      default: 2,
-    },
+});
+
+const props = defineProps({
+  // 同title
+  term: {
+    type: String,
+    default: '',
+    required: true,
   },
-  setup(props) {
-    const trend = computed(() => {
-      let type = props.type === null ? props.value >= props.target : props.type;
-      return type ? 'up' : 'down';
-    });
-    const rate = computed(() =>
-      (props.percentage === null ? (Math.abs(props.value - props.target) * 100) / props.target : props.percentage).toFixed(props.fixed),
-    );
-    return {
-      trend,
-      rate,
-    };
+  // 百分比
+  percentage: {
+    type: Number,
+    default: null,
+  },
+  type: {
+    type: Boolean,
+    default: null,
+  },
+  target: {
+    type: Number,
+    default: 0,
+  },
+  value: {
+    type: Number,
+    default: 0,
+  },
+  fixed: {
+    type: Number,
+    default: 2,
   },
 });
+
+const trend = computed(() => {
+  let type = props.type === null ? props.value >= props.target : props.type;
+  return type ? 'up' : 'down';
+});
+const rate = computed(() =>
+  (props.percentage === null ? (Math.abs(props.value - props.target) * 100) / props.target : props.percentage).toFixed(props.fixed),
+);
 </script>
 
 <style scoped>

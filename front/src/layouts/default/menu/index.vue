@@ -13,7 +13,7 @@ import { ScrollContainer } from '@begcode/components';
 
 import { useGo } from '@/hooks/web/usePage';
 import { useSplitMenu } from './useLayoutMenu';
-import { isUrl, openWindow, propTypes } from '@begcode/components';
+import { isHttpUrl, openWindow, propTypes } from '@begcode/components';
 import { useRootSetting } from '@/hooks/setting/useRootSetting';
 import { useAppInject } from '@begcode/components';
 import { useDesign } from '@begcode/components';
@@ -117,7 +117,7 @@ export default defineComponent({
      * @param menu
      */
     async function beforeMenuClickFn(path: string) {
-      if (!isUrl(path)) {
+      if (!isHttpUrl(path)) {
         return true;
       }
       openWindow(path);

@@ -220,6 +220,7 @@ public class FillRuleItemBaseService<R extends FillRuleItemRepository, E extends
                         ids.add(beforeId);
                         Map<Long, Integer> idSortValueMap = listByIds(ids)
                             .stream()
+                            .filter(fillRuleItem -> fillRuleItem.getSortValue() != null)
                             .collect(Collectors.toMap(FillRuleItem::getId, FillRuleItem::getSortValue));
                         return (
                             lambdaUpdate()
@@ -230,6 +231,21 @@ public class FillRuleItemBaseService<R extends FillRuleItemRepository, E extends
                                 .set(FillRuleItem::getSortValue, idSortValueMap.get(id))
                                 .eq(FillRuleItem::getId, beforeId)
                                 .update()
+                        );
+                    } else if (ObjectUtils.allNotNull(id, afterId)) {
+                        Set<Long> ids = new HashSet<>();
+                        ids.add(id);
+                        ids.add(afterId);
+                        Map<Long, Integer> idSortValueMap = listByIds(ids)
+                            .stream()
+                            .filter(fillRuleItem -> fillRuleItem.getSortValue() != null)
+                            .collect(Collectors.toMap(FillRuleItem::getId, FillRuleItem::getSortValue));
+                        return (
+                            lambdaUpdate()
+                                .set(FillRuleItem::getSortValue, idSortValueMap.get(afterId))
+                                .eq(FillRuleItem::getId, id)
+                                .update() &&
+                            lambdaUpdate().set(FillRuleItem::getSortValue, idSortValueMap.get(id)).eq(FillRuleItem::getId, afterId).update()
                         );
                     } else {
                         return false;
@@ -247,6 +263,7 @@ public class FillRuleItemBaseService<R extends FillRuleItemRepository, E extends
                     }
                     Map<Long, Integer> idSortValueMap = listByIds(ids)
                         .stream()
+                        .filter(fillRuleItem -> fillRuleItem.getSortValue() != null)
                         .collect(Collectors.toMap(FillRuleItem::getId, FillRuleItem::getSortValue));
                     if (ObjectUtils.allNotNull(beforeId, afterId)) {
                         // 计算中间值

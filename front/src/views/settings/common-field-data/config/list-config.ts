@@ -88,12 +88,19 @@ const searchForm = (): any[] => {
     {
       title: '是否禁用',
       field: 'disabled',
-      componentType: 'Switch',
+      componentType: 'RadioGroup',
       value: '',
       operator: '',
       span: 8,
       type: 'Boolean',
-      componentProps: {},
+      componentProps: {
+        optionType: 'button',
+        buttonStyle: 'solid',
+        options: [
+          { label: '是', value: true },
+          { label: '否', value: false },
+        ],
+      },
     },
     {
       title: '实体名称',
@@ -110,7 +117,7 @@ const searchForm = (): any[] => {
       field: 'ownerEntityId',
       componentType: 'Text',
       value: '',
-      type: 'String',
+      type: 'Long',
       operator: '',
       span: 8,
       componentProps: {},
@@ -133,7 +140,7 @@ const columns = (): VxeGridPropTypes.Columns => {
       visible: true,
       treeNode: false,
       params: { type: 'LONG' },
-      editRender: { name: 'AInputNumber', enabled: false },
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '名称',
@@ -214,11 +221,11 @@ const columns = (): VxeGridPropTypes.Columns => {
     {
       title: '使用实体ID',
       field: 'ownerEntityId',
-      minWidth: 160,
+      minWidth: 80,
       visible: false,
       treeNode: false,
-      params: { type: 'STRING' },
-      editRender: { name: 'AInput', enabled: false },
+      params: { type: 'LONG' },
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '操作',

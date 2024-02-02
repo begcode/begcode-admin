@@ -17,6 +17,8 @@ entity ResourceCategory {
 @replaceListComponentMethod(newEntity)
 @listBy(list)
 entity UploadFile {
+    @endUsed(selectFile)
+    url String required /** Url地址 */
     /**
      * 完整文件名
      * 不含路径
@@ -36,8 +38,6 @@ entity UploadFile {
     @fieldConfig(hideInForm)
     type String /** 文件类型 */
     @fieldConfig(hideInForm)
-    url String /** Url地址 */
-    @fieldConfig(hideInForm)
     path String /** 本地路径 */
     @fieldConfig(hideInForm)
     folder String /** 存储目录 */
@@ -46,7 +46,7 @@ entity UploadFile {
     ownerEntityName String /** 实体名称 */
     @ownerEntityId
     @fieldConfig(hideInList-hideInForm)
-    ownerEntityId String /** 使用实体ID */
+    ownerEntityId Long /** 使用实体ID */
     businessTitle String /** 业务标题 */
     businessDesc String /** 业务自定义描述内容 */
     businessStatus String /** 业务状态 */
@@ -68,6 +68,8 @@ entity UploadFile {
 @replaceListComponentMethod(newEntity)
 @listBy(list)
 entity UploadImage {
+    @endUsed(selectFile)
+    url String required /** Url地址 */
     /**
      * 完整文件名
      * 不含路径
@@ -85,14 +87,13 @@ entity UploadImage {
     @fieldConfig(hideInForm)
     type String /** 文件类型 */
     @fieldConfig(hideInForm)
-    url String /** Web Url地址 */
-    @fieldConfig(hideInForm)
     path String /** 本地路径 */
     @fieldConfig(hideInForm)
     folder String /** 本地存储目录 */
     @fieldConfig(hideInForm)
     ownerEntityName String /** 使用实体名称 */
-    ownerEntityId String /** 使用实体ID */
+    @fieldConfig(hideInForm)
+    ownerEntityId Long /** 使用实体ID */
     businessTitle String /** 业务标题 */
     businessDesc String /** 业务自定义描述内容 */
     businessStatus String /** 业务状态 */

@@ -39,7 +39,7 @@ import { Form, Row, type FormProps as AntFormProps } from 'ant-design-vue';
 import FormItem from './components/FormItem.vue';
 import FormAction from './components/FormAction.vue';
 
-import { dateItemType } from './helper';
+import { dateItemType, isIncludeSimpleComponents, handleInputStringValue } from './helper';
 import { dateUtil } from '@/utils/dateUtil';
 
 import { deepMerge } from '@/utils';
@@ -126,10 +126,20 @@ const getBindValue = computed(() => ({ ...attrs, ...props, ...unref(getProps) })
 const getSchema = computed((): FormSchema[] => {
   const schemas: FormSchema[] = unref(schemaRef) || (unref(getProps).schemas as any);
   for (const schema of schemas) {
-    const { defaultValue, component, componentProps, isHandleDateDefaultValue = true } = schema;
+    const { defaultValue, component, componentProps = {}, isHandleDateDefaultValue = true } = schema;
     // handle date type
     if (isHandleDateDefaultValue && defaultValue && component && dateItemType.includes(component)) {
-      const valueFormat = componentProps ? componentProps['valueFormat'] : null;
+      const opt = {
+        schema,
+        tableAction: props.tableAction ?? {},
+        formModel,
+        formActionType: {} as FormActionType,
+      };
+      const valueFormat = componentProps
+        ? typeof componentProps === 'function'
+          ? componentProps(opt)['valueFormat']
+          : componentProps['valueFormat']
+        : null;
       if (!Array.isArray(defaultValue)) {
         schema.defaultValue = valueFormat ? dateUtil(defaultValue).format(valueFormat) : dateUtil(defaultValue);
       } else {
@@ -142,7 +152,7 @@ const getSchema = computed((): FormSchema[] => {
     }
   }
   if (unref(getProps).showAdvancedButton) {
-    return cloneDeep(schemas.filter(schema => schema.component !== 'Divider') as FormSchema[]);
+    return cloneDeep(schemas.filter(schema => !isIncludeSimpleComponents(schema.component)) as FormSchema[]);
   } else {
     return cloneDeep(schemas as FormSchema[]);
   }
@@ -307,9 +317,6 @@ onMounted(() => {
 }
 .vben-basic-form .ant-form-item.suffix-item .ant-form-item-children {
   display: flex;
-}
-.vben-basic-form .ant-form-item.suffix-item .ant-form-item-control {
-  margin-top: 4px;
 }
 .vben-basic-form .ant-form-item.suffix-item .suffix {
   display: inline-flex;

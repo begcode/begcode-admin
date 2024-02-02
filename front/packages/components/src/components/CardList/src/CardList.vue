@@ -17,7 +17,7 @@
                   <Tooltip v-if="!button.hidden">
                     <template #title>{{ button.title }}</template>
                     <ImageUpload v-if="button.name === 'uploadImg'">{{ button.title }}</ImageUpload>
-                    <a-upload v-else-if="button.name === 'uploadFile'">{{ button.title }}</a-upload>
+                    <Upload v-else-if="button.name === 'uploadFile'">{{ button.title }}</Upload>
                     <Button :disabled="button.disabled" @click="button.click" v-else>
                       <Icon :icon="button.icon" v-if="button.icon"></Icon>
                       {{ button.title }}
@@ -46,7 +46,7 @@
               </template>
               <template class="ant-card-actions" #actions>
                 <template v-for="operation in rowOperations">
-                  <Button @click="operation.click">{{ operation.title }}</Button>
+                  <Button @click="operation.click(item)">{{ operation.title }}</Button>
                 </template>
                 <Dropdown
                   :trigger="['hover']"
@@ -67,7 +67,7 @@
               </template>
               <CardMeta>
                 <template #title>
-                  <Typography.Paragraph :content="titleValue(item)" :ellipsis="true" />
+                  <TypographyParagraph :content="titleValue(item)" :ellipsis="true" />
                 </template>
                 <template #avatar>
                   <Avatar :src="item.avatar" v-if="showAvatar" />
@@ -83,12 +83,13 @@
 </template>
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
-import { List, Card, Image, Typography, Tooltip, Slider, Avatar, Space } from 'ant-design-vue';
+import { List, Card, Image, TypographyParagraph, Tooltip, Slider, Avatar, Space, Upload } from 'ant-design-vue';
 import { EllipsisOutlined, RedoOutlined, TableOutlined } from '@ant-design/icons-vue';
 import { Dropdown } from '@/components/Dropdown';
 import { useForm } from '@/components/Form';
 import { propTypes } from '@/utils/propTypes';
 import { Button } from '@/components/Button';
+import Icon from '@/components/Icon/Icon.vue';
 import { isFunction } from 'lodash-es';
 import { useSlider, grid } from './data';
 import ImageUpload from '@/components/Upload/src/components/ImageUpload.vue';

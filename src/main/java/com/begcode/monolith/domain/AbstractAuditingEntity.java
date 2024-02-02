@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 
 /**
  * Base abstract class for entities which will hold definitions for created, last modified, created by,
@@ -21,13 +21,13 @@ public abstract class AbstractAuditingEntity<T, E> implements Serializable {
     private Long createdBy;
 
     @TableField(value = "created_date", fill = FieldFill.INSERT)
-    private ZonedDateTime createdDate;
+    private Instant createdDate;
 
     @TableField(value = "last_modified_by", fill = FieldFill.INSERT_UPDATE)
     private Long lastModifiedBy;
 
     @TableField(value = "last_modified_date", fill = FieldFill.INSERT_UPDATE)
-    private ZonedDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     public Long getCreatedBy() {
         return createdBy;
@@ -37,11 +37,11 @@ public abstract class AbstractAuditingEntity<T, E> implements Serializable {
         this.createdBy = createdBy;
     }
 
-    public ZonedDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(ZonedDateTime createdDate) {
+    public void setCreatedDate(Instant createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -53,11 +53,11 @@ public abstract class AbstractAuditingEntity<T, E> implements Serializable {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    public ZonedDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(ZonedDateTime lastModifiedDate) {
+    public void setLastModifiedDate(Instant lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 
@@ -71,12 +71,12 @@ public abstract class AbstractAuditingEntity<T, E> implements Serializable {
         return (E) this;
     }
 
-    public E lastModifiedDate(ZonedDateTime lastModifiedDate) {
+    public E lastModifiedDate(Instant lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
         return (E) this;
     }
 
-    public E createdDate(ZonedDateTime createdDate) {
+    public E createdDate(Instant createdDate) {
         this.createdDate = createdDate;
         return (E) this;
     }

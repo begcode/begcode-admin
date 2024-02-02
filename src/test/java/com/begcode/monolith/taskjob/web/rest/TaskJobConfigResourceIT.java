@@ -1,6 +1,5 @@
 package com.begcode.monolith.taskjob.web.rest;
 
-import static com.begcode.monolith.web.rest.TestUtil.sameInstant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -15,9 +14,7 @@ import com.begcode.monolith.taskjob.service.mapper.TaskJobConfigMapper;
 import com.begcode.monolith.web.rest.TestUtil;
 import com.begcode.monolith.web.rest.TestUtil;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -60,17 +57,15 @@ public class TaskJobConfigResourceIT {
     private static final Long UPDATED_CREATED_BY = 2L;
     private static final Long SMALLER_CREATED_BY = 1L - 1L;
 
-    private static final ZonedDateTime DEFAULT_CREATED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_CREATED_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_CREATED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final Instant DEFAULT_CREATED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final Long DEFAULT_LAST_MODIFIED_BY = 1L;
     private static final Long UPDATED_LAST_MODIFIED_BY = 2L;
     private static final Long SMALLER_LAST_MODIFIED_BY = 1L - 1L;
 
-    private static final ZonedDateTime DEFAULT_LAST_MODIFIED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_LAST_MODIFIED_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_LAST_MODIFIED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final Instant DEFAULT_LAST_MODIFIED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_LAST_MODIFIED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/task-job-configs";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -204,9 +199,9 @@ public class TaskJobConfigResourceIT {
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
             .andExpect(jsonPath("$.[*].jobStatus").value(hasItem(DEFAULT_JOB_STATUS.toString())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(sameInstant(DEFAULT_CREATED_DATE))))
+            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(sameInstant(DEFAULT_LAST_MODIFIED_DATE))));
+            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(DEFAULT_LAST_MODIFIED_DATE.toString())));
     }
 
     @Test
@@ -228,9 +223,9 @@ public class TaskJobConfigResourceIT {
             .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
             .andExpect(jsonPath("$.jobStatus").value(DEFAULT_JOB_STATUS.toString()))
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.intValue()))
-            .andExpect(jsonPath("$.createdDate").value(sameInstant(DEFAULT_CREATED_DATE)))
+            .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()))
             .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY.intValue()))
-            .andExpect(jsonPath("$.lastModifiedDate").value(sameInstant(DEFAULT_LAST_MODIFIED_DATE)));
+            .andExpect(jsonPath("$.lastModifiedDate").value(DEFAULT_LAST_MODIFIED_DATE.toString()));
     }
 
     @Test
@@ -747,58 +742,6 @@ public class TaskJobConfigResourceIT {
 
     @Test
     @Transactional
-    void getAllTaskJobConfigsByCreatedDateIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
-
-        // Get all the taskJobConfigList where createdDate is greater than or equal to DEFAULT_CREATED_DATE
-        defaultTaskJobConfigShouldBeFound("createdDate.greaterThanOrEqual=" + DEFAULT_CREATED_DATE);
-
-        // Get all the taskJobConfigList where createdDate is greater than or equal to UPDATED_CREATED_DATE
-        defaultTaskJobConfigShouldNotBeFound("createdDate.greaterThanOrEqual=" + UPDATED_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllTaskJobConfigsByCreatedDateIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
-
-        // Get all the taskJobConfigList where createdDate is less than or equal to DEFAULT_CREATED_DATE
-        defaultTaskJobConfigShouldBeFound("createdDate.lessThanOrEqual=" + DEFAULT_CREATED_DATE);
-
-        // Get all the taskJobConfigList where createdDate is less than or equal to SMALLER_CREATED_DATE
-        defaultTaskJobConfigShouldNotBeFound("createdDate.lessThanOrEqual=" + SMALLER_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllTaskJobConfigsByCreatedDateIsLessThanSomething() throws Exception {
-        // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
-
-        // Get all the taskJobConfigList where createdDate is less than DEFAULT_CREATED_DATE
-        defaultTaskJobConfigShouldNotBeFound("createdDate.lessThan=" + DEFAULT_CREATED_DATE);
-
-        // Get all the taskJobConfigList where createdDate is less than UPDATED_CREATED_DATE
-        defaultTaskJobConfigShouldBeFound("createdDate.lessThan=" + UPDATED_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllTaskJobConfigsByCreatedDateIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
-
-        // Get all the taskJobConfigList where createdDate is greater than DEFAULT_CREATED_DATE
-        defaultTaskJobConfigShouldNotBeFound("createdDate.greaterThan=" + DEFAULT_CREATED_DATE);
-
-        // Get all the taskJobConfigList where createdDate is greater than SMALLER_CREATED_DATE
-        defaultTaskJobConfigShouldBeFound("createdDate.greaterThan=" + SMALLER_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
     void getAllTaskJobConfigsByLastModifiedByIsEqualToSomething() throws Exception {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
@@ -927,58 +870,6 @@ public class TaskJobConfigResourceIT {
         defaultTaskJobConfigShouldNotBeFound("lastModifiedDate.specified=false");
     }
 
-    @Test
-    @Transactional
-    void getAllTaskJobConfigsByLastModifiedDateIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
-
-        // Get all the taskJobConfigList where lastModifiedDate is greater than or equal to DEFAULT_LAST_MODIFIED_DATE
-        defaultTaskJobConfigShouldBeFound("lastModifiedDate.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the taskJobConfigList where lastModifiedDate is greater than or equal to UPDATED_LAST_MODIFIED_DATE
-        defaultTaskJobConfigShouldNotBeFound("lastModifiedDate.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllTaskJobConfigsByLastModifiedDateIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
-
-        // Get all the taskJobConfigList where lastModifiedDate is less than or equal to DEFAULT_LAST_MODIFIED_DATE
-        defaultTaskJobConfigShouldBeFound("lastModifiedDate.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the taskJobConfigList where lastModifiedDate is less than or equal to SMALLER_LAST_MODIFIED_DATE
-        defaultTaskJobConfigShouldNotBeFound("lastModifiedDate.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllTaskJobConfigsByLastModifiedDateIsLessThanSomething() throws Exception {
-        // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
-
-        // Get all the taskJobConfigList where lastModifiedDate is less than DEFAULT_LAST_MODIFIED_DATE
-        defaultTaskJobConfigShouldNotBeFound("lastModifiedDate.lessThan=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the taskJobConfigList where lastModifiedDate is less than UPDATED_LAST_MODIFIED_DATE
-        defaultTaskJobConfigShouldBeFound("lastModifiedDate.lessThan=" + UPDATED_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllTaskJobConfigsByLastModifiedDateIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
-
-        // Get all the taskJobConfigList where lastModifiedDate is greater than DEFAULT_LAST_MODIFIED_DATE
-        defaultTaskJobConfigShouldNotBeFound("lastModifiedDate.greaterThan=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the taskJobConfigList where lastModifiedDate is greater than SMALLER_LAST_MODIFIED_DATE
-        defaultTaskJobConfigShouldBeFound("lastModifiedDate.greaterThan=" + SMALLER_LAST_MODIFIED_DATE);
-    }
-
     /**
      * Executes the search, and checks that the default entity is returned.
      */
@@ -995,9 +886,9 @@ public class TaskJobConfigResourceIT {
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
             .andExpect(jsonPath("$.[*].jobStatus").value(hasItem(DEFAULT_JOB_STATUS.toString())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(sameInstant(DEFAULT_CREATED_DATE))))
+            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(sameInstant(DEFAULT_LAST_MODIFIED_DATE))));
+            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(DEFAULT_LAST_MODIFIED_DATE.toString())));
 
         // Check, that the count call also returns 1
         restTaskJobConfigMockMvc

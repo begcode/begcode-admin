@@ -9,17 +9,10 @@
 import { computed, unref } from 'vue';
 import { SvgIcon } from '@begcode/components';
 import { useDesign } from '@begcode/components';
-import { useRootSetting } from '@/hooks/setting/useRootSetting';
-import {
-  updateTextColor,
-  updateBorderColor,
-  updateHeaderBgColor,
-  updateSidebarBgColor,
-  updateComponentBgColor,
-  updateAppContentBgColor,
-} from '@/logics/theme/updateBackground';
-import { updateDarkTheme } from '@/logics/theme/dark';
 import { ThemeEnum } from '@/enums/appEnum';
+import { useRootSetting } from '@/hooks/setting/useRootSetting';
+import { updateHeaderBgColor, updateSidebarBgColor } from '@/logics/theme/updateBackground';
+import { updateDarkTheme } from '@/logics/theme/dark';
 
 const { prefixCls } = useDesign('dark-switch');
 const { getDarkMode, setDarkMode, getShowDarkModeToggle } = useRootSetting();
@@ -37,12 +30,8 @@ function toggleDarkMode() {
   const darkMode = getDarkMode.value === ThemeEnum.DARK ? ThemeEnum.LIGHT : ThemeEnum.DARK;
   setDarkMode(darkMode);
   updateDarkTheme(darkMode);
-  updateTextColor();
-  updateBorderColor();
   updateHeaderBgColor();
   updateSidebarBgColor();
-  updateComponentBgColor();
-  updateAppContentBgColor();
 }
 </script>
 <style lang="less" scoped>

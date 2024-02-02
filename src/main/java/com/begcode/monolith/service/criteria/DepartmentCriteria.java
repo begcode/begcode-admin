@@ -28,7 +28,7 @@ public class DepartmentCriteria implements Serializable, Criteria {
     private String jhiCommonSearchKeywords;
 
     @BindQuery(ignore = true)
-    private Boolean useOr;
+    private Boolean useOr = false;
 
     @BindQuery(ignore = true)
     private DepartmentCriteria and;
@@ -63,7 +63,7 @@ public class DepartmentCriteria implements Serializable, Criteria {
     private LongFilter createUserId;
 
     @BindQuery(column = "self.create_time")
-    private ZonedDateTimeFilter createTime;
+    private InstantFilter createTime;
 
     @BindQuery(entity = Department.class, column = "id", condition = "id=parent_id")
     private LongFilter childrenId;
@@ -278,18 +278,18 @@ public class DepartmentCriteria implements Serializable, Criteria {
         this.createUserId = createUserId;
     }
 
-    public ZonedDateTimeFilter getCreateTime() {
+    public InstantFilter getCreateTime() {
         return createTime;
     }
 
-    public ZonedDateTimeFilter createTime() {
+    public InstantFilter createTime() {
         if (createTime == null) {
-            createTime = new ZonedDateTimeFilter();
+            createTime = new InstantFilter();
         }
         return createTime;
     }
 
-    public void setCreateTime(ZonedDateTimeFilter createTime) {
+    public void setCreateTime(InstantFilter createTime) {
         this.createTime = createTime;
     }
 

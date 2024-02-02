@@ -194,10 +194,6 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 application:
-  upload:
-    root-path: data
-    domainUrl: /
-    type: local
   pay:
     wxPay:
       appId: xxxxxxx #微信公众号或者小程序等的appid
@@ -206,10 +202,6 @@ application:
       subAppId: #服务商模式下的子商户公众账号ID
       subMchId: #服务商模式下的子商户号
       keyPath: classpath:config/cert/apiclient_cert.p12 # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
-  face:
-    arcFace:
-      appId: CHuRTesMsVrfR6pZwyQt7JMkB7BSR4P5QsBxneQvsNzR
-      sdkKey: 3osgFgkF7ygzEuYnTTW99iUvks844N85f5j9Cgn6SKqm
 oauth:
   qq:
     client-id: 1015*****

@@ -18,7 +18,6 @@ import com.begcode.monolith.log.service.dto.SysLogDTO;
 import com.begcode.monolith.log.service.mapper.SysLogMapper;
 import com.diboot.core.binding.Binder;
 import com.diboot.core.binding.query.dynamic.DynamicJoinQueryWrapper;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.Calendar;
 import java.util.Date;
@@ -389,10 +388,7 @@ public class SysLogQueryService implements QueryService<SysLog> {
         sysLogCriteria.logType().setEquals(LogType.LOGIN);
         Long totalVisitCount = countByCriteria(sysLogCriteria);
         result.put("totalVisitCount", totalVisitCount);
-        sysLogCriteria
-            .createdDate()
-            .setGreaterThanOrEqual(dayStart.toInstant().atZone(ZoneId.systemDefault()))
-            .setLessThan(dayEnd.toInstant().atZone(ZoneId.systemDefault()));
+        sysLogCriteria.createdDate().setGreaterThanOrEqual(dayStart.toInstant()).setLessThan(dayEnd.toInstant());
         Long todayVisitCount = countByCriteria(sysLogCriteria);
         result.put("todayVisitCount", todayVisitCount);
         Long todayIp = countByFieldNameAndCriteria("ip", true, sysLogCriteria);

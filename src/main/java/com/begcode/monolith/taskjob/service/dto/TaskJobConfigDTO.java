@@ -3,7 +3,7 @@ package com.begcode.monolith.taskjob.service.dto;
 import com.begcode.monolith.domain.AbstractAuditingEntity;
 import com.begcode.monolith.domain.enumeration.JobStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -69,7 +69,7 @@ public class TaskJobConfigDTO extends AbstractAuditingEntity<Long, TaskJobConfig
      * 创建时间
      */
     @Schema(description = "创建时间")
-    private ZonedDateTime createdDate;
+    private Instant createdDate;
 
     /**
      * 修改者Id
@@ -81,7 +81,7 @@ public class TaskJobConfigDTO extends AbstractAuditingEntity<Long, TaskJobConfig
      * 修改时间
      */
     @Schema(description = "修改时间")
-    private ZonedDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove
 
@@ -125,7 +125,7 @@ public class TaskJobConfigDTO extends AbstractAuditingEntity<Long, TaskJobConfig
         return this;
     }
 
-    public TaskJobConfigDTO createdDate(ZonedDateTime createdDate) {
+    public TaskJobConfigDTO createdDate(Instant createdDate) {
         this.createdDate = createdDate;
         return this;
     }
@@ -135,7 +135,7 @@ public class TaskJobConfigDTO extends AbstractAuditingEntity<Long, TaskJobConfig
         return this;
     }
 
-    public TaskJobConfigDTO lastModifiedDate(ZonedDateTime lastModifiedDate) {
+    public TaskJobConfigDTO lastModifiedDate(Instant lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
         return this;
     }

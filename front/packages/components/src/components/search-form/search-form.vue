@@ -1,31 +1,31 @@
 <template>
-  <a-form>
-    <a-row :gutter="[8, 16]">
-      <a-col :md="item.span || 4" v-for="(item, index) in config.fieldList.filter(field => !field.hidden)" :key="index">
-        <!-- <a-col  :md="item.span || 4" v-for="(item, index) in config.fieldList" :key="index"> -->
+  <Form>
+    <Row :gutter="[8, 16]">
+      <Col :md="item.span || 4" v-for="(item, index) in config.fieldList.filter(field => !field.hidden)" :key="index">
+        <!-- <Col  :md="item.span || 4" v-for="(item, index) in config.fieldList" :key="index"> -->
         <search-form-item :field="item" />
-      </a-col>
-      <a-col v-for="index of formActionSlotsShow ? blankCols : 0" :key="'blank' + index" style="flex: 1"></a-col>
-      <!--      <a-col :span="blankCols" />-->
+      </Col>
+      <Col v-for="index of formActionSlotsShow ? blankCols : 0" :key="'blank' + index" style="flex: 1"></Col>
+      <!--      <Col :span="blankCols" />-->
 
-      <a-col :md="config.showExportButton ? 6 : 4" v-if="config.compact && formActionSlotsShow">
+      <Col :md="config.showExportButton ? 6 : 4" v-if="config.compact && formActionSlotsShow">
         <FormAction v-bind="formActionConfig" @toggle-advanced="handleToggleAdvanced">
           <template #[item]="data" v-for="item in Object.keys(formActionSlots)">
             <slot :name="item" v-bind="data || {}">
               <div class="mr-2 inline-block" :key="item" v-if="formActionSlots[item].includes('mathType')">
-                <a-radio-group v-model:value="config.matchType" button-style="solid">
-                  <a-radio-button value="and">AND</a-radio-button>
-                  <a-radio-button value="or">OR</a-radio-button>
-                </a-radio-group>
+                <RadioGroup v-model:value="config.matchType" button-style="solid">
+                  <RadioButton value="and">AND</RadioButton>
+                  <RadioButton value="or">OR</RadioButton>
+                </RadioGroup>
               </div>
               <div class="mr-2 ml-2 inline-block" :key="item" v-if="formActionSlots[item].includes('exportButton')">
-                <a-button type="primary" button-style="solid" @click="exportClick" preIcon="ant-design:file-excel-filled">导出</a-button>
+                <Button type="primary" button-style="solid" @click="exportClick" preIcon="ant-design:file-excel-filled">导出</Button>
               </div>
             </slot>
           </template>
         </FormAction>
-      </a-col>
-    </a-row>
+      </Col>
+    </Row>
     <BasicModal
       title="高级搜索设置"
       :footer="null"
@@ -39,15 +39,16 @@
       <template #[item]="data" v-for="item in Object.keys(formActionSlots)">
         <slot :name="item" v-bind="data || {}" v-if="formActionSlots[item].length">
           <div class="mr-2 inline-block" :key="item" v-if="formActionSlots[item].includes('exportButton')">
-            <a-button button-style="solid" @click="exportClick">导出</a-button>
+            <Button button-style="solid" @click="exportClick">导出</Button>
           </div>
         </slot>
       </template>
     </FormAction>
-  </a-form>
+  </Form>
 </template>
 
 <script lang="ts">
+import { Form, Button, Row, Col, RadioGroup, RadioButton } from 'ant-design-vue';
 import SearchFormItem from './search-form-item.vue';
 import FormAction from '@/components/Form/src/components/FormAction.vue';
 import { createFormContext } from '@/components/Form/src/hooks/useFormContext';
@@ -58,7 +59,7 @@ import formConfig from './form-field';
 
 export default {
   name: 'SearchForm',
-  components: { BasicForm, BasicModal, SearchFormItem, FormAction },
+  components: { BasicForm, BasicModal, SearchFormItem, FormAction, Form, Button, Row, Col, RadioGroup, RadioButton },
   props: {
     config: {
       type: Object,

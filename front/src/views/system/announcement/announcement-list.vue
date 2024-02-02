@@ -283,7 +283,6 @@ const ctx = getCurrentInstance()?.proxy;
 const go = useGo();
 const apiService = ctx?.$apiService as typeof ServerProvider;
 const { getPageSetting } = useRootSetting();
-const relationshipApis: any = {};
 const apis = {
   announcementService: apiService.system.announcementService,
   find: apiService.system.announcementService.retrieve,

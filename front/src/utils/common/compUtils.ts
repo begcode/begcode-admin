@@ -1,9 +1,11 @@
 import { merge, random, isArray } from 'lodash-es';
 import { reactive } from 'vue';
+import { Modal } from 'ant-design-vue';
 import { useGlobSetting } from '@/hooks/setting';
 import { FormSchema } from '@/components/Form';
 import { getTenantId, getToken } from '@/utils/auth';
 import { useUserStoreWithOut } from '@/store/modules/user';
+import { defHttp } from '@/utils/http/axios';
 
 const globSetting = useGlobSetting();
 const baseApiUrl = globSetting.domainUrl;
@@ -457,4 +459,57 @@ export function replaceUserInfoByExpression(expression: string | any[]) {
   };
   // @ts-ignore
   return isString ? replace(expression) : expression.map(replace);
+}
+
+/**
+ * 设置租户缓存，当租户退出的时候
+ *
+ * @param tenantId
+ */
+export async function userExitChangeLoginTenantId(tenantId) {
+  const userStore = useUserStoreWithOut();
+  //step 1 获取用户租户
+  const url = '/sys/tenant/getCurrentUserTenant';
+  let currentTenantId = null;
+  const data = await defHttp.get({ url });
+  if (data && data.list) {
+    let arr = data.list;
+    if (arr.length > 0) {
+      //step 2.判断当前id是否存在用户租户中
+      let filterTenantId = arr.filter(item => item.id == tenantId);
+      //存在说明不是退出的不是当前租户，还用用来的租户即可
+      if (filterTenantId && filterTenantId.length > 0) {
+        currentTenantId = tenantId;
+      } else {
+        //不存在默认第一个
+        currentTenantId = arr[0].id;
+      }
+    }
+  }
+  let loginTenantId = getTenantId();
+  userStore.setTenant(currentTenantId);
+
+  //租户为空，说明没有租户了，需要刷新页面。或者当前租户和退出的租户一致则需要刷新浏览器
+  if (!currentTenantId || tenantId == loginTenantId) {
+    window.location.reload();
+  }
+}
+
+/**
+ * 我的租户模块需要开启多租户提示
+ *
+ * @param title 标题
+ */
+export function tenantSaasMessage(title) {
+  let tenantId = getTenantId();
+  if (!tenantId) {
+    Modal.confirm({
+      title: title,
+      content: '此菜单需要在多租户模式下使用，否则数据会出现混乱',
+      okText: '确认',
+      okType: 'danger',
+      // @ts-ignore
+      cancelButtonProps: { style: { display: 'none' } },
+    });
+  }
 }

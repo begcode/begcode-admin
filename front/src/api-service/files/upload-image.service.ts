@@ -61,17 +61,17 @@ export default {
     const queryParams = qs.stringify({ otherEntityIds, relatedIds, relationshipName }, { arrayFormat: 'repeat' });
     return defHttp.put({ url: `${apiUrl}/relations/${operateType}?${queryParams}` });
   },
-  create(uploadImage: IUploadImage, onUploadProgress?: (progressEvent: ProgressEvent) => void) {
+  create(uploadImage: IUploadImage, onUploadProgress?: (progressEvent: ProgressEvent) => void, success?) {
     const params: UploadFileParams = <UploadFileParams>{};
     params.name = 'image';
-    params.file = uploadImage.uploadFile as File;
+    params.file = uploadImage.file as File;
     if (uploadImage.filename) {
       params.filename = uploadImage.filename;
     } else {
-      params.filename = uploadImage!.uploadFile!.name;
+      params.filename = uploadImage!.file!.name;
     }
     const newUploadImage = { ...uploadImage };
-    delete newUploadImage.uploadFile;
+    delete newUploadImage.file;
     params.data = { uploadImageDTO: pickBy(newUploadImage, value => !!value) };
     return defHttp.uploadFile<IUploadImage>(
       {
@@ -79,7 +79,7 @@ export default {
         onUploadProgress,
       },
       params,
-      { isReturnResponse: true },
+      { isReturnResponse: true, success },
     );
   },
   uploadImageUrl: apiUrl,

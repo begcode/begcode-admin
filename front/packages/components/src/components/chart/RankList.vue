@@ -11,23 +11,23 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-export default defineComponent({
+<script lang="ts" setup>
+defineOptions({
   name: 'RankList',
-  props: {
-    title: {
-      type: String,
-      default: '',
-    },
-    list: {
-      type: Array,
-      default: null,
-    },
-    height: {
-      type: Number,
-      default: null,
-    },
+});
+
+const props = defineProps({
+  title: {
+    type: String,
+    default: '',
+  },
+  list: {
+    type: Array,
+    default: null,
+  },
+  height: {
+    type: Number,
+    default: null,
   },
 });
 </script>

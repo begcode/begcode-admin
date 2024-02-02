@@ -12,7 +12,7 @@ export interface ICommonFieldData {
   sortValue?: number | null; //排序
   disabled?: boolean | null; //是否禁用
   ownerEntityName?: string | null; //实体名称
-  ownerEntityId?: string | null; //使用实体ID
+  ownerEntityId?: number | null; //使用实体ID
   siteConfig?: ISiteConfig | null; //Site Config
   dictionary?: IDictionary | null; //Dictionary
 }
@@ -28,7 +28,7 @@ export class CommonFieldData implements ICommonFieldData {
     public sortValue?: number | null,
     public disabled?: boolean | null,
     public ownerEntityName?: string | null,
-    public ownerEntityId?: string | null,
+    public ownerEntityId?: number | null,
     public siteConfig?: ISiteConfig | null,
     public dictionary?: IDictionary | null,
   ) {

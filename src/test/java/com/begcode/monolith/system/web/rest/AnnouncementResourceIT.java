@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -104,17 +105,15 @@ public class AnnouncementResourceIT {
     private static final Long UPDATED_CREATED_BY = 2L;
     private static final Long SMALLER_CREATED_BY = 1L - 1L;
 
-    private static final ZonedDateTime DEFAULT_CREATED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_CREATED_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_CREATED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final Instant DEFAULT_CREATED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final Long DEFAULT_LAST_MODIFIED_BY = 1L;
     private static final Long UPDATED_LAST_MODIFIED_BY = 2L;
     private static final Long SMALLER_LAST_MODIFIED_BY = 1L - 1L;
 
-    private static final ZonedDateTime DEFAULT_LAST_MODIFIED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_LAST_MODIFIED_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_LAST_MODIFIED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final Instant DEFAULT_LAST_MODIFIED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_LAST_MODIFIED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/announcements";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -332,9 +331,9 @@ public class AnnouncementResourceIT {
             .andExpect(jsonPath("$.[*].openPage").value(hasItem(DEFAULT_OPEN_PAGE)))
             .andExpect(jsonPath("$.[*].receiverIds").value(hasItem(DEFAULT_RECEIVER_IDS.toString())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(sameInstant(DEFAULT_CREATED_DATE))))
+            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(sameInstant(DEFAULT_LAST_MODIFIED_DATE))));
+            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(DEFAULT_LAST_MODIFIED_DATE.toString())));
     }
 
     @Test
@@ -367,9 +366,9 @@ public class AnnouncementResourceIT {
             .andExpect(jsonPath("$.openPage").value(DEFAULT_OPEN_PAGE))
             .andExpect(jsonPath("$.receiverIds").value(DEFAULT_RECEIVER_IDS.toString()))
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.intValue()))
-            .andExpect(jsonPath("$.createdDate").value(sameInstant(DEFAULT_CREATED_DATE)))
+            .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()))
             .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY.intValue()))
-            .andExpect(jsonPath("$.lastModifiedDate").value(sameInstant(DEFAULT_LAST_MODIFIED_DATE)));
+            .andExpect(jsonPath("$.lastModifiedDate").value(DEFAULT_LAST_MODIFIED_DATE.toString()));
     }
 
     @Test
@@ -1432,58 +1431,6 @@ public class AnnouncementResourceIT {
 
     @Test
     @Transactional
-    void getAllAnnouncementsByCreatedDateIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        announcementRepository.save(announcement);
-
-        // Get all the announcementList where createdDate is greater than or equal to DEFAULT_CREATED_DATE
-        defaultAnnouncementShouldBeFound("createdDate.greaterThanOrEqual=" + DEFAULT_CREATED_DATE);
-
-        // Get all the announcementList where createdDate is greater than or equal to UPDATED_CREATED_DATE
-        defaultAnnouncementShouldNotBeFound("createdDate.greaterThanOrEqual=" + UPDATED_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllAnnouncementsByCreatedDateIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        announcementRepository.save(announcement);
-
-        // Get all the announcementList where createdDate is less than or equal to DEFAULT_CREATED_DATE
-        defaultAnnouncementShouldBeFound("createdDate.lessThanOrEqual=" + DEFAULT_CREATED_DATE);
-
-        // Get all the announcementList where createdDate is less than or equal to SMALLER_CREATED_DATE
-        defaultAnnouncementShouldNotBeFound("createdDate.lessThanOrEqual=" + SMALLER_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllAnnouncementsByCreatedDateIsLessThanSomething() throws Exception {
-        // Initialize the database
-        announcementRepository.save(announcement);
-
-        // Get all the announcementList where createdDate is less than DEFAULT_CREATED_DATE
-        defaultAnnouncementShouldNotBeFound("createdDate.lessThan=" + DEFAULT_CREATED_DATE);
-
-        // Get all the announcementList where createdDate is less than UPDATED_CREATED_DATE
-        defaultAnnouncementShouldBeFound("createdDate.lessThan=" + UPDATED_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllAnnouncementsByCreatedDateIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        announcementRepository.save(announcement);
-
-        // Get all the announcementList where createdDate is greater than DEFAULT_CREATED_DATE
-        defaultAnnouncementShouldNotBeFound("createdDate.greaterThan=" + DEFAULT_CREATED_DATE);
-
-        // Get all the announcementList where createdDate is greater than SMALLER_CREATED_DATE
-        defaultAnnouncementShouldBeFound("createdDate.greaterThan=" + SMALLER_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
     void getAllAnnouncementsByLastModifiedByIsEqualToSomething() throws Exception {
         // Initialize the database
         announcementRepository.save(announcement);
@@ -1612,58 +1559,6 @@ public class AnnouncementResourceIT {
         defaultAnnouncementShouldNotBeFound("lastModifiedDate.specified=false");
     }
 
-    @Test
-    @Transactional
-    void getAllAnnouncementsByLastModifiedDateIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        announcementRepository.save(announcement);
-
-        // Get all the announcementList where lastModifiedDate is greater than or equal to DEFAULT_LAST_MODIFIED_DATE
-        defaultAnnouncementShouldBeFound("lastModifiedDate.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the announcementList where lastModifiedDate is greater than or equal to UPDATED_LAST_MODIFIED_DATE
-        defaultAnnouncementShouldNotBeFound("lastModifiedDate.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllAnnouncementsByLastModifiedDateIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        announcementRepository.save(announcement);
-
-        // Get all the announcementList where lastModifiedDate is less than or equal to DEFAULT_LAST_MODIFIED_DATE
-        defaultAnnouncementShouldBeFound("lastModifiedDate.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the announcementList where lastModifiedDate is less than or equal to SMALLER_LAST_MODIFIED_DATE
-        defaultAnnouncementShouldNotBeFound("lastModifiedDate.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllAnnouncementsByLastModifiedDateIsLessThanSomething() throws Exception {
-        // Initialize the database
-        announcementRepository.save(announcement);
-
-        // Get all the announcementList where lastModifiedDate is less than DEFAULT_LAST_MODIFIED_DATE
-        defaultAnnouncementShouldNotBeFound("lastModifiedDate.lessThan=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the announcementList where lastModifiedDate is less than UPDATED_LAST_MODIFIED_DATE
-        defaultAnnouncementShouldBeFound("lastModifiedDate.lessThan=" + UPDATED_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllAnnouncementsByLastModifiedDateIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        announcementRepository.save(announcement);
-
-        // Get all the announcementList where lastModifiedDate is greater than DEFAULT_LAST_MODIFIED_DATE
-        defaultAnnouncementShouldNotBeFound("lastModifiedDate.greaterThan=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the announcementList where lastModifiedDate is greater than SMALLER_LAST_MODIFIED_DATE
-        defaultAnnouncementShouldBeFound("lastModifiedDate.greaterThan=" + SMALLER_LAST_MODIFIED_DATE);
-    }
-
     /**
      * Executes the search, and checks that the default entity is returned.
      */
@@ -1691,9 +1586,9 @@ public class AnnouncementResourceIT {
             .andExpect(jsonPath("$.[*].openPage").value(hasItem(DEFAULT_OPEN_PAGE)))
             .andExpect(jsonPath("$.[*].receiverIds").value(hasItem(DEFAULT_RECEIVER_IDS.toString())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(sameInstant(DEFAULT_CREATED_DATE))))
+            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(sameInstant(DEFAULT_LAST_MODIFIED_DATE))));
+            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(DEFAULT_LAST_MODIFIED_DATE.toString())));
 
         // Check, that the count call also returns 1
         restAnnouncementMockMvc

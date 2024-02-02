@@ -6,6 +6,7 @@ import type { Ref } from 'vue';
 import { ref, unref, nextTick, computed, watch, onBeforeUnmount, onDeactivated, useAttrs } from 'vue';
 import Vditor from 'vditor';
 import 'vditor/dist/index.css';
+import './adapter.js';
 import { useLocale } from '@/i18n/useLocale';
 import { useModalContext } from '../../Modal';
 import { useRootSetting } from '@/hooks/setting/useRootSetting';

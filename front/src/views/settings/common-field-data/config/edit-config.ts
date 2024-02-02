@@ -21,7 +21,7 @@ const fields = (): FormSchema[] => {
       },
       dynamicDisabled: true,
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入ID', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入ID', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {
@@ -65,7 +65,7 @@ const fields = (): FormSchema[] => {
       label: '排序',
       field: 'sortValue',
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入排序', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入排序', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {
@@ -87,8 +87,8 @@ const fields = (): FormSchema[] => {
       label: '使用实体ID',
       field: 'ownerEntityId',
       show: false,
-      component: 'Input',
-      componentProps: { type: 'text', clearable: true, placeholder: '请输入使用实体ID', style: 'width: 100%' },
+      component: 'InputNumber',
+      componentProps: { placeholder: '请输入使用实体ID', controls: false, style: 'width: 100%' },
       rules: [],
     },
   ];

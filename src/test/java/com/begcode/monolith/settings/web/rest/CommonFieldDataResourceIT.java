@@ -58,8 +58,9 @@ public class CommonFieldDataResourceIT {
     private static final String DEFAULT_OWNER_ENTITY_NAME = "AAAAAAAAAA";
     private static final String UPDATED_OWNER_ENTITY_NAME = "BBBBBBBBBB";
 
-    private static final String DEFAULT_OWNER_ENTITY_ID = "AAAAAAAAAA";
-    private static final String UPDATED_OWNER_ENTITY_ID = "BBBBBBBBBB";
+    private static final Long DEFAULT_OWNER_ENTITY_ID = 1L;
+    private static final Long UPDATED_OWNER_ENTITY_ID = 2L;
+    private static final Long SMALLER_OWNER_ENTITY_ID = 1L - 1L;
 
     private static final String ENTITY_API_URL = "/api/common-field-data";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -191,7 +192,7 @@ public class CommonFieldDataResourceIT {
             .andExpect(jsonPath("$.[*].sortValue").value(hasItem(DEFAULT_SORT_VALUE)))
             .andExpect(jsonPath("$.[*].disabled").value(hasItem(DEFAULT_DISABLED.booleanValue())))
             .andExpect(jsonPath("$.[*].ownerEntityName").value(hasItem(DEFAULT_OWNER_ENTITY_NAME)))
-            .andExpect(jsonPath("$.[*].ownerEntityId").value(hasItem(DEFAULT_OWNER_ENTITY_ID)));
+            .andExpect(jsonPath("$.[*].ownerEntityId").value(hasItem(DEFAULT_OWNER_ENTITY_ID.intValue())));
     }
 
     @Test
@@ -214,7 +215,7 @@ public class CommonFieldDataResourceIT {
             .andExpect(jsonPath("$.sortValue").value(DEFAULT_SORT_VALUE))
             .andExpect(jsonPath("$.disabled").value(DEFAULT_DISABLED.booleanValue()))
             .andExpect(jsonPath("$.ownerEntityName").value(DEFAULT_OWNER_ENTITY_NAME))
-            .andExpect(jsonPath("$.ownerEntityId").value(DEFAULT_OWNER_ENTITY_ID));
+            .andExpect(jsonPath("$.ownerEntityId").value(DEFAULT_OWNER_ENTITY_ID.intValue()));
     }
 
     @Test
@@ -770,28 +771,54 @@ public class CommonFieldDataResourceIT {
 
     @Test
     @Transactional
-    void getAllCommonFieldDataByOwnerEntityIdContainsSomething() throws Exception {
+    void getAllCommonFieldDataByOwnerEntityIdIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where ownerEntityId contains DEFAULT_OWNER_ENTITY_ID
-        defaultCommonFieldDataShouldBeFound("ownerEntityId.contains=" + DEFAULT_OWNER_ENTITY_ID);
+        // Get all the commonFieldDataList where ownerEntityId is greater than or equal to DEFAULT_OWNER_ENTITY_ID
+        defaultCommonFieldDataShouldBeFound("ownerEntityId.greaterThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID);
 
-        // Get all the commonFieldDataList where ownerEntityId contains UPDATED_OWNER_ENTITY_ID
-        defaultCommonFieldDataShouldNotBeFound("ownerEntityId.contains=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the commonFieldDataList where ownerEntityId is greater than or equal to UPDATED_OWNER_ENTITY_ID
+        defaultCommonFieldDataShouldNotBeFound("ownerEntityId.greaterThanOrEqual=" + UPDATED_OWNER_ENTITY_ID);
     }
 
     @Test
     @Transactional
-    void getAllCommonFieldDataByOwnerEntityIdNotContainsSomething() throws Exception {
+    void getAllCommonFieldDataByOwnerEntityIdIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where ownerEntityId does not contain DEFAULT_OWNER_ENTITY_ID
-        defaultCommonFieldDataShouldNotBeFound("ownerEntityId.doesNotContain=" + DEFAULT_OWNER_ENTITY_ID);
+        // Get all the commonFieldDataList where ownerEntityId is less than or equal to DEFAULT_OWNER_ENTITY_ID
+        defaultCommonFieldDataShouldBeFound("ownerEntityId.lessThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID);
 
-        // Get all the commonFieldDataList where ownerEntityId does not contain UPDATED_OWNER_ENTITY_ID
-        defaultCommonFieldDataShouldBeFound("ownerEntityId.doesNotContain=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the commonFieldDataList where ownerEntityId is less than or equal to SMALLER_OWNER_ENTITY_ID
+        defaultCommonFieldDataShouldNotBeFound("ownerEntityId.lessThanOrEqual=" + SMALLER_OWNER_ENTITY_ID);
+    }
+
+    @Test
+    @Transactional
+    void getAllCommonFieldDataByOwnerEntityIdIsLessThanSomething() throws Exception {
+        // Initialize the database
+        commonFieldDataRepository.save(commonFieldData);
+
+        // Get all the commonFieldDataList where ownerEntityId is less than DEFAULT_OWNER_ENTITY_ID
+        defaultCommonFieldDataShouldNotBeFound("ownerEntityId.lessThan=" + DEFAULT_OWNER_ENTITY_ID);
+
+        // Get all the commonFieldDataList where ownerEntityId is less than UPDATED_OWNER_ENTITY_ID
+        defaultCommonFieldDataShouldBeFound("ownerEntityId.lessThan=" + UPDATED_OWNER_ENTITY_ID);
+    }
+
+    @Test
+    @Transactional
+    void getAllCommonFieldDataByOwnerEntityIdIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        commonFieldDataRepository.save(commonFieldData);
+
+        // Get all the commonFieldDataList where ownerEntityId is greater than DEFAULT_OWNER_ENTITY_ID
+        defaultCommonFieldDataShouldNotBeFound("ownerEntityId.greaterThan=" + DEFAULT_OWNER_ENTITY_ID);
+
+        // Get all the commonFieldDataList where ownerEntityId is greater than SMALLER_OWNER_ENTITY_ID
+        defaultCommonFieldDataShouldBeFound("ownerEntityId.greaterThan=" + SMALLER_OWNER_ENTITY_ID);
     }
 
     /**
@@ -811,7 +838,7 @@ public class CommonFieldDataResourceIT {
             .andExpect(jsonPath("$.[*].sortValue").value(hasItem(DEFAULT_SORT_VALUE)))
             .andExpect(jsonPath("$.[*].disabled").value(hasItem(DEFAULT_DISABLED.booleanValue())))
             .andExpect(jsonPath("$.[*].ownerEntityName").value(hasItem(DEFAULT_OWNER_ENTITY_NAME)))
-            .andExpect(jsonPath("$.[*].ownerEntityId").value(hasItem(DEFAULT_OWNER_ENTITY_ID)));
+            .andExpect(jsonPath("$.[*].ownerEntityId").value(hasItem(DEFAULT_OWNER_ENTITY_ID.intValue())));
 
         // Check, that the count call also returns 1
         restCommonFieldDataMockMvc

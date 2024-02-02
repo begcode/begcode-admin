@@ -2,6 +2,8 @@ package com.begcode.monolith.service.dto;
 
 import com.begcode.monolith.domain.AbstractAuditingEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.*;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,6 +24,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
 
     private Long id;
+
+    /**
+     * Url地址
+     */
+    @NotNull
+    @Schema(description = "Url地址", required = true)
+    private String url;
 
     /**
      * 完整文件名
@@ -56,12 +65,6 @@ public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
     private String type;
 
     /**
-     * Url地址
-     */
-    @Schema(description = "Url地址")
-    private String url;
-
-    /**
      * 本地路径
      */
     @Schema(description = "本地路径")
@@ -83,7 +86,7 @@ public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
      * 使用实体ID
      */
     @Schema(description = "使用实体ID")
-    private String ownerEntityId;
+    private Long ownerEntityId;
 
     /**
      * 业务标题
@@ -131,7 +134,7 @@ public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
      * 创建时间
      */
     @Schema(description = "创建时间")
-    private ZonedDateTime createdDate;
+    private Instant createdDate;
 
     /**
      * 修改者Id
@@ -143,7 +146,7 @@ public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
      * 修改时间
      */
     @Schema(description = "修改时间")
-    private ZonedDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     /**
      * 所属分类
@@ -159,6 +162,11 @@ public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
 
     public UploadFileDTO id(Long id) {
         this.id = id;
+        return this;
+    }
+
+    public UploadFileDTO url(String url) {
+        this.url = url;
         return this;
     }
 
@@ -187,11 +195,6 @@ public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
         return this;
     }
 
-    public UploadFileDTO url(String url) {
-        this.url = url;
-        return this;
-    }
-
     public UploadFileDTO path(String path) {
         this.path = path;
         return this;
@@ -207,7 +210,7 @@ public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
         return this;
     }
 
-    public UploadFileDTO ownerEntityId(String ownerEntityId) {
+    public UploadFileDTO ownerEntityId(Long ownerEntityId) {
         this.ownerEntityId = ownerEntityId;
         return this;
     }
@@ -247,7 +250,7 @@ public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
         return this;
     }
 
-    public UploadFileDTO createdDate(ZonedDateTime createdDate) {
+    public UploadFileDTO createdDate(Instant createdDate) {
         this.createdDate = createdDate;
         return this;
     }
@@ -257,7 +260,7 @@ public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
         return this;
     }
 
-    public UploadFileDTO lastModifiedDate(ZonedDateTime lastModifiedDate) {
+    public UploadFileDTO lastModifiedDate(Instant lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
         return this;
     }

@@ -93,10 +93,10 @@ export default defineComponent({
       return omit(propsData, 'treeData', 'class') as TreeProps;
     });
 
-    const getTreeData = computed((): TreeItem[] => (searchState.startSearch ? searchState.searchData : unref(treeDataRef)));
+    const getTreeSearchData = computed((): TreeItem[] => (searchState.startSearch ? searchState.searchData : unref(treeDataRef)));
 
     const getNotFound = computed((): boolean => {
-      return !getTreeData.value || getTreeData.value.length === 0;
+      return !getTreeSearchData.value || getTreeSearchData.value.length === 0;
     });
 
     const {
@@ -137,6 +137,10 @@ export default defineComponent({
       if (!contextMenuOptions.items?.length) return;
       contextMenuOptions.items = contextMenuOptions.items.filter(item => !item.hidden);
       createContextMenu(contextMenuOptions);
+    }
+
+    function getTreeData() {
+      return unref(treeDataRef);
     }
 
     function setExpandedKeys(keys: KeyType[]) {
@@ -279,7 +283,7 @@ export default defineComponent({
     watch(
       () => props.value,
       () => {
-        state.checkedKeys = toRaw(props.value || []);
+        state.checkedKeys = toRaw(props.value || props.checkedKeys || []);
       },
       { immediate: true },
     );
@@ -298,7 +302,7 @@ export default defineComponent({
     });
 
     const instance: TreeActionType = {
-      getTreeData: () => treeDataRef,
+      getTreeData,
       setExpandedKeys,
       getExpandedKeys,
       setSelectedKeys,
@@ -345,7 +349,7 @@ export default defineComponent({
     }
 
     const treeData = computed(() => {
-      const data = cloneDeep(getTreeData.value);
+      const data = cloneDeep(getTreeSearchData.value);
       eachTree(data, (item, _parent) => {
         const searchText = searchState.searchText;
         const { highlight } = unref(props);
@@ -368,10 +372,10 @@ export default defineComponent({
           title
         );
 
-        const iconDom = icon ? <TreeIcon icon={icon} /> : slots.icon ? <span class="mr-1">{getSlot(slots, 'icon')}</span> : null;
+        const iconDom = icon ? <TreeIcon icon={icon} /> : slots.icon ? <span class="mr-2">{getSlot(slots, 'icon')}</span> : null;
 
         item[titleField] = (
-          <span class={`${bem('title')} pl-2`} onClick={handleClickNode.bind(null, item[keyField], item[childrenField])}>
+          <span class={`${bem('title')}`} onClick={handleClickNode.bind(null, item[keyField], item[childrenField])}>
             {slots?.title ? (
               <>
                 {iconDom}
@@ -436,10 +440,16 @@ export default defineComponent({
 .vben-tree .ant-tree-node-content-wrapper {
   position: relative;
 }
+.vben-tree .ant-tree .ant-tree-checkbox {
+  margin-block-start: 0;
+  margin-inline-start: 4px;
+  margin-inline-end: 4px;
+}
+.vben-tree .ant-tree .ant-tree-checkbox + span {
+  padding-left: 4px;
+}
+
 .vben-tree .ant-tree-node-content-wrapper .ant-tree-title {
-  position: absolute;
-  left: 0;
-  width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -474,5 +484,9 @@ export default defineComponent({
 }
 .h-full {
   height: 100%;
+}
+
+.mr-2 {
+  margin-right: 0.4rem;
 }
 </style>

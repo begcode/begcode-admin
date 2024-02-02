@@ -1,6 +1,6 @@
 {
   "annotations": {
-    "addCustomMethod": "repository-updateTemplate-clientService-service-listComponent-rest",
+    "addCustomMethod": "repository-clientService-service-listComponent-rest",
     "changelogDate": "20240101063406",
     "entityPackage": "system",
     "extendAbstractAuditingEntity": true,

@@ -1490,20 +1490,6 @@ public class ViewPermissionResourceIT {
 
     @Test
     @Transactional
-    void getAllViewPermissionsByChildrenIsEqualToSomething() throws Exception {
-        ViewPermission children = ViewPermissionResourceIT.createEntity();
-        // viewPermission.addChildren(children);
-        viewPermissionRepository.insert(viewPermission);
-        Long childrenId = children.getId();
-        // Get all the viewPermissionList where children equals to childrenId
-        defaultViewPermissionShouldBeFound("childrenId.equals=" + childrenId);
-
-        // Get all the viewPermissionList where children equals to (childrenId + 1)
-        defaultViewPermissionShouldNotBeFound("childrenId.equals=" + (childrenId + 1));
-    }
-
-    @Test
-    @Transactional
     void getAllViewPermissionsByParentIsEqualToSomething() throws Exception {
         ViewPermission parent = ViewPermissionResourceIT.createEntity();
         viewPermission.setParent(parent);
@@ -1741,16 +1727,13 @@ public class ViewPermissionResourceIT {
         partialUpdatedViewPermission.setId(viewPermission.getId());
 
         partialUpdatedViewPermission
-            .text(UPDATED_TEXT)
-            .i18n(UPDATED_I_18_N)
-            .externalLink(UPDATED_EXTERNAL_LINK)
-            .icon(UPDATED_ICON)
+            .group(UPDATED_GROUP)
+            .target(UPDATED_TARGET)
             .disabled(UPDATED_DISABLED)
             .hide(UPDATED_HIDE)
-            .shortcutRoot(UPDATED_SHORTCUT_ROOT)
-            .reuse(UPDATED_REUSE)
-            .code(UPDATED_CODE)
-            .order(UPDATED_ORDER);
+            .apiPermissionCodes(UPDATED_API_PERMISSION_CODES)
+            .componentFile(UPDATED_COMPONENT_FILE)
+            .redirect(UPDATED_REDIRECT);
 
         restViewPermissionMockMvc
             .perform(
@@ -1764,26 +1747,26 @@ public class ViewPermissionResourceIT {
         List<ViewPermission> viewPermissionList = viewPermissionRepository.findAll();
         assertThat(viewPermissionList).hasSize(databaseSizeBeforeUpdate);
         ViewPermission testViewPermission = viewPermissionList.get(viewPermissionList.size() - 1);
-        assertThat(testViewPermission.getText()).isEqualTo(UPDATED_TEXT);
+        assertThat(testViewPermission.getText()).isEqualTo(DEFAULT_TEXT);
         assertThat(testViewPermission.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testViewPermission.getI18n()).isEqualTo(UPDATED_I_18_N);
-        assertThat(testViewPermission.getGroup()).isEqualTo(DEFAULT_GROUP);
+        assertThat(testViewPermission.getI18n()).isEqualTo(DEFAULT_I_18_N);
+        assertThat(testViewPermission.getGroup()).isEqualTo(UPDATED_GROUP);
         assertThat(testViewPermission.getLink()).isEqualTo(DEFAULT_LINK);
-        assertThat(testViewPermission.getExternalLink()).isEqualTo(UPDATED_EXTERNAL_LINK);
-        assertThat(testViewPermission.getTarget()).isEqualTo(DEFAULT_TARGET);
-        assertThat(testViewPermission.getIcon()).isEqualTo(UPDATED_ICON);
+        assertThat(testViewPermission.getExternalLink()).isEqualTo(DEFAULT_EXTERNAL_LINK);
+        assertThat(testViewPermission.getTarget()).isEqualTo(UPDATED_TARGET);
+        assertThat(testViewPermission.getIcon()).isEqualTo(DEFAULT_ICON);
         assertThat(testViewPermission.getDisabled()).isEqualTo(UPDATED_DISABLED);
         assertThat(testViewPermission.getHide()).isEqualTo(UPDATED_HIDE);
         assertThat(testViewPermission.getHideInBreadcrumb()).isEqualTo(DEFAULT_HIDE_IN_BREADCRUMB);
         assertThat(testViewPermission.getShortcut()).isEqualTo(DEFAULT_SHORTCUT);
-        assertThat(testViewPermission.getShortcutRoot()).isEqualTo(UPDATED_SHORTCUT_ROOT);
-        assertThat(testViewPermission.getReuse()).isEqualTo(UPDATED_REUSE);
-        assertThat(testViewPermission.getCode()).isEqualTo(UPDATED_CODE);
+        assertThat(testViewPermission.getShortcutRoot()).isEqualTo(DEFAULT_SHORTCUT_ROOT);
+        assertThat(testViewPermission.getReuse()).isEqualTo(DEFAULT_REUSE);
+        assertThat(testViewPermission.getCode()).isEqualTo(DEFAULT_CODE);
         assertThat(testViewPermission.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
-        assertThat(testViewPermission.getOrder()).isEqualTo(UPDATED_ORDER);
-        assertThat(testViewPermission.getApiPermissionCodes()).isEqualTo(DEFAULT_API_PERMISSION_CODES);
-        assertThat(testViewPermission.getComponentFile()).isEqualTo(DEFAULT_COMPONENT_FILE);
-        assertThat(testViewPermission.getRedirect()).isEqualTo(DEFAULT_REDIRECT);
+        assertThat(testViewPermission.getOrder()).isEqualTo(DEFAULT_ORDER);
+        assertThat(testViewPermission.getApiPermissionCodes()).isEqualTo(UPDATED_API_PERMISSION_CODES);
+        assertThat(testViewPermission.getComponentFile()).isEqualTo(UPDATED_COMPONENT_FILE);
+        assertThat(testViewPermission.getRedirect()).isEqualTo(UPDATED_REDIRECT);
     }
 
     @Test

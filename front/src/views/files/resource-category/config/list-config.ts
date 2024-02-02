@@ -106,7 +106,7 @@ const columns = (): VxeGridPropTypes.Columns => {
       visible: false,
       treeNode: false,
       params: { type: 'LONG' },
-      editRender: { name: 'AInputNumber', enabled: false },
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '标题',
@@ -133,7 +133,7 @@ const columns = (): VxeGridPropTypes.Columns => {
       visible: true,
       treeNode: false,
       params: { type: 'INTEGER' },
-      editRender: { name: 'AInputNumber', enabled: false },
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '图片列表',
@@ -252,7 +252,7 @@ const baseGridOptions = (): VxeGridProps => {
     treeConfig: {
       childrenField: 'children',
       indent: 20,
-      line: false,
+      showLine: false,
       expandAll: false,
       accordion: false,
       trigger: 'default',

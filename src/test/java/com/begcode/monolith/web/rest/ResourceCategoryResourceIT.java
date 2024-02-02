@@ -10,8 +10,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.begcode.monolith.IntegrationTest;
 import com.begcode.monolith.domain.ResourceCategory;
 import com.begcode.monolith.domain.ResourceCategory;
-import com.begcode.monolith.domain.UploadFile;
-import com.begcode.monolith.domain.UploadImage;
 import com.begcode.monolith.repository.ResourceCategoryRepository;
 import com.begcode.monolith.repository.ResourceCategoryRepository;
 import com.begcode.monolith.service.ResourceCategoryService;
@@ -442,20 +440,6 @@ public class ResourceCategoryResourceIT {
 
     @Test
     @Transactional
-    void getAllResourceCategoriesByChildrenIsEqualToSomething() throws Exception {
-        ResourceCategory children = ResourceCategoryResourceIT.createEntity();
-        // resourceCategory.addChildren(children);
-        resourceCategoryRepository.insert(resourceCategory);
-        Long childrenId = children.getId();
-        // Get all the resourceCategoryList where children equals to childrenId
-        defaultResourceCategoryShouldBeFound("childrenId.equals=" + childrenId);
-
-        // Get all the resourceCategoryList where children equals to (childrenId + 1)
-        defaultResourceCategoryShouldNotBeFound("childrenId.equals=" + (childrenId + 1));
-    }
-
-    @Test
-    @Transactional
     void getAllResourceCategoriesByParentIsEqualToSomething() throws Exception {
         ResourceCategory parent = ResourceCategoryResourceIT.createEntity();
         resourceCategory.setParent(parent);
@@ -466,34 +450,6 @@ public class ResourceCategoryResourceIT {
 
         // Get all the resourceCategoryList where parent equals to (parentId + 1)
         defaultResourceCategoryShouldNotBeFound("parentId.equals=" + (parentId + 1));
-    }
-
-    @Test
-    @Transactional
-    void getAllResourceCategoriesByImagesIsEqualToSomething() throws Exception {
-        UploadImage images = UploadImageResourceIT.createEntity();
-        // resourceCategory.addImages(images);
-        resourceCategoryRepository.insert(resourceCategory);
-        Long imagesId = images.getId();
-        // Get all the resourceCategoryList where images equals to imagesId
-        defaultResourceCategoryShouldBeFound("imagesId.equals=" + imagesId);
-
-        // Get all the resourceCategoryList where images equals to (imagesId + 1)
-        defaultResourceCategoryShouldNotBeFound("imagesId.equals=" + (imagesId + 1));
-    }
-
-    @Test
-    @Transactional
-    void getAllResourceCategoriesByFilesIsEqualToSomething() throws Exception {
-        UploadFile files = UploadFileResourceIT.createEntity();
-        // resourceCategory.addFiles(files);
-        resourceCategoryRepository.insert(resourceCategory);
-        Long filesId = files.getId();
-        // Get all the resourceCategoryList where files equals to filesId
-        defaultResourceCategoryShouldBeFound("filesId.equals=" + filesId);
-
-        // Get all the resourceCategoryList where files equals to (filesId + 1)
-        defaultResourceCategoryShouldNotBeFound("filesId.equals=" + (filesId + 1));
     }
 
     /**

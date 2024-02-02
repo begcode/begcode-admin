@@ -1,9 +1,9 @@
 // #!/usr/bin/env node
 
+import { runBuildConfig } from './buildConf';
 import colors from 'picocolors';
 
 import pkg from '../../package.json';
-import { runBuildConfig } from './buildConf';
 
 export const runBuild = async () => {
   try {

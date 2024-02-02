@@ -185,7 +185,7 @@ export default defineComponent({
     const tableDrawerRef = ref<any>(null);
     const tableModalRef = ref<any>(null);
     const tableRef = computed(() => {
-      return props.container === 'modal' ? tableModalRef.value : tableDrawerRef;
+      return props.container === 'modal' ? tableModalRef.value : tableDrawerRef.value;
     });
     const [register, { closeModal, setModalProps }] = useModalInner(() => {
       setTimeout(() => {

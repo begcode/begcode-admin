@@ -17,7 +17,6 @@ import com.begcode.monolith.service.mapper.UserMapper;
 import com.diboot.core.binding.Binder;
 import com.diboot.core.service.impl.BaseServiceImpl;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -244,8 +243,8 @@ public class UserService extends BaseServiceImpl<UserRepository, User> {
                     .map(Optional::get)
                     .forEach(managedAuthorities::add);
 
-                user.departmentId(Optional.of(userDTO.getDepartment()).map(DepartmentDTO::getId).orElse(null));
-                user.departmentId(Optional.of(userDTO.getPosition()).map(PositionDTO::getId).orElse(null));
+                user.departmentId(Optional.ofNullable(userDTO.getDepartment()).map(DepartmentDTO::getId).orElse(null));
+                user.positionId(Optional.ofNullable(userDTO.getPosition()).map(PositionDTO::getId).orElse(null));
                 this.createOrUpdateAndRelatedRelations(user, List.of("authorities", "department", "position"));
                 this.clearUserCaches(user);
                 log.debug("Changed Information for User: {}", user);
@@ -334,7 +333,7 @@ public class UserService extends BaseServiceImpl<UserRepository, User> {
     @Scheduled(cron = "0 0 1 * * ?")
     public void removeNotActivatedUsers() {
         userRepository
-            .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(ZonedDateTime.now().minus(3, ChronoUnit.DAYS))
+            .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(Instant.now().minus(3, ChronoUnit.DAYS))
             .forEach(user -> {
                 log.debug("Deleting not activated user {}", user.getLogin());
                 userRepository.deleteById(user);

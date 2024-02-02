@@ -9,6 +9,7 @@ import com.begcode.monolith.domain.enumeration.PriorityLevel;
 import com.begcode.monolith.domain.enumeration.ReceiverType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -148,7 +149,7 @@ public class AnnouncementDTO extends AbstractAuditingEntity<Long, AnnouncementDT
      * 创建时间
      */
     @Schema(description = "创建时间")
-    private ZonedDateTime createdDate;
+    private Instant createdDate;
 
     /**
      * 修改者Id
@@ -160,7 +161,7 @@ public class AnnouncementDTO extends AbstractAuditingEntity<Long, AnnouncementDT
      * 修改时间
      */
     @Schema(description = "修改时间")
-    private ZonedDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove
 
@@ -259,7 +260,7 @@ public class AnnouncementDTO extends AbstractAuditingEntity<Long, AnnouncementDT
         return this;
     }
 
-    public AnnouncementDTO createdDate(ZonedDateTime createdDate) {
+    public AnnouncementDTO createdDate(Instant createdDate) {
         this.createdDate = createdDate;
         return this;
     }
@@ -269,7 +270,7 @@ public class AnnouncementDTO extends AbstractAuditingEntity<Long, AnnouncementDT
         return this;
     }
 
-    public AnnouncementDTO lastModifiedDate(ZonedDateTime lastModifiedDate) {
+    public AnnouncementDTO lastModifiedDate(Instant lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
         return this;
     }

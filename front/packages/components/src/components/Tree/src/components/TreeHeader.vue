@@ -1,5 +1,5 @@
 <template>
-  <div :class="bem()" class="flex px-2 py-1.5 items-center">
+  <div :class="bem()" class="flex mb-1 px-2 py-1.5 items-center">
     <slot name="headerTitle" v-if="slots.headerTitle"></slot>
     <BasicTitle :helpMessage="helpMessage" v-if="!slots.headerTitle && title">
       {{ title }}
@@ -163,6 +163,9 @@ watch(
 .mr-1 {
   margin-right: 0.25rem;
 }
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
 .flex-1 {
   flex: 1 1 0;
 }
@@ -172,5 +175,9 @@ watch(
 .py-1\.5 {
   padding-top: 0.375rem;
   padding-bottom: 0.375rem;
+}
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 </style>

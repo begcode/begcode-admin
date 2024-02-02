@@ -114,20 +114,20 @@ public class UploadImageQueryService implements QueryService<UploadImage> {
             keywordsCriteria.setUseOr(true);
             if (StringUtils.isNumeric(keywords)) {
                 keywordsCriteria.id().setEquals(Long.valueOf(keywords));
+                keywordsCriteria.ownerEntityId().setEquals(Long.valueOf(keywords));
                 keywordsCriteria.fileSize().setEquals(Long.valueOf(keywords));
                 keywordsCriteria.referenceCount().setEquals(Long.valueOf(keywords));
                 keywordsCriteria.createdBy().setEquals(Long.valueOf(keywords));
                 keywordsCriteria.lastModifiedBy().setEquals(Long.valueOf(keywords));
             }
+            keywordsCriteria.url().setContains(keywords);
             keywordsCriteria.fullName().setContains(keywords);
             keywordsCriteria.name().setContains(keywords);
             keywordsCriteria.ext().setContains(keywords);
             keywordsCriteria.type().setContains(keywords);
-            keywordsCriteria.url().setContains(keywords);
             keywordsCriteria.path().setContains(keywords);
             keywordsCriteria.folder().setContains(keywords);
             keywordsCriteria.ownerEntityName().setContains(keywords);
-            keywordsCriteria.ownerEntityId().setContains(keywords);
             keywordsCriteria.businessTitle().setContains(keywords);
             keywordsCriteria.businessDesc().setContains(keywords);
             keywordsCriteria.businessStatus().setContains(keywords);
@@ -317,6 +317,9 @@ public class UploadImageQueryService implements QueryService<UploadImage> {
         if (criteria.getId() != null) {
             getAggregateAndGroupBy(criteria.getId(), "id", selectFields, groupByFields);
         }
+        if (criteria.getUrl() != null) {
+            getAggregateAndGroupBy(criteria.getUrl(), "url", selectFields, groupByFields);
+        }
         if (criteria.getFullName() != null) {
             getAggregateAndGroupBy(criteria.getFullName(), "full_name", selectFields, groupByFields);
         }
@@ -328,9 +331,6 @@ public class UploadImageQueryService implements QueryService<UploadImage> {
         }
         if (criteria.getType() != null) {
             getAggregateAndGroupBy(criteria.getType(), "type", selectFields, groupByFields);
-        }
-        if (criteria.getUrl() != null) {
-            getAggregateAndGroupBy(criteria.getUrl(), "url", selectFields, groupByFields);
         }
         if (criteria.getPath() != null) {
             getAggregateAndGroupBy(criteria.getPath(), "path", selectFields, groupByFields);

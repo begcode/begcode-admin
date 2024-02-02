@@ -42,15 +42,15 @@ export default {
 
   updateSortValue(
     id: number,
-    type: string,
+    type: 'DROP' | 'STEP' | 'VALUE',
     newSortValue: number,
     beforeId: number,
     afterId: number,
-    commonFieldData: any,
+    commonFieldDataCriteria: any,
   ): Promise<Boolean> {
     return defHttp.put({
-      url: `${apiUrl}/sort-value/${id}/${type}?newSortValue=${newSortValue}&beforeId=${beforeId}&afterId=${afterId}`,
-      params: commonFieldData,
+      url: `${apiUrl}/sort-value/${id}/${type}?newSortValue=${newSortValue || ''}&beforeId=${beforeId || ''}&afterId=${afterId || ''}`,
+      params: commonFieldDataCriteria,
     });
   },
 

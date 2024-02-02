@@ -4,7 +4,7 @@ import com.begcode.monolith.domain.AbstractAuditingEntity;
 import com.begcode.monolith.domain.enumeration.MessageSendType;
 import com.begcode.monolith.domain.enumeration.SmsTemplateType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -82,7 +82,7 @@ public class SmsTemplateDTO extends AbstractAuditingEntity<Long, SmsTemplateDTO>
      * 创建时间
      */
     @Schema(description = "创建时间")
-    private ZonedDateTime createdDate;
+    private Instant createdDate;
 
     /**
      * 修改者Id
@@ -94,7 +94,7 @@ public class SmsTemplateDTO extends AbstractAuditingEntity<Long, SmsTemplateDTO>
      * 修改时间
      */
     @Schema(description = "修改时间")
-    private ZonedDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     /**
      * 短信服务商
@@ -156,7 +156,7 @@ public class SmsTemplateDTO extends AbstractAuditingEntity<Long, SmsTemplateDTO>
         return this;
     }
 
-    public SmsTemplateDTO createdDate(ZonedDateTime createdDate) {
+    public SmsTemplateDTO createdDate(Instant createdDate) {
         this.createdDate = createdDate;
         return this;
     }
@@ -166,7 +166,7 @@ public class SmsTemplateDTO extends AbstractAuditingEntity<Long, SmsTemplateDTO>
         return this;
     }
 
-    public SmsTemplateDTO lastModifiedDate(ZonedDateTime lastModifiedDate) {
+    public SmsTemplateDTO lastModifiedDate(Instant lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
         return this;
     }

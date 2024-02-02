@@ -22,7 +22,7 @@ const fields = (): FormSchema[] => {
       },
       dynamicDisabled: true,
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入ID', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入ID', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {
@@ -169,7 +169,7 @@ const fields = (): FormSchema[] => {
       label: '排序',
       field: 'order',
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入排序', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入排序', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {

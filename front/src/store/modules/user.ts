@@ -183,8 +183,13 @@ export const useUserStore = defineStore({
         let redirect = router.currentRoute.value?.query?.redirect as string;
         // 判断是否有 redirect 重定向地址
         if (redirect && goHome) {
+          const publicPath = import.meta.env.VITE_PUBLIC_PATH;
+          if (publicPath && publicPath != '/') {
+            redirect = publicPath + redirect;
+          }
           // 当前页面打开
           window.open(redirect, '_self');
+          return userInfo;
         }
         goHome && (await router.replace(PageEnum.BASE_HOME));
       }

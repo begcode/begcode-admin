@@ -86,7 +86,7 @@ const columns = (): VxeGridPropTypes.Columns => {
       visible: true,
       treeNode: false,
       params: { type: 'LONG' },
-      editRender: { name: 'AInputNumber', enabled: false },
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '岗位代码',

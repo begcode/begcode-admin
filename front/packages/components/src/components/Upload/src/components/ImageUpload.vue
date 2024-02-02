@@ -13,7 +13,7 @@
       @remove="handleRemove"
     >
       <div v-if="fileList && fileList.length < maxNumber">
-        <plus-outlined />
+        <PlusOutlined />
         <div style="margin-top: 8px">{{ t('component.upload.upload') }}</div>
       </div>
     </Upload>
@@ -92,6 +92,9 @@ watch(
       }) as UploadProps['fileList'];
     }
   },
+  {
+    immediate: true,
+  },
 );
 
 function getBase64<T extends string | ArrayBuffer | null>(file: File) {
@@ -165,7 +168,7 @@ async function customRequest(info: UploadRequestOption<any>) {
       name: props.name,
       filename: props.filename,
     });
-    info.onSuccess!(res.data);
+    info.onSuccess!(res);
     const value = getValue();
     isInnerOperate.value = true;
     emit('change', value);

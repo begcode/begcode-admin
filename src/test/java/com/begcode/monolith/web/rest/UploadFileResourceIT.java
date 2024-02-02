@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -44,6 +45,9 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 public class UploadFileResourceIT {
 
+    private static final String DEFAULT_URL = "AAAAAAAAAA";
+    private static final String UPDATED_URL = "BBBBBBBBBB";
+
     private static final String DEFAULT_FULL_NAME = "AAAAAAAAAA";
     private static final String UPDATED_FULL_NAME = "BBBBBBBBBB";
 
@@ -59,9 +63,6 @@ public class UploadFileResourceIT {
     private static final String DEFAULT_TYPE = "AAAAAAAAAA";
     private static final String UPDATED_TYPE = "BBBBBBBBBB";
 
-    private static final String DEFAULT_URL = "AAAAAAAAAA";
-    private static final String UPDATED_URL = "BBBBBBBBBB";
-
     private static final String DEFAULT_PATH = "AAAAAAAAAA";
     private static final String UPDATED_PATH = "BBBBBBBBBB";
 
@@ -71,8 +72,9 @@ public class UploadFileResourceIT {
     private static final String DEFAULT_OWNER_ENTITY_NAME = "AAAAAAAAAA";
     private static final String UPDATED_OWNER_ENTITY_NAME = "BBBBBBBBBB";
 
-    private static final String DEFAULT_OWNER_ENTITY_ID = "AAAAAAAAAA";
-    private static final String UPDATED_OWNER_ENTITY_ID = "BBBBBBBBBB";
+    private static final Long DEFAULT_OWNER_ENTITY_ID = 1L;
+    private static final Long UPDATED_OWNER_ENTITY_ID = 2L;
+    private static final Long SMALLER_OWNER_ENTITY_ID = 1L - 1L;
 
     private static final String DEFAULT_BUSINESS_TITLE = "AAAAAAAAAA";
     private static final String UPDATED_BUSINESS_TITLE = "BBBBBBBBBB";
@@ -99,17 +101,15 @@ public class UploadFileResourceIT {
     private static final Long UPDATED_CREATED_BY = 2L;
     private static final Long SMALLER_CREATED_BY = 1L - 1L;
 
-    private static final ZonedDateTime DEFAULT_CREATED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_CREATED_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_CREATED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final Instant DEFAULT_CREATED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final Long DEFAULT_LAST_MODIFIED_BY = 1L;
     private static final Long UPDATED_LAST_MODIFIED_BY = 2L;
     private static final Long SMALLER_LAST_MODIFIED_BY = 1L - 1L;
 
-    private static final ZonedDateTime DEFAULT_LAST_MODIFIED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_LAST_MODIFIED_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_LAST_MODIFIED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final Instant DEFAULT_LAST_MODIFIED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_LAST_MODIFIED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/upload-files";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -142,12 +142,12 @@ public class UploadFileResourceIT {
      */
     public static UploadFile createEntity() {
         UploadFile uploadFile = new UploadFile()
+            .url(DEFAULT_URL)
             .fullName(DEFAULT_FULL_NAME)
             .name(DEFAULT_NAME)
             .thumb(DEFAULT_THUMB)
             .ext(DEFAULT_EXT)
             .type(DEFAULT_TYPE)
-            .url(DEFAULT_URL)
             .path(DEFAULT_PATH)
             .folder(DEFAULT_FOLDER)
             .ownerEntityName(DEFAULT_OWNER_ENTITY_NAME)
@@ -173,12 +173,12 @@ public class UploadFileResourceIT {
      */
     public static UploadFile createUpdatedEntity() {
         UploadFile uploadFile = new UploadFile()
+            .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
             .name(UPDATED_NAME)
             .thumb(UPDATED_THUMB)
             .ext(UPDATED_EXT)
             .type(UPDATED_TYPE)
-            .url(UPDATED_URL)
             .path(UPDATED_PATH)
             .folder(UPDATED_FOLDER)
             .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
@@ -215,12 +215,12 @@ public class UploadFileResourceIT {
         List<UploadFile> uploadFileList = uploadFileRepository.findAll();
         assertThat(uploadFileList).hasSize(databaseSizeBeforeCreate + 1);
         UploadFile testUploadFile = uploadFileList.get(uploadFileList.size() - 1);
+        assertThat(testUploadFile.getUrl()).isEqualTo(DEFAULT_URL);
         assertThat(testUploadFile.getFullName()).isEqualTo(DEFAULT_FULL_NAME);
         assertThat(testUploadFile.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testUploadFile.getThumb()).isEqualTo(DEFAULT_THUMB);
         assertThat(testUploadFile.getExt()).isEqualTo(DEFAULT_EXT);
         assertThat(testUploadFile.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testUploadFile.getUrl()).isEqualTo(DEFAULT_URL);
         assertThat(testUploadFile.getPath()).isEqualTo(DEFAULT_PATH);
         assertThat(testUploadFile.getFolder()).isEqualTo(DEFAULT_FOLDER);
         assertThat(testUploadFile.getOwnerEntityName()).isEqualTo(DEFAULT_OWNER_ENTITY_NAME);
@@ -258,6 +258,24 @@ public class UploadFileResourceIT {
 
     @Test
     @Transactional
+    void checkUrlIsRequired() throws Exception {
+        int databaseSizeBeforeTest = uploadFileRepository.findAll().size();
+        // set the field null
+        uploadFile.setUrl(null);
+
+        // Create the UploadFile, which fails.
+        UploadFileDTO uploadFileDTO = uploadFileMapper.toDto(uploadFile);
+
+        restUploadFileMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(uploadFileDTO)))
+            .andExpect(status().isBadRequest());
+
+        List<UploadFile> uploadFileList = uploadFileRepository.findAll();
+        assertThat(uploadFileList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     void getAllUploadFiles() throws Exception {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
@@ -268,16 +286,16 @@ public class UploadFileResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(uploadFile.getId().intValue())))
+            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)))
             .andExpect(jsonPath("$.[*].fullName").value(hasItem(DEFAULT_FULL_NAME)))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].thumb").value(hasItem(DEFAULT_THUMB)))
             .andExpect(jsonPath("$.[*].ext").value(hasItem(DEFAULT_EXT)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE)))
-            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)))
             .andExpect(jsonPath("$.[*].path").value(hasItem(DEFAULT_PATH)))
             .andExpect(jsonPath("$.[*].folder").value(hasItem(DEFAULT_FOLDER)))
             .andExpect(jsonPath("$.[*].ownerEntityName").value(hasItem(DEFAULT_OWNER_ENTITY_NAME)))
-            .andExpect(jsonPath("$.[*].ownerEntityId").value(hasItem(DEFAULT_OWNER_ENTITY_ID)))
+            .andExpect(jsonPath("$.[*].ownerEntityId").value(hasItem(DEFAULT_OWNER_ENTITY_ID.intValue())))
             .andExpect(jsonPath("$.[*].businessTitle").value(hasItem(DEFAULT_BUSINESS_TITLE)))
             .andExpect(jsonPath("$.[*].businessDesc").value(hasItem(DEFAULT_BUSINESS_DESC)))
             .andExpect(jsonPath("$.[*].businessStatus").value(hasItem(DEFAULT_BUSINESS_STATUS)))
@@ -285,9 +303,9 @@ public class UploadFileResourceIT {
             .andExpect(jsonPath("$.[*].fileSize").value(hasItem(DEFAULT_FILE_SIZE.intValue())))
             .andExpect(jsonPath("$.[*].referenceCount").value(hasItem(DEFAULT_REFERENCE_COUNT.intValue())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(sameInstant(DEFAULT_CREATED_DATE))))
+            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(sameInstant(DEFAULT_LAST_MODIFIED_DATE))));
+            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(DEFAULT_LAST_MODIFIED_DATE.toString())));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -319,16 +337,16 @@ public class UploadFileResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(uploadFile.getId().intValue()))
+            .andExpect(jsonPath("$.url").value(DEFAULT_URL))
             .andExpect(jsonPath("$.fullName").value(DEFAULT_FULL_NAME))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.thumb").value(DEFAULT_THUMB))
             .andExpect(jsonPath("$.ext").value(DEFAULT_EXT))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE))
-            .andExpect(jsonPath("$.url").value(DEFAULT_URL))
             .andExpect(jsonPath("$.path").value(DEFAULT_PATH))
             .andExpect(jsonPath("$.folder").value(DEFAULT_FOLDER))
             .andExpect(jsonPath("$.ownerEntityName").value(DEFAULT_OWNER_ENTITY_NAME))
-            .andExpect(jsonPath("$.ownerEntityId").value(DEFAULT_OWNER_ENTITY_ID))
+            .andExpect(jsonPath("$.ownerEntityId").value(DEFAULT_OWNER_ENTITY_ID.intValue()))
             .andExpect(jsonPath("$.businessTitle").value(DEFAULT_BUSINESS_TITLE))
             .andExpect(jsonPath("$.businessDesc").value(DEFAULT_BUSINESS_DESC))
             .andExpect(jsonPath("$.businessStatus").value(DEFAULT_BUSINESS_STATUS))
@@ -336,9 +354,9 @@ public class UploadFileResourceIT {
             .andExpect(jsonPath("$.fileSize").value(DEFAULT_FILE_SIZE.intValue()))
             .andExpect(jsonPath("$.referenceCount").value(DEFAULT_REFERENCE_COUNT.intValue()))
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.intValue()))
-            .andExpect(jsonPath("$.createdDate").value(sameInstant(DEFAULT_CREATED_DATE)))
+            .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()))
             .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY.intValue()))
-            .andExpect(jsonPath("$.lastModifiedDate").value(sameInstant(DEFAULT_LAST_MODIFIED_DATE)));
+            .andExpect(jsonPath("$.lastModifiedDate").value(DEFAULT_LAST_MODIFIED_DATE.toString()));
     }
 
     @Test
@@ -357,6 +375,71 @@ public class UploadFileResourceIT {
 
         defaultUploadFileShouldBeFound("id.lessThanOrEqual=" + id);
         defaultUploadFileShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByUrlIsEqualToSomething() throws Exception {
+        // Initialize the database
+        uploadFileRepository.save(uploadFile);
+
+        // Get all the uploadFileList where url equals to DEFAULT_URL
+        defaultUploadFileShouldBeFound("url.equals=" + DEFAULT_URL);
+
+        // Get all the uploadFileList where url equals to UPDATED_URL
+        defaultUploadFileShouldNotBeFound("url.equals=" + UPDATED_URL);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByUrlIsInShouldWork() throws Exception {
+        // Initialize the database
+        uploadFileRepository.save(uploadFile);
+
+        // Get all the uploadFileList where url in DEFAULT_URL or UPDATED_URL
+        defaultUploadFileShouldBeFound("url.in=" + DEFAULT_URL + "," + UPDATED_URL);
+
+        // Get all the uploadFileList where url equals to UPDATED_URL
+        defaultUploadFileShouldNotBeFound("url.in=" + UPDATED_URL);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByUrlIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        uploadFileRepository.save(uploadFile);
+
+        // Get all the uploadFileList where url is not null
+        defaultUploadFileShouldBeFound("url.specified=true");
+
+        // Get all the uploadFileList where url is null
+        defaultUploadFileShouldNotBeFound("url.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByUrlContainsSomething() throws Exception {
+        // Initialize the database
+        uploadFileRepository.save(uploadFile);
+
+        // Get all the uploadFileList where url contains DEFAULT_URL
+        defaultUploadFileShouldBeFound("url.contains=" + DEFAULT_URL);
+
+        // Get all the uploadFileList where url contains UPDATED_URL
+        defaultUploadFileShouldNotBeFound("url.contains=" + UPDATED_URL);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByUrlNotContainsSomething() throws Exception {
+        // Initialize the database
+        uploadFileRepository.save(uploadFile);
+
+        // Get all the uploadFileList where url does not contain DEFAULT_URL
+        defaultUploadFileShouldNotBeFound("url.doesNotContain=" + DEFAULT_URL);
+
+        // Get all the uploadFileList where url does not contain UPDATED_URL
+        defaultUploadFileShouldBeFound("url.doesNotContain=" + UPDATED_URL);
     }
 
     @Test
@@ -686,71 +769,6 @@ public class UploadFileResourceIT {
 
     @Test
     @Transactional
-    void getAllUploadFilesByUrlIsEqualToSomething() throws Exception {
-        // Initialize the database
-        uploadFileRepository.save(uploadFile);
-
-        // Get all the uploadFileList where url equals to DEFAULT_URL
-        defaultUploadFileShouldBeFound("url.equals=" + DEFAULT_URL);
-
-        // Get all the uploadFileList where url equals to UPDATED_URL
-        defaultUploadFileShouldNotBeFound("url.equals=" + UPDATED_URL);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByUrlIsInShouldWork() throws Exception {
-        // Initialize the database
-        uploadFileRepository.save(uploadFile);
-
-        // Get all the uploadFileList where url in DEFAULT_URL or UPDATED_URL
-        defaultUploadFileShouldBeFound("url.in=" + DEFAULT_URL + "," + UPDATED_URL);
-
-        // Get all the uploadFileList where url equals to UPDATED_URL
-        defaultUploadFileShouldNotBeFound("url.in=" + UPDATED_URL);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByUrlIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        uploadFileRepository.save(uploadFile);
-
-        // Get all the uploadFileList where url is not null
-        defaultUploadFileShouldBeFound("url.specified=true");
-
-        // Get all the uploadFileList where url is null
-        defaultUploadFileShouldNotBeFound("url.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByUrlContainsSomething() throws Exception {
-        // Initialize the database
-        uploadFileRepository.save(uploadFile);
-
-        // Get all the uploadFileList where url contains DEFAULT_URL
-        defaultUploadFileShouldBeFound("url.contains=" + DEFAULT_URL);
-
-        // Get all the uploadFileList where url contains UPDATED_URL
-        defaultUploadFileShouldNotBeFound("url.contains=" + UPDATED_URL);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByUrlNotContainsSomething() throws Exception {
-        // Initialize the database
-        uploadFileRepository.save(uploadFile);
-
-        // Get all the uploadFileList where url does not contain DEFAULT_URL
-        defaultUploadFileShouldNotBeFound("url.doesNotContain=" + DEFAULT_URL);
-
-        // Get all the uploadFileList where url does not contain UPDATED_URL
-        defaultUploadFileShouldBeFound("url.doesNotContain=" + UPDATED_URL);
-    }
-
-    @Test
-    @Transactional
     void getAllUploadFilesByPathIsEqualToSomething() throws Exception {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
@@ -985,28 +1003,54 @@ public class UploadFileResourceIT {
 
     @Test
     @Transactional
-    void getAllUploadFilesByOwnerEntityIdContainsSomething() throws Exception {
+    void getAllUploadFilesByOwnerEntityIdIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where ownerEntityId contains DEFAULT_OWNER_ENTITY_ID
-        defaultUploadFileShouldBeFound("ownerEntityId.contains=" + DEFAULT_OWNER_ENTITY_ID);
+        // Get all the uploadFileList where ownerEntityId is greater than or equal to DEFAULT_OWNER_ENTITY_ID
+        defaultUploadFileShouldBeFound("ownerEntityId.greaterThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID);
 
-        // Get all the uploadFileList where ownerEntityId contains UPDATED_OWNER_ENTITY_ID
-        defaultUploadFileShouldNotBeFound("ownerEntityId.contains=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the uploadFileList where ownerEntityId is greater than or equal to UPDATED_OWNER_ENTITY_ID
+        defaultUploadFileShouldNotBeFound("ownerEntityId.greaterThanOrEqual=" + UPDATED_OWNER_ENTITY_ID);
     }
 
     @Test
     @Transactional
-    void getAllUploadFilesByOwnerEntityIdNotContainsSomething() throws Exception {
+    void getAllUploadFilesByOwnerEntityIdIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where ownerEntityId does not contain DEFAULT_OWNER_ENTITY_ID
-        defaultUploadFileShouldNotBeFound("ownerEntityId.doesNotContain=" + DEFAULT_OWNER_ENTITY_ID);
+        // Get all the uploadFileList where ownerEntityId is less than or equal to DEFAULT_OWNER_ENTITY_ID
+        defaultUploadFileShouldBeFound("ownerEntityId.lessThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID);
 
-        // Get all the uploadFileList where ownerEntityId does not contain UPDATED_OWNER_ENTITY_ID
-        defaultUploadFileShouldBeFound("ownerEntityId.doesNotContain=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the uploadFileList where ownerEntityId is less than or equal to SMALLER_OWNER_ENTITY_ID
+        defaultUploadFileShouldNotBeFound("ownerEntityId.lessThanOrEqual=" + SMALLER_OWNER_ENTITY_ID);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByOwnerEntityIdIsLessThanSomething() throws Exception {
+        // Initialize the database
+        uploadFileRepository.save(uploadFile);
+
+        // Get all the uploadFileList where ownerEntityId is less than DEFAULT_OWNER_ENTITY_ID
+        defaultUploadFileShouldNotBeFound("ownerEntityId.lessThan=" + DEFAULT_OWNER_ENTITY_ID);
+
+        // Get all the uploadFileList where ownerEntityId is less than UPDATED_OWNER_ENTITY_ID
+        defaultUploadFileShouldBeFound("ownerEntityId.lessThan=" + UPDATED_OWNER_ENTITY_ID);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByOwnerEntityIdIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        uploadFileRepository.save(uploadFile);
+
+        // Get all the uploadFileList where ownerEntityId is greater than DEFAULT_OWNER_ENTITY_ID
+        defaultUploadFileShouldNotBeFound("ownerEntityId.greaterThan=" + DEFAULT_OWNER_ENTITY_ID);
+
+        // Get all the uploadFileList where ownerEntityId is greater than SMALLER_OWNER_ENTITY_ID
+        defaultUploadFileShouldBeFound("ownerEntityId.greaterThan=" + SMALLER_OWNER_ENTITY_ID);
     }
 
     @Test
@@ -1609,58 +1653,6 @@ public class UploadFileResourceIT {
 
     @Test
     @Transactional
-    void getAllUploadFilesByCreatedDateIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        uploadFileRepository.save(uploadFile);
-
-        // Get all the uploadFileList where createdDate is greater than or equal to DEFAULT_CREATED_DATE
-        defaultUploadFileShouldBeFound("createdDate.greaterThanOrEqual=" + DEFAULT_CREATED_DATE);
-
-        // Get all the uploadFileList where createdDate is greater than or equal to UPDATED_CREATED_DATE
-        defaultUploadFileShouldNotBeFound("createdDate.greaterThanOrEqual=" + UPDATED_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByCreatedDateIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        uploadFileRepository.save(uploadFile);
-
-        // Get all the uploadFileList where createdDate is less than or equal to DEFAULT_CREATED_DATE
-        defaultUploadFileShouldBeFound("createdDate.lessThanOrEqual=" + DEFAULT_CREATED_DATE);
-
-        // Get all the uploadFileList where createdDate is less than or equal to SMALLER_CREATED_DATE
-        defaultUploadFileShouldNotBeFound("createdDate.lessThanOrEqual=" + SMALLER_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByCreatedDateIsLessThanSomething() throws Exception {
-        // Initialize the database
-        uploadFileRepository.save(uploadFile);
-
-        // Get all the uploadFileList where createdDate is less than DEFAULT_CREATED_DATE
-        defaultUploadFileShouldNotBeFound("createdDate.lessThan=" + DEFAULT_CREATED_DATE);
-
-        // Get all the uploadFileList where createdDate is less than UPDATED_CREATED_DATE
-        defaultUploadFileShouldBeFound("createdDate.lessThan=" + UPDATED_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByCreatedDateIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        uploadFileRepository.save(uploadFile);
-
-        // Get all the uploadFileList where createdDate is greater than DEFAULT_CREATED_DATE
-        defaultUploadFileShouldNotBeFound("createdDate.greaterThan=" + DEFAULT_CREATED_DATE);
-
-        // Get all the uploadFileList where createdDate is greater than SMALLER_CREATED_DATE
-        defaultUploadFileShouldBeFound("createdDate.greaterThan=" + SMALLER_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
     void getAllUploadFilesByLastModifiedByIsEqualToSomething() throws Exception {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
@@ -1791,58 +1783,6 @@ public class UploadFileResourceIT {
 
     @Test
     @Transactional
-    void getAllUploadFilesByLastModifiedDateIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        uploadFileRepository.save(uploadFile);
-
-        // Get all the uploadFileList where lastModifiedDate is greater than or equal to DEFAULT_LAST_MODIFIED_DATE
-        defaultUploadFileShouldBeFound("lastModifiedDate.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the uploadFileList where lastModifiedDate is greater than or equal to UPDATED_LAST_MODIFIED_DATE
-        defaultUploadFileShouldNotBeFound("lastModifiedDate.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByLastModifiedDateIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        uploadFileRepository.save(uploadFile);
-
-        // Get all the uploadFileList where lastModifiedDate is less than or equal to DEFAULT_LAST_MODIFIED_DATE
-        defaultUploadFileShouldBeFound("lastModifiedDate.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the uploadFileList where lastModifiedDate is less than or equal to SMALLER_LAST_MODIFIED_DATE
-        defaultUploadFileShouldNotBeFound("lastModifiedDate.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByLastModifiedDateIsLessThanSomething() throws Exception {
-        // Initialize the database
-        uploadFileRepository.save(uploadFile);
-
-        // Get all the uploadFileList where lastModifiedDate is less than DEFAULT_LAST_MODIFIED_DATE
-        defaultUploadFileShouldNotBeFound("lastModifiedDate.lessThan=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the uploadFileList where lastModifiedDate is less than UPDATED_LAST_MODIFIED_DATE
-        defaultUploadFileShouldBeFound("lastModifiedDate.lessThan=" + UPDATED_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByLastModifiedDateIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        uploadFileRepository.save(uploadFile);
-
-        // Get all the uploadFileList where lastModifiedDate is greater than DEFAULT_LAST_MODIFIED_DATE
-        defaultUploadFileShouldNotBeFound("lastModifiedDate.greaterThan=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the uploadFileList where lastModifiedDate is greater than SMALLER_LAST_MODIFIED_DATE
-        defaultUploadFileShouldBeFound("lastModifiedDate.greaterThan=" + SMALLER_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
     void getAllUploadFilesByCategoryIsEqualToSomething() throws Exception {
         ResourceCategory category = ResourceCategoryResourceIT.createEntity();
         uploadFile.setCategory(category);
@@ -1864,16 +1804,16 @@ public class UploadFileResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(uploadFile.getId().intValue())))
+            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)))
             .andExpect(jsonPath("$.[*].fullName").value(hasItem(DEFAULT_FULL_NAME)))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].thumb").value(hasItem(DEFAULT_THUMB)))
             .andExpect(jsonPath("$.[*].ext").value(hasItem(DEFAULT_EXT)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE)))
-            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)))
             .andExpect(jsonPath("$.[*].path").value(hasItem(DEFAULT_PATH)))
             .andExpect(jsonPath("$.[*].folder").value(hasItem(DEFAULT_FOLDER)))
             .andExpect(jsonPath("$.[*].ownerEntityName").value(hasItem(DEFAULT_OWNER_ENTITY_NAME)))
-            .andExpect(jsonPath("$.[*].ownerEntityId").value(hasItem(DEFAULT_OWNER_ENTITY_ID)))
+            .andExpect(jsonPath("$.[*].ownerEntityId").value(hasItem(DEFAULT_OWNER_ENTITY_ID.intValue())))
             .andExpect(jsonPath("$.[*].businessTitle").value(hasItem(DEFAULT_BUSINESS_TITLE)))
             .andExpect(jsonPath("$.[*].businessDesc").value(hasItem(DEFAULT_BUSINESS_DESC)))
             .andExpect(jsonPath("$.[*].businessStatus").value(hasItem(DEFAULT_BUSINESS_STATUS)))
@@ -1881,9 +1821,9 @@ public class UploadFileResourceIT {
             .andExpect(jsonPath("$.[*].fileSize").value(hasItem(DEFAULT_FILE_SIZE.intValue())))
             .andExpect(jsonPath("$.[*].referenceCount").value(hasItem(DEFAULT_REFERENCE_COUNT.intValue())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(sameInstant(DEFAULT_CREATED_DATE))))
+            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(sameInstant(DEFAULT_LAST_MODIFIED_DATE))));
+            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(DEFAULT_LAST_MODIFIED_DATE.toString())));
 
         // Check, that the count call also returns 1
         restUploadFileMockMvc
@@ -1930,12 +1870,12 @@ public class UploadFileResourceIT {
         // Update the uploadFile
         UploadFile updatedUploadFile = uploadFileRepository.findById(uploadFile.getId()).orElseThrow();
         updatedUploadFile
+            .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
             .name(UPDATED_NAME)
             .thumb(UPDATED_THUMB)
             .ext(UPDATED_EXT)
             .type(UPDATED_TYPE)
-            .url(UPDATED_URL)
             .path(UPDATED_PATH)
             .folder(UPDATED_FOLDER)
             .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
@@ -1964,12 +1904,12 @@ public class UploadFileResourceIT {
         List<UploadFile> uploadFileList = uploadFileRepository.findAll();
         assertThat(uploadFileList).hasSize(databaseSizeBeforeUpdate);
         UploadFile testUploadFile = uploadFileList.get(uploadFileList.size() - 1);
+        assertThat(testUploadFile.getUrl()).isEqualTo(UPDATED_URL);
         assertThat(testUploadFile.getFullName()).isEqualTo(UPDATED_FULL_NAME);
         assertThat(testUploadFile.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testUploadFile.getThumb()).isEqualTo(UPDATED_THUMB);
         assertThat(testUploadFile.getExt()).isEqualTo(UPDATED_EXT);
         assertThat(testUploadFile.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testUploadFile.getUrl()).isEqualTo(UPDATED_URL);
         assertThat(testUploadFile.getPath()).isEqualTo(UPDATED_PATH);
         assertThat(testUploadFile.getFolder()).isEqualTo(UPDATED_FOLDER);
         assertThat(testUploadFile.getOwnerEntityName()).isEqualTo(UPDATED_OWNER_ENTITY_NAME);
@@ -2064,7 +2004,7 @@ public class UploadFileResourceIT {
         partialUpdatedUploadFile.setId(uploadFile.getId());
 
         partialUpdatedUploadFile
-            .fullName(UPDATED_FULL_NAME)
+            .url(UPDATED_URL)
             .path(UPDATED_PATH)
             .folder(UPDATED_FOLDER)
             .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
@@ -2087,12 +2027,12 @@ public class UploadFileResourceIT {
         List<UploadFile> uploadFileList = uploadFileRepository.findAll();
         assertThat(uploadFileList).hasSize(databaseSizeBeforeUpdate);
         UploadFile testUploadFile = uploadFileList.get(uploadFileList.size() - 1);
-        assertThat(testUploadFile.getFullName()).isEqualTo(UPDATED_FULL_NAME);
+        assertThat(testUploadFile.getUrl()).isEqualTo(UPDATED_URL);
+        assertThat(testUploadFile.getFullName()).isEqualTo(DEFAULT_FULL_NAME);
         assertThat(testUploadFile.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testUploadFile.getThumb()).isEqualTo(DEFAULT_THUMB);
         assertThat(testUploadFile.getExt()).isEqualTo(DEFAULT_EXT);
         assertThat(testUploadFile.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testUploadFile.getUrl()).isEqualTo(DEFAULT_URL);
         assertThat(testUploadFile.getPath()).isEqualTo(UPDATED_PATH);
         assertThat(testUploadFile.getFolder()).isEqualTo(UPDATED_FOLDER);
         assertThat(testUploadFile.getOwnerEntityName()).isEqualTo(UPDATED_OWNER_ENTITY_NAME);
@@ -2122,12 +2062,12 @@ public class UploadFileResourceIT {
         partialUpdatedUploadFile.setId(uploadFile.getId());
 
         partialUpdatedUploadFile
+            .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
             .name(UPDATED_NAME)
             .thumb(UPDATED_THUMB)
             .ext(UPDATED_EXT)
             .type(UPDATED_TYPE)
-            .url(UPDATED_URL)
             .path(UPDATED_PATH)
             .folder(UPDATED_FOLDER)
             .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
@@ -2155,12 +2095,12 @@ public class UploadFileResourceIT {
         List<UploadFile> uploadFileList = uploadFileRepository.findAll();
         assertThat(uploadFileList).hasSize(databaseSizeBeforeUpdate);
         UploadFile testUploadFile = uploadFileList.get(uploadFileList.size() - 1);
+        assertThat(testUploadFile.getUrl()).isEqualTo(UPDATED_URL);
         assertThat(testUploadFile.getFullName()).isEqualTo(UPDATED_FULL_NAME);
         assertThat(testUploadFile.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testUploadFile.getThumb()).isEqualTo(UPDATED_THUMB);
         assertThat(testUploadFile.getExt()).isEqualTo(UPDATED_EXT);
         assertThat(testUploadFile.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testUploadFile.getUrl()).isEqualTo(UPDATED_URL);
         assertThat(testUploadFile.getPath()).isEqualTo(UPDATED_PATH);
         assertThat(testUploadFile.getFolder()).isEqualTo(UPDATED_FOLDER);
         assertThat(testUploadFile.getOwnerEntityName()).isEqualTo(UPDATED_OWNER_ENTITY_NAME);

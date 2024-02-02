@@ -283,10 +283,6 @@ const ctx = getCurrentInstance()?.proxy;
 const go = useGo();
 const apiService = ctx?.$apiService as typeof ServerProvider;
 const { getPageSetting } = useRootSetting();
-const relationshipApis: any = {
-  siteConfig: apiService.settings.siteConfigService.retrieve,
-  dictionary: apiService.settings.dictionaryService.retrieve,
-};
 const apis = {
   commonFieldDataService: apiService.settings.commonFieldDataService,
   find: apiService.settings.commonFieldDataService.retrieve,

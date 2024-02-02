@@ -2,10 +2,10 @@
 @import 'var/index.less';
 @import 'public.less';
 @import 'ant/index.less';
-@import './theme.less';
-@import './entry.css';
-@import './begcode/index.less';
-@import './begcode/vxeTable.less';
+@import 'theme.less';
+@import 'entry.css';
+@import 'begcode/index.less';
+@import 'begcode/vxeTable.less';
 
 .ant-col {
   width: 100%;
@@ -30,6 +30,8 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  // body添加行高保持跟3.x一致
+  line-height: 1.5715;
 
   &.color-weak {
     filter: invert(80%);

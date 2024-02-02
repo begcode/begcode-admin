@@ -1,11 +1,11 @@
 <template>
   <template v-if="getShow">
     <!--节点-->
-    <a-steps style="margin-bottom: 20px" :current="currentTab">
-      <a-step title="手机验证" />
-      <a-step title="更改密码" />
-      <a-step title="完成" />
-    </a-steps>
+    <Steps style="margin-bottom: 20px" :current="currentTab">
+      <Step title="手机验证" />
+      <Step title="更改密码" />
+      <Step title="完成" />
+    </Steps>
     <!--组件-->
     <div>
       <step1 v-if="currentTab === 0" @nextStep="nextStep" />
@@ -16,7 +16,7 @@
 </template>
 <script lang="ts" setup>
 import { reactive, ref, computed, unref } from 'vue';
-import { Form } from 'ant-design-vue';
+import { Form, Steps, Step } from 'ant-design-vue';
 import { useI18n } from '@/hooks/web/useI18n';
 import { useLoginState, useFormRules, LoginStateEnum } from './useLogin';
 import step1 from '../forget-password/step1.vue';

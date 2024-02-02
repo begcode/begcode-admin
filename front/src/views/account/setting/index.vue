@@ -20,7 +20,8 @@
                 {{ item.name }}
               </span>
             </template>
-            <component :is="item.component" v-if="activeKey === item.key" />
+            <component :is="item.component" v-if="activeKey === item.key && !item.isSlot" />
+            <slot name="component" v-if="activeKey === item.key && item.isSlot" />
           </TabPane>
         </template>
       </Tabs>
@@ -49,6 +50,12 @@ export default defineComponent({
     AccountSetting,
     TenantSetting,
     WeChatDingSetting,
+  },
+  props: {
+    componentList: {
+      type: Array,
+      default: settingList,
+    },
   },
   setup() {
     const { prefixCls } = useDesign('user-account-setting-container');
@@ -82,14 +89,6 @@ export default defineComponent({
         activeKey.value = '2';
       }
     }
-    onMounted(() => {
-      goToMyTeantPage();
-      if (router.currentRoute.value.fullPath == '/system/usersetting') {
-        showVip.value = false;
-        return;
-      }
-      showVip.value = true;
-    });
     return {
       prefixCls,
       settingList,
@@ -99,8 +98,6 @@ export default defineComponent({
       },
       componentClick,
       activeKey,
-      showVip,
-      componentList,
       isDark,
     };
   },

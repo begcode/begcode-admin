@@ -195,6 +195,7 @@ function handleMenuClick(e: MenuInfo) {
   }
 
   &-dropdown-overlay {
+    width: 160px;
     .ant-dropdown-menu-item {
       min-width: 160px;
     }

@@ -99,7 +99,7 @@ const ruleItemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'LONG' },
-      editRender: { name: 'AInputNumber', enabled: false },
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '排序值',
@@ -108,7 +108,7 @@ const ruleItemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'INTEGER' },
-      editRender: { name: 'AInputNumber', enabled: false },
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '字段参数类型',
@@ -147,7 +147,7 @@ const ruleItemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'INTEGER' },
-      editRender: { name: 'AInputNumber', enabled: false },
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '序列增量',
@@ -156,7 +156,7 @@ const ruleItemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'INTEGER' },
-      editRender: { name: 'AInputNumber', enabled: false },
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '序列起始值',
@@ -165,7 +165,7 @@ const ruleItemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'INTEGER' },
-      editRender: { name: 'AInputNumber', enabled: false },
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '操作',

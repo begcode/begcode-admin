@@ -3,6 +3,7 @@ package com.begcode.monolith.domain;
 import com.baomidou.mybatisplus.annotation.*;
 import com.diboot.core.binding.annotation.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import lombok.*;
@@ -23,6 +24,13 @@ public class UploadImage extends AbstractAuditingEntity<Long, UploadImage> imple
     @TableId(value = "id", type = IdType.AUTO)
     @TableField(value = "id")
     private Long id;
+
+    /**
+     * Url地址
+     */
+    @NotNull
+    @TableField(value = "url")
+    private String url;
 
     /**
      * 完整文件名
@@ -51,12 +59,6 @@ public class UploadImage extends AbstractAuditingEntity<Long, UploadImage> imple
     private String type;
 
     /**
-     * Web Url地址
-     */
-    @TableField(value = "url")
-    private String url;
-
-    /**
      * 本地路径
      */
     @TableField(value = "path")
@@ -78,7 +80,7 @@ public class UploadImage extends AbstractAuditingEntity<Long, UploadImage> imple
      * 使用实体ID
      */
     @TableField(value = "owner_entity_id")
-    private String ownerEntityId;
+    private Long ownerEntityId;
 
     /**
      * 业务标题
@@ -146,6 +148,11 @@ public class UploadImage extends AbstractAuditingEntity<Long, UploadImage> imple
         return this;
     }
 
+    public UploadImage url(String url) {
+        this.url = url;
+        return this;
+    }
+
     public UploadImage fullName(String fullName) {
         this.fullName = fullName;
         return this;
@@ -166,11 +173,6 @@ public class UploadImage extends AbstractAuditingEntity<Long, UploadImage> imple
         return this;
     }
 
-    public UploadImage url(String url) {
-        this.url = url;
-        return this;
-    }
-
     public UploadImage path(String path) {
         this.path = path;
         return this;
@@ -186,7 +188,7 @@ public class UploadImage extends AbstractAuditingEntity<Long, UploadImage> imple
         return this;
     }
 
-    public UploadImage ownerEntityId(String ownerEntityId) {
+    public UploadImage ownerEntityId(Long ownerEntityId) {
         this.ownerEntityId = ownerEntityId;
         return this;
     }

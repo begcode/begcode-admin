@@ -11,15 +11,16 @@
       <BasicForm @register="registerForm" />
 
       <div :class="`${prefixCls}__footer`">
-        <a-button type="primary" block class="mt-2" @click="handleLock">
+        <Button type="primary" block class="mt-2" @click="handleLock">
           {{ t('layout.header.lockScreenBtn') }}
-        </a-button>
+        </Button>
       </div>
     </div>
   </BasicModal>
 </template>
 <script lang="ts" setup>
 import { computed } from 'vue';
+import { Button } from 'ant-design-vue';
 import { useI18n } from '@/hooks/web/useI18n';
 import { useDesign } from '@begcode/components';
 import { BasicModal, useModalInner, BasicForm, useForm } from '@begcode/components';

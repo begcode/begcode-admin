@@ -1,5 +1,6 @@
 import { ComponentOptions, h, resolveComponent } from 'vue';
 import { VxeColumnPropTypes, VxeGlobalRendererHandles } from 'vxe-table';
+import { Select, SelectOption, SelectOptGroup } from 'ant-design-vue';
 import XEUtils from 'xe-utils';
 import { cellText, createCellRender, createEvents, createProps, isEmptyValue, createExportMethod, createFormItemRender } from './common';
 
@@ -8,7 +9,7 @@ function renderOptions(options: any[], optionProps: VxeGlobalRendererHandles.Ren
   const valueProp = optionProps.value || 'value';
   return XEUtils.map(options, (item, oIndex) => {
     return h(
-      resolveComponent('a-select-option') as ComponentOptions,
+      SelectOption,
       {
         key: oIndex,
         value: item[valueProp],
@@ -45,7 +46,7 @@ function createEditRender() {
       const groupLabel = optionGroupProps.label || 'label';
       return [
         h(
-          resolveComponent('a-select') as ComponentOptions,
+          Select,
           {
             ...attrs,
             ...props,
@@ -55,7 +56,7 @@ function createEditRender() {
             default: () => {
               return XEUtils.map(optionGroups, (group, gIndex) => {
                 return h(
-                  resolveComponent('a-select-opt-group') as ComponentOptions,
+                  SelectOptGroup,
                   {
                     key: gIndex,
                   },
@@ -74,7 +75,7 @@ function createEditRender() {
     }
     return [
       h(
-        resolveComponent('a-select') as ComponentOptions,
+        Select,
         {
           ...props,
           ...attrs,
@@ -138,7 +139,7 @@ function createFilterRender() {
               const props = createProps(renderOpts, optionValue);
 
               return h(
-                resolveComponent('a-select') as ComponentOptions,
+                Select,
                 {
                   key: oIndex,
                   ...attrs,
@@ -165,7 +166,7 @@ function createFilterRender() {
                   default: () => {
                     return XEUtils.map(optionGroups, (group, gIndex) => {
                       return h(
-                        resolveComponent('a-select-opt-group') as ComponentOptions,
+                        SelectOptGroup,
                         {
                           key: gIndex,
                         },
@@ -185,7 +186,7 @@ function createFilterRender() {
               const optionValue = option.data;
               const props = createProps(renderOpts, optionValue);
               return h(
-                resolveComponent('a-select') as ComponentOptions,
+                Select,
                 {
                   key: oIndex,
                   ...attrs,

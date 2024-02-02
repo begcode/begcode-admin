@@ -20,6 +20,8 @@ import com.begcode.monolith.util.web.PageableUtils;
 import com.begcode.monolith.web.rest.errors.BadRequestAlertException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -85,7 +87,7 @@ public class UploadImageBaseResource {
     @AutoLog(value = "更新上传图片", logType = LogType.OPERATE, operateType = OperateType.EDIT)
     public ResponseEntity<UploadImageDTO> updateUploadImage(
         @PathVariable(value = "id", required = false) final Long id,
-        @RequestBody UploadImageDTO uploadImageDTO,
+        @Valid @RequestBody UploadImageDTO uploadImageDTO,
         @RequestParam(value = "batchIds", required = false) ArrayList<Long> batchIds,
         @RequestParam(value = "batchFields", required = false) ArrayList<String> batchFields
     ) {
@@ -161,7 +163,7 @@ public class UploadImageBaseResource {
     @AutoLog(value = "部分更新上传图片", logType = LogType.OPERATE, operateType = OperateType.EDIT)
     public ResponseEntity<UploadImageDTO> partialUpdateUploadImage(
         @PathVariable(value = "id", required = false) final Long id,
-        @RequestBody UploadImageDTO uploadImageDTO
+        @NotNull @RequestBody UploadImageDTO uploadImageDTO
     ) throws URISyntaxException {
         log.debug("REST request to partial update UploadImage partially : {}, {}", id, uploadImageDTO);
         if (uploadImageDTO.getId() == null) {

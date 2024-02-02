@@ -226,10 +226,23 @@ public class SiteConfigBaseService<R extends SiteConfigRepository, E extends Sit
                         ids.add(beforeId);
                         Map<Long, Integer> idSortValueMap = listByIds(ids)
                             .stream()
+                            .filter(siteConfig -> siteConfig.getSortValue() != null)
                             .collect(Collectors.toMap(SiteConfig::getId, SiteConfig::getSortValue));
                         return (
                             lambdaUpdate().set(SiteConfig::getSortValue, idSortValueMap.get(beforeId)).eq(SiteConfig::getId, id).update() &&
                             lambdaUpdate().set(SiteConfig::getSortValue, idSortValueMap.get(id)).eq(SiteConfig::getId, beforeId).update()
+                        );
+                    } else if (ObjectUtils.allNotNull(id, afterId)) {
+                        Set<Long> ids = new HashSet<>();
+                        ids.add(id);
+                        ids.add(afterId);
+                        Map<Long, Integer> idSortValueMap = listByIds(ids)
+                            .stream()
+                            .filter(siteConfig -> siteConfig.getSortValue() != null)
+                            .collect(Collectors.toMap(SiteConfig::getId, SiteConfig::getSortValue));
+                        return (
+                            lambdaUpdate().set(SiteConfig::getSortValue, idSortValueMap.get(afterId)).eq(SiteConfig::getId, id).update() &&
+                            lambdaUpdate().set(SiteConfig::getSortValue, idSortValueMap.get(id)).eq(SiteConfig::getId, afterId).update()
                         );
                     } else {
                         return false;
@@ -247,6 +260,7 @@ public class SiteConfigBaseService<R extends SiteConfigRepository, E extends Sit
                     }
                     Map<Long, Integer> idSortValueMap = listByIds(ids)
                         .stream()
+                        .filter(siteConfig -> siteConfig.getSortValue() != null)
                         .collect(Collectors.toMap(SiteConfig::getId, SiteConfig::getSortValue));
                     if (ObjectUtils.allNotNull(beforeId, afterId)) {
                         // 计算中间值

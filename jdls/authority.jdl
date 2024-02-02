@@ -112,6 +112,7 @@ entity Authority (jhi_authority) {
 @publicDto(id-login-firstName-lastName-email-mobile-birthday-langKey-imageUrl)
 @publicDtoFile
 @skipWebsite
+@hasImageField
 entity User (jhi_user) {
   @importDataField
   @id
@@ -267,8 +268,10 @@ entity Department {
     @endUsed(imageUrl)
     logo String /** logo地址 */
     contact String /** 联系人 */
+    @createdBy
     createUserId Long /** 创建用户 Id */
-    createTime ZonedDateTime /** 创建时间 */
+    @CreatedDate
+    createTime Instant /** 创建时间 */
 }
 
 /**

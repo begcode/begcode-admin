@@ -30,40 +30,40 @@
               </div>
             </div>
             <div class="" style="height: 230px; position: relative">
-              <a-form ref="formRef" :model="formData" v-if="activeKey === 1">
+              <Form ref="formRef" :model="formData" v-if="activeKey === 1">
                 <!-- 身份验证 begin -->
                 <div class="aui-account aui-account-line aui-forgot">
-                  <a-form-item>
+                  <FormItem>
                     <div class="aui-input-line">
-                      <a-input type="text" :placeholder="t('sys.login.mobile')" v-model:value="formData.mobile" />
+                      <Input type="text" :placeholder="t('sys.login.mobile')" v-model:value="formData.mobile" />
                     </div>
-                  </a-form-item>
+                  </FormItem>
                   <div class="aui-input-line">
-                    <a-form-item>
-                      <a-input type="text" :placeholder="t('sys.login.smsCode')" v-model:value="formData.smscode" />
-                    </a-form-item>
+                    <FormItem>
+                      <Input type="text" :placeholder="t('sys.login.smsCode')" v-model:value="formData.smscode" />
+                    </FormItem>
                     <div v-if="showInterval" class="aui-code-line" @click="getLoginCode">{{ t('component.countdown.normalText') }}</div>
                     <div v-else class="aui-code-line">{{ t('component.countdown.sendText', [unref(timeRuning)]) }}</div>
                   </div>
                 </div>
                 <!-- 身份验证 end -->
-              </a-form>
-              <a-form ref="pwdFormRef" :model="pwdFormData" v-else-if="activeKey === 2">
+              </Form>
+              <Form ref="pwdFormRef" :model="pwdFormData" v-else-if="activeKey === 2">
                 <!-- 重置密码 begin -->
                 <div class="aui-account aui-account-line aui-forgot">
-                  <a-form-item>
+                  <FormItem>
                     <div class="aui-input-line">
-                      <a-input type="password" :placeholder="t('sys.login.passwordPlaceholder')" v-model:value="pwdFormData.password" />
+                      <Input type="password" :placeholder="t('sys.login.passwordPlaceholder')" v-model:value="pwdFormData.password" />
                     </div>
-                  </a-form-item>
-                  <a-form-item>
+                  </FormItem>
+                  <FormItem>
                     <div class="aui-input-line">
-                      <a-input type="password" :placeholder="t('sys.login.confirmPassword')" v-model:value="pwdFormData.confirmPassword" />
+                      <Input type="password" :placeholder="t('sys.login.confirmPassword')" v-model:value="pwdFormData.confirmPassword" />
                     </div>
-                  </a-form-item>
+                  </FormItem>
                 </div>
                 <!-- 重置密码 end -->
-              </a-form>
+              </Form>
               <!-- 重置成功 begin -->
               <div class="aui-success" v-else>
                 <div class="aui-success-icon">
@@ -90,14 +90,19 @@
     </div>
   </div>
 </template>
-<script lang="ts" name="mini-forgotpad" setup>
+<script lang="ts" setup>
 import { reactive, ref, toRaw, unref } from 'vue';
+import { Form, FormItem, Button } from 'ant-design-vue';
 import { useI18n } from '@/hooks/web/useI18n';
 import { SmsEnum, useFormRules, useFormValid, useLoginState } from '@/views/account/login/useLogin';
 import { useMessage } from '@/hooks/web/useMessage';
 import { getImageCaptcha, passwordChange, phoneVerify } from '@/api-service/sys/user';
 import adTextImg from '@/assets/loginmini/icon/jeecg_ad_text.png';
 import successImg from '@/assets/loginmini/icon/icon-success.png';
+
+defineOptions({
+  name: 'MiniForgotpad',
+});
 
 //下一步控制
 const activeKey = ref<number>(1);

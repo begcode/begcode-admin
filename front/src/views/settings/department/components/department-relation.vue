@@ -379,7 +379,7 @@ const config = {
         visible: false,
         treeNode: false,
         params: { type: 'LONG' },
-        editRender: { name: 'AInputNumber', enabled: false },
+        editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
       },
       {
         title: '名称',
@@ -442,7 +442,7 @@ const config = {
         visible: true,
         treeNode: false,
         params: { type: 'LONG' },
-        editRender: { name: 'AInputNumber', enabled: false },
+        editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
       },
       {
         title: '创建时间',
@@ -524,7 +524,7 @@ const config = {
       treeConfig: {
         childrenField: 'children',
         indent: 20,
-        line: false,
+        showLine: false,
         expandAll: false,
         accordion: false,
         trigger: 'default',

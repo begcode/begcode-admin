@@ -12,6 +12,10 @@ const fields: DescItem[] = [
     },
   },
   {
+    label: 'Url地址',
+    field: 'url',
+  },
+  {
     label: '完整文件名',
     field: 'fullName',
   },
@@ -26,10 +30,6 @@ const fields: DescItem[] = [
   {
     label: '文件类型',
     field: 'type',
-  },
-  {
-    label: 'Web Url地址',
-    field: 'url',
   },
   {
     label: '本地路径',
@@ -89,9 +89,6 @@ const fields: DescItem[] = [
   {
     label: '创建时间',
     field: 'createdDate',
-    format: (value, _data) => {
-      return value ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : '';
-    },
   },
   {
     label: '修改者Id',
@@ -100,9 +97,6 @@ const fields: DescItem[] = [
   {
     label: '修改时间',
     field: 'lastModifiedDate',
-    format: (value, _data) => {
-      return value ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : '';
-    },
   },
   {
     label: '所属分类',

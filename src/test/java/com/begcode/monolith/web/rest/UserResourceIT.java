@@ -13,7 +13,7 @@ import com.begcode.monolith.security.AuthoritiesConstants;
 import com.begcode.monolith.service.AuthorityService;
 import com.begcode.monolith.service.dto.AdminUserDTO;
 import com.begcode.monolith.service.mapper.UserMapper;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -506,9 +506,9 @@ public class UserResourceIT {
     void testUserToUserDTO() {
         user.setId(DEFAULT_ID);
         user.setCreatedBy(DEFAULT_ID);
-        user.setCreatedDate(ZonedDateTime.now());
+        user.setCreatedDate(Instant.now());
         user.setLastModifiedBy(DEFAULT_ID);
-        user.setLastModifiedDate(ZonedDateTime.now());
+        user.setLastModifiedDate(Instant.now());
         List<Authority> authorities = new ArrayList<>();
         Authority authority = new Authority();
         authority.setName(AuthoritiesConstants.USER);

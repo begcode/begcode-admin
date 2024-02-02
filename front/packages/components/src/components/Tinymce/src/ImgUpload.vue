@@ -1,26 +1,26 @@
 <template>
   <div :class="[prefixCls, { fullscreen }]">
     <Upload
-      name="file"
+      name="image"
       multiple
       @change="handleChange"
-      :action="uploadUrl"
+      :action="action"
       :showUploadList="false"
-      :data="getBizData()"
-      :headers="getheader()"
+      :headers="headers"
       accept=".jpg,.jpeg,.gif,.png,.webp"
     >
-      <a-button type="primary" v-bind="{ ...getButtonProps }">
+      <Button type="primary" v-bind="{ ...getButtonProps }">
         {{ t('component.upload.imgUpload') }}
-      </a-button>
+      </Button>
     </Upload>
   </div>
 </template>
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { Upload } from 'ant-design-vue';
+import { Upload, Button } from 'ant-design-vue';
 import { useDesign } from '@/hooks/web/useDesign';
 import { useI18n } from '@/hooks/web/useI18nOut';
+import { useUpload } from '@/hooks/web/useUploadOut';
 import { getFileAccessHttpUrl } from '@/utils';
 
 defineOptions({ name: 'TinymceImageUpload' });
@@ -49,18 +49,12 @@ const { t } = useI18n();
 let uploading = false;
 
 const { uploadUrl } = props;
+const { uploadImageUrl, getToken } = useUpload();
+const action = uploadUrl || uploadImageUrl;
 
-function getheader() {
-  return { Authorization: `Bearer ${props.token}` };
-  // return getHeaders();
-}
-
-function getBizData() {
-  return {
-    biz: 'jeditor',
-    jeditor: '1',
-  };
-}
+const headers = computed(() => {
+  return { Authorization: `Bearer ${getToken}` };
+});
 
 const { prefixCls } = useDesign('tinymce-img-upload');
 
@@ -83,7 +77,7 @@ function handleChange(info: Record<string, any>) {
       uploading = true;
     }
   } else if (status === 'done') {
-    let realUrl = getFileAccessHttpUrl(file.response.message);
+    let realUrl = getFileAccessHttpUrl(file.response.url);
     emit('done', name, realUrl);
     uploading = false;
   } else if (status === 'error') {

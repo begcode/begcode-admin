@@ -9,9 +9,9 @@
             </template>
             <template #title>
               {{ item.title }}
-              <a-button type="link" size="small" v-if="item.extra" class="extra">
+              <Button type="link" size="small" v-if="item.extra" class="extra">
                 {{ item.extra }}
-              </a-button>
+              </Button>
             </template>
             <template #description>
               <div>{{ item.description }}</div>
@@ -23,7 +23,7 @@
   </CollapseContainer>
 </template>
 <script lang="ts" setup>
-import { List } from 'ant-design-vue';
+import { List, Button } from 'ant-design-vue';
 import { CollapseContainer, Icon } from '@begcode/components';
 
 import { accountBindList } from './data';

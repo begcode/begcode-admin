@@ -26,7 +26,7 @@ public class FillRuleItemCriteria implements Serializable, Criteria {
     private String jhiCommonSearchKeywords;
 
     @BindQuery(ignore = true)
-    private Boolean useOr;
+    private Boolean useOr = false;
 
     @BindQuery(ignore = true)
     private FillRuleItemCriteria and;

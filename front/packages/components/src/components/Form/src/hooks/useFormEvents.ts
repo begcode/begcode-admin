@@ -3,8 +3,8 @@ import type { NamePath, ValidateOptions } from 'ant-design-vue/lib/form/interfac
 import { unref, toRaw, nextTick } from 'vue';
 import { cloneDeep, set, uniqBy, get } from 'lodash-es';
 import type { FormProps, FormSchemaInner as FormSchema, FormActionType } from '../types/form';
-import { dateItemType, handleInputNumberValue, defaultValueComponents } from '../helper';
-import { isArray, isFunction, isObject, isString, isDef, isNullOrUnDef } from '@/utils/is';
+import { dateItemType, handleInputNumberValue, defaultValueComponents, isIncludeSimpleComponents, handleInputStringValue } from '../helper';
+import { isArray, isFunction, isObject, isString, isDef, isNil } from '@/utils/is';
 import { deepMerge, getValueType } from '@/utils';
 import { dateUtil } from '@/utils/dateUtil';
 import { useLog } from '@/hooks/useLog';
@@ -125,6 +125,7 @@ export function useFormEvents({
       const hasKey = Reflect.has(values, key);
 
       value = handleInputNumberValue(schema?.component, value);
+      value = handleInputStringValue(schema?.component, value);
       const { componentProps } = schema || {};
       let _props = componentProps as any;
       if (typeof componentProps === 'function') {
@@ -244,7 +245,7 @@ export function useFormEvents({
       updateData = [...data];
     }
 
-    const hasField = updateData.every(item => item.component === 'Divider' || (Reflect.has(item, 'field') && item.field));
+    const hasField = updateData.every(item => isIncludeSimpleComponents(item.component) || (Reflect.has(item, 'field') && item.field));
 
     if (!hasField) {
       const log = useLog();
@@ -263,7 +264,7 @@ export function useFormEvents({
       updateData = [...data];
     }
 
-    const hasField = updateData.every(item => item.component === 'Divider' || (Reflect.has(item, 'field') && item.field));
+    const hasField = updateData.every(item => isIncludeSimpleComponents(item.component) || (Reflect.has(item, 'field') && item.field));
 
     if (!hasField) {
       const log = useLog();
@@ -271,21 +272,18 @@ export function useFormEvents({
       return;
     }
     const schema: FormSchema[] = [];
+    const updatedSchema: FormSchema[] = [];
     unref(getSchema).forEach(val => {
-      let _val;
-      updateData.forEach(item => {
-        if (val.field === item.field) {
-          _val = item;
-        }
-      });
-      if (_val !== undefined && val.field === _val.field) {
-        const newSchema = deepMerge(val, _val);
+      const updatedItem = updateData.find(item => val.field === item.field);
+      if (updatedItem) {
+        const newSchema = deepMerge(val, updatedItem);
+        updatedSchema.push(newSchema as FormSchema);
         schema.push(newSchema as FormSchema);
       } else {
         schema.push(val);
       }
     });
-    _setDefaultValue(schema);
+    _setDefaultValue(updatedSchema);
 
     schemaRef.value = uniqBy(schema, 'field');
   }
@@ -303,11 +301,11 @@ export function useFormEvents({
     const currentFieldsValue = getFieldsValue();
     schemas.forEach(item => {
       if (
-        item.component != 'Divider' &&
+        !isIncludeSimpleComponents(item.component) &&
         Reflect.has(item, 'field') &&
         item.field &&
-        !isNullOrUnDef(item.defaultValue) &&
-        (!(item.field in currentFieldsValue) || isNullOrUnDef(currentFieldsValue[item.field]))
+        !isNil(item.defaultValue) &&
+        (!(item.field in currentFieldsValue) || isNil(currentFieldsValue[item.field]))
       ) {
         obj[item.field] = item.defaultValue;
       }
@@ -427,7 +425,7 @@ function getDefaultValue(schema: FormSchema | undefined, defaultValueRef: UseFor
   let defaultValue = cloneDeep(defaultValueRef.value[key]);
   const isInput = checkIsInput(schema);
   if (isInput) {
-    return defaultValue || '';
+    return defaultValue || undefined;
   }
   if (!defaultValue && schema && checkIsRangeSlider(schema)) {
     defaultValue = [0, 0];

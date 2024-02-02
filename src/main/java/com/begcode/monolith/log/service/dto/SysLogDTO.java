@@ -4,7 +4,7 @@ import com.begcode.monolith.domain.AbstractAuditingEntity;
 import com.begcode.monolith.domain.enumeration.LogType;
 import com.begcode.monolith.domain.enumeration.OperateType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -100,7 +100,7 @@ public class SysLogDTO extends AbstractAuditingEntity<Long, SysLogDTO> {
      * 创建时间
      */
     @Schema(description = "创建时间")
-    private ZonedDateTime createdDate;
+    private Instant createdDate;
 
     /**
      * 修改者Id
@@ -112,7 +112,7 @@ public class SysLogDTO extends AbstractAuditingEntity<Long, SysLogDTO> {
      * 修改时间
      */
     @Schema(description = "修改时间")
-    private ZonedDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove
 
@@ -181,7 +181,7 @@ public class SysLogDTO extends AbstractAuditingEntity<Long, SysLogDTO> {
         return this;
     }
 
-    public SysLogDTO createdDate(ZonedDateTime createdDate) {
+    public SysLogDTO createdDate(Instant createdDate) {
         this.createdDate = createdDate;
         return this;
     }
@@ -191,7 +191,7 @@ public class SysLogDTO extends AbstractAuditingEntity<Long, SysLogDTO> {
         return this;
     }
 
-    public SysLogDTO lastModifiedDate(ZonedDateTime lastModifiedDate) {
+    public SysLogDTO lastModifiedDate(Instant lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
         return this;
     }

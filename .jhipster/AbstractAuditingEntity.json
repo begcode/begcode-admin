@@ -18,7 +18,7 @@
     {
       "documentation": "创建时间",
       "fieldName": "createdDate",
-      "fieldType": "ZonedDateTime"
+      "fieldType": "Instant"
     },
     {
       "documentation": "修改者Id",
@@ -28,7 +28,7 @@
     {
       "documentation": "修改时间",
       "fieldName": "lastModifiedDate",
-      "fieldType": "ZonedDateTime"
+      "fieldType": "Instant"
     }
   ],
   "jpaMetamodelFiltering": true,

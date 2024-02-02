@@ -14,9 +14,9 @@
     :cancelButtonProps="{ disabled: isUploadingRef }"
   >
     <template #centerFooter>
-      <a-button @click="handleStartUpload" color="success" :disabled="!getIsSelectFile" :loading="isUploadingRef">
+      <Button @click="handleStartUpload" color="success" :disabled="!getIsSelectFile" :loading="isUploadingRef">
         {{ getUploadBtnText }}
-      </a-button>
+      </Button>
     </template>
 
     <div class="upload-modal-toolbar">
@@ -29,26 +29,27 @@
         :show-upload-list="false"
         class="upload-modal-toolbar__btn"
       >
-        <a-button type="primary">
+        <Button type="primary">
           {{ t('component.upload.choose') }}
-        </a-button>
+        </Button>
       </Upload>
     </div>
-    <vxe-grid ref="xGrid" :columns="columns" :data="fileListRef">
+    <Grid ref="xGrid" :columns="columns" :data="fileListRef">
       <template #recordAction="{ row }">
-        <a-button :type="'link'" status="primary" @click="handleRemove(row)">
+        <Button :type="'link'" status="primary" @click="handleRemove(row)">
           <span>删除</span>
-        </a-button>
-        <a-button :type="'link'" status="primary" @click="handlePreview(row)">
+        </Button>
+        <Button :type="'link'" status="primary" @click="handlePreview(row)">
           <span>预览</span>
-        </a-button>
+        </Button>
       </template>
-    </vxe-grid>
+    </Grid>
   </BasicModal>
 </template>
 <script lang="ts" setup>
 import { ref, toRefs, unref, computed, PropType } from 'vue';
-import { Upload, Alert, message } from 'ant-design-vue';
+import { Upload, Alert, Button, message } from 'ant-design-vue';
+import { Grid } from 'vxe-table';
 import { BasicModal, useModalInner } from '@/components/Modal';
 // hooks
 import { useUploadType } from '../hooks/useUpload';

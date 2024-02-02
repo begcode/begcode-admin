@@ -1,21 +1,23 @@
 <template>
-  <a-card :bordered="false">
-    <a-table :columns="columns" :data-source="data" rowKey="name">
+  <Card :bordered="false">
+    <Table :columns="columns" :data-source="data" rowKey="name">
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.dataIndex === 'action'">
-          <a-button type="primary" @click="clear(text)">
+          <Button type="primary" @click="clear(text)">
             <template #icon><ClearOutlined /></template>
             清除
-          </a-button>
+          </Button>
         </template>
       </template>
-    </a-table>
-  </a-card>
+    </Table>
+  </Card>
 </template>
 
-<script>
+<script lang="ts" setup>
+import { onMounted, ref } from 'vue';
 import { ClearOutlined } from '@ant-design/icons-vue';
-import { message } from 'ant-design-vue';
+import { Card, Table, Button, message } from 'ant-design-vue';
+import apiService from '@/api-service';
 
 const columns = [
   {
@@ -30,32 +32,22 @@ const columns = [
   },
 ];
 
-const data = [];
+const data = ref<any[]>([]);
 
-export default {
-  components: {
-    ClearOutlined,
-  },
-  data() {
-    return {
-      data,
-      columns,
-    };
-  },
-  created() {
-    this.getAll();
-  },
-  methods: {
-    getAll() {
-      this.$apiService.system.cacheManagerService.getAll().then(res => {
-        res.forEach(cacheName => this.data.push({ name: cacheName }));
-      });
-    },
-    clear(cacheName) {
-      this.$apiService.system.cacheManagerService.clear(cacheName).then(res => {
-        message.success('清除缓存成功。');
-      });
-    },
-  },
-};
+function getAll() {
+  apiService.system.cacheManagerService.getAll().then(res => {
+    res.forEach(cacheName => data.value.push({ name: cacheName }));
+  });
+}
+
+function clear(cacheName) {
+  apiService.system.cacheManagerService.clear(cacheName).then(res => {
+    console.log('res', res);
+    message.success('清除缓存成功。');
+  });
+}
+
+onMounted(() => {
+  getAll();
+});
 </script>

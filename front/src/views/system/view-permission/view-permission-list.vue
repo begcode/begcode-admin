@@ -283,11 +283,6 @@ const ctx = getCurrentInstance()?.proxy;
 const go = useGo();
 const apiService = ctx?.$apiService as typeof ServerProvider;
 const { getPageSetting } = useRootSetting();
-const relationshipApis: any = {
-  children: apiService.system.viewPermissionService.tree,
-  parent: apiService.system.viewPermissionService.tree,
-  authorities: apiService.system.authorityService.tree,
-};
 const apis = {
   viewPermissionService: apiService.system.viewPermissionService,
   find: apiService.system.viewPermissionService.tree,

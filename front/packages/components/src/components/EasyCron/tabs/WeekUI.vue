@@ -1,42 +1,42 @@
 <template>
   <div :class="`${prefixCls}-config-list`">
-    <a-radio-group v-model:value="type">
+    <RadioGroup v-model:value="type">
       <div class="item">
-        <a-radio :value="TypeEnum.unset" v-bind="beforeRadioAttrs">不设置</a-radio>
+        <Radio :value="TypeEnum.unset" v-bind="beforeRadioAttrs">不设置</Radio>
         <span class="tip-info">日和周只能设置其中之一</span>
       </div>
       <div class="item">
-        <a-radio :value="TypeEnum.range" v-bind="beforeRadioAttrs">区间</a-radio>
+        <Radio :value="TypeEnum.range" v-bind="beforeRadioAttrs">区间</Radio>
         <span> 从 </span>
-        <a-select v-model:value="valueRange.start" :options="weekOptions" v-bind="typeRangeSelectAttrs" />
+        <Select v-model:value="valueRange.start" :options="weekOptions" v-bind="typeRangeSelectAttrs" />
         <span> 至 </span>
-        <a-select v-model:value="valueRange.end" :options="weekOptions" v-bind="typeRangeSelectAttrs" />
+        <Select v-model:value="valueRange.end" :options="weekOptions" v-bind="typeRangeSelectAttrs" />
       </div>
       <div class="item">
-        <a-radio :value="TypeEnum.loop" v-bind="beforeRadioAttrs">循环</a-radio>
+        <Radio :value="TypeEnum.loop" v-bind="beforeRadioAttrs">循环</Radio>
         <span> 从 </span>
-        <a-select v-model:value="valueLoop.start" :options="weekOptions" v-bind="typeLoopSelectAttrs" />
+        <Select v-model:value="valueLoop.start" :options="weekOptions" v-bind="typeLoopSelectAttrs" />
         <span> 开始，间隔 </span>
         <InputNumber v-model:value="valueLoop.interval" v-bind="typeLoopAttrs" />
         <span> 天 </span>
       </div>
       <div class="item">
-        <a-radio :value="TypeEnum.specify" v-bind="beforeRadioAttrs">指定</a-radio>
+        <Radio :value="TypeEnum.specify" v-bind="beforeRadioAttrs">指定</Radio>
         <div class="list list-cn">
-          <a-checkbox-group v-model:value="valueList">
+          <CheckboxGroup v-model:value="valueList">
             <template v-for="opt in weekOptions" :key="i">
-              <a-checkbox :value="opt.value" v-bind="typeSpecifyAttrs">{{ opt.label }}</a-checkbox>
+              <Checkbox :value="opt.value" v-bind="typeSpecifyAttrs">{{ opt.label }}</Checkbox>
             </template>
-          </a-checkbox-group>
+          </CheckboxGroup>
         </div>
       </div>
-    </a-radio-group>
+    </RadioGroup>
   </div>
 </template>
 
 <script lang="ts">
 import { computed, watch, defineComponent } from 'vue';
-import { InputNumber } from 'ant-design-vue';
+import { InputNumber, Radio, RadioGroup, Checkbox, CheckboxGroup, Select } from 'ant-design-vue';
 import { useTabProps, useTabEmits, useTabSetup, TypeEnum } from './useTabMixin';
 
 const WEEK_MAP_EN = {
@@ -61,7 +61,7 @@ const WEEK_MAP_CN = {
 
 export default defineComponent({
   name: 'WeekUI',
-  components: { InputNumber },
+  components: { InputNumber, Radio, RadioGroup, Checkbox, CheckboxGroup },
   props: useTabProps({
     defaultValue: '?',
     props: {

@@ -5,7 +5,6 @@
     @change="handleChange"
     :options="getOptions"
     :show-search="showSearch"
-    @search="searchHandle"
     v-model:value="state"
   >
     <template #[item]="data" v-for="item in Object.keys($slots)">
@@ -28,7 +27,7 @@ import { PropType, ref, computed, unref, watch, useAttrs } from 'vue';
 import { Select } from 'ant-design-vue';
 import type { SelectValue } from 'ant-design-vue/es/select';
 import { useRuleFormItem } from '@/hooks/component/useFormItem';
-import { get, omit, isFunction } from 'lodash-es';
+import { get, omit, isFunction, isEqual } from 'lodash-es';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons-vue';
 import { propTypes } from '@/utils/propTypes';
 import { useI18n } from '@/hooks/web/useI18nOut';
@@ -116,8 +115,9 @@ watch(
 
 watch(
   () => props.params,
-  () => {
-    !unref(isFirstLoaded) && fetch();
+  (value, oldValue) => {
+    if (isEqual(value, oldValue)) return;
+    fetch();
   },
   { deep: true, immediate: props.immediate },
 );

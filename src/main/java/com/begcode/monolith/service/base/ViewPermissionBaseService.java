@@ -16,9 +16,7 @@ import com.diboot.core.binding.Binder;
 import com.diboot.core.service.impl.BaseServiceImpl;
 import com.google.common.base.CaseFormat;
 import java.util.*;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -337,6 +335,7 @@ public class ViewPermissionBaseService<R extends ViewPermissionRepository, E ext
                         ids.add(beforeId);
                         Map<Long, Integer> idSortValueMap = listByIds(ids)
                             .stream()
+                            .filter(viewPermission -> viewPermission.getOrder() != null)
                             .collect(Collectors.toMap(ViewPermission::getId, ViewPermission::getOrder));
                         return (
                             lambdaUpdate()
@@ -347,6 +346,21 @@ public class ViewPermissionBaseService<R extends ViewPermissionRepository, E ext
                                 .set(ViewPermission::getOrder, idSortValueMap.get(id))
                                 .eq(ViewPermission::getId, beforeId)
                                 .update()
+                        );
+                    } else if (ObjectUtils.allNotNull(id, afterId)) {
+                        Set<Long> ids = new HashSet<>();
+                        ids.add(id);
+                        ids.add(afterId);
+                        Map<Long, Integer> idSortValueMap = listByIds(ids)
+                            .stream()
+                            .filter(viewPermission -> viewPermission.getOrder() != null)
+                            .collect(Collectors.toMap(ViewPermission::getId, ViewPermission::getOrder));
+                        return (
+                            lambdaUpdate()
+                                .set(ViewPermission::getOrder, idSortValueMap.get(afterId))
+                                .eq(ViewPermission::getId, id)
+                                .update() &&
+                            lambdaUpdate().set(ViewPermission::getOrder, idSortValueMap.get(id)).eq(ViewPermission::getId, afterId).update()
                         );
                     } else {
                         return false;
@@ -364,6 +378,7 @@ public class ViewPermissionBaseService<R extends ViewPermissionRepository, E ext
                     }
                     Map<Long, Integer> idSortValueMap = listByIds(ids)
                         .stream()
+                        .filter(viewPermission -> viewPermission.getOrder() != null)
                         .collect(Collectors.toMap(ViewPermission::getId, ViewPermission::getOrder));
                     if (ObjectUtils.allNotNull(beforeId, afterId)) {
                         // 计算中间值

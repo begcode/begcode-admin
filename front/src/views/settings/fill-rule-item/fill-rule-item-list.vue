@@ -283,9 +283,6 @@ const ctx = getCurrentInstance()?.proxy;
 const go = useGo();
 const apiService = ctx?.$apiService as typeof ServerProvider;
 const { getPageSetting } = useRootSetting();
-const relationshipApis: any = {
-  fillRule: apiService.settings.sysFillRuleService.retrieve,
-};
 const apis = {
   fillRuleItemService: apiService.settings.fillRuleItemService,
   find: apiService.settings.fillRuleItemService.retrieve,

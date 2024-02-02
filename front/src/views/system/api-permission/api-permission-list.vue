@@ -283,11 +283,6 @@ const ctx = getCurrentInstance()?.proxy;
 const go = useGo();
 const apiService = ctx?.$apiService as typeof ServerProvider;
 const { getPageSetting } = useRootSetting();
-const relationshipApis: any = {
-  children: apiService.system.apiPermissionService.tree,
-  parent: apiService.system.apiPermissionService.tree,
-  authorities: apiService.system.authorityService.tree,
-};
 const apis = {
   apiPermissionService: apiService.system.apiPermissionService,
   find: apiService.system.apiPermissionService.tree,
@@ -809,7 +804,6 @@ const rowClickHandler = (name, operation, row) => {
         },
       });
       break;
-
     default:
       if (operation) {
         if (operation.click) {

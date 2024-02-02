@@ -18,6 +18,7 @@ import {
   Slider,
   Rate,
   Divider,
+  Transfer,
 } from 'ant-design-vue';
 import type { ComponentType } from './types';
 
@@ -44,12 +45,13 @@ import { CodeEditor } from '@/components/CodeEditor';
 import { SelectModal } from '@/components/SelectModal';
 // import DictSelectTag from '@/views/settings/dictionary/DictSelectTag.vue';
 import { Time } from '@/components/Time';
+import { BasicTitle } from '@/components/Basic';
 import { CountdownInput } from '@/components/CountDown';
 import { IconPicker } from '@/components/Icon';
 import { StrengthMeter } from '@/components/StrengthMeter';
 import { BasicUpload, ImageUpload } from '@/components/Upload';
 
-const componentMap = new Map<ComponentType, Component>();
+const componentMap = new Map<ComponentType | string, Component>();
 
 componentMap.set('Time', Time);
 componentMap.set('Input', Input);
@@ -75,6 +77,7 @@ componentMap.set('ApiCascader', ApiCascader);
 componentMap.set('Cascader', Cascader);
 componentMap.set('Slider', Slider);
 componentMap.set('Rate', Rate);
+componentMap.set('Transfer', Transfer);
 componentMap.set('ApiTransfer', ApiTransfer);
 
 componentMap.set('DatePicker', DatePicker);
@@ -90,6 +93,7 @@ componentMap.set('InputCountDown', CountdownInput);
 componentMap.set('Upload', BasicUpload);
 componentMap.set('SelectFile', SelectFile);
 componentMap.set('Divider', Divider);
+componentMap.set('BasicTitle', BasicTitle);
 componentMap.set('ImageUpload', ImageUpload);
 componentMap.set('ColorPicker', ColorPicker);
 componentMap.set('RangeDate', RangeDate);
@@ -106,11 +110,11 @@ componentMap.set('CodeEditor', CodeEditor);
 componentMap.set('EditorPop', EditorPop);
 componentMap.set('SelectModal', SelectModal);
 
-export function add(compName: ComponentType, component: Component) {
+export function add<T extends string, R extends Component>(compName: ComponentType | T, component: R) {
   componentMap.set(compName, component);
 }
 
-export function del(compName: ComponentType) {
+export function del<T extends string>(compName: ComponentType | T) {
   componentMap.delete(compName);
 }
 

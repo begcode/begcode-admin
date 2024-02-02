@@ -25,7 +25,7 @@ public class TaskJobConfigCriteria implements Serializable, Criteria {
     private String jhiCommonSearchKeywords;
 
     @BindQuery(ignore = true)
-    private Boolean useOr;
+    private Boolean useOr = false;
 
     @BindQuery(ignore = true)
     private TaskJobConfigCriteria and;
@@ -89,13 +89,13 @@ public class TaskJobConfigCriteria implements Serializable, Criteria {
     private LongFilter createdBy;
 
     @BindQuery(column = "self.created_date")
-    private ZonedDateTimeFilter createdDate;
+    private InstantFilter createdDate;
 
     @BindQuery(column = "self.last_modified_by")
     private LongFilter lastModifiedBy;
 
     @BindQuery(column = "self.last_modified_date")
-    private ZonedDateTimeFilter lastModifiedDate;
+    private InstantFilter lastModifiedDate;
 
     @BindQuery(ignore = true)
     private Boolean distinct;
@@ -272,18 +272,18 @@ public class TaskJobConfigCriteria implements Serializable, Criteria {
         this.createdBy = createdBy;
     }
 
-    public ZonedDateTimeFilter getCreatedDate() {
+    public InstantFilter getCreatedDate() {
         return createdDate;
     }
 
-    public ZonedDateTimeFilter createdDate() {
+    public InstantFilter createdDate() {
         if (createdDate == null) {
-            createdDate = new ZonedDateTimeFilter();
+            createdDate = new InstantFilter();
         }
         return createdDate;
     }
 
-    public void setCreatedDate(ZonedDateTimeFilter createdDate) {
+    public void setCreatedDate(InstantFilter createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -302,18 +302,18 @@ public class TaskJobConfigCriteria implements Serializable, Criteria {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    public ZonedDateTimeFilter getLastModifiedDate() {
+    public InstantFilter getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public ZonedDateTimeFilter lastModifiedDate() {
+    public InstantFilter lastModifiedDate() {
         if (lastModifiedDate == null) {
-            lastModifiedDate = new ZonedDateTimeFilter();
+            lastModifiedDate = new InstantFilter();
         }
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(ZonedDateTimeFilter lastModifiedDate) {
+    public void setLastModifiedDate(InstantFilter lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 

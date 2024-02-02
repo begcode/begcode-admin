@@ -9,7 +9,7 @@ import { onMounted, ref, unref, computed, onUnmounted, useAttrs } from 'vue';
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import { useDesign } from '@begcode/components';
-import { useDebounceFn } from '@vueuse/shared';
+import { useDebounceFn } from '@vueuse/core';
 
 type Options = Cropper.Options;
 

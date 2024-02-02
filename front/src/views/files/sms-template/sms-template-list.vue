@@ -283,9 +283,6 @@ const ctx = getCurrentInstance()?.proxy;
 const go = useGo();
 const apiService = ctx?.$apiService as typeof ServerProvider;
 const { getPageSetting } = useRootSetting();
-const relationshipApis: any = {
-  supplier: apiService.files.smsSupplierService.retrieve,
-};
 const apis = {
   smsTemplateService: apiService.files.smsTemplateService,
   find: apiService.files.smsTemplateService.retrieve,

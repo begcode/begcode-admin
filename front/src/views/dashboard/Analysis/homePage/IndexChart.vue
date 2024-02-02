@@ -2,28 +2,29 @@
   <div class="p-4">
     <ChartGroupCard class="enter-y" :loading="loading" type="chart" />
     <SaleTabCard class="!my-4 enter-y" :loading="loading" />
-    <a-row>
-      <a-col :span="24">
-        <a-card :loading="loading" :bordered="false" title="最近一周访问量统计" :style="{ marginTop: '24px' }">
-          <a-row>
-            <a-col :span="6">
+    <Row>
+      <Col :span="24">
+        <Card :loading="loading" :bordered="false" title="最近一周访问量统计" :style="{ marginTop: '24px' }">
+          <Row>
+            <Col :span="6">
               <HeadInfo title="今日IP" :content="loginfo.todayIp" icon="environment"></HeadInfo>
-            </a-col>
-            <a-col :span="6">
+            </Col>
+            <Col :span="6">
               <HeadInfo title="今日访问" :content="loginfo.todayVisitCount" icon="team"></HeadInfo>
-            </a-col>
-            <a-col :span="6">
+            </Col>
+            <Col :span="6">
               <HeadInfo title="总访问量" :content="loginfo.totalVisitCount" icon="rise"></HeadInfo>
-            </a-col>
-          </a-row>
+            </Col>
+          </Row>
           <LineMulti :chartData="lineMultiData" height="50vh" type="line" :option="{ legend: { top: 'bottom' } }"></LineMulti>
-        </a-card>
-      </a-col>
-    </a-row>
+        </Card>
+      </Col>
+    </Row>
   </div>
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue';
+import { Row, Col, Card } from 'ant-design-vue';
 import ChartGroupCard from '../components/ChartGroupCard.vue';
 import SaleTabCard from '../components/SaleTabCard.vue';
 import { HeadInfo, LineMulti } from '@begcode/components';

@@ -27,7 +27,7 @@ public enum CommonFieldType {
     RADIO("RADIO", "单选"),
     MULTI_SELECT("MULTI_SELECT", "多选"),
     DATA_DICTIONARY("DATA_DICTIONARY", "数据字典"),
-    UUID("UUID", "UUID"),
+    UUID_STRING("UUID_STRING", "UUID"),
     INSTANT("INSTANT", "时间戳");
 
     @EnumValue

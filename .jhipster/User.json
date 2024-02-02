@@ -5,6 +5,7 @@
     "builtInUser": true,
     "changelogDate": "20240101061506",
     "extendAbstractAuditingEntity": true,
+    "hasImageField": true,
     "importData": true,
     "importDataFile": "jhi_user-rel_jhi_user__authorities",
     "moduleName": "system",

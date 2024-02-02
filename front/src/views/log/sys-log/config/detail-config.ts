@@ -1,5 +1,4 @@
 import { DescItem } from '@begcode/components';
-import dayjs from 'dayjs';
 import { useI18n } from '@/hooks/web/useI18n';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
@@ -71,9 +70,6 @@ const fields: DescItem[] = [
   {
     label: '创建时间',
     field: 'createdDate',
-    format: (value, _data) => {
-      return value ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : '';
-    },
   },
   {
     label: '修改者Id',
@@ -82,9 +78,6 @@ const fields: DescItem[] = [
   {
     label: '修改时间',
     field: 'lastModifiedDate',
-    format: (value, _data) => {
-      return value ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : '';
-    },
   },
 ];
 

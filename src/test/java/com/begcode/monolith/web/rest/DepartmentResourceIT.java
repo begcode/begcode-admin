@@ -1,6 +1,5 @@
 package com.begcode.monolith.web.rest;
 
-import static com.begcode.monolith.web.rest.TestUtil.sameInstant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.*;
@@ -12,16 +11,13 @@ import com.begcode.monolith.IntegrationTest;
 import com.begcode.monolith.domain.Authority;
 import com.begcode.monolith.domain.Department;
 import com.begcode.monolith.domain.Department;
-import com.begcode.monolith.domain.User;
 import com.begcode.monolith.repository.DepartmentRepository;
 import com.begcode.monolith.repository.DepartmentRepository;
 import com.begcode.monolith.service.DepartmentService;
 import com.begcode.monolith.service.dto.DepartmentDTO;
 import com.begcode.monolith.service.mapper.DepartmentMapper;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -69,9 +65,8 @@ public class DepartmentResourceIT {
     private static final Long UPDATED_CREATE_USER_ID = 2L;
     private static final Long SMALLER_CREATE_USER_ID = 1L - 1L;
 
-    private static final ZonedDateTime DEFAULT_CREATE_TIME = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_CREATE_TIME = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_CREATE_TIME = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final Instant DEFAULT_CREATE_TIME = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATE_TIME = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/departments";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -201,7 +196,7 @@ public class DepartmentResourceIT {
             .andExpect(jsonPath("$.[*].logo").value(hasItem(DEFAULT_LOGO)))
             .andExpect(jsonPath("$.[*].contact").value(hasItem(DEFAULT_CONTACT)))
             .andExpect(jsonPath("$.[*].createUserId").value(hasItem(DEFAULT_CREATE_USER_ID.intValue())))
-            .andExpect(jsonPath("$.[*].createTime").value(hasItem(sameInstant(DEFAULT_CREATE_TIME))));
+            .andExpect(jsonPath("$.[*].createTime").value(hasItem(DEFAULT_CREATE_TIME.toString())));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -240,7 +235,7 @@ public class DepartmentResourceIT {
             .andExpect(jsonPath("$.logo").value(DEFAULT_LOGO))
             .andExpect(jsonPath("$.contact").value(DEFAULT_CONTACT))
             .andExpect(jsonPath("$.createUserId").value(DEFAULT_CREATE_USER_ID.intValue()))
-            .andExpect(jsonPath("$.createTime").value(sameInstant(DEFAULT_CREATE_TIME)));
+            .andExpect(jsonPath("$.createTime").value(DEFAULT_CREATE_TIME.toString()));
     }
 
     @Test
@@ -783,72 +778,6 @@ public class DepartmentResourceIT {
 
     @Test
     @Transactional
-    void getAllDepartmentsByCreateTimeIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        departmentRepository.save(department);
-
-        // Get all the departmentList where createTime is greater than or equal to DEFAULT_CREATE_TIME
-        defaultDepartmentShouldBeFound("createTime.greaterThanOrEqual=" + DEFAULT_CREATE_TIME);
-
-        // Get all the departmentList where createTime is greater than or equal to UPDATED_CREATE_TIME
-        defaultDepartmentShouldNotBeFound("createTime.greaterThanOrEqual=" + UPDATED_CREATE_TIME);
-    }
-
-    @Test
-    @Transactional
-    void getAllDepartmentsByCreateTimeIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        departmentRepository.save(department);
-
-        // Get all the departmentList where createTime is less than or equal to DEFAULT_CREATE_TIME
-        defaultDepartmentShouldBeFound("createTime.lessThanOrEqual=" + DEFAULT_CREATE_TIME);
-
-        // Get all the departmentList where createTime is less than or equal to SMALLER_CREATE_TIME
-        defaultDepartmentShouldNotBeFound("createTime.lessThanOrEqual=" + SMALLER_CREATE_TIME);
-    }
-
-    @Test
-    @Transactional
-    void getAllDepartmentsByCreateTimeIsLessThanSomething() throws Exception {
-        // Initialize the database
-        departmentRepository.save(department);
-
-        // Get all the departmentList where createTime is less than DEFAULT_CREATE_TIME
-        defaultDepartmentShouldNotBeFound("createTime.lessThan=" + DEFAULT_CREATE_TIME);
-
-        // Get all the departmentList where createTime is less than UPDATED_CREATE_TIME
-        defaultDepartmentShouldBeFound("createTime.lessThan=" + UPDATED_CREATE_TIME);
-    }
-
-    @Test
-    @Transactional
-    void getAllDepartmentsByCreateTimeIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        departmentRepository.save(department);
-
-        // Get all the departmentList where createTime is greater than DEFAULT_CREATE_TIME
-        defaultDepartmentShouldNotBeFound("createTime.greaterThan=" + DEFAULT_CREATE_TIME);
-
-        // Get all the departmentList where createTime is greater than SMALLER_CREATE_TIME
-        defaultDepartmentShouldBeFound("createTime.greaterThan=" + SMALLER_CREATE_TIME);
-    }
-
-    @Test
-    @Transactional
-    void getAllDepartmentsByChildrenIsEqualToSomething() throws Exception {
-        Department children = DepartmentResourceIT.createEntity();
-        // department.addChildren(children);
-        departmentRepository.insert(department);
-        Long childrenId = children.getId();
-        // Get all the departmentList where children equals to childrenId
-        defaultDepartmentShouldBeFound("childrenId.equals=" + childrenId);
-
-        // Get all the departmentList where children equals to (childrenId + 1)
-        defaultDepartmentShouldNotBeFound("childrenId.equals=" + (childrenId + 1));
-    }
-
-    @Test
-    @Transactional
     void getAllDepartmentsByAuthoritiesIsEqualToSomething() throws Exception {
         Authority authorities = AuthorityResourceIT.createEntity();
         // department.addAuthorities(authorities);
@@ -875,20 +804,6 @@ public class DepartmentResourceIT {
         defaultDepartmentShouldNotBeFound("parentId.equals=" + (parentId + 1));
     }
 
-    @Test
-    @Transactional
-    void getAllDepartmentsByUsersIsEqualToSomething() throws Exception {
-        User users = UserResourceIT.createEntity();
-        // department.addUsers(users);
-        departmentRepository.insert(department);
-        Long usersId = users.getId();
-        // Get all the departmentList where users equals to usersId
-        defaultDepartmentShouldBeFound("usersId.equals=" + usersId);
-
-        // Get all the departmentList where users equals to (usersId + 1)
-        defaultDepartmentShouldNotBeFound("usersId.equals=" + (usersId + 1));
-    }
-
     /**
      * Executes the search, and checks that the default entity is returned.
      */
@@ -905,7 +820,7 @@ public class DepartmentResourceIT {
             .andExpect(jsonPath("$.[*].logo").value(hasItem(DEFAULT_LOGO)))
             .andExpect(jsonPath("$.[*].contact").value(hasItem(DEFAULT_CONTACT)))
             .andExpect(jsonPath("$.[*].createUserId").value(hasItem(DEFAULT_CREATE_USER_ID.intValue())))
-            .andExpect(jsonPath("$.[*].createTime").value(hasItem(sameInstant(DEFAULT_CREATE_TIME))));
+            .andExpect(jsonPath("$.[*].createTime").value(hasItem(DEFAULT_CREATE_TIME.toString())));
 
         // Check, that the count call also returns 1
         restDepartmentMockMvc

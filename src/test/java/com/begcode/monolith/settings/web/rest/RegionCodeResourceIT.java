@@ -878,20 +878,6 @@ public class RegionCodeResourceIT {
 
     @Test
     @Transactional
-    void getAllRegionCodesByChildrenIsEqualToSomething() throws Exception {
-        RegionCode children = RegionCodeResourceIT.createEntity();
-        // regionCode.addChildren(children);
-        regionCodeRepository.insert(regionCode);
-        Long childrenId = children.getId();
-        // Get all the regionCodeList where children equals to childrenId
-        defaultRegionCodeShouldBeFound("childrenId.equals=" + childrenId);
-
-        // Get all the regionCodeList where children equals to (childrenId + 1)
-        defaultRegionCodeShouldNotBeFound("childrenId.equals=" + (childrenId + 1));
-    }
-
-    @Test
-    @Transactional
     void getAllRegionCodesByParentIsEqualToSomething() throws Exception {
         RegionCode parent = RegionCodeResourceIT.createEntity();
         regionCode.setParent(parent);

@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.begcode.monolith.IntegrationTest;
 import com.begcode.monolith.domain.enumeration.ResetFrequency;
-import com.begcode.monolith.settings.domain.FillRuleItem;
 import com.begcode.monolith.settings.domain.SysFillRule;
 import com.begcode.monolith.settings.repository.SysFillRuleRepository;
 import com.begcode.monolith.settings.service.dto.SysFillRuleDTO;
@@ -1098,20 +1097,6 @@ public class SysFillRuleResourceIT {
 
         // Get all the sysFillRuleList where resetTime is greater than SMALLER_RESET_TIME
         defaultSysFillRuleShouldBeFound("resetTime.greaterThan=" + SMALLER_RESET_TIME);
-    }
-
-    @Test
-    @Transactional
-    void getAllSysFillRulesByRuleItemsIsEqualToSomething() throws Exception {
-        FillRuleItem ruleItems = FillRuleItemResourceIT.createEntity();
-        // sysFillRule.addRuleItems(ruleItems);
-        sysFillRuleRepository.insert(sysFillRule);
-        Long ruleItemsId = ruleItems.getId();
-        // Get all the sysFillRuleList where ruleItems equals to ruleItemsId
-        defaultSysFillRuleShouldBeFound("ruleItemsId.equals=" + ruleItemsId);
-
-        // Get all the sysFillRuleList where ruleItems equals to (ruleItemsId + 1)
-        defaultSysFillRuleShouldNotBeFound("ruleItemsId.equals=" + (ruleItemsId + 1));
     }
 
     /**

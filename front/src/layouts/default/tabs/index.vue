@@ -137,3 +137,11 @@ function handleEdit(targetKey: string) {
 @import url('./tabs.theme.card.less');
 @import url('./tabs.theme.smooth.less');
 </style>
+<style lang="less" scoped>
+@prefix-cls: ~'@{namespace}-multiple-tabs';
+.@{prefix-cls} {
+  :deep(.anticon) {
+    display: inline-block;
+  }
+}
+</style>

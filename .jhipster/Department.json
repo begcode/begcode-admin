@@ -47,12 +47,18 @@
     {
       "documentation": "创建用户 Id",
       "fieldName": "createUserId",
-      "fieldType": "Long"
+      "fieldType": "Long",
+      "options": {
+        "createdBy": true
+      }
     },
     {
       "documentation": "创建时间",
       "fieldName": "createTime",
-      "fieldType": "ZonedDateTime"
+      "fieldType": "Instant",
+      "options": {
+        "createdDate": true
+      }
     }
   ],
   "jpaMetamodelFiltering": true,

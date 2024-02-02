@@ -2,7 +2,7 @@ import type { NamePath, RuleObject, ValidateOptions } from 'ant-design-vue/lib/f
 import type { VNode, ComputedRef, CSSProperties } from 'vue';
 import type { RowProps } from 'ant-design-vue/lib/grid/Row';
 import type { FormItem } from './formItem';
-import type { ColEx, ComponentType } from './';
+import type { ColEx, ComponentType, ComponentProps } from './';
 import type { ButtonProps as AntdButtonProps } from '@/components/Button';
 
 export type FieldMapToTime = [string, [string, string], (string | [string, string])?][];
@@ -134,7 +134,7 @@ export type RenderOpts = {
   disabled: boolean;
   [key: string]: any;
 };
-interface BaseFormSchema {
+interface BaseFormSchema<T extends ComponentType = any> {
   // Field name
   field: string;
   // Extra Fields name[]
@@ -157,8 +157,8 @@ interface BaseFormSchema {
   disabledLabelWidth?: boolean;
   // Component parameters
   componentProps?:
-    | ((opt: { schema: FormSchema; tableAction: any; formActionType: FormActionType; formModel: Recordable }) => Recordable)
-    | object;
+    | ((opt: { schema: FormSchema; tableAction: any; formActionType: FormActionType; formModel: Recordable }) => ComponentProps[T])
+    | ComponentProps[T];
   // Required
   required?: boolean | ((renderCallbackParams: RenderCallbackParams) => boolean);
 
@@ -216,17 +216,18 @@ interface BaseFormSchema {
   labelLength?: number;
 }
 
-export interface ComponentFormSchema extends BaseFormSchema {
+export interface ComponentFormSchema<T extends ComponentType = any> extends BaseFormSchema<T> {
   // render component
-  component: ComponentType;
+  component: T;
 }
 
 export interface SlotFormSchema extends BaseFormSchema {
-  // Custom slot, in from-item
+  // Custom slot, in form-item
   slot: string;
 }
+type ComponentFormSchemaType<T extends ComponentType = ComponentType> = T extends any ? ComponentFormSchema<T> : never;
 
-export type FormSchema = ComponentFormSchema | SlotFormSchema;
+export type FormSchema = ComponentFormSchemaType | SlotFormSchema;
 
 export type FormSchemaInner = Partial<ComponentFormSchema> & Partial<SlotFormSchema> & BaseFormSchema;
 

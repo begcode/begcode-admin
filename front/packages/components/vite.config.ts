@@ -47,7 +47,7 @@ export default defineConfig({
       },
       name: 'begcode-components',
       fileName: (format, entryName) => `${entryName}.${format}.js`,
-      formats: ['es', 'umd', 'cjs'],
+      formats: ['es', 'umd'],
     },
     commonjsOptions: {
       transformMixedEsModules: true,

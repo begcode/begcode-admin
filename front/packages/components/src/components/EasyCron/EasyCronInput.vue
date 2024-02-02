@@ -1,13 +1,13 @@
 <template>
   <div :class="`${prefixCls}`">
-    <a-input :placeholder="placeholder" v-model:value="editCronValue" :disabled="disabled">
+    <Input :placeholder="placeholder" v-model:value="editCronValue" :disabled="disabled">
       <template #addonAfter>
         <a class="open-btn" :disabled="disabled ? 'disabled' : null" @click="showConfigModal">
           <Icon icon="ant-design:setting-outlined" />
           <span>选择</span>
         </a>
       </template>
-    </a-input>
+    </Input>
     <EasyCronModal
       @register="registerModal"
       v-model:value="editCronValue"
@@ -21,6 +21,7 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
+import { Input } from 'ant-design-vue';
 import { useDesign } from '@/hooks/web/useDesign';
 import { useModal } from '@/components/Modal';
 import { propTypes } from '@/utils/propTypes';

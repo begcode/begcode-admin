@@ -14,7 +14,7 @@
       <template #title>
         <span>编辑排序值</span>
       </template>
-      <Input :value="inputValue" :bordered="false" :disabled="true" style="text-align: center">
+      <Input :value="inputValue" :bordered="false" :readonly="true" style="text-align: center">
         <template #addonAfter v-if="!disabled">
           <Icon icon="ant-design:edit-outlined" @click="openPopover" />
         </template>
@@ -72,7 +72,9 @@ const props = defineProps({
 
 const emit = defineEmits(['update:value']);
 
-const inputValue = ref(props.value);
+const inputValue = computed(() => {
+  return props.value;
+});
 
 const open = ref(false);
 
@@ -91,9 +93,13 @@ const closePopover = (update: boolean) => {
   if (update && inputValue.value !== props.value) {
     emit('update:value', props.value);
     if (props.remoteApi) {
-      // todo remoteApi处理排序值
+      const row = props.params.row;
+      const id = row.id;
+      props.remoteApi(id, 'VALUE', inputValue.value).then(res => {
+        console.log('更新完成', res);
+      });
     } else {
-      // Todo 表格重新排序
+      recalcSortNumber().then(res => {});
     }
   }
   open.value = false;
@@ -132,7 +138,16 @@ async function doSort(oldIndex: number, newIndex: number, force = false) {
     sort(xTable.internalData.tableSourceData);
   }
   if (props.remoteApi) {
-    // todo remoteApi处理排序值
+    let xTable = props.params.$table;
+    let xGrid = props.params.$grid;
+    const oldRow = xTable.getData(oldIndex);
+    const newRow = xTable.getData(newIndex);
+    const type = 'STEP';
+    const id = oldRow.id;
+    const beforeId = newRow.id;
+    const result = await props.remoteApi(id, type, null, beforeId);
+    await xGrid.commitProxy('reload');
+    return result;
   } else {
     return await recalcSortNumber();
   }
@@ -164,6 +179,7 @@ function handleRowInsertDown() {
 
 function createSortable() {
   let xTable = props.params.$table;
+  let xGrid = props.params.$grid;
   let dom = props.params.$grid.getRefMaps().refTable.value.$el.querySelector('.body--wrapper>.vxe-table--body tbody');
   let startChildren = [];
   sortable2 = Sortable.create(dom as HTMLElement, {
@@ -199,16 +215,62 @@ function createSortable() {
       }
       from.removeChild(element);
       from.insertBefore(element, target);
-      nextTick(() => {
+      nextTick(async () => {
         const diffIndex = rowNode!.index - oldIndex;
         if (diffIndex > 0) {
           oldIndex = oldIndex + diffIndex;
           newIndex = newIndex + diffIndex;
         }
         if (props.remoteApi) {
-          // todo remoteApi处理排序值
+          const selfRow = xTable.getData(oldIndex);
+          const targetRow = xTable.getData(newIndex);
+          let type = 'DROP';
+          const id = selfRow.id;
+          let afterId = null;
+          let beforeId = null;
+          const { visibleData } = xTable.getTableData();
+          if (newIndex === 0) {
+            // 表示插入到第一个。
+            // 如果第一个，只有afterId,
+            afterId = targetRow.id;
+          } else if (newIndex === visibleData.length - 1) {
+            // 如果最后一个，只有beforeId,
+            beforeId = targetRow.id;
+          } else {
+            beforeId = targetRow.id;
+            const afterRow = xTable.getData(newIndex + 1);
+            afterId = afterRow.id;
+          }
+          const addIndex = newIndex - oldIndex;
+
+          if (Math.abs(addIndex) === 1) {
+            if (addIndex < 0) {
+              // 向上移动
+              // 只传afterId
+              beforeId = null;
+            } else if (addIndex === 0) {
+              // 未移动
+            } else {
+              // 向下移动
+              // 只传beforeId
+              afterId = null;
+            }
+            type = 'STEP';
+            // 采用上下移动的方向调整
+            await props.remoteApi(id, type, null, beforeId, afterId, null);
+            await xGrid.commitProxy('reload');
+          } else {
+            // 获得涉及的其他id列表
+            const ids: any[] = [];
+            for (let i = newIndex; i < oldIndex; i = i + addIndex / addIndex) {
+              const addRow = xTable.getData(i);
+              ids.push(addRow.id);
+            }
+            await props.remoteApi(id, type, null, beforeId, afterId, { 'id.in': ids });
+            await xGrid.commitProxy('reload');
+          }
         } else {
-          recalcSortNumber();
+          await recalcSortNumber();
         }
       });
     },

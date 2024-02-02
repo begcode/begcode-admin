@@ -18,8 +18,25 @@ const fields = (): FormSchema[] => {
       },
       dynamicDisabled: true,
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入ID', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入ID', controls: false, style: 'width: 100%' },
       rules: [],
+    },
+    {
+      label: 'Url地址',
+      field: 'url',
+      component: 'SelectFile',
+
+      componentProps: ({ formModel }) => ({
+        onSelectFile: (file: any) => {
+          formModel['file'] = file;
+        },
+        onChange: (file: any) => {
+          if (file instanceof File) {
+            formModel['url'] = file.name;
+          }
+        },
+      }),
+      rules: [{ required: true, message: '必填项' }],
     },
     {
       label: '完整文件名',
@@ -62,14 +79,6 @@ const fields = (): FormSchema[] => {
       rules: [],
     },
     {
-      label: 'Url地址',
-      field: 'url',
-      show: false,
-      component: 'Input',
-      componentProps: { type: 'text', clearable: true, placeholder: '请输入Url地址', style: 'width: 100%' },
-      rules: [],
-    },
-    {
       label: '本地路径',
       field: 'path',
       show: false,
@@ -97,8 +106,8 @@ const fields = (): FormSchema[] => {
       label: '使用实体ID',
       field: 'ownerEntityId',
       show: false,
-      component: 'Input',
-      componentProps: { type: 'text', clearable: true, placeholder: '请输入使用实体ID', style: 'width: 100%' },
+      component: 'InputNumber',
+      componentProps: { placeholder: '请输入使用实体ID', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {
@@ -135,7 +144,7 @@ const fields = (): FormSchema[] => {
       field: 'fileSize',
       show: false,
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入文件大小', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入文件大小', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {
@@ -143,7 +152,7 @@ const fields = (): FormSchema[] => {
       field: 'referenceCount',
       show: false,
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入被引次数', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入被引次数', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {
@@ -151,15 +160,15 @@ const fields = (): FormSchema[] => {
       field: 'createdBy',
       show: false,
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入创建者Id', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入创建者Id', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {
       label: '创建时间',
       field: 'createdDate',
       show: false,
-      component: 'DatePicker',
-      componentProps: { valueFormat: 'YYYY-MM-DD hh:mm:ss', placeholder: '请选择创建时间', style: 'width: 100%' },
+      component: 'Input',
+      componentProps: { type: 'text', clearable: true, placeholder: '请输入创建时间', style: 'width: 100%' },
       rules: [],
     },
     {
@@ -167,15 +176,15 @@ const fields = (): FormSchema[] => {
       field: 'lastModifiedBy',
       show: false,
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入修改者Id', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入修改者Id', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {
       label: '修改时间',
       field: 'lastModifiedDate',
       show: false,
-      component: 'DatePicker',
-      componentProps: { valueFormat: 'YYYY-MM-DD hh:mm:ss', placeholder: '请选择修改时间', style: 'width: 100%' },
+      component: 'Input',
+      componentProps: { type: 'text', clearable: true, placeholder: '请输入修改时间', style: 'width: 100%' },
       rules: [],
     },
     {

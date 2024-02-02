@@ -21,7 +21,7 @@ const fields = (): FormSchema[] => {
       },
       dynamicDisabled: true,
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入ID', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入ID', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {
@@ -65,7 +65,7 @@ const fields = (): FormSchema[] => {
       label: '序列值',
       field: 'seqValue',
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入序列值', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入序列值', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {
@@ -167,7 +167,7 @@ const ruleItemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'INTEGER' },
-      editRender: { name: 'AInputNumber', enabled: true },
+      editRender: { name: 'AInputNumber', enabled: true, props: { controls: false } },
     },
     {
       title: '序列增量',
@@ -176,7 +176,7 @@ const ruleItemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'INTEGER' },
-      editRender: { name: 'AInputNumber', enabled: true },
+      editRender: { name: 'AInputNumber', enabled: true, props: { controls: false } },
     },
     {
       title: '序列起始值',
@@ -185,7 +185,7 @@ const ruleItemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'INTEGER' },
-      editRender: { name: 'AInputNumber', enabled: true },
+      editRender: { name: 'AInputNumber', enabled: true, props: { controls: false } },
     },
     {
       title: '操作',

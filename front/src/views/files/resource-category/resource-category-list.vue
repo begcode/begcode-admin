@@ -283,12 +283,6 @@ const ctx = getCurrentInstance()?.proxy;
 const go = useGo();
 const apiService = ctx?.$apiService as typeof ServerProvider;
 const { getPageSetting } = useRootSetting();
-const relationshipApis: any = {
-  children: apiService.files.resourceCategoryService.tree,
-  parent: apiService.files.resourceCategoryService.tree,
-  images: apiService.files.uploadImageService.retrieve,
-  files: apiService.files.uploadFileService.retrieve,
-};
 const apis = {
   resourceCategoryService: apiService.files.resourceCategoryService,
   find: apiService.files.resourceCategoryService.tree,

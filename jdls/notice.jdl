@@ -31,7 +31,7 @@ entity SmsMessage {
 @entityPackage(system)
 @useTemplate(edit)
 @moduleName(system)
-@addCustomMethod(repository-updateTemplate-clientService-service-listComponent-rest)
+@addCustomMethod(repository-clientService-service-listComponent-rest)
 entity Announcement {
   title String required /** 标题 */
   @endUsed(textArea)

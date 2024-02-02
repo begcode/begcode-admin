@@ -284,10 +284,23 @@ public class AuthorityBaseService<R extends AuthorityRepository, E extends Autho
                         ids.add(beforeId);
                         Map<Long, Integer> idSortValueMap = listByIds(ids)
                             .stream()
+                            .filter(authority -> authority.getOrder() != null)
                             .collect(Collectors.toMap(Authority::getId, Authority::getOrder));
                         return (
                             lambdaUpdate().set(Authority::getOrder, idSortValueMap.get(beforeId)).eq(Authority::getId, id).update() &&
                             lambdaUpdate().set(Authority::getOrder, idSortValueMap.get(id)).eq(Authority::getId, beforeId).update()
+                        );
+                    } else if (ObjectUtils.allNotNull(id, afterId)) {
+                        Set<Long> ids = new HashSet<>();
+                        ids.add(id);
+                        ids.add(afterId);
+                        Map<Long, Integer> idSortValueMap = listByIds(ids)
+                            .stream()
+                            .filter(authority -> authority.getOrder() != null)
+                            .collect(Collectors.toMap(Authority::getId, Authority::getOrder));
+                        return (
+                            lambdaUpdate().set(Authority::getOrder, idSortValueMap.get(afterId)).eq(Authority::getId, id).update() &&
+                            lambdaUpdate().set(Authority::getOrder, idSortValueMap.get(id)).eq(Authority::getId, afterId).update()
                         );
                     } else {
                         return false;
@@ -305,6 +318,7 @@ public class AuthorityBaseService<R extends AuthorityRepository, E extends Autho
                     }
                     Map<Long, Integer> idSortValueMap = listByIds(ids)
                         .stream()
+                        .filter(authority -> authority.getOrder() != null)
                         .collect(Collectors.toMap(Authority::getId, Authority::getOrder));
                     if (ObjectUtils.allNotNull(beforeId, afterId)) {
                         // 计算中间值

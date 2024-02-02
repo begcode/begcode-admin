@@ -21,7 +21,7 @@
     <!-- left end -->
 
     <!-- menu start -->
-    <div v-if="getShowTopMenu && !getIsMobile" 　:class="`${prefixCls}-menu`">
+    <div v-if="getShowTopMenu && !getIsMobile" :class="`${prefixCls}-menu`">
       <LayoutMenu :isHorizontal="true" :theme="getHeaderTheme" :splitType="getSplitType" :menuMode="getMenuMode" />
     </div>
     <!-- menu-end -->
@@ -168,9 +168,10 @@ onMounted(() => {
 @import url('./index.less');
 @prefix-cls: ~'@{namespace}-layout-header';
 
-.@{prefix-cls} {
+.ant-layout.@{prefix-cls} {
   display: flex;
   padding: 0 8px !important;
+  height: 48px;
   align-items: center;
 
   .headerIntroductionClass {
@@ -191,7 +192,8 @@ onMounted(() => {
       color: rgba(255, 255, 255, 0.6);
     }
 
-    .anticon {
+    .anticon,
+    .truncate {
       color: rgba(255, 255, 255, 0.8);
     }
   }

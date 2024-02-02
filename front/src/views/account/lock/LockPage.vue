@@ -35,15 +35,15 @@
             {{ t('sys.lock.alert') }}
           </span>
           <div :class="`${prefixCls}-entry__footer enter-x`">
-            <a-button type="link" size="small" class="mt-2 mr-2 enter-x" :disabled="loading" @click="handleShowForm(true)">
+            <Button type="link" size="small" class="mt-2 mr-2 enter-x" :disabled="loading" @click="handleShowForm(true)">
               {{ t('common.back') }}
-            </a-button>
-            <a-button type="link" size="small" class="mt-2 mr-2 enter-x" :disabled="loading" @click="goLogin">
+            </Button>
+            <Button type="link" size="small" class="mt-2 mr-2 enter-x" :disabled="loading" @click="goLogin">
               {{ t('sys.lock.backToLogin') }}
-            </a-button>
-            <a-button class="mt-2" type="link" size="small" @click="unLock()" :loading="loading">
+            </Button>
+            <Button class="mt-2" type="link" size="small" @click="unLock()" :loading="loading">
               {{ t('sys.lock.entry') }}
-            </a-button>
+            </Button>
           </div>
         </div>
       </div>
@@ -59,7 +59,7 @@
 </template>
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import { Input } from 'ant-design-vue';
+import { Input, Button } from 'ant-design-vue';
 import { useUserStore } from '@/store/modules/user';
 import { useLockStore } from '@/store/modules/lock';
 import { useI18n } from '@/hooks/web/useI18n';

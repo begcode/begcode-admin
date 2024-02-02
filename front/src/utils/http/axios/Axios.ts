@@ -169,10 +169,10 @@ export class VAxios {
         } else if (callback?.isReturnResponse) {
           return Promise.resolve(res?.data);
         } else {
-          if (res.data.success == true && res.data.code == 200) {
-            createMessage.success(res.data.message);
+          if (res.status === 200 || res.status === 201) {
+            createMessage.success('上传成功');
           } else {
-            createMessage.error(res.data.message);
+            createMessage.error('上传失败！');
           }
         }
       });

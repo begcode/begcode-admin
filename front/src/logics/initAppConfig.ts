@@ -5,11 +5,10 @@ import type { ProjectConfig } from '/#/config';
 
 import { PROJ_CFG_KEY } from '@/enums/cacheEnum';
 import projectSetting from '@/settings/projectSetting';
-
+import { updateDarkTheme } from '/@/logics/theme/dark';
 import { updateHeaderBgColor, updateSidebarBgColor } from '@/logics/theme/updateBackground';
 import { updateColorWeak } from '@/logics/theme/updateColorWeak';
 import { updateGrayMode } from '@/logics/theme/updateGrayMode';
-import { updateDarkTheme } from '@/logics/theme/dark';
 import { changeTheme } from '@/logics/theme';
 
 import { useAppStore } from '@/store/modules/app';

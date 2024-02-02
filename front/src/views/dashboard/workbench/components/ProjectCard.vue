@@ -1,7 +1,7 @@
 <template>
   <Card title="项目" v-bind="$attrs">
     <template #extra>
-      <a-button type="link" size="small">更多</a-button>
+      <Button type="link" size="small">更多</Button>
     </template>
 
     <template v-for="item in groupItems" :key="item.title">
@@ -20,7 +20,7 @@
   </Card>
 </template>
 <script lang="ts" setup>
-import { Card, CardGrid } from 'ant-design-vue';
+import { Card, CardGrid, Button } from 'ant-design-vue';
 import { Icon } from '@begcode/components';
 import { groupItems } from './data';
 </script>

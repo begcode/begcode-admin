@@ -4,6 +4,7 @@ import com.begcode.monolith.domain.AbstractAuditingEntity;
 import com.begcode.monolith.domain.enumeration.MessageSendType;
 import com.begcode.monolith.domain.enumeration.SendStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -95,7 +96,7 @@ public class SmsMessageDTO extends AbstractAuditingEntity<Long, SmsMessageDTO> {
      * 创建时间
      */
     @Schema(description = "创建时间")
-    private ZonedDateTime createdDate;
+    private Instant createdDate;
 
     /**
      * 修改者Id
@@ -107,7 +108,7 @@ public class SmsMessageDTO extends AbstractAuditingEntity<Long, SmsMessageDTO> {
      * 修改时间
      */
     @Schema(description = "修改时间")
-    private ZonedDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove
 
@@ -171,7 +172,7 @@ public class SmsMessageDTO extends AbstractAuditingEntity<Long, SmsMessageDTO> {
         return this;
     }
 
-    public SmsMessageDTO createdDate(ZonedDateTime createdDate) {
+    public SmsMessageDTO createdDate(Instant createdDate) {
         this.createdDate = createdDate;
         return this;
     }
@@ -181,7 +182,7 @@ public class SmsMessageDTO extends AbstractAuditingEntity<Long, SmsMessageDTO> {
         return this;
     }
 
-    public SmsMessageDTO lastModifiedDate(ZonedDateTime lastModifiedDate) {
+    public SmsMessageDTO lastModifiedDate(Instant lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
         return this;
     }

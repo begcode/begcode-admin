@@ -3,7 +3,7 @@ import { unref } from 'vue';
 import type { Ref, ComputedRef } from 'vue';
 import dayjs from 'dayjs';
 import type { FormProps, FormSchemaInner as FormSchema } from '../types/form';
-import { isNullOrUnDef, isNotEmpty } from '@/utils/is';
+import { isNil, isEmpty } from '@/utils/is';
 import { dateUtil } from '@/utils/dateUtil';
 
 interface UseFormValuesContext {
@@ -73,12 +73,7 @@ export function useFormValues({ defaultValueRef, getSchema, formModel, getProps 
       }
       // Remove spaces
       if (isString(value)) {
-        // remove params from URL
-        if (value === '') {
-          value = undefined;
-        } else {
-          value = value.trim();
-        }
+        value = value.trim();
       }
       if (!tryDeconstructArray(key, value, res) && !tryDeconstructObject(key, value, res)) {
         // 没有解构成功的，按原样赋值
@@ -112,10 +107,10 @@ export function useFormValues({ defaultValueRef, getSchema, formModel, getProps 
 
       const [startTimeFormat, endTimeFormat] = Array.isArray(format) ? format : [format, format];
 
-      if (isNotEmpty(startTime)) {
+      if (!isNil(startTime) && !isEmpty(startTime)) {
         set(values, startTimeKey, formatTime(startTime, startTimeFormat));
       }
-      if (isNotEmpty(endTime)) {
+      if (!isNil(startTime) && !isEmpty(endTime)) {
         set(values, endTimeKey, formatTime(endTime, endTimeFormat));
       }
       unset(values, field);
@@ -147,7 +142,7 @@ export function useFormValues({ defaultValueRef, getSchema, formModel, getProps 
           }
         });
       }
-      if (!isNullOrUnDef(defaultValue)) {
+      if (!isNil(defaultValue)) {
         obj[item.field] = defaultValue;
 
         if (formModel[item.field] === undefined) {

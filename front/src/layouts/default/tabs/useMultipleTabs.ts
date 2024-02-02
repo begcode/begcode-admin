@@ -1,6 +1,6 @@
 import { toRaw, ref, nextTick } from 'vue';
 import type { RouteLocationNormalized } from 'vue-router';
-import { useDesign, isNullAndUnDef } from '@begcode/components';
+import { useDesign, isNil } from '@begcode/components';
 import { useRouter } from 'vue-router';
 import { useSortable } from '@/hooks/web/useSortable';
 import { useMultipleTabStore } from '@/store/modules/multipleTab';
@@ -68,7 +68,7 @@ export function useTabsDrag(affixTextList: string[]) {
       onEnd: evt => {
         const { oldIndex, newIndex } = evt;
 
-        if (isNullAndUnDef(oldIndex) || isNullAndUnDef(newIndex) || oldIndex === newIndex) {
+        if (isNil(oldIndex) || isNil(newIndex) || oldIndex === newIndex) {
           return;
         }
 

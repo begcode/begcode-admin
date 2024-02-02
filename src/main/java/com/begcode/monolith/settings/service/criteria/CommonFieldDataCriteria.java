@@ -25,7 +25,7 @@ public class CommonFieldDataCriteria implements Serializable, Criteria {
     private String jhiCommonSearchKeywords;
 
     @BindQuery(ignore = true)
-    private Boolean useOr;
+    private Boolean useOr = false;
 
     @BindQuery(ignore = true)
     private CommonFieldDataCriteria and;
@@ -92,7 +92,7 @@ public class CommonFieldDataCriteria implements Serializable, Criteria {
     private StringFilter ownerEntityName;
 
     @BindQuery(column = "self.owner_entity_id")
-    private StringFilter ownerEntityId;
+    private LongFilter ownerEntityId;
 
     @BindQuery(ignore = true)
     private Boolean distinct;
@@ -283,18 +283,18 @@ public class CommonFieldDataCriteria implements Serializable, Criteria {
         this.ownerEntityName = ownerEntityName;
     }
 
-    public StringFilter getOwnerEntityId() {
+    public LongFilter getOwnerEntityId() {
         return ownerEntityId;
     }
 
-    public StringFilter ownerEntityId() {
+    public LongFilter ownerEntityId() {
         if (ownerEntityId == null) {
-            ownerEntityId = new StringFilter();
+            ownerEntityId = new LongFilter();
         }
         return ownerEntityId;
     }
 
-    public void setOwnerEntityId(StringFilter ownerEntityId) {
+    public void setOwnerEntityId(LongFilter ownerEntityId) {
         this.ownerEntityId = ownerEntityId;
     }
 

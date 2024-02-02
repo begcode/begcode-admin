@@ -45,12 +45,19 @@ const searchForm = (): any[] => {
     {
       title: '启用',
       field: 'enabled',
-      componentType: 'Switch',
+      componentType: 'RadioGroup',
       value: '',
       operator: '',
       span: 8,
       type: 'Boolean',
-      componentProps: {},
+      componentProps: {
+        optionType: 'button',
+        buttonStyle: 'solid',
+        options: [
+          { label: '是', value: true },
+          { label: '否', value: false },
+        ],
+      },
     },
     {
       title: '备注',
@@ -90,7 +97,7 @@ const columns = (): VxeGridPropTypes.Columns => {
       visible: true,
       treeNode: false,
       params: { type: 'LONG' },
-      editRender: { name: 'AInputNumber', enabled: false },
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '提供商',
@@ -138,7 +145,7 @@ const columns = (): VxeGridPropTypes.Columns => {
       visible: true,
       treeNode: false,
       params: { type: 'STRING' },
-      editRender: { name: 'AInput', enabled: false },
+      cellRender: { name: 'ACodeEditor' },
     },
     {
       title: '操作',

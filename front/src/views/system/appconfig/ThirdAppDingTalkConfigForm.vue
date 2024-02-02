@@ -1,8 +1,8 @@
 <template>
   <div class="base-collapse">
     <div class="header">钉钉集成</div>
-    <a-collapse expand-icon-position="right" :bordered="false">
-      <a-collapse-panel key="1">
+    <Collapse expand-icon-position="right" :bordered="false">
+      <CollapsePanel key="1">
         <template #header>
           <div style="font-size: 16px">1.获取对接信息</div>
         </template>
@@ -10,11 +10,11 @@
         <div style="margin-top: 5px">
           <a href="https://help.qiaoqiaoyun.com/expand/dingding.html" target="_blank">如何获取对接信息?</a>
         </div>
-      </a-collapse-panel>
-    </a-collapse>
+      </CollapsePanel>
+    </Collapse>
     <div class="sync-padding">
-      <a-collapse expand-icon-position="right" :bordered="false">
-        <a-collapse-panel key="2">
+      <Collapse expand-icon-position="right" :bordered="false">
+        <CollapsePanel key="2">
           <template #header>
             <div style="width: 100%; justify-content: space-between; display: flex">
               <div style="font-size: 16px">2.对接信息录入</div>
@@ -24,26 +24,26 @@
           <div class="flex-flow">
             <div class="base-title">Agentld</div>
             <div class="base-message">
-              <a-input v-model:value="appConfigData.agentId" readonly />
+              <Input v-model:value="appConfigData.agentId" readonly />
             </div>
           </div>
           <div class="flex-flow">
             <div class="base-title">AppKey</div>
             <div class="base-message">
-              <a-input v-model:value="appConfigData.clientId" readonly />
+              <Input v-model:value="appConfigData.clientId" readonly />
             </div>
           </div>
           <div class="flex-flow">
             <div class="base-title">AppSecret</div>
             <div class="base-message">
-              <a-input v-model:value="appConfigData.clientSecret" readonly />
+              <Input v-model:value="appConfigData.clientSecret" readonly />
             </div>
           </div>
           <div style="margin-top: 20px; width: 100%; text-align: right">
-            <a-button @click="dingEditClick">编辑</a-button>
+            <Button @click="dingEditClick">编辑</Button>
           </div>
-        </a-collapse-panel>
-      </a-collapse>
+        </CollapsePanel>
+      </Collapse>
       <div class="sync-padding">
         <div style="font-size: 16px; width: 100%">3.数据同步</div>
         <div style="margin-top: 20px" class="base-desc">
@@ -52,13 +52,13 @@
             <li>同步部门到本地</li>
             <li>
               同步部门下的用户到本地
-              <a-tooltip title="同步用户与部门文档">
-                <a-icon @click="handleIconClick" type="question-circle" class="sync-text" />
-              </a-tooltip>
+              <Tooltip title="同步用户与部门文档">
+                <Icon @click="handleIconClick" type="question-circle" class="sync-text" />
+              </Tooltip>
             </li>
           </ul>
           <div style="float: right">
-            <a-button :loading="btnLoading" @click="syncDingTalk">{{ !btnLoading ? '同步' : '同步中' }}</a-button>
+            <Button :loading="btnLoading" @click="syncDingTalk">{{ !btnLoading ? '同步' : '同步中' }}</Button>
           </div>
         </div>
       </div>
@@ -68,163 +68,148 @@
   <ThirdAppConfigModal @register="registerAppConfigModal" @success="handleSuccess" />
 </template>
 
-<script lang="ts">
-import { defineComponent, h, inject, onMounted, reactive, ref, watch } from 'vue';
-import { Modal } from 'ant-design-vue';
-import { useModal } from '@begcode/components';
+<script lang="ts" setup>
+import { h, inject, onMounted, reactive, ref, watch } from 'vue';
+import { Modal, Button, Input, Tooltip, Collapse, CollapsePanel } from 'ant-design-vue';
+import { useModal, Icon } from '@begcode/components';
 import { getTenantId } from '@/utils/auth';
 import { useMessage } from '@/hooks/web/useMessage';
 import { getThirdConfigByTenantId, syncDingTalkDepartUserToLocal } from './ThirdApp.api';
 import ThirdAppConfigModal from './ThirdAppConfigModal.vue';
 
-export default defineComponent({
+defineOptions({
   name: 'OrganDingConfigForm',
-  components: {
-    ThirdAppConfigModal,
-  },
-  setup() {
-    const { createMessage } = useMessage();
-    //折叠面板选中key
-    const collapseActiveKey = ref<string>('');
-    //按钮加载事件
-    const btnLoading = ref<boolean>(false);
-    //第三方配置数据
-    const appConfigData = ref<any>({
-      agentId: undefined,
-      clientId: '',
-      clientSecret: '',
-    });
+});
 
-    //企业微信钉钉配置modal
-    const [registerAppConfigModal, { openModal }] = useModal();
+const { createMessage } = useMessage();
+//折叠面板选中key
+const collapseActiveKey = ref<string>('');
+//按钮加载事件
+const btnLoading = ref<boolean>(false);
+//第三方配置数据
+const appConfigData = ref<any>({
+  agentId: undefined,
+  clientId: '',
+  clientSecret: '',
+});
 
-    /**
-     * 钉钉编辑
-     */
-    async function dingEditClick() {
-      let tenantId = getTenantId();
-      openModal(true, {
-        tenantId: tenantId,
-        thirdType: 'dingtalk',
-      });
-    }
+//企业微信钉钉配置modal
+const [registerAppConfigModal, { openModal }] = useModal();
 
-    /**
-     * 初始化第三方数据
-     */
-    async function initThirdAppConfigData(params) {
-      let values = await getThirdConfigByTenantId(params);
-      if (values) {
-        appConfigData.value = values;
-      }
-    }
+/**
+ * 钉钉编辑
+ */
+async function dingEditClick() {
+  let tenantId = getTenantId();
+  openModal(true, {
+    tenantId: tenantId,
+    thirdType: 'dingtalk',
+  });
+}
 
-    /**
-     * 成功回调
-     */
-    function handleSuccess() {
-      let tenantId = getTenantId();
-      initThirdAppConfigData({ tenantId: tenantId, thirdType: 'dingtalk' });
-    }
+/**
+ * 初始化第三方数据
+ */
+async function initThirdAppConfigData(params) {
+  let values = await getThirdConfigByTenantId(params);
+  if (values) {
+    appConfigData.value = values;
+  }
+}
 
-    /**
-     * 同步钉钉
-     */
-    async function syncDingTalk() {
-      btnLoading.value = true;
-      await syncDingTalkDepartUserToLocal()
-        .then(res => {
-          let options = {};
-          if (res.result) {
-            options = {
-              width: 600,
-              title: res.message,
-              content: () => {
-                let nodes;
-                let successInfo = [`成功信息如下：`, renderTextarea(h, res.result.successInfo.map((v, i) => `${i + 1}. ${v}`).join('\n'))];
-                if (res.success) {
-                  nodes = [...successInfo, h('br'), `无失败信息！`];
-                } else {
-                  nodes = [
-                    `失败信息如下：`,
-                    renderTextarea(h, res.result.failInfo.map((v, i) => `${i + 1}. ${v}`).join('\n')),
-                    h('br'),
-                    ...successInfo,
-                  ];
-                }
-                return nodes;
-              },
-            };
-          }
-          if (res.success) {
-            if (options != null) {
-              Modal.success(options);
+/**
+ * 成功回调
+ */
+function handleSuccess() {
+  let tenantId = getTenantId();
+  initThirdAppConfigData({ tenantId: tenantId, thirdType: 'dingtalk' });
+}
+
+/**
+ * 同步钉钉
+ */
+async function syncDingTalk() {
+  btnLoading.value = true;
+  await syncDingTalkDepartUserToLocal()
+    .then(res => {
+      let options = {};
+      if (res.result) {
+        options = {
+          width: 600,
+          title: res.message,
+          content: () => {
+            let nodes;
+            let successInfo = [`成功信息如下：`, renderTextarea(h, res.result.successInfo.map((v, i) => `${i + 1}. ${v}`).join('\n'))];
+            if (res.success) {
+              nodes = [...successInfo, h('br'), `无失败信息！`];
             } else {
-              createMessage.warning(res.message);
+              nodes = [
+                `失败信息如下：`,
+                renderTextarea(h, res.result.failInfo.map((v, i) => `${i + 1}. ${v}`).join('\n')),
+                h('br'),
+                ...successInfo,
+              ];
             }
-          } else {
-            if (options && options.title) {
-              Modal.warning(options);
-            } else {
-              createMessage.warning({
-                content: '同步失败，请检查对接信息录入中是否填写正确，并确认是否已开启钉钉配置！',
-                duration: 5,
-              });
-            }
-          }
-        })
-        .finally(() => {
-          btnLoading.value = false;
-        });
-    }
-
-    /**
-     * 渲染文本
-     * @param h
-     * @param value
-     */
-    function renderTextarea(h, value) {
-      return h(
-        'div',
-        {
-          id: 'box',
-          style: {
-            minHeight: '100px',
-            border: '1px solid #d9d9d9',
-            fontSize: '14px',
-            maxHeight: '250px',
-            whiteSpace: 'pre',
-            overflow: 'auto',
-            padding: '10px',
+            return nodes;
           },
-        },
-        value,
-      );
-    }
-
-    /**
-     * 钉钉同步文档
-     */
-    function handleIconClick() {
-      window.open('https://help.qiaoqiaoyun.com/expand/dingdingsyn.html', '_target');
-    }
-
-    onMounted(() => {
-      let tenantId = getTenantId();
-      initThirdAppConfigData({ tenantId: tenantId, thirdType: 'dingtalk' });
+        };
+      }
+      if (res.success) {
+        if (options != null) {
+          Modal.success(options);
+        } else {
+          createMessage.warning(res.message);
+        }
+      } else {
+        if (options && options.title) {
+          Modal.warning(options);
+        } else {
+          createMessage.warning({
+            content: '同步失败，请检查对接信息录入中是否填写正确，并确认是否已开启钉钉配置！',
+            duration: 5,
+          });
+        }
+      }
+    })
+    .finally(() => {
+      btnLoading.value = false;
     });
+}
 
-    return {
-      appConfigData,
-      collapseActiveKey,
-      registerAppConfigModal,
-      dingEditClick,
-      handleSuccess,
-      syncDingTalk,
-      btnLoading,
-      handleIconClick,
-    };
-  },
+/**
+ * 渲染文本
+ * @param h
+ * @param value
+ */
+function renderTextarea(h, value) {
+  return h(
+    'div',
+    {
+      id: 'box',
+      style: {
+        minHeight: '100px',
+        border: '1px solid #d9d9d9',
+        fontSize: '14px',
+        maxHeight: '250px',
+        whiteSpace: 'pre',
+        overflow: 'auto',
+        padding: '10px',
+      },
+    },
+    value,
+  );
+}
+
+/**
+ * 钉钉同步文档
+ */
+function handleIconClick() {
+  window.open('https://help.qiaoqiaoyun.com/expand/dingdingsyn.html', '_target');
+}
+
+onMounted(() => {
+  let tenantId = getTenantId();
+  initThirdAppConfigData({ tenantId: tenantId, thirdType: 'dingtalk' });
 });
 </script>
 

@@ -27,4 +27,5 @@ export const buttonProps = {
   iconSize: { type: Number, default: 15 },
   isUpload: { type: Boolean, default: false },
   onClick: { type: [Function, Array] as PropType<(() => any) | (() => any)[]>, default: null },
+  text: { type: String },
 };

@@ -8,10 +8,10 @@ import type { Rule as ValidationRule } from 'ant-design-vue/lib/form/interface';
 import type { TableActionType } from '@/components/Table';
 import { Col, Divider, Form } from 'ant-design-vue';
 import { componentMap } from '../componentMap';
-import { BasicHelp } from '@/components/Basic';
+import { BasicHelp, BasicTitle } from '@/components/Basic';
 import { isBoolean, isFunction, isNull } from '@/utils/is';
 import { getSlot } from '@/utils/helper/tsxHelper';
-import { createPlaceholderMessage, NO_AUTO_LINK_COMPONENTS, setComponentRuleType } from '../helper';
+import { createPlaceholderMessage, NO_AUTO_LINK_COMPONENTS, setComponentRuleType, isIncludeSimpleComponents } from '../helper';
 import { cloneDeep, upperFirst } from 'lodash-es';
 import { useItemLabelWidth } from '../hooks/useLabelWidth';
 import { useI18n } from '@/hooks/web/useI18nOut';
@@ -88,7 +88,7 @@ export default defineComponent({
       if (isFunction(componentProps)) {
         componentProps = componentProps({ schema, tableAction, formModel, formActionType }) ?? {};
       }
-      if (schema.component === 'Divider') {
+      if (isIncludeSimpleComponents(schema.component)) {
         componentProps = Object.assign(
           {
             type: 'horizontal',
@@ -203,7 +203,8 @@ export default defineComponent({
        */
       if (getRequired) {
         if (!rules || rules.length === 0) {
-          rules = [{ required: getRequired, validator }];
+          const trigger = NO_AUTO_LINK_COMPONENTS.includes(component || 'Input') ? 'blur' : 'change';
+          rules = [{ required: getRequired, validator, trigger }];
         } else {
           const requiredIndex: number = rules.findIndex(rule => Reflect.has(rule, 'required'));
 
@@ -238,6 +239,20 @@ export default defineComponent({
         rules[characterInx].message =
           rules[characterInx].message || t('component.form.maxTip', [rules[characterInx].max] as Recordable<any>);
       }
+      rules.forEach(item => {
+        if (typeof item.pattern === 'string') {
+          try {
+            const reg = new Function('item', `return ${item.pattern}`)(item);
+            if (Object.prototype.toString.call(reg) === '[object RegExp]') {
+              item.pattern = reg;
+            } else {
+              item.pattern = new RegExp(item.pattern);
+            }
+          } catch (error) {
+            item.pattern = new RegExp(item.pattern);
+          }
+        }
+      });
       return rules;
     }
 
@@ -279,6 +294,9 @@ export default defineComponent({
       const { autoSetPlaceHolder, size } = props.formProps;
       const propsData: Recordable<any> = {
         allowClear: true,
+        getPopupContainer: (trigger: Element) => {
+          return trigger?.parentNode;
+        },
         size,
         ...unref(getComponentsProps),
         disabled: unref(getDisable),
@@ -360,6 +378,12 @@ export default defineComponent({
             <Divider {...unref(getComponentsProps)}>{renderLabelHelpMessage()}</Divider>
           </Col>
         );
+      } else if (component === 'BasicTitle') {
+        return (
+          <Form.Item labelCol={labelCol} wrapperCol={wrapperCol} name={field} class={{ 'suffix-item': !!suffix }}>
+            <BasicTitle {...unref(getComponentsProps)}>{renderLabelHelpMessage()}</BasicTitle>
+          </Form.Item>
+        );
       } else {
         const getContent = () => {
           return slot ? getSlot(slots, slot, unref(getValues), opts) : render ? render(unref(getValues), opts) : renderComponent();
@@ -399,15 +423,16 @@ export default defineComponent({
 
     return () => {
       const { colProps = {}, colSlot, renderColContent, component, slot } = props.schema;
-      if (!component || (!componentMap.has(component) && !slot)) {
+      if (!((component && componentMap.has(component)) || slot)) {
         return null;
       }
 
       const { baseColProps = {} } = props.formProps;
       const { getIsMobile } = useAppInject();
       let realColProps;
+      realColProps = { ...baseColProps, ...colProps };
       if (colProps['span'] && !unref(getIsMobile)) {
-        ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'].forEach(name => delete baseColProps[name]);
+        ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'].forEach(name => delete realColProps[name]);
       }
       realColProps = { ...baseColProps, ...colProps };
       const { isIfShow, isShow } = getShow();

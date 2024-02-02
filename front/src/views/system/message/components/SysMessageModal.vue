@@ -10,14 +10,14 @@
     destroyOnClose
   >
     <template #title>
-      <a-tabs v-model:activeKey="activeKey" @change="handleChangeTab" :tabBarStyle="{ margin: 0 }">
-        <a-tab-pane key="all" tab="全部消息"></a-tab-pane>
-        <a-tab-pane key="star" tab="标星消息" force-render></a-tab-pane>
+      <Tabs v-model:activeKey="activeKey" @change="handleChangeTab" :tabBarStyle="{ margin: 0 }">
+        <TabPane key="all" tab="全部消息"></TabPane>
+        <TabPane key="star" tab="标星消息" force-render></TabPane>
         <template #rightExtra>
           <div class="sys-msg-modal-title">
             <div class="icon-right">
               <div class="icons">
-                <a-popover placement="bottomRight" :overlayStyle="{ width: '400px' }" trigger="click" v-model:open="showSearch">
+                <Popover placement="bottomRight" :overlayStyle="{ width: '400px' }" trigger="click" v-model:open="showSearch">
                   <template #content>
                     <div>
                       <span class="search-label">回复、提到我的人?：</span>
@@ -27,9 +27,9 @@
                           <span>{{ searchParams.realname }}</span>
                           <span class="clear-user-icon"><close-outlined style="font-size: 12px" @click="clearSearchParamsUser" /></span>
                         </div>
-                        <a-button v-else type="dashed" shape="circle" @click="openSelectPerson">
-                          <plus-outlined />
-                        </a-button>
+                        <Button v-else type="dashed" shape="circle" @click="openSelectPerson">
+                          <PlusOutlined />
+                        </Button>
                       </span>
                     </div>
                     <div class="search-date">
@@ -45,250 +45,209 @@
                           </div>
                         </div>
                         <div class="cust-range-date" v-if="showRangeDate">
-                          <a-range-picker v-model:value="searchRangeDate" @change="handleChangeSearchDate" />
+                          <RangePicker v-model:value="searchRangeDate" @change="handleChangeSearchDate" />
                         </div>
                       </div>
                     </div>
                   </template>
 
                   <span v-if="conditionStr" class="anticon filtera">
-                    <filter-outlined />
+                    <FilterOutlined />
                     <span style="font-size: 12px; margin-left: 3px">{{ conditionStr }}</span>
                     <span style="display: flex; margin: 0 5px"><close-outlined style="font-size: 12px" @click="clearAll" /></span>
                   </span>
-                  <filter-outlined v-else />
-                </a-popover>
-                <close-outlined @click="closeModal" />
+                  <FilterOutlined v-else />
+                </Popover>
+                <CloseOutlined @click="closeModal" />
               </div>
             </div>
           </div>
         </template>
-      </a-tabs>
+      </Tabs>
     </template>
     <div>
-      <a-tabs :activeKey="activeKey" center @tabClick="handleChangePanel">
+      <Tabs :activeKey="activeKey" center @tabClick="handleChangePanel" animated>
         <template #renderTabBar>
           <div></div>
         </template>
 
-        <a-tab-pane tab="全部消息" key="all" forceRender>
+        <TabPane tab="全部消息" key="all" forceRender>
           <sys-message-list ref="allMessageRef" @close="hrefThenClose" @detail="showDetailModal" />
-        </a-tab-pane>
+        </TabPane>
 
         <!-- 标星 -->
-        <a-tab-pane tab="标星消息" key="star" forceRender>
+        <TabPane tab="标星消息" key="star" forceRender>
           <sys-message-list ref="starMessageRef" star @close="hrefThenClose" @detail="showDetailModal" />
-        </a-tab-pane>
-      </a-tabs>
+        </TabPane>
+      </Tabs>
     </div>
   </BasicModal>
   <DetailModal @register="registerDetail" />
 </template>
 
-<script>
+<script lang="ts" setup>
+import { ref, unref, reactive, computed } from 'vue';
+import { Tabs, TabPane, RangePicker, Button, Popover } from 'ant-design-vue';
 import { BasicModal, useModalInner, useModal } from '@begcode/components';
 import { FilterOutlined, CloseOutlined, BellFilled, ExclamationOutlined, PlusOutlined } from '@ant-design/icons-vue';
-import { ref, unref, reactive, computed } from 'vue';
 import SysMessageList from './SysMessageList.vue';
 import { SelectModal } from '@begcode/components';
 import DetailModal from '@/views/monitor/mynews/DetailModal.vue';
 
-export default {
-  name: 'SysMessageModal',
-  components: {
-    BasicModal,
-    FilterOutlined,
-    CloseOutlined,
-    BellFilled,
-    ExclamationOutlined,
-    SelectModal,
-    SysMessageList,
-    PlusOutlined,
-    DetailModal,
-  },
-  emits: ['register', 'refresh'],
-  setup(_p, { emit }) {
-    const allMessageRef = ref();
-    const starMessageRef = ref();
-    const activeKey = ref('all');
-    function handleChangeTab(key) {
-      activeKey.value = key;
-      loadData();
+defineOptions({ name: 'SysMessageModal' });
+
+const emit = defineEmits(['register', 'refresh']);
+
+const allMessageRef = ref();
+const starMessageRef = ref();
+const activeKey = ref('all');
+function handleChangeTab(key) {
+  activeKey.value = key;
+  loadData();
+}
+function handleChangePanel(key) {
+  activeKey.value = key;
+}
+
+// 查询区域存储值
+const searchParams = reactive({
+  fromUser: '',
+  realname: '',
+  rangeDateKey: '',
+  rangeDate: [],
+});
+
+function loadData() {
+  let params = {
+    fromUser: searchParams.fromUser,
+    rangeDateKey: searchParams.rangeDateKey,
+    rangeDate: searchParams.rangeDate,
+  };
+  if (activeKey.value === 'all') {
+    allMessageRef.value.reload(params);
+  } else {
+    starMessageRef.value.reload(params);
+  }
+}
+
+//useModalInner
+const [registerModal, { closeModal }] = useModalInner(async () => {
+  //每次弹窗打开 加载最新的数据
+  loadData();
+});
+
+const showSearch = ref(false);
+
+function handleChangeSearchPerson(value, a) {
+  console.log('选择改变', value, a);
+  showSearch.value = true;
+}
+
+const dateTags = reactive([
+  { key: 'jt', text: '今天', active: false },
+  { key: 'zt', text: '昨天', active: false },
+  { key: 'qt', text: '前天', active: false },
+  { key: 'bz', text: '本周', active: false },
+  { key: 'sz', text: '上周', active: false },
+  { key: 'by', text: '本月', active: false },
+  { key: 'sy', text: '上月', active: false },
+  { key: 'zdy', text: '自定义', active: false },
+]);
+function handleClickDateTag(item) {
+  for (let a of dateTags) {
+    if (a.key != item.key) {
+      a.active = false;
     }
-    function handleChangePanel(key) {
-      activeKey.value = key;
-    }
-
-    // 查询区域存储值
-    const searchParams = reactive({
-      fromUser: '',
-      realname: '',
-      rangeDateKey: '',
-      rangeDate: [],
-    });
-
-    function loadData() {
-      let params = {
-        fromUser: searchParams.fromUser,
-        rangeDateKey: searchParams.rangeDateKey,
-        rangeDate: searchParams.rangeDate,
-      };
-      if (activeKey.value === 'all') {
-        allMessageRef.value.reload(params);
-      } else {
-        starMessageRef.value.reload(params);
-      }
-    }
-
-    //useModalInner
-    const [registerModal, { closeModal }] = useModalInner(async () => {
-      //每次弹窗打开 加载最新的数据
-      loadData();
-    });
-
-    const showSearch = ref(false);
-
-    function handleChangeSearchPerson(value, a) {
-      console.log('选择改变', value, a);
-      showSearch.value = true;
-    }
-
-    const dateTags = reactive([
-      { key: 'jt', text: '今天', active: false },
-      { key: 'zt', text: '昨天', active: false },
-      { key: 'qt', text: '前天', active: false },
-      { key: 'bz', text: '本周', active: false },
-      { key: 'sz', text: '上周', active: false },
-      { key: 'by', text: '本月', active: false },
-      { key: 'sy', text: '上月', active: false },
-      { key: 'zdy', text: '自定义', active: false },
-    ]);
-    function handleClickDateTag(item) {
-      for (let a of dateTags) {
-        if (a.key != item.key) {
-          a.active = false;
-        }
-      }
-      item.active = !item.active;
-      if (item.active == false) {
-        searchParams.rangeDateKey = '';
-      } else {
-        searchParams.rangeDateKey = item.key;
-      }
-      if (item.key == 'zdy') {
-        // 自定义日期查询走的是 handleChangeSearchDate
-        if (item.active == false) {
-          searchParams.rangeDate = [];
-          loadData();
-        }
-      } else {
-        loadData();
-      }
-    }
-    const showRangeDate = computed(() => {
-      let temp = dateTags.filter(i => i.active == true);
-      if (temp && temp.length > 0) {
-        if (temp[0].text == '自定义') {
-          return true;
-        }
-      }
-      return false;
-    });
-    const searchRangeDate = ref([]);
-    function handleChangeSearchDate(_value, dateStringArray) {
-      searchParams.rangeDate = [...dateStringArray];
-      loadData();
-    }
-
-    function hrefThenClose(id) {
-      emit('refresh', id);
-      // closeModal();
-    }
-
-    // 有查询条件值的时候显示该字符串
-    const conditionStr = computed(() => {
-      const { fromUser, rangeDateKey, realname } = searchParams;
-      if (!fromUser && !rangeDateKey) {
-        return '';
-      }
-      let arr = [];
-      if (fromUser) {
-        arr.push(realname);
-      }
-      if (rangeDateKey) {
-        let rangDates = dateTags.filter(item => item.key == rangeDateKey);
-        if (rangDates && rangDates.length > 0) {
-          arr.push(rangDates[0].text);
-        }
-      }
-      return arr.join('、');
-    });
-
-    //注册model
-    const [regModal, { openModal }] = useModal();
-
-    function getSelectedUser(options, value) {
-      if (options && options.length > 0) {
-        searchParams.fromUser = value;
-        searchParams.realname = options[0].label;
-      }
-    }
-
-    function openSelectPerson() {
-      openModal(true, {});
-    }
-
-    function clearSearchParamsUser() {
-      searchParams.fromUser = '';
-      searchParams.realname = '';
-    }
-
-    function clearAll() {
-      searchParams.fromUser = '';
-      searchParams.realname = '';
-      searchParams.rangeDateKey = '';
+  }
+  item.active = !item.active;
+  if (item.active == false) {
+    searchParams.rangeDateKey = '';
+  } else {
+    searchParams.rangeDateKey = item.key;
+  }
+  if (item.key == 'zdy') {
+    // 自定义日期查询走的是 handleChangeSearchDate
+    if (item.active == false) {
       searchParams.rangeDate = [];
-      for (let a of dateTags) {
-        a.active = false;
-      }
+      loadData();
     }
-
-    const [registerDetail, { openModal: openDetailModal }] = useModal();
-    function showDetailModal(record) {
-      console.error(123, record);
-      openDetailModal(true, { record: unref(record), isUpdate: true });
+  } else {
+    loadData();
+  }
+}
+const showRangeDate = computed(() => {
+  let temp = dateTags.filter(i => i.active == true);
+  if (temp && temp.length > 0) {
+    if (temp[0].text == '自定义') {
+      return true;
     }
-    return {
-      conditionStr,
-      regModal,
-      getSelectedUser,
-      openSelectPerson,
-      clearSearchParamsUser,
-      clearAll,
+  }
+  return false;
+});
+const searchRangeDate = ref([]);
+function handleChangeSearchDate(_value, dateStringArray) {
+  searchParams.rangeDate = [...dateStringArray];
+  loadData();
+}
 
-      registerModal,
-      activeKey,
-      handleChangePanel,
-      handleChangeTab,
+function hrefThenClose(id) {
+  emit('refresh', id);
+  // closeModal();
+}
 
-      showSearch,
-      searchParams,
-      handleChangeSearchPerson,
-      dateTags,
-      handleClickDateTag,
-      showRangeDate,
-      searchRangeDate,
-      handleChangeSearchDate,
-      closeModal,
-      hrefThenClose,
+// 有查询条件值的时候显示该字符串
+const conditionStr = computed(() => {
+  const { fromUser, rangeDateKey, realname } = searchParams;
+  if (!fromUser && !rangeDateKey) {
+    return '';
+  }
+  let arr = [];
+  if (fromUser) {
+    arr.push(realname);
+  }
+  if (rangeDateKey) {
+    let rangDates = dateTags.filter(item => item.key == rangeDateKey);
+    if (rangDates && rangDates.length > 0) {
+      arr.push(rangDates[0].text);
+    }
+  }
+  return arr.join('、');
+});
 
-      allMessageRef,
-      starMessageRef,
-      registerDetail,
-      showDetailModal,
-    };
-  },
-};
+//注册model
+const [regModal, { openModal }] = useModal();
+
+function getSelectedUser(options, value) {
+  if (options && options.length > 0) {
+    searchParams.fromUser = value;
+    searchParams.realname = options[0].label;
+  }
+}
+
+function openSelectPerson() {
+  openModal(true, {});
+}
+
+function clearSearchParamsUser() {
+  searchParams.fromUser = '';
+  searchParams.realname = '';
+}
+
+function clearAll() {
+  searchParams.fromUser = '';
+  searchParams.realname = '';
+  searchParams.rangeDateKey = '';
+  searchParams.rangeDate = [];
+  for (let a of dateTags) {
+    a.active = false;
+  }
+}
+
+const [registerDetail, { openModal: openDetailModal }] = useModal();
+function showDetailModal(record) {
+  console.error(123, record);
+  openDetailModal(true, { record: unref(record), isUpdate: true });
+}
 </script>
 
 <style lang="less">
@@ -342,12 +301,6 @@ export default {
         padding: 10px;
         display: inline-block;
         cursor: pointer;
-        &:hover {
-          color: #1890ff;
-        }
-        &:active {
-          color: #1890ff;
-        }
       }
 
       > span.filtera {
@@ -362,6 +315,7 @@ export default {
         display: flex;
 
         > span.anticon {
+          height: auto;
           line-height: 9px;
           display: inline-block;
         }
@@ -371,6 +325,34 @@ export default {
   .ant-tabs-nav-wrap {
     display: inline-block;
     width: calc(100% - 340px);
+    .ant-tabs-tab {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 12px 0;
+      font-size: 14px;
+      background: transparent;
+      border: 0;
+      outline: none;
+      cursor: pointer;
+    }
+    .ant-tabs-tab {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 12px 0;
+      font-size: 14px;
+      background: transparent;
+      border: 0;
+      outline: none;
+      cursor: pointer;
+    }
+    .ant-tabs-tab + .ant-tabs-tab {
+      margin: 0 0 0 32px;
+    }
+    .ant-tabs-ink-bar {
+      background: @primary-color;
+    }
   }
   .ant-tabs-nav-scroll {
     text-align: center;
@@ -425,7 +407,6 @@ export default {
         cursor: pointer;
         &.active {
           background-color: #d3eafd !important;
-          color: #2196f3;
         }
       }
     }
@@ -438,12 +419,6 @@ export default {
   border-radius: 30px;
   .clear-user-icon {
     margin-left: 5px;
-
-    .anticon {
-      &:hover {
-        color: #2196f3;
-      }
-    }
   }
 }
 </style>

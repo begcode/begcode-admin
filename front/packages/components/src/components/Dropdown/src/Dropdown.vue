@@ -1,18 +1,23 @@
 <template>
-  <a-dropdown :class="[prefixCls]" :trigger="trigger" v-bind="$attrs">
+  <Dropdown :class="[prefixCls]" :trigger="trigger" v-bind="$attrs">
     <span>
       <slot></slot>
     </span>
     <template #overlay>
-      <a-menu :class="[`${prefixCls}-menu`]" :selectedKeys="selectedKeys">
+      <Menu :class="[`${prefixCls}-menu`]" :selectedKeys="selectedKeys">
         <template v-for="item in dropMenuList" :key="`${item.event}`">
-          <a-menu-item
+          <MenuItem
             v-bind="getAttr(item.event)"
             @click="handleClickMenu(item)"
             :disabled="item.disabled"
             :class="[{ 'is-pop-confirm': item.popConfirm }, item.class ?? []]"
           >
-            <a-popconfirm v-if="popconfirm && item.popConfirm" v-bind="getPopConfirmAttrs(item.popConfirm)" :disabled="item.disabled">
+            <Popconfirm
+              :disabled="item.disabled"
+              v-if="popconfirm && item.popConfirm"
+              v-bind="getPopConfirmAttrs(item.popConfirm)"
+              :disabled="item.disabled"
+            >
               <template #icon v-if="item.popConfirm.icon">
                 <Icon v-if="item.iconColor" :icon="item.popConfirm.icon" :color="item.iconColor" />
                 <Icon v-else :icon="item.popConfirm.icon" />
@@ -22,7 +27,7 @@
                 <Icon :icon="item.icon" v-else-if="item.icon" />
                 <span class="ml-1">{{ item.text }}</span>
               </div>
-            </a-popconfirm>
+            </Popconfirm>
             <!--  设置动态插槽   -->
             <template v-else-if="item.slot">
               <slot :name="item.slot" :label="item.text"></slot>
@@ -32,28 +37,22 @@
               <Icon :icon="item.icon" v-else-if="item.icon" />
               <span class="ml-1">{{ item.text }}</span>
             </template>
-          </a-menu-item>
-          <a-menu-divider v-if="item.divider" :key="`d-${item.event}`" />
+          </MenuItem>
+          <MenuDivider v-if="item.divider" :key="`d-${item.event}`" />
         </template>
-      </a-menu>
+      </Menu>
     </template>
-  </a-dropdown>
+  </Dropdown>
 </template>
 
 <script lang="ts" setup>
 import { computed, PropType } from 'vue';
 import { type Recordable } from '#/utils.d';
 import { type DropMenu } from './typing';
-import { Dropdown, Menu, Popconfirm } from 'ant-design-vue';
+import { Dropdown, Menu, MenuItem, Popconfirm, MenuDivider } from 'ant-design-vue';
 import Icon from '@/components/Icon/Icon.vue';
 import { omit, isFunction } from 'lodash-es';
 import { useDesign } from '@/hooks/web/useDesign';
-
-const ADropdown = Dropdown;
-const AMenu = Menu;
-const AMenuItem = Menu.Item;
-const AMenuDivider = Menu.Divider;
-const APopconfirm = Popconfirm;
 
 const { prefixCls } = useDesign('basic-dropdown');
 const props = defineProps({

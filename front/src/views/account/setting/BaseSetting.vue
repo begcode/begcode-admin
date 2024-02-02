@@ -13,12 +13,12 @@
         <div class="account-right">
           <div v-if="!isEdit">
             <span class="font-size-17 account-name">{{ userInfo.firstName }}</span>
-            <a-tooltip content="编辑姓名">
+            <Tooltip content="编辑姓名">
               <Icon class="pointer font-size-17 gray-bd account-icon" icon="ant-design:edit-outlined" @click="editHandleClick" />
-            </a-tooltip>
+            </Tooltip>
           </div>
           <div v-else>
-            <a-input ref="accountNameEdit" :maxlength="100" v-model:value="userInfo.firstName" @blur="editRealName" />
+            <Input ref="accountNameEdit" :maxlength="100" v-model:value="userInfo.firstName" @blur="editRealName" />
           </div>
           <div class="use-day">
             使用：<span>{{ userInfo.createTimeText }}</span>
@@ -65,6 +65,7 @@
 </template>
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
+import { Tooltip, Input } from 'ant-design-vue';
 import { CropperAvatar } from '@/components/Cropper';
 import { useMessage } from '@/hooks/web/useMessage';
 import headerImg from '@/assets/images/header.jpg';

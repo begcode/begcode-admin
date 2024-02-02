@@ -54,6 +54,7 @@ function handleClick(color: string) {
   flex-wrap: wrap;
   margin: 16px 0;
   justify-content: space-around;
+  line-height: 1.3;
 
   &__item {
     width: 20px;

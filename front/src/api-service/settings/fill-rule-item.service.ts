@@ -40,10 +40,17 @@ export default {
     });
   },
 
-  updateSortValue(id: number, type: string, newSortValue: number, beforeId: number, afterId: number, fillRuleItem: any): Promise<Boolean> {
+  updateSortValue(
+    id: number,
+    type: 'DROP' | 'STEP' | 'VALUE',
+    newSortValue: number,
+    beforeId: number,
+    afterId: number,
+    fillRuleItemCriteria: any,
+  ): Promise<Boolean> {
     return defHttp.put({
-      url: `${apiUrl}/sort-value/${id}/${type}?newSortValue=${newSortValue}&beforeId=${beforeId}&afterId=${afterId}`,
-      params: fillRuleItem,
+      url: `${apiUrl}/sort-value/${id}/${type}?newSortValue=${newSortValue || ''}&beforeId=${beforeId || ''}&afterId=${afterId || ''}`,
+      params: fillRuleItemCriteria,
     });
   },
 

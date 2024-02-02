@@ -14,6 +14,9 @@
             <column name="id" type="bigint" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <column name="url" type="varchar(255)" remarks="Url地址">
+                <constraints nullable="false" />
+            </column>
             <column name="full_name" type="varchar(255)" remarks="完整文件名\n不含路径">
                 <constraints nullable="true" />
             </column>
@@ -26,9 +29,6 @@
             <column name="type" type="varchar(255)" remarks="文件类型">
                 <constraints nullable="true" />
             </column>
-            <column name="url" type="varchar(255)" remarks="Web Url地址">
-                <constraints nullable="true" />
-            </column>
             <column name="path" type="varchar(255)" remarks="本地路径">
                 <constraints nullable="true" />
             </column>
@@ -38,7 +38,7 @@
             <column name="owner_entity_name" type="varchar(255)" remarks="使用实体名称">
                 <constraints nullable="true" />
             </column>
-            <column name="owner_entity_id" type="varchar(255)" remarks="使用实体ID">
+            <column name="owner_entity_id" type="bigint" remarks="使用实体ID">
                 <constraints nullable="true" />
             </column>
             <column name="business_title" type="varchar(255)" remarks="业务标题">

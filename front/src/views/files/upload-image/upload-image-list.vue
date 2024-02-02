@@ -44,7 +44,7 @@
           />
         </Col>
         <Col :span="24 - filterTreeConfig.filterTreeSpan">
-          <CardList ref="cardList" v-bind="cardListOptions" @getMethod="cardListFetchMethod">
+          <CardList ref="cardList" v-bind="cardListOptions" @getMethod="cardListFetchMethod" @delete="deleteById">
             <template #header_left>
               <Row class="toolbar_buttons_xgrid" :gutter="16">
                 <Col :lg="2" :md="2" :sm="4" v-if="filterTreeConfig.treeFilterData.length > 0">
@@ -112,7 +112,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref, getCurrentInstance, shallowRef } from 'vue';
-import { Modal, Card, Space, Divider, Row, Col, Tree, Input, Spin } from 'ant-design-vue';
+import { Modal, Card, Space, Divider, Row, Col, Tree, Input, Spin, message } from 'ant-design-vue';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { useModalInner, BasicModal, useDrawerInner, BasicDrawer, Icon, Button, SearchForm, CardList } from '@begcode/components';
 import { useGo } from '@/hooks/web/usePage';
@@ -278,7 +278,7 @@ const cardListOptions = reactive({
     {
       title: '编辑',
       click: (row: any) => {
-        console.log('row', row);
+        rowClickHandler('edit', { containerType: 'modal', title: '编辑' }, row);
       },
     },
   ],
@@ -321,6 +321,18 @@ const cardListFetchMethod = method => {
 
 const handleToggleSearch = () => {
   searchFormConfig.toggleSearchStatus = !searchFormConfig.toggleSearchStatus;
+};
+
+const deleteById = id => {
+  apis
+    .deleteById(id)
+    .then(() => {
+      message.success('删除成功。');
+      formSearch();
+    })
+    .catch(err => {
+      console.log('err', err);
+    });
 };
 
 const closeModalOrDrawer = ({ containerType, update }) => {
@@ -400,11 +412,13 @@ const rowClickHandler = (name, operation, row) => {
         } else {
           switch (operation.containerType) {
             case 'modal':
+              operation.title && (modalConfig.title = operation.title);
               modalConfig.componentName = shallowRef(UploadImageEdit);
               modalConfig.entityId = row.id;
               setModalProps({ open: true });
               break;
             case 'drawer':
+              operation.title && (drawerConfig.title = operation.title);
               drawerConfig.componentName = shallowRef(UploadImageEdit);
               drawerConfig.entityId = row.id;
               setDrawerProps({ open: true });
@@ -433,11 +447,13 @@ const rowClickHandler = (name, operation, row) => {
         } else {
           switch (operation.containerType) {
             case 'modal':
+              operation.title && (modalConfig.title = operation.title);
               modalConfig.componentName = shallowRef(UploadImageDetail);
               modalConfig.entityId = row.id;
               setModalProps({ open: true });
               break;
             case 'drawer':
+              operation.title && (drawerConfig.title = operation.title);
               drawerConfig.componentName = shallowRef(UploadImageDetail);
               drawerConfig.entityId = row.id;
               setDrawerProps({ open: true });

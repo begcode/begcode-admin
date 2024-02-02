@@ -1,13 +1,12 @@
 <script lang="tsx">
 import { getCurrentInstance, ref, reactive, h, resolveComponent, toRef, Component } from 'vue';
+import { Space, Button, Collapse, CollapsePanel, Card, Tabs, TabPane } from 'ant-design-vue';
 import { useRoute } from 'vue-router';
 import config from './config/detail-config';
 import { defineComponent } from 'vue';
 import { IAnnouncement } from '@/models/system/announcement.model';
 
 import ServerProvider from '@/api-service/index';
-import { ReceiverType } from '@/models/enumerations/receiver-type.model';
-
 import { PageWrapper, Icon, getButtonConfig, Description, DescList } from '@begcode/components';
 
 export default defineComponent({
@@ -91,10 +90,10 @@ export default defineComponent({
         return {
           recordAction: row => (
             <div>
-              <a-space>
+              <Space>
                 {buttons.map(button => {
                   return (
-                    <a-button
+                    <Button
                       {...{
                         type: button.type || 'primary',
                         shape: button.shape || 'circle',
@@ -108,10 +107,10 @@ export default defineComponent({
                         },
                       }}
                       v-slots={button.slots}
-                    ></a-button>
+                    ></Button>
                   );
                 })}
-              </a-space>
+              </Space>
             </div>
           ),
         };
@@ -134,26 +133,22 @@ export default defineComponent({
           if (componentRef.name === 'a-desc') {
             if (pageConfig?.canExpand) {
               return (
-                <a-collapse-panel>
+                <CollapsePanel>
                   <Description {...componentRef.props} />
-                </a-collapse-panel>
+                </CollapsePanel>
               );
             } else {
               return <Description {...componentRef.props} />;
             }
           } else {
             const component = resolveComponent(componentRef.name);
-            return h(
-              resolveComponent(pageConfig?.canExpand ? 'a-collapse-panel' : 'a-card'),
-              { ...wrapperPros },
-              h(component, componentRef.props),
-            );
+            return h(pageConfig?.canExpand ? CollapsePanel : Card, { ...wrapperPros }, h(component, componentRef.props));
           }
         } else if (componentRef && componentRef instanceof Array) {
-          return h(resolveComponent(pageConfig?.canExpand ? 'a-collapse-panel' : 'a-card'), { ...wrapperPros }, () =>
-            h(resolveComponent('a-tabs'), {}, () =>
+          return h(pageConfig?.canExpand ? CollapsePanel : Card, { ...wrapperPros }, () =>
+            h(Tabs, {}, () =>
               componentRef.map((child, index) => {
-                return h(resolveComponent('a-tab-pane'), { tab: child.title || index, key: index }, () =>
+                return h(TabPane, { tab: child.title || index, key: index }, () =>
                   h(resolveComponent(child?.name) as Component, child.props, child?.name === 'vxe-grid' ? getXGridSlots(child) : {}),
                 );
               }),
@@ -167,7 +162,7 @@ export default defineComponent({
     const slots = {
       rightFooter: () => (
         <div>
-          <a-space>
+          <Space>
             {pageConfig.operations.map((operation: any) => {
               const buttonSlots: any = {};
               if (operation.icon) {
@@ -185,13 +180,13 @@ export default defineComponent({
                     buttonSlots.default = () => '保存';
                   }
                   return (
-                    <a-button
+                    <Button
                       {...{
                         type: 'primary',
                         onClick: operation.click,
                       }}
                       v-slots={buttonSlots}
-                    ></a-button>
+                    ></Button>
                   );
                 case 'update':
                   if (!buttonSlots.icon) {
@@ -201,35 +196,35 @@ export default defineComponent({
                     buttonSlots.default = () => '更新';
                   }
                   return (
-                    <a-button
+                    <Button
                       {...{
                         type: 'primary',
                         onClick: operation.click,
                       }}
                       v-slots={buttonSlots}
-                    ></a-button>
+                    ></Button>
                   );
                 default:
                   return (
-                    <a-button
+                    <Button
                       {...{
                         type: 'primary',
                         onClick: operation.click,
                       }}
                     >
                       {operation.title}
-                    </a-button>
+                    </Button>
                   );
               }
             })}
-          </a-space>
+          </Space>
         </div>
       ),
       default: () => {
         if (pageConfig?.canExpand) {
           return (
             <div>
-              <a-collapse value={activeNames} onchange={handleChange} v-slots={{ default: () => renderChild() }} />
+              <Collapse value={activeNames} onchange={handleChange} v-slots={{ default: () => renderChild() }} />
             </div>
           );
         } else {
@@ -237,7 +232,6 @@ export default defineComponent({
         }
       },
     };
-
     return {
       // formConfig,
       pageConfig,

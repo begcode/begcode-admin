@@ -560,20 +560,6 @@ public class AuthorityResourceIT {
 
     @Test
     @Transactional
-    void getAllAuthoritiesByChildrenIsEqualToSomething() throws Exception {
-        Authority children = AuthorityResourceIT.createEntity();
-        // authority.addChildren(children);
-        authorityRepository.insert(authority);
-        Long childrenId = children.getId();
-        // Get all the authorityList where children equals to childrenId
-        defaultAuthorityShouldBeFound("childrenId.equals=" + childrenId);
-
-        // Get all the authorityList where children equals to (childrenId + 1)
-        defaultAuthorityShouldNotBeFound("childrenId.equals=" + (childrenId + 1));
-    }
-
-    @Test
-    @Transactional
     void getAllAuthoritiesByViewPermissionsIsEqualToSomething() throws Exception {
         ViewPermission viewPermissions = ViewPermissionResourceIT.createEntity();
         // authority.addViewPermissions(viewPermissions);

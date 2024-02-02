@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.diboot.core.binding.annotation.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.*;
 import lombok.*;
 
@@ -70,8 +70,8 @@ public class Department implements Serializable {
     /**
      * 创建时间
      */
-    @TableField(value = "create_time")
-    private ZonedDateTime createTime;
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    private Instant createTime;
 
     /**
      * 下级部门
@@ -160,7 +160,7 @@ public class Department implements Serializable {
         return this;
     }
 
-    public Department createTime(ZonedDateTime createTime) {
+    public Department createTime(Instant createTime) {
         this.createTime = createTime;
         return this;
     }

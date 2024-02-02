@@ -18,6 +18,15 @@
   "entityTableName": "upload_file",
   "fields": [
     {
+      "documentation": "Url地址",
+      "fieldName": "url",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"],
+      "options": {
+        "endUsed": "selectFile"
+      }
+    },
+    {
       "documentation": "完整文件名\\n不含路径",
       "fieldName": "fullName",
       "fieldType": "String",
@@ -58,14 +67,6 @@
       }
     },
     {
-      "documentation": "Url地址",
-      "fieldName": "url",
-      "fieldType": "String",
-      "options": {
-        "fieldConfig": "hideInForm"
-      }
-    },
-    {
       "documentation": "本地路径",
       "fieldName": "path",
       "fieldType": "String",
@@ -93,7 +94,7 @@
     {
       "documentation": "使用实体ID",
       "fieldName": "ownerEntityId",
-      "fieldType": "String",
+      "fieldType": "Long",
       "options": {
         "fieldConfig": "hideInList-hideInForm",
         "ownerEntityId": true

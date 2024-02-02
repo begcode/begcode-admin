@@ -1,13 +1,11 @@
 package com.begcode.monolith.settings.web.rest;
 
-import static com.begcode.monolith.web.rest.TestUtil.sameInstant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.begcode.monolith.IntegrationTest;
-import com.begcode.monolith.settings.domain.CommonFieldData;
 import com.begcode.monolith.settings.domain.SiteConfig;
 import com.begcode.monolith.settings.repository.SiteConfigRepository;
 import com.begcode.monolith.settings.service.dto.SiteConfigDTO;
@@ -15,9 +13,7 @@ import com.begcode.monolith.settings.service.mapper.SiteConfigMapper;
 import com.begcode.monolith.web.rest.TestUtil;
 import com.begcode.monolith.web.rest.TestUtil;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -58,17 +54,15 @@ public class SiteConfigResourceIT {
     private static final Long UPDATED_CREATED_BY = 2L;
     private static final Long SMALLER_CREATED_BY = 1L - 1L;
 
-    private static final ZonedDateTime DEFAULT_CREATED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_CREATED_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_CREATED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final Instant DEFAULT_CREATED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final Long DEFAULT_LAST_MODIFIED_BY = 1L;
     private static final Long UPDATED_LAST_MODIFIED_BY = 2L;
     private static final Long SMALLER_LAST_MODIFIED_BY = 1L - 1L;
 
-    private static final ZonedDateTime DEFAULT_LAST_MODIFIED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_LAST_MODIFIED_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_LAST_MODIFIED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final Instant DEFAULT_LAST_MODIFIED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_LAST_MODIFIED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/site-configs";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -230,9 +224,9 @@ public class SiteConfigResourceIT {
             .andExpect(jsonPath("$.[*].sortValue").value(hasItem(DEFAULT_SORT_VALUE)))
             .andExpect(jsonPath("$.[*].builtIn").value(hasItem(DEFAULT_BUILT_IN.booleanValue())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(sameInstant(DEFAULT_CREATED_DATE))))
+            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(sameInstant(DEFAULT_LAST_MODIFIED_DATE))));
+            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(DEFAULT_LAST_MODIFIED_DATE.toString())));
     }
 
     @Test
@@ -253,9 +247,9 @@ public class SiteConfigResourceIT {
             .andExpect(jsonPath("$.sortValue").value(DEFAULT_SORT_VALUE))
             .andExpect(jsonPath("$.builtIn").value(DEFAULT_BUILT_IN.booleanValue()))
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.intValue()))
-            .andExpect(jsonPath("$.createdDate").value(sameInstant(DEFAULT_CREATED_DATE)))
+            .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()))
             .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY.intValue()))
-            .andExpect(jsonPath("$.lastModifiedDate").value(sameInstant(DEFAULT_LAST_MODIFIED_DATE)));
+            .andExpect(jsonPath("$.lastModifiedDate").value(DEFAULT_LAST_MODIFIED_DATE.toString()));
     }
 
     @Test
@@ -707,58 +701,6 @@ public class SiteConfigResourceIT {
 
     @Test
     @Transactional
-    void getAllSiteConfigsByCreatedDateIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        siteConfigRepository.save(siteConfig);
-
-        // Get all the siteConfigList where createdDate is greater than or equal to DEFAULT_CREATED_DATE
-        defaultSiteConfigShouldBeFound("createdDate.greaterThanOrEqual=" + DEFAULT_CREATED_DATE);
-
-        // Get all the siteConfigList where createdDate is greater than or equal to UPDATED_CREATED_DATE
-        defaultSiteConfigShouldNotBeFound("createdDate.greaterThanOrEqual=" + UPDATED_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllSiteConfigsByCreatedDateIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        siteConfigRepository.save(siteConfig);
-
-        // Get all the siteConfigList where createdDate is less than or equal to DEFAULT_CREATED_DATE
-        defaultSiteConfigShouldBeFound("createdDate.lessThanOrEqual=" + DEFAULT_CREATED_DATE);
-
-        // Get all the siteConfigList where createdDate is less than or equal to SMALLER_CREATED_DATE
-        defaultSiteConfigShouldNotBeFound("createdDate.lessThanOrEqual=" + SMALLER_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllSiteConfigsByCreatedDateIsLessThanSomething() throws Exception {
-        // Initialize the database
-        siteConfigRepository.save(siteConfig);
-
-        // Get all the siteConfigList where createdDate is less than DEFAULT_CREATED_DATE
-        defaultSiteConfigShouldNotBeFound("createdDate.lessThan=" + DEFAULT_CREATED_DATE);
-
-        // Get all the siteConfigList where createdDate is less than UPDATED_CREATED_DATE
-        defaultSiteConfigShouldBeFound("createdDate.lessThan=" + UPDATED_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllSiteConfigsByCreatedDateIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        siteConfigRepository.save(siteConfig);
-
-        // Get all the siteConfigList where createdDate is greater than DEFAULT_CREATED_DATE
-        defaultSiteConfigShouldNotBeFound("createdDate.greaterThan=" + DEFAULT_CREATED_DATE);
-
-        // Get all the siteConfigList where createdDate is greater than SMALLER_CREATED_DATE
-        defaultSiteConfigShouldBeFound("createdDate.greaterThan=" + SMALLER_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
     void getAllSiteConfigsByLastModifiedByIsEqualToSomething() throws Exception {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
@@ -887,72 +829,6 @@ public class SiteConfigResourceIT {
         defaultSiteConfigShouldNotBeFound("lastModifiedDate.specified=false");
     }
 
-    @Test
-    @Transactional
-    void getAllSiteConfigsByLastModifiedDateIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        siteConfigRepository.save(siteConfig);
-
-        // Get all the siteConfigList where lastModifiedDate is greater than or equal to DEFAULT_LAST_MODIFIED_DATE
-        defaultSiteConfigShouldBeFound("lastModifiedDate.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the siteConfigList where lastModifiedDate is greater than or equal to UPDATED_LAST_MODIFIED_DATE
-        defaultSiteConfigShouldNotBeFound("lastModifiedDate.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllSiteConfigsByLastModifiedDateIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        siteConfigRepository.save(siteConfig);
-
-        // Get all the siteConfigList where lastModifiedDate is less than or equal to DEFAULT_LAST_MODIFIED_DATE
-        defaultSiteConfigShouldBeFound("lastModifiedDate.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the siteConfigList where lastModifiedDate is less than or equal to SMALLER_LAST_MODIFIED_DATE
-        defaultSiteConfigShouldNotBeFound("lastModifiedDate.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllSiteConfigsByLastModifiedDateIsLessThanSomething() throws Exception {
-        // Initialize the database
-        siteConfigRepository.save(siteConfig);
-
-        // Get all the siteConfigList where lastModifiedDate is less than DEFAULT_LAST_MODIFIED_DATE
-        defaultSiteConfigShouldNotBeFound("lastModifiedDate.lessThan=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the siteConfigList where lastModifiedDate is less than UPDATED_LAST_MODIFIED_DATE
-        defaultSiteConfigShouldBeFound("lastModifiedDate.lessThan=" + UPDATED_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllSiteConfigsByLastModifiedDateIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        siteConfigRepository.save(siteConfig);
-
-        // Get all the siteConfigList where lastModifiedDate is greater than DEFAULT_LAST_MODIFIED_DATE
-        defaultSiteConfigShouldNotBeFound("lastModifiedDate.greaterThan=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the siteConfigList where lastModifiedDate is greater than SMALLER_LAST_MODIFIED_DATE
-        defaultSiteConfigShouldBeFound("lastModifiedDate.greaterThan=" + SMALLER_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllSiteConfigsByItemsIsEqualToSomething() throws Exception {
-        CommonFieldData items = CommonFieldDataResourceIT.createEntity();
-        // siteConfig.addItems(items);
-        siteConfigRepository.insert(siteConfig);
-        Long itemsId = items.getId();
-        // Get all the siteConfigList where items equals to itemsId
-        defaultSiteConfigShouldBeFound("itemsId.equals=" + itemsId);
-
-        // Get all the siteConfigList where items equals to (itemsId + 1)
-        defaultSiteConfigShouldNotBeFound("itemsId.equals=" + (itemsId + 1));
-    }
-
     /**
      * Executes the search, and checks that the default entity is returned.
      */
@@ -968,9 +844,9 @@ public class SiteConfigResourceIT {
             .andExpect(jsonPath("$.[*].sortValue").value(hasItem(DEFAULT_SORT_VALUE)))
             .andExpect(jsonPath("$.[*].builtIn").value(hasItem(DEFAULT_BUILT_IN.booleanValue())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(sameInstant(DEFAULT_CREATED_DATE))))
+            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(sameInstant(DEFAULT_LAST_MODIFIED_DATE))));
+            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(DEFAULT_LAST_MODIFIED_DATE.toString())));
 
         // Check, that the count call also returns 1
         restSiteConfigMockMvc

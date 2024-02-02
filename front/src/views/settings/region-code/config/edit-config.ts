@@ -21,7 +21,7 @@ const fields = (): FormSchema[] => {
       },
       dynamicDisabled: true,
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入ID', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入ID', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {
@@ -79,14 +79,14 @@ const fields = (): FormSchema[] => {
       label: '经度',
       field: 'lng',
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入经度', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入经度', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {
       label: '纬度',
       field: 'lat',
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入纬度', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入纬度', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {

@@ -77,7 +77,7 @@ const itemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'LONG' },
-      editRender: { name: 'AInputNumber', enabled: false },
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '名称',
@@ -134,7 +134,7 @@ const itemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'INTEGER' },
-      editRender: { name: 'AInputNumber', enabled: false },
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '是否禁用',
@@ -157,11 +157,11 @@ const itemsColumns = () => {
     {
       title: '使用实体ID',
       field: 'ownerEntityId',
-      minWidth: 160,
+      minWidth: 80,
       visible: false,
       treeNode: false,
-      params: { type: 'STRING' },
-      editRender: { name: 'AInput', enabled: false },
+      params: { type: 'LONG' },
+      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '操作',

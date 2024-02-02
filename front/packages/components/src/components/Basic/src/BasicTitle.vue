@@ -59,6 +59,9 @@ const getClass = computed(() => [
   font-size: 14px;
   font-weight: 500;
 }
+.vben-basic-title.is-drawer {
+  cursor: default;
+}
 .vben-basic-title-show-span::before {
   content: '';
   position: absolute;

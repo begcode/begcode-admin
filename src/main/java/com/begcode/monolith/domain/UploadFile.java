@@ -3,6 +3,7 @@ package com.begcode.monolith.domain;
 import com.baomidou.mybatisplus.annotation.*;
 import com.diboot.core.binding.annotation.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import lombok.*;
@@ -23,6 +24,13 @@ public class UploadFile extends AbstractAuditingEntity<Long, UploadFile> impleme
     @TableId(value = "id", type = IdType.AUTO)
     @TableField(value = "id")
     private Long id;
+
+    /**
+     * Url地址
+     */
+    @NotNull
+    @TableField(value = "url")
+    private String url;
 
     /**
      * 完整文件名
@@ -57,12 +65,6 @@ public class UploadFile extends AbstractAuditingEntity<Long, UploadFile> impleme
     private String type;
 
     /**
-     * Url地址
-     */
-    @TableField(value = "url")
-    private String url;
-
-    /**
      * 本地路径
      */
     @TableField(value = "path")
@@ -84,7 +86,7 @@ public class UploadFile extends AbstractAuditingEntity<Long, UploadFile> impleme
      * 使用实体ID
      */
     @TableField(value = "owner_entity_id")
-    private String ownerEntityId;
+    private Long ownerEntityId;
 
     /**
      * 业务标题
@@ -140,6 +142,11 @@ public class UploadFile extends AbstractAuditingEntity<Long, UploadFile> impleme
         return this;
     }
 
+    public UploadFile url(String url) {
+        this.url = url;
+        return this;
+    }
+
     public UploadFile fullName(String fullName) {
         this.fullName = fullName;
         return this;
@@ -165,11 +172,6 @@ public class UploadFile extends AbstractAuditingEntity<Long, UploadFile> impleme
         return this;
     }
 
-    public UploadFile url(String url) {
-        this.url = url;
-        return this;
-    }
-
     public UploadFile path(String path) {
         this.path = path;
         return this;
@@ -185,7 +187,7 @@ public class UploadFile extends AbstractAuditingEntity<Long, UploadFile> impleme
         return this;
     }
 
-    public UploadFile ownerEntityId(String ownerEntityId) {
+    public UploadFile ownerEntityId(Long ownerEntityId) {
         this.ownerEntityId = ownerEntityId;
         return this;
     }

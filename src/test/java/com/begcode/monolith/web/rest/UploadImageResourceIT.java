@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -44,6 +45,9 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 public class UploadImageResourceIT {
 
+    private static final String DEFAULT_URL = "AAAAAAAAAA";
+    private static final String UPDATED_URL = "BBBBBBBBBB";
+
     private static final String DEFAULT_FULL_NAME = "AAAAAAAAAA";
     private static final String UPDATED_FULL_NAME = "BBBBBBBBBB";
 
@@ -56,9 +60,6 @@ public class UploadImageResourceIT {
     private static final String DEFAULT_TYPE = "AAAAAAAAAA";
     private static final String UPDATED_TYPE = "BBBBBBBBBB";
 
-    private static final String DEFAULT_URL = "AAAAAAAAAA";
-    private static final String UPDATED_URL = "BBBBBBBBBB";
-
     private static final String DEFAULT_PATH = "AAAAAAAAAA";
     private static final String UPDATED_PATH = "BBBBBBBBBB";
 
@@ -68,8 +69,9 @@ public class UploadImageResourceIT {
     private static final String DEFAULT_OWNER_ENTITY_NAME = "AAAAAAAAAA";
     private static final String UPDATED_OWNER_ENTITY_NAME = "BBBBBBBBBB";
 
-    private static final String DEFAULT_OWNER_ENTITY_ID = "AAAAAAAAAA";
-    private static final String UPDATED_OWNER_ENTITY_ID = "BBBBBBBBBB";
+    private static final Long DEFAULT_OWNER_ENTITY_ID = 1L;
+    private static final Long UPDATED_OWNER_ENTITY_ID = 2L;
+    private static final Long SMALLER_OWNER_ENTITY_ID = 1L - 1L;
 
     private static final String DEFAULT_BUSINESS_TITLE = "AAAAAAAAAA";
     private static final String UPDATED_BUSINESS_TITLE = "BBBBBBBBBB";
@@ -102,17 +104,15 @@ public class UploadImageResourceIT {
     private static final Long UPDATED_CREATED_BY = 2L;
     private static final Long SMALLER_CREATED_BY = 1L - 1L;
 
-    private static final ZonedDateTime DEFAULT_CREATED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_CREATED_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_CREATED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final Instant DEFAULT_CREATED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final Long DEFAULT_LAST_MODIFIED_BY = 1L;
     private static final Long UPDATED_LAST_MODIFIED_BY = 2L;
     private static final Long SMALLER_LAST_MODIFIED_BY = 1L - 1L;
 
-    private static final ZonedDateTime DEFAULT_LAST_MODIFIED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_LAST_MODIFIED_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_LAST_MODIFIED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final Instant DEFAULT_LAST_MODIFIED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_LAST_MODIFIED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/upload-images";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -145,11 +145,11 @@ public class UploadImageResourceIT {
      */
     public static UploadImage createEntity() {
         UploadImage uploadImage = new UploadImage()
+            .url(DEFAULT_URL)
             .fullName(DEFAULT_FULL_NAME)
             .name(DEFAULT_NAME)
             .ext(DEFAULT_EXT)
             .type(DEFAULT_TYPE)
-            .url(DEFAULT_URL)
             .path(DEFAULT_PATH)
             .folder(DEFAULT_FOLDER)
             .ownerEntityName(DEFAULT_OWNER_ENTITY_NAME)
@@ -177,11 +177,11 @@ public class UploadImageResourceIT {
      */
     public static UploadImage createUpdatedEntity() {
         UploadImage uploadImage = new UploadImage()
+            .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
             .name(UPDATED_NAME)
             .ext(UPDATED_EXT)
             .type(UPDATED_TYPE)
-            .url(UPDATED_URL)
             .path(UPDATED_PATH)
             .folder(UPDATED_FOLDER)
             .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
@@ -222,11 +222,11 @@ public class UploadImageResourceIT {
         List<UploadImage> uploadImageList = uploadImageRepository.findAll();
         assertThat(uploadImageList).hasSize(databaseSizeBeforeCreate + 1);
         UploadImage testUploadImage = uploadImageList.get(uploadImageList.size() - 1);
+        assertThat(testUploadImage.getUrl()).isEqualTo(DEFAULT_URL);
         assertThat(testUploadImage.getFullName()).isEqualTo(DEFAULT_FULL_NAME);
         assertThat(testUploadImage.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testUploadImage.getExt()).isEqualTo(DEFAULT_EXT);
         assertThat(testUploadImage.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testUploadImage.getUrl()).isEqualTo(DEFAULT_URL);
         assertThat(testUploadImage.getPath()).isEqualTo(DEFAULT_PATH);
         assertThat(testUploadImage.getFolder()).isEqualTo(DEFAULT_FOLDER);
         assertThat(testUploadImage.getOwnerEntityName()).isEqualTo(DEFAULT_OWNER_ENTITY_NAME);
@@ -268,6 +268,26 @@ public class UploadImageResourceIT {
 
     @Test
     @Transactional
+    void checkUrlIsRequired() throws Exception {
+        int databaseSizeBeforeTest = uploadImageRepository.findAll().size();
+        // set the field null
+        uploadImage.setUrl(null);
+
+        // Create the UploadImage, which fails.
+        UploadImageDTO uploadImageDTO = uploadImageMapper.toDto(uploadImage);
+
+        restUploadImageMockMvc
+            .perform(
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(uploadImageDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        List<UploadImage> uploadImageList = uploadImageRepository.findAll();
+        assertThat(uploadImageList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     void getAllUploadImages() throws Exception {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
@@ -278,15 +298,15 @@ public class UploadImageResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(uploadImage.getId().intValue())))
+            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)))
             .andExpect(jsonPath("$.[*].fullName").value(hasItem(DEFAULT_FULL_NAME)))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].ext").value(hasItem(DEFAULT_EXT)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE)))
-            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)))
             .andExpect(jsonPath("$.[*].path").value(hasItem(DEFAULT_PATH)))
             .andExpect(jsonPath("$.[*].folder").value(hasItem(DEFAULT_FOLDER)))
             .andExpect(jsonPath("$.[*].ownerEntityName").value(hasItem(DEFAULT_OWNER_ENTITY_NAME)))
-            .andExpect(jsonPath("$.[*].ownerEntityId").value(hasItem(DEFAULT_OWNER_ENTITY_ID)))
+            .andExpect(jsonPath("$.[*].ownerEntityId").value(hasItem(DEFAULT_OWNER_ENTITY_ID.intValue())))
             .andExpect(jsonPath("$.[*].businessTitle").value(hasItem(DEFAULT_BUSINESS_TITLE)))
             .andExpect(jsonPath("$.[*].businessDesc").value(hasItem(DEFAULT_BUSINESS_DESC)))
             .andExpect(jsonPath("$.[*].businessStatus").value(hasItem(DEFAULT_BUSINESS_STATUS)))
@@ -296,9 +316,9 @@ public class UploadImageResourceIT {
             .andExpect(jsonPath("$.[*].mediumUrl").value(hasItem(DEFAULT_MEDIUM_URL)))
             .andExpect(jsonPath("$.[*].referenceCount").value(hasItem(DEFAULT_REFERENCE_COUNT.intValue())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(sameInstant(DEFAULT_CREATED_DATE))))
+            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(sameInstant(DEFAULT_LAST_MODIFIED_DATE))));
+            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(DEFAULT_LAST_MODIFIED_DATE.toString())));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -330,15 +350,15 @@ public class UploadImageResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(uploadImage.getId().intValue()))
+            .andExpect(jsonPath("$.url").value(DEFAULT_URL))
             .andExpect(jsonPath("$.fullName").value(DEFAULT_FULL_NAME))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.ext").value(DEFAULT_EXT))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE))
-            .andExpect(jsonPath("$.url").value(DEFAULT_URL))
             .andExpect(jsonPath("$.path").value(DEFAULT_PATH))
             .andExpect(jsonPath("$.folder").value(DEFAULT_FOLDER))
             .andExpect(jsonPath("$.ownerEntityName").value(DEFAULT_OWNER_ENTITY_NAME))
-            .andExpect(jsonPath("$.ownerEntityId").value(DEFAULT_OWNER_ENTITY_ID))
+            .andExpect(jsonPath("$.ownerEntityId").value(DEFAULT_OWNER_ENTITY_ID.intValue()))
             .andExpect(jsonPath("$.businessTitle").value(DEFAULT_BUSINESS_TITLE))
             .andExpect(jsonPath("$.businessDesc").value(DEFAULT_BUSINESS_DESC))
             .andExpect(jsonPath("$.businessStatus").value(DEFAULT_BUSINESS_STATUS))
@@ -348,9 +368,9 @@ public class UploadImageResourceIT {
             .andExpect(jsonPath("$.mediumUrl").value(DEFAULT_MEDIUM_URL))
             .andExpect(jsonPath("$.referenceCount").value(DEFAULT_REFERENCE_COUNT.intValue()))
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.intValue()))
-            .andExpect(jsonPath("$.createdDate").value(sameInstant(DEFAULT_CREATED_DATE)))
+            .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()))
             .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY.intValue()))
-            .andExpect(jsonPath("$.lastModifiedDate").value(sameInstant(DEFAULT_LAST_MODIFIED_DATE)));
+            .andExpect(jsonPath("$.lastModifiedDate").value(DEFAULT_LAST_MODIFIED_DATE.toString()));
     }
 
     @Test
@@ -369,6 +389,71 @@ public class UploadImageResourceIT {
 
         defaultUploadImageShouldBeFound("id.lessThanOrEqual=" + id);
         defaultUploadImageShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByUrlIsEqualToSomething() throws Exception {
+        // Initialize the database
+        uploadImageRepository.save(uploadImage);
+
+        // Get all the uploadImageList where url equals to DEFAULT_URL
+        defaultUploadImageShouldBeFound("url.equals=" + DEFAULT_URL);
+
+        // Get all the uploadImageList where url equals to UPDATED_URL
+        defaultUploadImageShouldNotBeFound("url.equals=" + UPDATED_URL);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByUrlIsInShouldWork() throws Exception {
+        // Initialize the database
+        uploadImageRepository.save(uploadImage);
+
+        // Get all the uploadImageList where url in DEFAULT_URL or UPDATED_URL
+        defaultUploadImageShouldBeFound("url.in=" + DEFAULT_URL + "," + UPDATED_URL);
+
+        // Get all the uploadImageList where url equals to UPDATED_URL
+        defaultUploadImageShouldNotBeFound("url.in=" + UPDATED_URL);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByUrlIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        uploadImageRepository.save(uploadImage);
+
+        // Get all the uploadImageList where url is not null
+        defaultUploadImageShouldBeFound("url.specified=true");
+
+        // Get all the uploadImageList where url is null
+        defaultUploadImageShouldNotBeFound("url.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByUrlContainsSomething() throws Exception {
+        // Initialize the database
+        uploadImageRepository.save(uploadImage);
+
+        // Get all the uploadImageList where url contains DEFAULT_URL
+        defaultUploadImageShouldBeFound("url.contains=" + DEFAULT_URL);
+
+        // Get all the uploadImageList where url contains UPDATED_URL
+        defaultUploadImageShouldNotBeFound("url.contains=" + UPDATED_URL);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByUrlNotContainsSomething() throws Exception {
+        // Initialize the database
+        uploadImageRepository.save(uploadImage);
+
+        // Get all the uploadImageList where url does not contain DEFAULT_URL
+        defaultUploadImageShouldNotBeFound("url.doesNotContain=" + DEFAULT_URL);
+
+        // Get all the uploadImageList where url does not contain UPDATED_URL
+        defaultUploadImageShouldBeFound("url.doesNotContain=" + UPDATED_URL);
     }
 
     @Test
@@ -633,71 +718,6 @@ public class UploadImageResourceIT {
 
     @Test
     @Transactional
-    void getAllUploadImagesByUrlIsEqualToSomething() throws Exception {
-        // Initialize the database
-        uploadImageRepository.save(uploadImage);
-
-        // Get all the uploadImageList where url equals to DEFAULT_URL
-        defaultUploadImageShouldBeFound("url.equals=" + DEFAULT_URL);
-
-        // Get all the uploadImageList where url equals to UPDATED_URL
-        defaultUploadImageShouldNotBeFound("url.equals=" + UPDATED_URL);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByUrlIsInShouldWork() throws Exception {
-        // Initialize the database
-        uploadImageRepository.save(uploadImage);
-
-        // Get all the uploadImageList where url in DEFAULT_URL or UPDATED_URL
-        defaultUploadImageShouldBeFound("url.in=" + DEFAULT_URL + "," + UPDATED_URL);
-
-        // Get all the uploadImageList where url equals to UPDATED_URL
-        defaultUploadImageShouldNotBeFound("url.in=" + UPDATED_URL);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByUrlIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        uploadImageRepository.save(uploadImage);
-
-        // Get all the uploadImageList where url is not null
-        defaultUploadImageShouldBeFound("url.specified=true");
-
-        // Get all the uploadImageList where url is null
-        defaultUploadImageShouldNotBeFound("url.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByUrlContainsSomething() throws Exception {
-        // Initialize the database
-        uploadImageRepository.save(uploadImage);
-
-        // Get all the uploadImageList where url contains DEFAULT_URL
-        defaultUploadImageShouldBeFound("url.contains=" + DEFAULT_URL);
-
-        // Get all the uploadImageList where url contains UPDATED_URL
-        defaultUploadImageShouldNotBeFound("url.contains=" + UPDATED_URL);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByUrlNotContainsSomething() throws Exception {
-        // Initialize the database
-        uploadImageRepository.save(uploadImage);
-
-        // Get all the uploadImageList where url does not contain DEFAULT_URL
-        defaultUploadImageShouldNotBeFound("url.doesNotContain=" + DEFAULT_URL);
-
-        // Get all the uploadImageList where url does not contain UPDATED_URL
-        defaultUploadImageShouldBeFound("url.doesNotContain=" + UPDATED_URL);
-    }
-
-    @Test
-    @Transactional
     void getAllUploadImagesByPathIsEqualToSomething() throws Exception {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
@@ -932,28 +952,54 @@ public class UploadImageResourceIT {
 
     @Test
     @Transactional
-    void getAllUploadImagesByOwnerEntityIdContainsSomething() throws Exception {
+    void getAllUploadImagesByOwnerEntityIdIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where ownerEntityId contains DEFAULT_OWNER_ENTITY_ID
-        defaultUploadImageShouldBeFound("ownerEntityId.contains=" + DEFAULT_OWNER_ENTITY_ID);
+        // Get all the uploadImageList where ownerEntityId is greater than or equal to DEFAULT_OWNER_ENTITY_ID
+        defaultUploadImageShouldBeFound("ownerEntityId.greaterThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID);
 
-        // Get all the uploadImageList where ownerEntityId contains UPDATED_OWNER_ENTITY_ID
-        defaultUploadImageShouldNotBeFound("ownerEntityId.contains=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the uploadImageList where ownerEntityId is greater than or equal to UPDATED_OWNER_ENTITY_ID
+        defaultUploadImageShouldNotBeFound("ownerEntityId.greaterThanOrEqual=" + UPDATED_OWNER_ENTITY_ID);
     }
 
     @Test
     @Transactional
-    void getAllUploadImagesByOwnerEntityIdNotContainsSomething() throws Exception {
+    void getAllUploadImagesByOwnerEntityIdIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where ownerEntityId does not contain DEFAULT_OWNER_ENTITY_ID
-        defaultUploadImageShouldNotBeFound("ownerEntityId.doesNotContain=" + DEFAULT_OWNER_ENTITY_ID);
+        // Get all the uploadImageList where ownerEntityId is less than or equal to DEFAULT_OWNER_ENTITY_ID
+        defaultUploadImageShouldBeFound("ownerEntityId.lessThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID);
 
-        // Get all the uploadImageList where ownerEntityId does not contain UPDATED_OWNER_ENTITY_ID
-        defaultUploadImageShouldBeFound("ownerEntityId.doesNotContain=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the uploadImageList where ownerEntityId is less than or equal to SMALLER_OWNER_ENTITY_ID
+        defaultUploadImageShouldNotBeFound("ownerEntityId.lessThanOrEqual=" + SMALLER_OWNER_ENTITY_ID);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByOwnerEntityIdIsLessThanSomething() throws Exception {
+        // Initialize the database
+        uploadImageRepository.save(uploadImage);
+
+        // Get all the uploadImageList where ownerEntityId is less than DEFAULT_OWNER_ENTITY_ID
+        defaultUploadImageShouldNotBeFound("ownerEntityId.lessThan=" + DEFAULT_OWNER_ENTITY_ID);
+
+        // Get all the uploadImageList where ownerEntityId is less than UPDATED_OWNER_ENTITY_ID
+        defaultUploadImageShouldBeFound("ownerEntityId.lessThan=" + UPDATED_OWNER_ENTITY_ID);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByOwnerEntityIdIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        uploadImageRepository.save(uploadImage);
+
+        // Get all the uploadImageList where ownerEntityId is greater than DEFAULT_OWNER_ENTITY_ID
+        defaultUploadImageShouldNotBeFound("ownerEntityId.greaterThan=" + DEFAULT_OWNER_ENTITY_ID);
+
+        // Get all the uploadImageList where ownerEntityId is greater than SMALLER_OWNER_ENTITY_ID
+        defaultUploadImageShouldBeFound("ownerEntityId.greaterThan=" + SMALLER_OWNER_ENTITY_ID);
     }
 
     @Test
@@ -1686,58 +1732,6 @@ public class UploadImageResourceIT {
 
     @Test
     @Transactional
-    void getAllUploadImagesByCreatedDateIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        uploadImageRepository.save(uploadImage);
-
-        // Get all the uploadImageList where createdDate is greater than or equal to DEFAULT_CREATED_DATE
-        defaultUploadImageShouldBeFound("createdDate.greaterThanOrEqual=" + DEFAULT_CREATED_DATE);
-
-        // Get all the uploadImageList where createdDate is greater than or equal to UPDATED_CREATED_DATE
-        defaultUploadImageShouldNotBeFound("createdDate.greaterThanOrEqual=" + UPDATED_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByCreatedDateIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        uploadImageRepository.save(uploadImage);
-
-        // Get all the uploadImageList where createdDate is less than or equal to DEFAULT_CREATED_DATE
-        defaultUploadImageShouldBeFound("createdDate.lessThanOrEqual=" + DEFAULT_CREATED_DATE);
-
-        // Get all the uploadImageList where createdDate is less than or equal to SMALLER_CREATED_DATE
-        defaultUploadImageShouldNotBeFound("createdDate.lessThanOrEqual=" + SMALLER_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByCreatedDateIsLessThanSomething() throws Exception {
-        // Initialize the database
-        uploadImageRepository.save(uploadImage);
-
-        // Get all the uploadImageList where createdDate is less than DEFAULT_CREATED_DATE
-        defaultUploadImageShouldNotBeFound("createdDate.lessThan=" + DEFAULT_CREATED_DATE);
-
-        // Get all the uploadImageList where createdDate is less than UPDATED_CREATED_DATE
-        defaultUploadImageShouldBeFound("createdDate.lessThan=" + UPDATED_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByCreatedDateIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        uploadImageRepository.save(uploadImage);
-
-        // Get all the uploadImageList where createdDate is greater than DEFAULT_CREATED_DATE
-        defaultUploadImageShouldNotBeFound("createdDate.greaterThan=" + DEFAULT_CREATED_DATE);
-
-        // Get all the uploadImageList where createdDate is greater than SMALLER_CREATED_DATE
-        defaultUploadImageShouldBeFound("createdDate.greaterThan=" + SMALLER_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
     void getAllUploadImagesByLastModifiedByIsEqualToSomething() throws Exception {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
@@ -1868,58 +1862,6 @@ public class UploadImageResourceIT {
 
     @Test
     @Transactional
-    void getAllUploadImagesByLastModifiedDateIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        uploadImageRepository.save(uploadImage);
-
-        // Get all the uploadImageList where lastModifiedDate is greater than or equal to DEFAULT_LAST_MODIFIED_DATE
-        defaultUploadImageShouldBeFound("lastModifiedDate.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the uploadImageList where lastModifiedDate is greater than or equal to UPDATED_LAST_MODIFIED_DATE
-        defaultUploadImageShouldNotBeFound("lastModifiedDate.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByLastModifiedDateIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        uploadImageRepository.save(uploadImage);
-
-        // Get all the uploadImageList where lastModifiedDate is less than or equal to DEFAULT_LAST_MODIFIED_DATE
-        defaultUploadImageShouldBeFound("lastModifiedDate.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the uploadImageList where lastModifiedDate is less than or equal to SMALLER_LAST_MODIFIED_DATE
-        defaultUploadImageShouldNotBeFound("lastModifiedDate.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByLastModifiedDateIsLessThanSomething() throws Exception {
-        // Initialize the database
-        uploadImageRepository.save(uploadImage);
-
-        // Get all the uploadImageList where lastModifiedDate is less than DEFAULT_LAST_MODIFIED_DATE
-        defaultUploadImageShouldNotBeFound("lastModifiedDate.lessThan=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the uploadImageList where lastModifiedDate is less than UPDATED_LAST_MODIFIED_DATE
-        defaultUploadImageShouldBeFound("lastModifiedDate.lessThan=" + UPDATED_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByLastModifiedDateIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        uploadImageRepository.save(uploadImage);
-
-        // Get all the uploadImageList where lastModifiedDate is greater than DEFAULT_LAST_MODIFIED_DATE
-        defaultUploadImageShouldNotBeFound("lastModifiedDate.greaterThan=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the uploadImageList where lastModifiedDate is greater than SMALLER_LAST_MODIFIED_DATE
-        defaultUploadImageShouldBeFound("lastModifiedDate.greaterThan=" + SMALLER_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
     void getAllUploadImagesByCategoryIsEqualToSomething() throws Exception {
         ResourceCategory category = ResourceCategoryResourceIT.createEntity();
         uploadImage.setCategory(category);
@@ -1941,15 +1883,15 @@ public class UploadImageResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(uploadImage.getId().intValue())))
+            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)))
             .andExpect(jsonPath("$.[*].fullName").value(hasItem(DEFAULT_FULL_NAME)))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].ext").value(hasItem(DEFAULT_EXT)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE)))
-            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)))
             .andExpect(jsonPath("$.[*].path").value(hasItem(DEFAULT_PATH)))
             .andExpect(jsonPath("$.[*].folder").value(hasItem(DEFAULT_FOLDER)))
             .andExpect(jsonPath("$.[*].ownerEntityName").value(hasItem(DEFAULT_OWNER_ENTITY_NAME)))
-            .andExpect(jsonPath("$.[*].ownerEntityId").value(hasItem(DEFAULT_OWNER_ENTITY_ID)))
+            .andExpect(jsonPath("$.[*].ownerEntityId").value(hasItem(DEFAULT_OWNER_ENTITY_ID.intValue())))
             .andExpect(jsonPath("$.[*].businessTitle").value(hasItem(DEFAULT_BUSINESS_TITLE)))
             .andExpect(jsonPath("$.[*].businessDesc").value(hasItem(DEFAULT_BUSINESS_DESC)))
             .andExpect(jsonPath("$.[*].businessStatus").value(hasItem(DEFAULT_BUSINESS_STATUS)))
@@ -1959,9 +1901,9 @@ public class UploadImageResourceIT {
             .andExpect(jsonPath("$.[*].mediumUrl").value(hasItem(DEFAULT_MEDIUM_URL)))
             .andExpect(jsonPath("$.[*].referenceCount").value(hasItem(DEFAULT_REFERENCE_COUNT.intValue())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(sameInstant(DEFAULT_CREATED_DATE))))
+            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(sameInstant(DEFAULT_LAST_MODIFIED_DATE))));
+            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(DEFAULT_LAST_MODIFIED_DATE.toString())));
 
         // Check, that the count call also returns 1
         restUploadImageMockMvc
@@ -2008,11 +1950,11 @@ public class UploadImageResourceIT {
         // Update the uploadImage
         UploadImage updatedUploadImage = uploadImageRepository.findById(uploadImage.getId()).orElseThrow();
         updatedUploadImage
+            .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
             .name(UPDATED_NAME)
             .ext(UPDATED_EXT)
             .type(UPDATED_TYPE)
-            .url(UPDATED_URL)
             .path(UPDATED_PATH)
             .folder(UPDATED_FOLDER)
             .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
@@ -2043,11 +1985,11 @@ public class UploadImageResourceIT {
         List<UploadImage> uploadImageList = uploadImageRepository.findAll();
         assertThat(uploadImageList).hasSize(databaseSizeBeforeUpdate);
         UploadImage testUploadImage = uploadImageList.get(uploadImageList.size() - 1);
+        assertThat(testUploadImage.getUrl()).isEqualTo(UPDATED_URL);
         assertThat(testUploadImage.getFullName()).isEqualTo(UPDATED_FULL_NAME);
         assertThat(testUploadImage.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testUploadImage.getExt()).isEqualTo(UPDATED_EXT);
         assertThat(testUploadImage.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testUploadImage.getUrl()).isEqualTo(UPDATED_URL);
         assertThat(testUploadImage.getPath()).isEqualTo(UPDATED_PATH);
         assertThat(testUploadImage.getFolder()).isEqualTo(UPDATED_FOLDER);
         assertThat(testUploadImage.getOwnerEntityName()).isEqualTo(UPDATED_OWNER_ENTITY_NAME);
@@ -2144,8 +2086,8 @@ public class UploadImageResourceIT {
         partialUpdatedUploadImage.setId(uploadImage.getId());
 
         partialUpdatedUploadImage
+            .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
-            .name(UPDATED_NAME)
             .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
             .ownerEntityId(UPDATED_OWNER_ENTITY_ID)
             .businessTitle(UPDATED_BUSINESS_TITLE)
@@ -2170,11 +2112,11 @@ public class UploadImageResourceIT {
         List<UploadImage> uploadImageList = uploadImageRepository.findAll();
         assertThat(uploadImageList).hasSize(databaseSizeBeforeUpdate);
         UploadImage testUploadImage = uploadImageList.get(uploadImageList.size() - 1);
+        assertThat(testUploadImage.getUrl()).isEqualTo(UPDATED_URL);
         assertThat(testUploadImage.getFullName()).isEqualTo(UPDATED_FULL_NAME);
-        assertThat(testUploadImage.getName()).isEqualTo(UPDATED_NAME);
+        assertThat(testUploadImage.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testUploadImage.getExt()).isEqualTo(DEFAULT_EXT);
         assertThat(testUploadImage.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testUploadImage.getUrl()).isEqualTo(DEFAULT_URL);
         assertThat(testUploadImage.getPath()).isEqualTo(DEFAULT_PATH);
         assertThat(testUploadImage.getFolder()).isEqualTo(DEFAULT_FOLDER);
         assertThat(testUploadImage.getOwnerEntityName()).isEqualTo(UPDATED_OWNER_ENTITY_NAME);
@@ -2206,11 +2148,11 @@ public class UploadImageResourceIT {
         partialUpdatedUploadImage.setId(uploadImage.getId());
 
         partialUpdatedUploadImage
+            .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
             .name(UPDATED_NAME)
             .ext(UPDATED_EXT)
             .type(UPDATED_TYPE)
-            .url(UPDATED_URL)
             .path(UPDATED_PATH)
             .folder(UPDATED_FOLDER)
             .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
@@ -2240,11 +2182,11 @@ public class UploadImageResourceIT {
         List<UploadImage> uploadImageList = uploadImageRepository.findAll();
         assertThat(uploadImageList).hasSize(databaseSizeBeforeUpdate);
         UploadImage testUploadImage = uploadImageList.get(uploadImageList.size() - 1);
+        assertThat(testUploadImage.getUrl()).isEqualTo(UPDATED_URL);
         assertThat(testUploadImage.getFullName()).isEqualTo(UPDATED_FULL_NAME);
         assertThat(testUploadImage.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testUploadImage.getExt()).isEqualTo(UPDATED_EXT);
         assertThat(testUploadImage.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testUploadImage.getUrl()).isEqualTo(UPDATED_URL);
         assertThat(testUploadImage.getPath()).isEqualTo(UPDATED_PATH);
         assertThat(testUploadImage.getFolder()).isEqualTo(UPDATED_FOLDER);
         assertThat(testUploadImage.getOwnerEntityName()).isEqualTo(UPDATED_OWNER_ENTITY_NAME);

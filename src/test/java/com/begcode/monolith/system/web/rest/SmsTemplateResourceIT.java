@@ -1,6 +1,5 @@
 package com.begcode.monolith.system.web.rest;
 
-import static com.begcode.monolith.web.rest.TestUtil.sameInstant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.*;
@@ -20,9 +19,7 @@ import com.begcode.monolith.system.service.mapper.SmsTemplateMapper;
 import com.begcode.monolith.web.rest.TestUtil;
 import com.begcode.monolith.web.rest.TestUtil;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -76,17 +73,15 @@ public class SmsTemplateResourceIT {
     private static final Long UPDATED_CREATED_BY = 2L;
     private static final Long SMALLER_CREATED_BY = 1L - 1L;
 
-    private static final ZonedDateTime DEFAULT_CREATED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_CREATED_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_CREATED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final Instant DEFAULT_CREATED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final Long DEFAULT_LAST_MODIFIED_BY = 1L;
     private static final Long UPDATED_LAST_MODIFIED_BY = 2L;
     private static final Long SMALLER_LAST_MODIFIED_BY = 1L - 1L;
 
-    private static final ZonedDateTime DEFAULT_LAST_MODIFIED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_LAST_MODIFIED_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_LAST_MODIFIED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    private static final Instant DEFAULT_LAST_MODIFIED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_LAST_MODIFIED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/sms-templates";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -234,9 +229,9 @@ public class SmsTemplateResourceIT {
             .andExpect(jsonPath("$.[*].remark").value(hasItem(DEFAULT_REMARK)))
             .andExpect(jsonPath("$.[*].enabled").value(hasItem(DEFAULT_ENABLED.booleanValue())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(sameInstant(DEFAULT_CREATED_DATE))))
+            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(sameInstant(DEFAULT_LAST_MODIFIED_DATE))));
+            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(DEFAULT_LAST_MODIFIED_DATE.toString())));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -277,9 +272,9 @@ public class SmsTemplateResourceIT {
             .andExpect(jsonPath("$.remark").value(DEFAULT_REMARK))
             .andExpect(jsonPath("$.enabled").value(DEFAULT_ENABLED.booleanValue()))
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.intValue()))
-            .andExpect(jsonPath("$.createdDate").value(sameInstant(DEFAULT_CREATED_DATE)))
+            .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()))
             .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY.intValue()))
-            .andExpect(jsonPath("$.lastModifiedDate").value(sameInstant(DEFAULT_LAST_MODIFIED_DATE)));
+            .andExpect(jsonPath("$.lastModifiedDate").value(DEFAULT_LAST_MODIFIED_DATE.toString()));
     }
 
     @Test
@@ -874,58 +869,6 @@ public class SmsTemplateResourceIT {
 
     @Test
     @Transactional
-    void getAllSmsTemplatesByCreatedDateIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
-
-        // Get all the smsTemplateList where createdDate is greater than or equal to DEFAULT_CREATED_DATE
-        defaultSmsTemplateShouldBeFound("createdDate.greaterThanOrEqual=" + DEFAULT_CREATED_DATE);
-
-        // Get all the smsTemplateList where createdDate is greater than or equal to UPDATED_CREATED_DATE
-        defaultSmsTemplateShouldNotBeFound("createdDate.greaterThanOrEqual=" + UPDATED_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllSmsTemplatesByCreatedDateIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
-
-        // Get all the smsTemplateList where createdDate is less than or equal to DEFAULT_CREATED_DATE
-        defaultSmsTemplateShouldBeFound("createdDate.lessThanOrEqual=" + DEFAULT_CREATED_DATE);
-
-        // Get all the smsTemplateList where createdDate is less than or equal to SMALLER_CREATED_DATE
-        defaultSmsTemplateShouldNotBeFound("createdDate.lessThanOrEqual=" + SMALLER_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllSmsTemplatesByCreatedDateIsLessThanSomething() throws Exception {
-        // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
-
-        // Get all the smsTemplateList where createdDate is less than DEFAULT_CREATED_DATE
-        defaultSmsTemplateShouldNotBeFound("createdDate.lessThan=" + DEFAULT_CREATED_DATE);
-
-        // Get all the smsTemplateList where createdDate is less than UPDATED_CREATED_DATE
-        defaultSmsTemplateShouldBeFound("createdDate.lessThan=" + UPDATED_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllSmsTemplatesByCreatedDateIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
-
-        // Get all the smsTemplateList where createdDate is greater than DEFAULT_CREATED_DATE
-        defaultSmsTemplateShouldNotBeFound("createdDate.greaterThan=" + DEFAULT_CREATED_DATE);
-
-        // Get all the smsTemplateList where createdDate is greater than SMALLER_CREATED_DATE
-        defaultSmsTemplateShouldBeFound("createdDate.greaterThan=" + SMALLER_CREATED_DATE);
-    }
-
-    @Test
-    @Transactional
     void getAllSmsTemplatesByLastModifiedByIsEqualToSomething() throws Exception {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
@@ -1056,58 +999,6 @@ public class SmsTemplateResourceIT {
 
     @Test
     @Transactional
-    void getAllSmsTemplatesByLastModifiedDateIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
-
-        // Get all the smsTemplateList where lastModifiedDate is greater than or equal to DEFAULT_LAST_MODIFIED_DATE
-        defaultSmsTemplateShouldBeFound("lastModifiedDate.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the smsTemplateList where lastModifiedDate is greater than or equal to UPDATED_LAST_MODIFIED_DATE
-        defaultSmsTemplateShouldNotBeFound("lastModifiedDate.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllSmsTemplatesByLastModifiedDateIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
-
-        // Get all the smsTemplateList where lastModifiedDate is less than or equal to DEFAULT_LAST_MODIFIED_DATE
-        defaultSmsTemplateShouldBeFound("lastModifiedDate.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the smsTemplateList where lastModifiedDate is less than or equal to SMALLER_LAST_MODIFIED_DATE
-        defaultSmsTemplateShouldNotBeFound("lastModifiedDate.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllSmsTemplatesByLastModifiedDateIsLessThanSomething() throws Exception {
-        // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
-
-        // Get all the smsTemplateList where lastModifiedDate is less than DEFAULT_LAST_MODIFIED_DATE
-        defaultSmsTemplateShouldNotBeFound("lastModifiedDate.lessThan=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the smsTemplateList where lastModifiedDate is less than UPDATED_LAST_MODIFIED_DATE
-        defaultSmsTemplateShouldBeFound("lastModifiedDate.lessThan=" + UPDATED_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
-    void getAllSmsTemplatesByLastModifiedDateIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
-
-        // Get all the smsTemplateList where lastModifiedDate is greater than DEFAULT_LAST_MODIFIED_DATE
-        defaultSmsTemplateShouldNotBeFound("lastModifiedDate.greaterThan=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the smsTemplateList where lastModifiedDate is greater than SMALLER_LAST_MODIFIED_DATE
-        defaultSmsTemplateShouldBeFound("lastModifiedDate.greaterThan=" + SMALLER_LAST_MODIFIED_DATE);
-    }
-
-    @Test
-    @Transactional
     void getAllSmsTemplatesBySupplierIsEqualToSomething() throws Exception {
         SmsSupplier supplier = SmsSupplierResourceIT.createEntity();
         smsTemplate.setSupplier(supplier);
@@ -1138,9 +1029,9 @@ public class SmsTemplateResourceIT {
             .andExpect(jsonPath("$.[*].remark").value(hasItem(DEFAULT_REMARK)))
             .andExpect(jsonPath("$.[*].enabled").value(hasItem(DEFAULT_ENABLED.booleanValue())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(sameInstant(DEFAULT_CREATED_DATE))))
+            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
-            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(sameInstant(DEFAULT_LAST_MODIFIED_DATE))));
+            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(DEFAULT_LAST_MODIFIED_DATE.toString())));
 
         // Check, that the count call also returns 1
         restSmsTemplateMockMvc

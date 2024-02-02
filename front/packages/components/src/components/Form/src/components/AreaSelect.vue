@@ -1,35 +1,41 @@
 <template>
-  <a-form-item-rest>
+  <FormItemRest>
     <div class="area-select">
       <!--省份-->
-      <a-select v-model:value="province" @change="proChange" allowClear :disabled="disabled">
+      <Select v-model:value="province" @change="proChange" allowClear :disabled="disabled">
         <template v-for="item in provinceOptions" :key="`${item.value}`">
-          <a-select-option :value="item.value">{{ item.label }}</a-select-option>
+          <SelectOption :value="item.value">{{ item.label }}</SelectOption>
         </template>
-      </a-select>
+      </Select>
       <!--城市-->
-      <a-select v-if="level >= 2" v-model:value="city" @change="cityChange" :disabled="disabled">
+      <Select v-if="level >= 2" v-model:value="city" @change="cityChange" :disabled="disabled">
         <template v-for="item in cityOptions" :key="`${item.value}`">
-          <a-select-option :value="item.value">{{ item.label }}</a-select-option>
+          <SelectOption :value="item.value">{{ item.label }}</SelectOption>
         </template>
-      </a-select>
+      </Select>
       <!--地区-->
-      <a-select v-if="level >= 3" v-model:value="area" @change="areaChange" :disabled="disabled">
+      <Select v-if="level >= 3" v-model:value="area" @change="areaChange" :disabled="disabled">
         <template v-for="item in areaOptions" :key="`${item.value}`">
-          <a-select-option :value="item.value">{{ item.label }}</a-select-option>
+          <SelectOption :value="item.value">{{ item.label }}</SelectOption>
         </template>
-      </a-select>
+      </Select>
     </div>
-  </a-form-item-rest>
+  </FormItemRest>
 </template>
 <script lang="ts">
 import { defineComponent, ref, reactive, watchEffect, computed, unref, watch, toRefs } from 'vue';
+import { FormItemRest, Select, SelectOption } from 'ant-design-vue';
 import { propTypes } from '@/utils/propTypes';
 import { useRuleFormItem } from '@/hooks/component/useFormItem';
 import { provinceOptions, getDataByCode, getRealCode } from '../utils/areaDataUtil';
 
 export default defineComponent({
   name: 'AreaSelect',
+  components: {
+    FormItemRest,
+    Select,
+    SelectOption,
+  },
   props: {
     value: [Array, String],
     province: [String],
@@ -44,7 +50,7 @@ export default defineComponent({
     allowClear: propTypes.bool.def(false),
     getPopupContainer: {
       type: Function,
-      default: node => node.parentNode,
+      default: node => node?.parentNode,
     },
   },
   emits: ['change', 'update:value', 'update:area', 'update:city', 'update:province'],

@@ -1,24 +1,24 @@
 <template>
   <div :class="prefixCls">
-    <a-button type="primary" block @click="handleCopy">
+    <Button type="primary" block @click="handleCopy">
       <CopyOutlined class="mr-2" />
       {{ t('layout.setting.copyBtn') }}
-    </a-button>
+    </Button>
 
-    <a-button color="warning" block @click="handleResetSetting" class="my-3">
+    <Button color="warning" block @click="handleResetSetting" class="my-3">
       <RedoOutlined class="mr-2" />
       {{ t('common.resetText') }}
-    </a-button>
+    </Button>
 
-    <a-button color="error" block @click="handleClearAndRedo">
+    <Button color="error" block @click="handleClearAndRedo">
       <RedoOutlined class="mr-2" />
       {{ t('layout.setting.clearBtn') }}
-    </a-button>
+    </Button>
   </div>
 </template>
 <script lang="ts" setup>
 import { unref } from 'vue';
-
+import { Button } from 'ant-design-vue';
 import { CopyOutlined, RedoOutlined } from '@ant-design/icons-vue';
 
 import { useAppStore } from '@/store/modules/app';
@@ -47,11 +47,11 @@ const userStore = useUserStore();
 const appStore = useAppStore();
 
 function handleCopy() {
-  copyText(JSON.stringify(unref(appStore.getProjectConfig), null, 2), null);
-
-  createSuccessModal({
-    title: t('layout.setting.operatingTitle'),
-    content: t('layout.setting.operatingContent'),
+  copyText(JSON.stringify(unref(appStore.getProjectConfig), null, 2), null).then(() => {
+    createSuccessModal({
+      title: t('layout.setting.operatingTitle'),
+      content: t('layout.setting.operatingContent'),
+    });
   });
 }
 

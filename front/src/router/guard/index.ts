@@ -105,7 +105,7 @@ function createScrollGuard(router: Router) {
 
   router.afterEach(async to => {
     // scroll top
-    isHash((to as RouteLocationNormalized & { href: string })?.href) && body.scrollTo(0, 0);
+    isHash((to as RouteLocationNormalized & { href: string })?.href) && document.querySelector('.vben-layout-content')?.scrollTo(0, 0);
     return true;
   });
 }

@@ -40,4 +40,9 @@ function handleChange(e) {
     width: 126px !important;
   }
 }
+html[data-theme='dark'] {
+  .@{prefix-cls} {
+    color: rgba(255, 255, 255, 0.8);
+  }
+}
 </style>

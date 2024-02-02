@@ -38,7 +38,7 @@
             <column name="owner_entity_name" type="varchar(255)" remarks="实体名称">
                 <constraints nullable="true" />
             </column>
-            <column name="owner_entity_id" type="varchar(255)" remarks="使用实体ID">
+            <column name="owner_entity_id" type="bigint" remarks="使用实体ID">
                 <constraints nullable="true" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->

@@ -281,9 +281,6 @@ const ctx = getCurrentInstance()?.proxy;
 const go = useGo();
 const apiService = ctx?.$apiService as typeof ServerProvider;
 const { getPageSetting } = useRootSetting();
-const relationshipApis: any = {
-  users: apiService.system.userService.retrieve,
-};
 const apis = {
   positionService: apiService.settings.positionService,
   find: apiService.settings.positionService.retrieve,

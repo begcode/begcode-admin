@@ -205,10 +205,23 @@ public class PositionBaseService<R extends PositionRepository, E extends Positio
                         ids.add(beforeId);
                         Map<Long, Integer> idSortValueMap = listByIds(ids)
                             .stream()
+                            .filter(position -> position.getSortNo() != null)
                             .collect(Collectors.toMap(Position::getId, Position::getSortNo));
                         return (
                             lambdaUpdate().set(Position::getSortNo, idSortValueMap.get(beforeId)).eq(Position::getId, id).update() &&
                             lambdaUpdate().set(Position::getSortNo, idSortValueMap.get(id)).eq(Position::getId, beforeId).update()
+                        );
+                    } else if (ObjectUtils.allNotNull(id, afterId)) {
+                        Set<Long> ids = new HashSet<>();
+                        ids.add(id);
+                        ids.add(afterId);
+                        Map<Long, Integer> idSortValueMap = listByIds(ids)
+                            .stream()
+                            .filter(position -> position.getSortNo() != null)
+                            .collect(Collectors.toMap(Position::getId, Position::getSortNo));
+                        return (
+                            lambdaUpdate().set(Position::getSortNo, idSortValueMap.get(afterId)).eq(Position::getId, id).update() &&
+                            lambdaUpdate().set(Position::getSortNo, idSortValueMap.get(id)).eq(Position::getId, afterId).update()
                         );
                     } else {
                         return false;
@@ -226,6 +239,7 @@ public class PositionBaseService<R extends PositionRepository, E extends Positio
                     }
                     Map<Long, Integer> idSortValueMap = listByIds(ids)
                         .stream()
+                        .filter(position -> position.getSortNo() != null)
                         .collect(Collectors.toMap(Position::getId, Position::getSortNo));
                     if (ObjectUtils.allNotNull(beforeId, afterId)) {
                         // 计算中间值

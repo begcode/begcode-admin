@@ -1,7 +1,7 @@
 <template>
   <Drawer v-bind="getBindValues" :class="prefixCls" @close="onClose">
     <template #title v-if="!$slots.title">
-      <DrawerHeader :title="mergeProps.title" :isDetail="isDetail" :showDetailBack="showDetailBack" @close="onClose">
+      <DrawerHeader :title="getMergeProps.title" :isDetail="isDetail" :showDetailBack="showDetailBack" @close="onClose">
         <template #titleToolbar>
           <slot name="titleToolbar"></slot>
         </template>
@@ -23,8 +23,8 @@
 </template>
 <script lang="ts" setup>
 import type { DrawerInstance, DrawerProps } from './typing';
-import type { CSSProperties } from 'vue';
-import { ref, computed, watch, unref, nextTick, toRaw, getCurrentInstance } from 'vue';
+import type { CSSProperties, Ref } from 'vue';
+import { ref, computed, watch, unref, nextTick, getCurrentInstance } from 'vue';
 import { Drawer, theme } from 'ant-design-vue';
 import { useI18n } from '@/hooks/web/useI18nOut';
 import { isFunction, isNumber } from '@/utils/is';
@@ -44,26 +44,26 @@ const emit = defineEmits(['open-change', 'ok', 'close', 'register']);
 
 const openRef = ref(false);
 const attrs = useAttrs();
-const propsRef = ref<Partial<DrawerProps | null>>(null);
+const propsRef = ref({}) as Ref<Partial<DrawerProps>>;
 
 const { t } = useI18n();
 
 const { prefixVar, prefixCls } = useDesign('basic-drawer');
 
 const drawerInstance: DrawerInstance = {
-  setDrawerProps: setDrawerProps as any,
+  setDrawerProps,
   emitOpen: undefined,
 };
 const instance = getCurrentInstance();
 
 instance && emit('register', drawerInstance, instance.uid);
 
-const getMergeProps = computed((): DrawerProps => {
-  return deepMerge(toRaw(props), unref(propsRef)) as any;
+const getMergeProps = computed(() => {
+  return deepMerge(props, unref(propsRef));
 });
 
-const getProps = computed((): DrawerProps => {
-  const opt = {
+const getProps = computed(() => {
+  const opt: Partial<DrawerProps> = {
     placement: 'right',
     ...unref(attrs),
     ...unref(getMergeProps),
@@ -81,10 +81,10 @@ const getProps = computed((): DrawerProps => {
       opt.getContainer = `.${prefixVar}-layout-content`;
     }
   }
-  return opt as DrawerProps;
+  return opt;
 });
 
-const getBindValues = computed((): DrawerProps => {
+const getBindValues = computed(() => {
   return {
     ...attrs,
     ...unref(getProps),
@@ -125,7 +125,9 @@ watch(
   open => {
     nextTick(() => {
       emit('open-change', open);
-      instance && drawerInstance.emitOpen?.(open, instance.uid);
+      if (instance && drawerInstance.emitOpen) {
+        drawerInstance.emitOpen(open, instance.uid);
+      }
     });
   },
 );
@@ -142,9 +144,9 @@ async function onClose(e) {
   openRef.value = false;
 }
 
-function setDrawerProps(props: Partial<DrawerProps>): void {
+function setDrawerProps(props: Partial<DrawerProps>) {
   // Keep the last setDrawerProps
-  propsRef.value = deepMerge(unref(propsRef) || ({} as any), props);
+  propsRef.value = deepMerge(unref(propsRef), props);
   if (Reflect.has(props, 'open')) {
     openRef.value = !!props.open;
   }
@@ -152,7 +154,6 @@ function setDrawerProps(props: Partial<DrawerProps>): void {
 function handleOk() {
   emit('ok');
 }
-const mergeProps = getMergeProps as any;
 
 const { useToken } = theme;
 const { token } = useToken();

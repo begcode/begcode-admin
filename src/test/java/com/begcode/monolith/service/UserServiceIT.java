@@ -7,8 +7,8 @@ import com.begcode.monolith.IntegrationTest;
 import com.begcode.monolith.domain.User;
 import com.begcode.monolith.repository.UserRepository;
 import java.time.Instant;
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
@@ -148,7 +148,7 @@ class UserServiceIT {
     @Test
     @Transactional
     void assertThatNotActivatedUsersWithNotNullActivationKeyCreatedBefore3DaysAreDeleted() {
-        ZonedDateTime now = ZonedDateTime.now();
+        Instant now = Instant.now();
         when(dateTimeProvider.getNow()).thenReturn(Optional.of(now.minus(4, ChronoUnit.DAYS)));
         user.setActivated(false);
         user.setActivationKey(RandomStringUtils.random(20));
@@ -156,7 +156,7 @@ class UserServiceIT {
         User dbUser = userRepository.selectById(user.getId());
         dbUser.setCreatedDate(now.minus(4, ChronoUnit.DAYS));
         userRepository.insert(user);
-        ZonedDateTime threeDaysAgo = now.minus(3, ChronoUnit.DAYS);
+        Instant threeDaysAgo = now.minus(3, ChronoUnit.DAYS);
         List<User> users = userRepository.findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(threeDaysAgo);
         assertThat(users).isNotEmpty();
         userService.removeNotActivatedUsers();
@@ -167,14 +167,14 @@ class UserServiceIT {
     @Test
     @Transactional
     void assertThatNotActivatedUsersWithNullActivationKeyCreatedBefore3DaysAreNotDeleted() {
-        ZonedDateTime now = ZonedDateTime.now();
+        Instant now = Instant.now();
         when(dateTimeProvider.getNow()).thenReturn(Optional.of(now.minus(4, ChronoUnit.DAYS)));
         user.setActivated(false);
         userRepository.insert(user);
         User dbUser = userRepository.selectById(user.getId());
         dbUser.setCreatedDate(now.minus(4, ChronoUnit.DAYS));
         userRepository.insert(user);
-        ZonedDateTime threeDaysAgo = now.minus(3, ChronoUnit.DAYS);
+        Instant threeDaysAgo = now.minus(3, ChronoUnit.DAYS);
         List<User> users = userRepository.findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(threeDaysAgo);
         assertThat(users).isEmpty();
         userService.removeNotActivatedUsers();

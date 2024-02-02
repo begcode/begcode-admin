@@ -21,7 +21,7 @@ const fields = (): FormSchema[] => {
       },
       dynamicDisabled: true,
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入ID', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入ID', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {
@@ -56,6 +56,7 @@ const fields = (): FormSchema[] => {
       label: 'logo地址',
       field: 'logo',
       component: 'ImageUpload',
+      componentProps: { api: apiService.files.uploadImageService.create },
       rules: [],
     },
     {
@@ -69,7 +70,7 @@ const fields = (): FormSchema[] => {
       label: '创建用户 Id',
       field: 'createUserId',
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入创建用户 Id', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入创建用户 Id', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {

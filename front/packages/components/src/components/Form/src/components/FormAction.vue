@@ -32,8 +32,6 @@ import { useFormContext } from '../hooks/useFormContext';
 import { useI18n } from '@/hooks/web/useI18nOut';
 import { propTypes } from '@/utils/propTypes';
 
-type ButtonOptions = Partial<ButtonProps> & { text: string };
-
 defineOptions({ name: 'BasicFormAction' });
 
 const props = defineProps({
@@ -42,11 +40,11 @@ const props = defineProps({
   showSubmitButton: propTypes.bool.def(true),
   showAdvancedButton: propTypes.bool.def(true),
   resetButtonOptions: {
-    type: Object as PropType<ButtonOptions>,
+    type: Object as PropType<ButtonProps>,
     default: () => ({}),
   },
   submitButtonOptions: {
-    type: Object as PropType<ButtonOptions>,
+    type: Object as PropType<ButtonProps>,
     default: () => ({}),
   },
   actionColOptions: {
@@ -68,8 +66,10 @@ const actionColOpt = computed(() => {
   const { showAdvancedButton, actionSpan: span, actionColOptions } = props;
   const actionSpan = 24 - span;
   const advancedSpanObj = showAdvancedButton ? { span: actionSpan < 6 ? 24 : actionSpan } : {};
+  const defaultSpan = props.layout === 'inline' ? {} : { span: showAdvancedButton ? 6 : 4 };
   const actionColOpt: Partial<ColEx> = {
     style: { textAlign: 'right' },
+    ...defaultSpan,
     ...advancedSpanObj,
     ...actionColOptions,
   };
@@ -78,7 +78,7 @@ const actionColOpt = computed(() => {
   }
   return actionColOpt;
 });
-const getResetBtnOptions = computed((): ButtonOptions => {
+const getResetBtnOptions = computed((): ButtonProps => {
   return Object.assign(
     {
       text: t('common.resetText'),
@@ -88,7 +88,7 @@ const getResetBtnOptions = computed((): ButtonOptions => {
   );
 });
 
-const getSubmitBtnOptions = computed(() => {
+const getSubmitBtnOptions = computed((): ButtonProps => {
   return Object.assign(
     {
       text: t('common.queryText'),

@@ -3,7 +3,7 @@ package com.begcode.monolith.service.dto;
 import com.begcode.monolith.config.Constants;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,11 +43,11 @@ public class AdminUserDTO implements Serializable {
 
     private Long createdBy;
 
-    private ZonedDateTime createdDate;
+    private Instant createdDate;
 
     private Long lastModifiedBy;
 
-    private ZonedDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     private List<AuthorityDTO> authorities = new ArrayList<>();
 
@@ -135,11 +135,11 @@ public class AdminUserDTO implements Serializable {
         this.createdBy = createdBy;
     }
 
-    public ZonedDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(ZonedDateTime createdDate) {
+    public void setCreatedDate(Instant createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -151,11 +151,11 @@ public class AdminUserDTO implements Serializable {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    public ZonedDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(ZonedDateTime lastModifiedDate) {
+    public void setLastModifiedDate(Instant lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 

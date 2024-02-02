@@ -84,9 +84,6 @@ const fields: DescItem[] = [
   {
     label: '创建时间',
     field: 'createdDate',
-    format: (value, _data) => {
-      return value ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : '';
-    },
   },
   {
     label: '修改者Id',
@@ -95,9 +92,6 @@ const fields: DescItem[] = [
   {
     label: '修改时间',
     field: 'lastModifiedDate',
-    format: (value, _data) => {
-      return value ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : '';
-    },
   },
   {
     label: '部门',

@@ -729,20 +729,6 @@ public class ApiPermissionResourceIT {
 
     @Test
     @Transactional
-    void getAllApiPermissionsByChildrenIsEqualToSomething() throws Exception {
-        ApiPermission children = ApiPermissionResourceIT.createEntity();
-        // apiPermission.addChildren(children);
-        apiPermissionRepository.insert(apiPermission);
-        Long childrenId = children.getId();
-        // Get all the apiPermissionList where children equals to childrenId
-        defaultApiPermissionShouldBeFound("childrenId.equals=" + childrenId);
-
-        // Get all the apiPermissionList where children equals to (childrenId + 1)
-        defaultApiPermissionShouldNotBeFound("childrenId.equals=" + (childrenId + 1));
-    }
-
-    @Test
-    @Transactional
     void getAllApiPermissionsByParentIsEqualToSomething() throws Exception {
         ApiPermission parent = ApiPermissionResourceIT.createEntity();
         apiPermission.setParent(parent);

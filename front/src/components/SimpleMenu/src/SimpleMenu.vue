@@ -21,7 +21,7 @@ import { useDesign } from '@begcode/components';
 import Menu from './components/Menu.vue';
 import SimpleSubMenu from './SimpleSubMenu.vue';
 import { listenerRouteChange } from '@/logics/mitt/routeChange';
-import { propTypes, isUrl, openWindow } from '@begcode/components';
+import { propTypes, isHttpUrl, openWindow } from '@begcode/components';
 import { REDIRECT_NAME } from '@/router/constant';
 import { useRouter } from 'vue-router';
 import { isFunction } from 'lodash-es';
@@ -108,7 +108,7 @@ async function handleMenuChange(route?: RouteLocationNormalizedLoaded) {
 }
 
 async function handleSelect(key: string) {
-  if (isUrl(key)) {
+  if (isHttpUrl(key)) {
     openWindow(key);
     return;
   }

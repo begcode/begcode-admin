@@ -2,13 +2,13 @@
   <div :class="prefixCls" :style="getStyle" v-if="showFooter || $slots.footer">
     <template v-if="!$slots.footer">
       <slot name="insertFooter"></slot>
-      <a-button v-bind="cancelButtonProps" @click="handleClose" class="mr-2" v-if="showCancelBtn">
+      <Button v-bind="cancelButtonProps" @click="handleClose" class="mr-2" v-if="showCancelBtn">
         {{ cancelText }}
-      </a-button>
+      </Button>
       <slot name="centerFooter"></slot>
-      <a-button :type="okType" @click="handleOk" v-bind="okButtonProps" class="mr-2" :loading="confirmLoading" v-if="showOkBtn">
+      <Button :type="okType" @click="handleOk" v-bind="okButtonProps" class="mr-2" :loading="confirmLoading" v-if="showOkBtn">
         {{ okText }}
-      </a-button>
+      </Button>
       <slot name="appendFooter"></slot>
     </template>
 
@@ -19,7 +19,7 @@
 </template>
 <script lang="ts" setup>
 import type { CSSProperties } from 'vue';
-import { theme } from 'ant-design-vue';
+import { theme, Button } from 'ant-design-vue';
 import { computed } from 'vue';
 import { useDesign } from '@/hooks/web/useDesign';
 

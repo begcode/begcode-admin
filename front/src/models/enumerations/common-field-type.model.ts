@@ -123,7 +123,7 @@ export enum CommonFieldType {
    * UUID
    */
 
-  UUID = 'UUID',
+  UUID_STRING = 'UUID_STRING',
 
   /**
    * 时间戳

@@ -283,10 +283,6 @@ const ctx = getCurrentInstance()?.proxy;
 const go = useGo();
 const apiService = ctx?.$apiService as typeof ServerProvider;
 const { getPageSetting } = useRootSetting();
-const relationshipApis: any = {
-  children: apiService.settings.regionCodeService.tree,
-  parent: apiService.settings.regionCodeService.tree,
-};
 const apis = {
   regionCodeService: apiService.settings.regionCodeService,
   find: apiService.settings.regionCodeService.tree,

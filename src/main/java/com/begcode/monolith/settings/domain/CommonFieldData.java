@@ -75,7 +75,7 @@ public class CommonFieldData implements Serializable {
      * 使用实体ID
      */
     @TableField(value = "owner_entity_id")
-    private String ownerEntityId;
+    private Long ownerEntityId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -124,7 +124,7 @@ public class CommonFieldData implements Serializable {
         return this;
     }
 
-    public CommonFieldData ownerEntityId(String ownerEntityId) {
+    public CommonFieldData ownerEntityId(Long ownerEntityId) {
         this.ownerEntityId = ownerEntityId;
         return this;
     }

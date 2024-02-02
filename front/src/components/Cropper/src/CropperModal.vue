@@ -17,21 +17,15 @@
         <div :class="`${prefixCls}-toolbar`">
           <Upload :fileList="[]" accept="image/*" :beforeUpload="handleBeforeUpload">
             <Tooltip :title="t('component.cropper.selectImage')" placement="bottom">
-              <a-button size="small" preIcon="ant-design:upload-outlined" type="primary" />
+              <Button size="small" preIcon="ant-design:upload-outlined" type="primary" />
             </Tooltip>
           </Upload>
           <Space>
             <Tooltip :title="t('component.cropper.btn_reset')" placement="bottom">
-              <a-button
-                type="primary"
-                preIcon="ant-design:reload-outlined"
-                size="small"
-                :disabled="!src"
-                @click="handlerToolbar('reset')"
-              />
+              <Button type="primary" preIcon="ant-design:reload-outlined" size="small" :disabled="!src" @click="handlerToolbar('reset')" />
             </Tooltip>
             <Tooltip :title="t('component.cropper.btn_rotate_left')" placement="bottom">
-              <a-button
+              <Button
                 type="primary"
                 preIcon="ant-design:rotate-left-outlined"
                 size="small"
@@ -40,7 +34,7 @@
               />
             </Tooltip>
             <Tooltip :title="t('component.cropper.btn_rotate_right')" placement="bottom">
-              <a-button
+              <Button
                 type="primary"
                 preIcon="ant-design:rotate-right-outlined"
                 size="small"
@@ -49,13 +43,13 @@
               />
             </Tooltip>
             <Tooltip :title="t('component.cropper.btn_scale_x')" placement="bottom">
-              <a-button type="primary" preIcon="vaadin:arrows-long-h" size="small" :disabled="!src" @click="handlerToolbar('scaleX')" />
+              <Button type="primary" preIcon="vaadin:arrows-long-h" size="small" :disabled="!src" @click="handlerToolbar('scaleX')" />
             </Tooltip>
             <Tooltip :title="t('component.cropper.btn_scale_y')" placement="bottom">
-              <a-button type="primary" preIcon="vaadin:arrows-long-v" size="small" :disabled="!src" @click="handlerToolbar('scaleY')" />
+              <Button type="primary" preIcon="vaadin:arrows-long-v" size="small" :disabled="!src" @click="handlerToolbar('scaleY')" />
             </Tooltip>
             <Tooltip :title="t('component.cropper.btn_zoom_in')" placement="bottom">
-              <a-button
+              <Button
                 type="primary"
                 preIcon="ant-design:zoom-in-outlined"
                 size="small"
@@ -64,7 +58,7 @@
               />
             </Tooltip>
             <Tooltip :title="t('component.cropper.btn_zoom_out')" placement="bottom">
-              <a-button
+              <Button
                 type="primary"
                 preIcon="ant-design:zoom-out-outlined"
                 size="small"
@@ -98,7 +92,7 @@ import { ref, PropType } from 'vue';
 import CropperImage from './Cropper.vue';
 import { Space, Upload, Avatar, Tooltip } from 'ant-design-vue';
 import { useDesign } from '@begcode/components';
-import { BasicModal, useModalInner, dataURLtoBlob } from '@begcode/components';
+import { BasicModal, useModalInner, dataURLtoBlob, Button } from '@begcode/components';
 import { isFunction } from 'lodash-es';
 import { useI18n } from '@/hooks/web/useI18n';
 

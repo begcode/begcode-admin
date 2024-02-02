@@ -1,4 +1,4 @@
-import type { RouteLocationNormalized, RouteLocationRaw, Router } from 'vue-router';
+import type { RouteLocationNormalized, RouteLocationRaw, Router, LocationQueryRaw, RouteParamsRaw } from 'vue-router';
 
 import { toRaw, unref } from 'vue';
 import { defineStore } from 'pinia';
@@ -19,6 +19,15 @@ export interface MultipleTabState {
   cacheTabList: Set<string>;
   tabList: RouteLocationNormalized[];
   lastDragEndIndex: number;
+  redirectPageParam: null | redirectPageParamType;
+}
+
+interface redirectPageParamType {
+  redirect_type: string;
+  name?: string;
+  path?: string;
+  query: LocationQueryRaw;
+  params?: RouteParamsRaw;
 }
 
 function handleGotoPage(router: Router) {
@@ -46,6 +55,8 @@ export const useMultipleTabStore = defineStore({
     tabList: cacheTab ? Persistent.getLocal(MULTIPLE_TABS_KEY) || [] : [],
     // Index of the last moved tab
     lastDragEndIndex: 0,
+    // 重定向时存储的路由参数
+    redirectPageParam: null,
   }),
   getters: {
     getTabList(state): RouteLocationNormalized[] {
@@ -349,6 +360,9 @@ export const useMultipleTabStore = defineStore({
         findTab.path = fullPath;
         await this.updateCacheTab();
       }
+    },
+    setRedirectPageParam(data) {
+      this.redirectPageParam = data;
     },
   },
 });

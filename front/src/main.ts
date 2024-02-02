@@ -24,11 +24,8 @@ import { useSso } from './hooks/web/useSso';
 // import { registerPackages } from '@/utils/monorepo/registerPackages';
 import apiService from '@/api-service/index';
 import './utils/useMonacoWork';
+import { useUserStore } from '@/store/modules/user';
 
-if (import.meta.env.DEV) {
-  // @ts-ignore
-  import('ant-design-vue/dist/reset.css');
-}
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
 async function bootstrap() {
@@ -41,6 +38,9 @@ async function bootstrap() {
   // Configure store
   // 配置 store
   setupStore(app);
+
+  const userStore = useUserStore();
+  app.config.globalProperties.$getToken = userStore.getToken;
 
   // Initialize internal system configuration
   // 初始化内部系统配置

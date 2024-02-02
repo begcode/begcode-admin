@@ -1,5 +1,6 @@
 package com.begcode.monolith.domain.enumeration;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
@@ -10,6 +11,7 @@ public enum SortValueOperateType {
     STEP("STEP", "单步"),
     VALUE("VALUE", "修改值");
 
+    @EnumValue
     @JsonValue
     private String value;
 

@@ -20,7 +20,7 @@ const fields = (): FormSchema[] => {
       },
       dynamicDisabled: true,
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入ID', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入ID', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {
@@ -48,7 +48,7 @@ const fields = (): FormSchema[] => {
       label: '排序',
       field: 'sortValue',
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入排序', style: 'width: 100%' },
+      componentProps: { placeholder: '请输入排序', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {
@@ -156,11 +156,11 @@ const itemsColumns = () => {
     {
       title: '使用实体ID',
       field: 'ownerEntityId',
-      minWidth: 160,
+      minWidth: 80,
       visible: false,
       treeNode: false,
-      params: { type: 'STRING' },
-      editRender: { name: 'AInput', enabled: true },
+      params: { type: 'LONG' },
+      editRender: { name: 'AInputNumber', enabled: true, props: { controls: false } },
     },
     {
       title: '操作',

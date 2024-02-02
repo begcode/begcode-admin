@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.begcode.monolith.IntegrationTest;
 import com.begcode.monolith.domain.Position;
-import com.begcode.monolith.domain.User;
 import com.begcode.monolith.repository.PositionRepository;
 import com.begcode.monolith.service.dto.PositionDTO;
 import com.begcode.monolith.service.mapper.PositionMapper;
@@ -501,20 +500,6 @@ public class PositionResourceIT {
 
         // Get all the positionList where description does not contain UPDATED_DESCRIPTION
         defaultPositionShouldBeFound("description.doesNotContain=" + UPDATED_DESCRIPTION);
-    }
-
-    @Test
-    @Transactional
-    void getAllPositionsByUsersIsEqualToSomething() throws Exception {
-        User users = UserResourceIT.createEntity();
-        // position.addUsers(users);
-        positionRepository.insert(position);
-        Long usersId = users.getId();
-        // Get all the positionList where users equals to usersId
-        defaultPositionShouldBeFound("usersId.equals=" + usersId);
-
-        // Get all the positionList where users equals to (usersId + 1)
-        defaultPositionShouldNotBeFound("usersId.equals=" + (usersId + 1));
     }
 
     /**

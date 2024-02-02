@@ -12,7 +12,7 @@ entity AbstractAuditingEntity (jhi_auditing) {
   /**
    * 创建时间
    */
-  createdDate ZonedDateTime
+  createdDate Instant
   /**
    * 修改者Id
    */
@@ -20,7 +20,7 @@ entity AbstractAuditingEntity (jhi_auditing) {
   /**
    * 修改时间
    */
-  lastModifiedDate ZonedDateTime
+  lastModifiedDate Instant
 }
 enum FixedType {
 	LEFT ("左侧"),
@@ -35,6 +35,7 @@ enum EndUsedType {
     CODE_EDITOR ("代码编辑器"),
     SELECT ("下拉框"),
     SELECT_MODAL ("弹窗复合选择"),
+    SELECT_FILE ("本地选择文件"),
     CHECKBOX ("复选框"),
     RADIO ("单选框"),
     RADIO_BUTTON ("单选按钮"),
@@ -44,7 +45,7 @@ enum EndUsedType {
     TEXT_AREA ("文本域"),
     AVATAR ("头像"),
     ICON_PICKER ("图标选择器"),
-    COLOR_PICKER ("图标选择器")
+    COLOR_PICKER ("颜色选择器")
 }
 /** 来源，实体或数据字典 */
 enum SourceType {
@@ -86,7 +87,7 @@ enum CommonFieldType {
     RADIO ("单选"),
     MULTI_SELECT ("多选"),
     DATA_DICTIONARY ("数据字典"),
-    UUID ("UUID"),
+    UUID_STRING ("UUID"),
     INSTANT ("时间戳")
 }
 /** Api权限类型 */

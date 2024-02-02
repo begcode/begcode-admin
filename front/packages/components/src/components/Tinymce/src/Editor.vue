@@ -15,7 +15,6 @@
 
 <script lang="ts" setup>
 import type { Editor, RawEditorSettings } from 'tinymce';
-import { theme } from 'ant-design-vue';
 import tinymce from 'tinymce/tinymce';
 import 'tinymce/themes/silver';
 import 'tinymce/icons/default/icons';
@@ -61,8 +60,8 @@ import { bindHandlers } from './helper';
 import { onMountedOrActivated } from '@/hooks/vben';
 import { useDesign } from '@/hooks/web/useDesign';
 import { isNumber } from '@/utils/is';
+import { useUpload } from '@/hooks/web/useUploadOut';
 import { useI18n } from 'vue-i18n';
-import { getFileAccessHttpUrl } from '@/utils';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
@@ -118,6 +117,8 @@ const props = defineProps({
 const emit = defineEmits(['change', 'update:modelValue', 'inited', 'init-error']);
 
 const { uploadFile } = props;
+const { uploadImage } = useUpload();
+const uploadApi = uploadFile || uploadImage;
 const attrs = useAttrs();
 const editorRef = ref<Editor | null>(null);
 const fullscreen = ref(false);
@@ -133,8 +134,6 @@ const containerWidth = computed(() => {
   }
   return width;
 });
-
-const { defaultAlgorithm } = theme;
 
 const skinName = computed(() => {
   return 'jeecg';
@@ -176,17 +175,10 @@ const initOptions = computed((): RawEditorSettings => {
         data: { biz: 'jeditor', jeditor: '1' },
       };
       const uploadSuccess = res => {
-        if (res.success) {
-          if (res.message == 'local') {
-            const img = 'data:image/jpeg;base64,' + blobInfo.base64();
-            success(img);
-          } else {
-            let img = getFileAccessHttpUrl(res.message);
-            success(img);
-          }
-        }
+        // 根据实际情况，如何使用了其他的api可能要修改这里。
+        success(res.url);
       };
-      uploadFile(params, uploadSuccess);
+      uploadApi(params, undefined, uploadSuccess);
     },
     content_css: publicPath + 'resource/tinymce/skins/ui/' + skinName.value + '/content.min.css',
     ...options,
