@@ -67,7 +67,6 @@ public class AutoLogAspect {
         SysLogDTO dto = new SysLogDTO();
         AutoLog syslog = method.getAnnotation(AutoLog.class);
         if (syslog != null) {
-            //update-begin-author:taoyan date:
             String content = syslog.value();
             /*if(syslog.module() == ModuleType.ONLINE){
                 content = getOnlineLogContent(obj, content);
@@ -130,7 +129,6 @@ public class AutoLogAspect {
                 }
                 arguments[i] = paramsArray[i];
             }
-            //update-begin-author:taoyan date:20200724 for:日志数据太长的直接过滤掉
             try {
                 params = new StringBuilder(mapper.writeValueAsString(arguments));
             } catch (JsonProcessingException e) {

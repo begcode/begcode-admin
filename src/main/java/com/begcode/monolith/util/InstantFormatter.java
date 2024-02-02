@@ -1,11 +1,11 @@
 package com.begcode.monolith.util;
 
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.format.Formatter;
 
 public class InstantFormatter implements Formatter<Instant> {

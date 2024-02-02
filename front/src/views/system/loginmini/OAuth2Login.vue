@@ -2,7 +2,7 @@
   <div></div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { ref } from 'vue';
 import { isOAuth2AppEnv, sysOAuth2Login } from '@/views/account/login/useLogin';
 import { useRouter } from 'vue-router';
@@ -29,14 +29,13 @@ if (isOAuth.value) {
  * 检测当前的环境
  */
 function checkEnv() {
+  env.value.thirdApp = true;
   // 判断当时是否是企业微信环境
   if (/wxwork/i.test(navigator.userAgent)) {
-    env.value.thirdApp = true;
     env.value.wxWork = true;
   }
   // 判断当时是否是钉钉环境
   if (/dingtalk/i.test(navigator.userAgent)) {
-    env.value.thirdApp = true;
     env.value.dingtalk = true;
   }
   doOAuth2Login();

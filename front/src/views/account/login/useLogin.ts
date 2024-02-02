@@ -170,7 +170,8 @@ async function checkPhone(_rule, value, _callback) {
  * 判断是否是OAuth2APP环境
  */
 export function isOAuth2AppEnv() {
-  return /wxwork|dingtalk/i.test(navigator.userAgent);
+  const third = '';
+  return /wxwork|dingtalk/i.test(navigator.userAgent) || third === 'Keycloak';
 }
 
 /**

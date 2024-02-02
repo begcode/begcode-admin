@@ -8,7 +8,9 @@ export enum PageEnum {
   // error log page path
   ERROR_LOG_PAGE = '/error-log/list',
   // auth2登录路由路径
-  OAUTH2_LOGIN_PAGE_PATH = '/oauth2-app/login',
+  OAUTH2_LOGIN_PAGE_PATH = '/login/oauth2/code/oidc',
+  // oauth2 Web登录地址
+  OAUTH2_SERVER_PAGE_PATH = '/oauth2/authorization/oidc',
   //文件路由
   SYS_FILES_PATH = '/file/share',
   // 邮件中的跳转地址

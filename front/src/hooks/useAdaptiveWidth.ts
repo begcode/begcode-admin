@@ -6,7 +6,7 @@
  */
 import { ref } from 'vue';
 import { useDebounceFn, tryOnUnmounted } from '@vueuse/core';
-import { useEventListener } from '@/hooks/event/useEventListener';
+import { useEventListener } from '@begcode/components';
 
 // key = js运算符+数字
 const defWidthConfig: configType = {

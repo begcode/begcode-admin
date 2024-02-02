@@ -97,7 +97,6 @@ entity Authority (jhi_authority) {
   @importDataField
   display Boolean /** 展示 */
 }
-
 /**
  * 用户
  */

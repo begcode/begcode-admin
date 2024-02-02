@@ -12,10 +12,6 @@
 <script lang="ts" setup>
 import { inject } from 'vue';
 import { useDesign } from '@/hooks/web/useDesign';
-import { theme } from 'ant-design-vue';
-
-const { useToken } = theme;
-const token = useToken().token;
 
 const { prefixCls } = useDesign('page-footer');
 const getCalcContentWidth = inject('CALC_CONTENT_WIDTH', '100%');

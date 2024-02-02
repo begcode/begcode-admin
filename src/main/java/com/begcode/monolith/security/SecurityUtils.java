@@ -62,6 +62,28 @@ public final class SecurityUtils {
     }
 
     /**
+     * Get the id of the current user.
+     *
+     * @return the id of the current user.
+     */
+    public static Optional<Long> getCurrentUserId() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        return Optional
+            .ofNullable(securityContext.getAuthentication())
+            .map(authentication -> {
+                if (authentication.getPrincipal() instanceof UserDetails) {
+                    MyUserDetails springSecurityUser = (MyUserDetails) authentication.getPrincipal();
+                    return springSecurityUser.getId();
+                }
+
+                if (authentication.getPrincipal() instanceof Jwt jwt) {
+                    return Long.parseLong(jwt.getClaim(USER_ID));
+                }
+                return null;
+            });
+    }
+
+    /**
      * Check if a user is authenticated.
      *
      * @return true if the user is authenticated, false otherwise.
@@ -106,27 +128,5 @@ public final class SecurityUtils {
 
     private static Stream<String> getAuthorities(Authentication authentication) {
         return authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority);
-    }
-
-    /**
-     * Get the id of the current user.
-     *
-     * @return the id of the current user.
-     */
-    public static Optional<Long> getCurrentUserId() {
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        return Optional
-            .ofNullable(securityContext.getAuthentication())
-            .map(authentication -> {
-                if (authentication.getPrincipal() instanceof UserDetails) {
-                    MyUserDetails springSecurityUser = (MyUserDetails) authentication.getPrincipal();
-                    return springSecurityUser.getId();
-                }
-
-                if (authentication.getPrincipal() instanceof Jwt jwt) {
-                    return Long.parseLong(jwt.getClaim(USER_ID));
-                }
-                return null;
-            });
     }
 }

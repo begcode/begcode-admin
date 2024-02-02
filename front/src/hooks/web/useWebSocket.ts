@@ -12,7 +12,6 @@ const listeners = new Map();
  * @param url
  */
 export function connectWebSocket(url: string) {
-  //update-begin-author:taoyan date:2022-4-24 for: v2.4.6 的 websocket 服务端，存在性能和安全问题。 #3278
   let token = (getToken() || '') as string;
   result = useWebSocket(url, {
     // 自动重连 (遇到错误最多重复连接10次)
@@ -27,7 +26,6 @@ export function connectWebSocket(url: string) {
     },
     protocols: [token],
   });
-  //update-end-author:taoyan date:2022-4-24 for: v2.4.6 的 websocket 服务端，存在性能和安全问题。 #3278
   if (result) {
     result.open = onOpen;
     result.close = onClose;
