@@ -155,37 +155,35 @@ public class AnnouncementRecordQueryService implements QueryService<Announcement
                 criteria,
                 AnnouncementRecord.class
             );
-            if (MapUtils.isNotEmpty(queryWrapperMapMap)) {
-                Map.Entry<QueryWrapper<AnnouncementRecord>, Map<String, Object>> queryWrapperMapEntry = queryWrapperMapMap
-                    .entrySet()
-                    .stream()
-                    .findFirst()
-                    .get();
-                Map<String, Object> fieldMap = queryWrapperMapEntry.getValue();
-                if (MapUtils.isNotEmpty(fieldMap)) {
-                    if (queryWrapper == null) {
-                        queryWrapper = queryWrapperMapEntry.getKey();
-                    }
-                    QueryWrapper<AnnouncementRecord> finalQueryWrapper = queryWrapper;
-                    Boolean finalUseOr = useOr;
-                    fieldMap.forEach((fieldName, filter) -> {
-                        if (filter instanceof StringFilter) {
-                            CriteriaUtil.build(
-                                finalUseOr,
-                                finalQueryWrapper,
-                                buildStringSpecification((StringFilter) filter, fieldName, finalUseOr)
-                            );
-                        } else if (filter instanceof RangeFilter) {
-                            CriteriaUtil.build(
-                                finalUseOr,
-                                finalQueryWrapper,
-                                buildRangeSpecification((RangeFilter) filter, fieldName, finalUseOr)
-                            );
-                        } else if (filter instanceof Filter) {
-                            CriteriaUtil.build(finalUseOr, finalQueryWrapper, buildSpecification((Filter) filter, fieldName, finalUseOr));
-                        }
-                    });
+            Map.Entry<QueryWrapper<AnnouncementRecord>, Map<String, Object>> queryWrapperMapEntry = queryWrapperMapMap
+                .entrySet()
+                .stream()
+                .findFirst()
+                .orElseThrow();
+            Map<String, Object> fieldMap = queryWrapperMapEntry.getValue();
+            if (MapUtils.isNotEmpty(fieldMap)) {
+                if (queryWrapper == null) {
+                    queryWrapper = queryWrapperMapEntry.getKey();
                 }
+                QueryWrapper<AnnouncementRecord> finalQueryWrapper = queryWrapper;
+                Boolean finalUseOr = useOr;
+                fieldMap.forEach((fieldName, filter) -> {
+                    if (filter instanceof StringFilter) {
+                        CriteriaUtil.build(
+                            finalUseOr,
+                            finalQueryWrapper,
+                            buildStringSpecification((StringFilter) filter, fieldName, finalUseOr)
+                        );
+                    } else if (filter instanceof RangeFilter) {
+                        CriteriaUtil.build(
+                            finalUseOr,
+                            finalQueryWrapper,
+                            buildRangeSpecification((RangeFilter) filter, fieldName, finalUseOr)
+                        );
+                    } else if (filter instanceof Filter) {
+                        CriteriaUtil.build(finalUseOr, finalQueryWrapper, buildSpecification((Filter) filter, fieldName, finalUseOr));
+                    }
+                });
             }
             if (criteria.getAnd() != null) {
                 Map<String, Object> stringObjectMap = BeanUtil.beanToMap(criteria.getAnd(), false, true);
@@ -231,37 +229,35 @@ public class AnnouncementRecordQueryService implements QueryService<Announcement
                 criteria,
                 AnnouncementRecord.class
             );
-            if (MapUtils.isNotEmpty(queryWrapperMapMap)) {
-                Map.Entry<QueryWrapper<AnnouncementRecord>, Map<String, Object>> queryWrapperMapEntry = queryWrapperMapMap
-                    .entrySet()
-                    .stream()
-                    .findFirst()
-                    .get();
-                Map<String, Object> fieldMap = queryWrapperMapEntry.getValue();
-                if (MapUtils.isNotEmpty(fieldMap)) {
-                    if (queryWrapper == null) {
-                        queryWrapper = queryWrapperMapEntry.getKey();
-                    }
-                    QueryWrapper<AnnouncementRecord> finalQueryWrapper = queryWrapper;
-                    Boolean finalUseOr = useOr;
-                    fieldMap.forEach((fieldName, filter) -> {
-                        if (filter instanceof StringFilter) {
-                            CriteriaUtil.build(
-                                finalUseOr,
-                                finalQueryWrapper,
-                                buildStringSpecification((StringFilter) filter, fieldName, finalUseOr)
-                            );
-                        } else if (filter instanceof RangeFilter) {
-                            CriteriaUtil.build(
-                                finalUseOr,
-                                finalQueryWrapper,
-                                buildRangeSpecification((RangeFilter) filter, fieldName, finalUseOr)
-                            );
-                        } else if (filter instanceof Filter) {
-                            CriteriaUtil.build(finalUseOr, finalQueryWrapper, buildSpecification((Filter) filter, fieldName, finalUseOr));
-                        }
-                    });
+            Map.Entry<QueryWrapper<AnnouncementRecord>, Map<String, Object>> queryWrapperMapEntry = queryWrapperMapMap
+                .entrySet()
+                .stream()
+                .findFirst()
+                .orElseThrow();
+            Map<String, Object> fieldMap = queryWrapperMapEntry.getValue();
+            if (MapUtils.isNotEmpty(fieldMap)) {
+                if (queryWrapper == null) {
+                    queryWrapper = queryWrapperMapEntry.getKey();
                 }
+                QueryWrapper<AnnouncementRecord> finalQueryWrapper = queryWrapper;
+                Boolean finalUseOr = useOr;
+                fieldMap.forEach((fieldName, filter) -> {
+                    if (filter instanceof StringFilter) {
+                        CriteriaUtil.build(
+                            finalUseOr,
+                            finalQueryWrapper,
+                            buildStringSpecification((StringFilter) filter, fieldName, finalUseOr)
+                        );
+                    } else if (filter instanceof RangeFilter) {
+                        CriteriaUtil.build(
+                            finalUseOr,
+                            finalQueryWrapper,
+                            buildRangeSpecification((RangeFilter) filter, fieldName, finalUseOr)
+                        );
+                    } else if (filter instanceof Filter) {
+                        CriteriaUtil.build(finalUseOr, finalQueryWrapper, buildSpecification((Filter) filter, fieldName, finalUseOr));
+                    }
+                });
             }
             if (criteria.getAnd() != null) {
                 Map<String, Object> stringObjectMap = BeanUtil.beanToMap(criteria.getAnd(), false, true);

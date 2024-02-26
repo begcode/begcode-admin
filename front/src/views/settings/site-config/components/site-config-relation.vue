@@ -231,6 +231,8 @@ import SiteConfigEdit from '../site-config-edit.vue';
 import SiteConfigDetail from '../site-config-detail.vue';
 import SiteConfigList from '../site-config-list.vue';
 
+import dayjs from 'dayjs';
+
 const relationships = {};
 
 const config = {
@@ -321,6 +323,15 @@ const config = {
         componentProps: {},
       },
       {
+        title: '创建时间',
+        field: 'createdDate',
+        componentType: 'DateTime',
+        operator: '',
+        span: 8,
+        type: 'Instant',
+        componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
+      },
+      {
         title: '修改者Id',
         field: 'lastModifiedBy',
         componentType: 'Text',
@@ -329,6 +340,15 @@ const config = {
         operator: '',
         span: 8,
         componentProps: {},
+      },
+      {
+        title: '修改时间',
+        field: 'lastModifiedDate',
+        componentType: 'DateTime',
+        operator: '',
+        span: 8,
+        type: 'Instant',
+        componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
       },
       {
         title: '配置项列表',
@@ -412,6 +432,15 @@ const config = {
         editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
       },
       {
+        title: '创建时间',
+        field: 'createdDate',
+        minWidth: 100,
+        visible: true,
+        treeNode: false,
+        params: { type: 'Instant' },
+        formatter: ({ cellValue }) => (cellValue ? dayjs(cellValue).format('YYYY-MM-DD hh:mm:ss') : ''),
+      },
+      {
         title: '修改者Id',
         field: 'lastModifiedBy',
         minWidth: 80,
@@ -419,6 +448,15 @@ const config = {
         treeNode: false,
         params: { type: 'LONG' },
         editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
+      },
+      {
+        title: '修改时间',
+        field: 'lastModifiedDate',
+        minWidth: 100,
+        visible: true,
+        treeNode: false,
+        params: { type: 'Instant' },
+        formatter: ({ cellValue }) => (cellValue ? dayjs(cellValue).format('YYYY-MM-DD hh:mm:ss') : ''),
       },
       {
         title: '操作',

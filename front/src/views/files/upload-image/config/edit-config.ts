@@ -175,8 +175,8 @@ const fields = (): FormSchema[] => {
       label: '创建时间',
       field: 'createdDate',
       show: false,
-      component: 'Input',
-      componentProps: { type: 'text', clearable: true, placeholder: '请输入创建时间', style: 'width: 100%' },
+      component: 'DatePicker',
+      componentProps: { valueFormat: 'YYYY-MM-DD hh:mm:ss', placeholder: '请选择创建时间', style: 'width: 100%' },
       rules: [],
     },
     {
@@ -191,8 +191,8 @@ const fields = (): FormSchema[] => {
       label: '修改时间',
       field: 'lastModifiedDate',
       show: false,
-      component: 'Input',
-      componentProps: { type: 'text', clearable: true, placeholder: '请输入修改时间', style: 'width: 100%' },
+      component: 'DatePicker',
+      componentProps: { valueFormat: 'YYYY-MM-DD hh:mm:ss', placeholder: '请选择修改时间', style: 'width: 100%' },
       rules: [],
     },
     {

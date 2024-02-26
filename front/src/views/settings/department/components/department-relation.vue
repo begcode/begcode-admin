@@ -324,7 +324,7 @@ const config = {
         componentType: 'DateTime',
         operator: '',
         span: 8,
-        type: 'ZonedDateTime',
+        type: 'Instant',
         componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
       },
       {
@@ -447,10 +447,10 @@ const config = {
       {
         title: '创建时间',
         field: 'createTime',
-        minWidth: 140,
+        minWidth: 100,
         visible: true,
         treeNode: false,
-        params: { type: 'ZONED_DATE_TIME' },
+        params: { type: 'Instant' },
         formatter: ({ cellValue }) => (cellValue ? dayjs(cellValue).format('YYYY-MM-DD hh:mm:ss') : ''),
       },
       {

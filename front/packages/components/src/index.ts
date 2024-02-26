@@ -32,6 +32,7 @@ export { EasyCron, EasyCronModal, EasyCronInner, CronValidator } from '@/compone
 export { Ellipsis };
 export * from '@/components/Form';
 export * from '@/components/FormList';
+export * from '@/components/FormDesigner';
 export * from '@/components/CardList';
 export * from '@/components/CodeEditor';
 export * from '@/components/Description';

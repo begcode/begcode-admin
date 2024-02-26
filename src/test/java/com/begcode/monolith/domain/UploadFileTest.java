@@ -5,6 +5,7 @@ import static com.begcode.monolith.domain.UploadFileTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.begcode.monolith.web.rest.TestUtil;
+import java.util.*;
 import org.junit.jupiter.api.Test;
 
 class UploadFileTest {

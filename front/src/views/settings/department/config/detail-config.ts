@@ -1,6 +1,5 @@
 import { h } from 'vue';
 import { DescItem } from '@begcode/components';
-import dayjs from 'dayjs';
 import { Select } from 'ant-design-vue';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
@@ -45,9 +44,6 @@ const fields: DescItem[] = [
   {
     label: '创建时间',
     field: 'createTime',
-    format: (value, _data) => {
-      return value ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : '';
-    },
   },
   {
     label: '角色列表',

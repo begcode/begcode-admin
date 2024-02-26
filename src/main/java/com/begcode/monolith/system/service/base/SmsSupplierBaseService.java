@@ -23,7 +23,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
 import java.util.*;
-import java.util.Map;
+import java.util.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.sms4j.aliyun.config.AlibabaConfig;
@@ -174,10 +174,11 @@ public class SmsSupplierBaseService<R extends SmsSupplierRepository, E extends S
     @Override
     public BaseConfig getSupplierConfig(String s) {
         Optional<SmsSupplier> smsSupplierOptional = smsSupplierRepository.findById(Long.parseLong(s));
+
         if (smsSupplierOptional.isEmpty()) {
             return null;
         }
-        SmsSupplier smsSupplier = smsSupplierOptional.get();
+        SmsSupplier smsSupplier = smsSupplierOptional.orElseThrow();
         ObjectMapper objectMapper = new ObjectMapper();
         switch (smsSupplier.getProvider()) {
             case ALIBABA:

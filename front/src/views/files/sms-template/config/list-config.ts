@@ -1,4 +1,5 @@
 import type { VxeGridPropTypes, VxeGridProps } from 'vxe-table/types/grid';
+import dayjs from 'dayjs';
 import apiService from '@/api-service/index';
 import { useI18n } from '@/hooks/web/useI18n';
 
@@ -124,6 +125,15 @@ const searchForm = (): any[] => {
       componentProps: {},
     },
     {
+      title: '创建时间',
+      field: 'createdDate',
+      componentType: 'DateTime',
+      operator: '',
+      span: 8,
+      type: 'Instant',
+      componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
+    },
+    {
       title: '修改者Id',
       field: 'lastModifiedBy',
       componentType: 'Text',
@@ -132,6 +142,15 @@ const searchForm = (): any[] => {
       operator: '',
       span: 8,
       componentProps: {},
+    },
+    {
+      title: '修改时间',
+      field: 'lastModifiedDate',
+      componentType: 'DateTime',
+      operator: '',
+      span: 8,
+      type: 'Instant',
+      componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
     },
     {
       title: '短信服务商',
@@ -250,6 +269,15 @@ const columns = (): VxeGridPropTypes.Columns => {
       editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
+      title: '创建时间',
+      field: 'createdDate',
+      minWidth: 100,
+      visible: true,
+      treeNode: false,
+      params: { type: 'Instant' },
+      formatter: ({ cellValue }) => (cellValue ? dayjs(cellValue).format('YYYY-MM-DD hh:mm:ss') : ''),
+    },
+    {
       title: '修改者Id',
       field: 'lastModifiedBy',
       minWidth: 80,
@@ -259,26 +287,19 @@ const columns = (): VxeGridPropTypes.Columns => {
       editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
+      title: '修改时间',
+      field: 'lastModifiedDate',
+      minWidth: 100,
+      visible: true,
+      treeNode: false,
+      params: { type: 'Instant' },
+      formatter: ({ cellValue }) => (cellValue ? dayjs(cellValue).format('YYYY-MM-DD hh:mm:ss') : ''),
+    },
+    {
       title: '短信服务商',
       field: 'supplier',
       minWidth: 120,
-      editRender: {
-        name: 'ASelectModal',
-        enabled: false,
-        props: {
-          showComponentName: 'Select',
-          container: 'modal',
-          componentName: 'SmsSupplierDetail',
-          multiple: false,
-          style: { width: '100%' },
-          queryNames: ['id'],
-          avatarSlotName: 'default',
-          avatarSlotField: 'signName',
-          avatarTipField: 'signName',
-          rowIdField: 'value.id',
-          source: 'SmsTemplate',
-        },
-      },
+      formatter: ({ cellValue }) => cellValue?.signName || '',
     },
     {
       title: '操作',

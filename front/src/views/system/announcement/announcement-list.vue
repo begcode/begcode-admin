@@ -7,7 +7,7 @@
           <Button type="default" @click="showSearchFormSetting" preIcon="ant-design:setting-outlined" shape="circle" size="small"></Button>
         </Space>
       </template>
-      <search-form :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" />
+      <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" />
     </Card>
     <Card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
       <template #title>
@@ -241,7 +241,7 @@ const props = defineProps({
   },
   editIn: {
     type: String,
-    default: '',
+    default: 'page',
   },
   baseData: {
     type: Object,
@@ -552,11 +552,11 @@ const gridEvents = reactive<VxeGridListeners>({
         if (props.editIn === 'modal') {
           modalConfig.componentName = shallowRef(AnnouncementEdit);
           modalConfig.entityId = '';
-          setModalProps({ open: true });
+          setModalProps({ open: true, title: '新建' });
         } else if (props.editIn === 'drawer') {
           drawerConfig.componentName = shallowRef(AnnouncementEdit);
           drawerConfig.entityId = '';
-          setDrawerProps({ open: true });
+          setDrawerProps({ open: true, title: '新建' });
         } else {
           if (pageConfig.baseRouteName) {
             go({ name: `${pageConfig.baseRouteName}New` });
