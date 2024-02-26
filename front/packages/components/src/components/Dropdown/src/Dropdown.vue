@@ -12,12 +12,7 @@
             :disabled="item.disabled"
             :class="[{ 'is-pop-confirm': item.popConfirm }, item.class ?? []]"
           >
-            <Popconfirm
-              :disabled="item.disabled"
-              v-if="popconfirm && item.popConfirm"
-              v-bind="getPopConfirmAttrs(item.popConfirm)"
-              :disabled="item.disabled"
-            >
+            <Popconfirm :disabled="item.disabled" v-if="popconfirm && item.popConfirm" v-bind="getPopConfirmAttrs(item.popConfirm)">
               <template #icon v-if="item.popConfirm.icon">
                 <Icon v-if="item.iconColor" :icon="item.popConfirm.icon" :color="item.iconColor" />
                 <Icon v-else :icon="item.popConfirm.icon" />

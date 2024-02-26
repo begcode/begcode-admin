@@ -39,7 +39,7 @@ import { Form, Row, type FormProps as AntFormProps } from 'ant-design-vue';
 import FormItem from './components/FormItem.vue';
 import FormAction from './components/FormAction.vue';
 
-import { dateItemType, isIncludeSimpleComponents, handleInputStringValue } from './helper';
+import { dateItemType, isIncludeSimpleComponents } from './helper';
 import { dateUtil } from '@/utils/dateUtil';
 
 import { deepMerge } from '@/utils';

@@ -3,7 +3,7 @@ import type { NamePath, ValidateOptions } from 'ant-design-vue/lib/form/interfac
 import { unref, toRaw, nextTick } from 'vue';
 import { cloneDeep, set, uniqBy, get } from 'lodash-es';
 import type { FormProps, FormSchemaInner as FormSchema, FormActionType } from '../types/form';
-import { dateItemType, handleInputNumberValue, defaultValueComponents, isIncludeSimpleComponents, handleInputStringValue } from '../helper';
+import { dateItemType, handleInputNumberValue, defaultValueComponents, isIncludeSimpleComponents } from '../helper';
 import { isArray, isFunction, isObject, isString, isDef, isNil } from '@/utils/is';
 import { deepMerge, getValueType } from '@/utils';
 import { dateUtil } from '@/utils/dateUtil';
@@ -125,7 +125,6 @@ export function useFormEvents({
       const hasKey = Reflect.has(values, key);
 
       value = handleInputNumberValue(schema?.component, value);
-      value = handleInputStringValue(schema?.component, value);
       const { componentProps } = schema || {};
       let _props = componentProps as any;
       if (typeof componentProps === 'function') {
