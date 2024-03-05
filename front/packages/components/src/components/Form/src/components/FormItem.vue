@@ -1,11 +1,11 @@
 <script lang="tsx">
 import { NamePath, ValidateOptions } from 'ant-design-vue/lib/form/interface';
-import { type Recordable, type Nullable } from '#/utils.d';
+import type { Recordable } from '#/utils.d';
+import type { Nullable } from '#/types.d';
 import type { PropType, Ref } from 'vue';
 import { computed, defineComponent, toRefs, unref } from 'vue';
 import { isComponentFormSchema, type FormActionType, type FormProps, type FormSchemaInner as FormSchema } from '../types/form';
 import type { Rule as ValidationRule } from 'ant-design-vue/lib/form/interface';
-import type { TableActionType } from '@/components/Table';
 import { Col, Divider, Form } from 'ant-design-vue';
 import { componentMap } from '../componentMap';
 import { BasicHelp, BasicTitle } from '@/components/Basic';
@@ -47,9 +47,6 @@ export default defineComponent({
       type: Function as PropType<(nameList?: NamePath[] | undefined, options?: ValidateOptions) => Promise<any>>,
       default: null,
     },
-    tableAction: {
-      type: Object as PropType<TableActionType>,
-    },
     formActionType: {
       type: Object as PropType<FormActionType>,
     },
@@ -83,10 +80,10 @@ export default defineComponent({
     });
 
     const getComponentsProps = computed(() => {
-      const { schema, tableAction, formModel, formActionType } = props;
+      const { schema, formModel, formActionType } = props;
       let { componentProps = {} } = schema;
       if (isFunction(componentProps)) {
-        componentProps = componentProps({ schema, tableAction, formModel, formActionType }) ?? {};
+        componentProps = componentProps({ schema, formModel, formActionType }) ?? {};
       }
       if (isIncludeSimpleComponents(schema.component)) {
         componentProps = Object.assign(
@@ -246,10 +243,10 @@ export default defineComponent({
             if (Object.prototype.toString.call(reg) === '[object RegExp]') {
               item.pattern = reg;
             } else {
-              item.pattern = new RegExp(item.pattern);
+              item.pattern = new RegExp(item.pattern as string);
             }
           } catch (error) {
-            item.pattern = new RegExp(item.pattern);
+            item.pattern = new RegExp(item.pattern!);
           }
         }
       });
@@ -344,13 +341,12 @@ export default defineComponent({
       if (labelLength && showLabel.length > 4) {
         showLabel = showLabel.substr(0, labelLength);
       }
-      const titleObj = { title: label };
       const renderLabel = subLabel ? (
         <span>
           {label} <span class="text-secondary">{subLabel}</span>
         </span>
       ) : labelLength ? (
-        <label {...titleObj}>{showLabel}</label>
+        <label title={showLabel}>{showLabel}</label>
       ) : (
         label
       );

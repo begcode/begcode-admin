@@ -16,10 +16,10 @@
     >
       <li
         class="bs-box text-ellipsis"
-        @dragstart="$emit('add-attrs', list, index)"
+        @dragstart="$emit('add-attrs', list)"
         @click="$emit('handle-list-push', element)"
         v-for="element in list"
-        :key="element.name"
+        :key="element.field"
       >
         <Icon :icon="element.icon" />
         {{ element.label }}

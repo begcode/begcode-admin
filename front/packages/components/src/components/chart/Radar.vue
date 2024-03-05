@@ -5,6 +5,7 @@
 import { PropType, ref, Ref, reactive, watchEffect } from 'vue';
 import { useECharts } from '@/hooks/web/useECharts';
 import { cloneDeep } from 'lodash-es';
+import { EChartsOption } from 'echarts';
 
 defineOptions({
   name: 'Radar',
@@ -12,7 +13,7 @@ defineOptions({
 
 const props = defineProps({
   chartData: {
-    type: Array,
+    type: Array as PropType<any[]>,
     default: () => [],
   },
   option: {
@@ -30,7 +31,7 @@ const props = defineProps({
 });
 
 const chartRef = ref<HTMLDivElement | null>(null);
-const { setOptions, echarts } = useECharts(chartRef as Ref<HTMLDivElement>);
+const { setOptions } = useECharts(chartRef as Ref<HTMLDivElement>);
 const option = reactive({
   title: {
     text: '基础雷达图',
@@ -39,8 +40,8 @@ const option = reactive({
     data: ['文综'],
   },
   radar: {
-    indicator: [{ name: '历史' }, { name: '地理' }, { name: '生物' }, { name: '化学' }, { name: '物理' }, { name: '政治' }],
-  },
+    indicator: [{ name: '历史' }, { name: '地理' }, { name: '生物' }, { name: '化学' }, { name: '物理' }, { name: '政治' }] as any[],
+  } as any,
   series: [
     {
       type: 'radar' as 'custom',
@@ -51,7 +52,7 @@ const option = reactive({
         },
       ],
     },
-  ],
+  ] as any[],
 });
 
 watchEffect(() => {
@@ -74,7 +75,7 @@ function initCharts() {
     ),
   );
 
-  let data = [];
+  let data: any[] = [];
   typeArr.forEach(type => {
     let obj = { name: type };
     let chartArr = props.chartData.filter(item => type === item.type);
@@ -84,6 +85,6 @@ function initCharts() {
   });
   option.radar.axisName = indicator;
   option.series[0]['data'] = data;
-  setOptions(option);
+  setOptions(option as EChartsOption);
 }
 </script>

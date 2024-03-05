@@ -21,7 +21,6 @@ public class SysLog extends AbstractAuditingEntity<Long, SysLog> implements Seri
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    @TableField(value = "id")
     private Long id;
 
     /**

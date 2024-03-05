@@ -31,7 +31,7 @@
 </template>
 <script lang="ts">
 import { Recordable } from '#/utils.d';
-import { defineComponent, reactive, toRefs, computed, PropType, unref } from 'vue';
+import { defineComponent, reactive, computed, PropType, unref, Component } from 'vue';
 import { componentMap } from '../../core/formItemConfig';
 import { IVFormComponent, IFormConfig } from '../../typings/v-form-component';
 import { asyncComputed } from '@vueuse/core';
@@ -67,16 +67,16 @@ export default defineComponent({
   },
   emits: ['update:form-data', 'change'],
   setup(props, { emit }) {
-    const state = reactive({
+    const state: any = reactive({
       componentMap,
     });
 
     const { formModel: formData1, setFormModel } = useFormModelState();
-    const colPropsComputed = computed(() => {
+    const colPropsComputed: any = computed(() => {
       const { colProps = {} } = props.schema;
       return colProps;
     });
-    const formItemProps = computed(() => {
+    const formItemProps: any = computed(() => {
       const { formConfig } = unref(props);
       let { field, required, rules, labelCol, wrapperCol } = unref(props.schema);
       const { colon } = props.formConfig;
@@ -131,16 +131,16 @@ export default defineComponent({
       return newConfig;
     }) as Recordable<any>;
 
-    const componentItem = computed(() => componentMap.get(props.schema.component as string));
+    const componentItem: Component = computed(() => state.componentMap.get(props.schema.component as string));
 
     // console.log('component change:', props.schema.component, componentItem.value);
-    const handleClick = (schema: IVFormComponent) => {
+    const handleClick = (schema: IVFormComponent): void => {
       if (schema.component === 'Button' && schema.componentProps?.handle) emit(schema.componentProps?.handle);
     };
     /**
      * 处理异步属性，异步属性会导致一些属性渲染错误，如defaultValue异步加载会导致渲染不出来，故而此处只处理options，treeData，同步属性在cmpProps中处理
      */
-    const asyncProps = asyncComputed(async () => {
+    const asyncProps: any = asyncComputed(async () => {
       let { options, treeData } = props.schema.componentProps ?? {};
       if (options) options = await handleAsyncOptions(options);
       if (treeData) treeData = await handleAsyncOptions(treeData);
@@ -153,7 +153,7 @@ export default defineComponent({
     /**
      * 处理同步属性
      */
-    const cmpProps = computed(() => {
+    const cmpProps: any = computed(() => {
       const isCheck = props.schema && ['Switch', 'Checkbox', 'Radio'].includes(props.schema.component);
       let { field } = props.schema;
 
@@ -168,15 +168,17 @@ export default defineComponent({
       };
     });
 
-    const handleChange = function (e) {
+    const handleChange = function (e): void {
       const isCheck = ['Switch', 'Checkbox', 'Radio'].includes(props.schema.component);
-      const target = e ? e.target : null;
+      const target: any = e ? e.target : null;
       const value = target ? (isCheck ? target.checked : target.value) : e;
-      setFormModel(props.schema.field!, value);
+      if (setFormModel) {
+        setFormModel(props.schema.field!, value);
+      }
       emit('change', value);
     };
     return {
-      ...toRefs(state),
+      state,
       componentItem,
       formItemProps,
       handleClick,

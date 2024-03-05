@@ -1,6 +1,6 @@
 <script lang="tsx">
 import type { CSSProperties } from 'vue';
-import type { FieldNames, TreeState, TreeItem, KeyType, CheckKeys, TreeActionType } from './types/tree';
+import { FieldNames, TreeState, TreeItem, KeyType, CheckKeys, TreeActionType } from './types/tree.d';
 
 import { defineComponent, reactive, computed, unref, ref, watchEffect, toRaw, watch, onMounted } from 'vue';
 import TreeHeader from './components/TreeHeader.vue';
@@ -13,10 +13,11 @@ import { extendSlots, getSlot } from '@/utils/helper/tsxHelper';
 import { filter, treeToList, eachTree } from '@/utils/helper/treeHelper';
 import { useTree } from './hooks/useTree';
 import { useContextMenu } from '@/hooks/web/useContextMenu';
-import { CreateContextOptions } from '@/components/ContextMenu';
-import { treeEmits, treeProps } from './types/tree';
+import { treeEmits, treeProps } from './types/tree.d';
 import { createBEM } from '@/utils/bem';
 import type { TreeProps } from 'ant-design-vue/es/tree/Tree';
+import type { Recordable } from '#/utils';
+import { CreateContextOptions } from '@/components/ContextMenu';
 
 export default defineComponent({
   name: 'BasicTree',
@@ -150,6 +151,7 @@ export default defineComponent({
     function getExpandedKeys() {
       return state.expandedKeys;
     }
+
     function setSelectedKeys(keys: KeyType[]) {
       state.selectedKeys = keys;
     }
@@ -260,7 +262,7 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      const level = parseInt(props.defaultExpandLevel);
+      const level = parseInt((props.defaultExpandLevel || '0').toString());
       if (level > 0) {
         state.expandedKeys = filterByLevel(level);
       } else if (props.defaultExpandAll) {
@@ -412,7 +414,7 @@ export default defineComponent({
               search={search}
               toolbar={toolbar}
               helpMessage={helpMessage}
-              onStrictlyChange={onStrictlyChange}
+              on-trictly-change={onStrictlyChange}
               onSearch={handleSearch}
               searchText={searchState.searchText}
             >
@@ -435,16 +437,19 @@ export default defineComponent({
 </script>
 <style>
 .vben-tree {
-  background-color: v-bind('token["component-background"]');
+  background-color: #fff;
 }
+
 .vben-tree .ant-tree-node-content-wrapper {
   position: relative;
 }
+
 .vben-tree .ant-tree .ant-tree-checkbox {
   margin-block-start: 0;
   margin-inline-start: 4px;
   margin-inline-end: 4px;
 }
+
 .vben-tree .ant-tree .ant-tree-checkbox + span {
   padding-left: 4px;
 }
@@ -454,6 +459,7 @@ export default defineComponent({
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .vben-tree__title {
   position: relative;
   display: flex;
@@ -461,27 +467,34 @@ export default defineComponent({
   width: 100%;
   padding-right: 10px;
 }
+
 .vben-tree__title:hover .vben-tree__action {
   visibility: visible;
 }
+
 .vben-tree__content {
   overflow: hidden;
 }
+
 .vben-tree__actions {
   position: absolute;
   right: 3px;
   display: flex;
 }
+
 .vben-tree__action {
   margin-left: 4px;
   visibility: hidden;
 }
+
 .vben-tree-header {
-  border-bottom: 1px solid v-bind('token["colorBorder"]');
+  border-bottom: 1px solid #d9d9d9;
 }
+
 .\!mt-4 {
   margin-top: 1rem !important;
 }
+
 .h-full {
   height: 100%;
 }

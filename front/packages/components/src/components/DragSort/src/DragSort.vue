@@ -99,7 +99,9 @@ const closePopover = (update: boolean) => {
         console.log('更新完成', res);
       });
     } else {
-      recalcSortNumber().then(res => {});
+      recalcSortNumber().then(res => {
+        console.log('res', res);
+      });
     }
   }
   open.value = false;
@@ -123,9 +125,8 @@ async function recalcSortNumber() {
  * 排序表格
  * @param oldIndex
  * @param newIndex
- * @param force 强制排序
  */
-async function doSort(oldIndex: number, newIndex: number, force = false) {
+async function doSort(oldIndex: number, newIndex: number) {
   let xTable = props.params.$table;
   let sort = array => {
     // 存储old数据，并删除该项
@@ -155,7 +156,7 @@ async function doSort(oldIndex: number, newIndex: number, force = false) {
 
 /** 行重新排序 */
 function rowResort(oldIndex: number, newIndex: number) {
-  return doSort(oldIndex, newIndex, true);
+  return doSort(oldIndex, newIndex);
 }
 
 /** 向上移 */

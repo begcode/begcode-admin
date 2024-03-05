@@ -1219,10 +1219,9 @@ const rowClickHandler = (name, operation, row) => {
       }
   }
 };
-const getCheckboxRecords = () => {
+const getSelectRows = () => {
   return toRaw(selectedRows);
 };
-
 const getData = () => {
   if (xGrid.value) {
     const data = xGrid.value.getTableData();
@@ -1233,7 +1232,7 @@ const getData = () => {
 };
 
 defineExpose({
-  getCheckboxRecords,
+  getSelectRows,
   getData,
 });
 </script>

@@ -8,7 +8,7 @@ export function copyText(text: string, prompt: string | null = '已成功复制�
       .then(() => {
         prompt && message.success(prompt);
       })
-      .catch(error => {
+      .catch((error: any) => {
         message.error('复制失败!' + error.message);
         return error;
       });
@@ -31,7 +31,7 @@ export function copyText(text: string, prompt: string | null = '已成功复制�
 
         prompt && message.success(prompt);
         resolve();
-      } catch (error) {
+      } catch (error: any) {
         message.error('复制失败!' + error.message);
         reject(error);
       }

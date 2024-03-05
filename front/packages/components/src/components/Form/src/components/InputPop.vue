@@ -24,7 +24,8 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, ref, watch } from 'vue';
+import type { TooltipPlacement } from 'ant-design-vue/es/tooltip';
+import { computed, nextTick, ref, watch, PropType } from 'vue';
 import { Input, Popover, Textarea } from 'ant-design-vue';
 import Icon from '@/components/Icon/Icon.vue';
 import { useAttrs } from '@/hooks/vben/useAttrs';
@@ -37,7 +38,10 @@ const props = defineProps({
   value: propTypes.string.def(''),
   title: propTypes.string.def(''),
   // 弹出框显示位置
-  position: propTypes.string.def('right'),
+  position: {
+    type: String as PropType<TooltipPlacement>,
+    default: 'right',
+  },
   width: propTypes.number.def(300),
   height: propTypes.number.def(150),
   disabled: propTypes.bool.def(false),

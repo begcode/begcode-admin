@@ -6,7 +6,6 @@
 import { useAttrs, watchEffect, ref } from 'vue';
 import { CheckboxGroup } from 'ant-design-vue';
 import { propTypes } from '@/utils/propTypes';
-import { initDictOptions } from '@/utils/dict/index';
 
 defineOptions({ name: 'DictCheckbox' });
 
@@ -16,6 +15,10 @@ const props = defineProps({
   options: {
     type: Array,
     default: () => [],
+  },
+  initDictOptions: {
+    type: Function,
+    default: null,
   },
 });
 
@@ -35,9 +38,9 @@ watchEffect(() => {
     checkboxArray.value = [];
   } else {
     temp = temp + '';
-    checkboxArray.value = temp.split(',');
+    checkboxArray.value = (temp as string).split(',');
   }
-  props.value && (checkboxArray.value = props.value ? props.value.split(',') : []);
+  props.value && (checkboxArray.value = props.value ? (props.value as string).split(',') : []);
   if (props.value === '' || props.value === undefined) {
     checkboxArray.value = [];
   }
@@ -60,7 +63,7 @@ async function initOptions() {
   }
   //根据字典Code, 初始化选项
   if (props.dictCode) {
-    const dictData = await initDictOptions(props.dictCode);
+    const dictData = await props.initDictOptions(props.dictCode);
     checkOptions.value = dictData.reduce((prev, next) => {
       if (next) {
         const value = next['value'];

@@ -1,3 +1,4 @@
+import type { Nullable, RefType } from '#/types';
 export type ScrollType = 'default' | 'main';
 
 export interface CollapseContainerOptions {

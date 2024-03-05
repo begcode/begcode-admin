@@ -181,7 +181,7 @@ function handleChange(keys, args) {
 }
 
 const handleRenderDisplay: CascaderProps['displayRender'] = ({ labels, selectedOptions }) => {
-  if (unref(emitData).length === selectedOptions.length) {
+  if (unref(emitData).length === selectedOptions?.length) {
     return labels.join(' / ');
   }
   if (props.displayRenderArray) {

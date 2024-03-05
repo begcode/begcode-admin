@@ -5,6 +5,7 @@
 import { PropType, ref, Ref, reactive, watchEffect } from 'vue';
 import { useECharts } from '@/hooks/web/useECharts';
 import { cloneDeep } from 'lodash-es';
+import { EChartsOption } from 'echarts';
 
 defineOptions({
   name: 'BarMulti',
@@ -12,7 +13,7 @@ defineOptions({
 
 const props = defineProps({
   chartData: {
-    type: Array,
+    type: Array as PropType<any[]>,
     default: () => [],
     required: true,
   },
@@ -57,12 +58,12 @@ const option = reactive({
   },
   xAxis: {
     type: 'category',
-    data: [],
+    data: [] as any[],
   },
   yAxis: {
     type: 'value',
   },
-  series: [],
+  series: [] as any[],
 });
 
 watchEffect(() => {
@@ -77,10 +78,10 @@ function initCharts() {
   let typeArr = Array.from(new Set(props.chartData.map(item => item.type)));
   //轴数据
   let xAxisData = Array.from(new Set(props.chartData.map(item => item.name)));
-  let seriesData = [];
+  let seriesData: any[] = [];
   typeArr.forEach(type => {
     let obj: any = { name: type, type: props.type };
-    let data = [];
+    let data: any[] = [];
     xAxisData.forEach(x => {
       let dataArr = props.chartData.filter(item => type === item.type && item.name == x);
       if (dataArr && dataArr.length > 0) {
@@ -95,7 +96,7 @@ function initCharts() {
   });
   option.series = seriesData;
   option.xAxis.data = xAxisData;
-  setOptions(option);
+  setOptions(option as EChartsOption);
   getInstance()?.off('click', onClick);
   getInstance()?.on('click', onClick);
 }

@@ -5,7 +5,7 @@
   <Modal
     title="JSON数据"
     :footer="null"
-    :open="visible"
+    :open="state.visible"
     @cancel="handleCancel"
     :destroyOnClose="true"
     wrapClassName="v-code-modal"
@@ -16,7 +16,7 @@
   </Modal>
 </template>
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue';
+import { computed, ComputedRef, defineComponent, reactive } from 'vue';
 import PreviewCode from './PreviewCode.vue';
 import { IFormConfig } from '../../../typings/v-form-component';
 import { formatRules, removeAttrs } from '../../../utils';
@@ -30,36 +30,32 @@ export default defineComponent({
   },
   emits: ['cancel'],
   setup(_props, { emit }) {
-    const state = reactive<{
-      visible: boolean;
-      jsonData: IFormConfig;
-    }>({
+    const state: any = reactive({
       visible: false, // 控制json数据弹框显示
-      jsonData: {} as IFormConfig, // json数据
+      jsonData: {}, // json数据
     });
     /**
      * 显示Json数据弹框
      * @param jsonData
      */
-    const showModal = (jsonData: IFormConfig) => {
+    const showModal = (jsonData: IFormConfig): void => {
       formatRules(jsonData.schemas);
       state.jsonData = jsonData as any;
       state.visible = true;
     };
 
     // 计算json数据
-    const editorJson = computed(() => {
-      // @ts-ignore
-      return JSON.stringify(removeAttrs(state.jsonData), null, '\t');
+    const editorJson: ComputedRef<string> = computed(() => {
+      return JSON.stringify(removeAttrs(state.jsonData as IFormConfig), null, '\t');
     });
 
     // 关闭弹框
-    const handleCancel = () => {
+    const handleCancel = (): void => {
       state.visible = false;
       emit('cancel');
     };
 
-    return { ...toRefs(state), editorJson, handleCancel, showModal };
+    return { state, editorJson, handleCancel, showModal };
   },
 });
 </script>

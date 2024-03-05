@@ -37,7 +37,7 @@ export default defineComponent({
     // 获取 formDesignMethods
     const handleSelectItem = () => {
       // 调用 formDesignMethods
-      formDesignMethods.handleSetSelectItem(props.schema);
+      formDesignMethods?.handleSetSelectItem(props.schema);
     };
     return {
       ...toRefs(state),

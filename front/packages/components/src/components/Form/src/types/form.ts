@@ -3,7 +3,8 @@ import type { VNode, ComputedRef, CSSProperties } from 'vue';
 import type { RowProps } from 'ant-design-vue/lib/grid/Row';
 import type { FormItem } from './formItem';
 import type { ColEx, ComponentType, ComponentProps } from './';
-import type { ButtonProps as AntdButtonProps } from '@/components/Button';
+import type { ButtonProps } from '@/components/Button';
+import type { Recordable } from '#/utils';
 
 export type FieldMapToTime = [string, [string, string], (string | [string, string])?][];
 export type FieldMapToNumber = [string, [string, string]][];
@@ -19,10 +20,6 @@ export interface RenderCallbackParams {
   field: string;
 }
 
-export interface ButtonProps extends AntdButtonProps {
-  text?: string;
-}
-
 export interface FormActionType {
   submit: () => Promise<void>;
   setFieldsValue: (values: Recordable) => Promise<void>;
@@ -32,7 +29,7 @@ export interface FormActionType {
   updateSchema: (data: Partial<FormSchemaInner> | Partial<FormSchemaInner>[]) => Promise<void>;
   resetSchema: (data: Partial<FormSchemaInner> | Partial<FormSchemaInner>[]) => Promise<void>;
   setProps: (formProps: Partial<FormProps>) => Promise<void>;
-  getProps: ComputedRef<Partial<FormProps>>;
+  getProps?: ComputedRef<Partial<FormProps>>;
   removeSchemaByField: (field: string | string[]) => Promise<void>;
   appendSchemaByField: (
     schema: FormSchemaInner | FormSchemaInner[],
@@ -40,7 +37,7 @@ export interface FormActionType {
     first?: boolean | undefined,
   ) => Promise<void>;
   validateFields: (nameList?: NamePath[], options?: ValidateOptions) => Promise<any>;
-  validate: <T = Recordable>(nameList?: NamePath[] | false) => Promise<any>;
+  validate: <T = Recordable>(nameList?: NamePath[] | false) => Promise<T>;
   scrollToField: (name: NamePath, options?: ScrollOptions) => Promise<void>;
 }
 

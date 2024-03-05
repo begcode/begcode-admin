@@ -3,7 +3,7 @@
 </template>
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import { useIntervalFn } from '@vueuse/core';
+import { useIntervalFn } from '@vueuse/shared';
 import { formatToDateTime, formatToDate, dateUtil } from '@/utils/dateUtil';
 import { isNumber, isObject, isString } from 'lodash-es';
 import { propTypes } from '@/utils/propTypes';
@@ -82,7 +82,7 @@ function getRelativeTime(timeStamp: number) {
     resStr = t('component.time.just');
     // Less than or equal to 59 seconds
   } else if (diff < ONE_MINUTES) {
-    resStr = parseInt(diff / ONE_SECONDS) + t('component.time.seconds') + dirStr;
+    resStr = parseInt((diff / ONE_SECONDS).toString()) + t('component.time.seconds') + dirStr;
     // More than 59 seconds, less than or equal to 59 minutes and 59 seconds
   } else if (diff >= ONE_MINUTES && diff < ONE_HOUR) {
     resStr = Math.floor(diff / ONE_MINUTES) + t('component.time.minutes') + dirStr;

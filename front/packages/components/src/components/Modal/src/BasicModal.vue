@@ -1,5 +1,5 @@
 <template>
-  <Modal v-bind="getBindValue" @cancel="handleCancel">
+  <ModalContainer v-bind="getBindValue" @cancel="handleCancel">
     <template #closeIcon v-if="!$slots.closeIcon">
       <ModalClose
         :canFullscreen="getProps.canFullscreen"
@@ -42,22 +42,23 @@
     <template #[item]="data" v-for="item in Object.keys(omit($slots, 'default'))">
       <slot :name="item" v-bind="data || {}"></slot>
     </template>
-  </Modal>
+  </ModalContainer>
 </template>
 <script lang="ts" setup>
 import type { ModalProps, ModalMethods } from './typing';
+import type { Recordable } from '#/utils';
 import { computed, ref, watch, unref, watchEffect, toRef, getCurrentInstance, nextTick, useAttrs } from 'vue';
 import { omit } from 'lodash-es';
-import Modal from './components/Modal';
+import ModalContainer from './components/ModalContainer.vue';
 import ModalWrapper from './components/ModalWrapper.vue';
 import ModalClose from './components/ModalClose.vue';
 import ModalFooter from './components/ModalFooter.vue';
 import ModalHeader from './components/ModalHeader.vue';
 import { isFunction } from 'lodash-es';
 import { deepMerge } from '@/utils';
-import { basicProps } from './props';
 import { useFullScreen } from './hooks/useModalFullScreen';
 import { useDesign } from '@/hooks/web/useDesign';
+import { basicProps } from './props';
 
 defineOptions({ name: 'BasicModal', inheritAttrs: false });
 

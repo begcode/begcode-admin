@@ -5,8 +5,8 @@
   <Modal
     title="代码"
     :footer="null"
-    :open="visible"
-    @cancel="visible = false"
+    :open="state.visible"
+    @cancel="state.visible = false"
     wrapClassName="v-code-modal"
     style="top: 20px"
     width="850px"
@@ -16,13 +16,13 @@
   </Modal>
 </template>
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from 'vue';
+import { computed, defineComponent, reactive } from 'vue';
 import { formatRules, removeAttrs } from '../../../utils';
 import PreviewCode from './PreviewCode.vue';
 import { IFormConfig } from '../../../typings/v-form-component';
 import { Modal } from 'ant-design-vue';
 
-const codeVueFront = `<template>
+const codeVueFront: string = `<template>
   <div>
     <v-form-create
       :formConfig="formConfig"
@@ -53,27 +53,27 @@ let codeVueLast = `
   }
 }
 <\/script>`;
-//
+
 export default defineComponent({
   name: 'CodeModal',
   components: { PreviewCode, Modal },
   setup() {
-    const state = reactive({
+    const state: any = reactive({
       visible: false,
-      jsonData: {} as IFormConfig,
+      jsonData: {},
     });
 
     const showModal = (formConfig: IFormConfig) => {
       formConfig.schemas && formatRules(formConfig.schemas);
       state.visible = true;
-      state.jsonData = formConfig as any;
+      state.jsonData = formConfig;
     };
 
     const editorVueJson = computed(() => {
       return codeVueFront + JSON.stringify(removeAttrs(state.jsonData as any), null, '\t') + codeVueLast;
     });
 
-    return { ...toRefs(state), editorVueJson, showModal };
+    return { state, editorVueJson, showModal };
   },
 });
 </script>

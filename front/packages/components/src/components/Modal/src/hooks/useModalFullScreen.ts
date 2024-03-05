@@ -1,4 +1,5 @@
 import { computed, Ref, ref, unref } from 'vue';
+import type { ComponentRef } from '#/types';
 
 export interface UseFullScreenContext {
   wrapClassName: Ref<string | undefined>;

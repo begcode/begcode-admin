@@ -2,6 +2,7 @@ import { ref, onUnmounted, unref, getCurrentInstance, reactive, watchEffect, nex
 import { isEqual, isFunction } from 'lodash-es';
 import { tryOnUnmounted } from '@vueuse/core';
 import type { UseModalReturnType, ModalMethods, ModalProps, ReturnMethods, UseModalInnerReturnType } from '../typing';
+import type { Nullable, Fn } from '#/types';
 import { isProdMode } from '@/utils';
 import { useLog } from '@/hooks/useLog';
 

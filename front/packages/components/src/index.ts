@@ -51,7 +51,6 @@ export * from '@/components/Tree';
 export * from '@/components/Upload';
 export * from '@/components/Verify';
 export * from '@/components/DragSort';
-export * from '@/components/VxeTable';
 export * as Log from '@/utils/Log';
 export * from '@/components/Transition';
 export * from '@/hooks';

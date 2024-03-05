@@ -17,7 +17,14 @@
         <CodeEditor />
       </div>
     </template>
-    <Input :class="`${prefixCls}-input`" :value="innerValue" :disabled="disabled" v-bind="attrs" @change="onInputChange">
+    <Input
+      :class="`${prefixCls}-input`"
+      :value="innerValue"
+      :disabled="disabled"
+      v-bind="attrs"
+      @change="onInputChange"
+      :style="textareaStyle"
+    >
       <template #suffix>
         <Icon icon="ant-design:fullscreen-outlined" @click.stop="onShowPopup" />
       </template>
@@ -26,13 +33,14 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch, PropType } from 'vue';
 import { Input, Popover } from 'ant-design-vue';
 import Icon from '@/components/Icon/Icon.vue';
 import { useAttrs } from '@/hooks/vben/useAttrs';
 import { propTypes } from '@/utils/propTypes';
 import { useDesign } from '@/hooks/web/useDesign';
 import CodeEditor from '@/components/CodeEditor/src/CodeEditor.vue';
+import { TooltipPlacement } from 'ant-design-vue/es/tooltip';
 
 const { prefixCls } = useDesign('j-input-popup');
 const props = defineProps({
@@ -40,7 +48,10 @@ const props = defineProps({
   value: propTypes.string.def(''),
   title: propTypes.string.def(''),
   // 弹出框显示位置
-  position: propTypes.string.def('right'),
+  position: {
+    type: String as PropType<TooltipPlacement>,
+    default: 'right',
+  },
   width: propTypes.number.def(300),
   height: propTypes.number.def(150),
   disabled: propTypes.bool.def(false),

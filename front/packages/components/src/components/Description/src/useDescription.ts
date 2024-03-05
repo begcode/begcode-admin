@@ -1,6 +1,7 @@
 import { ref, getCurrentInstance, unref } from 'vue';
 import type { DescriptionProps, DescInstance, UseDescReturnType } from './typing';
 import { isProdMode } from '@/utils';
+import type { Nullable } from '#/utils';
 
 export function useDescription(props?: Partial<DescriptionProps>): UseDescReturnType {
   if (!getCurrentInstance()) {

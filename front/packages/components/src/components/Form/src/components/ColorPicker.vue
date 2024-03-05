@@ -1,14 +1,11 @@
-<script lang="ts">
-// 声明无法在 <script setup> 中声明的选项
-export default {
-  name: 'ColorPicker',
-};
-</script>
-
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed, ref } from 'vue';
-import { onClickOutside } from '@vueuse/core';
+import { MaybeElement, MaybeElementRef, onClickOutside } from '@vueuse/core';
 import Icon from '@/components/Icon/Icon.vue';
+
+defineOptions({
+  name: 'ColorPicker',
+});
 const props = withDefaults(
   defineProps<{
     // 当前颜色
@@ -38,7 +35,7 @@ const colorPicker = ref<HTMLInputElement | null>(null);
 const closePanel = () => {
   openStatus.value = false;
 };
-onClickOutside(colorPicker, closePanel);
+onClickOutside(colorPicker as MaybeElementRef<MaybeElement>, closePanel);
 // 鼠标经过的颜色块
 const hoveColor = ref('');
 const handleOver = (color: string) => {
@@ -80,7 +77,7 @@ const showColor = computed(() => {
 });
 // 计算属性：颜色面板
 const colorPanel = computed(() => {
-  let colorArr = [];
+  let colorArr: any[] = [];
   for (let color of colorConfig) {
     colorArr.push(gradient(color[1], color[0], 5));
   }
@@ -106,7 +103,7 @@ const handleDefaultColor = () => {
  */
 const parseColor = (hexStr: string) => {
   if (hexStr.length === 4) {
-    return (hexStr = '#' + hexStr[1] + hexStr[1] + hexStr[2] + hexStr[2] + hexStr[3] + hexStr[3]);
+    return '#' + hexStr[1] + hexStr[1] + hexStr[2] + hexStr[2] + hexStr[3] + hexStr[3];
   } else {
     return hexStr;
   }
@@ -119,7 +116,7 @@ const rgbToHex = (r: number, g: number, b: number) => {
 // HEX 转 RGB 颜色
 const hexToRgb = (hex: string) => {
   hex = parseColor(hex);
-  let rgb = [];
+  let rgb: any[] = [];
   for (let i = 1; i < 7; i += 2) {
     rgb.push(parseInt('0x' + hex.slice(i, i + 2)));
   }
@@ -134,7 +131,7 @@ const gradient = (startColor: string, endColor: string, step: number) => {
   let rStep = (eColor[0] - sColor[0]) / step;
   let gStep = (eColor[1] - sColor[1]) / step;
   let bStep = (eColor[2] - sColor[2]) / step;
-  let gradientColorArr = [];
+  let gradientColorArr: any[] = [];
   // 计算每一步的hex值
   for (let i = 0; i < step; i++) {
     gradientColorArr.push(rgbToHex(rStep * i + sColor[0], gStep * i + sColor[1], bStep * i + sColor[2]));
@@ -183,10 +180,10 @@ const gradient = (startColor: string, endColor: string, step: number) => {
               <li
                 v-for="(color, cindex) of item"
                 :key="cindex"
-                :style="{ backgroundColor: color }"
-                @mouseover="handleOver(color)"
+                :style="{ backgroundColor: color + '' }"
+                @mouseover="handleOver(color + '')"
                 @mouseout="handleOver('')"
-                @click="updataValue(color)"
+                @click="updataValue(color + '')"
               ></li>
             </ul>
           </li>

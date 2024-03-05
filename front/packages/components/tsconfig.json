@@ -2,12 +2,12 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@/*": ["./src/*"],
-      "#/*": ["./types/*"]
+      "@/*": ["src/*"],
+      "#/*": ["src/types/*"]
     },
     "target": "esnext",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "Node16",
     "strict": true,
     "noLib": false,
     "forceConsistentCasingInFileNames": true,
@@ -15,7 +15,6 @@
     "strictFunctionTypes": false,
     "jsx": "preserve",
     "declaration": false,
-    "allowJs": true,
     "sourceMap": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
@@ -28,18 +27,6 @@
     "types": ["vite/client"],
     "removeComments": true
   },
-  "include": [
-    "tests/**/*.ts",
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "types/**/*.d.ts",
-    "types/**/*.ts",
-    "build/**/*.ts",
-    "build/**/*.d.ts",
-    "mock/**/*.ts",
-    "vite.config.ts"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "types/*.d.ts", "vite.config.ts"],
   "exclude": ["node_modules", "dist"]
 }

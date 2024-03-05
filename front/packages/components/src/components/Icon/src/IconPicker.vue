@@ -77,6 +77,7 @@ import SvgIcon from './SvgIcon.vue';
 import iconsData from '../data/icons.data';
 import { usePagination } from '@/hooks/web/usePagination';
 import { useDebounceFn } from '@vueuse/core';
+// @ts-ignore
 import svgIcons from 'virtual:svg-icons-names';
 import { copyText } from '@/utils/copyTextToClipboard';
 import { useI18n } from '@/hooks/web/useI18nOut';
@@ -170,7 +171,7 @@ function handlePageChange(page: number, size: number) {
 }
 
 function handleClick(icon: string) {
-  if (props.clearSelect === true) {
+  if (props.clearSelect) {
     if (currentSelect.value === icon) {
       currentSelect.value = '';
     } else {
@@ -185,7 +186,7 @@ function handleClick(icon: string) {
 }
 
 function handleSearchChange(e: Event) {
-  const value = e.target.value;
+  const value = (e.target as any).value;
   setCurrentPage(1);
   current.value = 1;
   if (!value) {
@@ -193,14 +194,6 @@ function handleSearchChange(e: Event) {
     return;
   }
   currentList.value = icons.filter(item => item.includes(value));
-}
-function currentSelectClick() {
-  setCurrentPage(1);
-  setPageSize(140);
-  current.value = 1;
-  pageSize.value = 140;
-  currentList.value = icons;
-  searchIconValue.value = '';
 }
 </script>
 <style>

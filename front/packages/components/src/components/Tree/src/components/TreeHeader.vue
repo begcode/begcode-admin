@@ -32,7 +32,7 @@ import { BasicTitle } from '@/components/Basic';
 import { useI18n } from '@/hooks/web/useI18nOut';
 import { useDebounceFn } from '@vueuse/core';
 import { createBEM } from '@/utils/bem';
-import { ToolbarEnum } from '../types/tree';
+import { ToolbarEnum } from '../types/tree.d';
 
 const searchValue = ref('');
 

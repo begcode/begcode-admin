@@ -20,7 +20,6 @@ public class TaskJobConfig extends AbstractAuditingEntity<Long, TaskJobConfig> i
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    @TableField(value = "id")
     private Long id;
 
     /**

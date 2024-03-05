@@ -41,7 +41,7 @@ const emit = defineEmits(['list-change', 'register', 'delete']);
 
 const columns = createPreviewColumns() as any[];
 
-const [register, { closeModal }] = useModalInner();
+const [register] = useModalInner();
 
 const { t } = useI18n();
 

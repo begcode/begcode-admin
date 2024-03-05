@@ -2,6 +2,7 @@ import { createVNode, render } from 'vue';
 import contextMenuVue from './ContextMenu.vue';
 import { CreateContextOptions, ContextMenuProps } from './typing';
 import { isClient } from '@/utils/is';
+import type { Fn } from '#/types';
 
 const menuManager: {
   domList: Element[];

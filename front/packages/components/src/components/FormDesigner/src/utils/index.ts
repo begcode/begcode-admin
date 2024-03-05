@@ -84,7 +84,7 @@ export function toLine(str: string) {
  * @param array
  * @param cb
  */
-export function formItemsForEach(array: IVFormComponent[], cb: (item: IVFormComponent) => void) {
+export function formItemsForEach(array: IVFormComponent[], cb: (item: IVFormComponent) => void): void {
   if (!isArray(array)) return;
   const traverse = (schemas: IVFormComponent[]) => {
     schemas.forEach((formItem: IVFormComponent) => {
@@ -128,7 +128,7 @@ export const findFormItem: (schemas: IVFormComponent[], cb: (formItem: IVFormCom
  * @returns {IFormConfig}
  */
 export const removeAttrs = (formConfig: IFormConfig): IFormConfig => {
-  const copyFormConfig = cloneDeep(formConfig);
+  const copyFormConfig: IFormConfig = cloneDeep(formConfig);
   delete copyFormConfig.currentItem;
   delete copyFormConfig.activeKey;
   copyFormConfig.schemas &&
@@ -157,7 +157,7 @@ export const handleAsyncOptions = async (options: (() => Promise<any[]>) | any[]
  * 格式化表单项校验规则配置
  * @param {IVFormComponent[]} schemas
  */
-export const formatRules = (schemas: IVFormComponent[]) => {
+export const formatRules = (schemas: IVFormComponent[]): void => {
   formItemsForEach(schemas, item => {
     if ('required' in item) {
       !isArray(item.rules) && (item.rules = []);

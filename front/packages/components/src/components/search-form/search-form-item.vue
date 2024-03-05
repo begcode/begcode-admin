@@ -63,7 +63,6 @@
           format="HH:mm:ss"
           :placeholder="field?.componentProps?.placeholder || '请选择时间'"
           style="width: 100%"
-          @change="(time, value) => (field.value = value)"
         />
         <RangePicker
           v-bind="field.componentProps"
@@ -178,6 +177,7 @@ import {
   TimePicker,
   DatePicker,
   CheckboxGroup,
+  message,
 } from 'ant-design-vue';
 import { TypeOperator } from './filter-operator';
 import Icon from '@/components/Icon/Icon.vue';
@@ -266,7 +266,7 @@ export default {
           return TypeOperator.null;
       }
     },
-    handleSelectField(fieldName, field) {
+    handleSelectField(_fieldName, field) {
       if (field.componentType === 'Select') {
         field.componentProps = {
           ...field.componentProps,
@@ -368,7 +368,7 @@ export default {
         case 'Instant':
         case 'Duration':
           field.componentType = 'DateTime';
-          this.$set(field, 'value', null);
+          field.value = null;
           if (operator === 'specified') {
             field.componentType = 'Switch';
             field.options = [
@@ -384,7 +384,7 @@ export default {
         case 'TextBlob':
         case 'ByteBuffer':
           field.componentType = null;
-          this.$set(field, 'value', null);
+          field.value = null;
           if (operator === 'specified') {
             field.componentType = 'Switch';
             field.options = [
@@ -399,7 +399,7 @@ export default {
           if (operator === 'in') {
             field.componentType = 'SelectListModal';
             field.props = { multiple: true };
-            this.$set(field, 'value', []);
+            field.value = [];
           }
           if (operator === 'specified') {
             field.componentType = 'Switch';
@@ -505,7 +505,7 @@ export default {
             this.field.value = null;
         }
         this.componentByField(this.field);
-        this.$message.info('过滤条件已经清除！');
+        message.info('过滤条件已经清除！');
       }
     },
   },

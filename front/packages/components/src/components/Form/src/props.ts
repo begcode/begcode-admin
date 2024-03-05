@@ -1,8 +1,10 @@
 import type { CSSProperties, PropType } from 'vue';
 import type { RowProps } from 'ant-design-vue/lib/grid/Row';
 import dayjs from 'dayjs';
+import type { FieldMapToNumber, FieldMapToTime, FormSchema } from './types/form';
 import type { ColEx } from './types';
-import type { FieldMapToTime, FormSchema } from './types/form';
+import type { Fn } from '#/types';
+import type { Recordable } from '#/utils';
 import { propTypes } from '@/utils/propTypes';
 import { ButtonProps } from '@/components/Button';
 
@@ -35,7 +37,7 @@ export const basicProps = {
     default: () => [],
   },
   fieldMapToNumber: {
-    type: Array as PropType<FieldMapToTime>,
+    type: Array as PropType<FieldMapToNumber>,
     default: () => [],
   },
   compact: propTypes.bool,

@@ -1,6 +1,7 @@
 import type { Rule as ValidationRule } from 'ant-design-vue/lib/form/interface';
 import { isNumber, isObject } from 'lodash-es';
 import type { ComponentType } from './types';
+import type { Recordable } from '#/utils';
 import { useI18n } from '@/hooks/web/useI18nOut';
 import { dateUtil } from '@/utils/dateUtil';
 

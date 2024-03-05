@@ -1,6 +1,6 @@
 <template>
-  <Upload name="file" :showUploadList="false" :customRequest="file => onClick(file)">
-    <Button :type="type" :class="getButtonClass">
+  <Upload name="file" :showUploadList="false">
+    <Button :class="getButtonClass" v-bind="getBindValue">
       <template #default="data">
         <Icon :icon="preIcon" v-if="preIcon" :size="iconSize" />
         <slot v-bind="data || {}"></slot>

@@ -17,7 +17,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { reactive, ref, UnwrapRef, watchEffect } from 'vue';
+import { reactive, UnwrapRef, watchEffect } from 'vue';
 import { Button, Input } from 'ant-design-vue';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons-vue';
 import { propTypes } from '@/utils/propTypes';

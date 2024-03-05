@@ -69,6 +69,7 @@ watch(
           sizeUnit: 4,
           colorWarning: '#EFBD47',
           colorError: '#ED6F6F',
+          previewZIndex: 1000,
         },
       },
     };

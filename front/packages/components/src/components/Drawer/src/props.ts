@@ -1,4 +1,5 @@
 import type { PropType } from 'vue';
+import type { ButtonType } from 'ant-design-vue/es/button/buttonTypes';
 import { useI18n } from '@/hooks/web/useI18nOut';
 
 export const footerProps = {
@@ -27,7 +28,7 @@ export const footerProps = {
       return t('common.okText');
     },
   },
-  okType: { type: String, default: 'primary' },
+  okType: { type: String as PropType<ButtonType>, default: 'primary' },
   showFooter: { type: Boolean },
   footerHeight: {
     type: [String, Number] as PropType<string | number>,

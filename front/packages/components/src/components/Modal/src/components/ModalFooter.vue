@@ -12,8 +12,8 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { Button } from 'ant-design-vue';
 import { basicProps } from '../props';
+import { Button } from '@/components/Button';
 
 defineOptions({ name: 'BasicModalFooter' });
 

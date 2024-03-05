@@ -1,181 +1,161 @@
 <template>
   <div ref="monacoRef"></div>
 </template>
-<script>
+<script lang="ts" setup>
 import * as monacoEditor from 'monaco-editor';
 import { watch, onMounted, nextTick, onBeforeUnmount, ref } from 'vue';
 
-export default {
+defineOptions({
   name: 'MonacoEditor',
-  model: {
-    event: 'change',
+});
+
+const props = defineProps({
+  original: {
+    type: String,
   },
-  props: {
-    original: {
-      type: String,
-    },
-    value: {
-      type: String,
-      required: true,
-    },
-    theme: {
-      type: String,
-      default: 'vs',
-    },
-    language: {
-      type: String,
-    },
-    options: {
-      type: Object,
-    },
-    amdRequire: {
-      type: Function,
-    },
-    diffEditor: {
-      type: Boolean,
-      default: false,
-    },
+  value: {
+    type: String,
+    required: true,
   },
-  emits: ['change', 'editorWillMount', 'editorDidMount'],
-  setup(props, { emit }) {
-    const vueMonaco = {
-      editor: null,
-      monaco: null,
-    };
-    const monacoRef = ref(null);
+  theme: {
+    type: String,
+    default: 'vs',
+  },
+  language: {
+    type: String,
+  },
+  options: {
+    type: Object,
+  },
+  amdRequire: {
+    type: Function,
+  },
+  diffEditor: {
+    type: Boolean,
+    default: false,
+  },
+});
 
-    const focus = () => vueMonaco.editor && vueMonaco.editor.focus();
+const emit = defineEmits(['update:value', 'change', 'editorWillMount', 'editorDidMount']);
 
-    const getMonaco = () => vueMonaco.monaco;
+const vueMonaco = {
+  editor: null as any,
+  monaco: null as any,
+};
+const monacoRef = ref(null);
 
-    const getEditor = () => vueMonaco.editor;
+const getModifiedEditor = () => (props.diffEditor ? vueMonaco.editor?.getModifiedEditor() : vueMonaco.editor);
 
-    const getModifiedEditor = () => (props.diffEditor ? vueMonaco.editor.getModifiedEditor() : vueMonaco.editor);
+const getOriginalEditor = () => (props.diffEditor ? vueMonaco.editor?.getOriginalEditor() : vueMonaco.editor);
 
-    const getOriginalEditor = () => (props.diffEditor ? vueMonaco.editor.getOriginalEditor() : vueMonaco.editor);
+const initMonaco = monaco => {
+  emit('editorWillMount', vueMonaco.monaco);
 
-    const getModelMarkers = () => vueMonaco.monaco.editor.getModelMarkers();
+  const options = { value: props.value, theme: props.theme, language: props.language, ...props.options };
 
-    const initMonaco = monaco => {
-      emit('editorWillMount', vueMonaco.monaco);
+  if (props.diffEditor) {
+    vueMonaco.editor = monaco.editor?.createDiffEditor(monacoRef.value, options);
+    const originalModel = monaco.editor?.createModel(props.original, props.language);
+    const modifiedModel = monaco.editor?.createModel(props.value, props.language);
 
-      const options = { value: props.value, theme: props.theme, language: props.language, ...props.options };
+    vueMonaco.editor?.setModel({
+      original: originalModel,
+      modified: modifiedModel,
+    });
+  } else {
+    vueMonaco.editor = monaco.editor?.create(monacoRef.value, options);
+  }
 
-      if (props.diffEditor) {
-        vueMonaco.editor = monaco.editor.createDiffEditor(monacoRef.value, options);
-        const originalModel = monaco.editor.createModel(props.original, props.language);
-        const modifiedModel = monaco.editor.createModel(props.value, props.language);
+  const editor2 = getModifiedEditor();
 
-        vueMonaco.editor.setModel({
-          original: originalModel,
-          modified: modifiedModel,
-        });
-      } else {
-        vueMonaco.editor = monaco.editor.create(monacoRef.value, options);
-      }
+  editor2.onDidChangeModelContent(event => {
+    const value = editor2.getValue();
 
+    if (props.value !== value) {
+      emit('update:value', value, event);
+      emit('change', value, event);
+    }
+  });
+
+  emit('editorDidMount', vueMonaco.editor);
+};
+
+onMounted(() => {
+  if (props.amdRequire) {
+    props.amdRequire(['vs/editor/editor.main'], () => {
+      vueMonaco.monaco = (window as any).monaco;
+      nextTick(() => {
+        initMonaco((window as any).monaco);
+      });
+    });
+  } else {
+    vueMonaco.monaco = monacoEditor;
+    nextTick(() => {
+      initMonaco(vueMonaco.monaco);
+    });
+  }
+});
+
+onBeforeUnmount(() => {
+  vueMonaco.editor && vueMonaco.editor?.dispose();
+});
+
+watch(
+  () => props.options,
+  options => {
+    if (vueMonaco.editor) {
       const editor2 = getModifiedEditor();
 
-      editor2.onDidChangeModelContent(event => {
-        const value = editor2.getValue();
-
-        if (props.value !== value) {
-          emit('change', value, event);
-        }
-      });
-
-      emit('editorDidMount', vueMonaco.editor);
-    };
-
-    onMounted(() => {
-      if (props.amdRequire) {
-        props.amdRequire(['vs/editor/editor.main'], () => {
-          vueMonaco.monaco = window.monaco;
-          nextTick(() => {
-            initMonaco(window.monaco);
-          });
-        });
-      } else {
-        vueMonaco.monaco = monacoEditor;
-        nextTick(() => {
-          initMonaco(vueMonaco.monaco);
-        });
-      }
-    });
-
-    onBeforeUnmount(() => {
-      vueMonaco.editor && vueMonaco.editor.dispose();
-    });
-
-    watch(
-      () => props.options,
-      options => {
-        if (vueMonaco.editor) {
-          const editor2 = getModifiedEditor();
-
-          editor2.updateOptions(options);
-        }
-      },
-      {
-        deep: true,
-      },
-    );
-
-    watch(
-      () => props.value,
-      newValue => {
-        if (vueMonaco.editor) {
-          const editor = getModifiedEditor();
-
-          if (newValue !== editor.getValue()) {
-            editor.setValue(newValue);
-          }
-        }
-      },
-    );
-
-    watch(
-      () => props.original,
-      newValue => {
-        if (vueMonaco.editor && props.diffEditor) {
-          const editor = getOriginalEditor();
-
-          if (newValue !== editor.getValue()) {
-            editor.setValue(newValue);
-          }
-        }
-      },
-    );
-
-    watch(
-      () => props.language,
-      newVal => {
-        if (vueMonaco.editor) {
-          const editor = getModifiedEditor();
-          vueMonaco.monaco.editor.setModelLanguage(editor.getModel(), newVal);
-        }
-      },
-    );
-
-    watch(
-      () => props.theme,
-      newVal => {
-        if (vueMonaco.editor) {
-          vueMonaco.monaco.editor.setTheme(newVal);
-        }
-      },
-    );
-
-    return {
-      getMonaco,
-      getEditor,
-      getModifiedEditor,
-      getOriginalEditor,
-      initMonaco,
-      focus,
-      monacoRef,
-      getModelMarkers,
-    };
+      editor2.updateOptions(options);
+    }
   },
-};
+  {
+    deep: true,
+  },
+);
+
+watch(
+  () => props.value,
+  newValue => {
+    if (vueMonaco.editor) {
+      const editor = getModifiedEditor();
+
+      if (newValue !== editor.getValue()) {
+        editor.setValue(newValue);
+      }
+    }
+  },
+);
+
+watch(
+  () => props.original,
+  newValue => {
+    if (vueMonaco.editor && props.diffEditor) {
+      const editor = getOriginalEditor();
+
+      if (newValue !== editor.getValue()) {
+        editor.setValue(newValue);
+      }
+    }
+  },
+);
+
+watch(
+  () => props.language,
+  newVal => {
+    if (vueMonaco.editor) {
+      const editor = getModifiedEditor();
+      vueMonaco.monaco?.editor?.setModelLanguage(editor.getModel(), newVal);
+    }
+  },
+);
+
+watch(
+  () => props.theme,
+  newVal => {
+    if (vueMonaco.editor) {
+      vueMonaco.monaco?.editor?.setTheme(newVal);
+    }
+  },
+);
 </script>

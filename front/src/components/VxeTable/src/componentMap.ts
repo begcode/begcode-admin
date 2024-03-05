@@ -17,14 +17,8 @@ import {
   Avatar,
   Image,
 } from 'ant-design-vue';
+import { Button, IconPicker, Icon, SelectModal, DragSort, ApiSelect, ApiTreeSelect } from '@begcode/components';
 import type { ComponentType } from './componentType';
-import { ApiSelect, ApiTreeSelect } from '@/components/Form';
-import { Button } from '@/components/Button';
-
-import { IconPicker } from '@/components/Icon';
-import Icon from '@/components/Icon/Icon.vue';
-import { SelectModal } from '@/components/SelectModal';
-import { DragSort } from '@/components/DragSort';
 
 const componentMap = new Map<ComponentType, Component>();
 

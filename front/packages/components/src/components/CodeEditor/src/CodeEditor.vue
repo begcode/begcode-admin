@@ -12,6 +12,7 @@
   </div>
 </template>
 <script lang="ts" setup>
+import type { PropType } from 'vue';
 import { reactive, ref, watchEffect } from 'vue';
 import VueMonaco from './VueMonaco.vue';
 
@@ -33,7 +34,7 @@ const props = defineProps({
 const emit = defineEmits(['change', 'update:value', 'format-error']);
 
 const value = ref('');
-const editor = ref(null);
+const editor = ref<any>(null);
 
 watchEffect(() => {
   const { value: val } = props;
@@ -61,7 +62,7 @@ const editorState = reactive({
   showEditorDemo: false,
 });
 
-const parseContent = (content = editor.value?.getEditor().getValue()) => {
+const parseContent = (content = editor.value?.getEditor()?.getValue()) => {
   let jsonData;
   if (props.language === 'json' && content) {
     try {

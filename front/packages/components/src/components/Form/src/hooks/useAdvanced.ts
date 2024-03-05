@@ -4,6 +4,9 @@ import { useDebounceFn } from '@vueuse/core';
 import type { ColEx } from '../types';
 import type { AdvanceState } from '../types/hooks';
 import type { FormProps, FormSchemaInner as FormSchema } from '../types/form';
+import type { Recordable } from '#/utils';
+import type { EmitType } from '#/types';
+
 import { useBreakpoint } from '@/hooks/event/useBreakpoint';
 
 const BASIC_COL_LEN = 24;
@@ -17,7 +20,7 @@ interface UseAdvancedContext {
   defaultValueRef: Ref<Recordable>;
 }
 
-export default function ({ advanceState, emit, getProps, getSchema, formModel, defaultValueRef }: UseAdvancedContext) {
+export function useAdvanced({ advanceState, emit, getProps, getSchema, formModel, defaultValueRef }: UseAdvancedContext) {
   const vm = getCurrentInstance();
 
   const { realWidthRef, screenEnum, screenRef } = useBreakpoint();
@@ -107,7 +110,7 @@ export default function ({ advanceState, emit, getProps, getSchema, formModel, d
     }
   }
 
-  const fieldsIsAdvancedMap = shallowReactive({});
+  const fieldsIsAdvancedMap: any = shallowReactive({});
 
   function updateAdvanced() {
     let itemColSum = 0;

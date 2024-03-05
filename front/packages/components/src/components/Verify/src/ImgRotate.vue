@@ -2,6 +2,7 @@
 import { defineComponent, computed, unref, reactive, watch, ref } from 'vue';
 import { theme } from 'ant-design-vue';
 import type { MoveData, DragVerifyActionType } from './typing';
+import type { Nullable } from '#/types';
 import { useTimeoutFn } from '@/hooks/vben';
 import BasicDragVerify from './DragVerify.vue';
 import { hackCss } from '@/utils/domUtils';
@@ -28,8 +29,11 @@ export default defineComponent({
       startTime: 0,
       endTime: 0,
       draged: false,
+      tipStyle: {},
     });
     const { t } = useI18n();
+    const { useToken } = theme;
+    const { token } = useToken();
 
     watch(
       () => state.isPassing,
@@ -40,6 +44,9 @@ export default defineComponent({
           emit('success', { isPassing, time: time.toFixed(1) });
           emit('change', isPassing);
           emit('update:value', isPassing);
+          state.tipStyle['background-color'] = fadeColor(token.value.colorSuccess, 0.6);
+        } else {
+          state.tipStyle['background-color'] = fadeColor(token.value.colorError, 0.6);
         }
       },
     );
@@ -116,13 +123,6 @@ export default defineComponent({
 
     expose({ resume });
 
-    const { useToken } = theme;
-    const { token } = useToken();
-    const fadeColorSet = {
-      success: fadeColor(token.successColor, 0.6),
-      error: fadeColor(token.errorColor, 0.6),
-    };
-
     // handleImgOnLoad();
     return () => {
       const { src } = props;
@@ -148,11 +148,15 @@ export default defineComponent({
               alt="verify"
             />
             {state.showTip && (
-              <span class={[`ir-dv-img__tip`, state.isPassing ? 'success' : 'error']}>
+              <span style={state.tipStyle}>
                 {state.isPassing ? t('component.verify.time', { time: time.toFixed(1) }) : t('component.verify.error')}
               </span>
             )}
-            {!state.showTip && !state.draged && <span class={[`ir-dv-img__tip`, 'normal']}>{t('component.verify.redoTip')}</span>}
+            {!state.showTip && !state.draged && (
+              <span class={[`ir-dv-img__tip`, 'normal']} style={{ color: unref(token).colorWhite }}>
+                {t('component.verify.redoTip')}
+              </span>
+            )}
           </div>
           <BasicDragVerify
             class={`ir-dv-drag__bar`}
@@ -199,14 +203,7 @@ export default defineComponent({
   height: 30px;
   font-size: 12px;
   line-height: 30px;
-  color: v-bind('token.colorWhite');
   text-align: center;
-}
-.ir-dv-img__tip.success {
-  background-color: v-bind('fadeColorSet.success');
-}
-.ir-dv-img__tip.error {
-  background-color: v-bind('fadeColorSet.error');
 }
 .ir-dv-img__tip.normal {
   background-color: rgba(0, 0, 0, 0.3);

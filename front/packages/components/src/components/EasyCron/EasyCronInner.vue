@@ -89,7 +89,7 @@
         </Col>
         <Col :span="6">
           <div>近十次执行时间（不含年）</div>
-          <Textarea type="textarea" :value="preTimeList" :rows="5" />
+          <Textarea :value="preTimeList" :rows="5" />
         </Col>
       </Row>
     </div>
@@ -260,7 +260,7 @@ function convertWeekToQuartz(week: string) {
   if (/^[0-7]$/.test(week)) {
     return convert(week);
   } else if (patten1.test(week)) {
-    return week.replace(patten1, ($0, before, separator, after) => {
+    return week.replace(patten1, (_first, before, separator, after) => {
       if (separator === '/') {
         return convert(before) + separator + after;
       } else {

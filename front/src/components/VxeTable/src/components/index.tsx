@@ -114,8 +114,4 @@ export const VXETablePluginAntd = {
   },
 };
 
-if (typeof window !== 'undefined' && window.VXETable && window.VXETable.use) {
-  window.VXETable.use(VXETablePluginAntd);
-}
-
 export default VXETablePluginAntd;

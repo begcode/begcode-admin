@@ -9,17 +9,19 @@
   </Input>
 </template>
 <script lang="ts" setup>
-import { PropType } from 'vue';
+import { type DeepReadonly, PropType, type WritableComputedRef } from 'vue';
 import { Input } from 'ant-design-vue';
 import CountButton from './CountButton.vue';
 import { useDesign } from '@/hooks/web/useDesign';
 import { useRuleFormItem } from '@/hooks/component/useFormItemSingle';
+import { SizeType } from 'ant-design-vue/es/config-provider';
+import { FormItemContext } from 'ant-design-vue/es/form/FormItemContext';
 
 defineOptions({ name: 'CountDownInput', inheritAttrs: false });
 
 const props = defineProps({
   value: { type: String },
-  size: { type: String, validator: (v: string) => ['default', 'large', 'small'].includes(v) },
+  size: { type: String as PropType<SizeType> },
   count: { type: Number, default: 60 },
   sendCodeApi: {
     type: Function as PropType<() => Promise<boolean>>,
@@ -28,7 +30,7 @@ const props = defineProps({
 });
 
 const { prefixCls } = useDesign('countdown-input');
-const [state] = useRuleFormItem(props);
+const [state] = useRuleFormItem(props) as [WritableComputedRef<string>, (val: string) => void, DeepReadonly<any>, FormItemContext];
 </script>
 <style>
 .vben-countdown-input .ant-input-group-addon {

@@ -252,9 +252,7 @@ export default defineComponent({
             }
           } else {
             const component = resolveComponent(componentRef.name);
-            return h(
-              pageConfig?.canExpand ? CollapsePanel : Card,
-              { ...wrapperPros },
+            return h(pageConfig?.canExpand ? CollapsePanel : Card, { ...wrapperPros }, () =>
               h(component, { ...componentRef.props, ref: componentRef.props.modelName }, () => []),
             );
           }

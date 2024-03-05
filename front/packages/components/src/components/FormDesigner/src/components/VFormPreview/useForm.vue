@@ -25,6 +25,7 @@ import { IAnyObject } from '../../typings/base-type';
 import JsonModal from '../VFormDesign/components/JsonModal.vue';
 import { IToolbarMethods } from '../../typings/form-type';
 import { Modal } from 'ant-design-vue';
+import type { Recordable } from '#/utils';
 
 const jsonModal = ref<IToolbarMethods | null>(null);
 const state = reactive<{

@@ -108,25 +108,27 @@ interface _CustomComponents {
   ImageUpload: ExtractPropTypes<(typeof import('@/components/Upload/src/components/ImageUpload.vue'))['default']>;
   IconPicker: ExtractPropTypes<(typeof import('@/components/Icon/src/IconPicker.vue'))['default']>;
   ApiTransfer: ExtractPropTypes<(typeof import('../components/ApiTransfer.vue'))['default']>;
-  CropperAvatar: ExtractPropTypes<(typeof import('@/components/Cropper/src/CropperAvatar.vue'))['default']>;
+  // CropperAvatar: ExtractPropTypes<(typeof import('@/components/Cropper/src/CropperAvatar.vue'))['default']>;
   BasicTitle: ExtractPropTypes<(typeof import('@/components/Basic/src/BasicTitle.vue'))['default']>;
   InputCountDown: ExtractPropTypes<(typeof import('@/components/CountDown/src/CountdownInput.vue'))['default']>;
-  SelectFile: ExtractPropTypes<(typeof import('@begcode/components/Upload/src/BasicUpload.vue'))['default']>;
-  ColorPicker: ExtractPropTypes<(typeof import('@begcode/components/Upload/src/BasicUpload.vue'))['default']>;
-  RangeDate: ExtractPropTypes<(typeof import('@begcode/components/Upload/src/BasicUpload.vue'))['default']>;
-  AreaLinkage: ExtractPropTypes<(typeof import('@begcode/components/Upload/src/BasicUpload.vue'))['default']>;
-  RangeNumber: ExtractPropTypes<(typeof import('@begcode/components/Upload/src/BasicUpload.vue'))['default']>;
-  InputPop: ExtractPropTypes<(typeof import('@begcode/components/Upload/src/BasicUpload.vue'))['default']>;
-  AddInput: ExtractPropTypes<(typeof import('@begcode/components/Upload/src/BasicUpload.vue'))['default']>;
-  EasyCron: ExtractPropTypes<(typeof import('@begcode/components/Upload/src/BasicUpload.vue'))['default']>;
-  Editor: ExtractPropTypes<(typeof import('@begcode/components/Upload/src/BasicUpload.vue'))['default']>;
-  CodeEditor: ExtractPropTypes<(typeof import('@begcode/components/Upload/src/BasicUpload.vue'))['default']>;
-  AreaSelect: ExtractPropTypes<(typeof import('@begcode/components/Upload/src/BasicUpload.vue'))['default']>;
-  RangeTime: ExtractPropTypes<(typeof import('@begcode/components/Upload/src/BasicUpload.vue'))['default']>;
-  Time: ExtractPropTypes<(typeof import('@begcode/components/Upload/src/BasicUpload.vue'))['default']>;
-  EditorPop: ExtractPropTypes<(typeof import('@begcode/components/Upload/src/BasicUpload.vue'))['default']>;
-  SelectModal: ExtractPropTypes<(typeof import('@begcode/components/Upload/src/BasicUpload.vue'))['default']>;
-  Avatar: ExtractPropTypes<(typeof import('@begcode/components/Upload/src/BasicUpload.vue'))['default']>;
+  SelectFile: ExtractPropTypes<(typeof import('../components/SelectFile.vue'))['default']>;
+  ColorPicker: ExtractPropTypes<(typeof import('../components/ColorPicker.vue'))['default']>;
+  RangeDate: ExtractPropTypes<(typeof import('../components/RangeDate.vue'))['default']>;
+  AreaLinkage: ExtractPropTypes<(typeof import('../components/AreaLinkage.vue'))['default']>;
+  RangeNumber: ExtractPropTypes<(typeof import('../components/RangeNumber.vue'))['default']>;
+  InputPop: ExtractPropTypes<(typeof import('../components/InputPop.vue'))['default']>;
+  AddInput: ExtractPropTypes<(typeof import('../components/AddInput.vue'))['default']>;
+  EasyCron: ExtractPropTypes<(typeof import('@/components/EasyCron/EasyCronInput.vue'))['default']>;
+  Editor: ExtractPropTypes<(typeof import('@/components/Tinymce/src/Editor.vue'))['default']>;
+  CodeEditor: ExtractPropTypes<(typeof import('@/components/CodeEditor/src/CodeEditor.vue'))['default']>;
+  AreaSelect: ExtractPropTypes<(typeof import('../components/AreaSelect.vue'))['default']>;
+  RangeTime: ExtractPropTypes<(typeof import('../components/RangeTime.vue'))['default']>;
+  Time: ExtractPropTypes<(typeof import('@/components/Time/src/Time.vue'))['default']>;
+  EditorPop: ExtractPropTypes<(typeof import('../components/EditorPop.vue'))['default']>;
+  SelectModal: ExtractPropTypes<(typeof import('@/components/SelectModal/src/SelectModal.vue'))['default']>;
+  // todo CropperAvatar: ExtractPropTypes<
+  //     (typeof import('@/components/Cropper/src/CropperAvatar.vue'))['default']
+  //   >;
 }
 
 type CustomComponents<T = _CustomComponents> = {
@@ -172,7 +174,7 @@ export interface ComponentProps {
   Divider: ExtractPropTypes<(typeof import('ant-design-vue/es/divider'))['default']>;
   ApiTransfer: CustomComponents['ApiTransfer'] & ComponentProps['Transfer'];
   Transfer: ExtractPropTypes<(typeof import('ant-design-vue/es/transfer'))['default']>;
-  CropperAvatar: CustomComponents['CropperAvatar'];
+  // CropperAvatar: CustomComponents['CropperAvatar'];
   BasicTitle: CustomComponents['BasicTitle'];
   ColorPicker: CustomComponents['ColorPicker'];
   RangeDate: CustomComponents['RangeDate'];
@@ -188,6 +190,5 @@ export interface ComponentProps {
   Time: CustomComponents['Time'];
   EditorPop: CustomComponents['EditorPop'];
   SelectModal: CustomComponents['SelectModal'];
-  Avatar: CustomComponents['Avatar'];
   // | 'DictSelectTag'
 }

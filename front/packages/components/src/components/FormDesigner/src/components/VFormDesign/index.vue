@@ -99,6 +99,10 @@ import { useDesign } from '@/hooks/web/useDesign';
 
 import { CollapseContainer } from '@/components/Container';
 
+defineOptions({
+  name: 'VFormDesign',
+});
+
 const props = defineProps({
   title: {
     type: String,

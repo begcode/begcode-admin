@@ -1,4 +1,8 @@
-import { UploadApiResult } from '@/api-service/sys/model/uploadModel';
+export interface UploadApiResult {
+  message: string;
+  code: number;
+  url: string;
+}
 
 export enum UploadResultStatus {
   DONE = 'done',

@@ -1,3 +1,4 @@
+import type { Fn } from '#/types';
 interface TreeHelperConfig {
   id: string;
   children: string;

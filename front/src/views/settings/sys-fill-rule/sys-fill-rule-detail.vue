@@ -169,14 +169,18 @@ export default defineComponent({
             }
           } else {
             const component = resolveComponent(componentRef.name);
-            return h(pageConfig?.canExpand ? CollapsePanel : Card, { ...wrapperPros }, h(component, componentRef.props));
+            return h(
+              pageConfig?.canExpand ? CollapsePanel : Card,
+              { ...wrapperPros },
+              h(component, componentRef.props, () => []),
+            );
           }
         } else if (componentRef && componentRef instanceof Array) {
           return h(pageConfig?.canExpand ? CollapsePanel : Card, { ...wrapperPros }, () =>
             h(Tabs, {}, () =>
               componentRef.map((child, index) => {
                 return h(TabPane, { tab: child.title || index, key: index }, () =>
-                  h(resolveComponent(child?.name) as Component, child.props, child?.name === 'vxe-grid' ? getXGridSlots(child) : {}),
+                  h(resolveComponent(child?.name) as Component, child.props, child?.name === 'vxe-grid' ? getXGridSlots(child) : () => []),
                 );
               }),
             ),

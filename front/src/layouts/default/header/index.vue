@@ -14,6 +14,7 @@
       <span
         v-if="getShowContent && getShowBreadTitle && !getIsMobile"
         :class="[prefixCls, `${prefixCls}--${getHeaderTheme}`, 'headerIntroductionClass']"
+        style="border: 0"
       >
         欢迎进入 {{ title }}
       </span>
@@ -167,6 +168,10 @@ onMounted(() => {
 <style lang="less">
 @import url('./index.less');
 @prefix-cls: ~'@{namespace}-layout-header';
+
+.ant-layout .ant-layout-header {
+  padding-inline: 0 !important;
+}
 
 .ant-layout.@{prefix-cls} {
   display: flex;

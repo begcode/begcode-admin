@@ -1,3 +1,4 @@
+import type { Fn } from '#/types';
 export interface DropMenu {
   onClick?: Fn;
   to?: string;

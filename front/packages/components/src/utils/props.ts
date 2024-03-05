@@ -1,9 +1,8 @@
-// copy from element-plus
+import type { ExtractPropTypes, PropType } from 'vue';
 
 import { warn } from 'vue';
 import { fromPairs, isObject } from 'lodash-es';
-import type { ExtractPropTypes, PropType } from 'vue';
-import type { Mutable } from './types';
+import type { Mutable } from '#/types';
 
 const wrapperKey = Symbol();
 export type PropWrapper<T> = { [wrapperKey]: T };

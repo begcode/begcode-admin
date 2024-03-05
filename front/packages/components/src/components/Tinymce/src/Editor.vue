@@ -84,7 +84,7 @@ const props = defineProps({
     default: defaultPlugins,
   },
   menubar: {
-    type: [Object, String],
+    type: [Boolean, String],
     default: defaultMenubar,
   },
   modelValue: {
@@ -155,7 +155,7 @@ const initOptions = computed((): RawEditorSettings => {
     selector: `#${unref(tinymceId)}`,
     height: mini ? 200 : height,
     toolbar: mini ? simpleToolbar : toolbar,
-    menubar: mini ? [] : menubar,
+    menubar: mini || !menubar ? false : menubar,
     plugins: mini ? simplePlugins : plugins,
     language_url: publicPath + 'resource/tinymce/langs/' + langName.value + '.js',
     language: langName.value,

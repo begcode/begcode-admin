@@ -1,5 +1,5 @@
 import { ComponentType } from './componentType';
-import { useI18n } from '@/hooks/web/useI18nOut';
+import { useI18n } from '@/hooks/web/useI18n';
 
 /**
  * @description: 生成placeholder

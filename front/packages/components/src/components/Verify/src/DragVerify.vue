@@ -1,6 +1,6 @@
 <script lang="tsx">
 import type { Ref } from 'vue';
-import { defineComponent, ref, computed, unref, reactive, watch, watchEffect, getCurrentInstance, ComponentInternalInstance } from 'vue';
+import { defineComponent, ref, computed, unref, reactive, watch, watchEffect } from 'vue';
 import { theme } from 'ant-design-vue';
 import { useTimeoutFn } from '@/hooks/vben';
 import { useEventListener } from '@/hooks/event/useEventListener';
@@ -37,6 +37,9 @@ export default defineComponent({
       },
     });
 
+    const { useToken } = theme;
+    const { token } = useToken();
+
     const getActionStyleRef = computed(() => {
       const { height, actionStyle } = props;
       const h = `${parseInt(height as string)}px`;
@@ -45,6 +48,7 @@ export default defineComponent({
         width: h,
         height: h,
         ...actionStyle,
+        'background-color': unref(token).colorWhite,
       };
     });
 
@@ -68,6 +72,7 @@ export default defineComponent({
         height: `${h}px`,
         borderRadius: circle ? h / 2 + 'px 0 0 ' + h / 2 + 'px' : 0,
         ...barStyle,
+        'background-color': unref(token).colorSuccess,
       };
     });
 
@@ -215,13 +220,6 @@ export default defineComponent({
       contentEl.style.width = unref(getContentStyleRef).width;
     }
 
-    const { useToken } = theme;
-    const { token } = useToken();
-    const { proxy } = getCurrentInstance() as ComponentInternalInstance;
-    if (proxy) {
-      proxy['token'] = token.value;
-    }
-
     expose({
       resume,
     });
@@ -239,8 +237,11 @@ export default defineComponent({
         const cls = [`drag-verify-content`];
         const { isPassing } = state;
         const { text, successText } = props;
-
-        isPassing && cls.push('success');
+        if (isPassing) {
+          getContentStyleRef.value['-webkit-text-fill-color'] = unref(token).colorWhite;
+        } else {
+          delete getContentStyleRef.value['-webkit-text-fill-color'];
+        }
 
         return (
           <div class={cls} ref={contentElRef} style={unref(getContentStyleRef)}>
@@ -300,7 +301,6 @@ export default defineComponent({
   position: absolute;
   width: 0;
   height: 36px;
-  background-color: v-bind('token["colorSuccess"]');
   border-radius: 4px;
 }
 .drag-verify-bar.to-left {
@@ -326,9 +326,6 @@ export default defineComponent({
   background-clip: text;
   user-select: none;
 }
-.drag-verify-content.success {
-  -webkit-text-fill-color: v-bind('token["colorWhite"]');
-}
 .drag-verify-content > * {
   -webkit-text-fill-color: #333;
 }
@@ -338,7 +335,6 @@ export default defineComponent({
   left: 0;
   display: flex;
   cursor: move;
-  background-color: v-bind('token["colorWhite"]');
   border-radius: 4px;
   justify-content: center;
   align-items: center;

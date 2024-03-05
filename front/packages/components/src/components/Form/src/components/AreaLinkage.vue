@@ -2,12 +2,14 @@
   <Cascader v-bind="attrs" :value="state" :options="getOptions" @change="handleChange" />
 </template>
 <script lang="ts">
-import { defineComponent, PropType, ref, reactive, watchEffect, computed, unref, watch, onMounted } from 'vue';
+import { defineComponent, ref, watchEffect, computed, type WritableComputedRef, type DeepReadonly } from 'vue';
 import { Cascader } from 'ant-design-vue';
 import { provinceAndCityData, regionData, provinceAndCityDataPlus, regionDataPlus } from '../utils/areaDataUtil';
 import { useRuleFormItem } from '@/hooks/component/useFormItem';
 import { propTypes } from '@/utils/propTypes';
 import { useAttrs } from '@/hooks/vben/useAttrs';
+import { ValueType } from 'ant-design-vue/es/vc-cascader/Cascader';
+import { FormItemContext } from 'ant-design-vue/es/form/FormItemContext';
 export default defineComponent({
   name: 'AreaLinkage',
   components: {
@@ -22,10 +24,15 @@ export default defineComponent({
     showAll: propTypes.bool.def(false),
   },
   emits: ['options-change', 'change'],
-  setup(props, { emit, refs }) {
+  setup(props) {
     const emitData = ref<any[]>([]);
     const attrs = useAttrs();
-    const [state] = useRuleFormItem(props, 'value', 'change', emitData);
+    const [state] = useRuleFormItem(props, 'value', 'change', emitData) as [
+      WritableComputedRef<ValueType>,
+      (val: string) => void,
+      DeepReadonly<any>,
+      FormItemContext,
+    ];
     const getOptions = computed(() => {
       if (props.showArea && props.showAll) {
         return regionDataPlus;
@@ -57,7 +64,7 @@ export default defineComponent({
       }
     }
 
-    function handleChange(array, ...args) {
+    function handleChange(array) {
       // emitData.value = args;
       state.value = array;
       console.info(emitData);

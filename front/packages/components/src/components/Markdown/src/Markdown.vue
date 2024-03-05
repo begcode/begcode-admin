@@ -7,36 +7,35 @@ import { ref, unref, nextTick, computed, watch, onBeforeUnmount, onDeactivated, 
 import Vditor from 'vditor';
 import 'vditor/dist/index.css';
 import './adapter.js';
-import { useLocale } from '@/i18n/useLocale';
 import { useModalContext } from '../../Modal';
-import { useRootSetting } from '@/hooks/setting/useRootSetting';
 import { onMountedOrActivated } from '@/hooks/vben';
 import { getTheme } from './getTheme';
-import { getTenantId, getToken } from '@/utils/auth';
 import { getFileAccessHttpUrl } from '@/utils';
+import { useUpload } from '@/hooks/web/useUploadOut';
 
 type Lang = 'zh_CN' | 'en_US' | 'ja_JP' | 'ko_KR' | undefined;
 
-// begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
   height: { type: Number, default: 360 },
   value: { type: String, default: '' },
+  uploadUrl: { type: String, default: '' },
+  token: { type: String, default: '' },
 });
 
 const emit = defineEmits(['change', 'get', 'update:value']);
 
 const attrs = useAttrs();
 
-const wrapRef = ref(null);
+const wrapRef = ref();
 const vditorRef = ref(null) as Ref<Vditor | null>;
 const initedRef = ref(false);
 
 const modalFn = useModalContext();
 
-const { getLocale } = useLocale();
-const { getDarkMode } = useRootSetting();
+const getLocale = ref('zh_CN');
+const getDarkMode = ref('light');
 const valueRef = ref(props.value || '');
 
 watch(
@@ -80,13 +79,9 @@ const getCurrentLang = computed((): 'zh_CN' | 'en_US' | 'ja_JP' | 'ko_KR' => {
   }
   return lang;
 });
-const uploadUrl = `${window._CONFIG['domianURL']}/sys/common/upload`;
-const token = getToken();
-const tenantId = getTenantId() ? getTenantId() : '0';
 
 function formatResult(files, responseText): string {
   let data: any = JSON.parse(responseText);
-  // {"success":true,"message":"markdown/aa_1653391146501.png","code":0,"result":null,"timestamp":1653391146501}'
   let filename = files[0].name as string;
   let result = {
     msg: '',
@@ -113,6 +108,7 @@ function init() {
   const wrapEl = unref(wrapRef) as HTMLElement;
   if (!wrapEl) return;
   const bindValue = { ...attrs, ...props };
+  const { getToken } = useUpload();
   const insEditor = new Vditor(wrapEl, {
     // 设置外观主题
     theme: getTheme(getDarkMode.value) as any,
@@ -134,14 +130,11 @@ function init() {
     },
     upload: {
       accept: 'image/*',
-      url: uploadUrl,
+      url: props.uploadUrl,
       fieldName: 'file',
       extraData: { biz: 'markdown' },
       setHeaders() {
-        return {
-          'X-Access-Token': token as string,
-          'X-Tenant-Id': tenantId,
-        };
+        return { Authorization: `Bearer ${getToken}` };
       },
       format(files, response) {
         return formatResult(files, response);

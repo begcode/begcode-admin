@@ -2,9 +2,10 @@
   <div ref="chartRef" :style="{ height, width }"></div>
 </template>
 <script lang="ts" setup>
-import { defineComponent, PropType, ref, Ref, watchEffect, reactive, watch } from 'vue';
+import { PropType, ref, Ref, watchEffect, reactive, watch } from 'vue';
 import { useECharts } from '@/hooks/web/useECharts';
 import { cloneDeep } from 'lodash-es';
+import { EChartsOption } from 'echarts';
 
 defineOptions({
   name: 'Pie',
@@ -54,7 +55,7 @@ const option = reactive({
         color: '#B1B9D3',
       },
     },
-  ],
+  ] as any[],
 });
 
 watchEffect(() => {
@@ -77,7 +78,7 @@ function initCharts() {
     Object.assign(option, cloneDeep(props.option));
   }
   option.series[0].data = props.chartData;
-  setOptions(option);
+  setOptions(option as EChartsOption);
   resize();
   getInstance()?.off('click', onClick);
   getInstance()?.on('click', onClick);

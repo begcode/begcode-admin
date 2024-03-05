@@ -1,4 +1,4 @@
-import type { ComponentRenderProxy, VNode, VNodeChild, ComponentPublicInstance, FunctionalComponent, PropType as VuePropType } from 'vue';
+import type { ComponentRenderProxy, VNode, ComponentPublicInstance, FunctionalComponent, PropType as VuePropType } from 'vue';
 import apiService from '@/api-service/index';
 
 declare global {
@@ -25,7 +25,6 @@ declare global {
 
   // vue
   declare type PropType<T> = VuePropType<T>;
-  declare type VueNode = VNodeChild | JSX.Element;
 
   export type Writable<T> = {
     -readonly [P in keyof T]: T[P];

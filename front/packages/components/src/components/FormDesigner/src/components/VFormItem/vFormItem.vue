@@ -19,7 +19,7 @@
   </FormItem>
 </template>
 <script lang="ts">
-import { computed, defineComponent, unref } from 'vue';
+import { computed, defineComponent, unref, PropType } from 'vue';
 import { IFormConfig, IVFormComponent } from '../../typings/v-form-component';
 import { FormProps, FormSchema } from '@/components/Form';
 

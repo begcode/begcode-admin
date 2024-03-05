@@ -6,6 +6,7 @@
 import { ref, watch } from 'vue';
 import { propTypes } from '@/utils/propTypes';
 import { Form, TimeRangePicker } from 'ant-design-vue';
+import type { RangeValue } from 'ant-design-vue/es/vc-picker/interface';
 
 defineOptions({ name: 'RangeTime' });
 
@@ -17,18 +18,18 @@ const props = defineProps({
 
 const emit = defineEmits(['change', 'update:value']);
 
-const placeholder = ['开始时间', '结束时间'];
+const placeholder: [string, string] = ['开始时间', '结束时间'];
 
-const rangeValue = ref<any[]>([]);
+const rangeValue = ref<RangeValue<string>>(null);
 const formItemContext = Form.useInjectFormItemContext();
 
 watch(
   () => props.value,
   val => {
     if (val) {
-      rangeValue.value = val.split(',');
+      rangeValue.value = val.split(',') as [string, string];
     } else {
-      rangeValue.value = [];
+      rangeValue.value = null;
     }
   },
   { immediate: true },

@@ -1,8 +1,5 @@
 <template>
   <div class="p-2">
-    <!--    <div class="p-4 mb-2 bg-white">-->
-    <!--      <BasicForm @register="registerForm" />-->
-    <!--    </div>-->
     <div class="p-2 bg-white">
       <List :grid="{ gutter: 5, xs: 1, sm: 2, md: 4, lg: 4, xl: 6, xxl: grid }" :data-source="data" :pagination="paginationProp">
         <template #header>
@@ -84,9 +81,8 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
 import { List, Card, Image, TypographyParagraph, Tooltip, Slider, Avatar, Space, Upload } from 'ant-design-vue';
-import { EllipsisOutlined, RedoOutlined, TableOutlined } from '@ant-design/icons-vue';
+import { EllipsisOutlined, TableOutlined } from '@ant-design/icons-vue';
 import { Dropdown } from '@/components/Dropdown';
-import { useForm } from '@/components/Form';
 import { propTypes } from '@/utils/propTypes';
 import { Button } from '@/components/Button';
 import Icon from '@/components/Icon/Icon.vue';
@@ -108,8 +104,8 @@ const props = defineProps({
   imageField: propTypes.string.def('url'),
   resultField: propTypes.string.def('data'),
   totalField: propTypes.string.def('total'),
-  toolButtons: propTypes.array.def([]),
-  rowOperations: propTypes.array.def([]),
+  toolButtons: propTypes.arrayOf(propTypes.object).def([]),
+  rowOperations: propTypes.arrayOf(propTypes.object).def([]),
   showAvatar: propTypes.bool.def(false),
   showDesc: propTypes.bool.def(true),
   metaDesc: propTypes.oneOfType([propTypes.string, propTypes.func]).def(''),
@@ -143,20 +139,6 @@ const imageClick = (e, item) => {
   }
 };
 
-//表单
-const [registerForm, { validate }] = useForm({
-  schemas: [{ field: 'type', component: 'Input', label: '类型' }],
-  labelWidth: 80,
-  baseColProps: { span: 6 },
-  actionColOptions: { span: 24 },
-  autoSubmitOnEnter: true,
-  submitFunc: handleSubmit,
-});
-//表单提交
-async function handleSubmit() {
-  const data = await validate();
-  await fetch(data);
-}
 function sliderChange(n) {
   pageSize.value = n * 4;
   fetch();

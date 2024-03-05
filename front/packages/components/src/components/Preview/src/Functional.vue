@@ -1,6 +1,5 @@
 <script lang="tsx">
-import { defineComponent, ref, unref, computed, reactive, watchEffect, PropType, getCurrentInstance, ComponentInternalInstance } from 'vue';
-import { theme } from 'ant-design-vue';
+import { defineComponent, ref, unref, computed, reactive, watchEffect, PropType } from 'vue';
 import { CloseOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons-vue';
 import resumeSvg from '@/assets/svg/preview/resume.svg';
 import rotateSvg from '@/assets/svg/preview/p-rotate.svg';
@@ -25,6 +24,7 @@ interface ImgState {
   moveY: number;
   show: boolean;
 }
+
 const props = {
   show: {
     type: Boolean as PropType<boolean>,
@@ -64,6 +64,7 @@ export default defineComponent({
       top: number;
       left: number;
     }
+
     const stateMap = new Map<string, stateInfo>();
     const imgState = reactive<ImgState>({
       currentUrl: '',
@@ -140,6 +141,7 @@ export default defineComponent({
         scaleFunc(-getScaleStep.value);
       }
     }
+
     // 缩放函数
     function scaleFunc(num: number) {
       // 最小缩放
@@ -240,13 +242,6 @@ export default defineComponent({
     // 图片复原
     function resume() {
       initState();
-    }
-
-    const { useToken } = theme;
-    const { token } = useToken();
-    const { proxy } = getCurrentInstance() as ComponentInternalInstance;
-    if (proxy) {
-      proxy['token'] = token.value;
     }
 
     expose({
@@ -426,22 +421,25 @@ export default defineComponent({
 .img-preview {
   position: fixed;
   inset: 0;
-  z-index: v-bind('token["preview-comp-z-index"]');
+  z-index: 1000;
   background: rgba(0, 0, 0, 0.5);
   user-select: none;
 }
+
 .img-preview-content {
   align-items: center;
   justify-content: center;
   display: flex;
   width: 100%;
   height: 100%;
-  color: v-bind('token["colorWhite"]');
+  color: #fff;
 }
+
 .img-preview-image {
   cursor: pointer;
   transition: transform 0.3s;
 }
+
 .img-preview__close {
   position: absolute;
   top: -40px;
@@ -449,21 +447,24 @@ export default defineComponent({
   width: 80px;
   height: 80px;
   overflow: hidden;
-  color: v-bind('token["colorWhite"]');
+  color: #fff;
   cursor: pointer;
   background-color: rgba(0, 0, 0, 0.5);
   border-radius: 50%;
   transition: all 0.2s;
 }
+
 .img-preview__close-icon {
   position: absolute;
   top: 46px;
   left: 16px;
   font-size: 16px;
 }
+
 .img-preview__close:hover {
   background-color: rgba(0, 0, 0, 0.8);
 }
+
 .img-preview__index {
   position: absolute;
   bottom: 5%;
@@ -474,6 +475,7 @@ export default defineComponent({
   border-radius: 15px;
   transform: translateX(-50%);
 }
+
 .img-preview__controller {
   position: absolute;
   bottom: 10%;
@@ -487,6 +489,7 @@ export default defineComponent({
   border-radius: 22px;
   justify-content: center;
 }
+
 .img-preview__controller-item {
   display: flex;
   height: 100%;
@@ -495,12 +498,15 @@ export default defineComponent({
   cursor: pointer;
   transition: all 0.2s;
 }
+
 .img-preview__controller-item:hover {
   transform: scale(1.2);
 }
+
 .img-preview__controller-item img {
   width: 1em;
 }
+
 .img-preview__arrow {
   position: absolute;
   top: 50%;
@@ -515,12 +521,15 @@ export default defineComponent({
   border-radius: 50%;
   transition: all 0.2s;
 }
+
 .img-preview__arrow:hover {
   background-color: rgba(0, 0, 0, 0.8);
 }
+
 .img-preview__arrow.left {
   left: 50px;
 }
+
 .img-preview__arrow.right {
   right: 50px;
 }

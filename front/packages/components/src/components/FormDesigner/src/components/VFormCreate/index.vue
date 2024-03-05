@@ -30,6 +30,7 @@ import { useFormInstanceMethods } from '../../hooks/useFormInstanceMethods';
 import { IProps, IVFormMethods, useVFormMethods } from '../../hooks/useVFormMethods';
 import { useVModel } from '@vueuse/core';
 import { omit } from 'lodash-es';
+import type { Recordable } from '#/utils';
 
 export default defineComponent({
   name: 'FormCreate',

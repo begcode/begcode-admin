@@ -1,6 +1,6 @@
 <script lang="tsx">
-import type { CSSProperties, PropType, VNodeChild } from 'vue';
-import { defineComponent, computed, unref, getCurrentInstance, ComponentInternalInstance } from 'vue';
+import { CSSProperties, PropType, reactive, VNodeChild } from 'vue';
+import { defineComponent, computed, unref } from 'vue';
 import { Tooltip, theme } from 'ant-design-vue';
 import { InfoCircleOutlined } from '@ant-design/icons-vue';
 import { getPopupContainer } from '@/utils';
@@ -45,7 +45,7 @@ export default defineComponent({
   name: 'BasicHelp',
   components: { Tooltip },
   props,
-  setup(props, { slots, expose }) {
+  setup(props, { slots }) {
     const { prefixCls } = useDesign('basic-help');
 
     const getTooltipStyle = computed((): CSSProperties => ({ color: props.color, fontSize: props.fontSize }));
@@ -76,10 +76,14 @@ export default defineComponent({
 
     const { useToken } = theme;
     const { token } = useToken();
-    const { proxy } = getCurrentInstance() as ComponentInternalInstance;
-    if (proxy) {
-      proxy['token'] = token.value;
-    }
+    const helpColor = reactive({ color: token.value.colorPrimary });
+
+    const onMousemove = () => {
+      helpColor.color = '#909399';
+    };
+    const onMouseout = () => {
+      helpColor.color = token.value.colorPrimary;
+    };
 
     return () => {
       return (
@@ -91,7 +95,9 @@ export default defineComponent({
           placement={props.placement as 'right'}
           getPopupContainer={() => getPopupContainer()}
         >
-          <span class={prefixCls}>{getSlot(slots) || <InfoCircleOutlined />}</span>
+          <span class={prefixCls} style={helpColor} onMousemove={onMousemove} onMouseout={onMouseout}>
+            {getSlot(slots) || <InfoCircleOutlined />}
+          </span>
         </Tooltip>
       );
     };
@@ -102,12 +108,8 @@ export default defineComponent({
 .vben-basic-help {
   display: inline-block;
   margin-left: 6px;
-  color: v-bind('token["text-color-help-dark"');
   font-size: 14px;
   cursor: pointer;
-}
-.vben-basic-help:hover {
-  color: v-bind('token.colorPrimary');
 }
 .vben-basic-help__wrap p {
   margin-bottom: 0;

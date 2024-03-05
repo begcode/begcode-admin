@@ -51,7 +51,7 @@ export default defineComponent({
           if (key === props.currentItem.key) {
             let params: IVFormComponent =
               schemas.length === 1 ? { component: '' } : schemas.length - 1 > index ? schemas[index + 1] : schemas[index - 1];
-            formDesignMethods.handleSetSelectItem(params);
+            formDesignMethods?.handleSetSelectItem(params);
             remove(schemas, index);
             return true;
           }
@@ -61,7 +61,7 @@ export default defineComponent({
     };
 
     const handleCopy = () => {
-      formDesignMethods.handleCopy();
+      formDesignMethods?.handleCopy();
     };
     return { activeClass, handleDelete, handleCopy };
   },

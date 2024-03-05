@@ -1,3 +1,5 @@
+import type { Nullable } from '#/types';
+
 /**
  * @description: base64 to blob
  */

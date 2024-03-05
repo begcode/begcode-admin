@@ -42,31 +42,49 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { computed, onMounted, ref, reactive, onBeforeUpdate } from 'vue';
+import { onMounted, ref, reactive, onBeforeUpdate, PropType } from 'vue';
 import { RedoOutlined, VerticalAlignBottomOutlined, VerticalAlignTopOutlined } from '@ant-design/icons-vue';
-import { List, Tooltip, Slider, Avatar } from 'ant-design-vue';
+import { List, Tooltip } from 'ant-design-vue';
 import { propTypes } from '@/utils/propTypes';
 import { Button } from '@/components/Button';
-import { useSlider } from './data';
 import { BasicForm } from '@/components/Form';
 
 const ListItem = List.Item;
-// 获取slider属性
-const sliderProp = computed(() => useSlider(4));
 // 组件接收参数
 const props = defineProps({
   // 请求API的参数
   params: propTypes.object.def({}),
   // imageField
-  imageField: propTypes.string.def('url'),
-  resultField: propTypes.string.def('data'),
-  totalField: propTypes.string.def('total'),
-  toolButtons: propTypes.array.def([]),
+  imageField: {
+    type: String,
+    default: 'url',
+  },
+  resultField: {
+    type: String,
+    default: 'data',
+  },
+  totalField: {
+    type: String,
+    default: 'total',
+  },
+  toolButtons: {
+    type: Array as PropType<any[]>,
+    default: [],
+  },
   rowOperations: propTypes.array.def([]),
-  showAvatar: propTypes.bool.def(true),
-  showDesc: propTypes.bool.def(true),
+  showAvatar: {
+    type: Boolean,
+    default: true,
+  },
+  showDesc: {
+    type: Boolean,
+    default: true,
+  },
   formConfig: propTypes.object.def({}),
-  size: propTypes.number.def(1),
+  size: {
+    type: Number,
+    default: 1,
+  },
   fieldName: propTypes.string.def('unknown'),
   fieldData: propTypes.array.def([]),
 });
@@ -113,13 +131,6 @@ const getConfigData = () => {
 };
 
 const data = ref(getConfigData());
-// 切换每行个数
-// cover图片自适应高度
-//修改pageSize并重新请求数据
-
-const height = computed(() => {
-  return `h-${120 - grid.column * 6}`;
-});
 
 const add = () => {
   data.value.push({ ...baseFormConfig, ...props.formConfig, model: {} });
@@ -147,42 +158,10 @@ async function validate() {
   });
 }
 
-function sliderChange(n) {
-  pageSize.value = n * 4;
-}
-
 // 自动请求并暴露内部方法
 onMounted(() => {
   emit('getMethod', fetch);
 });
-
-//分页相关
-const page = ref(0);
-const pageSize = ref(36);
-const total = ref(0);
-const paginationProp = ref({
-  showSizeChanger: false,
-  showQuickJumper: true,
-  pageSize,
-  current: page,
-  total,
-  showTotal: total => `总 ${total} 条`,
-  onChange: pageChange,
-  onShowSizeChange: pageSizeChange,
-});
-
-function pageChange(p, pz) {
-  page.value = p;
-  pageSize.value = pz;
-}
-
-function pageSizeChange(_current, size) {
-  pageSize.value = size;
-}
-
-async function handleDelete(id) {
-  emit('delete', id);
-}
 
 defineExpose({
   validate,

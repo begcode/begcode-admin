@@ -991,12 +991,12 @@
                     <artifactId>spring-boot-devtools</artifactId>
                     <optional>true</optional>
                 </dependency>
-                <dependency>
+                <!--<dependency>
                     <groupId>com.github.gavlyukovskiy</groupId>
                     <artifactId>p6spy-spring-boot-starter</artifactId>
                     <version>1.9.1</version>
                     <optional>true</optional>
-                </dependency>
+                </dependency>-->
             </dependencies>
         </profile>
         <profile>

@@ -22,7 +22,6 @@ public class SmsMessage extends AbstractAuditingEntity<Long, SmsMessage> impleme
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    @TableField(value = "id")
     private Long id;
 
     /**

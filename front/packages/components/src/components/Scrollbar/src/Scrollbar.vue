@@ -19,7 +19,7 @@
 <script lang="ts" setup>
 import { addResizeListener, removeResizeListener } from '@/utils/event';
 import { ref, onMounted, onBeforeUnmount, nextTick, provide, unref, watch, type PropType } from 'vue';
-import type { StyleValue } from '@/utils/types';
+import type { StyleValue } from '#/types';
 import Bar from './bar';
 
 defineOptions({ name: 'Scrollbar' });

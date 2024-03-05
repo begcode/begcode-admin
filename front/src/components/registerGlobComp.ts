@@ -1,5 +1,5 @@
 import type { App } from 'vue';
-import { Button, UploadButton, Icon, VXETablePluginAntd } from '@begcode/components';
+import { Button, UploadButton, Icon } from '@begcode/components';
 import {
   Button as AntButton,
   Alert,
@@ -51,6 +51,7 @@ import {
 } from 'ant-design-vue';
 import VXETable from 'vxe-table';
 import VXETablePluginExportXLSX from 'vxe-table-plugin-export-xlsx';
+import { VXETablePluginAntd } from './VxeTable';
 
 const compList = [AntButton.Group, Icon, UploadButton];
 

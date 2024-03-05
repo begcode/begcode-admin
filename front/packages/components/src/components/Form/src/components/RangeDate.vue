@@ -48,8 +48,8 @@ const props = defineProps({
 
 const emit = defineEmits(['change', 'update:value']);
 
-const startDate = ref(null);
-const endDate = ref(null);
+const startDate = ref();
+const endDate = ref();
 const formItemContext = Form.useInjectFormItemContext();
 
 watch(
@@ -79,10 +79,10 @@ const valueFormatConfig = computed(() => {
       return ['YYYY-MM-DD', 'YYYY-MM-DD'];
     }
   } else {
-    if (props.valueFormat instanceof String && props.valueFormat) {
+    if (typeof props.valueFormat === 'string' && props.valueFormat) {
       return [props.valueFormat, props.valueFormat];
     }
-    if (props.valueFormat instanceof Array) {
+    if (Array.isArray(props.valueFormat)) {
       if (props.valueFormat.length === 0) {
         if (props.datetime === true) {
           return ['YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD HH:mm:ss'];

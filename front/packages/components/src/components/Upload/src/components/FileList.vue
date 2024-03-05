@@ -1,15 +1,37 @@
 <script lang="tsx">
-import { defineComponent, CSSProperties, watch, nextTick, ref, onMounted, getCurrentInstance, ComponentInternalInstance } from 'vue';
-import { fileListProps } from '../props';
+import { defineComponent, CSSProperties, watch, nextTick, ref, onMounted, type PropType } from 'vue';
 import { isFunction } from 'lodash-es';
 import { isDef } from '@/utils/is';
 import { useSortable } from '@/hooks/web/useSortable';
 import { useModalContext } from '@/components/Modal/src/hooks/useModalContext';
 import { theme } from 'ant-design-vue';
+import { FileBasicColumn } from '@/components/Upload/src/types/typing';
+import { SortOptions } from '@/components/Upload/src/props';
 
 export default defineComponent({
   name: 'FileList',
-  props: fileListProps,
+  props: {
+    columns: {
+      type: Array as PropType<FileBasicColumn[]>,
+      default: null,
+    },
+    actionColumn: {
+      type: Object as PropType<FileBasicColumn>,
+      default: null,
+    },
+    dataSource: {
+      type: Array as PropType<any[]>,
+      default: null,
+    },
+    openDrag: {
+      type: Boolean,
+      default: false,
+    },
+    dragOptions: {
+      type: Object as PropType<SortOptions>,
+      default: () => ({}),
+    },
+  },
   setup(props, { emit }) {
     const modalFn = useModalContext();
     const sortableContainer = ref<HTMLTableSectionElement>();
@@ -47,16 +69,13 @@ export default defineComponent({
     }
     const { useToken } = theme;
     const { token } = useToken();
-    const { proxy } = getCurrentInstance() as ComponentInternalInstance;
-    if (proxy) {
-      proxy['token'] = token.value;
-    }
+    const borderStyle = { border: `1px solid ${token.value.colorBorder}` };
     return () => {
       const { columns, actionColumn, dataSource } = props;
       const columnList = [...columns, actionColumn];
       return (
         <div class="overflow-x-auto">
-          <table class="file-table">
+          <table class="file-table" style={borderStyle}>
             <colgroup>
               {columnList.map(item => {
                 const { width = 0, dataIndex } = item;
@@ -72,7 +91,7 @@ export default defineComponent({
                 {columnList.map(item => {
                   const { title = '', align = 'center', dataIndex } = item;
                   return (
-                    <th class={['file-table-th', align]} key={dataIndex}>
+                    <th class={['file-table-th', align]} key={dataIndex} style={borderStyle}>
                       {title}
                     </th>
                   );
@@ -87,7 +106,7 @@ export default defineComponent({
                       const { dataIndex = '', customRender, align = 'center' } = item;
                       const render = customRender && isFunction(customRender);
                       return (
-                        <td class={['file-table-td break-all', align]} key={dataIndex}>
+                        <td class={['file-table-td break-all', align]} style={borderStyle} key={dataIndex}>
                           {render ? customRender?.({ text: record[dataIndex], record }) : record[dataIndex]}
                         </td>
                       );
@@ -108,25 +127,25 @@ export default defineComponent({
   width: 100%;
   border-collapse: collapse;
 }
+
 .file-table .center {
   text-align: center;
 }
+
 .file-table .left {
   text-align: left;
 }
+
 .file-table .right {
   text-align: right;
 }
+
 .file-table-th,
 .file-table-td {
   padding: 12px 8px;
 }
+
 .file-table thead {
-  background-color: v-bind('token["background-color-light"]');
-}
-.file-table table,
-.file-table td,
-.file-table th {
-  border: 1px solid v-bind('token["colorBorder"]');
+  background-color: #fafafaff;
 }
 </style>

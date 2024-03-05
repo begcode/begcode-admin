@@ -12,18 +12,20 @@
 </template>
 
 <script lang="ts" setup>
+import type { PropType } from 'vue';
+
 defineOptions({
   name: 'RankList',
 });
 
-const props = defineProps({
+defineProps({
   title: {
     type: String,
     default: '',
   },
   list: {
-    type: Array,
-    default: null,
+    type: Array as PropType<any[]>,
+    default: [],
   },
   height: {
     type: Number,

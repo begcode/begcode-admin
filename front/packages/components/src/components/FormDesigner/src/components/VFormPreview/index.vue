@@ -4,7 +4,7 @@
 <template>
   <Modal
     title="预览(支持布局)"
-    :open="visible"
+    :open="state.visible"
     @ok="handleGetData"
     @cancel="handleCancel"
     okText="获取数据"
@@ -13,7 +13,7 @@
     :destroyOnClose="true"
     :width="900"
   >
-    <VFormCreate :form-config="formConfig as any" v-model:fApi="fApi" v-model:formModel="formModel" @submit="onSubmit">
+    <VFormCreate :form-config="state.formConfig as any" v-model:fApi="state.fApi" v-model:formModel="state.formModel" @submit="onSubmit">
       <template #slotName="{ formModel, field }">
         <a-input v-model:value="formModel[field]" placeholder="我是插槽传递的输入框" />
       </template>
@@ -22,7 +22,7 @@
   </Modal>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, ref, toRefs } from 'vue';
+import { defineComponent, reactive, ref } from 'vue';
 import { IFormConfig } from '../../typings/v-form-component';
 import { IAnyObject } from '../../typings/base-type';
 import VFormCreate from '../VFormCreate/index.vue';
@@ -41,7 +41,7 @@ export default defineComponent({
   },
   setup() {
     const jsonModal = ref<IToolbarMethods | null>(null);
-    const state = reactive<{
+    const state: any = reactive<{
       formModel: IAnyObject;
       visible: boolean;
       formConfig: IFormConfig;
@@ -86,7 +86,7 @@ export default defineComponent({
     return {
       handleGetData,
       handleCancel,
-      ...toRefs(state),
+      state,
       showModal,
       jsonModal,
       onSubmit,

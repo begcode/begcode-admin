@@ -13,7 +13,7 @@ defineOptions({
   name: 'HeadInfo',
 });
 
-const props = defineProps({
+defineProps({
   title: {
     type: String,
     default: '',

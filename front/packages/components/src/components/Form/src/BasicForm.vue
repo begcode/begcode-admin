@@ -45,32 +45,16 @@ import { dateUtil } from '@/utils/dateUtil';
 import { deepMerge } from '@/utils';
 
 import { useFormValues } from './hooks/useFormValues';
-import useAdvanced from './hooks/useAdvanced';
+import { useAdvanced } from './hooks/useAdvanced';
 import { useFormEvents } from './hooks/useFormEvents';
 import { createFormContext } from './hooks/useFormContext';
 import { useAutoFocus } from './hooks/useAutoFocus';
 import { useModalContext } from '@/components/Modal';
-import { useDebounceFn } from '@vueuse/core';
-import dayjs from 'dayjs';
+import { useDebounceFn } from '@vueuse/shared';
 
 import { basicProps } from './props';
 import { useDesign } from '@/hooks/web/useDesign';
 import { cloneDeep } from 'lodash-es';
-
-const form = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 4 },
-    xl: { span: 6 },
-    xxl: { span: 4 },
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 18 },
-  },
-  //表单默认冒号
-  colon: true,
-};
 
 defineOptions({ name: 'BasicForm' });
 

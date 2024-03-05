@@ -84,7 +84,7 @@ export default defineComponent({
           formItemsForEach(editorJsonData.schemas, formItem => {
             generateKey(formItem);
           });
-        formDesignMethods.setFormConfig({
+        formDesignMethods?.setFormConfig({
           ...editorJsonData,
           activeKey: 1,
           currentItem: { component: '' },

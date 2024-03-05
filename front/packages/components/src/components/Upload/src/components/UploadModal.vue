@@ -87,7 +87,7 @@ const { accept, helpText, maxNumber, maxSize } = toRefs(props);
 const { t } = useI18n();
 const [register, { closeModal }] = useModalInner();
 
-const { getStringAccept, getHelpText } = useUploadType({
+const { getAccept, getStringAccept, getHelpText } = useUploadType({
   acceptRef: accept,
   helpTextRef: helpText,
   maxNumberRef: maxNumber,
@@ -211,7 +211,7 @@ async function uploadApiByItem(item: FileItem) {
 // 点击开始上传
 async function handleStartUpload() {
   const { maxNumber } = props;
-  if ((fileListRef.value.length + props.previewFileList?.length ?? 0) > maxNumber) {
+  if (fileListRef.value.length + (props.previewFileList?.length || 0) > maxNumber) {
     return message.warning(t('component.upload.maxNumber', [maxNumber]));
   }
   try {

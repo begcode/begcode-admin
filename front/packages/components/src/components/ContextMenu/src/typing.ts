@@ -1,3 +1,4 @@
+import type { Fn } from '#/types';
 export interface Axis {
   x: number;
   y: number;

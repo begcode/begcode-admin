@@ -73,7 +73,7 @@ const getIsContentFullHeight = computed(() => {
 });
 
 const getUpwardSpace = computed(() => props.upwardSpace);
-const useContentHeight = inject('USE_CONTENT_HEIGHT');
+const useContentHeight = inject<any>('USE_CONTENT_HEIGHT');
 const { redoHeight, setCompensation, contentHeight } = useContentHeight(
   getIsContentFullHeight,
   wrapperRef,

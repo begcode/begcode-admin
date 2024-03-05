@@ -1,19 +1,9 @@
 <script lang="tsx">
 import type { ContextMenuItem, ItemContentProps, Axis } from './typing';
 import type { FunctionalComponent, CSSProperties, PropType } from 'vue';
-import {
-  defineComponent,
-  nextTick,
-  onMounted,
-  computed,
-  ref,
-  unref,
-  onUnmounted,
-  getCurrentInstance,
-  ComponentInternalInstance,
-} from 'vue';
+import { defineComponent, nextTick, onMounted, computed, ref, unref, onUnmounted } from 'vue';
 import Icon from '@/components/Icon/Icon.vue';
-import { Menu, Divider, theme } from 'ant-design-vue';
+import { Menu, Divider } from 'ant-design-vue';
 
 const prefixCls = 'context-menu';
 
@@ -128,13 +118,6 @@ export default defineComponent({
       });
     }
 
-    const { useToken } = theme;
-    const { token } = useToken();
-    const { proxy } = getCurrentInstance() as ComponentInternalInstance;
-    if (proxy) {
-      proxy['token'] = token.value;
-    }
-
     return () => {
       if (!unref(showRef)) {
         return null;
@@ -162,7 +145,7 @@ export default defineComponent({
   width: 156px;
   margin: 0;
   list-style: none;
-  background-color: v-bind('token["component-background"]');
+  background-color: #fff;
   border: 1px solid #000000;
   border-radius: 8px;
   box-shadow:
@@ -172,9 +155,11 @@ export default defineComponent({
   background-clip: padding-box;
   user-select: none;
 }
+
 .context-menu__item {
   margin: 0 !important;
 }
+
 .context-menu li {
   display: inline-block;
   width: 100% !important;
@@ -182,24 +167,30 @@ export default defineComponent({
   margin: 0 !important;
   line-height: 42px !important;
 }
+
 .context-menu li span {
   line-height: 42px !important;
 }
+
 .context-menu li > div {
   width: 100% !important;
   height: 100% !important;
   margin: 0 !important;
 }
+
 .context-menu li:not(.ant-menu-item-disabled):hover {
-  color: v-bind('token["colorText"]');
-  background-color: v-bind('token["controlItemBgHover"]');
+  color: rgba(0, 0, 0, 0.88);
+  background-color: rgba(0, 0, 0, 0.04);
 }
+
 .context-menu .ant-divider {
   margin: 0;
 }
+
 .context-menu__popup .ant-divider {
   margin: 0;
 }
+
 .context-menu__popup li {
   display: inline-block;
   width: 100% !important;
@@ -207,18 +198,22 @@ export default defineComponent({
   margin: 0 !important;
   line-height: 42px !important;
 }
+
 .context-menu__popup li span {
   line-height: 42px !important;
 }
+
 .context-menu__popup li > div {
   width: 100% !important;
   height: 100% !important;
   margin: 0 !important;
 }
+
 .context-menu__popup li:not(.ant-menu-item-disabled):hover {
-  color: v-bind('token["colorText"]');
-  background-color: v-bind('token["controlItemBgHover"]');
+  color: rgba(0, 0, 0, 0.88);
+  background-color: rgba(0, 0, 0, 0.04);
 }
+
 .context-menu .ant-menu-submenu-title,
 .context-menu .ant-menu-item {
   padding: 0 !important;

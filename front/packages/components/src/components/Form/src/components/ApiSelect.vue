@@ -30,6 +30,7 @@ import { useRuleFormItem } from '@/hooks/component/useFormItem';
 import { get, omit, isFunction, isEqual } from 'lodash-es';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons-vue';
 import { propTypes } from '@/utils/propTypes';
+import type { Recordable } from '#/utils';
 import { useI18n } from '@/hooks/web/useI18nOut';
 
 type OptionsItem = { label: string; value: string; disabled?: boolean; [name: string]: any };
@@ -75,7 +76,7 @@ if (props.showSearch) {
   attrs['onSearch'] = searchHandle;
 }
 
-const [state] = useRuleFormItem(props, 'value', 'change', emitData);
+const [state, setState] = useRuleFormItem(props, 'value', 'change', emitData);
 
 const searchKeyword = ref('');
 const searchParamValues = computed(() => {

@@ -64,7 +64,7 @@
 <script lang="ts">
 import { Empty, Input, Form, FormItem, Switch, Checkbox, Select, InputNumber, RadioGroup, Col, Row } from 'ant-design-vue';
 import RadioButtonGroup from '@/components/Form/src/components/RadioButtonGroup.vue';
-import { computed, defineComponent, ref, watch } from 'vue';
+import { computed, ComputedRef, defineComponent, ref, watch } from 'vue';
 import { useFormDesignState } from '../../../hooks/useFormDesignState';
 import {
   baseComponentControlAttrs,
@@ -96,7 +96,7 @@ export default defineComponent({
   setup() {
     // 让compuated属性自动更新
 
-    const allOptions = ref([] as Omit<IBaseFormAttrs, 'tag'>[]);
+    const allOptions = ref<Omit<IBaseFormAttrs, 'tag'>[]>([] as Omit<IBaseFormAttrs, 'tag'>[]);
     const showControlAttrs = (includes: string[] | undefined) => {
       if (!includes) return true;
       return includes.includes(formConfig.value.currentItem!.component);
@@ -170,14 +170,14 @@ export default defineComponent({
       },
     );
     // 控制性的选项
-    const controlOptions = computed(() => {
+    const controlOptions: ComputedRef<Omit<IBaseFormAttrs, 'tag'>[]> = computed(() => {
       return allOptions.value.filter(item => {
         return item.category == 'control';
       });
     });
 
     // 非控制性选择
-    const inputOptions = computed(() => {
+    const inputOptions: ComputedRef<Omit<IBaseFormAttrs, 'tag'>[]> = computed(() => {
       return allOptions.value.filter(item => {
         return item.category == 'input';
       });
@@ -196,7 +196,7 @@ export default defineComponent({
         deep: true,
       },
     );
-    const linkOptions = computed(() => {
+    const linkOptions: ComputedRef<{ label: string; value: string | undefined }[]> = computed(() => {
       return (
         formConfig.value.schemas &&
         formConfig.value.schemas

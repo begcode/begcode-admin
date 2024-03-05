@@ -1,7 +1,9 @@
 import type { ExtractPropTypes, PropType } from 'vue';
 import type { TreeDataItem } from 'ant-design-vue/es/tree/Tree';
+import type { Recordable } from '#/utils';
 
 import { buildProps } from '@/utils/props';
+import { ContextMenuItem, CreateContextOptions } from '@/components/ContextMenu';
 
 export enum ToolbarEnum {
   SELECT_ALL,
@@ -95,7 +97,7 @@ export const treeProps = buildProps({
   },
 
   beforeRightClick: {
-    type: Function as PropType<(...arg: any) => Promise<ContextMenuItem[] | ContextMenuOptions>>,
+    type: Function as PropType<(...arg: any) => Promise<ContextMenuItem[] | CreateContextOptions>>,
     default: undefined,
   },
 
@@ -126,22 +128,6 @@ export const treeProps = buildProps({
 });
 
 export type TreeProps = ExtractPropTypes<typeof treeProps>;
-
-export interface ContextMenuItem {
-  label: string;
-  icon?: string;
-  hidden?: boolean;
-  disabled?: boolean;
-  handler?: Function;
-  divider?: boolean;
-  children?: ContextMenuItem[];
-}
-
-export interface ContextMenuOptions {
-  icon?: string;
-  styles?: any;
-  items?: ContextMenuItem[];
-}
 
 export interface TreeItem extends TreeDataItem {
   icon?: any;

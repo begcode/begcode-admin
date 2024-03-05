@@ -1,9 +1,12 @@
 import type { ComputedRef, Ref } from 'vue';
 import type { NamePath, ValidateOptions } from 'ant-design-vue/lib/form/interface';
+
 import { unref, toRaw, nextTick } from 'vue';
 import { cloneDeep, set, uniqBy, get } from 'lodash-es';
 import type { FormProps, FormSchemaInner as FormSchema, FormActionType } from '../types/form';
 import { dateItemType, handleInputNumberValue, defaultValueComponents, isIncludeSimpleComponents } from '../helper';
+import type { Recordable } from '#/utils';
+import type { Fn, EmitType } from '#/types';
 import { isArray, isFunction, isObject, isString, isDef, isNil } from '@/utils/is';
 import { deepMerge, getValueType } from '@/utils';
 import { dateUtil } from '@/utils/dateUtil';
@@ -222,7 +225,7 @@ export function useFormEvents({
 
     const index = schemaList.findIndex(schema => schema.field === prefixField);
     const _schemaList = isObject(schema) ? [schema as FormSchema] : (schema as FormSchema[]);
-    const hasInList = schemaList.some(item => item.field === prefixField || schema.field);
+    const hasInList = schemaList.some(item => item.field === prefixField || (schema as FormSchema).field);
     if (!hasInList) return;
 
     if (!prefixField || index === -1 || first) {
@@ -328,7 +331,7 @@ export function useFormEvents({
   }
 
   async function validateFields(nameList?: NamePath[] | undefined, options?: ValidateOptions) {
-    const values = await unref(formElRef)?.validateFields(nameList);
+    const values = await unref(formElRef)?.validateFields(nameList, options);
     return handleFormValues(values);
   }
 

@@ -6,7 +6,6 @@
 import { onBeforeUnmount, onDeactivated, Ref, ref, unref, watch } from 'vue';
 import VditorPreview from 'vditor/dist/method.min';
 import { onMountedOrActivated } from '@/hooks/vben';
-import { useRootSetting } from '@/hooks/setting/useRootSetting';
 import { getTheme } from './getTheme';
 
 const props = defineProps({
@@ -15,7 +14,7 @@ const props = defineProps({
 });
 const viewerRef = ref(null);
 const vditorPreviewRef = ref(null) as Ref<VditorPreview | null>;
-const { getDarkMode } = useRootSetting();
+const getDarkMode = ref('light');
 
 function init() {
   const viewerEl = unref(viewerRef);

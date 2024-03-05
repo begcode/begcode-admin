@@ -4,7 +4,7 @@
   </Button>
 </template>
 <script lang="ts" setup>
-import { ref, watchEffect, computed, unref } from 'vue';
+import { ref, watchEffect, computed, unref, PropType } from 'vue';
 import { Button } from 'ant-design-vue';
 import { useCountdown } from './useCountdown';
 import { isFunction } from 'lodash-es';

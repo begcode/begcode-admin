@@ -2,8 +2,9 @@
   <div ref="chartRef" :style="{ height, width }"></div>
 </template>
 <script lang="ts" setup>
-import { defineComponent, PropType, ref, Ref, reactive, watchEffect } from 'vue';
+import { PropType, ref, Ref, reactive, watchEffect } from 'vue';
 import { useECharts } from '@/hooks/web/useECharts';
+import { EChartsOption } from 'echarts';
 
 defineOptions({
   name: 'Line',
@@ -11,7 +12,7 @@ defineOptions({
 
 const props = defineProps({
   chartData: {
-    type: Array,
+    type: Array as PropType<any[]>,
     default: () => [],
   },
   option: {
@@ -29,7 +30,7 @@ const props = defineProps({
 });
 
 const chartRef = ref<HTMLDivElement | null>(null);
-const { setOptions, echarts } = useECharts(chartRef as Ref<HTMLDivElement>);
+const { setOptions } = useECharts(chartRef as Ref<HTMLDivElement>);
 const option = reactive({
   tooltip: {
     trigger: 'axis',
@@ -43,7 +44,7 @@ const option = reactive({
   },
   xAxis: {
     type: 'category',
-    data: [],
+    data: [] as any[],
   },
   yAxis: {
     type: 'value',
@@ -56,7 +57,7 @@ const option = reactive({
       areaStyle: {},
       data: [],
     },
-  ],
+  ] as any[],
 });
 
 watchEffect(() => {
@@ -75,6 +76,6 @@ function initCharts() {
   });
   option.series[0].data = seriesData;
   option.xAxis.data = xAxisData;
-  setOptions(option);
+  setOptions(option as EChartsOption);
 }
 </script>

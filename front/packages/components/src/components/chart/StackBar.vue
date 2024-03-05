@@ -5,6 +5,7 @@
 import { PropType, ref, Ref, reactive, watchEffect, watch } from 'vue';
 import { useECharts } from '@/hooks/web/useECharts';
 import { cloneDeep } from 'lodash-es';
+import { EChartsOption } from 'echarts';
 
 defineOptions({
   name: 'StackBar',
@@ -12,7 +13,7 @@ defineOptions({
 
 const props = defineProps({
   chartData: {
-    type: Array,
+    type: Array as PropType<any[]>,
     default: () => [],
     required: true,
   },
@@ -39,7 +40,7 @@ const props = defineProps({
 });
 
 const chartRef = ref<HTMLDivElement | null>(null);
-const { setOptions, echarts, resize } = useECharts(chartRef as Ref<HTMLDivElement>);
+const { setOptions, resize } = useECharts(chartRef as Ref<HTMLDivElement>);
 const option = reactive({
   tooltip: {
     trigger: 'axis',
@@ -62,9 +63,9 @@ const option = reactive({
   },
   yAxis: {
     type: 'category',
-    data: [],
+    data: [] as any[],
   },
-  series: [],
+  series: [] as any[],
 });
 
 watchEffect(() => {
@@ -91,7 +92,7 @@ function initCharts() {
   let typeArr = Array.from(new Set(props.chartData.map(item => item.type)));
   //轴数据
   let yAxisData = Array.from(new Set(props.chartData.map(item => item.name)));
-  let seriesData = [];
+  let seriesData: any[] = [];
   typeArr.forEach(type => {
     let obj = { name: type, type: props.type, stack: 'total' };
     let chartArr = props.chartData.filter(item => type === item.type);
@@ -101,6 +102,6 @@ function initCharts() {
   });
   option.series = seriesData;
   option.yAxis.data = yAxisData;
-  setOptions(option);
+  setOptions(option as EChartsOption);
 }
 </script>

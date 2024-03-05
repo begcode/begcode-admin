@@ -7,16 +7,17 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { ref, watch, PropType } from 'vue';
 import { Form, InputGroup, Input } from 'ant-design-vue';
-import { propTypes } from '@/utils/propTypes';
 
 defineOptions({
   name: 'RangeNumber',
 });
 
 const props = defineProps({
-  value: propTypes.oneOfType([propTypes.string, propTypes.array]),
+  value: {
+    type: [String, Array] as PropType<string | string[]>,
+  },
 });
 
 const emit = defineEmits(['change', 'update:value']);
@@ -36,7 +37,7 @@ function handleChangeEnd(e) {
 }
 
 function emitArray() {
-  let arr = [];
+  let arr: string[] = [];
   let begin = beginValue.value || '';
   let end = endValue.value || '';
   arr.push(begin);

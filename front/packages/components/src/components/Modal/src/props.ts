@@ -1,6 +1,7 @@
 import type { PropType, CSSProperties } from 'vue';
 import { ButtonProps } from 'ant-design-vue/es/button/buttonTypes';
 import type { ModalWrapperProps } from './typing';
+import type { VueNode } from '#/types';
 
 export const modalProps = {
   open: { type: Boolean },
@@ -16,7 +17,7 @@ export const modalProps = {
   closeFunc: Function as PropType<() => Promise<boolean>>,
 };
 
-export const basicProps = Object.assign({}, modalProps, {
+export const basicProps: any = Object.assign({}, modalProps, {
   defaultFullscreen: { type: Boolean },
   // Can it be full screen
   canFullscreen: { type: Boolean, default: true },

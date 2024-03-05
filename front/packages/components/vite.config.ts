@@ -5,15 +5,18 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 import visualizer from 'rollup-plugin-visualizer';
 import monacoEditorPlugin from 'vite-plugin-monaco-editor';
+import dts from 'vite-plugin-dts';
 
-const configVisualizerConfig = () => {
+const configVisualizerConfig = (): any[] => {
   if (process.env.REPORT === 'true') {
-    return visualizer({
-      filename: './node_modules/.cache/visualizer/stats.html',
-      open: true,
-      gzipSize: true,
-      brotliSize: true,
-    });
+    return [
+      visualizer({
+        filename: './node_modules/.cache/visualizer/stats.html',
+        open: true,
+        gzipSize: true,
+        brotliSize: true,
+      }),
+    ];
   }
   return [];
 };
@@ -28,14 +31,20 @@ export default defineConfig({
       // default
       symbolId: 'icon-[dir]-[name]',
     }),
-    configVisualizerConfig(),
-    monacoEditorPlugin(),
+    dts({
+      outDir: ['typings'],
+      tsConfigFilePath: path.resolve(__dirname, 'tsconfig.json'),
+    }),
+    ...configVisualizerConfig(),
+    monacoEditorPlugin({
+      languageWorkers: ['editorWorkerService', 'typescript', 'json', 'html'],
+    }),
   ],
   publicDir: false,
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '#': path.resolve(__dirname, './types'),
+      '#': path.resolve(__dirname, './src/types'),
     },
   },
   build: {
@@ -53,7 +62,7 @@ export default defineConfig({
       transformMixedEsModules: true,
     },
     rollupOptions: {
-      external: ['vue', 'vue-i18n', 'ant-design-vue', 'vxe-table'],
+      external: ['vue', 'vue-i18n', 'ant-design-vue'],
       output: {
         banner: chunk => {
           if (chunk.name === 'index') {

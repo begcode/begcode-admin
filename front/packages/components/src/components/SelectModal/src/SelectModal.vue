@@ -33,8 +33,23 @@
               </Avatar>
             </Tooltip>
           </AvatarGroup>
-          <Button v-if="disabled" pre-icon="ant-design:file-search-outlined" type="link" @click.stop="disabled && openModal()"></Button>
-          <Button v-else pre-icon="ant-design:edit-outlined" type="link" @click.stop="!disabled && openModal()"></Button>
+          <div>
+            <Button
+              v-if="disabled"
+              pre-icon="ant-design:file-search-outlined"
+              type="link"
+              size="small"
+              @click.stop="disabled && openModal()"
+            ></Button>
+            <Button v-else pre-icon="ant-design:edit-outlined" type="link" size="small" @click.stop="!disabled && openModal()"></Button>
+            <Button
+              v-if="avatarGroupData.length"
+              pre-icon="ant-design:close-outlined"
+              type="link"
+              size="small"
+              @click.stop="!disabled && clear()"
+            ></Button>
+          </div>
         </div>
       </Col>
     </Row>
@@ -288,6 +303,11 @@ export default defineComponent({
         }
       } else if (props.componentName?.endsWith('List') || props.componentName?.endsWith('Relation')) {
         result.updateType = props.updateType;
+        if (props.multiple) {
+          result.selectType = 'checkbox';
+        } else {
+          result.selectType = 'radio';
+        }
         const tools: string[] = [];
         const buttons: string[] = [];
         const rowOperations = ['detail'];
@@ -413,7 +433,8 @@ export default defineComponent({
         } else {
           if (tableRef.value) {
             // selectRecords = tableRef.value.getCheckboxRecords() || [];
-            selectRecords = tableRef.value.getData() || [];
+            // selectRecords = tableRef.value.getData() || [];
+            selectRecords = tableRef.value.getSelectRows() || [];
           }
         }
         if (props.valueType === 'splitString') {
@@ -433,6 +454,23 @@ export default defineComponent({
       }
     }
     function visibleChange(_visible) {}
+
+    function clear() {
+      if (props.updateType === 'emitSelected') {
+        if (props.valueType === 'splitString') {
+          emit('change', '');
+          emit('update:value', '');
+        } else {
+          if (props.multiple) {
+            emit('change', []);
+            emit('update:value', []);
+          } else {
+            emit('change', null);
+            emit('update:value', null);
+          }
+        }
+      }
+    }
 
     return {
       attrs,
@@ -458,6 +496,7 @@ export default defineComponent({
       showComponentProps,
       avatarGroupData,
       isObject,
+      clear,
     };
   },
 });

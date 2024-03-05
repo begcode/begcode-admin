@@ -1,5 +1,7 @@
 import { defineComponent, h, computed, ref, getCurrentInstance, onUnmounted, inject, Ref } from 'vue';
 import { renderThumbStyle, BAR_MAP } from './util';
+import type { Nullable } from '#/types';
+import type { Recordable } from '#/utils';
 import { on, off } from '@/utils/domUtils';
 
 export default defineComponent({

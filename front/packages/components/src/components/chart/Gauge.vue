@@ -6,6 +6,7 @@ import { PropType, ref, Ref, reactive, watchEffect } from 'vue';
 import { useECharts } from '@/hooks/web/useECharts';
 import { GaugeChart } from 'echarts/charts';
 import { cloneDeep } from 'lodash-es';
+import { EChartsOption } from 'echarts';
 
 defineOptions({
   name: 'Gauge',
@@ -13,8 +14,8 @@ defineOptions({
 
 const props = defineProps({
   chartData: {
-    type: Object as PropType<Object>,
-    default: () => [],
+    type: Object as PropType<any>,
+    default: () => ({}),
   },
   option: {
     type: Object,
@@ -96,6 +97,6 @@ function initCharts() {
   }
   option.series[0].data[0].name = props.chartData.name;
   option.series[0].data[0].value = props.chartData.value;
-  setOptions(option);
+  setOptions(option as EChartsOption);
 }
 </script>

@@ -44,7 +44,7 @@ export default defineComponent({
   components: { Input, Icon },
   // props: {},
   setup() {
-    const state = reactive({});
+    const state = reactive<any>({});
     const { formConfig } = useFormDesignState();
     const key = formConfig.value.currentItem?.component === 'TreeSelect' ? 'treeData' : 'options';
     const addOptions = () => {

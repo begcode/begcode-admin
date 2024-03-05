@@ -2,6 +2,7 @@ import { ref, getCurrentInstance, unref, reactive, watchEffect, nextTick, toRaw,
 import { tryOnUnmounted } from '@vueuse/core';
 import { isEqual } from 'lodash-es';
 import type { UseDrawerReturnType, DrawerInstance, ReturnMethods, DrawerProps, UseDrawerInnerReturnType } from './typing';
+import type { Fn, Nullable } from '#/types';
 import { isProdMode } from '@/utils';
 import { isFunction } from '@/utils/is';
 import { useLog } from '@/hooks/useLog';

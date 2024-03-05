@@ -63,13 +63,18 @@ export default defineComponent({
       proxy['token'] = token.value;
     }
 
+    const footerStyle = { 'border-top': token.value.colorBorder };
+    const headStyle = { 'border-bottom': token.value.colorBorder };
+    const containerStyle = { 'background-color': 'fff' };
+
     return () => (
-      <div class={unref(prefixCls)}>
+      <div class={unref(prefixCls)} style={containerStyle}>
         <CollapseHeader
           {...props}
           prefixCls={unref(prefixCls)}
           onExpand={handleExpand}
           show={show.value}
+          style={headStyle}
           v-slots={{
             title: slots.title,
             action: slots.action,
@@ -77,7 +82,7 @@ export default defineComponent({
         />
 
         <div class="p-2">
-          <CollapseTransition enable={props.canExpan}>
+          <CollapseTransition>
             {props.loading ? (
               <Skeleton active={props.loading} />
             ) : (
@@ -88,7 +93,7 @@ export default defineComponent({
           </CollapseTransition>
         </div>
 
-        {slots.footer && <div class={`${prefixCls}__footer`}>{slots.footer()}</div>}
+        {slots.footer && <div style={footerStyle}>{slots.footer()}</div>}
       </div>
     );
   },
@@ -99,18 +104,15 @@ export default defineComponent({
 .vben-collapse-container {
   transition: all 0.3s ease-in-out;
   border-radius: 2px;
-  background-color: v-bind('token["component-background"]');
 }
+
 .vben-collapse-container__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 32px;
-  border-bottom: 1px solid v-bind('token["colorBorder"]');
 }
-.vben-collapse-container__footer {
-  border-top: 1px solid v-bind('token["colorBorder"]');
-}
+
 .vben-collapse-container__action {
   display: flex;
   flex: 1;

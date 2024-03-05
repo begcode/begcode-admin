@@ -1,8 +1,10 @@
 import type { NamePath, ValidateOptions } from 'ant-design-vue/lib/form/interface';
 import { ref, onUnmounted, unref, nextTick, watch } from 'vue';
+import type { UnwrapRef } from 'vue';
 import type { FormProps, FormActionType, UseFormReturnType, FormSchemaInner as FormSchema } from '../types/form';
-import type { DynamicProps } from '/#/utils';
 import { handleRangeValue } from '../utils/formUtils';
+import type { DynamicProps, Nullable } from '#/types';
+import type { Recordable } from '#/utils';
 import { useLog } from '@/hooks/useLog';
 import { getDynamicProps, getValueType, isProdMode } from '@/utils';
 
@@ -34,7 +36,8 @@ export function useForm(props?: Props): UseFormReturnType {
       });
     if (unref(loadedRef) && isProdMode() && instance === unref(formRef)) return;
 
-    formRef.value = instance;
+    // formRef.value = (instance as Ref<Nullable<FormActionType>>);
+    formRef.value = instance as UnwrapRef<Nullable<FormActionType>>;
     loadedRef.value = true;
 
     watch(
@@ -50,6 +53,38 @@ export function useForm(props?: Props): UseFormReturnType {
   }
 
   const methods: FormActionType = {
+    submit: async (): Promise<any> => {
+      const form = await getForm();
+      return form.submit();
+    },
+
+    setFieldsValue: async <T extends Recordable<any>>(values: T) => {
+      const form = await getForm();
+      form.setFieldsValue(values);
+    },
+
+    resetFields: async () => {
+      getForm().then(async form => {
+        await form.resetFields();
+      });
+    },
+
+    // TODO promisify
+    getFieldsValue: <T>() => {
+      let values = unref(formRef)?.getFieldsValue() as T;
+      if (values) {
+        Object.keys(values).map(key => {
+          if (values[key] instanceof Array) {
+            let isObject = typeof (values[key][0] || '') === 'object';
+            if (!isObject) {
+              values[key] = values[key].join(',');
+            }
+          }
+        });
+      }
+      return values;
+    },
+
     scrollToField: async (name: NamePath, options?: ScrollOptions | undefined) => {
       const form = await getForm();
       form.scrollToField(name, options);
@@ -74,47 +109,13 @@ export function useForm(props?: Props): UseFormReturnType {
       form.clearValidate(name);
     },
 
-    resetFields: async () => {
-      getForm().then(async form => {
-        await form.resetFields();
-      });
-    },
-
     removeSchemaByField: async (field: string | string[]) => {
       unref(formRef)?.removeSchemaByField(field);
-    },
-
-    // TODO promisify
-    getFieldsValue: <T>() => {
-      let values = unref(formRef)?.getFieldsValue() as T;
-      if (values) {
-        Object.keys(values).map(key => {
-          if (values[key] instanceof Array) {
-            // update-begin-author:sunjianlei date:20221205 for: 【issues/4330】判断如果是对象数组，则不拼接
-            let isObject = typeof (values[key][0] || '') === 'object';
-            if (!isObject) {
-              values[key] = values[key].join(',');
-            }
-            // update-end-author:sunjianlei date:20221205 for: 【issues/4330】判断如果是对象数组，则不拼接
-          }
-        });
-      }
-      return values;
-    },
-
-    setFieldsValue: async <T extends Recordable<any>>(values: T) => {
-      const form = await getForm();
-      form.setFieldsValue(values);
     },
 
     appendSchemaByField: async (schema: FormSchema | FormSchema[], prefixField: string | undefined, first?: boolean) => {
       const form = await getForm();
       form.appendSchemaByField(schema, prefixField, first);
-    },
-
-    submit: async (): Promise<any> => {
-      const form = await getForm();
-      return form.submit();
     },
 
     /**

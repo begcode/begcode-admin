@@ -29,7 +29,7 @@
     "webapp:build:dev": "cross-env NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 vite build && esno ./build/script/postBuild.ts",
     "webapp:build:prod": "pnpm run build",
     "build:docker": "vite build --mode docker",
-    "components:build": "pnpm --filter ./packages/** build",
+    "components:build": "pnpm --filter \"./packages/**\" build",
     "webapp:dev": "pnpm run start",
     "webapp:prod": "pnpm run clean-www && pnpm run webapp:build:prod",
     "webapp:test": "pnpm run test"

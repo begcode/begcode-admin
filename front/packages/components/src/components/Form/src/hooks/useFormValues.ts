@@ -1,8 +1,10 @@
-import { isArray, isFunction, isObject, isString, cloneDeep, get, set, unset } from 'lodash-es';
-import { unref } from 'vue';
 import type { Ref, ComputedRef } from 'vue';
+
 import dayjs from 'dayjs';
+import { unref } from 'vue';
+import { isArray, isFunction, isObject, isString, cloneDeep, get, set, unset } from 'lodash-es';
 import type { FormProps, FormSchemaInner as FormSchema } from '../types/form';
+import type { Recordable } from '#/utils';
 import { isNil, isEmpty } from '@/utils/is';
 import { dateUtil } from '@/utils/dateUtil';
 
@@ -67,7 +69,7 @@ export function useFormValues({ defaultValueRef, getSchema, formModel, getProps 
         value = transformDateFunc?.(value);
       }
       // 判断是否是dayjs实例
-      // dayjs.isDayjs(value[0]) && dayjs.isDayjs(value[1])
+      // @ts-ignore
       if (isArray(value) && dayjs.isDayjs(value[0]) && dayjs.isDayjs(value[1]) && value[0]?.format && value[1]?.format) {
         value = value.map(item => transformDateFunc?.(item));
       }

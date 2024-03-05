@@ -1,6 +1,7 @@
 import type { ComputedRef, Ref } from 'vue';
 import { unref, nextTick, watchEffect } from 'vue';
 import { type FormSchemaInner as FormSchema, type FormActionType, type FormProps } from '../types/form';
+import type { Nullable } from '#/utils';
 
 interface UseAutoFocusContext {
   getSchema: ComputedRef<FormSchema[]>;

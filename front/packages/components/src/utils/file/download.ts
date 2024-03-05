@@ -1,5 +1,6 @@
 import { openWindow } from '../index';
 import { dataURLtoBlob, urlToBase64 } from './base64Conver';
+import type { TargetContext } from '#/types';
 
 /**
  * Download online pictures

@@ -1121,7 +1121,7 @@ deleteProps(componentAttrs['StrengthMeter'], 'suffix');
 export const baseComponentAttrs: IBaseComponentProps = componentAttrs;
 
 //在所有的选项中查找需要配置项
-const findCompoentProps = (props, name) => {
+const findCompoentProps = (props, name): any => {
   const idx = props.findIndex((value: BaseFormAttrs) => {
     return value.name === name;
   });
@@ -1131,7 +1131,7 @@ const findCompoentProps = (props, name) => {
 };
 
 // 根据其它选项的值更新自身控件配置值
-export const componentPropsFuncs = {
+export const componentPropsFuncs: any = {
   RadioGroup: (compProp, options: BaseFormAttrs[]) => {
     const props = findCompoentProps(options, 'size');
     if (props) {
