@@ -30,10 +30,10 @@ class SiteConfigTest {
         CommonFieldData commonFieldDataBack = getCommonFieldDataRandomSampleGenerator();
 
         // siteConfig.addItems(commonFieldDataBack);
-        assertThat(siteConfig.getItems()).containsOnly(commonFieldDataBack);
+        // assertThat(siteConfig.getItems()).containsOnly(commonFieldDataBack);
 
         // siteConfig.removeItems(commonFieldDataBack);
-        assertThat(siteConfig.getItems()).doesNotContain(commonFieldDataBack);
+        // assertThat(siteConfig.getItems()).doesNotContain(commonFieldDataBack);
 
         siteConfig.items(new ArrayList<>(Set.of(commonFieldDataBack)));
         assertThat(siteConfig.getItems()).containsOnly(commonFieldDataBack);

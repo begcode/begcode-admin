@@ -1,4 +1,5 @@
-import type { ProjectConfig } from '/#/config';
+import { SIDE_BAR_BG_COLOR_LIST, HEADER_PRESET_BG_COLOR_LIST, APP_PRESET_COLOR_LIST } from './designSetting';
+import type { ProjectConfig } from '#/config';
 import { MenuTypeEnum, MenuModeEnum, TriggerEnum, MixSidebarTriggerEnum } from '@/enums/menuEnum';
 import { CacheTypeEnum } from '@/enums/cacheEnum';
 import {
@@ -10,7 +11,6 @@ import {
   SessionTimeoutProcessingEnum,
   TabsThemeEnum,
 } from '@/enums/appEnum';
-import { SIDE_BAR_BG_COLOR_LIST, HEADER_PRESET_BG_COLOR_LIST, APP_PRESET_COLOR_LIST } from './designSetting';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 

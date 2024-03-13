@@ -17,7 +17,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ApiPermission implements Serializable {
 
@@ -161,6 +160,11 @@ public class ApiPermission implements Serializable {
         return this;
     }
 
+    public ApiPermission parentId(Long parentId) {
+        this.parentId = parentId;
+        return this;
+    }
+
     public ApiPermission authorities(List<Authority> authorities) {
         this.authorities = authorities;
         return this;
@@ -183,5 +187,21 @@ public class ApiPermission implements Serializable {
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "ApiPermission{" +
+            "id=" + getId() +
+            ", serviceName='" + getServiceName() + "'" +
+            ", name='" + getName() + "'" +
+            ", code='" + getCode() + "'" +
+            ", description='" + getDescription() + "'" +
+            ", type='" + getType() + "'" +
+            ", method='" + getMethod() + "'" +
+            ", url='" + getUrl() + "'" +
+            ", status='" + getStatus() + "'" +
+            "}";
     }
 }

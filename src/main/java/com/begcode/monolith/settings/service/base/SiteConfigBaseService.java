@@ -1,8 +1,9 @@
 package com.begcode.monolith.settings.service.base;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.begcode.monolith.domain.enumeration.SortValueOperateType;
@@ -157,6 +158,26 @@ public class SiteConfigBaseService<R extends SiteConfigRepository, E extends Sit
                 CommonFieldData::setOwnerEntityName,
                 "SiteConfig"
             );
+    }
+
+    public <T> T getSiteConfigByName(String name, Class<T> t) {
+        SiteConfig baseConfig = this.baseMapper.selectOne(new LambdaQueryWrapper<SiteConfig>().eq(SiteConfig::getCategoryKey, name));
+        if (Objects.isNull(baseConfig)) {
+            return null;
+        }
+        Binder.bindRelations(baseConfig);
+        // 将baseConfig.getItems转为Map对象。
+        Map<String, String> configMap = baseConfig
+            .getItems()
+            .stream()
+            .collect(Collectors.toMap(CommonFieldData::getName, CommonFieldData::getValue, (k1, k2) -> k1));
+        // 将configMap转为对应的对象。
+        try {
+            return BeanUtil.toBean(configMap, t);
+        } catch (Exception e) {
+            log.error("getSiteConfigByName error", e);
+        }
+        return null;
     }
 
     /**

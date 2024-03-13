@@ -13,7 +13,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class AnnouncementRecord extends AbstractAuditingEntity<Long, AnnouncementRecord> implements Serializable {
 
@@ -90,5 +89,21 @@ public class AnnouncementRecord extends AbstractAuditingEntity<Long, Announcemen
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "AnnouncementRecord{" +
+            "id=" + getId() +
+            ", anntId=" + getAnntId() +
+            ", userId=" + getUserId() +
+            ", hasRead='" + getHasRead() + "'" +
+            ", readTime='" + getReadTime() + "'" +
+            ", createdBy=" + getCreatedBy() +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastModifiedBy=" + getLastModifiedBy() +
+            ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            "}";
     }
 }

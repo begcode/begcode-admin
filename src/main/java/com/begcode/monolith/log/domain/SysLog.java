@@ -14,7 +14,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class SysLog extends AbstractAuditingEntity<Long, SysLog> implements Serializable {
 
@@ -168,5 +167,28 @@ public class SysLog extends AbstractAuditingEntity<Long, SysLog> implements Seri
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "SysLog{" +
+            "id=" + getId() +
+            ", logType='" + getLogType() + "'" +
+            ", logContent='" + getLogContent() + "'" +
+            ", operateType='" + getOperateType() + "'" +
+            ", userid='" + getUserid() + "'" +
+            ", username='" + getUsername() + "'" +
+            ", ip='" + getIp() + "'" +
+            ", method='" + getMethod() + "'" +
+            ", requestUrl='" + getRequestUrl() + "'" +
+            ", requestParam='" + getRequestParam() + "'" +
+            ", requestType='" + getRequestType() + "'" +
+            ", costTime=" + getCostTime() +
+            ", createdBy=" + getCreatedBy() +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastModifiedBy=" + getLastModifiedBy() +
+            ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            "}";
     }
 }

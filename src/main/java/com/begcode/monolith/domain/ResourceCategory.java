@@ -15,7 +15,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ResourceCategory implements Serializable {
 
@@ -111,6 +110,11 @@ public class ResourceCategory implements Serializable {
         return this;
     }
 
+    public ResourceCategory parentId(Long parentId) {
+        this.parentId = parentId;
+        return this;
+    }
+
     public ResourceCategory images(List<UploadImage> uploadImages) {
         this.images = uploadImages;
         return this;
@@ -138,5 +142,16 @@ public class ResourceCategory implements Serializable {
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "ResourceCategory{" +
+            "id=" + getId() +
+            ", title='" + getTitle() + "'" +
+            ", code='" + getCode() + "'" +
+            ", orderNumber=" + getOrderNumber() +
+            "}";
     }
 }

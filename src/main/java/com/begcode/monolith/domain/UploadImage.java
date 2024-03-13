@@ -15,7 +15,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class UploadImage extends AbstractAuditingEntity<Long, UploadImage> implements Serializable {
 
@@ -237,6 +236,11 @@ public class UploadImage extends AbstractAuditingEntity<Long, UploadImage> imple
         return this;
     }
 
+    public UploadImage categoryId(Long categoryId) {
+        this.categoryId = categoryId;
+        return this;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -254,5 +258,34 @@ public class UploadImage extends AbstractAuditingEntity<Long, UploadImage> imple
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "UploadImage{" +
+            "id=" + getId() +
+            ", url='" + getUrl() + "'" +
+            ", fullName='" + getFullName() + "'" +
+            ", name='" + getName() + "'" +
+            ", ext='" + getExt() + "'" +
+            ", type='" + getType() + "'" +
+            ", path='" + getPath() + "'" +
+            ", folder='" + getFolder() + "'" +
+            ", ownerEntityName='" + getOwnerEntityName() + "'" +
+            ", ownerEntityId=" + getOwnerEntityId() +
+            ", businessTitle='" + getBusinessTitle() + "'" +
+            ", businessDesc='" + getBusinessDesc() + "'" +
+            ", businessStatus='" + getBusinessStatus() + "'" +
+            ", createAt='" + getCreateAt() + "'" +
+            ", fileSize=" + getFileSize() +
+            ", smartUrl='" + getSmartUrl() + "'" +
+            ", mediumUrl='" + getMediumUrl() + "'" +
+            ", referenceCount=" + getReferenceCount() +
+            ", createdBy=" + getCreatedBy() +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastModifiedBy=" + getLastModifiedBy() +
+            ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            "}";
     }
 }

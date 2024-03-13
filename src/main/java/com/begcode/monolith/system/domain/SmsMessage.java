@@ -15,7 +15,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class SmsMessage extends AbstractAuditingEntity<Long, SmsMessage> implements Serializable {
 
@@ -159,5 +158,27 @@ public class SmsMessage extends AbstractAuditingEntity<Long, SmsMessage> impleme
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "SmsMessage{" +
+            "id=" + getId() +
+            ", title='" + getTitle() + "'" +
+            ", sendType='" + getSendType() + "'" +
+            ", receiver='" + getReceiver() + "'" +
+            ", params='" + getParams() + "'" +
+            ", content='" + getContent() + "'" +
+            ", sendTime='" + getSendTime() + "'" +
+            ", sendStatus='" + getSendStatus() + "'" +
+            ", retryNum=" + getRetryNum() +
+            ", failResult='" + getFailResult() + "'" +
+            ", remark='" + getRemark() + "'" +
+            ", createdBy=" + getCreatedBy() +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastModifiedBy=" + getLastModifiedBy() +
+            ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            "}";
     }
 }

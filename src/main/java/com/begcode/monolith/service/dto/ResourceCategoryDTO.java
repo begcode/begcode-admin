@@ -5,6 +5,7 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -89,6 +90,40 @@ public class ResourceCategoryDTO implements Serializable {
         this.parent = parent;
         return this;
     }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ResourceCategoryDTO)) {
+            return false;
+        }
+
+        ResourceCategoryDTO resourceCategoryDTO = (ResourceCategoryDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, resourceCategoryDTO.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id);
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "ResourceCategoryDTO{" +
+            "id=" + getId() +
+            ", title='" + getTitle() + "'" +
+            ", code='" + getCode() + "'" +
+            ", orderNumber=" + getOrderNumber() +
+            ", children=" + getChildren() +
+            ", parent=" + getParent() +
+            "}";
+    }
 }

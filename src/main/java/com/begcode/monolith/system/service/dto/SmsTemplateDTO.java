@@ -5,6 +5,7 @@ import com.begcode.monolith.domain.enumeration.MessageSendType;
 import com.begcode.monolith.domain.enumeration.SmsTemplateType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -175,6 +176,48 @@ public class SmsTemplateDTO extends AbstractAuditingEntity<Long, SmsTemplateDTO>
         this.supplier = supplier;
         return this;
     }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof SmsTemplateDTO)) {
+            return false;
+        }
+
+        SmsTemplateDTO smsTemplateDTO = (SmsTemplateDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, smsTemplateDTO.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id);
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "SmsTemplateDTO{" +
+            "id=" + getId() +
+            ", name='" + getName() + "'" +
+            ", code='" + getCode() + "'" +
+            ", sendType='" + getSendType() + "'" +
+            ", content='" + getContent() + "'" +
+            ", testJson='" + getTestJson() + "'" +
+            ", type='" + getType() + "'" +
+            ", remark='" + getRemark() + "'" +
+            ", enabled='" + getEnabled() + "'" +
+            ", createdBy=" + getCreatedBy() +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastModifiedBy=" + getLastModifiedBy() +
+            ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            ", supplier=" + getSupplier() +
+            "}";
+    }
 }

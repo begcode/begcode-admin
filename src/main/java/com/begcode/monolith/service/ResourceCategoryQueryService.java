@@ -6,7 +6,7 @@ import static tech.jhipster.service.mybatis.AggregateUtil.buildAggregate;
 import static tech.jhipster.service.mybatis.AggregateUtil.buildGroupBy;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.*;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;

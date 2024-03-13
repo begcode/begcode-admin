@@ -3,13 +3,13 @@
 
 import type { AxiosInstance, AxiosResponse } from 'axios';
 import { clone, isString, isNull, isEmpty } from 'lodash-es';
-import type { RequestOptions, Result } from '/#/axios';
 import { setObjToUrlParams, deepMerge } from '@begcode/components';
 import axios from 'axios';
 import type { AxiosTransform, CreateAxiosOptions } from './axiosTransform';
 import { VAxios } from './Axios';
 import { checkStatus } from './checkStatus';
 import { joinTimestamp, formatRequestDate } from './helper';
+import type { RequestOptions, Result } from '#/axios';
 import { useGlobSetting } from '@/hooks/setting';
 import { useMessage } from '@/hooks/web/useMessage';
 import { RequestEnum, ResultEnum, ContentTypeEnum, ConfigEnum } from '@/enums/httpEnum';

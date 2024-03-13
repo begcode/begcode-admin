@@ -4,6 +4,7 @@ import com.begcode.monolith.domain.AbstractAuditingEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -117,6 +118,43 @@ public class AnnouncementRecordDTO extends AbstractAuditingEntity<Long, Announce
         this.lastModifiedDate = lastModifiedDate;
         return this;
     }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof AnnouncementRecordDTO)) {
+            return false;
+        }
+
+        AnnouncementRecordDTO announcementRecordDTO = (AnnouncementRecordDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, announcementRecordDTO.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id);
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "AnnouncementRecordDTO{" +
+            "id=" + getId() +
+            ", anntId=" + getAnntId() +
+            ", userId=" + getUserId() +
+            ", hasRead='" + getHasRead() + "'" +
+            ", readTime='" + getReadTime() + "'" +
+            ", createdBy=" + getCreatedBy() +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastModifiedBy=" + getLastModifiedBy() +
+            ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            "}";
+    }
 }

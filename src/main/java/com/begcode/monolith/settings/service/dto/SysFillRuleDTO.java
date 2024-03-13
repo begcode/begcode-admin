@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -174,6 +175,48 @@ public class SysFillRuleDTO implements Serializable {
         this.ruleItems = ruleItems;
         return this;
     }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof SysFillRuleDTO)) {
+            return false;
+        }
+
+        SysFillRuleDTO sysFillRuleDTO = (SysFillRuleDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, sysFillRuleDTO.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id);
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "SysFillRuleDTO{" +
+            "id=" + getId() +
+            ", name='" + getName() + "'" +
+            ", code='" + getCode() + "'" +
+            ", desc='" + getDesc() + "'" +
+            ", enabled='" + getEnabled() + "'" +
+            ", resetFrequency='" + getResetFrequency() + "'" +
+            ", seqValue=" + getSeqValue() +
+            ", fillValue='" + getFillValue() + "'" +
+            ", implClass='" + getImplClass() + "'" +
+            ", params='" + getParams() + "'" +
+            ", resetStartTime='" + getResetStartTime() + "'" +
+            ", resetEndTime='" + getResetEndTime() + "'" +
+            ", resetTime='" + getResetTime() + "'" +
+            ", ruleItems=" + getRuleItems() +
+            "}";
+    }
 }

@@ -19,7 +19,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ViewPermission implements Serializable {
 
@@ -301,6 +300,11 @@ public class ViewPermission implements Serializable {
         return this;
     }
 
+    public ViewPermission parentId(Long parentId) {
+        this.parentId = parentId;
+        return this;
+    }
+
     public ViewPermission authorities(List<Authority> authorities) {
         this.authorities = authorities;
         return this;
@@ -323,5 +327,33 @@ public class ViewPermission implements Serializable {
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "ViewPermission{" +
+            "id=" + getId() +
+            ", text='" + getText() + "'" +
+            ", type='" + getType() + "'" +
+            ", i18n='" + getI18n() + "'" +
+            ", group='" + getGroup() + "'" +
+            ", link='" + getLink() + "'" +
+            ", externalLink='" + getExternalLink() + "'" +
+            ", target='" + getTarget() + "'" +
+            ", icon='" + getIcon() + "'" +
+            ", disabled='" + getDisabled() + "'" +
+            ", hide='" + getHide() + "'" +
+            ", hideInBreadcrumb='" + getHideInBreadcrumb() + "'" +
+            ", shortcut='" + getShortcut() + "'" +
+            ", shortcutRoot='" + getShortcutRoot() + "'" +
+            ", reuse='" + getReuse() + "'" +
+            ", code='" + getCode() + "'" +
+            ", description='" + getDescription() + "'" +
+            ", order=" + getOrder() +
+            ", apiPermissionCodes='" + getApiPermissionCodes() + "'" +
+            ", componentFile='" + getComponentFile() + "'" +
+            ", redirect='" + getRedirect() + "'" +
+            "}";
     }
 }

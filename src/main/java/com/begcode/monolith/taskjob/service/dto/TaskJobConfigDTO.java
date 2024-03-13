@@ -4,6 +4,7 @@ import com.begcode.monolith.domain.AbstractAuditingEntity;
 import com.begcode.monolith.domain.enumeration.JobStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -139,6 +140,45 @@ public class TaskJobConfigDTO extends AbstractAuditingEntity<Long, TaskJobConfig
         this.lastModifiedDate = lastModifiedDate;
         return this;
     }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof TaskJobConfigDTO)) {
+            return false;
+        }
+
+        TaskJobConfigDTO taskJobConfigDTO = (TaskJobConfigDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, taskJobConfigDTO.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id);
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "TaskJobConfigDTO{" +
+            "id=" + getId() +
+            ", name='" + getName() + "'" +
+            ", jobClassName='" + getJobClassName() + "'" +
+            ", cronExpression='" + getCronExpression() + "'" +
+            ", parameter='" + getParameter() + "'" +
+            ", description='" + getDescription() + "'" +
+            ", jobStatus='" + getJobStatus() + "'" +
+            ", createdBy=" + getCreatedBy() +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastModifiedBy=" + getLastModifiedBy() +
+            ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            "}";
+    }
 }

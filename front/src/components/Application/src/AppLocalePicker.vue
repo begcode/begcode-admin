@@ -18,7 +18,7 @@
   </Dropdown>
 </template>
 <script lang="ts" setup>
-import type { LocaleType } from '/#/config';
+import type { LocaleType } from '#/config';
 import type { DropMenu } from '@begcode/components';
 import { ref, watchEffect, unref, computed } from 'vue';
 import { Icon, Dropdown } from '@begcode/components';

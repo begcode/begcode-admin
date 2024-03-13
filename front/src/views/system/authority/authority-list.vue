@@ -435,6 +435,7 @@ const gridOptions = reactive<VxeGridProps>({
         if (searchValue.value) {
           queryParams.value['jhiCommonSearchKeywords'] = searchValue.value;
         } else {
+          delete queryParams.value['jhiCommonSearchKeywords'];
           Object.assign(queryParams.value, getSearchQueryData(searchFormConfig));
         }
         return await apis.find(queryParams.value);

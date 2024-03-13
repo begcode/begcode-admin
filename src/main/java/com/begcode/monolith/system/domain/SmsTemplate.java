@@ -15,7 +15,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class SmsTemplate extends AbstractAuditingEntity<Long, SmsTemplate> implements Serializable {
 
@@ -134,6 +133,11 @@ public class SmsTemplate extends AbstractAuditingEntity<Long, SmsTemplate> imple
         return this;
     }
 
+    public SmsTemplate supplierId(Long supplierId) {
+        this.supplierId = supplierId;
+        return this;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -151,5 +155,25 @@ public class SmsTemplate extends AbstractAuditingEntity<Long, SmsTemplate> imple
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "SmsTemplate{" +
+            "id=" + getId() +
+            ", name='" + getName() + "'" +
+            ", code='" + getCode() + "'" +
+            ", sendType='" + getSendType() + "'" +
+            ", content='" + getContent() + "'" +
+            ", testJson='" + getTestJson() + "'" +
+            ", type='" + getType() + "'" +
+            ", remark='" + getRemark() + "'" +
+            ", enabled='" + getEnabled() + "'" +
+            ", createdBy=" + getCreatedBy() +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastModifiedBy=" + getLastModifiedBy() +
+            ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            "}";
     }
 }

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -279,6 +280,57 @@ public class ViewPermissionDTO implements Serializable {
         this.parent = parent;
         return this;
     }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ViewPermissionDTO)) {
+            return false;
+        }
+
+        ViewPermissionDTO viewPermissionDTO = (ViewPermissionDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, viewPermissionDTO.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id);
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "ViewPermissionDTO{" +
+            "id=" + getId() +
+            ", text='" + getText() + "'" +
+            ", type='" + getType() + "'" +
+            ", i18n='" + getI18n() + "'" +
+            ", group='" + getGroup() + "'" +
+            ", link='" + getLink() + "'" +
+            ", externalLink='" + getExternalLink() + "'" +
+            ", target='" + getTarget() + "'" +
+            ", icon='" + getIcon() + "'" +
+            ", disabled='" + getDisabled() + "'" +
+            ", hide='" + getHide() + "'" +
+            ", hideInBreadcrumb='" + getHideInBreadcrumb() + "'" +
+            ", shortcut='" + getShortcut() + "'" +
+            ", shortcutRoot='" + getShortcutRoot() + "'" +
+            ", reuse='" + getReuse() + "'" +
+            ", code='" + getCode() + "'" +
+            ", description='" + getDescription() + "'" +
+            ", order=" + getOrder() +
+            ", apiPermissionCodes='" + getApiPermissionCodes() + "'" +
+            ", componentFile='" + getComponentFile() + "'" +
+            ", redirect='" + getRedirect() + "'" +
+            ", children=" + getChildren() +
+            ", parent=" + getParent() +
+            "}";
+    }
 }

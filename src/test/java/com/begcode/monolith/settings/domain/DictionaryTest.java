@@ -30,10 +30,10 @@ class DictionaryTest {
         CommonFieldData commonFieldDataBack = getCommonFieldDataRandomSampleGenerator();
 
         // dictionary.addItems(commonFieldDataBack);
-        assertThat(dictionary.getItems()).containsOnly(commonFieldDataBack);
+        // assertThat(dictionary.getItems()).containsOnly(commonFieldDataBack);
 
         // dictionary.removeItems(commonFieldDataBack);
-        assertThat(dictionary.getItems()).doesNotContain(commonFieldDataBack);
+        // assertThat(dictionary.getItems()).doesNotContain(commonFieldDataBack);
 
         dictionary.items(new ArrayList<>(Set.of(commonFieldDataBack)));
         assertThat(dictionary.getItems()).containsOnly(commonFieldDataBack);

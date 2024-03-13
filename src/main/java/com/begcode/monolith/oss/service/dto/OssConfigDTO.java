@@ -4,6 +4,7 @@ import com.begcode.monolith.domain.enumeration.OssProvider;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -87,6 +88,40 @@ public class OssConfigDTO implements Serializable {
         this.configData = configData;
         return this;
     }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof OssConfigDTO)) {
+            return false;
+        }
+
+        OssConfigDTO ossConfigDTO = (OssConfigDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, ossConfigDTO.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id);
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "OssConfigDTO{" +
+            "id=" + getId() +
+            ", provider='" + getProvider() + "'" +
+            ", platform='" + getPlatform() + "'" +
+            ", enabled='" + getEnabled() + "'" +
+            ", remark='" + getRemark() + "'" +
+            ", configData='" + getConfigData() + "'" +
+            "}";
+    }
 }

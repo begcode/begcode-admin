@@ -13,7 +13,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class TaskJobConfig extends AbstractAuditingEntity<Long, TaskJobConfig> implements Serializable {
 
@@ -112,5 +111,23 @@ public class TaskJobConfig extends AbstractAuditingEntity<Long, TaskJobConfig> i
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "TaskJobConfig{" +
+            "id=" + getId() +
+            ", name='" + getName() + "'" +
+            ", jobClassName='" + getJobClassName() + "'" +
+            ", cronExpression='" + getCronExpression() + "'" +
+            ", parameter='" + getParameter() + "'" +
+            ", description='" + getDescription() + "'" +
+            ", jobStatus='" + getJobStatus() + "'" +
+            ", createdBy=" + getCreatedBy() +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastModifiedBy=" + getLastModifiedBy() +
+            ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            "}";
     }
 }

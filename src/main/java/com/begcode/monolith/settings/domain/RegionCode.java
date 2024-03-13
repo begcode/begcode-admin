@@ -15,7 +15,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class RegionCode implements Serializable {
 
@@ -159,6 +158,11 @@ public class RegionCode implements Serializable {
         return this;
     }
 
+    public RegionCode parentId(Long parentId) {
+        this.parentId = parentId;
+        return this;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -176,5 +180,22 @@ public class RegionCode implements Serializable {
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "RegionCode{" +
+            "id=" + getId() +
+            ", name='" + getName() + "'" +
+            ", areaCode='" + getAreaCode() + "'" +
+            ", cityCode='" + getCityCode() + "'" +
+            ", mergerName='" + getMergerName() + "'" +
+            ", shortName='" + getShortName() + "'" +
+            ", zipCode='" + getZipCode() + "'" +
+            ", level='" + getLevel() + "'" +
+            ", lng=" + getLng() +
+            ", lat=" + getLat() +
+            "}";
     }
 }

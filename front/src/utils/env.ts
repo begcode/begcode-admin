@@ -1,7 +1,7 @@
-import type { GlobEnvConfig } from '/#/config';
 import pkg from '../../package.json';
-import { API_ADDRESS } from '@/enums/cacheEnum';
 import { getConfigFileName } from '../../build/getConfigFileName';
+import type { GlobEnvConfig } from '#/config';
+import { API_ADDRESS } from '@/enums/cacheEnum';
 
 export function getCommonStoragePrefix() {
   const { VITE_GLOB_APP_TITLE } = getAppEnvConfig();

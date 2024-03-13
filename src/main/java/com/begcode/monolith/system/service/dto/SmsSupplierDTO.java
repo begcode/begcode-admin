@@ -3,6 +3,7 @@ package com.begcode.monolith.system.service.dto;
 import com.begcode.monolith.domain.enumeration.SmsProvider;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -83,6 +84,40 @@ public class SmsSupplierDTO implements Serializable {
         this.enabled = enabled;
         return this;
     }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof SmsSupplierDTO)) {
+            return false;
+        }
+
+        SmsSupplierDTO smsSupplierDTO = (SmsSupplierDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, smsSupplierDTO.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id);
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "SmsSupplierDTO{" +
+            "id=" + getId() +
+            ", provider='" + getProvider() + "'" +
+            ", configData='" + getConfigData() + "'" +
+            ", signName='" + getSignName() + "'" +
+            ", remark='" + getRemark() + "'" +
+            ", enabled='" + getEnabled() + "'" +
+            "}";
+    }
 }

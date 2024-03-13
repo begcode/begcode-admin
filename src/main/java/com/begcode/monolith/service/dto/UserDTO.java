@@ -6,6 +6,7 @@ import jakarta.validation.constraints.*;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -148,6 +149,43 @@ public class UserDTO extends AbstractAuditingEntity<Long, UserDTO> {
         this.imageUrl = imageUrl;
         return this;
     }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof UserDTO)) {
+            return false;
+        }
+
+        UserDTO userDTO = (UserDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, userDTO.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id);
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "UserDTO{" +
+            "id=" + getId() +
+            ", login='" + getLogin() + "'" +
+            ", firstName='" + getFirstName() + "'" +
+            ", lastName='" + getLastName() + "'" +
+            ", email='" + getEmail() + "'" +
+            ", mobile='" + getMobile() + "'" +
+            ", birthday='" + getBirthday() + "'" +
+            ", langKey='" + getLangKey() + "'" +
+            ", imageUrl='" + getImageUrl() + "'" +
+            "}";
+    }
 }

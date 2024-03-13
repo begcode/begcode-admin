@@ -1,4 +1,4 @@
-import type { GlobConfig } from '/#/config';
+import type { GlobConfig } from '#/config';
 
 import { getAppEnvConfig } from '@/utils/env';
 
@@ -24,6 +24,5 @@ export const useGlobSetting = (): Readonly<GlobConfig> => {
     uploadUrl: VITE_GLOB_DOMAIN_URL,
     viewUrl: VITE_GLOB_ONLINE_VIEW_URL,
   };
-  (window as any)._CONFIG['domianURL'] = VITE_GLOB_DOMAIN_URL;
   return glob as Readonly<GlobConfig>;
 };

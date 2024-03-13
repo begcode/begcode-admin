@@ -20,7 +20,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Announcement extends AbstractAuditingEntity<Long, Announcement> implements Serializable {
 
@@ -247,5 +246,34 @@ public class Announcement extends AbstractAuditingEntity<Long, Announcement> imp
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "Announcement{" +
+            "id=" + getId() +
+            ", title='" + getTitle() + "'" +
+            ", summary='" + getSummary() + "'" +
+            ", content='" + getContent() + "'" +
+            ", startTime='" + getStartTime() + "'" +
+            ", endTime='" + getEndTime() + "'" +
+            ", senderId=" + getSenderId() +
+            ", priority='" + getPriority() + "'" +
+            ", category='" + getCategory() + "'" +
+            ", receiverType='" + getReceiverType() + "'" +
+            ", sendStatus='" + getSendStatus() + "'" +
+            ", sendTime='" + getSendTime() + "'" +
+            ", cancelTime='" + getCancelTime() + "'" +
+            ", businessType='" + getBusinessType() + "'" +
+            ", businessId=" + getBusinessId() +
+            ", openType='" + getOpenType() + "'" +
+            ", openPage='" + getOpenPage() + "'" +
+            ", receiverIds='" + getReceiverIds() + "'" +
+            ", createdBy=" + getCreatedBy() +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastModifiedBy=" + getLastModifiedBy() +
+            ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            "}";
     }
 }

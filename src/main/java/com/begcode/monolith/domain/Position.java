@@ -16,7 +16,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Position implements Serializable {
 
@@ -111,5 +110,17 @@ public class Position implements Serializable {
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "Position{" +
+            "id=" + getId() +
+            ", code='" + getCode() + "'" +
+            ", name='" + getName() + "'" +
+            ", sortNo=" + getSortNo() +
+            ", description='" + getDescription() + "'" +
+            "}";
     }
 }

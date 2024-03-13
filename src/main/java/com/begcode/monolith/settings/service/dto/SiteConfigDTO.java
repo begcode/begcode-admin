@@ -6,6 +6,7 @@ import jakarta.validation.constraints.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -143,6 +144,45 @@ public class SiteConfigDTO extends AbstractAuditingEntity<Long, SiteConfigDTO> {
         this.items = items;
         return this;
     }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof SiteConfigDTO)) {
+            return false;
+        }
+
+        SiteConfigDTO siteConfigDTO = (SiteConfigDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, siteConfigDTO.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id);
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "SiteConfigDTO{" +
+            "id=" + getId() +
+            ", categoryName='" + getCategoryName() + "'" +
+            ", categoryKey='" + getCategoryKey() + "'" +
+            ", disabled='" + getDisabled() + "'" +
+            ", sortValue=" + getSortValue() +
+            ", builtIn='" + getBuiltIn() + "'" +
+            ", createdBy=" + getCreatedBy() +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastModifiedBy=" + getLastModifiedBy() +
+            ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            ", items=" + getItems() +
+            "}";
+    }
 }

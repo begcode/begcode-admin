@@ -13,7 +13,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class UReportFile implements Serializable {
 
@@ -91,5 +90,17 @@ public class UReportFile implements Serializable {
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "UReportFile{" +
+            "id=" + getId() +
+            ", name='" + getName() + "'" +
+            ", content='" + getContent() + "'" +
+            ", createAt='" + getCreateAt() + "'" +
+            ", updateAt='" + getUpdateAt() + "'" +
+            "}";
     }
 }

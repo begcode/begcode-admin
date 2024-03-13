@@ -13,7 +13,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class OssConfig implements Serializable {
 
@@ -104,5 +103,18 @@ public class OssConfig implements Serializable {
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "OssConfig{" +
+            "id=" + getId() +
+            ", provider='" + getProvider() + "'" +
+            ", platform='" + getPlatform() + "'" +
+            ", enabled='" + getEnabled() + "'" +
+            ", remark='" + getRemark() + "'" +
+            ", configData='" + getConfigData() + "'" +
+            "}";
     }
 }

@@ -1,6 +1,5 @@
-import type { MultiTabsSetting } from '/#/config';
-
 import { computed } from 'vue';
+import type { MultiTabsSetting } from '#/config';
 
 import { useAppStore } from '@/store/modules/app';
 

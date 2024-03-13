@@ -1,5 +1,6 @@
 {
   "annotations": {
+    "addCustomMethod": "service",
     "changelogDate": "20240101062706",
     "entityPackage": "settings",
     "extendAbstractAuditingEntity": true,

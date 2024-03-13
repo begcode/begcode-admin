@@ -14,7 +14,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class FillRuleItem implements Serializable {
 
@@ -123,6 +122,11 @@ public class FillRuleItem implements Serializable {
         return this;
     }
 
+    public FillRuleItem fillRuleId(Long fillRuleId) {
+        this.fillRuleId = fillRuleId;
+        return this;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -140,5 +144,20 @@ public class FillRuleItem implements Serializable {
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "FillRuleItem{" +
+            "id=" + getId() +
+            ", sortValue=" + getSortValue() +
+            ", fieldParamType='" + getFieldParamType() + "'" +
+            ", fieldParamValue='" + getFieldParamValue() + "'" +
+            ", datePattern='" + getDatePattern() + "'" +
+            ", seqLength=" + getSeqLength() +
+            ", seqIncrement=" + getSeqIncrement() +
+            ", seqStartValue=" + getSeqStartValue() +
+            "}";
     }
 }

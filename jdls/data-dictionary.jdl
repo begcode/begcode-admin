@@ -26,6 +26,7 @@ entity Dictionary {
 @entityPackage(settings)
 @moduleName(system)
 @skipWebsite
+@addCustomMethod(service)
 entity SiteConfig {
     categoryName String required /** 分类名称 */
     categoryKey String required /** 分类Key */

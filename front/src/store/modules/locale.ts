@@ -1,6 +1,6 @@
-import type { LocaleSetting, LocaleType } from '/#/config';
-
 import { defineStore } from 'pinia';
+import type { LocaleSetting, LocaleType } from '#/config';
+
 import { store } from '@/store';
 
 import { LOCALE_KEY } from '@/enums/cacheEnum';

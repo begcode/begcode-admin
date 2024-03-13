@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.begcode.monolith.IntegrationTest;
+import com.begcode.monolith.config.WithMockMyUser;
 import com.begcode.monolith.domain.enumeration.OssProvider;
 import com.begcode.monolith.oss.domain.OssConfig;
 import com.begcode.monolith.oss.repository.OssConfigRepository;
@@ -21,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @IntegrationTest
 @AutoConfigureMockMvc
-@WithMockUser
+@WithMockMyUser
 public class OssConfigResourceIT {
 
     private static final OssProvider DEFAULT_PROVIDER = OssProvider.LOCAL;

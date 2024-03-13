@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -139,6 +140,45 @@ public class ApiPermissionDTO implements Serializable {
         this.parent = parent;
         return this;
     }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ApiPermissionDTO)) {
+            return false;
+        }
+
+        ApiPermissionDTO apiPermissionDTO = (ApiPermissionDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, apiPermissionDTO.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id);
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "ApiPermissionDTO{" +
+            "id=" + getId() +
+            ", serviceName='" + getServiceName() + "'" +
+            ", name='" + getName() + "'" +
+            ", code='" + getCode() + "'" +
+            ", description='" + getDescription() + "'" +
+            ", type='" + getType() + "'" +
+            ", method='" + getMethod() + "'" +
+            ", url='" + getUrl() + "'" +
+            ", status='" + getStatus() + "'" +
+            ", children=" + getChildren() +
+            ", parent=" + getParent() +
+            "}";
+    }
 }

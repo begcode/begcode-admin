@@ -1,7 +1,7 @@
 import { LoginParams, MobileLoginParams, LoginResultModel, GetUserInfoModel } from './model/userModel';
 import { defHttp } from '@/utils/http/axios';
 
-import { ErrorMessageMode } from '/#/axios';
+import { ErrorMessageMode } from '#/axios';
 import { useMessage } from '@/hooks/web/useMessage';
 import { useUserStoreWithOut } from '@/store/modules/user';
 import { setAuthCache } from '@/utils/auth';

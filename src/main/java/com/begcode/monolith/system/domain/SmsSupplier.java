@@ -12,7 +12,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class SmsSupplier implements Serializable {
 
@@ -100,5 +99,18 @@ public class SmsSupplier implements Serializable {
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "SmsSupplier{" +
+            "id=" + getId() +
+            ", provider='" + getProvider() + "'" +
+            ", configData='" + getConfigData() + "'" +
+            ", signName='" + getSignName() + "'" +
+            ", remark='" + getRemark() + "'" +
+            ", enabled='" + getEnabled() + "'" +
+            "}";
     }
 }

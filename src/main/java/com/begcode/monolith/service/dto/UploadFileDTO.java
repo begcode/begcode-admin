@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -277,6 +278,56 @@ public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
     public void setFile(MultipartFile file) {
         this.file = file;
     }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof UploadFileDTO)) {
+            return false;
+        }
+
+        UploadFileDTO uploadFileDTO = (UploadFileDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, uploadFileDTO.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id);
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "UploadFileDTO{" +
+            "id=" + getId() +
+            ", url='" + getUrl() + "'" +
+            ", fullName='" + getFullName() + "'" +
+            ", name='" + getName() + "'" +
+            ", thumb='" + getThumb() + "'" +
+            ", ext='" + getExt() + "'" +
+            ", type='" + getType() + "'" +
+            ", path='" + getPath() + "'" +
+            ", folder='" + getFolder() + "'" +
+            ", ownerEntityName='" + getOwnerEntityName() + "'" +
+            ", ownerEntityId=" + getOwnerEntityId() +
+            ", businessTitle='" + getBusinessTitle() + "'" +
+            ", businessDesc='" + getBusinessDesc() + "'" +
+            ", businessStatus='" + getBusinessStatus() + "'" +
+            ", createAt='" + getCreateAt() + "'" +
+            ", fileSize=" + getFileSize() +
+            ", referenceCount=" + getReferenceCount() +
+            ", createdBy=" + getCreatedBy() +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastModifiedBy=" + getLastModifiedBy() +
+            ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            ", category=" + getCategory() +
+            "}";
+    }
 }

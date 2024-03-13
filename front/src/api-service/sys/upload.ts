@@ -1,7 +1,7 @@
 import { AxiosProgressEvent } from 'axios';
 import { UploadApiResult } from './model/uploadModel';
 import { defHttp } from '@/utils/http/axios';
-import { UploadFileParams } from '/#/axios';
+import { UploadFileParams } from '#/axios';
 import { useGlobSetting } from '@/hooks/setting';
 
 const { uploadUrl = '' } = useGlobSetting();

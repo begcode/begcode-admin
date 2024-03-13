@@ -16,7 +16,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class SiteConfig extends AbstractAuditingEntity<Long, SiteConfig> implements Serializable {
 
@@ -124,5 +123,22 @@ public class SiteConfig extends AbstractAuditingEntity<Long, SiteConfig> impleme
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "SiteConfig{" +
+            "id=" + getId() +
+            ", categoryName='" + getCategoryName() + "'" +
+            ", categoryKey='" + getCategoryKey() + "'" +
+            ", disabled='" + getDisabled() + "'" +
+            ", sortValue=" + getSortValue() +
+            ", builtIn='" + getBuiltIn() + "'" +
+            ", createdBy=" + getCreatedBy() +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastModifiedBy=" + getLastModifiedBy() +
+            ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            "}";
     }
 }

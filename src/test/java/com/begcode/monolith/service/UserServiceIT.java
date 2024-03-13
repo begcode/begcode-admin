@@ -17,7 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.auditing.AuditingHandler;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.security.RandomUtil;
@@ -47,9 +46,6 @@ class UserServiceIT {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private AuditingHandler auditingHandler;
-
     @MockBean
     private DateTimeProvider dateTimeProvider;
 
@@ -68,7 +64,7 @@ class UserServiceIT {
         user.setLangKey(DEFAULT_LANGKEY);
 
         when(dateTimeProvider.getNow()).thenReturn(Optional.of(LocalDateTime.now()));
-        auditingHandler.setDateTimeProvider(dateTimeProvider);
+        // auditingHandler.setDateTimeProvider(dateTimeProvider);
     }
 
     @Test
@@ -155,7 +151,7 @@ class UserServiceIT {
         userRepository.insert(user);
         User dbUser = userRepository.selectById(user.getId());
         dbUser.setCreatedDate(now.minus(4, ChronoUnit.DAYS));
-        userRepository.insert(user);
+        userRepository.updateById(dbUser);
         Instant threeDaysAgo = now.minus(3, ChronoUnit.DAYS);
         List<User> users = userRepository.findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(threeDaysAgo);
         assertThat(users).isNotEmpty();
@@ -173,7 +169,7 @@ class UserServiceIT {
         userRepository.insert(user);
         User dbUser = userRepository.selectById(user.getId());
         dbUser.setCreatedDate(now.minus(4, ChronoUnit.DAYS));
-        userRepository.insert(user);
+        userRepository.updateById(dbUser);
         Instant threeDaysAgo = now.minus(3, ChronoUnit.DAYS);
         List<User> users = userRepository.findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(threeDaysAgo);
         assertThat(users).isEmpty();

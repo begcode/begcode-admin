@@ -6,6 +6,7 @@ import com.begcode.monolith.domain.enumeration.SendStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -186,6 +187,49 @@ public class SmsMessageDTO extends AbstractAuditingEntity<Long, SmsMessageDTO> {
         this.lastModifiedDate = lastModifiedDate;
         return this;
     }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof SmsMessageDTO)) {
+            return false;
+        }
+
+        SmsMessageDTO smsMessageDTO = (SmsMessageDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, smsMessageDTO.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id);
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "SmsMessageDTO{" +
+            "id=" + getId() +
+            ", title='" + getTitle() + "'" +
+            ", sendType='" + getSendType() + "'" +
+            ", receiver='" + getReceiver() + "'" +
+            ", params='" + getParams() + "'" +
+            ", content='" + getContent() + "'" +
+            ", sendTime='" + getSendTime() + "'" +
+            ", sendStatus='" + getSendStatus() + "'" +
+            ", retryNum=" + getRetryNum() +
+            ", failResult='" + getFailResult() + "'" +
+            ", remark='" + getRemark() + "'" +
+            ", createdBy=" + getCreatedBy() +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastModifiedBy=" + getLastModifiedBy() +
+            ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            "}";
+    }
 }

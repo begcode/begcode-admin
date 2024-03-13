@@ -13,7 +13,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class CommonFieldData implements Serializable {
 
@@ -145,5 +144,22 @@ public class CommonFieldData implements Serializable {
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "CommonFieldData{" +
+            "id=" + getId() +
+            ", name='" + getName() + "'" +
+            ", value='" + getValue() + "'" +
+            ", label='" + getLabel() + "'" +
+            ", valueType='" + getValueType() + "'" +
+            ", remark='" + getRemark() + "'" +
+            ", sortValue=" + getSortValue() +
+            ", disabled='" + getDisabled() + "'" +
+            ", ownerEntityName='" + getOwnerEntityName() + "'" +
+            ", ownerEntityId=" + getOwnerEntityId() +
+            "}";
     }
 }

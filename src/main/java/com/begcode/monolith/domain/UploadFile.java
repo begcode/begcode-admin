@@ -15,7 +15,6 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class UploadFile extends AbstractAuditingEntity<Long, UploadFile> implements Serializable {
 
@@ -226,6 +225,11 @@ public class UploadFile extends AbstractAuditingEntity<Long, UploadFile> impleme
         return this;
     }
 
+    public UploadFile categoryId(Long categoryId) {
+        this.categoryId = categoryId;
+        return this;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -243,5 +247,33 @@ public class UploadFile extends AbstractAuditingEntity<Long, UploadFile> impleme
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "UploadFile{" +
+            "id=" + getId() +
+            ", url='" + getUrl() + "'" +
+            ", fullName='" + getFullName() + "'" +
+            ", name='" + getName() + "'" +
+            ", thumb='" + getThumb() + "'" +
+            ", ext='" + getExt() + "'" +
+            ", type='" + getType() + "'" +
+            ", path='" + getPath() + "'" +
+            ", folder='" + getFolder() + "'" +
+            ", ownerEntityName='" + getOwnerEntityName() + "'" +
+            ", ownerEntityId=" + getOwnerEntityId() +
+            ", businessTitle='" + getBusinessTitle() + "'" +
+            ", businessDesc='" + getBusinessDesc() + "'" +
+            ", businessStatus='" + getBusinessStatus() + "'" +
+            ", createAt='" + getCreateAt() + "'" +
+            ", fileSize=" + getFileSize() +
+            ", referenceCount=" + getReferenceCount() +
+            ", createdBy=" + getCreatedBy() +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastModifiedBy=" + getLastModifiedBy() +
+            ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            "}";
     }
 }

@@ -3,6 +3,7 @@ package com.begcode.monolith.service.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -77,6 +78,39 @@ public class PositionDTO implements Serializable {
         this.description = description;
         return this;
     }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PositionDTO)) {
+            return false;
+        }
+
+        PositionDTO positionDTO = (PositionDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, positionDTO.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id);
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "PositionDTO{" +
+            "id=" + getId() +
+            ", code='" + getCode() + "'" +
+            ", name='" + getName() + "'" +
+            ", sortNo=" + getSortNo() +
+            ", description='" + getDescription() + "'" +
+            "}";
+    }
 }
