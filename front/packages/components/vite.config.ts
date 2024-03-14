@@ -33,7 +33,7 @@ export default defineConfig({
     }),
     dts({
       outDir: ['typings'],
-      tsConfigFilePath: path.resolve(__dirname, 'tsconfig.json'),
+      tsconfigPath: path.resolve(__dirname, 'tsconfig.json'),
     }),
     ...configVisualizerConfig(),
     monacoEditorPlugin({
