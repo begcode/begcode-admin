@@ -13,14 +13,17 @@
   "clientRootFolder": "log",
   "documentation": "系统日志",
   "dto": "mapstruct",
-  "entityTableName": "sys_log",
   "fields": [
     {
       "documentation": "日志类型",
       "fieldName": "logType",
       "fieldType": "LogType",
       "fieldTypeDocumentation": "日志类型",
-      "fieldValues": "LOGIN (登录日志),OPERATE (操作日志)"
+      "fieldValues": "LOGIN,OPERATE",
+      "fieldValuesJavadocs": {
+        "LOGIN": "登录日志",
+        "OPERATE": "操作日志"
+      }
     },
     {
       "documentation": "日志内容",
@@ -32,7 +35,21 @@
       "fieldName": "operateType",
       "fieldType": "OperateType",
       "fieldTypeDocumentation": "操作类型",
-      "fieldValues": "LIST (列表),ADD (新增),EDIT (编辑),DELETE (删除),IMPORT (导入),EXPORT (导出),OTHER (其他),LOGIN (登录),STATS (统计),VIEW (查看),AUDIT (审核),WORK_FLOW (工作流)"
+      "fieldValues": "LIST,ADD,EDIT,DELETE,IMPORT,EXPORT,OTHER,LOGIN,STATS,VIEW,AUDIT,WORK_FLOW",
+      "fieldValuesJavadocs": {
+        "ADD": "新增",
+        "AUDIT": "审核",
+        "DELETE": "删除",
+        "EDIT": "编辑",
+        "EXPORT": "导出",
+        "IMPORT": "导入",
+        "LIST": "列表",
+        "LOGIN": "登录",
+        "OTHER": "其他",
+        "STATS": "统计",
+        "VIEW": "查看",
+        "WORK_FLOW": "工作流"
+      }
     },
     {
       "documentation": "操作用户账号",

@@ -12,7 +12,6 @@
   "clientRootFolder": "system",
   "documentation": "系统通告",
   "dto": "mapstruct",
-  "entityTableName": "announcement",
   "fields": [
     {
       "documentation": "标题",
@@ -58,14 +57,24 @@
       "fieldName": "priority",
       "fieldType": "PriorityLevel",
       "fieldTypeDocumentation": "优先级",
-      "fieldValues": "HIGH (高),MEDIUM (中),LOW (低)"
+      "fieldValues": "HIGH,MEDIUM,LOW",
+      "fieldValuesJavadocs": {
+        "HIGH": "高",
+        "LOW": "低",
+        "MEDIUM": "中"
+      }
     },
     {
       "documentation": "消息类型\\n通知公告,系统消息",
       "fieldName": "category",
       "fieldType": "AnnoCategory",
       "fieldTypeDocumentation": "消息类型",
-      "fieldValues": "SYSTEM_INFO (系统消息),NOTICE (通知),TODO (待办)"
+      "fieldValues": "SYSTEM_INFO,NOTICE,TODO",
+      "fieldValuesJavadocs": {
+        "NOTICE": "通知",
+        "SYSTEM_INFO": "系统消息",
+        "TODO": "待办"
+      }
     },
     {
       "documentation": "通告对象类型\\n（USER:指定用户，ALL:全体用户）",
@@ -73,14 +82,26 @@
       "fieldType": "ReceiverType",
       "fieldTypeDocumentation": "通告对象类型",
       "fieldValidateRules": ["required"],
-      "fieldValues": "ALL (全部),USER (用户),DEPARTMENT (部门),AUTHORITY (角色),POSITION (岗位)"
+      "fieldValues": "ALL,USER,DEPARTMENT,AUTHORITY,POSITION",
+      "fieldValuesJavadocs": {
+        "ALL": "全部",
+        "AUTHORITY": "角色",
+        "DEPARTMENT": "部门",
+        "POSITION": "岗位",
+        "USER": "用户"
+      }
     },
     {
       "documentation": "发布状态\\n",
       "fieldName": "sendStatus",
       "fieldType": "AnnoSendStatus",
       "fieldTypeDocumentation": "发布状态",
-      "fieldValues": "NOT_RELEASE (未发布),RELEASED (已发布),CANCELED (已取消)",
+      "fieldValues": "NOT_RELEASE,RELEASED,CANCELED",
+      "fieldValuesJavadocs": {
+        "CANCELED": "已撤销",
+        "NOT_RELEASE": "未发布",
+        "RELEASED": "已发布"
+      },
       "options": {
         "fieldConfig": "hideInForm"
       }
@@ -106,7 +127,11 @@
       "fieldName": "businessType",
       "fieldType": "AnnoBusinessType",
       "fieldTypeDocumentation": "业务类型",
-      "fieldValues": "EMAIL (邮件),WORKFLOW (工作流)",
+      "fieldValues": "EMAIL,WORKFLOW",
+      "fieldValuesJavadocs": {
+        "EMAIL": "邮件",
+        "WORKFLOW": "工作流"
+      },
       "options": {
         "fieldConfig": "hideInForm"
       }
@@ -124,7 +149,12 @@
       "fieldName": "openType",
       "fieldType": "AnnoOpenType",
       "fieldTypeDocumentation": "打开方式",
-      "fieldValues": "URL (URL地址),COMPONENT (组件),MODAL_DETAIL (弹窗详情)"
+      "fieldValues": "URL,COMPONENT,MODAL_DETAIL",
+      "fieldValuesJavadocs": {
+        "COMPONENT": "组件",
+        "MODAL_DETAIL": "弹窗详情",
+        "URL": "URL地址"
+      }
     },
     {
       "documentation": "组件/路由 地址",

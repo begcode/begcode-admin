@@ -27,26 +27,40 @@ entity SysLog {
  * 日志类型
  */
 enum LogType {
-	LOGIN ("登录日志"),
-    OPERATE ("操作日志")
+    /** 登录日志 */
+	LOGIN,
+    /** 操作日志 */
+    OPERATE
 }
 
 /**
  * 操作类型
  */
 enum OperateType {
-    LIST ("列表"),
-    ADD ("新增"),
-    EDIT ("编辑"),
-    DELETE ("删除"),
-    IMPORT ("导入"),
-    EXPORT ("导出"),
-    OTHER ("其他"),
-    LOGIN ("登录"),
-    STATS ("统计"),
-    VIEW ("查看"),
-    AUDIT ("审核"),
-    WORK_FLOW ("工作流")
+    /** 列表 */
+    LIST,
+    /** 新增 */
+    ADD,
+    /** 编辑 */
+    EDIT,
+    /** 删除 */
+    DELETE,
+    /** 导入 */
+    IMPORT,
+    /** 导出 */
+    EXPORT,
+    /** 其他 */
+    OTHER,
+    /** 登录 */
+    LOGIN,
+    /** 统计 */
+    STATS,
+    /** 查看 */
+    VIEW,
+    /** 审核 */
+    AUDIT,
+    /** 工作流 */
+    WORK_FLOW
 }
 
 service all with serviceClass

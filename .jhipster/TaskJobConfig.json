@@ -12,7 +12,6 @@
   "clientRootFolder": "taskjob",
   "documentation": "定时任务",
   "dto": "mapstruct",
-  "entityTableName": "task_job_config",
   "fields": [
     {
       "documentation": "任务名称",
@@ -44,7 +43,14 @@
       "fieldName": "jobStatus",
       "fieldType": "JobStatus",
       "fieldTypeDocumentation": "任务状态",
-      "fieldValues": "NORMAL (正常),PAUSED (暂停),COMPLETE (完成),ERROR (错误),BLOCKED (阻塞)"
+      "fieldValues": "NORMAL,PAUSED,COMPLETE,ERROR,BLOCKED",
+      "fieldValuesJavadocs": {
+        "BLOCKED": "阻塞",
+        "COMPLETE": "完成",
+        "ERROR": "错误",
+        "NORMAL": "正常",
+        "PAUSED": "暂停"
+      }
     }
   ],
   "jpaMetamodelFiltering": true,

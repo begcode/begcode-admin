@@ -12,7 +12,6 @@
   "clientRootFolder": "settings",
   "documentation": "网站配置",
   "dto": "mapstruct",
-  "entityTableName": "site_config",
   "fields": [
     {
       "documentation": "分类名称",

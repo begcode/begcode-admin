@@ -151,3 +151,4 @@ Desktop.ini
 ######################
 /coverage/
 /.nyc_output/
+/src/main/resources/static/assets/

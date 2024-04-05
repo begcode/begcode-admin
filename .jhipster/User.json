@@ -9,7 +9,7 @@
     "importData": true,
     "importDataFile": "jhi_user-rel_jhi_user__authorities",
     "moduleName": "system",
-    "publicDto": "id-login-firstName-lastName-email-mobile-birthday-langKey-imageUrl",
+    "publicDto": "id-login-firstName-lastName-email-mobile-birthday-langKey-imageUrl-activated",
     "publicDtoFile": true,
     "skipComponent": "domain-mapper-repository-controllerTest-serviceClass-restController",
     "skipFakeData": true,

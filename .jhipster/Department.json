@@ -9,7 +9,6 @@
   "clientRootFolder": "settings",
   "documentation": "部门",
   "dto": "mapstruct",
-  "entityTableName": "department",
   "fields": [
     {
       "documentation": "名称",

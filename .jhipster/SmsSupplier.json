@@ -11,14 +11,23 @@
   "clientRootFolder": "files",
   "documentation": "短信服务商配置",
   "dto": "mapstruct",
-  "entityTableName": "sms_supplier",
   "fields": [
     {
       "documentation": "提供商",
       "fieldName": "provider",
       "fieldType": "SmsProvider",
       "fieldTypeDocumentation": "短信厂商",
-      "fieldValues": "ALIBABA (阿里云),HUAWEI (华为云),YUNPIAN (云片),TENCENT (腾讯云),UNI_SMS (合一),JD_CLOUD (京东云),CLOOPEN (容联云),EMAY (亿美软通)"
+      "fieldValues": "ALIBABA,HUAWEI,YUNPIAN,TENCENT,UNI_SMS,JD_CLOUD,CLOOPEN,EMAY",
+      "fieldValuesJavadocs": {
+        "ALIBABA": "阿里云",
+        "CLOOPEN": "容联云",
+        "EMAY": "亿美软通",
+        "HUAWEI": "华为云",
+        "JD_CLOUD": "京东云",
+        "TENCENT": "腾讯云",
+        "UNI_SMS": "合一",
+        "YUNPIAN": "云片"
+      }
     },
     {
       "documentation": "配置数据",

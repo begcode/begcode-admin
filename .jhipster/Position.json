@@ -9,7 +9,6 @@
   "clientRootFolder": "settings",
   "documentation": "岗位\\n",
   "dto": "mapstruct",
-  "entityTableName": "position",
   "fields": [
     {
       "documentation": "岗位代码",

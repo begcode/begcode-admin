@@ -86,51 +86,70 @@ entity Announcement {
  * 发布状态
  */
 enum AnnoSendStatus {
-    NOT_RELEASE ("未发布"),
-    RELEASED ("已发布"),
-    CANCELED ("已取消")
+    /** 未发布 */
+    NOT_RELEASE,
+    /** 已发布 */
+    RELEASED,
+    /** 已撤销 */
+    CANCELED
 }
 /**
  * 打开方式
  */
 enum AnnoOpenType {
-    URL ("URL地址"),
-    COMPONENT ("组件"),
-    MODAL_DETAIL ("弹窗详情")
+    /** URL地址 */
+    URL,
+    /** 组件 */
+    COMPONENT,
+    /** 弹窗详情 */
+    MODAL_DETAIL
 }
 /**
  * 业务类型
  */
 enum AnnoBusinessType {
-    EMAIL ("邮件"),
-    WORKFLOW ("工作流")
+    /** 邮件 */
+    EMAIL,
+    /** 工作流 */
+    WORKFLOW
 }
 /**
  * 通告对象类型
  */
 enum ReceiverType {
-    ALL ("全部"),
-    USER ("用户"),
-    DEPARTMENT ("部门"),
-    AUTHORITY ("角色"),
-    POSITION ("岗位")
+    /** 全部 */
+    ALL,
+    /** 用户 */
+    USER,
+    /** 部门 */
+    DEPARTMENT,
+    /** 角色 */
+    AUTHORITY,
+    /** 岗位 */
+    POSITION
 }
 
 /**
  * 消息类型
  */
 enum AnnoCategory {
-    SYSTEM_INFO ("系统消息"),
-    NOTICE ("通知"),
-    TODO ("待办")
+    /** 系统消息 */
+    SYSTEM_INFO,
+    /** 通知 */
+    NOTICE,
+    /** 待办 */
+    TODO
 }
 /**
  * 优先级
  */
 enum PriorityLevel {
-    HIGH ("高"),
-    MEDIUM ("中"),
-    LOW ("低")
+    /** 高 */
+    HIGH,
+    /** 中 */
+    MEDIUM,
+    /** 低 */
+    LOW
 }
 
 /**
@@ -167,19 +186,28 @@ entity TaskJobConfig {
 }
 /** 任务状态 */
 enum JobStatus {
-    NORMAL ("正常"),
-    PAUSED ("暂停"),
-    COMPLETE ("完成"),
-    ERROR ("错误"),
-    BLOCKED ("阻塞")
+    /** 正常 */
+    NORMAL,
+    /** 暂停 */
+    PAUSED,
+    /** 完成 */
+    COMPLETE,
+    /** 错误 */
+    ERROR,
+    /** 阻塞 */
+    BLOCKED
 }
 
 /** 推送状态 */
 enum SendStatus {
-    WAITING ("未推送"),
-    SUCCESS ("推送成功"),
-    FAILURE ("推送失败"),
-    NOT_TRY ("失败不再发送")
+    /** 未推送 */
+    WAITING,
+    /** 推送成功 */
+    SUCCESS,
+    /** 推送失败 */
+    FAILURE,
+    /** 失败不再发送 */
+    NOT_TRY
 }
 
 service all with serviceClass

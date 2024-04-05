@@ -11,7 +11,6 @@
   "clientRootFolder": "settings",
   "documentation": "填充规则条目",
   "dto": "mapstruct",
-  "entityTableName": "fill_rule_item",
   "fields": [
     {
       "documentation": "排序值",
@@ -26,7 +25,13 @@
       "fieldName": "fieldParamType",
       "fieldType": "FieldParamType",
       "fieldTypeDocumentation": "字段参数类型",
-      "fieldValues": "DATETIME (日期时间),NUMBER (数字序列),FIXED_CHAR (固定字符),PARAM (参数)",
+      "fieldValues": "DATETIME,NUMBER,FIXED_CHAR,PARAM",
+      "fieldValuesJavadocs": {
+        "DATETIME": "日期时间",
+        "FIXED_CHAR": "固定字符",
+        "NUMBER": "数字序列",
+        "PARAM": "参数"
+      },
       "options": {
         "dict": true
       }

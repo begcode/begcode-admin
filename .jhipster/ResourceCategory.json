@@ -8,7 +8,6 @@
   "clientRootFolder": "files",
   "documentation": "资源分类",
   "dto": "mapstruct",
-  "entityTableName": "resource_category",
   "fields": [
     {
       "documentation": "标题",

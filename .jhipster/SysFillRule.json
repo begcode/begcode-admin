@@ -12,7 +12,6 @@
   "clientRootFolder": "settings",
   "documentation": "填充规则",
   "dto": "mapstruct",
-  "entityTableName": "sys_fill_rule",
   "fields": [
     {
       "documentation": "规则名称",
@@ -39,7 +38,15 @@
       "fieldName": "resetFrequency",
       "fieldType": "ResetFrequency",
       "fieldTypeDocumentation": "重置频率",
-      "fieldValues": "NONE (不重置),DAILY (每天重置),WEEKLY (每周重置),MONTHLY (每月重置),YEARLY (每年重置),CUSTOM (自定义重置)"
+      "fieldValues": "NONE,DAILY,WEEKLY,MONTHLY,YEARLY,CUSTOM",
+      "fieldValuesJavadocs": {
+        "CUSTOM": "自定义重置",
+        "DAILY": "每天重置",
+        "MONTHLY": "每月重置",
+        "NONE": "不重置",
+        "WEEKLY": "每周重置",
+        "YEARLY": "每年重置"
+      }
     },
     {
       "documentation": "序列值",

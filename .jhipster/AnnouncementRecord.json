@@ -12,7 +12,6 @@
   "clientRootFolder": "system",
   "documentation": "通告阅读记录",
   "dto": "mapstruct",
-  "entityTableName": "announcement_record",
   "fields": [
     {
       "documentation": "通告ID",

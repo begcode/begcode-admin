@@ -12,7 +12,6 @@
   "clientRootFolder": "files",
   "documentation": "消息模板",
   "dto": "mapstruct",
-  "entityTableName": "sms_template",
   "fields": [
     {
       "documentation": "模板标题",
@@ -29,7 +28,12 @@
       "fieldName": "sendType",
       "fieldType": "MessageSendType",
       "fieldTypeDocumentation": "通知类型",
-      "fieldValues": "EMAIL (邮件),SMS (短信),WECHAT (微信)"
+      "fieldValues": "EMAIL,SMS,WECHAT",
+      "fieldValuesJavadocs": {
+        "EMAIL": "邮件",
+        "SMS": "短信",
+        "WECHAT": "微信"
+      }
     },
     {
       "documentation": "模板内容",
@@ -46,7 +50,12 @@
       "fieldName": "type",
       "fieldType": "SmsTemplateType",
       "fieldTypeDocumentation": "短信模板类型",
-      "fieldValues": "MESSAGE (通知短信),VERIFICATION (验证码),PROMOTION (推广短信)"
+      "fieldValues": "MESSAGE,VERIFICATION,PROMOTION",
+      "fieldValuesJavadocs": {
+        "MESSAGE": "通知短信",
+        "PROMOTION": "推广短信",
+        "VERIFICATION": "验证码"
+      }
     },
     {
       "documentation": "备注",

@@ -15,7 +15,6 @@
   "clientRootFolder": "files",
   "documentation": "上传图片",
   "dto": "mapstruct",
-  "entityTableName": "upload_image",
   "fields": [
     {
       "documentation": "Url地址",

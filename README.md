@@ -1,6 +1,6 @@
 # monolithMybatis
 
-本应用程序由BegCode8.1.0-beta.0生成, 你可以在 [https://www.begcode.com/documentation-archive/v8.1.0-beta.0](https://www.begcode.com/documentation-archive/v8.1.0-beta.0) 找到文档和帮助。
+本应用程序由BegCode8.2.0-beta.0生成, 你可以在 [https://www.begcode.com) 找到文档和帮助。
 
 ## 截图展示
 
@@ -78,7 +78,7 @@
 
 在构建此项目之前，您必须在计算机上安装并配置以下依赖项：
 
-1. [Node.js][]: 我们使用 Node 来运行开发 Web 服务器并构建项目。
+1. [Node.js](https://nodejs.org/): 我们使用 Node 来运行开发 Web 服务器并构建项目。
    根据您的系统，您可以从源代码安装 Node，也可以将 Node 安装为预打包的捆绑包。
 
 安装 Node 后，您应该能够运行以下命令来安装开发工具。
@@ -103,43 +103,6 @@ Npm 还用于管理此应用程序中使用的 CSS 和 JavaScript 依赖项。 �
 
 `pnpm run` 命令将列出可用于该项目运行的所有脚本。
 
-### PWA支持
-
-BegCode 附带 PWA（渐进式 Web 应用程序）支持，并且默认情况下处于关闭状态。 PWA 的主要组件之一是 Service Worker。
-
-The service worker initialization code is commented out by default. To enable it, uncomment the following code in `front/src/index.html`:
-
-```html
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js').then(function () {
-      console.log('Service Worker Registered');
-    });
-  }
-</script>
-```
-
-Note: [Workbox](https://developers.google.com/web/tools/workbox/) powers JHipster's service worker. It dynamically generates the `service-worker.js` file.
-
-### 依赖管理
-
-例如，要将 [Leaflet][] 库添加为应用程序的运行时依赖项，您可以运行以下命令：
-
-```
-pnpm install --save --save-exact leaflet
-```
-
-To benefit from TypeScript type definitions from [DefinitelyTyped][] repository in development, you would run following command:
-
-```
-pnpm install --save-dev --save-exact @types/leaflet
-```
-
-Then you would import the JS and CSS files specified in library's installation instructions so that [Webpack][] knows about them:
-Note: There are still a few other things remaining to do for Leaflet that we won't detail here.
-
-For further instructions on how to develop with JHipster, have a look at [Using JHipster in development][].
-
 ## 系统构建
 
 ### 创建Jar包
@@ -147,7 +110,7 @@ For further instructions on how to develop with JHipster, have a look at [Using 
 要优化monolithMybatis应用程序创建Jar包并进行生产部署，请运行：
 
 ```
-./mvnw -Pprod clean verify
+./mvnw package -Pprod clean verify -DskipTests
 ```
 
 这将压缩客户端和重新打包CSS和JavaScript文件。 它还将修改`index.html`，以便引用这些新文件。
@@ -157,16 +120,16 @@ For further instructions on how to develop with JHipster, have a look at [Using 
 java -jar target/*.jar
 ```
 
-Then navigate to [http://localhost:8080](http://localhost:8080) in your browser.
+然后在浏览器打开：[http://localhost:8080](http://localhost:8080)。
 
-Refer to [Using JHipster in production][] for more details.
+请参阅[Using JHipster in production][] 了解更多详细信息。
 
 ### 创建War包
 
 要将您的应用程序打包为 war 以便将其部署到应用程序服务器，请运行：
 
 ```
-./mvnw -Pprod,war clean verify
+./mvnw package -Pprod,war clean verify
 ```
 
 ### JHipster Control Center
@@ -179,20 +142,20 @@ docker compose -f src/main/docker/jhipster-control-center.yml up
 
 ## 测试
 
-### Spring Boot tests
-
-To launch your application's tests, run:
-
-```
-./mvnw verify
-```
-
 ### Client tests
 
 Unit tests are run by [Jest][]. They're located in [front/src/test/javascript/](front/src/test/javascript/) and can be run with:
 
 ```
 pnpm test
+```
+
+### Spring Boot tests
+
+To launch your application's tests, run:
+
+```
+./mvnw verify
 ```
 
 ## 其他
@@ -273,14 +236,7 @@ For more information refer to [Using Docker and Docker-Compose][], this page als
 
 To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`), this will let you generate configuration files for a number of Continuous Integration systems. Consult the [Setting up Continuous Integration][] page for more information.
 
-[JHipster官网和最新文档]: https://www.begcode.com
-[JHipster 8.1.0-beta.0 archive]: https://www.begcode.com/documentation-archive/v8.1.0-beta.0
-[Using JHipster in development]: https://www.begcode.com/documentation-archive/v8.1.0-beta.0/development/
-[Using Docker and Docker-Compose]: https://www.begcode.com/documentation-archive/v8.1.0-beta.0/docker-compose
-[Using JHipster in production]: https://www.begcode.com/documentation-archive/v8.1.0-beta.0/production/
-[Running tests page]: https://www.begcode.com/documentation-archive/v8.1.0-beta.0/running-tests/
-[Code quality page]: https://www.begcode.com/documentation-archive/v8.1.0-beta.0/code-quality/
-[Setting up Continuous Integration]: https://www.begcode.com/documentation-archive/v8.1.0-beta.0/setting-up-ci/
+[BegCode最新文档]: https://www.begcode.com
 [Node.js]: https://nodejs.org/
 [NPM]: https://www.npmjs.com/
 [Webpack]: https://webpack.github.io/

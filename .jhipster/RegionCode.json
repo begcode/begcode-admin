@@ -11,7 +11,6 @@
   "clientRootFolder": "settings",
   "documentation": "行政区划码",
   "dto": "mapstruct",
-  "entityTableName": "region_code",
   "fields": [
     {
       "documentation": "名称",
@@ -48,7 +47,14 @@
       "fieldName": "level",
       "fieldType": "RegionCodeLevel",
       "fieldTypeDocumentation": "区域等级",
-      "fieldValues": "PROVINCE (省),CITY (市),COUNTY (区),TOWN (镇),VILLAGE (村)"
+      "fieldValues": "PROVINCE,CITY,COUNTY,TOWN,VILLAGE",
+      "fieldValuesJavadocs": {
+        "CITY": "市",
+        "COUNTY": "区",
+        "PROVINCE": "省",
+        "TOWN": "镇",
+        "VILLAGE": "村"
+      }
     },
     {
       "documentation": "经度",

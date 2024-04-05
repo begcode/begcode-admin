@@ -12,7 +12,6 @@
   "clientRootFolder": "settings",
   "documentation": "通用字段数据",
   "dto": "mapstruct",
-  "entityTableName": "common_field_data",
   "fields": [
     {
       "documentation": "名称",
@@ -34,7 +33,30 @@
       "fieldName": "valueType",
       "fieldType": "CommonFieldType",
       "fieldTypeDocumentation": "字段类型",
-      "fieldValues": "INTEGER (整数),LONG (长整数),BOOLEAN (布尔),STRING (字符串),FLOAT (单精度),DOUBLE (双精度),ZONED_DATE_TIME (日期时间),LOCATE_DATE (本地日期),BIG_DECIMA (大数字),L,TEXTBLOB (大文本),IMAGEBLOB (大图片),ARRAY (数组),ENUM (枚举),UPLOAD_IMAGE (上传图片),UPLOAD_FILE (上传文件),ENTITY (实体),RADIO (单选),MULTI_SELECT (多选),DATA_DICTIONARY (数据字典),UUID_STRING (UUID),INSTANT (时间戳)"
+      "fieldValues": "INTEGER,LONG,BOOLEAN,STRING,FLOAT,DOUBLE,ZONED_DATE_TIME,LOCATE_DATE,BIG_DECIMA,TEXTBLOB,IMAGEBLOB,ARRAY,ENUM,UPLOAD_IMAGE,UPLOAD_FILE,ENTITY,RADIO,MULTI_SELECT,DATA_DICTIONARY,UUID_STRING,INSTANT",
+      "fieldValuesJavadocs": {
+        "ARRAY": "数组",
+        "BIG_DECIMA": "大数字",
+        "BOOLEAN": "布尔",
+        "DATA_DICTIONARY": "数据字典",
+        "DOUBLE": "双精度",
+        "ENTITY": "实体",
+        "ENUM": "枚举",
+        "FLOAT": "单精度",
+        "IMAGEBLOB": "大图片",
+        "INSTANT": "时间戳",
+        "INTEGER": "整数",
+        "LOCATE_DATE": "本地日期",
+        "LONG": "长整数",
+        "MULTI_SELECT": "多选",
+        "RADIO": "单选",
+        "STRING": "字符串",
+        "TEXTBLOB": "大文本",
+        "UPLOAD_FILE": "上传文件",
+        "UPLOAD_IMAGE": "上传图片",
+        "UUID_STRING": "UUID",
+        "ZONED_DATE_TIME": "日期时间"
+      }
     },
     {
       "documentation": "说明",

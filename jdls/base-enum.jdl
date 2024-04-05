@@ -23,84 +23,143 @@ entity AbstractAuditingEntity (jhi_auditing) {
   lastModifiedDate Instant
 }
 enum FixedType {
-	LEFT ("左侧"),
-    RIGHT ("右侧")
+    /** 左侧 */
+	LEFT,
+    /** 右侧 */
+    RIGHT
 }
 enum EndUsedType {
-	FILE_URL ("文件地址"),
-    IMAGE_URL ("图片地址"),
-    VIDEO_URL ("视频地址"),
-    AUDIO_URL ("音频地址"),
-    EDITOR ("编辑器"),
-    CODE_EDITOR ("代码编辑器"),
-    SELECT ("下拉框"),
-    SELECT_MODAL ("弹窗复合选择"),
-    SELECT_FILE ("本地选择文件"),
-    CHECKBOX ("复选框"),
-    RADIO ("单选框"),
-    RADIO_BUTTON ("单选按钮"),
-    RATE ("评分"),
-    SLIDER ("滑块"),
-    SWITCH ("开关"),
-    TEXT_AREA ("文本域"),
-    AVATAR ("头像"),
-    ICON_PICKER ("图标选择器"),
-    COLOR_PICKER ("颜色选择器")
+    /** 文件地址 */
+	FILE_URL,
+    /** 图片地址 */
+    IMAGE_URL,
+    /** 视频地址 */
+    VIDEO_URL,
+    /** 音频地址 */
+    AUDIO_URL,
+    /** 编辑器 */
+    EDITOR,
+    /** 代码编辑器 */
+    CODE_EDITOR,
+    /** 下拉框 */
+    SELECT,
+    /** 弹窗复合选择 */
+    SELECT_MODAL,
+    /** 本地选择文件 */
+    SELECT_FILE,
+    /** 复选框 */
+    CHECKBOX,
+    /** 单选框 */
+    RADIO,
+    /** 单选按钮 */
+    RADIO_BUTTON,
+    /** 评分 */
+    RATE,
+    /** 滑块 */
+    SLIDER,
+    /** 开关 */
+    SWITCH,
+    /** 文本域 */
+    TEXT_AREA,
+    /** 头像 */
+    AVATAR,
+    /** 图标选择器 */
+    ICON_PICKER,
+    /** 颜色选择器 */
+    COLOR_PICKER
 }
 /** 来源，实体或数据字典 */
 enum SourceType {
-	ENTITY ("实体"),
-    DATA_DICTIONARY ("数据字典"),
-    SERVICE_ENTITY ("微服务实体")
+    /** 实体 */
+	ENTITY,
+    /** 数据字典 */
+    DATA_DICTIONARY,
+    /** 微服务实体 */
+    SERVICE_ENTITY
 }
 enum RelationshipType {
-	ONE_TO_MANY ("一对多"),
-    MANY_TO_ONE ("多对一"),
-    MANY_TO_MANY ("多对多"),
-    ONE_TO_ONE ("一对一")
+    /** 一对多 */
+	ONE_TO_MANY,
+    /** 多对一 */
+    MANY_TO_ONE,
+    /** 多对多 */
+    MANY_TO_MANY,
+    /** 一对一 */
+    ONE_TO_ONE
 }
 enum DictType {
-    NUMBER ("数字"),
-    STRING ("字符串")
+    /** 数字 */
+    NUMBER,
+    /** 字符串 */
+    STRING
 }
 
 /**
  * 字段类型
  */
 enum CommonFieldType {
-	INTEGER ("整数"),
-    LONG ("长整数"),
-    BOOLEAN ("布尔"),
-    STRING ("字符串"),
-    FLOAT ("单精度"),
-    DOUBLE ("双精度"),
-    ZONED_DATE_TIME ("日期时间"),
-    LOCATE_DATE ("本地日期"),
-    BIG_DECIMA ("大数字")L,
-    TEXTBLOB ("大文本"),
-    IMAGEBLOB ("大图片"),
-    ARRAY ("数组"),
-    ENUM ("枚举"),
-    UPLOAD_IMAGE ("上传图片"),
-    UPLOAD_FILE ("上传文件"),
-    ENTITY ("实体"),
-    RADIO ("单选"),
-    MULTI_SELECT ("多选"),
-    DATA_DICTIONARY ("数据字典"),
-    UUID_STRING ("UUID"),
-    INSTANT ("时间戳")
+    /** 整数 */
+	INTEGER,
+    /** 长整数 */
+    LONG,
+    /** 布尔 */
+    BOOLEAN,
+    /** 字符串 */
+    STRING,
+    /** 单精度 */
+    FLOAT,
+    /** 双精度 */
+    DOUBLE,
+    /** 日期时间 */
+    ZONED_DATE_TIME,
+    /** 本地日期 */
+    LOCATE_DATE,
+    /** 大数字 */
+    BIG_DECIMA,
+    /** 大文本 */
+    TEXTBLOB,
+    /** 大图片 */
+    IMAGEBLOB,
+    /** 数组 */
+    ARRAY,
+    /** 枚举 */
+    ENUM,
+    /** 上传图片 */
+    UPLOAD_IMAGE,
+    /** 上传文件 */
+    UPLOAD_FILE,
+    /** 实体 */
+    ENTITY,
+    /** 单选 */
+    RADIO,
+    /** 多选 */
+    MULTI_SELECT,
+    /** 数据字典 */
+    DATA_DICTIONARY,
+    /** UUID */
+    UUID_STRING,
+    /** 时间戳 */
+    INSTANT
 }
 /** Api权限类型 */
 enum ApiPermissionType {
-    BUSINESS ("业务"),
-    API ("API接口"),
-    ENTITY ("实体"),
-    MICRO_SERVICE ("微服务")
+    /** 业务 */
+    BUSINESS,
+    /** API接口 */
+    API,
+    /** 实体 */
+    ENTITY,
+    /** 微服务 */
+    MICRO_SERVICE
 }
 /** Api权限状态 */
 enum ApiPermissionState {
-    CONFIGURABLE ("可配置"),
-    PERMIT_ALL ("允许所有"),
-    UNREACHABLE ("不可达"),
-    AUTHENTICATE ("认证")
+    /** 可配置 */
+    CONFIGURABLE,
+    /** 允许所有 */
+    PERMIT_ALL,
+    /** 不可达 */
+    UNREACHABLE,
+    /** 认证 */
+    AUTHENTICATE
 }

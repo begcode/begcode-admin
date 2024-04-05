@@ -11,7 +11,6 @@
   "clientRootFolder": "system",
   "documentation": "API权限\\n菜单或按钮下有相关的api权限",
   "dto": "mapstruct",
-  "entityTableName": "api_permission",
   "fields": [
     {
       "documentation": "服务名称",
@@ -37,7 +36,13 @@
       "fieldName": "type",
       "fieldType": "ApiPermissionType",
       "fieldTypeDocumentation": "Api权限类型",
-      "fieldValues": "BUSINESS (业务),API (API接口),ENTITY (实体),MICRO_SERVICE (微服务)"
+      "fieldValues": "BUSINESS,API,ENTITY,MICRO_SERVICE",
+      "fieldValuesJavadocs": {
+        "API": "API接口",
+        "BUSINESS": "业务",
+        "ENTITY": "实体",
+        "MICRO_SERVICE": "微服务"
+      }
     },
     {
       "documentation": "请求类型",
@@ -54,7 +59,13 @@
       "fieldName": "status",
       "fieldType": "ApiPermissionState",
       "fieldTypeDocumentation": "Api权限状态",
-      "fieldValues": "CONFIGURABLE (可配置),PERMIT_ALL (允许所有),UNREACHABLE (不可达),AUTHENTICATE (认证)"
+      "fieldValues": "CONFIGURABLE,PERMIT_ALL,UNREACHABLE,AUTHENTICATE",
+      "fieldValuesJavadocs": {
+        "AUTHENTICATE": "认证",
+        "CONFIGURABLE": "可配置",
+        "PERMIT_ALL": "允许所有",
+        "UNREACHABLE": "不可达"
+      }
     }
   ],
   "jpaMetamodelFiltering": true,

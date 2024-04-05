@@ -10,7 +10,6 @@
   "clientRootFolder": "system",
   "documentation": "短信消息",
   "dto": "mapstruct",
-  "entityTableName": "sms_message",
   "fields": [
     {
       "documentation": "消息标题",
@@ -22,7 +21,12 @@
       "fieldName": "sendType",
       "fieldType": "MessageSendType",
       "fieldTypeDocumentation": "通知类型",
-      "fieldValues": "EMAIL (邮件),SMS (短信),WECHAT (微信)"
+      "fieldValues": "EMAIL,SMS,WECHAT",
+      "fieldValuesJavadocs": {
+        "EMAIL": "邮件",
+        "SMS": "短信",
+        "WECHAT": "微信"
+      }
     },
     {
       "documentation": "接收人",
@@ -50,7 +54,13 @@
       "fieldName": "sendStatus",
       "fieldType": "SendStatus",
       "fieldTypeDocumentation": "推送状态",
-      "fieldValues": "WAITING (未推送),SUCCESS (推送成功),FAILURE (推送失败),NOT_TRY (失败不再发送)"
+      "fieldValues": "WAITING,SUCCESS,FAILURE,NOT_TRY",
+      "fieldValuesJavadocs": {
+        "FAILURE": "推送失败",
+        "NOT_TRY": "失败不再发送",
+        "SUCCESS": "推送成功",
+        "WAITING": "未推送"
+      }
     },
     {
       "documentation": "发送次数 超过5次不再发送",

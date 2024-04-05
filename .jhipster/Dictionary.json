@@ -13,7 +13,6 @@
   "clientRootFolder": "settings",
   "documentation": "数据字典",
   "dto": "mapstruct",
-  "entityTableName": "dictionary",
   "fields": [
     {
       "documentation": "字典名称",

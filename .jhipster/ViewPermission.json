@@ -11,7 +11,6 @@
   "clientRootFolder": "system",
   "documentation": "可视权限\\n权限分为菜单权限、按钮权限等\\n",
   "dto": "mapstruct",
-  "entityTableName": "view_permission",
   "fields": [
     {
       "documentation": "权限名称",
@@ -27,7 +26,11 @@
       "fieldName": "type",
       "fieldType": "ViewPermissionType",
       "fieldTypeDocumentation": "可视权限类型",
-      "fieldValues": "MENU (菜单),BUTTON (按钮)",
+      "fieldValues": "MENU,BUTTON",
+      "fieldValuesJavadocs": {
+        "BUTTON": "按钮",
+        "MENU": "菜单"
+      },
       "options": {
         "endUsed": "radioButton",
         "importDataField": true
@@ -73,7 +76,13 @@
       "fieldName": "target",
       "fieldType": "TargetType",
       "fieldTypeDocumentation": "链接目标",
-      "fieldValues": "BLANK (新窗口),SELF (当前窗口),PARENT (父窗口),TOP (顶层窗口)",
+      "fieldValues": "BLANK,SELF,PARENT,TOP",
+      "fieldValuesJavadocs": {
+        "BLANK": "新窗口",
+        "PARENT": "父窗口",
+        "SELF": "当前窗口",
+        "TOP": "顶层窗口"
+      },
       "options": {
         "importDataField": true,
         "showBy": "type=MENU"

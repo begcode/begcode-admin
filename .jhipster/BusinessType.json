@@ -10,7 +10,6 @@
   "clientRootFolder": "settings",
   "documentation": "业务类型",
   "dto": "mapstruct",
-  "entityTableName": "business_type",
   "fields": [
     {
       "documentation": "名称",

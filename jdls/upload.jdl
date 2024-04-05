@@ -155,11 +155,16 @@ entity OssConfig {
 
 /** OSS提供商 */
 enum OssProvider {
-    LOCAL ("本地"),
-    MINIO ("MINIO"),
-    QINIU ("七牛云"),
-    ALI ("阿里云"),
-    TENCENT ("腾讯云")
+    /** 本地 */
+    LOCAL,
+    /** MINIO */
+    MINIO,
+    /** 七牛云 */
+    QINIU,
+    /** 阿里云 */
+    ALI,
+    /** 腾讯云 */
+    TENCENT
 }
 
 service all with serviceClass

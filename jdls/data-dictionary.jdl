@@ -92,19 +92,29 @@ entity RegionCode {
 	lat Double /** 纬度 */
 }
 enum GpsType {
+    /** 百度 */
 	BAIDU,
+    /** GoogleMap */
     GOOGLE_MAP,
-    GOOGLE_EART,AMAP
+    /** GoogleEarth */
+    GOOGLE_EARTH,
+    /** 高德 */
+    AMAP
 }
 /**
  * 区域等级
  */
 enum RegionCodeLevel {
-	PROVINCE ("省"),
-    CITY ("市"),
-    COUNTY ("区"),
-    TOWN ("镇"),
-    VILLAGE ("村")
+    /** 省 */
+	PROVINCE,
+    /** 市 */
+    CITY,
+    /** 区 */
+    COUNTY,
+    /** 镇 */
+    TOWN,
+    /** 村 */
+    VILLAGE
 }
 
 /** 填充规则 */
@@ -149,21 +159,31 @@ entity FillRuleItem {
 
 /** 字段参数类型 */
 enum FieldParamType {
-  DATETIME ("日期时间"),
-  NUMBER ("数字序列"),
-  FIXED_CHAR ("固定字符"),
-  PARAM ("参数")
+    /** 日期时间 */
+    DATETIME,
+    /** 数字序列 */
+    NUMBER,
+    /** 固定字符 */
+    FIXED_CHAR,
+    /** 参数 */
+    PARAM
 }
 /**
  * 重置频率
  */
 enum ResetFrequency {
-  NONE ("不重置"),
-  DAILY ("每天重置"),
-  WEEKLY ("每周重置"),
-  MONTHLY ("每月重置"),
-  YEARLY ("每年重置"),
-  CUSTOM ("自定义重置")
+    /** 不重置 */
+    NONE,
+    /** 每天重置 */
+    DAILY,
+    /** 每周重置 */
+    WEEKLY,
+    /** 每月重置 */
+    MONTHLY,
+    /** 每年重置 */
+    YEARLY,
+    /** 自定义重置 */
+    CUSTOM
 }
 
 relationship OneToMany {
@@ -190,10 +210,34 @@ relationship OneToMany {
     FillRuleItem{fillRule(name)}
 }
 
+/**
+* 表单配置
+*/
+@skipFakeData
+@extendAbstractAuditingEntity
+@moduleName(system)
+@entityPackage(system)
+@addCustomMethod(listComponent)
+@skipMobile
+entity FormConfig {
+    formKey String maxlength(100) /** 表单Key */
+    formName String maxlength(100) /** 名称 */
+    formJson TextBlob /** 表单配置 */
+}
+
+/**
+* Many to one relationship.
+*/
+relationship ManyToOne {
+    /** 业务类别 */
+    FormConfig{businessType(name)}
+    to
+    BusinessType with builtInEntity
+}
+
 
 service all with serviceClass
 filter *
 dto all with mapstruct
 paginate all with pagination
-clientRootFolder Dictionary, SysFillRule, FillRuleItem, RegionCode, SiteConfig, CommonFieldData with settings
-//
+clientRootFolder Dictionary, SysFillRule, FillRuleItem, RegionCode, SiteConfig, CommonFieldData, FormConfig with settings
