@@ -50,7 +50,7 @@ import { useFormEvents } from './hooks/useFormEvents';
 import { createFormContext } from './hooks/useFormContext';
 import { useAutoFocus } from './hooks/useAutoFocus';
 import { useModalContext } from '@/components/Modal';
-import { useDebounceFn } from '@vueuse/shared';
+import { useDebounceFn } from '@vueuse/core';
 
 import { basicProps } from './props';
 import { useDesign } from '@/hooks/web/useDesign';
@@ -108,7 +108,7 @@ const getRow = computed(() => {
 const getBindValue = computed(() => ({ ...attrs, ...props, ...unref(getProps) }) as AntFormProps);
 
 const getSchema = computed((): FormSchema[] => {
-  const schemas: FormSchema[] = unref(schemaRef) || (unref(getProps).schemas as any);
+  const schemas: FormSchema[] = cloneDeep(unref(schemaRef) || (unref(getProps).schemas as any));
   for (const schema of schemas) {
     const { defaultValue, component, componentProps = {}, isHandleDateDefaultValue = true } = schema;
     // handle date type
@@ -136,9 +136,9 @@ const getSchema = computed((): FormSchema[] => {
     }
   }
   if (unref(getProps).showAdvancedButton) {
-    return cloneDeep(schemas.filter(schema => !isIncludeSimpleComponents(schema.component)) as FormSchema[]);
+    return schemas.filter(schema => !isIncludeSimpleComponents(schema.component)) as FormSchema[];
   } else {
-    return cloneDeep(schemas as FormSchema[]);
+    return schemas as FormSchema[];
   }
 });
 

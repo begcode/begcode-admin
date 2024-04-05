@@ -1,5 +1,11 @@
 <template>
-  <CheckboxGroup v-bind="attrs" v-model:value="checkboxArray" :options="checkOptions" @change="handleChange"></CheckboxGroup>
+  <CheckboxGroup v-bind="attrs" v-model:value="checkboxArray" :options="checkOptions" @change="handleChange">
+    <template #label="{ label, value }">
+      <span :class="[useDicColor && getDicColor(value) ? 'colorText' : '']" :style="{ backgroundColor: `${getDicColor(value)}` }">{{
+        label
+      }}</span>
+    </template>
+  </CheckboxGroup>
 </template>
 
 <script lang="ts" setup>
@@ -12,6 +18,7 @@ defineOptions({ name: 'DictCheckbox' });
 const props = defineProps({
   value: propTypes.oneOfType([propTypes.string, propTypes.number]),
   dictCode: propTypes.string,
+  useDicColor: propTypes.bool.def(false),
   options: {
     type: Array,
     default: () => [],
@@ -70,6 +77,7 @@ async function initOptions() {
         prev.push({
           label: next['text'],
           value: value,
+          color: next['color'],
         });
       }
       return prev;
@@ -85,4 +93,26 @@ function handleChange($event) {
   emit('update:value', $event.join(','));
   emit('change', $event.join(','));
 }
+
+const getDicColor = value => {
+  if (props.useDicColor) {
+    const findItem = checkOptions.value.find(item => item.value == value);
+    if (findItem) {
+      return findItem.color;
+    }
+  }
+  return null;
+};
 </script>
+<style scoped>
+.colorText {
+  display: inline-block;
+  height: 20px;
+  line-height: 20px;
+  padding: 0 6px;
+  border-radius: 8px;
+  background-color: red;
+  color: #fff;
+  font-size: 12px;
+}
+</style>

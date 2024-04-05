@@ -150,10 +150,10 @@ async function fetch() {
     emitChange();
   } catch (error) {
     console.warn(error);
-  } finally {
-    loading.value = false;
     // reset status
     isFirstLoaded.value = false;
+  } finally {
+    loading.value = false;
     unref(attrs).mode == 'multiple' && !Array.isArray(unref(state)) && setState([]);
     initValue();
   }

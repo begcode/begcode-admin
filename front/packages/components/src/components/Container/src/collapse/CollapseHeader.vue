@@ -7,7 +7,7 @@ const collapseHeaderProps = {
   prefixCls: String,
   title: String,
   show: Boolean,
-  canExpan: Boolean,
+  canExpand: Boolean,
   helpMessage: {
     type: [Array, String] as PropType<string[] | string>,
     default: '',
@@ -33,7 +33,7 @@ export default defineComponent({
         <div class={`${unref(_prefixCls)}__action`}>
           {slots.action
             ? slots.action({ expand: props.show, onClick: () => emit('expand') })
-            : props.canExpan && <BasicArrow up expand={props.show} onClick={() => emit('expand')} />}
+            : props.canExpand && <BasicArrow up expand={props.show} onClick={() => emit('expand')} />}
         </div>
       </div>
     );

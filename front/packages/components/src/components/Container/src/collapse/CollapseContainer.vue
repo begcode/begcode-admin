@@ -14,7 +14,7 @@ const collapseContainerProps = {
   /**
    *  Can it be expanded
    */
-  canExpan: { type: Boolean, default: true },
+  canExpand: { type: Boolean, default: true },
   /**
    * Warm reminder on the right side of the title
    */
@@ -82,7 +82,7 @@ export default defineComponent({
         />
 
         <div class="p-2">
-          <CollapseTransition>
+          <CollapseTransition enable={props.canExpand}>
             {props.loading ? (
               <Skeleton active={props.loading} />
             ) : (

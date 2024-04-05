@@ -62,6 +62,10 @@ export default defineComponent({
       formProps: Ref<FormProps>;
     };
 
+    if (schema.value.component === 'CropperAvatar' && typeof formProps.value.size === 'string') {
+      formProps.value.size = undefined;
+    }
+
     const itemLabelWidthProp = useItemLabelWidth(schema, formProps);
 
     const getValues = computed(() => {

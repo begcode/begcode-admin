@@ -95,7 +95,7 @@ function handleChange(...args) {
 watch(
   () => props.params,
   () => {
-    !unref(isFirstLoaded) && fetch();
+    unref(isFirstLoaded) && fetch();
   },
   { deep: true },
 );

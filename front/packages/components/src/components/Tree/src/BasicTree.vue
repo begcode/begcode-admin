@@ -1,6 +1,6 @@
 <script lang="tsx">
 import type { CSSProperties } from 'vue';
-import { FieldNames, TreeState, TreeItem, KeyType, CheckKeys, TreeActionType } from './types/tree.d';
+import type { FieldNames, TreeState, TreeItem, KeyType, CheckKeys, TreeActionType } from './types/tree.d';
 
 import { defineComponent, reactive, computed, unref, ref, watchEffect, toRaw, watch, onMounted } from 'vue';
 import TreeHeader from './components/TreeHeader.vue';
@@ -446,8 +446,7 @@ export default defineComponent({
 
 .vben-tree .ant-tree .ant-tree-checkbox {
   margin-block-start: 0;
-  margin-inline-start: 4px;
-  margin-inline-end: 4px;
+  margin-inline: 4px 4px;
 }
 
 .vben-tree .ant-tree .ant-tree-checkbox + span {

@@ -38,8 +38,8 @@ export default defineComponent({
     });
 
     return () => {
-      const bindValues = omit(unref(getBindValues), 'icon');
-      const btnBind = omit(bindValues, 'title') as any;
+      const bindValues = omit(unref(getBindValues), 'icon', 'color');
+      const btnBind = omit(unref(getBindValues), 'title') as any;
       if (btnBind.disabled) btnBind.color = '';
       const Button = h(BasicButton, btnBind, extendSlots(slots));
 

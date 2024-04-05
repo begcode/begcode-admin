@@ -10,6 +10,7 @@ import { configCompressPlugin } from './compress';
 import { configVisualizerConfig } from './visualizer';
 import { configThemePlugin } from './theme';
 import { configSvgIconsPlugin } from './svgSprite';
+import { configHtmlPlugin } from './html';
 
 export function createVitePlugins(viteEnv: ViteEnv, isBuild: boolean) {
   const { VITE_USE_MOCK, VITE_BUILD_COMPRESS, VITE_BUILD_COMPRESS_DELETE_ORIGIN_FILE } = viteEnv;
@@ -55,6 +56,9 @@ export function createVitePlugins(viteEnv: ViteEnv, isBuild: boolean) {
 
   // vite-plugin-purge-icons
   vitePlugins.push(purgeIcons());
+
+  // vite-plugin-html
+  vitePlugins.push(configHtmlPlugin(viteEnv, isBuild));
 
   // rollup-plugin-visualizer
   vitePlugins.push(configVisualizerConfig());

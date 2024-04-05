@@ -21,7 +21,7 @@ export function useMethods() {
    * @param url
    */
   async function exportXls(name, url, params, isXlsx = false) {
-    const data = await defHttp.get({ url: url, params: params, responseType: 'blob' }, { isTransformResponse: false });
+    const data = await defHttp.get({ url: url, params: params, responseType: 'blob', timeout: 60000 }, { isTransformResponse: false });
     if (!data) {
       createMessage.warning('文件下载失败');
       return;

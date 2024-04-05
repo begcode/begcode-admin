@@ -43,3 +43,8 @@ export enum CacheTypeEnum {
   SESSION,
   LOCAL,
 }
+// ai助手标识（退出需要记录一下）
+export const AIDE_FLAG = 'AIDE_FLAG';
+
+// ai助手标识（退出需要记录一下）
+export const JEECG_CHAT_KEY = 'AI_CHAT_KEY';

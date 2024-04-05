@@ -1,5 +1,6 @@
 import type { ButtonProps } from 'ant-design-vue/lib/button/buttonTypes';
 import type { CSSProperties, VNodeChild, ComputedRef } from 'vue';
+import type { JSX } from '#/types.d';
 /**
  * @description: 弹窗对外暴露的方法
  */

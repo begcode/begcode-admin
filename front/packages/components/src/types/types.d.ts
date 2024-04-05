@@ -1,6 +1,6 @@
 // copy from element-plus
 
-import type { ComputedRef, CSSProperties, Plugin, Ref, VNode, VNodeChild } from 'vue';
+import type { ComponentRenderProxy, ComputedRef, CSSProperties, Plugin, Ref, VNode, VNodeChild } from 'vue';
 
 type OptionalKeys<T extends Record<string, unknown>> = {
   [K in keyof T]: T extends Record<K, T[K]> ? never : K;
@@ -84,3 +84,19 @@ export interface PromiseFn<T = any, R = T> {
 export type DynamicProps<T> = {
   [P in keyof T]: Ref<T[P]> | T[P] | ComputedRef<T[P]>;
 };
+
+export namespace JSX {
+  // tslint:disable no-empty-interface
+  type Element = VNode;
+  // tslint:disable no-empty-interface
+  type ElementClass = ComponentRenderProxy;
+  interface ElementAttributesProperty {
+    $props: any;
+  }
+  interface IntrinsicElements {
+    [elem: string]: any;
+  }
+  interface IntrinsicAttributes {
+    [elem: string]: any;
+  }
+}

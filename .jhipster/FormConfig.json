@@ -1,0 +1,58 @@
+{
+  "annotations": {
+    "addCustomMethod": "listComponent",
+    "changelogDate": "20240405165934",
+    "entityPackage": "system",
+    "extendAbstractAuditingEntity": true,
+    "moduleName": "system",
+    "skipFakeData": true,
+    "skipMobile": true
+  },
+  "applications": "*",
+  "clientRootFolder": "settings",
+  "documentation": "表单配置",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "documentation": "表单Key",
+      "fieldName": "formKey",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "100"
+    },
+    {
+      "documentation": "名称",
+      "fieldName": "formName",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "100"
+    },
+    {
+      "documentation": "表单配置",
+      "fieldName": "formJson",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "text"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "FormConfig",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "documentation": "业务类别",
+      "options": {
+        "global": {
+          "builtInEntity": true
+        }
+      },
+      "otherEntityField": "name",
+      "otherEntityName": "businessType",
+      "relationshipName": "businessType",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipWithBuiltInEntity": true
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}
