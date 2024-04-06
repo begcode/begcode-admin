@@ -4,7 +4,7 @@
 <script lang="ts" setup>
 import { unref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useMultipleTabStore } from '/@/store/modules/multipleTab';
+import { useMultipleTabStore } from '@/store/modules/multipleTab';
 
 const { currentRoute, replace } = useRouter();
 

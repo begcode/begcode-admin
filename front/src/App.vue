@@ -18,10 +18,10 @@ import { useDarkModeTheme } from '@/hooks/setting/useDarkModeTheme';
 import { useContentHeight } from '@/hooks/web/useContentHeight';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
 import { getViewComponent } from '@/views/getViews';
-import { useAppStore } from '/@/store/modules/app';
-import { useRootSetting } from '/@/hooks/setting/useRootSetting';
-import { ThemeEnum } from '/@/enums/appEnum';
-import { changeTheme } from '/@/logics/theme/index';
+import { useAppStore } from '@/store/modules/app';
+import { useRootSetting } from '@/hooks/setting/useRootSetting';
+import { ThemeEnum } from '@/enums/appEnum';
+import { changeTheme } from '@/logics/theme/index';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 

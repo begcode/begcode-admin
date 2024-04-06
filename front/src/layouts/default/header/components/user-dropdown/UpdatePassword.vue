@@ -9,8 +9,8 @@ import { rules } from '@/utils/helper/validator';
 import { BasicModal, useModalInner, useForm, BasicForm } from '@begcode/components';
 import { useMessage } from '@/hooks/web/useMessage';
 import accountService from '@/api-service/account/account.service';
-import { useLocaleStore } from '/@/store/modules/locale';
-import { useI18n } from '/@/hooks/web/useI18n';
+import { useLocaleStore } from '@/store/modules/locale';
+import { useI18n } from '@/hooks/web/useI18n';
 const localeStore = useLocaleStore();
 const { t } = useI18n();
 
