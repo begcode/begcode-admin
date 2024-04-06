@@ -276,3 +276,15 @@ id;text;i_18_n;group;link;external_link;target;icon;disabled;hide;hide_in_breadc
 375;导出系统日志;;false;;;SELF;;false;true;false;false;false;false;log:sysLog:export;;BUTTON;1;;365;;
 376;打印系统日志;;false;;;SELF;;false;true;false;false;false;false;log:sysLog:print;;BUTTON;1;;365;;
 377;列配置系统日志;;false;;;SELF;;false;true;false;false;false;false;log:sysLog:customColumn;;BUTTON;1;;365;;
+378;表单配置;;false;/system/form-config;;SELF;;false;false;false;false;false;false;systemFormConfigList;;MENU;1;;105;settings/form-config/form-config-list;
+379;新建表单配置;;false;;;SELF;;false;true;false;false;false;false;system:formConfig:new;;BUTTON;1;;378;;
+380;编辑表单配置;;false;;;SELF;;false;true;false;false;false;false;system:formConfig:edit;;BUTTON;1;;378;;
+381;查看表单配置;;false;;;SELF;;false;true;false;false;false;false;system:formConfig:detail;;BUTTON;1;;378;;
+382;删除表单配置;;false;;;SELF;;false;true;false;false;false;false;system:formConfig:delete;;BUTTON;1;;378;;
+383;导入表单配置;;false;;;SELF;;false;true;false;false;false;false;system:formConfig:import;;BUTTON;1;;378;;
+384;导出表单配置;;false;;;SELF;;false;true;false;false;false;false;system:formConfig:export;;BUTTON;1;;378;;
+385;打印表单配置;;false;;;SELF;;false;true;false;false;false;false;system:formConfig:print;;BUTTON;1;;378;;
+386;列配置表单配置;;false;;;SELF;;false;true;false;false;false;false;system:formConfig:customColumn;;BUTTON;1;;378;;
+387;编辑表单配置;;false;/system/form-config/:entityId/edit;;SELF;;false;true;false;false;false;false;systemFormConfigEdit;;MENU;1;;105;settings/form-config/form-config-edit;
+388;新建表单配置;;false;/system/form-config/new;;SELF;;false;true;false;false;false;false;systemFormConfigNew;;MENU;1;;105;settings/form-config/form-config-edit;
+389;查看表单配置;;false;/system/form-config/detail;;SELF;;false;true;false;false;false;false;systemFormConfigDetail;;MENU;1;;105;settings/form-config/form-config-detail;

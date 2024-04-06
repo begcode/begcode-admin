@@ -9,7 +9,7 @@
     <!--
         Added the entity OssConfig.
     -->
-        <changeSet id="20240101062506-1" author="jhipster">
+    <changeSet id="20240101062506-1" author="jhipster">
         <createTable tableName="oss_config" remarks="对象存储配置">
             <column name="id" type="bigint" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>

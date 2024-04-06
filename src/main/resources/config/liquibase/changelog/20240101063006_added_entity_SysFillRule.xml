@@ -9,7 +9,7 @@
     <!--
         Added the entity SysFillRule.
     -->
-        <changeSet id="20240101063006-1" author="jhipster">
+    <changeSet id="20240101063006-1" author="jhipster">
         <createTable tableName="sys_fill_rule" remarks="填充规则">
             <column name="id" type="bigint" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>

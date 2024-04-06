@@ -9,7 +9,7 @@
     <!--
         Added the entity TaskJobConfig.
     -->
-        <changeSet id="20240101063606-1" author="jhipster">
+    <changeSet id="20240101063606-1" author="jhipster">
         <createTable tableName="task_job_config" remarks="定时任务">
             <column name="id" type="bigint" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>

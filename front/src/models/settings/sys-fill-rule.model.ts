@@ -1,5 +1,3 @@
-import { IFillRuleItem } from '@/models/settings/fill-rule-item.model';
-
 import { ResetFrequency } from '@/models/enumerations/reset-frequency.model';
 export interface ISysFillRule {
   id?: number; //ID
@@ -15,7 +13,6 @@ export interface ISysFillRule {
   resetStartTime?: Date | null; //重置开始日期
   resetEndTime?: Date | null; //重置结束日期
   resetTime?: Date | null; //重置时间
-  ruleItems?: IFillRuleItem[] | null; //配置项列表
 }
 
 export class SysFillRule implements ISysFillRule {
@@ -33,7 +30,6 @@ export class SysFillRule implements ISysFillRule {
     public resetStartTime?: Date | null,
     public resetEndTime?: Date | null,
     public resetTime?: Date | null,
-    public ruleItems?: IFillRuleItem[] | null,
   ) {
     this.enabled = this.enabled ?? false;
   }

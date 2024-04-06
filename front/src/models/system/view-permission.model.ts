@@ -24,7 +24,6 @@ export interface IViewPermission {
   apiPermissionCodes?: string | null; //api权限标识串
   componentFile?: string | null; //组件名称
   redirect?: string | null; //重定向路径
-  children?: IViewPermission[] | null; //子节点
   parent?: IViewPermission | null; //上级
   authorities?: IAuthority[] | null; //角色列表
   expand?: boolean;
@@ -54,7 +53,6 @@ export class ViewPermission implements IViewPermission {
     public apiPermissionCodes?: string | null,
     public componentFile?: string | null,
     public redirect?: string | null,
-    public children?: IViewPermission[] | null,
     public parent?: IViewPermission | null,
     public authorities?: IAuthority[] | null,
     public expand?: boolean,

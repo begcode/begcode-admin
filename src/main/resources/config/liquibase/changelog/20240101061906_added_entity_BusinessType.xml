@@ -9,7 +9,7 @@
     <!--
         Added the entity BusinessType.
     -->
-        <changeSet id="20240101061906-1" author="jhipster">
+    <changeSet id="20240101061906-1" author="jhipster">
         <createTable tableName="business_type" remarks="业务类型">
             <column name="id" type="bigint" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>

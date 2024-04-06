@@ -127,7 +127,7 @@ const { t } = useI18n();
 function handleBeforeUpload(file: File) {
   if (props.size && file.size > 1024 * 1024 * props.size) {
     emit('uploadError', { msg: t('component.cropper.imageTooBig') });
-    return;
+    return false;
   }
   const reader = new FileReader();
   reader.readAsDataURL(file);

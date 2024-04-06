@@ -9,7 +9,7 @@
     <!--
         Added the entity UReportFile.
     -->
-        <changeSet id="20240101063206-1" author="jhipster">
+    <changeSet id="20240101063206-1" author="jhipster">
         <createTable tableName="u_report_file" remarks="报表存储">
             <column name="id" type="bigint" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>

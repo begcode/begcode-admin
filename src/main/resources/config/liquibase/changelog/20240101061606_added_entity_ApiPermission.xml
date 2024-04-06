@@ -9,7 +9,7 @@
     <!--
         Added the entity ApiPermission.
     -->
-        <changeSet id="20240101061606-1" author="jhipster">
+    <changeSet id="20240101061606-1" author="jhipster">
         <createTable tableName="api_permission" remarks="API权限\n菜单或按钮下有相关的api权限">
             <column name="id" type="bigint" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>

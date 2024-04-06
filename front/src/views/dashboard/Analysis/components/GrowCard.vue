@@ -7,7 +7,7 @@
         :title="item.title"
         class="md:w-1/4 w-full !md:mt-0 !mt-4"
         :class="[index + 1 < 4 && '!md:mr-4']"
-        :canExpan="false"
+        :canExpand="false"
       >
         <template #extra>
           <Tag :color="item.color">{{ item.action }}</Tag>

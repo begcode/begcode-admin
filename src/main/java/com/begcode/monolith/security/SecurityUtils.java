@@ -55,8 +55,7 @@ public final class SecurityUtils {
      */
     public static Optional<String> getCurrentUserJWT() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
-        return Optional
-            .ofNullable(securityContext.getAuthentication())
+        return Optional.ofNullable(securityContext.getAuthentication())
             .filter(authentication -> authentication.getCredentials() instanceof String)
             .map(authentication -> (String) authentication.getCredentials());
     }
@@ -68,19 +67,17 @@ public final class SecurityUtils {
      */
     public static Optional<Long> getCurrentUserId() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
-        return Optional
-            .ofNullable(securityContext.getAuthentication())
-            .map(authentication -> {
-                if (authentication.getPrincipal() instanceof UserDetails) {
-                    MyUserDetails springSecurityUser = (MyUserDetails) authentication.getPrincipal();
-                    return springSecurityUser.getId();
-                }
+        return Optional.ofNullable(securityContext.getAuthentication()).map(authentication -> {
+            if (authentication.getPrincipal() instanceof UserDetails) {
+                MyUserDetails springSecurityUser = (MyUserDetails) authentication.getPrincipal();
+                return springSecurityUser.getId();
+            }
 
-                if (authentication.getPrincipal() instanceof Jwt jwt) {
-                    return Long.parseLong(jwt.getClaim(USER_ID));
-                }
-                return null;
-            });
+            if (authentication.getPrincipal() instanceof Jwt jwt) {
+                return Long.parseLong(jwt.getClaim(USER_ID));
+            }
+            return null;
+        });
     }
 
     /**

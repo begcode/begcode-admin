@@ -78,19 +78,13 @@ export function createPermissionGuard(router: Router) {
           next();
         }
       } else {
-        //----------【首次登陆并且是企业微信或者钉钉的情况下才会调用】-----------------------------------------------
-        //只有首次登陆并且是企业微信或者钉钉的情况下才会调用
         let href = window.location.href;
-        //判断当前是auth2页面，并且是钉钉/企业微信，并且包含tenantId参数
         if (isOAuth2AppEnv() && href.indexOf('/tenantId/') != -1) {
           let params = to.params;
           if (params && params.path && params.path.length > 0) {
-            //直接获取参数最后一位
             setAuthCache(OAUTH2_THIRD_LOGIN_TENANT_ID, params.path[params.path.length - 1]);
           }
         }
-        //---------【首次登陆并且是企业微信或者钉钉的情况下才会调用】------------------------------------------------
-        // 如果当前是在OAuth2APP环境，就跳转到OAuth2登录页面，否则跳转到登录页面
         path = isOAuth2AppEnv() ? OAUTH2_LOGIN_PAGE_PATH : LOGIN_PATH;
       }
 
@@ -131,16 +125,6 @@ export function createPermissionGuard(router: Router) {
     ) {
       next(userStore.getUserInfo.homePath || PageEnum.BASE_HOME);
       return;
-    }
-
-    // get userinfo while last fetch time is empty
-    if (userStore.getLastUpdateTime === 0) {
-      try {
-        await userStore.getUserInfoAction();
-      } catch (err) {
-        next();
-        return;
-      }
     }
 
     if (permissionStore.getIsDynamicAddedRoute) {

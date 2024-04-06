@@ -9,7 +9,7 @@
     <!--
         Added the entity Dictionary.
     -->
-        <changeSet id="20240101062606-1" author="jhipster">
+    <changeSet id="20240101062606-1" author="jhipster">
         <createTable tableName="dictionary" remarks="数据字典">
             <column name="id" type="bigint" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>

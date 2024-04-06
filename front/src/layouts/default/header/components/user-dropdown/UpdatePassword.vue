@@ -1,5 +1,5 @@
 <template>
-  <BasicModal v-bind="$attrs" @register="registerModal" title="修改密码" @ok="handleSubmit" width="600px">
+  <BasicModal v-bind="$attrs" @register="registerModal" :title="title" @ok="handleSubmit" width="600px">
     <BasicForm @register="registerForm" />
   </BasicModal>
 </template>
@@ -9,43 +9,50 @@ import { rules } from '@/utils/helper/validator';
 import { BasicModal, useModalInner, useForm, BasicForm } from '@begcode/components';
 import { useMessage } from '@/hooks/web/useMessage';
 import accountService from '@/api-service/account/account.service';
+import { useLocaleStore } from '/@/store/modules/locale';
+import { useI18n } from '/@/hooks/web/useI18n';
+const localeStore = useLocaleStore();
+const { t } = useI18n();
 
 // 声明Emits
 const emit = defineEmits(['register']);
 const $message = useMessage();
 const formRef = ref();
 const username = ref('');
+const title = ref(t('layout.changePassword.changePassword'));
 //表单配置
 const [registerForm, { resetFields, validate, clearValidate }] = useForm({
   schemas: [
     {
-      label: '旧密码',
+      label: t('layout.changePassword.oldPassword'),
       field: 'currentPassword',
       component: 'InputPassword',
       required: true,
     },
     {
-      label: '新密码',
+      label: t('layout.changePassword.newPassword'),
       field: 'newPassword',
       component: 'StrengthMeter',
       componentProps: {
-        placeholder: '请输入新密码',
+        placeholder: t('layout.changePassword.pleaseEnterNewPassword'),
       },
       rules: [
         {
           required: true,
-          message: '请输入新密码',
+          message: t('layout.changePassword.pleaseEnterNewPassword'),
         },
       ],
     },
     {
-      label: '确认新密码',
+      label: t('layout.changePassword.confirmNewPassword'),
       field: 'confirmpassword',
       component: 'InputPassword',
       dynamicRules: ({ values }) => rules.confirmPassword(values, true),
     },
   ],
   showActionButtonGroup: false,
+  wrapperCol: null,
+  labelWidth: localeStore.getLocale == 'zh_CN' ? 100 : 160,
 });
 //表单赋值
 const [registerModal, { setModalProps, closeModal }] = useModalInner();
@@ -85,5 +92,6 @@ async function show(login) {
 
 defineExpose({
   show,
+  title,
 });
 </script>

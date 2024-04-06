@@ -9,7 +9,7 @@
     <!--
         Added the entity RegionCode.
     -->
-        <changeSet id="20240101062906-1" author="jhipster">
+    <changeSet id="20240101062906-1" author="jhipster">
         <createTable tableName="region_code" remarks="行政区划码">
             <column name="id" type="bigint" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>

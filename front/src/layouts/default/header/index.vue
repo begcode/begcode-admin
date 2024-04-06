@@ -16,7 +16,7 @@
         :class="[prefixCls, `${prefixCls}--${getHeaderTheme}`, 'headerIntroductionClass']"
         style="border: 0"
       >
-        欢迎进入 {{ title }}
+        {{ t('layout.header.welcomeIn') }} {{ title }}
       </span>
     </div>
     <!-- left end -->
@@ -44,6 +44,7 @@
       <UserDropDown :theme="getHeaderTheme" />
 
       <SettingDrawer v-if="getShowSetting" :class="`${prefixCls}-action__item`" />
+      <Aide></Aide>
     </div>
   </Layout.Header>
   <LoginSelect ref="loginSelectRef" @success="loginSelectOk"></LoginSelect>
@@ -64,6 +65,8 @@ import { useLocale } from '@/i18n/useLocale';
 import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
 import { useGlobSetting } from '@/hooks/setting';
 import { propTypes } from '@begcode/components';
+import { useI18n } from '/@/hooks/web/useI18n';
+import Aide from '@/views/dashboard/ai/components/aide/index.vue';
 
 import LayoutMenu from '../menu/index.vue';
 import LayoutTrigger from '../trigger/index.vue';
@@ -74,6 +77,8 @@ import LoginSelect from '@/views/account/login/LoginSelect.vue';
 import { useUserStore } from '@/store/modules/user';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
+
+const { t } = useI18n();
 
 const SettingDrawer = createAsyncComponent(() => import('@/layouts/default/setting/index.vue'), {
   loading: true,

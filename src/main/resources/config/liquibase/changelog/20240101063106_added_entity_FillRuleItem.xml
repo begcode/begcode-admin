@@ -9,7 +9,7 @@
     <!--
         Added the entity FillRuleItem.
     -->
-        <changeSet id="20240101063106-1" author="jhipster">
+    <changeSet id="20240101063106-1" author="jhipster">
         <createTable tableName="fill_rule_item" remarks="填充规则条目">
             <column name="id" type="bigint" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>

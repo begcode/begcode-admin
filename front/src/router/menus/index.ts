@@ -9,7 +9,7 @@ import { transformMenuModule, getAllParentPath } from '@/router/helper/menuHelpe
 import { router } from '@/router';
 import { PermissionModeEnum } from '@/enums/appEnum';
 
-const modules = import.meta.glob('./modules/**/*.ts', { eager: true });
+const modules = import.meta.glob('../routes/modules/**/*.ts', { eager: true });
 
 const menuModules: MenuModule[] = [];
 

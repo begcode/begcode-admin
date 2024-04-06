@@ -9,7 +9,7 @@
     <!--
         Added the entity User.
     -->
-        <changeSet id="20240101061506-1" author="jhipster">
+    <changeSet id="20240101061506-1" author="jhipster">
         <createTable tableName="jhi_user" remarks="用户">
             <column name="id" type="bigint" remarks="用户ID" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>
@@ -134,8 +134,8 @@
                 separator=";"
                 tableName="rel_jhi_user__authorities"
                 usePreparedStatements="true">
-                <column name="authorities_id" type="bigint"/>
-                <column name="jhi_user_id" type="bigint"/>
+                <column name="authorities_id" type="numeric"/>
+                <column name="jhi_user_id" type="numeric"/>
         </loadData>
 
     </changeSet>

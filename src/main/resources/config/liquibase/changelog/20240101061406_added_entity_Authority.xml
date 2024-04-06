@@ -9,7 +9,7 @@
     <!--
         Added the entity Authority.
     -->
-        <changeSet id="20240101061406-1" author="jhipster">
+    <changeSet id="20240101061406-1" author="jhipster">
         <createTable tableName="jhi_authority" remarks="角色">
             <column name="id" type="bigint" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>
@@ -96,8 +96,8 @@
                 separator=";"
                 tableName="rel_jhi_authority__view_permissions"
                 usePreparedStatements="true">
-                <column name="view_permissions_id" type="bigint"/>
-                <column name="jhi_authority_id" type="bigint"/>
+                <column name="view_permissions_id" type="numeric"/>
+                <column name="jhi_authority_id" type="numeric"/>
         </loadData>
 
     </changeSet>

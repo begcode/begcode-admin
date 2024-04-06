@@ -141,7 +141,10 @@ export function mapTableTotalSummary(tableData: Recordable[], fieldKeys: string[
   let totals: any = { _row: '合计', _index: '合计' };
   fieldKeys.forEach(key => {
     totals[key] = tableData.reduce((prev, next) => {
-      prev += next[key];
+      const value = Number(next[key]);
+      if (!Number.isNaN(value)) {
+        prev += value;
+      }
       return prev;
     }, 0);
   });

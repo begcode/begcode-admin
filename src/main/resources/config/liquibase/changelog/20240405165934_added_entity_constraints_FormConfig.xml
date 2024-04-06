@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity FormConfig.
+    -->
+    <changeSet id="20240405165934-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="business_type_id"
+                                 baseTableName="form_config"
+                                 constraintName="fk_form_config__business_type_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="business_type"
+                                 />
+    </changeSet>
+</databaseChangeLog>

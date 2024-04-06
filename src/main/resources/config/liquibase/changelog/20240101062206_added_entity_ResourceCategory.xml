@@ -9,7 +9,7 @@
     <!--
         Added the entity ResourceCategory.
     -->
-        <changeSet id="20240101062206-1" author="jhipster">
+    <changeSet id="20240101062206-1" author="jhipster">
         <createTable tableName="resource_category" remarks="资源分类">
             <column name="id" type="bigint" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>

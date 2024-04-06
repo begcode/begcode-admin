@@ -9,7 +9,7 @@
     <!--
         Added the entity ViewPermission.
     -->
-        <changeSet id="20240101061306-1" author="jhipster">
+    <changeSet id="20240101061306-1" author="jhipster">
         <createTable tableName="view_permission" remarks="可视权限\n权限分为菜单权限、按钮权限等\n">
             <column name="id" type="bigint" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>

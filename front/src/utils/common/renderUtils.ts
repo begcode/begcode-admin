@@ -47,7 +47,7 @@ const render = {
     if (obj.length > 0) {
       text = obj[0].text;
     }
-    return isEmpty(text) || !renderTag ? h('span', text) : h(Tag, text);
+    return isEmpty(text) || !renderTag ? h('span', text) : h(Tag, () => text);
   },
   /**
    * 渲染图片

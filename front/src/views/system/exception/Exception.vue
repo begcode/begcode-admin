@@ -117,7 +117,7 @@ export default defineComponent({
                   {() => btnText}
                 </Button>
               ),
-            icon: () => (icon ? <img src={icon} /> : null),
+            icon: status && ExceptionEnum[status] === void 0 ? () => (icon ? <img src={icon} /> : null) : undefined,
           }}
         </Result>
       );

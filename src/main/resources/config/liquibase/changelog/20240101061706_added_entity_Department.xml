@@ -9,7 +9,7 @@
     <!--
         Added the entity Department.
     -->
-        <changeSet id="20240101061706-1" author="jhipster">
+    <changeSet id="20240101061706-1" author="jhipster">
         <createTable tableName="department" remarks="部门">
             <column name="id" type="bigint" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>

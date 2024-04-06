@@ -48,9 +48,11 @@ import {
   Carousel,
   Popconfirm,
   Cascader,
+  Progress,
 } from 'ant-design-vue';
 import VXETable from 'vxe-table';
 import VXETablePluginExportXLSX from 'vxe-table-plugin-export-xlsx';
+import ExcelJS from 'exceljs';
 import { VXETablePluginAntd } from './VxeTable';
 
 const compList = [AntButton.Group, Icon, UploadButton];
@@ -107,6 +109,7 @@ export function registerGlobComp(app: App) {
     .use(Popconfirm)
     .use(Cascader)
     .use(VXETable)
+    .use(Progress)
     .use(Tabs);
-  VXETable.use(VXETablePluginAntd).use(VXETablePluginExportXLSX);
+  VXETable.use(VXETablePluginAntd).use(VXETablePluginExportXLSX, { ExcelJS });
 }

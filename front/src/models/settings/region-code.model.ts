@@ -10,7 +10,6 @@ export interface IRegionCode {
   level?: keyof typeof RegionCodeLevel | null; //等级
   lng?: number | null; //经度
   lat?: number | null; //纬度
-  children?: IRegionCode[] | null; //子节点
   parent?: IRegionCode | null; //上级节点
   expand?: boolean;
   nzAddLevel?: number;
@@ -28,7 +27,6 @@ export class RegionCode implements IRegionCode {
     public level?: keyof typeof RegionCodeLevel | null,
     public lng?: number | null,
     public lat?: number | null,
-    public children?: IRegionCode[] | null,
     public parent?: IRegionCode | null,
     public expand?: boolean,
     public nzAddLevel?: number,

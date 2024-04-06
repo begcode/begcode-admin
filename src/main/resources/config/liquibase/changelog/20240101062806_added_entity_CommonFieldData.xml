@@ -9,7 +9,7 @@
     <!--
         Added the entity CommonFieldData.
     -->
-        <changeSet id="20240101062806-1" author="jhipster">
+    <changeSet id="20240101062806-1" author="jhipster">
         <createTable tableName="common_field_data" remarks="通用字段数据">
             <column name="id" type="bigint" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>

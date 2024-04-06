@@ -24,13 +24,15 @@ public class CacheConfiguration {
     public CacheConfiguration(JHipsterProperties jHipsterProperties) {
         JHipsterProperties.Cache.Ehcache ehcache = jHipsterProperties.getCache().getEhcache();
 
-        jcacheConfiguration =
-            Eh107Configuration.fromEhcacheCacheConfiguration(
-                CacheConfigurationBuilder
-                    .newCacheConfigurationBuilder(Object.class, Object.class, ResourcePoolsBuilder.heap(ehcache.getMaxEntries()))
-                    .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofSeconds(ehcache.getTimeToLiveSeconds())))
-                    .build()
-            );
+        jcacheConfiguration = Eh107Configuration.fromEhcacheCacheConfiguration(
+            CacheConfigurationBuilder.newCacheConfigurationBuilder(
+                Object.class,
+                Object.class,
+                ResourcePoolsBuilder.heap(ehcache.getMaxEntries())
+            )
+                .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofSeconds(ehcache.getTimeToLiveSeconds())))
+                .build()
+        );
     }
 
     @Bean
@@ -85,6 +87,7 @@ public class CacheConfiguration {
             createCache(cm, com.begcode.monolith.system.domain.AnnouncementRecord.class.getName());
             createCache(cm, com.begcode.monolith.taskjob.domain.TaskJobConfig.class.getName());
             createCache(cm, com.begcode.monolith.log.domain.SysLog.class.getName());
+            createCache(cm, com.begcode.monolith.system.domain.FormConfig.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

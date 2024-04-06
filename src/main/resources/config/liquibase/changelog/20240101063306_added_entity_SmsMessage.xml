@@ -9,7 +9,7 @@
     <!--
         Added the entity SmsMessage.
     -->
-        <changeSet id="20240101063306-1" author="jhipster">
+    <changeSet id="20240101063306-1" author="jhipster">
         <createTable tableName="sms_message" remarks="短信消息">
             <column name="id" type="bigint" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>

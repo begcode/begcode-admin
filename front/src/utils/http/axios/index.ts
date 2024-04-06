@@ -102,12 +102,16 @@ const transform: AxiosTransform = {
   // 请求之前处理config
   beforeRequestHook: (config, options) => {
     const { apiUrl, joinPrefix, joinParamsToUrl, formatDate, joinTime = true, urlPrefix } = options;
-
-    if (joinPrefix) {
+    let isStartWithHttp = false;
+    const requestUrl = config.url;
+    if (requestUrl != null && (requestUrl.startsWith('http:') || requestUrl.startsWith('https:'))) {
+      isStartWithHttp = true;
+    }
+    if (!isStartWithHttp && joinPrefix) {
       config.url = `${urlPrefix}${config.url}`;
     }
 
-    if (apiUrl && isString(apiUrl)) {
+    if (!isStartWithHttp && apiUrl && isString(apiUrl)) {
       config.url = `${apiUrl}${config.url}`;
     }
     const params = config.params || {};
