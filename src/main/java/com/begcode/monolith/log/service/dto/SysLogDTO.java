@@ -6,9 +6,8 @@ import com.begcode.monolith.domain.enumeration.OperateType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.Objects;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
 
@@ -17,9 +16,8 @@ import lombok.ToString;
  * {@link com.begcode.monolith.log.domain.SysLog}的DTO。
  */
 @Schema(description = "系统日志")
-@Data
-@ToString
-@EqualsAndHashCode(callSuper = true)
+@Setter
+@Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class SysLogDTO extends AbstractAuditingEntity<Long, SysLogDTO> {
 
@@ -204,11 +202,11 @@ public class SysLogDTO extends AbstractAuditingEntity<Long, SysLogDTO> {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof SysLogDTO)) {
+
+        if (!(o instanceof SysLogDTO sysLogDTO)) {
             return false;
         }
 
-        SysLogDTO sysLogDTO = (SysLogDTO) o;
         if (this.id == null) {
             return false;
         }

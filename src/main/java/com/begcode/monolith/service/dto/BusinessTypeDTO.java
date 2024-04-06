@@ -3,9 +3,8 @@ package com.begcode.monolith.service.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.Objects;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
 
@@ -14,9 +13,8 @@ import lombok.ToString;
  * {@link com.begcode.monolith.domain.BusinessType}的DTO。
  */
 @Schema(description = "业务类型")
-@Data
-@ToString
-@EqualsAndHashCode
+@Setter
+@Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class BusinessTypeDTO implements Serializable {
 
@@ -80,11 +78,11 @@ public class BusinessTypeDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof BusinessTypeDTO)) {
+
+        if (!(o instanceof BusinessTypeDTO businessTypeDTO)) {
             return false;
         }
 
-        BusinessTypeDTO businessTypeDTO = (BusinessTypeDTO) o;
         if (this.id == null) {
             return false;
         }

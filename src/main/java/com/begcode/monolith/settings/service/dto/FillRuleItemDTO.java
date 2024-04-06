@@ -4,9 +4,8 @@ import com.begcode.monolith.domain.enumeration.FieldParamType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.Objects;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
 
@@ -15,9 +14,8 @@ import lombok.ToString;
  * {@link com.begcode.monolith.settings.domain.FillRuleItem}的DTO。
  */
 @Schema(description = "填充规则条目")
-@Data
-@ToString
-@EqualsAndHashCode
+@Setter
+@Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class FillRuleItemDTO implements Serializable {
 
@@ -120,6 +118,11 @@ public class FillRuleItemDTO implements Serializable {
         return this;
     }
 
+    public FillRuleItemDTO fillRuleId(Long fillRuleId) {
+        this.fillRuleId = fillRuleId;
+        return this;
+    }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -127,11 +130,11 @@ public class FillRuleItemDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof FillRuleItemDTO)) {
+
+        if (!(o instanceof FillRuleItemDTO fillRuleItemDTO)) {
             return false;
         }
 
-        FillRuleItemDTO fillRuleItemDTO = (FillRuleItemDTO) o;
         if (this.id == null) {
             return false;
         }

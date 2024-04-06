@@ -5,12 +5,9 @@ import com.begcode.monolith.domain.enumeration.ViewPermissionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
 
@@ -19,9 +16,8 @@ import lombok.ToString;
  * {@link com.begcode.monolith.domain.ViewPermission}的DTO。
  */
 @Schema(description = "可视权限\n权限分为菜单权限、按钮权限等\n")
-@Data
-@ToString
-@EqualsAndHashCode
+@Setter
+@Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ViewPermissionDTO implements Serializable {
 
@@ -151,12 +147,6 @@ public class ViewPermissionDTO implements Serializable {
     private String redirect;
 
     /**
-     * 子节点
-     */
-    @Schema(description = "子节点")
-    private List<ViewPermissionDTO> children = new ArrayList<>();
-
-    /**
      * 上级
      */
     @Schema(description = "上级")
@@ -271,13 +261,13 @@ public class ViewPermissionDTO implements Serializable {
         return this;
     }
 
-    public ViewPermissionDTO children(List<ViewPermissionDTO> children) {
-        this.children = children;
+    public ViewPermissionDTO parent(ViewPermissionDTO parent) {
+        this.parent = parent;
         return this;
     }
 
-    public ViewPermissionDTO parent(ViewPermissionDTO parent) {
-        this.parent = parent;
+    public ViewPermissionDTO parentId(Long parentId) {
+        this.parentId = parentId;
         return this;
     }
 
@@ -288,11 +278,11 @@ public class ViewPermissionDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ViewPermissionDTO)) {
+
+        if (!(o instanceof ViewPermissionDTO viewPermissionDTO)) {
             return false;
         }
 
-        ViewPermissionDTO viewPermissionDTO = (ViewPermissionDTO) o;
         if (this.id == null) {
             return false;
         }
@@ -329,7 +319,6 @@ public class ViewPermissionDTO implements Serializable {
             ", apiPermissionCodes='" + getApiPermissionCodes() + "'" +
             ", componentFile='" + getComponentFile() + "'" +
             ", redirect='" + getRedirect() + "'" +
-            ", children=" + getChildren() +
             ", parent=" + getParent() +
             "}";
     }

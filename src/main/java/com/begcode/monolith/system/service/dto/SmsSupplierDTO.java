@@ -4,9 +4,8 @@ import com.begcode.monolith.domain.enumeration.SmsProvider;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.Objects;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
 
@@ -15,9 +14,8 @@ import lombok.ToString;
  * {@link com.begcode.monolith.system.domain.SmsSupplier}的DTO。
  */
 @Schema(description = "短信服务商配置")
-@Data
-@ToString
-@EqualsAndHashCode
+@Setter
+@Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class SmsSupplierDTO implements Serializable {
 
@@ -92,11 +90,11 @@ public class SmsSupplierDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof SmsSupplierDTO)) {
+
+        if (!(o instanceof SmsSupplierDTO smsSupplierDTO)) {
             return false;
         }
 
-        SmsSupplierDTO smsSupplierDTO = (SmsSupplierDTO) o;
         if (this.id == null) {
             return false;
         }

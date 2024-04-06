@@ -5,9 +5,8 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
 
@@ -16,9 +15,8 @@ import lombok.ToString;
  * {@link com.begcode.monolith.domain.UReportFile}的DTO。
  */
 @Schema(description = "报表存储")
-@Data
-@ToString
-@EqualsAndHashCode
+@Setter
+@Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class UReportFileDTO implements Serializable {
 
@@ -83,11 +81,11 @@ public class UReportFileDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof UReportFileDTO)) {
+
+        if (!(o instanceof UReportFileDTO uReportFileDTO)) {
             return false;
         }
 
-        UReportFileDTO uReportFileDTO = (UReportFileDTO) o;
         if (this.id == null) {
             return false;
         }

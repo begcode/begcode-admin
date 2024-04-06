@@ -4,12 +4,9 @@ import com.begcode.monolith.domain.enumeration.ApiPermissionState;
 import com.begcode.monolith.domain.enumeration.ApiPermissionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
 
@@ -18,9 +15,8 @@ import lombok.ToString;
  * {@link com.begcode.monolith.domain.ApiPermission}的DTO。
  */
 @Schema(description = "API权限\n菜单或按钮下有相关的api权限")
-@Data
-@ToString
-@EqualsAndHashCode
+@Setter
+@Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ApiPermissionDTO implements Serializable {
 
@@ -69,12 +65,6 @@ public class ApiPermissionDTO implements Serializable {
      */
     @Schema(description = "状态")
     private ApiPermissionState status;
-
-    /**
-     * 子节点
-     */
-    @Schema(description = "子节点")
-    private List<ApiPermissionDTO> children = new ArrayList<>();
 
     /**
      * 上级
@@ -131,13 +121,13 @@ public class ApiPermissionDTO implements Serializable {
         return this;
     }
 
-    public ApiPermissionDTO children(List<ApiPermissionDTO> children) {
-        this.children = children;
+    public ApiPermissionDTO parent(ApiPermissionDTO parent) {
+        this.parent = parent;
         return this;
     }
 
-    public ApiPermissionDTO parent(ApiPermissionDTO parent) {
-        this.parent = parent;
+    public ApiPermissionDTO parentId(Long parentId) {
+        this.parentId = parentId;
         return this;
     }
 
@@ -148,11 +138,11 @@ public class ApiPermissionDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ApiPermissionDTO)) {
+
+        if (!(o instanceof ApiPermissionDTO apiPermissionDTO)) {
             return false;
         }
 
-        ApiPermissionDTO apiPermissionDTO = (ApiPermissionDTO) o;
         if (this.id == null) {
             return false;
         }
@@ -177,7 +167,6 @@ public class ApiPermissionDTO implements Serializable {
             ", method='" + getMethod() + "'" +
             ", url='" + getUrl() + "'" +
             ", status='" + getStatus() + "'" +
-            ", children=" + getChildren() +
             ", parent=" + getParent() +
             "}";
     }

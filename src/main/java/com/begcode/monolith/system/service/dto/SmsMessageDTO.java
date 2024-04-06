@@ -7,9 +7,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
 
@@ -18,9 +17,8 @@ import lombok.ToString;
  * {@link com.begcode.monolith.system.domain.SmsMessage}的DTO。
  */
 @Schema(description = "短信消息")
-@Data
-@ToString
-@EqualsAndHashCode(callSuper = true)
+@Setter
+@Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class SmsMessageDTO extends AbstractAuditingEntity<Long, SmsMessageDTO> {
 
@@ -195,11 +193,11 @@ public class SmsMessageDTO extends AbstractAuditingEntity<Long, SmsMessageDTO> {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof SmsMessageDTO)) {
+
+        if (!(o instanceof SmsMessageDTO smsMessageDTO)) {
             return false;
         }
 
-        SmsMessageDTO smsMessageDTO = (SmsMessageDTO) o;
         if (this.id == null) {
             return false;
         }

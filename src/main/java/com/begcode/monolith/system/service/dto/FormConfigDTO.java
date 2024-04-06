@@ -1,50 +1,47 @@
 package com.begcode.monolith.system.service.dto;
 
 import com.begcode.monolith.domain.AbstractAuditingEntity;
+// jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
+
+import com.begcode.monolith.service.dto.BusinessTypeDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.*;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
 
-// jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
-
 /**
 
- * {@link com.begcode.monolith.system.domain.AnnouncementRecord}的DTO。
+ * {@link com.begcode.monolith.system.domain.FormConfig}的DTO。
  */
-@Schema(description = "通告阅读记录")
+@Schema(description = "表单配置")
 @Setter
 @Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class AnnouncementRecordDTO extends AbstractAuditingEntity<Long, AnnouncementRecordDTO> {
+public class FormConfigDTO extends AbstractAuditingEntity<Long, FormConfigDTO> {
 
     private Long id;
 
     /**
-     * 通告ID
+     * 表单Key
      */
-    @Schema(description = "通告ID")
-    private Long anntId;
+    @Size(max = 100)
+    @Schema(description = "表单Key")
+    private String formKey;
 
     /**
-     * 用户id
+     * 名称
      */
-    @Schema(description = "用户id")
-    private Long userId;
+    @Size(max = 100)
+    @Schema(description = "名称")
+    private String formName;
 
     /**
-     * 是否已读
+     * 表单配置
      */
-    @Schema(description = "是否已读")
-    private Boolean hasRead;
-
-    /**
-     * 阅读时间
-     */
-    @Schema(description = "阅读时间")
-    private ZonedDateTime readTime;
+    @Schema(description = "表单配置")
+    private String formJson;
 
     /**
      * 创建者Id
@@ -70,50 +67,63 @@ public class AnnouncementRecordDTO extends AbstractAuditingEntity<Long, Announce
     @Schema(description = "修改时间")
     private Instant lastModifiedDate;
 
+    /**
+     * 业务类别
+     */
+    @Schema(description = "业务类别")
+    private BusinessTypeDTO businessType;
+
+    private Long businessTypeId;
+
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove
 
-    public AnnouncementRecordDTO id(Long id) {
+    public FormConfigDTO id(Long id) {
         this.id = id;
         return this;
     }
 
-    public AnnouncementRecordDTO anntId(Long anntId) {
-        this.anntId = anntId;
+    public FormConfigDTO formKey(String formKey) {
+        this.formKey = formKey;
         return this;
     }
 
-    public AnnouncementRecordDTO userId(Long userId) {
-        this.userId = userId;
+    public FormConfigDTO formName(String formName) {
+        this.formName = formName;
         return this;
     }
 
-    public AnnouncementRecordDTO hasRead(Boolean hasRead) {
-        this.hasRead = hasRead;
+    public FormConfigDTO formJson(String formJson) {
+        this.formJson = formJson;
         return this;
     }
 
-    public AnnouncementRecordDTO readTime(ZonedDateTime readTime) {
-        this.readTime = readTime;
-        return this;
-    }
-
-    public AnnouncementRecordDTO createdBy(Long createdBy) {
+    public FormConfigDTO createdBy(Long createdBy) {
         this.createdBy = createdBy;
         return this;
     }
 
-    public AnnouncementRecordDTO createdDate(Instant createdDate) {
+    public FormConfigDTO createdDate(Instant createdDate) {
         this.createdDate = createdDate;
         return this;
     }
 
-    public AnnouncementRecordDTO lastModifiedBy(Long lastModifiedBy) {
+    public FormConfigDTO lastModifiedBy(Long lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
         return this;
     }
 
-    public AnnouncementRecordDTO lastModifiedDate(Instant lastModifiedDate) {
+    public FormConfigDTO lastModifiedDate(Instant lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
+        return this;
+    }
+
+    public FormConfigDTO businessType(BusinessTypeDTO businessType) {
+        this.businessType = businessType;
+        return this;
+    }
+
+    public FormConfigDTO businessTypeId(Long businessTypeId) {
+        this.businessTypeId = businessTypeId;
         return this;
     }
 
@@ -125,14 +135,14 @@ public class AnnouncementRecordDTO extends AbstractAuditingEntity<Long, Announce
             return true;
         }
 
-        if (!(o instanceof AnnouncementRecordDTO announcementRecordDTO)) {
+        if (!(o instanceof FormConfigDTO formConfigDTO)) {
             return false;
         }
 
         if (this.id == null) {
             return false;
         }
-        return Objects.equals(this.id, announcementRecordDTO.id);
+        return Objects.equals(this.id, formConfigDTO.id);
     }
 
     @Override
@@ -143,16 +153,16 @@ public class AnnouncementRecordDTO extends AbstractAuditingEntity<Long, Announce
     // prettier-ignore
     @Override
     public String toString() {
-        return "AnnouncementRecordDTO{" +
+        return "FormConfigDTO{" +
             "id=" + getId() +
-            ", anntId=" + getAnntId() +
-            ", userId=" + getUserId() +
-            ", hasRead='" + getHasRead() + "'" +
-            ", readTime='" + getReadTime() + "'" +
+            ", formKey='" + getFormKey() + "'" +
+            ", formName='" + getFormName() + "'" +
+            ", formJson='" + getFormJson() + "'" +
             ", createdBy=" + getCreatedBy() +
             ", createdDate='" + getCreatedDate() + "'" +
             ", lastModifiedBy=" + getLastModifiedBy() +
             ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            ", businessType=" + getBusinessType() +
             "}";
     }
 }

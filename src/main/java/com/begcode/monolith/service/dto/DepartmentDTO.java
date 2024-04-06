@@ -6,9 +6,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
 
@@ -17,9 +16,8 @@ import lombok.ToString;
  * {@link com.begcode.monolith.domain.Department}的DTO。
  */
 @Schema(description = "部门")
-@Data
-@ToString
-@EqualsAndHashCode
+@Setter
+@Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class DepartmentDTO implements Serializable {
 
@@ -72,12 +70,6 @@ public class DepartmentDTO implements Serializable {
      */
     @Schema(description = "创建时间")
     private Instant createTime;
-
-    /**
-     * 下级部门
-     */
-    @Schema(description = "下级部门")
-    private List<DepartmentDTO> children = new ArrayList<>();
 
     /**
      * 角色列表
@@ -140,11 +132,6 @@ public class DepartmentDTO implements Serializable {
         return this;
     }
 
-    public DepartmentDTO children(List<DepartmentDTO> children) {
-        this.children = children;
-        return this;
-    }
-
     public DepartmentDTO authorities(List<AuthorityDTO> authorities) {
         this.authorities = authorities;
         return this;
@@ -155,6 +142,11 @@ public class DepartmentDTO implements Serializable {
         return this;
     }
 
+    public DepartmentDTO parentId(Long parentId) {
+        this.parentId = parentId;
+        return this;
+    }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -162,11 +154,11 @@ public class DepartmentDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DepartmentDTO)) {
+
+        if (!(o instanceof DepartmentDTO departmentDTO)) {
             return false;
         }
 
-        DepartmentDTO departmentDTO = (DepartmentDTO) o;
         if (this.id == null) {
             return false;
         }
@@ -191,7 +183,6 @@ public class DepartmentDTO implements Serializable {
             ", contact='" + getContact() + "'" +
             ", createUserId=" + getCreateUserId() +
             ", createTime='" + getCreateTime() + "'" +
-            ", children=" + getChildren() +
             ", authorities=" + getAuthorities() +
             ", parent=" + getParent() +
             "}";

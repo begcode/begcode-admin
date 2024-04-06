@@ -3,12 +3,9 @@ package com.begcode.monolith.service.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
 
@@ -17,9 +14,8 @@ import lombok.ToString;
  * {@link com.begcode.monolith.domain.ResourceCategory}的DTO。
  */
 @Schema(description = "资源分类")
-@Data
-@ToString
-@EqualsAndHashCode
+@Setter
+@Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ResourceCategoryDTO implements Serializable {
 
@@ -44,12 +40,6 @@ public class ResourceCategoryDTO implements Serializable {
      */
     @Schema(description = "排序")
     private Integer orderNumber;
-
-    /**
-     * 下级列表
-     */
-    @Schema(description = "下级列表")
-    private List<ResourceCategoryDTO> children = new ArrayList<>();
 
     /**
      * 上级
@@ -81,13 +71,13 @@ public class ResourceCategoryDTO implements Serializable {
         return this;
     }
 
-    public ResourceCategoryDTO children(List<ResourceCategoryDTO> children) {
-        this.children = children;
+    public ResourceCategoryDTO parent(ResourceCategoryDTO parent) {
+        this.parent = parent;
         return this;
     }
 
-    public ResourceCategoryDTO parent(ResourceCategoryDTO parent) {
-        this.parent = parent;
+    public ResourceCategoryDTO parentId(Long parentId) {
+        this.parentId = parentId;
         return this;
     }
 
@@ -98,11 +88,11 @@ public class ResourceCategoryDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ResourceCategoryDTO)) {
+
+        if (!(o instanceof ResourceCategoryDTO resourceCategoryDTO)) {
             return false;
         }
 
-        ResourceCategoryDTO resourceCategoryDTO = (ResourceCategoryDTO) o;
         if (this.id == null) {
             return false;
         }
@@ -122,7 +112,6 @@ public class ResourceCategoryDTO implements Serializable {
             ", title='" + getTitle() + "'" +
             ", code='" + getCode() + "'" +
             ", orderNumber=" + getOrderNumber() +
-            ", children=" + getChildren() +
             ", parent=" + getParent() +
             "}";
     }

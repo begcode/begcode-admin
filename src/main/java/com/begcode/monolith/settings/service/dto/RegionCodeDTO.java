@@ -3,12 +3,9 @@ package com.begcode.monolith.settings.service.dto;
 import com.begcode.monolith.domain.enumeration.RegionCodeLevel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
 
@@ -17,9 +14,8 @@ import lombok.ToString;
  * {@link com.begcode.monolith.settings.domain.RegionCode}的DTO。
  */
 @Schema(description = "行政区划码")
-@Data
-@ToString
-@EqualsAndHashCode
+@Setter
+@Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class RegionCodeDTO implements Serializable {
 
@@ -78,12 +74,6 @@ public class RegionCodeDTO implements Serializable {
      */
     @Schema(description = "纬度")
     private Double lat;
-
-    /**
-     * 子节点
-     */
-    @Schema(description = "子节点")
-    private List<RegionCodeDTO> children = new ArrayList<>();
 
     /**
      * 上级节点
@@ -145,13 +135,13 @@ public class RegionCodeDTO implements Serializable {
         return this;
     }
 
-    public RegionCodeDTO children(List<RegionCodeDTO> children) {
-        this.children = children;
+    public RegionCodeDTO parent(RegionCodeDTO parent) {
+        this.parent = parent;
         return this;
     }
 
-    public RegionCodeDTO parent(RegionCodeDTO parent) {
-        this.parent = parent;
+    public RegionCodeDTO parentId(Long parentId) {
+        this.parentId = parentId;
         return this;
     }
 
@@ -162,11 +152,11 @@ public class RegionCodeDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof RegionCodeDTO)) {
+
+        if (!(o instanceof RegionCodeDTO regionCodeDTO)) {
             return false;
         }
 
-        RegionCodeDTO regionCodeDTO = (RegionCodeDTO) o;
         if (this.id == null) {
             return false;
         }
@@ -192,7 +182,6 @@ public class RegionCodeDTO implements Serializable {
             ", level='" + getLevel() + "'" +
             ", lng=" + getLng() +
             ", lat=" + getLat() +
-            ", children=" + getChildren() +
             ", parent=" + getParent() +
             "}";
     }

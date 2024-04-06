@@ -5,9 +5,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
 
@@ -16,9 +15,8 @@ import lombok.ToString;
  * {@link com.begcode.monolith.domain.Authority}的DTO。
  */
 @Schema(description = "角色")
-@Data
-@ToString
-@EqualsAndHashCode
+@Setter
+@Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class AuthorityDTO implements Serializable {
 
@@ -53,12 +51,6 @@ public class AuthorityDTO implements Serializable {
      */
     @Schema(description = "展示")
     private Boolean display;
-
-    /**
-     * 子节点
-     */
-    @Schema(description = "子节点")
-    private List<AuthorityDTO> children = new ArrayList<>();
 
     /**
      * 菜单列表
@@ -112,11 +104,6 @@ public class AuthorityDTO implements Serializable {
         return this;
     }
 
-    public AuthorityDTO children(List<AuthorityDTO> children) {
-        this.children = children;
-        return this;
-    }
-
     public AuthorityDTO viewPermissions(List<ViewPermissionDTO> viewPermissions) {
         this.viewPermissions = viewPermissions;
         return this;
@@ -132,6 +119,11 @@ public class AuthorityDTO implements Serializable {
         return this;
     }
 
+    public AuthorityDTO parentId(Long parentId) {
+        this.parentId = parentId;
+        return this;
+    }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -139,11 +131,11 @@ public class AuthorityDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof AuthorityDTO)) {
+
+        if (!(o instanceof AuthorityDTO authorityDTO)) {
             return false;
         }
 
-        AuthorityDTO authorityDTO = (AuthorityDTO) o;
         if (this.id == null) {
             return false;
         }
@@ -165,7 +157,6 @@ public class AuthorityDTO implements Serializable {
             ", info='" + getInfo() + "'" +
             ", order=" + getOrder() +
             ", display='" + getDisplay() + "'" +
-            ", children=" + getChildren() +
             ", viewPermissions=" + getViewPermissions() +
             ", apiPermissions=" + getApiPermissions() +
             ", parent=" + getParent() +

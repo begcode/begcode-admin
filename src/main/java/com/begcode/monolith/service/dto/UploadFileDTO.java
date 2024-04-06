@@ -6,9 +6,8 @@ import jakarta.validation.constraints.*;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
@@ -18,9 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
  * {@link com.begcode.monolith.domain.UploadFile}的DTO。
  */
 @Schema(description = "上传文件")
-@Data
-@ToString
-@EqualsAndHashCode(callSuper = true)
+@Setter
+@Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
 
@@ -271,6 +269,11 @@ public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
         return this;
     }
 
+    public UploadFileDTO categoryId(Long categoryId) {
+        this.categoryId = categoryId;
+        return this;
+    }
+
     public MultipartFile getFile() {
         return file;
     }
@@ -286,11 +289,11 @@ public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof UploadFileDTO)) {
+
+        if (!(o instanceof UploadFileDTO uploadFileDTO)) {
             return false;
         }
 
-        UploadFileDTO uploadFileDTO = (UploadFileDTO) o;
         if (this.id == null) {
             return false;
         }

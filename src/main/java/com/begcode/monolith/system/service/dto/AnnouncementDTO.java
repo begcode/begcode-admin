@@ -12,9 +12,8 @@ import jakarta.validation.constraints.*;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
 
@@ -23,9 +22,8 @@ import lombok.ToString;
  * {@link com.begcode.monolith.system.domain.Announcement}的DTO。
  */
 @Schema(description = "系统通告")
-@Data
-@ToString
-@EqualsAndHashCode(callSuper = true)
+@Setter
+@Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class AnnouncementDTO extends AbstractAuditingEntity<Long, AnnouncementDTO> {
 
@@ -283,11 +281,11 @@ public class AnnouncementDTO extends AbstractAuditingEntity<Long, AnnouncementDT
         if (this == o) {
             return true;
         }
-        if (!(o instanceof AnnouncementDTO)) {
+
+        if (!(o instanceof AnnouncementDTO announcementDTO)) {
             return false;
         }
 
-        AnnouncementDTO announcementDTO = (AnnouncementDTO) o;
         if (this.id == null) {
             return false;
         }

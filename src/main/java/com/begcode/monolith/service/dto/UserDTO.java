@@ -7,9 +7,8 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
 
@@ -18,9 +17,8 @@ import lombok.ToString;
  * {@link com.begcode.monolith.domain.User}的DTO。
  */
 @Schema(description = "用户")
-@Data
-@ToString
-@EqualsAndHashCode(callSuper = true)
+@Setter
+@Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class UserDTO extends AbstractAuditingEntity<Long, UserDTO> {
 
@@ -68,6 +66,12 @@ public class UserDTO extends AbstractAuditingEntity<Long, UserDTO> {
      */
     @Schema(description = "出生日期")
     private ZonedDateTime birthday;
+
+    /**
+     * 激活状态
+     */
+    @Schema(description = "激活状态")
+    private Boolean activated;
 
     /**
      * 语言Key
@@ -140,6 +144,11 @@ public class UserDTO extends AbstractAuditingEntity<Long, UserDTO> {
         return this;
     }
 
+    public UserDTO activated(Boolean activated) {
+        this.activated = activated;
+        return this;
+    }
+
     public UserDTO langKey(String langKey) {
         this.langKey = langKey;
         return this;
@@ -150,6 +159,31 @@ public class UserDTO extends AbstractAuditingEntity<Long, UserDTO> {
         return this;
     }
 
+    public UserDTO department(DepartmentDTO department) {
+        this.department = department;
+        return this;
+    }
+
+    public UserDTO departmentId(Long departmentId) {
+        this.departmentId = departmentId;
+        return this;
+    }
+
+    public UserDTO position(PositionDTO position) {
+        this.position = position;
+        return this;
+    }
+
+    public UserDTO positionId(Long positionId) {
+        this.positionId = positionId;
+        return this;
+    }
+
+    public UserDTO authorities(List<AuthorityDTO> authorities) {
+        this.authorities = authorities;
+        return this;
+    }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -157,11 +191,11 @@ public class UserDTO extends AbstractAuditingEntity<Long, UserDTO> {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof UserDTO)) {
+
+        if (!(o instanceof UserDTO userDTO)) {
             return false;
         }
 
-        UserDTO userDTO = (UserDTO) o;
         if (this.id == null) {
             return false;
         }
@@ -184,6 +218,7 @@ public class UserDTO extends AbstractAuditingEntity<Long, UserDTO> {
             ", email='" + getEmail() + "'" +
             ", mobile='" + getMobile() + "'" +
             ", birthday='" + getBirthday() + "'" +
+            ", activated='" + getActivated() + "'" +
             ", langKey='" + getLangKey() + "'" +
             ", imageUrl='" + getImageUrl() + "'" +
             "}";

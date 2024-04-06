@@ -4,9 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
 
@@ -15,9 +14,8 @@ import lombok.ToString;
  * {@link com.begcode.monolith.domain.Position}的DTO。
  */
 @Schema(description = "岗位\n")
-@Data
-@ToString
-@EqualsAndHashCode
+@Setter
+@Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class PositionDTO implements Serializable {
 
@@ -86,11 +84,11 @@ public class PositionDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof PositionDTO)) {
+
+        if (!(o instanceof PositionDTO positionDTO)) {
             return false;
         }
 
-        PositionDTO positionDTO = (PositionDTO) o;
         if (this.id == null) {
             return false;
         }
