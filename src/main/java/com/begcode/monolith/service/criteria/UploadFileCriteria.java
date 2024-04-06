@@ -4,6 +4,7 @@ import com.begcode.monolith.domain.ResourceCategory;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
@@ -20,18 +21,6 @@ import tech.jhipster.service.filter.*;
 @ParameterObject
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class UploadFileCriteria implements Serializable, Criteria {
-
-    @BindQuery(ignore = true)
-    private String jhiCommonSearchKeywords;
-
-    @BindQuery(ignore = true)
-    private Boolean useOr = false;
-
-    @BindQuery(ignore = true)
-    private UploadFileCriteria and;
-
-    @BindQuery(ignore = true)
-    private UploadFileCriteria or;
 
     private static final long serialVersionUID = 1L;
 
@@ -98,47 +87,495 @@ public class UploadFileCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.last_modified_date")
     private InstantFilter lastModifiedDate;
 
-    @BindQuery(column = "self.category_id")
+    @BindQuery(entity = ResourceCategory.class, column = "id", condition = "this.category_id=id")
     private LongFilter categoryId;
 
     @BindQuery(entity = ResourceCategory.class, column = "title", condition = "this.category_id=id")
     private StringFilter categoryTitle;
 
     @BindQuery(ignore = true)
+    private String jhiCommonSearchKeywords;
+
+    @BindQuery(ignore = true)
+    private Boolean useOr = false;
+
+    @BindQuery(ignore = true)
+    private UploadFileCriteria and;
+
+    @BindQuery(ignore = true)
+    private UploadFileCriteria or;
+
     private Boolean distinct;
 
     public UploadFileCriteria() {}
 
     public UploadFileCriteria(UploadFileCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.url = other.url == null ? null : other.url.copy();
-        this.fullName = other.fullName == null ? null : other.fullName.copy();
-        this.name = other.name == null ? null : other.name.copy();
-        this.thumb = other.thumb == null ? null : other.thumb.copy();
-        this.ext = other.ext == null ? null : other.ext.copy();
-        this.type = other.type == null ? null : other.type.copy();
-        this.path = other.path == null ? null : other.path.copy();
-        this.folder = other.folder == null ? null : other.folder.copy();
-        this.ownerEntityName = other.ownerEntityName == null ? null : other.ownerEntityName.copy();
-        this.ownerEntityId = other.ownerEntityId == null ? null : other.ownerEntityId.copy();
-        this.businessTitle = other.businessTitle == null ? null : other.businessTitle.copy();
-        this.businessDesc = other.businessDesc == null ? null : other.businessDesc.copy();
-        this.businessStatus = other.businessStatus == null ? null : other.businessStatus.copy();
-        this.createAt = other.createAt == null ? null : other.createAt.copy();
-        this.fileSize = other.fileSize == null ? null : other.fileSize.copy();
-        this.referenceCount = other.referenceCount == null ? null : other.referenceCount.copy();
-        this.createdBy = other.createdBy == null ? null : other.createdBy.copy();
-        this.createdDate = other.createdDate == null ? null : other.createdDate.copy();
-        this.lastModifiedBy = other.lastModifiedBy == null ? null : other.lastModifiedBy.copy();
-        this.lastModifiedDate = other.lastModifiedDate == null ? null : other.lastModifiedDate.copy();
-        this.categoryId = other.categoryId == null ? null : other.categoryId.copy();
-        this.categoryTitle = other.categoryTitle == null ? null : other.categoryTitle.copy();
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.url = other.optionalUrl().map(StringFilter::copy).orElse(null);
+        this.fullName = other.optionalFullName().map(StringFilter::copy).orElse(null);
+        this.name = other.optionalName().map(StringFilter::copy).orElse(null);
+        this.thumb = other.optionalThumb().map(StringFilter::copy).orElse(null);
+        this.ext = other.optionalExt().map(StringFilter::copy).orElse(null);
+        this.type = other.optionalType().map(StringFilter::copy).orElse(null);
+        this.path = other.optionalPath().map(StringFilter::copy).orElse(null);
+        this.folder = other.optionalFolder().map(StringFilter::copy).orElse(null);
+        this.ownerEntityName = other.optionalOwnerEntityName().map(StringFilter::copy).orElse(null);
+        this.ownerEntityId = other.optionalOwnerEntityId().map(LongFilter::copy).orElse(null);
+        this.businessTitle = other.optionalBusinessTitle().map(StringFilter::copy).orElse(null);
+        this.businessDesc = other.optionalBusinessDesc().map(StringFilter::copy).orElse(null);
+        this.businessStatus = other.optionalBusinessStatus().map(StringFilter::copy).orElse(null);
+        this.createAt = other.optionalCreateAt().map(ZonedDateTimeFilter::copy).orElse(null);
+        this.fileSize = other.optionalFileSize().map(LongFilter::copy).orElse(null);
+        this.referenceCount = other.optionalReferenceCount().map(LongFilter::copy).orElse(null);
+        this.createdBy = other.optionalCreatedBy().map(LongFilter::copy).orElse(null);
+        this.createdDate = other.optionalCreatedDate().map(InstantFilter::copy).orElse(null);
+        this.lastModifiedBy = other.optionalLastModifiedBy().map(LongFilter::copy).orElse(null);
+        this.lastModifiedDate = other.optionalLastModifiedDate().map(InstantFilter::copy).orElse(null);
+        this.categoryId = other.optionalCategoryId().map(LongFilter::copy).orElse(null);
+        this.categoryTitle = other.optionalCategoryTitle().map(StringFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
     public UploadFileCriteria copy() {
         return new UploadFileCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public StringFilter getUrl() {
+        return url;
+    }
+
+    public Optional<StringFilter> optionalUrl() {
+        return Optional.ofNullable(url);
+    }
+
+    public StringFilter url() {
+        if (url == null) {
+            setUrl(new StringFilter());
+        }
+        return url;
+    }
+
+    public void setUrl(StringFilter url) {
+        this.url = url;
+    }
+
+    public StringFilter getFullName() {
+        return fullName;
+    }
+
+    public Optional<StringFilter> optionalFullName() {
+        return Optional.ofNullable(fullName);
+    }
+
+    public StringFilter fullName() {
+        if (fullName == null) {
+            setFullName(new StringFilter());
+        }
+        return fullName;
+    }
+
+    public void setFullName(StringFilter fullName) {
+        this.fullName = fullName;
+    }
+
+    public StringFilter getName() {
+        return name;
+    }
+
+    public Optional<StringFilter> optionalName() {
+        return Optional.ofNullable(name);
+    }
+
+    public StringFilter name() {
+        if (name == null) {
+            setName(new StringFilter());
+        }
+        return name;
+    }
+
+    public void setName(StringFilter name) {
+        this.name = name;
+    }
+
+    public StringFilter getThumb() {
+        return thumb;
+    }
+
+    public Optional<StringFilter> optionalThumb() {
+        return Optional.ofNullable(thumb);
+    }
+
+    public StringFilter thumb() {
+        if (thumb == null) {
+            setThumb(new StringFilter());
+        }
+        return thumb;
+    }
+
+    public void setThumb(StringFilter thumb) {
+        this.thumb = thumb;
+    }
+
+    public StringFilter getExt() {
+        return ext;
+    }
+
+    public Optional<StringFilter> optionalExt() {
+        return Optional.ofNullable(ext);
+    }
+
+    public StringFilter ext() {
+        if (ext == null) {
+            setExt(new StringFilter());
+        }
+        return ext;
+    }
+
+    public void setExt(StringFilter ext) {
+        this.ext = ext;
+    }
+
+    public StringFilter getType() {
+        return type;
+    }
+
+    public Optional<StringFilter> optionalType() {
+        return Optional.ofNullable(type);
+    }
+
+    public StringFilter type() {
+        if (type == null) {
+            setType(new StringFilter());
+        }
+        return type;
+    }
+
+    public void setType(StringFilter type) {
+        this.type = type;
+    }
+
+    public StringFilter getPath() {
+        return path;
+    }
+
+    public Optional<StringFilter> optionalPath() {
+        return Optional.ofNullable(path);
+    }
+
+    public StringFilter path() {
+        if (path == null) {
+            setPath(new StringFilter());
+        }
+        return path;
+    }
+
+    public void setPath(StringFilter path) {
+        this.path = path;
+    }
+
+    public StringFilter getFolder() {
+        return folder;
+    }
+
+    public Optional<StringFilter> optionalFolder() {
+        return Optional.ofNullable(folder);
+    }
+
+    public StringFilter folder() {
+        if (folder == null) {
+            setFolder(new StringFilter());
+        }
+        return folder;
+    }
+
+    public void setFolder(StringFilter folder) {
+        this.folder = folder;
+    }
+
+    public StringFilter getOwnerEntityName() {
+        return ownerEntityName;
+    }
+
+    public Optional<StringFilter> optionalOwnerEntityName() {
+        return Optional.ofNullable(ownerEntityName);
+    }
+
+    public StringFilter ownerEntityName() {
+        if (ownerEntityName == null) {
+            setOwnerEntityName(new StringFilter());
+        }
+        return ownerEntityName;
+    }
+
+    public void setOwnerEntityName(StringFilter ownerEntityName) {
+        this.ownerEntityName = ownerEntityName;
+    }
+
+    public LongFilter getOwnerEntityId() {
+        return ownerEntityId;
+    }
+
+    public Optional<LongFilter> optionalOwnerEntityId() {
+        return Optional.ofNullable(ownerEntityId);
+    }
+
+    public LongFilter ownerEntityId() {
+        if (ownerEntityId == null) {
+            setOwnerEntityId(new LongFilter());
+        }
+        return ownerEntityId;
+    }
+
+    public void setOwnerEntityId(LongFilter ownerEntityId) {
+        this.ownerEntityId = ownerEntityId;
+    }
+
+    public StringFilter getBusinessTitle() {
+        return businessTitle;
+    }
+
+    public Optional<StringFilter> optionalBusinessTitle() {
+        return Optional.ofNullable(businessTitle);
+    }
+
+    public StringFilter businessTitle() {
+        if (businessTitle == null) {
+            setBusinessTitle(new StringFilter());
+        }
+        return businessTitle;
+    }
+
+    public void setBusinessTitle(StringFilter businessTitle) {
+        this.businessTitle = businessTitle;
+    }
+
+    public StringFilter getBusinessDesc() {
+        return businessDesc;
+    }
+
+    public Optional<StringFilter> optionalBusinessDesc() {
+        return Optional.ofNullable(businessDesc);
+    }
+
+    public StringFilter businessDesc() {
+        if (businessDesc == null) {
+            setBusinessDesc(new StringFilter());
+        }
+        return businessDesc;
+    }
+
+    public void setBusinessDesc(StringFilter businessDesc) {
+        this.businessDesc = businessDesc;
+    }
+
+    public StringFilter getBusinessStatus() {
+        return businessStatus;
+    }
+
+    public Optional<StringFilter> optionalBusinessStatus() {
+        return Optional.ofNullable(businessStatus);
+    }
+
+    public StringFilter businessStatus() {
+        if (businessStatus == null) {
+            setBusinessStatus(new StringFilter());
+        }
+        return businessStatus;
+    }
+
+    public void setBusinessStatus(StringFilter businessStatus) {
+        this.businessStatus = businessStatus;
+    }
+
+    public ZonedDateTimeFilter getCreateAt() {
+        return createAt;
+    }
+
+    public Optional<ZonedDateTimeFilter> optionalCreateAt() {
+        return Optional.ofNullable(createAt);
+    }
+
+    public ZonedDateTimeFilter createAt() {
+        if (createAt == null) {
+            setCreateAt(new ZonedDateTimeFilter());
+        }
+        return createAt;
+    }
+
+    public void setCreateAt(ZonedDateTimeFilter createAt) {
+        this.createAt = createAt;
+    }
+
+    public LongFilter getFileSize() {
+        return fileSize;
+    }
+
+    public Optional<LongFilter> optionalFileSize() {
+        return Optional.ofNullable(fileSize);
+    }
+
+    public LongFilter fileSize() {
+        if (fileSize == null) {
+            setFileSize(new LongFilter());
+        }
+        return fileSize;
+    }
+
+    public void setFileSize(LongFilter fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public LongFilter getReferenceCount() {
+        return referenceCount;
+    }
+
+    public Optional<LongFilter> optionalReferenceCount() {
+        return Optional.ofNullable(referenceCount);
+    }
+
+    public LongFilter referenceCount() {
+        if (referenceCount == null) {
+            setReferenceCount(new LongFilter());
+        }
+        return referenceCount;
+    }
+
+    public void setReferenceCount(LongFilter referenceCount) {
+        this.referenceCount = referenceCount;
+    }
+
+    public LongFilter getCreatedBy() {
+        return createdBy;
+    }
+
+    public Optional<LongFilter> optionalCreatedBy() {
+        return Optional.ofNullable(createdBy);
+    }
+
+    public LongFilter createdBy() {
+        if (createdBy == null) {
+            setCreatedBy(new LongFilter());
+        }
+        return createdBy;
+    }
+
+    public void setCreatedBy(LongFilter createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public InstantFilter getCreatedDate() {
+        return createdDate;
+    }
+
+    public Optional<InstantFilter> optionalCreatedDate() {
+        return Optional.ofNullable(createdDate);
+    }
+
+    public InstantFilter createdDate() {
+        if (createdDate == null) {
+            setCreatedDate(new InstantFilter());
+        }
+        return createdDate;
+    }
+
+    public void setCreatedDate(InstantFilter createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LongFilter getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public Optional<LongFilter> optionalLastModifiedBy() {
+        return Optional.ofNullable(lastModifiedBy);
+    }
+
+    public LongFilter lastModifiedBy() {
+        if (lastModifiedBy == null) {
+            setLastModifiedBy(new LongFilter());
+        }
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(LongFilter lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public InstantFilter getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public Optional<InstantFilter> optionalLastModifiedDate() {
+        return Optional.ofNullable(lastModifiedDate);
+    }
+
+    public InstantFilter lastModifiedDate() {
+        if (lastModifiedDate == null) {
+            setLastModifiedDate(new InstantFilter());
+        }
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(InstantFilter lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public LongFilter getCategoryId() {
+        return categoryId;
+    }
+
+    public Optional<LongFilter> optionalCategoryId() {
+        return Optional.ofNullable(categoryId);
+    }
+
+    public LongFilter categoryId() {
+        if (categoryId == null) {
+            setCategoryId(new LongFilter());
+        }
+        return categoryId;
+    }
+
+    public void setCategoryId(LongFilter categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public StringFilter getCategoryTitle() {
+        return categoryTitle;
+    }
+
+    public Optional<StringFilter> optionalCategoryTitle() {
+        return Optional.ofNullable(categoryTitle);
+    }
+
+    public StringFilter categoryTitle() {
+        if (categoryTitle == null) {
+            setCategoryTitle(new StringFilter());
+        }
+        return categoryTitle;
+    }
+
+    public void setCategoryTitle(StringFilter categoryTitle) {
+        this.categoryTitle = categoryTitle;
     }
 
     public void setAnd(UploadFileCriteria and) {
@@ -171,351 +608,6 @@ public class UploadFileCriteria implements Serializable, Criteria {
         return or;
     }
 
-    public LongFilter getId() {
-        return id;
-    }
-
-    public LongFilter id() {
-        if (id == null) {
-            id = new LongFilter();
-        }
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
-    }
-
-    public StringFilter getUrl() {
-        return url;
-    }
-
-    public StringFilter url() {
-        if (url == null) {
-            url = new StringFilter();
-        }
-        return url;
-    }
-
-    public void setUrl(StringFilter url) {
-        this.url = url;
-    }
-
-    public StringFilter getFullName() {
-        return fullName;
-    }
-
-    public StringFilter fullName() {
-        if (fullName == null) {
-            fullName = new StringFilter();
-        }
-        return fullName;
-    }
-
-    public void setFullName(StringFilter fullName) {
-        this.fullName = fullName;
-    }
-
-    public StringFilter getName() {
-        return name;
-    }
-
-    public StringFilter name() {
-        if (name == null) {
-            name = new StringFilter();
-        }
-        return name;
-    }
-
-    public void setName(StringFilter name) {
-        this.name = name;
-    }
-
-    public StringFilter getThumb() {
-        return thumb;
-    }
-
-    public StringFilter thumb() {
-        if (thumb == null) {
-            thumb = new StringFilter();
-        }
-        return thumb;
-    }
-
-    public void setThumb(StringFilter thumb) {
-        this.thumb = thumb;
-    }
-
-    public StringFilter getExt() {
-        return ext;
-    }
-
-    public StringFilter ext() {
-        if (ext == null) {
-            ext = new StringFilter();
-        }
-        return ext;
-    }
-
-    public void setExt(StringFilter ext) {
-        this.ext = ext;
-    }
-
-    public StringFilter getType() {
-        return type;
-    }
-
-    public StringFilter type() {
-        if (type == null) {
-            type = new StringFilter();
-        }
-        return type;
-    }
-
-    public void setType(StringFilter type) {
-        this.type = type;
-    }
-
-    public StringFilter getPath() {
-        return path;
-    }
-
-    public StringFilter path() {
-        if (path == null) {
-            path = new StringFilter();
-        }
-        return path;
-    }
-
-    public void setPath(StringFilter path) {
-        this.path = path;
-    }
-
-    public StringFilter getFolder() {
-        return folder;
-    }
-
-    public StringFilter folder() {
-        if (folder == null) {
-            folder = new StringFilter();
-        }
-        return folder;
-    }
-
-    public void setFolder(StringFilter folder) {
-        this.folder = folder;
-    }
-
-    public StringFilter getOwnerEntityName() {
-        return ownerEntityName;
-    }
-
-    public StringFilter ownerEntityName() {
-        if (ownerEntityName == null) {
-            ownerEntityName = new StringFilter();
-        }
-        return ownerEntityName;
-    }
-
-    public void setOwnerEntityName(StringFilter ownerEntityName) {
-        this.ownerEntityName = ownerEntityName;
-    }
-
-    public LongFilter getOwnerEntityId() {
-        return ownerEntityId;
-    }
-
-    public LongFilter ownerEntityId() {
-        if (ownerEntityId == null) {
-            ownerEntityId = new LongFilter();
-        }
-        return ownerEntityId;
-    }
-
-    public void setOwnerEntityId(LongFilter ownerEntityId) {
-        this.ownerEntityId = ownerEntityId;
-    }
-
-    public StringFilter getBusinessTitle() {
-        return businessTitle;
-    }
-
-    public StringFilter businessTitle() {
-        if (businessTitle == null) {
-            businessTitle = new StringFilter();
-        }
-        return businessTitle;
-    }
-
-    public void setBusinessTitle(StringFilter businessTitle) {
-        this.businessTitle = businessTitle;
-    }
-
-    public StringFilter getBusinessDesc() {
-        return businessDesc;
-    }
-
-    public StringFilter businessDesc() {
-        if (businessDesc == null) {
-            businessDesc = new StringFilter();
-        }
-        return businessDesc;
-    }
-
-    public void setBusinessDesc(StringFilter businessDesc) {
-        this.businessDesc = businessDesc;
-    }
-
-    public StringFilter getBusinessStatus() {
-        return businessStatus;
-    }
-
-    public StringFilter businessStatus() {
-        if (businessStatus == null) {
-            businessStatus = new StringFilter();
-        }
-        return businessStatus;
-    }
-
-    public void setBusinessStatus(StringFilter businessStatus) {
-        this.businessStatus = businessStatus;
-    }
-
-    public ZonedDateTimeFilter getCreateAt() {
-        return createAt;
-    }
-
-    public ZonedDateTimeFilter createAt() {
-        if (createAt == null) {
-            createAt = new ZonedDateTimeFilter();
-        }
-        return createAt;
-    }
-
-    public void setCreateAt(ZonedDateTimeFilter createAt) {
-        this.createAt = createAt;
-    }
-
-    public LongFilter getFileSize() {
-        return fileSize;
-    }
-
-    public LongFilter fileSize() {
-        if (fileSize == null) {
-            fileSize = new LongFilter();
-        }
-        return fileSize;
-    }
-
-    public void setFileSize(LongFilter fileSize) {
-        this.fileSize = fileSize;
-    }
-
-    public LongFilter getReferenceCount() {
-        return referenceCount;
-    }
-
-    public LongFilter referenceCount() {
-        if (referenceCount == null) {
-            referenceCount = new LongFilter();
-        }
-        return referenceCount;
-    }
-
-    public void setReferenceCount(LongFilter referenceCount) {
-        this.referenceCount = referenceCount;
-    }
-
-    public LongFilter getCreatedBy() {
-        return createdBy;
-    }
-
-    public LongFilter createdBy() {
-        if (createdBy == null) {
-            createdBy = new LongFilter();
-        }
-        return createdBy;
-    }
-
-    public void setCreatedBy(LongFilter createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public InstantFilter getCreatedDate() {
-        return createdDate;
-    }
-
-    public InstantFilter createdDate() {
-        if (createdDate == null) {
-            createdDate = new InstantFilter();
-        }
-        return createdDate;
-    }
-
-    public void setCreatedDate(InstantFilter createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public LongFilter getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public LongFilter lastModifiedBy() {
-        if (lastModifiedBy == null) {
-            lastModifiedBy = new LongFilter();
-        }
-        return lastModifiedBy;
-    }
-
-    public void setLastModifiedBy(LongFilter lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public InstantFilter getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public InstantFilter lastModifiedDate() {
-        if (lastModifiedDate == null) {
-            lastModifiedDate = new InstantFilter();
-        }
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(InstantFilter lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    public LongFilter getCategoryId() {
-        return categoryId;
-    }
-
-    public LongFilter categoryId() {
-        if (categoryId == null) {
-            categoryId = new LongFilter();
-        }
-        return categoryId;
-    }
-
-    public void setCategoryId(LongFilter categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public StringFilter getCategoryTitle() {
-        return categoryTitle;
-    }
-
-    public StringFilter categoryTitle() {
-        if (categoryTitle == null) {
-            categoryTitle = new StringFilter();
-        }
-        return categoryTitle;
-    }
-
-    public void setCategoryTitle(StringFilter categoryTitle) {
-        this.categoryTitle = categoryTitle;
-    }
-
     public String getJhiCommonSearchKeywords() {
         return jhiCommonSearchKeywords;
     }
@@ -533,6 +625,17 @@ public class UploadFileCriteria implements Serializable, Criteria {
     }
 
     public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
         return distinct;
     }
 
@@ -572,7 +675,6 @@ public class UploadFileCriteria implements Serializable, Criteria {
             Objects.equals(lastModifiedBy, that.lastModifiedBy) &&
             Objects.equals(lastModifiedDate, that.lastModifiedDate) &&
             Objects.equals(categoryId, that.categoryId) &&
-            Objects.equals(categoryTitle, that.categoryTitle) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -602,7 +704,6 @@ public class UploadFileCriteria implements Serializable, Criteria {
             lastModifiedBy,
             lastModifiedDate,
             categoryId,
-            categoryTitle,
             distinct
         );
     }
@@ -611,34 +712,34 @@ public class UploadFileCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "UploadFileCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (url != null ? "url=" + url + ", " : "") +
-            (fullName != null ? "fullName=" + fullName + ", " : "") +
-            (name != null ? "name=" + name + ", " : "") +
-            (thumb != null ? "thumb=" + thumb + ", " : "") +
-            (ext != null ? "ext=" + ext + ", " : "") +
-            (type != null ? "type=" + type + ", " : "") +
-            (path != null ? "path=" + path + ", " : "") +
-            (folder != null ? "folder=" + folder + ", " : "") +
-            (ownerEntityName != null ? "ownerEntityName=" + ownerEntityName + ", " : "") +
-            (ownerEntityId != null ? "ownerEntityId=" + ownerEntityId + ", " : "") +
-            (businessTitle != null ? "businessTitle=" + businessTitle + ", " : "") +
-            (businessDesc != null ? "businessDesc=" + businessDesc + ", " : "") +
-            (businessStatus != null ? "businessStatus=" + businessStatus + ", " : "") +
-            (createAt != null ? "createAt=" + createAt + ", " : "") +
-            (fileSize != null ? "fileSize=" + fileSize + ", " : "") +
-            (referenceCount != null ? "referenceCount=" + referenceCount + ", " : "") +
-            (createdBy != null ? "createdBy=" + createdBy + ", " : "") +
-            (createdDate != null ? "createdDate=" + createdDate + ", " : "") +
-            (lastModifiedBy != null ? "lastModifiedBy=" + lastModifiedBy + ", " : "") +
-            (lastModifiedDate != null ? "lastModifiedDate=" + lastModifiedDate + ", " : "") +
-            (categoryId != null ? "categoryId=" + categoryId + ", " : "") +
-            (categoryTitle != null ? "categoryTitle=" + categoryTitle + ", " : "") +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalUrl().map(f -> "url=" + f + ", ").orElse("") +
+            optionalFullName().map(f -> "fullName=" + f + ", ").orElse("") +
+            optionalName().map(f -> "name=" + f + ", ").orElse("") +
+            optionalThumb().map(f -> "thumb=" + f + ", ").orElse("") +
+            optionalExt().map(f -> "ext=" + f + ", ").orElse("") +
+            optionalType().map(f -> "type=" + f + ", ").orElse("") +
+            optionalPath().map(f -> "path=" + f + ", ").orElse("") +
+            optionalFolder().map(f -> "folder=" + f + ", ").orElse("") +
+            optionalOwnerEntityName().map(f -> "ownerEntityName=" + f + ", ").orElse("") +
+            optionalOwnerEntityId().map(f -> "ownerEntityId=" + f + ", ").orElse("") +
+            optionalBusinessTitle().map(f -> "businessTitle=" + f + ", ").orElse("") +
+            optionalBusinessDesc().map(f -> "businessDesc=" + f + ", ").orElse("") +
+            optionalBusinessStatus().map(f -> "businessStatus=" + f + ", ").orElse("") +
+            optionalCreateAt().map(f -> "createAt=" + f + ", ").orElse("") +
+            optionalFileSize().map(f -> "fileSize=" + f + ", ").orElse("") +
+            optionalReferenceCount().map(f -> "referenceCount=" + f + ", ").orElse("") +
+            optionalCreatedBy().map(f -> "createdBy=" + f + ", ").orElse("") +
+            optionalCreatedDate().map(f -> "createdDate=" + f + ", ").orElse("") +
+            optionalLastModifiedBy().map(f -> "lastModifiedBy=" + f + ", ").orElse("") +
+            optionalLastModifiedDate().map(f -> "lastModifiedDate=" + f + ", ").orElse("") +
+            optionalCategoryId().map(f -> "categoryId=" + f + ", ").orElse("") +
+            optionalCategoryTitle().map(f -> "categoryTitle=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +
             (or != null ? "or=" + or + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
     }
 }

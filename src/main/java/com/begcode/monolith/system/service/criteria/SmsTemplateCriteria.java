@@ -6,6 +6,7 @@ import com.begcode.monolith.system.domain.SmsSupplier;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
@@ -23,36 +24,12 @@ import tech.jhipster.service.filter.*;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class SmsTemplateCriteria implements Serializable, Criteria {
 
-    @BindQuery(ignore = true)
-    private String jhiCommonSearchKeywords;
-
-    @BindQuery(ignore = true)
-    private Boolean useOr = false;
-
-    @BindQuery(ignore = true)
-    private SmsTemplateCriteria and;
-
-    @BindQuery(ignore = true)
-    private SmsTemplateCriteria or;
-
     /**
      * Class for filtering MessageSendType
      */
     public static class MessageSendTypeFilter extends Filter<MessageSendType> {
 
         public MessageSendTypeFilter() {}
-
-        public MessageSendTypeFilter(String value) {
-            MessageSendType enumValue = MessageSendType.getByValue(value);
-            if (enumValue != null) {
-                setEquals(enumValue);
-            } else {
-                enumValue = MessageSendType.getByDesc(value);
-                if (enumValue != null) {
-                    setEquals(enumValue);
-                }
-            }
-        }
 
         public MessageSendTypeFilter(MessageSendTypeFilter filter) {
             super(filter);
@@ -70,18 +47,6 @@ public class SmsTemplateCriteria implements Serializable, Criteria {
     public static class SmsTemplateTypeFilter extends Filter<SmsTemplateType> {
 
         public SmsTemplateTypeFilter() {}
-
-        public SmsTemplateTypeFilter(String value) {
-            SmsTemplateType enumValue = SmsTemplateType.getByValue(value);
-            if (enumValue != null) {
-                setEquals(enumValue);
-            } else {
-                enumValue = SmsTemplateType.getByDesc(value);
-                if (enumValue != null) {
-                    setEquals(enumValue);
-                }
-            }
-        }
 
         public SmsTemplateTypeFilter(SmsTemplateTypeFilter filter) {
             super(filter);
@@ -134,39 +99,335 @@ public class SmsTemplateCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.last_modified_date")
     private InstantFilter lastModifiedDate;
 
-    @BindQuery(column = "self.supplier_id")
+    @BindQuery(entity = SmsSupplier.class, column = "id", condition = "this.supplier_id=id")
     private LongFilter supplierId;
 
     @BindQuery(entity = SmsSupplier.class, column = "sign_name", condition = "this.supplier_id=id")
     private StringFilter supplierSignName;
 
     @BindQuery(ignore = true)
+    private String jhiCommonSearchKeywords;
+
+    @BindQuery(ignore = true)
+    private Boolean useOr = false;
+
+    @BindQuery(ignore = true)
+    private SmsTemplateCriteria and;
+
+    @BindQuery(ignore = true)
+    private SmsTemplateCriteria or;
+
     private Boolean distinct;
 
     public SmsTemplateCriteria() {}
 
     public SmsTemplateCriteria(SmsTemplateCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.name = other.name == null ? null : other.name.copy();
-        this.code = other.code == null ? null : other.code.copy();
-        this.sendType = other.sendType == null ? null : other.sendType.copy();
-        this.content = other.content == null ? null : other.content.copy();
-        this.testJson = other.testJson == null ? null : other.testJson.copy();
-        this.type = other.type == null ? null : other.type.copy();
-        this.remark = other.remark == null ? null : other.remark.copy();
-        this.enabled = other.enabled == null ? null : other.enabled.copy();
-        this.createdBy = other.createdBy == null ? null : other.createdBy.copy();
-        this.createdDate = other.createdDate == null ? null : other.createdDate.copy();
-        this.lastModifiedBy = other.lastModifiedBy == null ? null : other.lastModifiedBy.copy();
-        this.lastModifiedDate = other.lastModifiedDate == null ? null : other.lastModifiedDate.copy();
-        this.supplierId = other.supplierId == null ? null : other.supplierId.copy();
-        this.supplierSignName = other.supplierSignName == null ? null : other.supplierSignName.copy();
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.name = other.optionalName().map(StringFilter::copy).orElse(null);
+        this.code = other.optionalCode().map(StringFilter::copy).orElse(null);
+        this.sendType = other.optionalSendType().map(MessageSendTypeFilter::copy).orElse(null);
+        this.content = other.optionalContent().map(StringFilter::copy).orElse(null);
+        this.testJson = other.optionalTestJson().map(StringFilter::copy).orElse(null);
+        this.type = other.optionalType().map(SmsTemplateTypeFilter::copy).orElse(null);
+        this.remark = other.optionalRemark().map(StringFilter::copy).orElse(null);
+        this.enabled = other.optionalEnabled().map(BooleanFilter::copy).orElse(null);
+        this.createdBy = other.optionalCreatedBy().map(LongFilter::copy).orElse(null);
+        this.createdDate = other.optionalCreatedDate().map(InstantFilter::copy).orElse(null);
+        this.lastModifiedBy = other.optionalLastModifiedBy().map(LongFilter::copy).orElse(null);
+        this.lastModifiedDate = other.optionalLastModifiedDate().map(InstantFilter::copy).orElse(null);
+        this.supplierId = other.optionalSupplierId().map(LongFilter::copy).orElse(null);
+        this.supplierSignName = other.optionalSupplierSignName().map(StringFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
     public SmsTemplateCriteria copy() {
         return new SmsTemplateCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public StringFilter getName() {
+        return name;
+    }
+
+    public Optional<StringFilter> optionalName() {
+        return Optional.ofNullable(name);
+    }
+
+    public StringFilter name() {
+        if (name == null) {
+            setName(new StringFilter());
+        }
+        return name;
+    }
+
+    public void setName(StringFilter name) {
+        this.name = name;
+    }
+
+    public StringFilter getCode() {
+        return code;
+    }
+
+    public Optional<StringFilter> optionalCode() {
+        return Optional.ofNullable(code);
+    }
+
+    public StringFilter code() {
+        if (code == null) {
+            setCode(new StringFilter());
+        }
+        return code;
+    }
+
+    public void setCode(StringFilter code) {
+        this.code = code;
+    }
+
+    public MessageSendTypeFilter getSendType() {
+        return sendType;
+    }
+
+    public Optional<MessageSendTypeFilter> optionalSendType() {
+        return Optional.ofNullable(sendType);
+    }
+
+    public MessageSendTypeFilter sendType() {
+        if (sendType == null) {
+            setSendType(new MessageSendTypeFilter());
+        }
+        return sendType;
+    }
+
+    public void setSendType(MessageSendTypeFilter sendType) {
+        this.sendType = sendType;
+    }
+
+    public StringFilter getContent() {
+        return content;
+    }
+
+    public Optional<StringFilter> optionalContent() {
+        return Optional.ofNullable(content);
+    }
+
+    public StringFilter content() {
+        if (content == null) {
+            setContent(new StringFilter());
+        }
+        return content;
+    }
+
+    public void setContent(StringFilter content) {
+        this.content = content;
+    }
+
+    public StringFilter getTestJson() {
+        return testJson;
+    }
+
+    public Optional<StringFilter> optionalTestJson() {
+        return Optional.ofNullable(testJson);
+    }
+
+    public StringFilter testJson() {
+        if (testJson == null) {
+            setTestJson(new StringFilter());
+        }
+        return testJson;
+    }
+
+    public void setTestJson(StringFilter testJson) {
+        this.testJson = testJson;
+    }
+
+    public SmsTemplateTypeFilter getType() {
+        return type;
+    }
+
+    public Optional<SmsTemplateTypeFilter> optionalType() {
+        return Optional.ofNullable(type);
+    }
+
+    public SmsTemplateTypeFilter type() {
+        if (type == null) {
+            setType(new SmsTemplateTypeFilter());
+        }
+        return type;
+    }
+
+    public void setType(SmsTemplateTypeFilter type) {
+        this.type = type;
+    }
+
+    public StringFilter getRemark() {
+        return remark;
+    }
+
+    public Optional<StringFilter> optionalRemark() {
+        return Optional.ofNullable(remark);
+    }
+
+    public StringFilter remark() {
+        if (remark == null) {
+            setRemark(new StringFilter());
+        }
+        return remark;
+    }
+
+    public void setRemark(StringFilter remark) {
+        this.remark = remark;
+    }
+
+    public BooleanFilter getEnabled() {
+        return enabled;
+    }
+
+    public Optional<BooleanFilter> optionalEnabled() {
+        return Optional.ofNullable(enabled);
+    }
+
+    public BooleanFilter enabled() {
+        if (enabled == null) {
+            setEnabled(new BooleanFilter());
+        }
+        return enabled;
+    }
+
+    public void setEnabled(BooleanFilter enabled) {
+        this.enabled = enabled;
+    }
+
+    public LongFilter getCreatedBy() {
+        return createdBy;
+    }
+
+    public Optional<LongFilter> optionalCreatedBy() {
+        return Optional.ofNullable(createdBy);
+    }
+
+    public LongFilter createdBy() {
+        if (createdBy == null) {
+            setCreatedBy(new LongFilter());
+        }
+        return createdBy;
+    }
+
+    public void setCreatedBy(LongFilter createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public InstantFilter getCreatedDate() {
+        return createdDate;
+    }
+
+    public Optional<InstantFilter> optionalCreatedDate() {
+        return Optional.ofNullable(createdDate);
+    }
+
+    public InstantFilter createdDate() {
+        if (createdDate == null) {
+            setCreatedDate(new InstantFilter());
+        }
+        return createdDate;
+    }
+
+    public void setCreatedDate(InstantFilter createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LongFilter getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public Optional<LongFilter> optionalLastModifiedBy() {
+        return Optional.ofNullable(lastModifiedBy);
+    }
+
+    public LongFilter lastModifiedBy() {
+        if (lastModifiedBy == null) {
+            setLastModifiedBy(new LongFilter());
+        }
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(LongFilter lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public InstantFilter getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public Optional<InstantFilter> optionalLastModifiedDate() {
+        return Optional.ofNullable(lastModifiedDate);
+    }
+
+    public InstantFilter lastModifiedDate() {
+        if (lastModifiedDate == null) {
+            setLastModifiedDate(new InstantFilter());
+        }
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(InstantFilter lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public LongFilter getSupplierId() {
+        return supplierId;
+    }
+
+    public Optional<LongFilter> optionalSupplierId() {
+        return Optional.ofNullable(supplierId);
+    }
+
+    public LongFilter supplierId() {
+        if (supplierId == null) {
+            setSupplierId(new LongFilter());
+        }
+        return supplierId;
+    }
+
+    public void setSupplierId(LongFilter supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public StringFilter getSupplierSignName() {
+        return supplierSignName;
+    }
+
+    public Optional<StringFilter> optionalSupplierSignName() {
+        return Optional.ofNullable(supplierSignName);
+    }
+
+    public StringFilter supplierSignName() {
+        if (supplierSignName == null) {
+            setSupplierSignName(new StringFilter());
+        }
+        return supplierSignName;
+    }
+
+    public void setSupplierSignName(StringFilter supplierSignName) {
+        this.supplierSignName = supplierSignName;
     }
 
     public void setAnd(SmsTemplateCriteria and) {
@@ -199,231 +460,6 @@ public class SmsTemplateCriteria implements Serializable, Criteria {
         return or;
     }
 
-    public LongFilter getId() {
-        return id;
-    }
-
-    public LongFilter id() {
-        if (id == null) {
-            id = new LongFilter();
-        }
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
-    }
-
-    public StringFilter getName() {
-        return name;
-    }
-
-    public StringFilter name() {
-        if (name == null) {
-            name = new StringFilter();
-        }
-        return name;
-    }
-
-    public void setName(StringFilter name) {
-        this.name = name;
-    }
-
-    public StringFilter getCode() {
-        return code;
-    }
-
-    public StringFilter code() {
-        if (code == null) {
-            code = new StringFilter();
-        }
-        return code;
-    }
-
-    public void setCode(StringFilter code) {
-        this.code = code;
-    }
-
-    public MessageSendTypeFilter getSendType() {
-        return sendType;
-    }
-
-    public MessageSendTypeFilter sendType() {
-        if (sendType == null) {
-            sendType = new MessageSendTypeFilter();
-        }
-        return sendType;
-    }
-
-    public void setSendType(MessageSendTypeFilter sendType) {
-        this.sendType = sendType;
-    }
-
-    public StringFilter getContent() {
-        return content;
-    }
-
-    public StringFilter content() {
-        if (content == null) {
-            content = new StringFilter();
-        }
-        return content;
-    }
-
-    public void setContent(StringFilter content) {
-        this.content = content;
-    }
-
-    public StringFilter getTestJson() {
-        return testJson;
-    }
-
-    public StringFilter testJson() {
-        if (testJson == null) {
-            testJson = new StringFilter();
-        }
-        return testJson;
-    }
-
-    public void setTestJson(StringFilter testJson) {
-        this.testJson = testJson;
-    }
-
-    public SmsTemplateTypeFilter getType() {
-        return type;
-    }
-
-    public SmsTemplateTypeFilter type() {
-        if (type == null) {
-            type = new SmsTemplateTypeFilter();
-        }
-        return type;
-    }
-
-    public void setType(SmsTemplateTypeFilter type) {
-        this.type = type;
-    }
-
-    public StringFilter getRemark() {
-        return remark;
-    }
-
-    public StringFilter remark() {
-        if (remark == null) {
-            remark = new StringFilter();
-        }
-        return remark;
-    }
-
-    public void setRemark(StringFilter remark) {
-        this.remark = remark;
-    }
-
-    public BooleanFilter getEnabled() {
-        return enabled;
-    }
-
-    public BooleanFilter enabled() {
-        if (enabled == null) {
-            enabled = new BooleanFilter();
-        }
-        return enabled;
-    }
-
-    public void setEnabled(BooleanFilter enabled) {
-        this.enabled = enabled;
-    }
-
-    public LongFilter getCreatedBy() {
-        return createdBy;
-    }
-
-    public LongFilter createdBy() {
-        if (createdBy == null) {
-            createdBy = new LongFilter();
-        }
-        return createdBy;
-    }
-
-    public void setCreatedBy(LongFilter createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public InstantFilter getCreatedDate() {
-        return createdDate;
-    }
-
-    public InstantFilter createdDate() {
-        if (createdDate == null) {
-            createdDate = new InstantFilter();
-        }
-        return createdDate;
-    }
-
-    public void setCreatedDate(InstantFilter createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public LongFilter getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public LongFilter lastModifiedBy() {
-        if (lastModifiedBy == null) {
-            lastModifiedBy = new LongFilter();
-        }
-        return lastModifiedBy;
-    }
-
-    public void setLastModifiedBy(LongFilter lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public InstantFilter getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public InstantFilter lastModifiedDate() {
-        if (lastModifiedDate == null) {
-            lastModifiedDate = new InstantFilter();
-        }
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(InstantFilter lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    public LongFilter getSupplierId() {
-        return supplierId;
-    }
-
-    public LongFilter supplierId() {
-        if (supplierId == null) {
-            supplierId = new LongFilter();
-        }
-        return supplierId;
-    }
-
-    public void setSupplierId(LongFilter supplierId) {
-        this.supplierId = supplierId;
-    }
-
-    public StringFilter getSupplierSignName() {
-        return supplierSignName;
-    }
-
-    public StringFilter supplierSignName() {
-        if (supplierSignName == null) {
-            supplierSignName = new StringFilter();
-        }
-        return supplierSignName;
-    }
-
-    public void setSupplierSignName(StringFilter supplierSignName) {
-        this.supplierSignName = supplierSignName;
-    }
-
     public String getJhiCommonSearchKeywords() {
         return jhiCommonSearchKeywords;
     }
@@ -441,6 +477,17 @@ public class SmsTemplateCriteria implements Serializable, Criteria {
     }
 
     public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
         return distinct;
     }
 
@@ -472,7 +519,6 @@ public class SmsTemplateCriteria implements Serializable, Criteria {
             Objects.equals(lastModifiedBy, that.lastModifiedBy) &&
             Objects.equals(lastModifiedDate, that.lastModifiedDate) &&
             Objects.equals(supplierId, that.supplierId) &&
-            Objects.equals(supplierSignName, that.supplierSignName) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -494,7 +540,6 @@ public class SmsTemplateCriteria implements Serializable, Criteria {
             lastModifiedBy,
             lastModifiedDate,
             supplierId,
-            supplierSignName,
             distinct
         );
     }
@@ -503,26 +548,26 @@ public class SmsTemplateCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "SmsTemplateCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (name != null ? "name=" + name + ", " : "") +
-            (code != null ? "code=" + code + ", " : "") +
-            (sendType != null ? "sendType=" + sendType + ", " : "") +
-            (content != null ? "content=" + content + ", " : "") +
-            (testJson != null ? "testJson=" + testJson + ", " : "") +
-            (type != null ? "type=" + type + ", " : "") +
-            (remark != null ? "remark=" + remark + ", " : "") +
-            (enabled != null ? "enabled=" + enabled + ", " : "") +
-            (createdBy != null ? "createdBy=" + createdBy + ", " : "") +
-            (createdDate != null ? "createdDate=" + createdDate + ", " : "") +
-            (lastModifiedBy != null ? "lastModifiedBy=" + lastModifiedBy + ", " : "") +
-            (lastModifiedDate != null ? "lastModifiedDate=" + lastModifiedDate + ", " : "") +
-            (supplierId != null ? "supplierId=" + supplierId + ", " : "") +
-            (supplierSignName != null ? "supplierSignName=" + supplierSignName + ", " : "") +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalName().map(f -> "name=" + f + ", ").orElse("") +
+            optionalCode().map(f -> "code=" + f + ", ").orElse("") +
+            optionalSendType().map(f -> "sendType=" + f + ", ").orElse("") +
+            optionalContent().map(f -> "content=" + f + ", ").orElse("") +
+            optionalTestJson().map(f -> "testJson=" + f + ", ").orElse("") +
+            optionalType().map(f -> "type=" + f + ", ").orElse("") +
+            optionalRemark().map(f -> "remark=" + f + ", ").orElse("") +
+            optionalEnabled().map(f -> "enabled=" + f + ", ").orElse("") +
+            optionalCreatedBy().map(f -> "createdBy=" + f + ", ").orElse("") +
+            optionalCreatedDate().map(f -> "createdDate=" + f + ", ").orElse("") +
+            optionalLastModifiedBy().map(f -> "lastModifiedBy=" + f + ", ").orElse("") +
+            optionalLastModifiedDate().map(f -> "lastModifiedDate=" + f + ", ").orElse("") +
+            optionalSupplierId().map(f -> "supplierId=" + f + ", ").orElse("") +
+            optionalSupplierSignName().map(f -> "supplierSignName=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +
             (or != null ? "or=" + or + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
     }
 }

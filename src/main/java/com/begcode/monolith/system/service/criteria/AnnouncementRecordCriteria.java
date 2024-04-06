@@ -3,6 +3,7 @@ package com.begcode.monolith.system.service.criteria;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
@@ -19,18 +20,6 @@ import tech.jhipster.service.filter.*;
 @ParameterObject
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class AnnouncementRecordCriteria implements Serializable, Criteria {
-
-    @BindQuery(ignore = true)
-    private String jhiCommonSearchKeywords;
-
-    @BindQuery(ignore = true)
-    private Boolean useOr = false;
-
-    @BindQuery(ignore = true)
-    private AnnouncementRecordCriteria and;
-
-    @BindQuery(ignore = true)
-    private AnnouncementRecordCriteria or;
 
     private static final long serialVersionUID = 1L;
 
@@ -62,26 +51,208 @@ public class AnnouncementRecordCriteria implements Serializable, Criteria {
     private InstantFilter lastModifiedDate;
 
     @BindQuery(ignore = true)
+    private String jhiCommonSearchKeywords;
+
+    @BindQuery(ignore = true)
+    private Boolean useOr = false;
+
+    @BindQuery(ignore = true)
+    private AnnouncementRecordCriteria and;
+
+    @BindQuery(ignore = true)
+    private AnnouncementRecordCriteria or;
+
     private Boolean distinct;
 
     public AnnouncementRecordCriteria() {}
 
     public AnnouncementRecordCriteria(AnnouncementRecordCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.anntId = other.anntId == null ? null : other.anntId.copy();
-        this.userId = other.userId == null ? null : other.userId.copy();
-        this.hasRead = other.hasRead == null ? null : other.hasRead.copy();
-        this.readTime = other.readTime == null ? null : other.readTime.copy();
-        this.createdBy = other.createdBy == null ? null : other.createdBy.copy();
-        this.createdDate = other.createdDate == null ? null : other.createdDate.copy();
-        this.lastModifiedBy = other.lastModifiedBy == null ? null : other.lastModifiedBy.copy();
-        this.lastModifiedDate = other.lastModifiedDate == null ? null : other.lastModifiedDate.copy();
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.anntId = other.optionalAnntId().map(LongFilter::copy).orElse(null);
+        this.userId = other.optionalUserId().map(LongFilter::copy).orElse(null);
+        this.hasRead = other.optionalHasRead().map(BooleanFilter::copy).orElse(null);
+        this.readTime = other.optionalReadTime().map(ZonedDateTimeFilter::copy).orElse(null);
+        this.createdBy = other.optionalCreatedBy().map(LongFilter::copy).orElse(null);
+        this.createdDate = other.optionalCreatedDate().map(InstantFilter::copy).orElse(null);
+        this.lastModifiedBy = other.optionalLastModifiedBy().map(LongFilter::copy).orElse(null);
+        this.lastModifiedDate = other.optionalLastModifiedDate().map(InstantFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
     public AnnouncementRecordCriteria copy() {
         return new AnnouncementRecordCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public LongFilter getAnntId() {
+        return anntId;
+    }
+
+    public Optional<LongFilter> optionalAnntId() {
+        return Optional.ofNullable(anntId);
+    }
+
+    public LongFilter anntId() {
+        if (anntId == null) {
+            setAnntId(new LongFilter());
+        }
+        return anntId;
+    }
+
+    public void setAnntId(LongFilter anntId) {
+        this.anntId = anntId;
+    }
+
+    public LongFilter getUserId() {
+        return userId;
+    }
+
+    public Optional<LongFilter> optionalUserId() {
+        return Optional.ofNullable(userId);
+    }
+
+    public LongFilter userId() {
+        if (userId == null) {
+            setUserId(new LongFilter());
+        }
+        return userId;
+    }
+
+    public void setUserId(LongFilter userId) {
+        this.userId = userId;
+    }
+
+    public BooleanFilter getHasRead() {
+        return hasRead;
+    }
+
+    public Optional<BooleanFilter> optionalHasRead() {
+        return Optional.ofNullable(hasRead);
+    }
+
+    public BooleanFilter hasRead() {
+        if (hasRead == null) {
+            setHasRead(new BooleanFilter());
+        }
+        return hasRead;
+    }
+
+    public void setHasRead(BooleanFilter hasRead) {
+        this.hasRead = hasRead;
+    }
+
+    public ZonedDateTimeFilter getReadTime() {
+        return readTime;
+    }
+
+    public Optional<ZonedDateTimeFilter> optionalReadTime() {
+        return Optional.ofNullable(readTime);
+    }
+
+    public ZonedDateTimeFilter readTime() {
+        if (readTime == null) {
+            setReadTime(new ZonedDateTimeFilter());
+        }
+        return readTime;
+    }
+
+    public void setReadTime(ZonedDateTimeFilter readTime) {
+        this.readTime = readTime;
+    }
+
+    public LongFilter getCreatedBy() {
+        return createdBy;
+    }
+
+    public Optional<LongFilter> optionalCreatedBy() {
+        return Optional.ofNullable(createdBy);
+    }
+
+    public LongFilter createdBy() {
+        if (createdBy == null) {
+            setCreatedBy(new LongFilter());
+        }
+        return createdBy;
+    }
+
+    public void setCreatedBy(LongFilter createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public InstantFilter getCreatedDate() {
+        return createdDate;
+    }
+
+    public Optional<InstantFilter> optionalCreatedDate() {
+        return Optional.ofNullable(createdDate);
+    }
+
+    public InstantFilter createdDate() {
+        if (createdDate == null) {
+            setCreatedDate(new InstantFilter());
+        }
+        return createdDate;
+    }
+
+    public void setCreatedDate(InstantFilter createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LongFilter getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public Optional<LongFilter> optionalLastModifiedBy() {
+        return Optional.ofNullable(lastModifiedBy);
+    }
+
+    public LongFilter lastModifiedBy() {
+        if (lastModifiedBy == null) {
+            setLastModifiedBy(new LongFilter());
+        }
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(LongFilter lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public InstantFilter getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public Optional<InstantFilter> optionalLastModifiedDate() {
+        return Optional.ofNullable(lastModifiedDate);
+    }
+
+    public InstantFilter lastModifiedDate() {
+        if (lastModifiedDate == null) {
+            setLastModifiedDate(new InstantFilter());
+        }
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(InstantFilter lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public void setAnd(AnnouncementRecordCriteria and) {
@@ -114,141 +285,6 @@ public class AnnouncementRecordCriteria implements Serializable, Criteria {
         return or;
     }
 
-    public LongFilter getId() {
-        return id;
-    }
-
-    public LongFilter id() {
-        if (id == null) {
-            id = new LongFilter();
-        }
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
-    }
-
-    public LongFilter getAnntId() {
-        return anntId;
-    }
-
-    public LongFilter anntId() {
-        if (anntId == null) {
-            anntId = new LongFilter();
-        }
-        return anntId;
-    }
-
-    public void setAnntId(LongFilter anntId) {
-        this.anntId = anntId;
-    }
-
-    public LongFilter getUserId() {
-        return userId;
-    }
-
-    public LongFilter userId() {
-        if (userId == null) {
-            userId = new LongFilter();
-        }
-        return userId;
-    }
-
-    public void setUserId(LongFilter userId) {
-        this.userId = userId;
-    }
-
-    public BooleanFilter getHasRead() {
-        return hasRead;
-    }
-
-    public BooleanFilter hasRead() {
-        if (hasRead == null) {
-            hasRead = new BooleanFilter();
-        }
-        return hasRead;
-    }
-
-    public void setHasRead(BooleanFilter hasRead) {
-        this.hasRead = hasRead;
-    }
-
-    public ZonedDateTimeFilter getReadTime() {
-        return readTime;
-    }
-
-    public ZonedDateTimeFilter readTime() {
-        if (readTime == null) {
-            readTime = new ZonedDateTimeFilter();
-        }
-        return readTime;
-    }
-
-    public void setReadTime(ZonedDateTimeFilter readTime) {
-        this.readTime = readTime;
-    }
-
-    public LongFilter getCreatedBy() {
-        return createdBy;
-    }
-
-    public LongFilter createdBy() {
-        if (createdBy == null) {
-            createdBy = new LongFilter();
-        }
-        return createdBy;
-    }
-
-    public void setCreatedBy(LongFilter createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public InstantFilter getCreatedDate() {
-        return createdDate;
-    }
-
-    public InstantFilter createdDate() {
-        if (createdDate == null) {
-            createdDate = new InstantFilter();
-        }
-        return createdDate;
-    }
-
-    public void setCreatedDate(InstantFilter createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public LongFilter getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public LongFilter lastModifiedBy() {
-        if (lastModifiedBy == null) {
-            lastModifiedBy = new LongFilter();
-        }
-        return lastModifiedBy;
-    }
-
-    public void setLastModifiedBy(LongFilter lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public InstantFilter getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public InstantFilter lastModifiedDate() {
-        if (lastModifiedDate == null) {
-            lastModifiedDate = new InstantFilter();
-        }
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(InstantFilter lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
     public String getJhiCommonSearchKeywords() {
         return jhiCommonSearchKeywords;
     }
@@ -266,6 +302,17 @@ public class AnnouncementRecordCriteria implements Serializable, Criteria {
     }
 
     public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
         return distinct;
     }
 
@@ -305,20 +352,20 @@ public class AnnouncementRecordCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "AnnouncementRecordCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (anntId != null ? "anntId=" + anntId + ", " : "") +
-            (userId != null ? "userId=" + userId + ", " : "") +
-            (hasRead != null ? "hasRead=" + hasRead + ", " : "") +
-            (readTime != null ? "readTime=" + readTime + ", " : "") +
-            (createdBy != null ? "createdBy=" + createdBy + ", " : "") +
-            (createdDate != null ? "createdDate=" + createdDate + ", " : "") +
-            (lastModifiedBy != null ? "lastModifiedBy=" + lastModifiedBy + ", " : "") +
-            (lastModifiedDate != null ? "lastModifiedDate=" + lastModifiedDate + ", " : "") +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalAnntId().map(f -> "anntId=" + f + ", ").orElse("") +
+            optionalUserId().map(f -> "userId=" + f + ", ").orElse("") +
+            optionalHasRead().map(f -> "hasRead=" + f + ", ").orElse("") +
+            optionalReadTime().map(f -> "readTime=" + f + ", ").orElse("") +
+            optionalCreatedBy().map(f -> "createdBy=" + f + ", ").orElse("") +
+            optionalCreatedDate().map(f -> "createdDate=" + f + ", ").orElse("") +
+            optionalLastModifiedBy().map(f -> "lastModifiedBy=" + f + ", ").orElse("") +
+            optionalLastModifiedDate().map(f -> "lastModifiedDate=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +
             (or != null ? "or=" + or + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
     }
 }

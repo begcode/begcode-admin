@@ -4,6 +4,7 @@ import com.begcode.monolith.domain.User;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
@@ -20,18 +21,6 @@ import tech.jhipster.service.filter.*;
 @ParameterObject
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class PositionCriteria implements Serializable, Criteria {
-
-    @BindQuery(ignore = true)
-    private String jhiCommonSearchKeywords;
-
-    @BindQuery(ignore = true)
-    private Boolean useOr = false;
-
-    @BindQuery(ignore = true)
-    private PositionCriteria and;
-
-    @BindQuery(ignore = true)
-    private PositionCriteria or;
 
     private static final long serialVersionUID = 1L;
 
@@ -57,24 +46,168 @@ public class PositionCriteria implements Serializable, Criteria {
     private StringFilter usersFirstName;
 
     @BindQuery(ignore = true)
+    private String jhiCommonSearchKeywords;
+
+    @BindQuery(ignore = true)
+    private Boolean useOr = false;
+
+    @BindQuery(ignore = true)
+    private PositionCriteria and;
+
+    @BindQuery(ignore = true)
+    private PositionCriteria or;
+
     private Boolean distinct;
 
     public PositionCriteria() {}
 
     public PositionCriteria(PositionCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.code = other.code == null ? null : other.code.copy();
-        this.name = other.name == null ? null : other.name.copy();
-        this.sortNo = other.sortNo == null ? null : other.sortNo.copy();
-        this.description = other.description == null ? null : other.description.copy();
-        this.usersId = other.usersId == null ? null : other.usersId.copy();
-        this.usersFirstName = other.usersFirstName == null ? null : other.usersFirstName.copy();
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.code = other.optionalCode().map(StringFilter::copy).orElse(null);
+        this.name = other.optionalName().map(StringFilter::copy).orElse(null);
+        this.sortNo = other.optionalSortNo().map(IntegerFilter::copy).orElse(null);
+        this.description = other.optionalDescription().map(StringFilter::copy).orElse(null);
+        this.usersId = other.optionalUsersId().map(LongFilter::copy).orElse(null);
+        this.usersFirstName = other.optionalUsersFirstName().map(StringFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
     public PositionCriteria copy() {
         return new PositionCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public StringFilter getCode() {
+        return code;
+    }
+
+    public Optional<StringFilter> optionalCode() {
+        return Optional.ofNullable(code);
+    }
+
+    public StringFilter code() {
+        if (code == null) {
+            setCode(new StringFilter());
+        }
+        return code;
+    }
+
+    public void setCode(StringFilter code) {
+        this.code = code;
+    }
+
+    public StringFilter getName() {
+        return name;
+    }
+
+    public Optional<StringFilter> optionalName() {
+        return Optional.ofNullable(name);
+    }
+
+    public StringFilter name() {
+        if (name == null) {
+            setName(new StringFilter());
+        }
+        return name;
+    }
+
+    public void setName(StringFilter name) {
+        this.name = name;
+    }
+
+    public IntegerFilter getSortNo() {
+        return sortNo;
+    }
+
+    public Optional<IntegerFilter> optionalSortNo() {
+        return Optional.ofNullable(sortNo);
+    }
+
+    public IntegerFilter sortNo() {
+        if (sortNo == null) {
+            setSortNo(new IntegerFilter());
+        }
+        return sortNo;
+    }
+
+    public void setSortNo(IntegerFilter sortNo) {
+        this.sortNo = sortNo;
+    }
+
+    public StringFilter getDescription() {
+        return description;
+    }
+
+    public Optional<StringFilter> optionalDescription() {
+        return Optional.ofNullable(description);
+    }
+
+    public StringFilter description() {
+        if (description == null) {
+            setDescription(new StringFilter());
+        }
+        return description;
+    }
+
+    public void setDescription(StringFilter description) {
+        this.description = description;
+    }
+
+    public LongFilter getUsersId() {
+        return usersId;
+    }
+
+    public Optional<LongFilter> optionalUsersId() {
+        return Optional.ofNullable(usersId);
+    }
+
+    public LongFilter usersId() {
+        if (usersId == null) {
+            setUsersId(new LongFilter());
+        }
+        return usersId;
+    }
+
+    public void setUsersId(LongFilter usersId) {
+        this.usersId = usersId;
+    }
+
+    public StringFilter getUsersFirstName() {
+        return usersFirstName;
+    }
+
+    public Optional<StringFilter> optionalUsersFirstName() {
+        return Optional.ofNullable(usersFirstName);
+    }
+
+    public StringFilter usersFirstName() {
+        if (usersFirstName == null) {
+            setUsersFirstName(new StringFilter());
+        }
+        return usersFirstName;
+    }
+
+    public void setUsersFirstName(StringFilter usersFirstName) {
+        this.usersFirstName = usersFirstName;
     }
 
     public void setAnd(PositionCriteria and) {
@@ -107,111 +240,6 @@ public class PositionCriteria implements Serializable, Criteria {
         return or;
     }
 
-    public LongFilter getId() {
-        return id;
-    }
-
-    public LongFilter id() {
-        if (id == null) {
-            id = new LongFilter();
-        }
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
-    }
-
-    public StringFilter getCode() {
-        return code;
-    }
-
-    public StringFilter code() {
-        if (code == null) {
-            code = new StringFilter();
-        }
-        return code;
-    }
-
-    public void setCode(StringFilter code) {
-        this.code = code;
-    }
-
-    public StringFilter getName() {
-        return name;
-    }
-
-    public StringFilter name() {
-        if (name == null) {
-            name = new StringFilter();
-        }
-        return name;
-    }
-
-    public void setName(StringFilter name) {
-        this.name = name;
-    }
-
-    public IntegerFilter getSortNo() {
-        return sortNo;
-    }
-
-    public IntegerFilter sortNo() {
-        if (sortNo == null) {
-            sortNo = new IntegerFilter();
-        }
-        return sortNo;
-    }
-
-    public void setSortNo(IntegerFilter sortNo) {
-        this.sortNo = sortNo;
-    }
-
-    public StringFilter getDescription() {
-        return description;
-    }
-
-    public StringFilter description() {
-        if (description == null) {
-            description = new StringFilter();
-        }
-        return description;
-    }
-
-    public void setDescription(StringFilter description) {
-        this.description = description;
-    }
-
-    public LongFilter getUsersId() {
-        return usersId;
-    }
-
-    public LongFilter usersId() {
-        if (usersId == null) {
-            usersId = new LongFilter();
-        }
-        return usersId;
-    }
-
-    public void setUsersId(LongFilter usersId) {
-        this.usersId = usersId;
-    }
-
-    public StringFilter getUsersFirstName() {
-        return usersFirstName;
-    }
-
-    public StringFilter usersFirstName() {
-        if (usersFirstName == null) {
-            usersFirstName = new StringFilter();
-        }
-        return usersFirstName;
-    }
-
-    public void setUsersFirstName(StringFilter usersFirstName) {
-        this.usersFirstName = usersFirstName;
-    }
-
     public String getJhiCommonSearchKeywords() {
         return jhiCommonSearchKeywords;
     }
@@ -229,6 +257,17 @@ public class PositionCriteria implements Serializable, Criteria {
     }
 
     public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
         return distinct;
     }
 
@@ -252,32 +291,31 @@ public class PositionCriteria implements Serializable, Criteria {
             Objects.equals(sortNo, that.sortNo) &&
             Objects.equals(description, that.description) &&
             Objects.equals(usersId, that.usersId) &&
-            Objects.equals(usersFirstName, that.usersFirstName) &&
             Objects.equals(distinct, that.distinct)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, code, name, sortNo, description, usersId, usersFirstName, distinct);
+        return Objects.hash(id, code, name, sortNo, description, usersId, distinct);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "PositionCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (code != null ? "code=" + code + ", " : "") +
-            (name != null ? "name=" + name + ", " : "") +
-            (sortNo != null ? "sortNo=" + sortNo + ", " : "") +
-            (description != null ? "description=" + description + ", " : "") +
-            (usersId != null ? "usersId=" + usersId + ", " : "") +
-            (usersFirstName != null ? "usersFirstName=" + usersFirstName + ", " : "") +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalCode().map(f -> "code=" + f + ", ").orElse("") +
+            optionalName().map(f -> "name=" + f + ", ").orElse("") +
+            optionalSortNo().map(f -> "sortNo=" + f + ", ").orElse("") +
+            optionalDescription().map(f -> "description=" + f + ", ").orElse("") +
+            optionalUsersId().map(f -> "usersId=" + f + ", ").orElse("") +
+            optionalUsersFirstName().map(f -> "usersFirstName=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +
             (or != null ? "or=" + or + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
     }
 }

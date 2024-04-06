@@ -6,6 +6,7 @@ import com.begcode.monolith.domain.Position;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
@@ -22,18 +23,6 @@ import tech.jhipster.service.filter.*;
 @ParameterObject
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class UserCriteria implements Serializable, Criteria {
-
-    @BindQuery(ignore = true)
-    private String jhiCommonSearchKeywords;
-
-    @BindQuery(ignore = true)
-    private Boolean useOr = false;
-
-    @BindQuery(ignore = true)
-    private UserCriteria and;
-
-    @BindQuery(ignore = true)
-    private UserCriteria or;
 
     private static final long serialVersionUID = 1L;
 
@@ -79,13 +68,13 @@ public class UserCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.last_modified_date")
     private InstantFilter lastModifiedDate;
 
-    @BindQuery(column = "self.department_id")
+    @BindQuery(entity = Department.class, column = "id", condition = "this.department_id=id")
     private LongFilter departmentId;
 
     @BindQuery(entity = Department.class, column = "name", condition = "this.department_id=id")
     private StringFilter departmentName;
 
-    @BindQuery(column = "self.position_id")
+    @BindQuery(entity = Position.class, column = "id", condition = "this.position_id=id")
     private LongFilter positionId;
 
     @BindQuery(entity = Position.class, column = "name", condition = "this.position_id=id")
@@ -94,49 +83,440 @@ public class UserCriteria implements Serializable, Criteria {
     @BindQuery(
         entity = Authority.class,
         column = "id",
-        condition = "this.id=rel_jhi_user__authorities.jhi_user_id AND rel_jhi_user__authorities.authorities_id=id"
+        condition = "this.id=rel_jhi_user__authorities.jhi_user_id AND rel_jhi_user__authorities.authorities_id=[object Object]"
     )
     private LongFilter authoritiesId;
 
     @BindQuery(
         entity = Authority.class,
         column = "name",
-        condition = "this.id=rel_jhi_user__authorities.jhi_user_id AND rel_jhi_user__authorities.authorities_id=id"
+        condition = "this.id=rel_jhi_user__authorities.jhi_user_id AND rel_jhi_user__authorities.authorities_id=[object Object]"
     )
     private StringFilter authoritiesName;
 
     @BindQuery(ignore = true)
+    private String jhiCommonSearchKeywords;
+
+    @BindQuery(ignore = true)
+    private Boolean useOr = false;
+
+    @BindQuery(ignore = true)
+    private UserCriteria and;
+
+    @BindQuery(ignore = true)
+    private UserCriteria or;
+
     private Boolean distinct;
 
     public UserCriteria() {}
 
     public UserCriteria(UserCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.login = other.login == null ? null : other.login.copy();
-        this.firstName = other.firstName == null ? null : other.firstName.copy();
-        this.lastName = other.lastName == null ? null : other.lastName.copy();
-        this.email = other.email == null ? null : other.email.copy();
-        this.mobile = other.mobile == null ? null : other.mobile.copy();
-        this.birthday = other.birthday == null ? null : other.birthday.copy();
-        this.activated = other.activated == null ? null : other.activated.copy();
-        this.langKey = other.langKey == null ? null : other.langKey.copy();
-        this.imageUrl = other.imageUrl == null ? null : other.imageUrl.copy();
-        this.createdBy = other.createdBy == null ? null : other.createdBy.copy();
-        this.createdDate = other.createdDate == null ? null : other.createdDate.copy();
-        this.lastModifiedBy = other.lastModifiedBy == null ? null : other.lastModifiedBy.copy();
-        this.lastModifiedDate = other.lastModifiedDate == null ? null : other.lastModifiedDate.copy();
-        this.departmentId = other.departmentId == null ? null : other.departmentId.copy();
-        this.departmentName = other.departmentName == null ? null : other.departmentName.copy();
-        this.positionId = other.positionId == null ? null : other.positionId.copy();
-        this.positionName = other.positionName == null ? null : other.positionName.copy();
-        this.authoritiesId = other.authoritiesId == null ? null : other.authoritiesId.copy();
-        this.authoritiesName = other.authoritiesName == null ? null : other.authoritiesName.copy();
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.login = other.optionalLogin().map(StringFilter::copy).orElse(null);
+        this.firstName = other.optionalFirstName().map(StringFilter::copy).orElse(null);
+        this.lastName = other.optionalLastName().map(StringFilter::copy).orElse(null);
+        this.email = other.optionalEmail().map(StringFilter::copy).orElse(null);
+        this.mobile = other.optionalMobile().map(StringFilter::copy).orElse(null);
+        this.birthday = other.optionalBirthday().map(ZonedDateTimeFilter::copy).orElse(null);
+        this.activated = other.optionalActivated().map(BooleanFilter::copy).orElse(null);
+        this.langKey = other.optionalLangKey().map(StringFilter::copy).orElse(null);
+        this.imageUrl = other.optionalImageUrl().map(StringFilter::copy).orElse(null);
+        this.createdBy = other.optionalCreatedBy().map(LongFilter::copy).orElse(null);
+        this.createdDate = other.optionalCreatedDate().map(InstantFilter::copy).orElse(null);
+        this.lastModifiedBy = other.optionalLastModifiedBy().map(LongFilter::copy).orElse(null);
+        this.lastModifiedDate = other.optionalLastModifiedDate().map(InstantFilter::copy).orElse(null);
+        this.departmentId = other.optionalDepartmentId().map(LongFilter::copy).orElse(null);
+        this.departmentName = other.optionalDepartmentName().map(StringFilter::copy).orElse(null);
+        this.positionId = other.optionalPositionId().map(LongFilter::copy).orElse(null);
+        this.positionName = other.optionalPositionName().map(StringFilter::copy).orElse(null);
+        this.authoritiesId = other.optionalAuthoritiesId().map(LongFilter::copy).orElse(null);
+        this.authoritiesName = other.optionalAuthoritiesName().map(StringFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
     public UserCriteria copy() {
         return new UserCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public StringFilter getLogin() {
+        return login;
+    }
+
+    public Optional<StringFilter> optionalLogin() {
+        return Optional.ofNullable(login);
+    }
+
+    public StringFilter login() {
+        if (login == null) {
+            setLogin(new StringFilter());
+        }
+        return login;
+    }
+
+    public void setLogin(StringFilter login) {
+        this.login = login;
+    }
+
+    public StringFilter getFirstName() {
+        return firstName;
+    }
+
+    public Optional<StringFilter> optionalFirstName() {
+        return Optional.ofNullable(firstName);
+    }
+
+    public StringFilter firstName() {
+        if (firstName == null) {
+            setFirstName(new StringFilter());
+        }
+        return firstName;
+    }
+
+    public void setFirstName(StringFilter firstName) {
+        this.firstName = firstName;
+    }
+
+    public StringFilter getLastName() {
+        return lastName;
+    }
+
+    public Optional<StringFilter> optionalLastName() {
+        return Optional.ofNullable(lastName);
+    }
+
+    public StringFilter lastName() {
+        if (lastName == null) {
+            setLastName(new StringFilter());
+        }
+        return lastName;
+    }
+
+    public void setLastName(StringFilter lastName) {
+        this.lastName = lastName;
+    }
+
+    public StringFilter getEmail() {
+        return email;
+    }
+
+    public Optional<StringFilter> optionalEmail() {
+        return Optional.ofNullable(email);
+    }
+
+    public StringFilter email() {
+        if (email == null) {
+            setEmail(new StringFilter());
+        }
+        return email;
+    }
+
+    public void setEmail(StringFilter email) {
+        this.email = email;
+    }
+
+    public StringFilter getMobile() {
+        return mobile;
+    }
+
+    public Optional<StringFilter> optionalMobile() {
+        return Optional.ofNullable(mobile);
+    }
+
+    public StringFilter mobile() {
+        if (mobile == null) {
+            setMobile(new StringFilter());
+        }
+        return mobile;
+    }
+
+    public void setMobile(StringFilter mobile) {
+        this.mobile = mobile;
+    }
+
+    public ZonedDateTimeFilter getBirthday() {
+        return birthday;
+    }
+
+    public Optional<ZonedDateTimeFilter> optionalBirthday() {
+        return Optional.ofNullable(birthday);
+    }
+
+    public ZonedDateTimeFilter birthday() {
+        if (birthday == null) {
+            setBirthday(new ZonedDateTimeFilter());
+        }
+        return birthday;
+    }
+
+    public void setBirthday(ZonedDateTimeFilter birthday) {
+        this.birthday = birthday;
+    }
+
+    public BooleanFilter getActivated() {
+        return activated;
+    }
+
+    public Optional<BooleanFilter> optionalActivated() {
+        return Optional.ofNullable(activated);
+    }
+
+    public BooleanFilter activated() {
+        if (activated == null) {
+            setActivated(new BooleanFilter());
+        }
+        return activated;
+    }
+
+    public void setActivated(BooleanFilter activated) {
+        this.activated = activated;
+    }
+
+    public StringFilter getLangKey() {
+        return langKey;
+    }
+
+    public Optional<StringFilter> optionalLangKey() {
+        return Optional.ofNullable(langKey);
+    }
+
+    public StringFilter langKey() {
+        if (langKey == null) {
+            setLangKey(new StringFilter());
+        }
+        return langKey;
+    }
+
+    public void setLangKey(StringFilter langKey) {
+        this.langKey = langKey;
+    }
+
+    public StringFilter getImageUrl() {
+        return imageUrl;
+    }
+
+    public Optional<StringFilter> optionalImageUrl() {
+        return Optional.ofNullable(imageUrl);
+    }
+
+    public StringFilter imageUrl() {
+        if (imageUrl == null) {
+            setImageUrl(new StringFilter());
+        }
+        return imageUrl;
+    }
+
+    public void setImageUrl(StringFilter imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public LongFilter getCreatedBy() {
+        return createdBy;
+    }
+
+    public Optional<LongFilter> optionalCreatedBy() {
+        return Optional.ofNullable(createdBy);
+    }
+
+    public LongFilter createdBy() {
+        if (createdBy == null) {
+            setCreatedBy(new LongFilter());
+        }
+        return createdBy;
+    }
+
+    public void setCreatedBy(LongFilter createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public InstantFilter getCreatedDate() {
+        return createdDate;
+    }
+
+    public Optional<InstantFilter> optionalCreatedDate() {
+        return Optional.ofNullable(createdDate);
+    }
+
+    public InstantFilter createdDate() {
+        if (createdDate == null) {
+            setCreatedDate(new InstantFilter());
+        }
+        return createdDate;
+    }
+
+    public void setCreatedDate(InstantFilter createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LongFilter getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public Optional<LongFilter> optionalLastModifiedBy() {
+        return Optional.ofNullable(lastModifiedBy);
+    }
+
+    public LongFilter lastModifiedBy() {
+        if (lastModifiedBy == null) {
+            setLastModifiedBy(new LongFilter());
+        }
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(LongFilter lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public InstantFilter getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public Optional<InstantFilter> optionalLastModifiedDate() {
+        return Optional.ofNullable(lastModifiedDate);
+    }
+
+    public InstantFilter lastModifiedDate() {
+        if (lastModifiedDate == null) {
+            setLastModifiedDate(new InstantFilter());
+        }
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(InstantFilter lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public LongFilter getDepartmentId() {
+        return departmentId;
+    }
+
+    public Optional<LongFilter> optionalDepartmentId() {
+        return Optional.ofNullable(departmentId);
+    }
+
+    public LongFilter departmentId() {
+        if (departmentId == null) {
+            setDepartmentId(new LongFilter());
+        }
+        return departmentId;
+    }
+
+    public void setDepartmentId(LongFilter departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public StringFilter getDepartmentName() {
+        return departmentName;
+    }
+
+    public Optional<StringFilter> optionalDepartmentName() {
+        return Optional.ofNullable(departmentName);
+    }
+
+    public StringFilter departmentName() {
+        if (departmentName == null) {
+            setDepartmentName(new StringFilter());
+        }
+        return departmentName;
+    }
+
+    public void setDepartmentName(StringFilter departmentName) {
+        this.departmentName = departmentName;
+    }
+
+    public LongFilter getPositionId() {
+        return positionId;
+    }
+
+    public Optional<LongFilter> optionalPositionId() {
+        return Optional.ofNullable(positionId);
+    }
+
+    public LongFilter positionId() {
+        if (positionId == null) {
+            setPositionId(new LongFilter());
+        }
+        return positionId;
+    }
+
+    public void setPositionId(LongFilter positionId) {
+        this.positionId = positionId;
+    }
+
+    public StringFilter getPositionName() {
+        return positionName;
+    }
+
+    public Optional<StringFilter> optionalPositionName() {
+        return Optional.ofNullable(positionName);
+    }
+
+    public StringFilter positionName() {
+        if (positionName == null) {
+            setPositionName(new StringFilter());
+        }
+        return positionName;
+    }
+
+    public void setPositionName(StringFilter positionName) {
+        this.positionName = positionName;
+    }
+
+    public LongFilter getAuthoritiesId() {
+        return authoritiesId;
+    }
+
+    public Optional<LongFilter> optionalAuthoritiesId() {
+        return Optional.ofNullable(authoritiesId);
+    }
+
+    public LongFilter authoritiesId() {
+        if (authoritiesId == null) {
+            setAuthoritiesId(new LongFilter());
+        }
+        return authoritiesId;
+    }
+
+    public void setAuthoritiesId(LongFilter authoritiesId) {
+        this.authoritiesId = authoritiesId;
+    }
+
+    public StringFilter getAuthoritiesName() {
+        return authoritiesName;
+    }
+
+    public Optional<StringFilter> optionalAuthoritiesName() {
+        return Optional.ofNullable(authoritiesName);
+    }
+
+    public StringFilter authoritiesName() {
+        if (authoritiesName == null) {
+            setAuthoritiesName(new StringFilter());
+        }
+        return authoritiesName;
+    }
+
+    public void setAuthoritiesName(StringFilter authoritiesName) {
+        this.authoritiesName = authoritiesName;
     }
 
     public void setAnd(UserCriteria and) {
@@ -169,306 +549,6 @@ public class UserCriteria implements Serializable, Criteria {
         return or;
     }
 
-    public LongFilter getId() {
-        return id;
-    }
-
-    public LongFilter id() {
-        if (id == null) {
-            id = new LongFilter();
-        }
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
-    }
-
-    public StringFilter getLogin() {
-        return login;
-    }
-
-    public StringFilter login() {
-        if (login == null) {
-            login = new StringFilter();
-        }
-        return login;
-    }
-
-    public void setLogin(StringFilter login) {
-        this.login = login;
-    }
-
-    public StringFilter getFirstName() {
-        return firstName;
-    }
-
-    public StringFilter firstName() {
-        if (firstName == null) {
-            firstName = new StringFilter();
-        }
-        return firstName;
-    }
-
-    public void setFirstName(StringFilter firstName) {
-        this.firstName = firstName;
-    }
-
-    public StringFilter getLastName() {
-        return lastName;
-    }
-
-    public StringFilter lastName() {
-        if (lastName == null) {
-            lastName = new StringFilter();
-        }
-        return lastName;
-    }
-
-    public void setLastName(StringFilter lastName) {
-        this.lastName = lastName;
-    }
-
-    public StringFilter getEmail() {
-        return email;
-    }
-
-    public StringFilter email() {
-        if (email == null) {
-            email = new StringFilter();
-        }
-        return email;
-    }
-
-    public void setEmail(StringFilter email) {
-        this.email = email;
-    }
-
-    public StringFilter getMobile() {
-        return mobile;
-    }
-
-    public StringFilter mobile() {
-        if (mobile == null) {
-            mobile = new StringFilter();
-        }
-        return mobile;
-    }
-
-    public void setMobile(StringFilter mobile) {
-        this.mobile = mobile;
-    }
-
-    public ZonedDateTimeFilter getBirthday() {
-        return birthday;
-    }
-
-    public ZonedDateTimeFilter birthday() {
-        if (birthday == null) {
-            birthday = new ZonedDateTimeFilter();
-        }
-        return birthday;
-    }
-
-    public void setBirthday(ZonedDateTimeFilter birthday) {
-        this.birthday = birthday;
-    }
-
-    public BooleanFilter getActivated() {
-        return activated;
-    }
-
-    public BooleanFilter activated() {
-        if (activated == null) {
-            activated = new BooleanFilter();
-        }
-        return activated;
-    }
-
-    public void setActivated(BooleanFilter activated) {
-        this.activated = activated;
-    }
-
-    public StringFilter getLangKey() {
-        return langKey;
-    }
-
-    public StringFilter langKey() {
-        if (langKey == null) {
-            langKey = new StringFilter();
-        }
-        return langKey;
-    }
-
-    public void setLangKey(StringFilter langKey) {
-        this.langKey = langKey;
-    }
-
-    public StringFilter getImageUrl() {
-        return imageUrl;
-    }
-
-    public StringFilter imageUrl() {
-        if (imageUrl == null) {
-            imageUrl = new StringFilter();
-        }
-        return imageUrl;
-    }
-
-    public void setImageUrl(StringFilter imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public LongFilter getCreatedBy() {
-        return createdBy;
-    }
-
-    public LongFilter createdBy() {
-        if (createdBy == null) {
-            createdBy = new LongFilter();
-        }
-        return createdBy;
-    }
-
-    public void setCreatedBy(LongFilter createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public InstantFilter getCreatedDate() {
-        return createdDate;
-    }
-
-    public InstantFilter createdDate() {
-        if (createdDate == null) {
-            createdDate = new InstantFilter();
-        }
-        return createdDate;
-    }
-
-    public void setCreatedDate(InstantFilter createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public LongFilter getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public LongFilter lastModifiedBy() {
-        if (lastModifiedBy == null) {
-            lastModifiedBy = new LongFilter();
-        }
-        return lastModifiedBy;
-    }
-
-    public void setLastModifiedBy(LongFilter lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public InstantFilter getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public InstantFilter lastModifiedDate() {
-        if (lastModifiedDate == null) {
-            lastModifiedDate = new InstantFilter();
-        }
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(InstantFilter lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    public LongFilter getDepartmentId() {
-        return departmentId;
-    }
-
-    public LongFilter departmentId() {
-        if (departmentId == null) {
-            departmentId = new LongFilter();
-        }
-        return departmentId;
-    }
-
-    public void setDepartmentId(LongFilter departmentId) {
-        this.departmentId = departmentId;
-    }
-
-    public StringFilter getDepartmentName() {
-        return departmentName;
-    }
-
-    public StringFilter departmentName() {
-        if (departmentName == null) {
-            departmentName = new StringFilter();
-        }
-        return departmentName;
-    }
-
-    public void setDepartmentName(StringFilter departmentName) {
-        this.departmentName = departmentName;
-    }
-
-    public LongFilter getPositionId() {
-        return positionId;
-    }
-
-    public LongFilter positionId() {
-        if (positionId == null) {
-            positionId = new LongFilter();
-        }
-        return positionId;
-    }
-
-    public void setPositionId(LongFilter positionId) {
-        this.positionId = positionId;
-    }
-
-    public StringFilter getPositionName() {
-        return positionName;
-    }
-
-    public StringFilter positionName() {
-        if (positionName == null) {
-            positionName = new StringFilter();
-        }
-        return positionName;
-    }
-
-    public void setPositionName(StringFilter positionName) {
-        this.positionName = positionName;
-    }
-
-    public LongFilter getAuthoritiesId() {
-        return authoritiesId;
-    }
-
-    public LongFilter authoritiesId() {
-        if (authoritiesId == null) {
-            authoritiesId = new LongFilter();
-        }
-        return authoritiesId;
-    }
-
-    public void setAuthoritiesId(LongFilter authoritiesId) {
-        this.authoritiesId = authoritiesId;
-    }
-
-    public StringFilter getAuthoritiesName() {
-        return authoritiesName;
-    }
-
-    public StringFilter authoritiesName() {
-        if (authoritiesName == null) {
-            authoritiesName = new StringFilter();
-        }
-        return authoritiesName;
-    }
-
-    public void setAuthoritiesName(StringFilter authoritiesName) {
-        this.authoritiesName = authoritiesName;
-    }
-
     public String getJhiCommonSearchKeywords() {
         return jhiCommonSearchKeywords;
     }
@@ -486,6 +566,17 @@ public class UserCriteria implements Serializable, Criteria {
     }
 
     public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
         return distinct;
     }
 
@@ -518,11 +609,8 @@ public class UserCriteria implements Serializable, Criteria {
             Objects.equals(lastModifiedBy, that.lastModifiedBy) &&
             Objects.equals(lastModifiedDate, that.lastModifiedDate) &&
             Objects.equals(departmentId, that.departmentId) &&
-            Objects.equals(departmentName, that.departmentName) &&
             Objects.equals(positionId, that.positionId) &&
-            Objects.equals(positionName, that.positionName) &&
             Objects.equals(authoritiesId, that.authoritiesId) &&
-            Objects.equals(authoritiesName, that.authoritiesName) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -545,11 +633,8 @@ public class UserCriteria implements Serializable, Criteria {
             lastModifiedBy,
             lastModifiedDate,
             departmentId,
-            departmentName,
             positionId,
-            positionName,
             authoritiesId,
-            authoritiesName,
             distinct
         );
     }
@@ -558,31 +643,31 @@ public class UserCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "UserCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (login != null ? "login=" + login + ", " : "") +
-            (firstName != null ? "firstName=" + firstName + ", " : "") +
-            (lastName != null ? "lastName=" + lastName + ", " : "") +
-            (email != null ? "email=" + email + ", " : "") +
-            (mobile != null ? "mobile=" + mobile + ", " : "") +
-            (birthday != null ? "birthday=" + birthday + ", " : "") +
-            (activated != null ? "activated=" + activated + ", " : "") +
-            (langKey != null ? "langKey=" + langKey + ", " : "") +
-            (imageUrl != null ? "imageUrl=" + imageUrl + ", " : "") +
-            (createdBy != null ? "createdBy=" + createdBy + ", " : "") +
-            (createdDate != null ? "createdDate=" + createdDate + ", " : "") +
-            (lastModifiedBy != null ? "lastModifiedBy=" + lastModifiedBy + ", " : "") +
-            (lastModifiedDate != null ? "lastModifiedDate=" + lastModifiedDate + ", " : "") +
-            (departmentId != null ? "departmentId=" + departmentId + ", " : "") +
-            (departmentName != null ? "departmentName=" + departmentName + ", " : "") +
-            (positionId != null ? "positionId=" + positionId + ", " : "") +
-            (positionName != null ? "positionName=" + positionName + ", " : "") +
-            (authoritiesId != null ? "authoritiesId=" + authoritiesId + ", " : "") +
-            (authoritiesName != null ? "authoritiesName=" + authoritiesName + ", " : "") +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalLogin().map(f -> "login=" + f + ", ").orElse("") +
+            optionalFirstName().map(f -> "firstName=" + f + ", ").orElse("") +
+            optionalLastName().map(f -> "lastName=" + f + ", ").orElse("") +
+            optionalEmail().map(f -> "email=" + f + ", ").orElse("") +
+            optionalMobile().map(f -> "mobile=" + f + ", ").orElse("") +
+            optionalBirthday().map(f -> "birthday=" + f + ", ").orElse("") +
+            optionalActivated().map(f -> "activated=" + f + ", ").orElse("") +
+            optionalLangKey().map(f -> "langKey=" + f + ", ").orElse("") +
+            optionalImageUrl().map(f -> "imageUrl=" + f + ", ").orElse("") +
+            optionalCreatedBy().map(f -> "createdBy=" + f + ", ").orElse("") +
+            optionalCreatedDate().map(f -> "createdDate=" + f + ", ").orElse("") +
+            optionalLastModifiedBy().map(f -> "lastModifiedBy=" + f + ", ").orElse("") +
+            optionalLastModifiedDate().map(f -> "lastModifiedDate=" + f + ", ").orElse("") +
+            optionalDepartmentId().map(f -> "departmentId=" + f + ", ").orElse("") +
+            optionalDepartmentName().map(f -> "departmentName=" + f + ", ").orElse("") +
+            optionalPositionId().map(f -> "positionId=" + f + ", ").orElse("") +
+            optionalPositionName().map(f -> "positionName=" + f + ", ").orElse("") +
+            optionalAuthoritiesId().map(f -> "authoritiesId=" + f + ", ").orElse("") +
+            optionalAuthoritiesName().map(f -> "authoritiesName=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +
             (or != null ? "or=" + or + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
     }
 }

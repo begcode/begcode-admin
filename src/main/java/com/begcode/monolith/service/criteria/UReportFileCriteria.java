@@ -3,6 +3,7 @@ package com.begcode.monolith.service.criteria;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
@@ -20,18 +21,6 @@ import tech.jhipster.service.filter.*;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class UReportFileCriteria implements Serializable, Criteria {
 
-    @BindQuery(ignore = true)
-    private String jhiCommonSearchKeywords;
-
-    @BindQuery(ignore = true)
-    private Boolean useOr = false;
-
-    @BindQuery(ignore = true)
-    private UReportFileCriteria and;
-
-    @BindQuery(ignore = true)
-    private UReportFileCriteria or;
-
     private static final long serialVersionUID = 1L;
 
     @BindQuery(column = "self.id")
@@ -47,21 +36,108 @@ public class UReportFileCriteria implements Serializable, Criteria {
     private ZonedDateTimeFilter updateAt;
 
     @BindQuery(ignore = true)
+    private String jhiCommonSearchKeywords;
+
+    @BindQuery(ignore = true)
+    private Boolean useOr = false;
+
+    @BindQuery(ignore = true)
+    private UReportFileCriteria and;
+
+    @BindQuery(ignore = true)
+    private UReportFileCriteria or;
+
     private Boolean distinct;
 
     public UReportFileCriteria() {}
 
     public UReportFileCriteria(UReportFileCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.name = other.name == null ? null : other.name.copy();
-        this.createAt = other.createAt == null ? null : other.createAt.copy();
-        this.updateAt = other.updateAt == null ? null : other.updateAt.copy();
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.name = other.optionalName().map(StringFilter::copy).orElse(null);
+        this.createAt = other.optionalCreateAt().map(ZonedDateTimeFilter::copy).orElse(null);
+        this.updateAt = other.optionalUpdateAt().map(ZonedDateTimeFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
     public UReportFileCriteria copy() {
         return new UReportFileCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public StringFilter getName() {
+        return name;
+    }
+
+    public Optional<StringFilter> optionalName() {
+        return Optional.ofNullable(name);
+    }
+
+    public StringFilter name() {
+        if (name == null) {
+            setName(new StringFilter());
+        }
+        return name;
+    }
+
+    public void setName(StringFilter name) {
+        this.name = name;
+    }
+
+    public ZonedDateTimeFilter getCreateAt() {
+        return createAt;
+    }
+
+    public Optional<ZonedDateTimeFilter> optionalCreateAt() {
+        return Optional.ofNullable(createAt);
+    }
+
+    public ZonedDateTimeFilter createAt() {
+        if (createAt == null) {
+            setCreateAt(new ZonedDateTimeFilter());
+        }
+        return createAt;
+    }
+
+    public void setCreateAt(ZonedDateTimeFilter createAt) {
+        this.createAt = createAt;
+    }
+
+    public ZonedDateTimeFilter getUpdateAt() {
+        return updateAt;
+    }
+
+    public Optional<ZonedDateTimeFilter> optionalUpdateAt() {
+        return Optional.ofNullable(updateAt);
+    }
+
+    public ZonedDateTimeFilter updateAt() {
+        if (updateAt == null) {
+            setUpdateAt(new ZonedDateTimeFilter());
+        }
+        return updateAt;
+    }
+
+    public void setUpdateAt(ZonedDateTimeFilter updateAt) {
+        this.updateAt = updateAt;
     }
 
     public void setAnd(UReportFileCriteria and) {
@@ -94,66 +170,6 @@ public class UReportFileCriteria implements Serializable, Criteria {
         return or;
     }
 
-    public LongFilter getId() {
-        return id;
-    }
-
-    public LongFilter id() {
-        if (id == null) {
-            id = new LongFilter();
-        }
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
-    }
-
-    public StringFilter getName() {
-        return name;
-    }
-
-    public StringFilter name() {
-        if (name == null) {
-            name = new StringFilter();
-        }
-        return name;
-    }
-
-    public void setName(StringFilter name) {
-        this.name = name;
-    }
-
-    public ZonedDateTimeFilter getCreateAt() {
-        return createAt;
-    }
-
-    public ZonedDateTimeFilter createAt() {
-        if (createAt == null) {
-            createAt = new ZonedDateTimeFilter();
-        }
-        return createAt;
-    }
-
-    public void setCreateAt(ZonedDateTimeFilter createAt) {
-        this.createAt = createAt;
-    }
-
-    public ZonedDateTimeFilter getUpdateAt() {
-        return updateAt;
-    }
-
-    public ZonedDateTimeFilter updateAt() {
-        if (updateAt == null) {
-            updateAt = new ZonedDateTimeFilter();
-        }
-        return updateAt;
-    }
-
-    public void setUpdateAt(ZonedDateTimeFilter updateAt) {
-        this.updateAt = updateAt;
-    }
-
     public String getJhiCommonSearchKeywords() {
         return jhiCommonSearchKeywords;
     }
@@ -171,6 +187,17 @@ public class UReportFileCriteria implements Serializable, Criteria {
     }
 
     public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
         return distinct;
     }
 
@@ -205,15 +232,15 @@ public class UReportFileCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "UReportFileCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (name != null ? "name=" + name + ", " : "") +
-            (createAt != null ? "createAt=" + createAt + ", " : "") +
-            (updateAt != null ? "updateAt=" + updateAt + ", " : "") +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalName().map(f -> "name=" + f + ", ").orElse("") +
+            optionalCreateAt().map(f -> "createAt=" + f + ", ").orElse("") +
+            optionalUpdateAt().map(f -> "updateAt=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +
             (or != null ? "or=" + or + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
     }
 }

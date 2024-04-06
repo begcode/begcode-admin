@@ -7,6 +7,7 @@ import com.begcode.monolith.domain.enumeration.ApiPermissionType;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
@@ -24,36 +25,12 @@ import tech.jhipster.service.filter.*;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ApiPermissionCriteria implements Serializable, Criteria {
 
-    @BindQuery(ignore = true)
-    private String jhiCommonSearchKeywords;
-
-    @BindQuery(ignore = true)
-    private Boolean useOr = false;
-
-    @BindQuery(ignore = true)
-    private ApiPermissionCriteria and;
-
-    @BindQuery(ignore = true)
-    private ApiPermissionCriteria or;
-
     /**
      * Class for filtering ApiPermissionType
      */
     public static class ApiPermissionTypeFilter extends Filter<ApiPermissionType> {
 
         public ApiPermissionTypeFilter() {}
-
-        public ApiPermissionTypeFilter(String value) {
-            ApiPermissionType enumValue = ApiPermissionType.getByValue(value);
-            if (enumValue != null) {
-                setEquals(enumValue);
-            } else {
-                enumValue = ApiPermissionType.getByDesc(value);
-                if (enumValue != null) {
-                    setEquals(enumValue);
-                }
-            }
-        }
 
         public ApiPermissionTypeFilter(ApiPermissionTypeFilter filter) {
             super(filter);
@@ -71,18 +48,6 @@ public class ApiPermissionCriteria implements Serializable, Criteria {
     public static class ApiPermissionStateFilter extends Filter<ApiPermissionState> {
 
         public ApiPermissionStateFilter() {}
-
-        public ApiPermissionStateFilter(String value) {
-            ApiPermissionState enumValue = ApiPermissionState.getByValue(value);
-            if (enumValue != null) {
-                setEquals(enumValue);
-            } else {
-                enumValue = ApiPermissionState.getByDesc(value);
-                if (enumValue != null) {
-                    setEquals(enumValue);
-                }
-            }
-        }
 
         public ApiPermissionStateFilter(ApiPermissionStateFilter filter) {
             super(filter);
@@ -129,7 +94,7 @@ public class ApiPermissionCriteria implements Serializable, Criteria {
     @BindQuery(entity = ApiPermission.class, column = "name", condition = "id=parent_id")
     private StringFilter childrenName;
 
-    @BindQuery(column = "self.parent_id")
+    @BindQuery(entity = ApiPermission.class, column = "id", condition = "this.parent_id=id")
     private LongFilter parentId;
 
     @BindQuery(entity = ApiPermission.class, column = "name", condition = "this.parent_id=id")
@@ -140,32 +105,328 @@ public class ApiPermissionCriteria implements Serializable, Criteria {
     private StringFilter authoritiesName;
 
     @BindQuery(ignore = true)
+    private String jhiCommonSearchKeywords;
+
+    @BindQuery(ignore = true)
+    private Boolean useOr = false;
+
+    @BindQuery(ignore = true)
+    private ApiPermissionCriteria and;
+
+    @BindQuery(ignore = true)
+    private ApiPermissionCriteria or;
+
     private Boolean distinct;
 
     public ApiPermissionCriteria() {}
 
     public ApiPermissionCriteria(ApiPermissionCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.serviceName = other.serviceName == null ? null : other.serviceName.copy();
-        this.name = other.name == null ? null : other.name.copy();
-        this.code = other.code == null ? null : other.code.copy();
-        this.description = other.description == null ? null : other.description.copy();
-        this.type = other.type == null ? null : other.type.copy();
-        this.method = other.method == null ? null : other.method.copy();
-        this.url = other.url == null ? null : other.url.copy();
-        this.status = other.status == null ? null : other.status.copy();
-        this.childrenId = other.childrenId == null ? null : other.childrenId.copy();
-        this.childrenName = other.childrenName == null ? null : other.childrenName.copy();
-        this.parentId = other.parentId == null ? null : other.parentId.copy();
-        this.parentName = other.parentName == null ? null : other.parentName.copy();
-        this.authoritiesId = other.authoritiesId == null ? null : other.authoritiesId.copy();
-        this.authoritiesName = other.authoritiesName == null ? null : other.authoritiesName.copy();
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.serviceName = other.optionalServiceName().map(StringFilter::copy).orElse(null);
+        this.name = other.optionalName().map(StringFilter::copy).orElse(null);
+        this.code = other.optionalCode().map(StringFilter::copy).orElse(null);
+        this.description = other.optionalDescription().map(StringFilter::copy).orElse(null);
+        this.type = other.optionalType().map(ApiPermissionTypeFilter::copy).orElse(null);
+        this.method = other.optionalMethod().map(StringFilter::copy).orElse(null);
+        this.url = other.optionalUrl().map(StringFilter::copy).orElse(null);
+        this.status = other.optionalStatus().map(ApiPermissionStateFilter::copy).orElse(null);
+        this.childrenId = other.optionalChildrenId().map(LongFilter::copy).orElse(null);
+        this.childrenName = other.optionalChildrenName().map(StringFilter::copy).orElse(null);
+        this.parentId = other.optionalParentId().map(LongFilter::copy).orElse(null);
+        this.parentName = other.optionalParentName().map(StringFilter::copy).orElse(null);
+        this.authoritiesId = other.optionalAuthoritiesId().map(LongFilter::copy).orElse(null);
+        this.authoritiesName = other.optionalAuthoritiesName().map(StringFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
     public ApiPermissionCriteria copy() {
         return new ApiPermissionCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public StringFilter getServiceName() {
+        return serviceName;
+    }
+
+    public Optional<StringFilter> optionalServiceName() {
+        return Optional.ofNullable(serviceName);
+    }
+
+    public StringFilter serviceName() {
+        if (serviceName == null) {
+            setServiceName(new StringFilter());
+        }
+        return serviceName;
+    }
+
+    public void setServiceName(StringFilter serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public StringFilter getName() {
+        return name;
+    }
+
+    public Optional<StringFilter> optionalName() {
+        return Optional.ofNullable(name);
+    }
+
+    public StringFilter name() {
+        if (name == null) {
+            setName(new StringFilter());
+        }
+        return name;
+    }
+
+    public void setName(StringFilter name) {
+        this.name = name;
+    }
+
+    public StringFilter getCode() {
+        return code;
+    }
+
+    public Optional<StringFilter> optionalCode() {
+        return Optional.ofNullable(code);
+    }
+
+    public StringFilter code() {
+        if (code == null) {
+            setCode(new StringFilter());
+        }
+        return code;
+    }
+
+    public void setCode(StringFilter code) {
+        this.code = code;
+    }
+
+    public StringFilter getDescription() {
+        return description;
+    }
+
+    public Optional<StringFilter> optionalDescription() {
+        return Optional.ofNullable(description);
+    }
+
+    public StringFilter description() {
+        if (description == null) {
+            setDescription(new StringFilter());
+        }
+        return description;
+    }
+
+    public void setDescription(StringFilter description) {
+        this.description = description;
+    }
+
+    public ApiPermissionTypeFilter getType() {
+        return type;
+    }
+
+    public Optional<ApiPermissionTypeFilter> optionalType() {
+        return Optional.ofNullable(type);
+    }
+
+    public ApiPermissionTypeFilter type() {
+        if (type == null) {
+            setType(new ApiPermissionTypeFilter());
+        }
+        return type;
+    }
+
+    public void setType(ApiPermissionTypeFilter type) {
+        this.type = type;
+    }
+
+    public StringFilter getMethod() {
+        return method;
+    }
+
+    public Optional<StringFilter> optionalMethod() {
+        return Optional.ofNullable(method);
+    }
+
+    public StringFilter method() {
+        if (method == null) {
+            setMethod(new StringFilter());
+        }
+        return method;
+    }
+
+    public void setMethod(StringFilter method) {
+        this.method = method;
+    }
+
+    public StringFilter getUrl() {
+        return url;
+    }
+
+    public Optional<StringFilter> optionalUrl() {
+        return Optional.ofNullable(url);
+    }
+
+    public StringFilter url() {
+        if (url == null) {
+            setUrl(new StringFilter());
+        }
+        return url;
+    }
+
+    public void setUrl(StringFilter url) {
+        this.url = url;
+    }
+
+    public ApiPermissionStateFilter getStatus() {
+        return status;
+    }
+
+    public Optional<ApiPermissionStateFilter> optionalStatus() {
+        return Optional.ofNullable(status);
+    }
+
+    public ApiPermissionStateFilter status() {
+        if (status == null) {
+            setStatus(new ApiPermissionStateFilter());
+        }
+        return status;
+    }
+
+    public void setStatus(ApiPermissionStateFilter status) {
+        this.status = status;
+    }
+
+    public LongFilter getChildrenId() {
+        return childrenId;
+    }
+
+    public Optional<LongFilter> optionalChildrenId() {
+        return Optional.ofNullable(childrenId);
+    }
+
+    public LongFilter childrenId() {
+        if (childrenId == null) {
+            setChildrenId(new LongFilter());
+        }
+        return childrenId;
+    }
+
+    public void setChildrenId(LongFilter childrenId) {
+        this.childrenId = childrenId;
+    }
+
+    public StringFilter getChildrenName() {
+        return childrenName;
+    }
+
+    public Optional<StringFilter> optionalChildrenName() {
+        return Optional.ofNullable(childrenName);
+    }
+
+    public StringFilter childrenName() {
+        if (childrenName == null) {
+            setChildrenName(new StringFilter());
+        }
+        return childrenName;
+    }
+
+    public void setChildrenName(StringFilter childrenName) {
+        this.childrenName = childrenName;
+    }
+
+    public LongFilter getParentId() {
+        return parentId;
+    }
+
+    public Optional<LongFilter> optionalParentId() {
+        return Optional.ofNullable(parentId);
+    }
+
+    public LongFilter parentId() {
+        if (parentId == null) {
+            setParentId(new LongFilter());
+        }
+        return parentId;
+    }
+
+    public void setParentId(LongFilter parentId) {
+        this.parentId = parentId;
+    }
+
+    public StringFilter getParentName() {
+        return parentName;
+    }
+
+    public Optional<StringFilter> optionalParentName() {
+        return Optional.ofNullable(parentName);
+    }
+
+    public StringFilter parentName() {
+        if (parentName == null) {
+            setParentName(new StringFilter());
+        }
+        return parentName;
+    }
+
+    public void setParentName(StringFilter parentName) {
+        this.parentName = parentName;
+    }
+
+    public LongFilter getAuthoritiesId() {
+        return authoritiesId;
+    }
+
+    public Optional<LongFilter> optionalAuthoritiesId() {
+        return Optional.ofNullable(authoritiesId);
+    }
+
+    public LongFilter authoritiesId() {
+        if (authoritiesId == null) {
+            setAuthoritiesId(new LongFilter());
+        }
+        return authoritiesId;
+    }
+
+    public void setAuthoritiesId(LongFilter authoritiesId) {
+        this.authoritiesId = authoritiesId;
+    }
+
+    public StringFilter getAuthoritiesName() {
+        return authoritiesName;
+    }
+
+    public Optional<StringFilter> optionalAuthoritiesName() {
+        return Optional.ofNullable(authoritiesName);
+    }
+
+    public StringFilter authoritiesName() {
+        if (authoritiesName == null) {
+            setAuthoritiesName(new StringFilter());
+        }
+        return authoritiesName;
+    }
+
+    public void setAuthoritiesName(StringFilter authoritiesName) {
+        this.authoritiesName = authoritiesName;
     }
 
     public void setAnd(ApiPermissionCriteria and) {
@@ -198,231 +459,6 @@ public class ApiPermissionCriteria implements Serializable, Criteria {
         return or;
     }
 
-    public LongFilter getId() {
-        return id;
-    }
-
-    public LongFilter id() {
-        if (id == null) {
-            id = new LongFilter();
-        }
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
-    }
-
-    public StringFilter getServiceName() {
-        return serviceName;
-    }
-
-    public StringFilter serviceName() {
-        if (serviceName == null) {
-            serviceName = new StringFilter();
-        }
-        return serviceName;
-    }
-
-    public void setServiceName(StringFilter serviceName) {
-        this.serviceName = serviceName;
-    }
-
-    public StringFilter getName() {
-        return name;
-    }
-
-    public StringFilter name() {
-        if (name == null) {
-            name = new StringFilter();
-        }
-        return name;
-    }
-
-    public void setName(StringFilter name) {
-        this.name = name;
-    }
-
-    public StringFilter getCode() {
-        return code;
-    }
-
-    public StringFilter code() {
-        if (code == null) {
-            code = new StringFilter();
-        }
-        return code;
-    }
-
-    public void setCode(StringFilter code) {
-        this.code = code;
-    }
-
-    public StringFilter getDescription() {
-        return description;
-    }
-
-    public StringFilter description() {
-        if (description == null) {
-            description = new StringFilter();
-        }
-        return description;
-    }
-
-    public void setDescription(StringFilter description) {
-        this.description = description;
-    }
-
-    public ApiPermissionTypeFilter getType() {
-        return type;
-    }
-
-    public ApiPermissionTypeFilter type() {
-        if (type == null) {
-            type = new ApiPermissionTypeFilter();
-        }
-        return type;
-    }
-
-    public void setType(ApiPermissionTypeFilter type) {
-        this.type = type;
-    }
-
-    public StringFilter getMethod() {
-        return method;
-    }
-
-    public StringFilter method() {
-        if (method == null) {
-            method = new StringFilter();
-        }
-        return method;
-    }
-
-    public void setMethod(StringFilter method) {
-        this.method = method;
-    }
-
-    public StringFilter getUrl() {
-        return url;
-    }
-
-    public StringFilter url() {
-        if (url == null) {
-            url = new StringFilter();
-        }
-        return url;
-    }
-
-    public void setUrl(StringFilter url) {
-        this.url = url;
-    }
-
-    public ApiPermissionStateFilter getStatus() {
-        return status;
-    }
-
-    public ApiPermissionStateFilter status() {
-        if (status == null) {
-            status = new ApiPermissionStateFilter();
-        }
-        return status;
-    }
-
-    public void setStatus(ApiPermissionStateFilter status) {
-        this.status = status;
-    }
-
-    public LongFilter getChildrenId() {
-        return childrenId;
-    }
-
-    public LongFilter childrenId() {
-        if (childrenId == null) {
-            childrenId = new LongFilter();
-        }
-        return childrenId;
-    }
-
-    public void setChildrenId(LongFilter childrenId) {
-        this.childrenId = childrenId;
-    }
-
-    public StringFilter getChildrenName() {
-        return childrenName;
-    }
-
-    public StringFilter childrenName() {
-        if (childrenName == null) {
-            childrenName = new StringFilter();
-        }
-        return childrenName;
-    }
-
-    public void setChildrenName(StringFilter childrenName) {
-        this.childrenName = childrenName;
-    }
-
-    public LongFilter getParentId() {
-        return parentId;
-    }
-
-    public LongFilter parentId() {
-        if (parentId == null) {
-            parentId = new LongFilter();
-        }
-        return parentId;
-    }
-
-    public void setParentId(LongFilter parentId) {
-        this.parentId = parentId;
-    }
-
-    public StringFilter getParentName() {
-        return parentName;
-    }
-
-    public StringFilter parentName() {
-        if (parentName == null) {
-            parentName = new StringFilter();
-        }
-        return parentName;
-    }
-
-    public void setParentName(StringFilter parentName) {
-        this.parentName = parentName;
-    }
-
-    public LongFilter getAuthoritiesId() {
-        return authoritiesId;
-    }
-
-    public LongFilter authoritiesId() {
-        if (authoritiesId == null) {
-            authoritiesId = new LongFilter();
-        }
-        return authoritiesId;
-    }
-
-    public void setAuthoritiesId(LongFilter authoritiesId) {
-        this.authoritiesId = authoritiesId;
-    }
-
-    public StringFilter getAuthoritiesName() {
-        return authoritiesName;
-    }
-
-    public StringFilter authoritiesName() {
-        if (authoritiesName == null) {
-            authoritiesName = new StringFilter();
-        }
-        return authoritiesName;
-    }
-
-    public void setAuthoritiesName(StringFilter authoritiesName) {
-        this.authoritiesName = authoritiesName;
-    }
-
     public String getJhiCommonSearchKeywords() {
         return jhiCommonSearchKeywords;
     }
@@ -440,6 +476,17 @@ public class ApiPermissionCriteria implements Serializable, Criteria {
     }
 
     public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
         return distinct;
     }
 
@@ -467,11 +514,8 @@ public class ApiPermissionCriteria implements Serializable, Criteria {
             Objects.equals(url, that.url) &&
             Objects.equals(status, that.status) &&
             Objects.equals(childrenId, that.childrenId) &&
-            Objects.equals(childrenName, that.childrenName) &&
             Objects.equals(parentId, that.parentId) &&
-            Objects.equals(parentName, that.parentName) &&
             Objects.equals(authoritiesId, that.authoritiesId) &&
-            Objects.equals(authoritiesName, that.authoritiesName) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -489,11 +533,8 @@ public class ApiPermissionCriteria implements Serializable, Criteria {
             url,
             status,
             childrenId,
-            childrenName,
             parentId,
-            parentName,
             authoritiesId,
-            authoritiesName,
             distinct
         );
     }
@@ -502,26 +543,26 @@ public class ApiPermissionCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "ApiPermissionCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (serviceName != null ? "serviceName=" + serviceName + ", " : "") +
-            (name != null ? "name=" + name + ", " : "") +
-            (code != null ? "code=" + code + ", " : "") +
-            (description != null ? "description=" + description + ", " : "") +
-            (type != null ? "type=" + type + ", " : "") +
-            (method != null ? "method=" + method + ", " : "") +
-            (url != null ? "url=" + url + ", " : "") +
-            (status != null ? "status=" + status + ", " : "") +
-            (childrenId != null ? "childrenId=" + childrenId + ", " : "") +
-            (childrenName != null ? "childrenName=" + childrenName + ", " : "") +
-            (parentId != null ? "parentId=" + parentId + ", " : "") +
-            (parentName != null ? "parentName=" + parentName + ", " : "") +
-            (authoritiesId != null ? "authoritiesId=" + authoritiesId + ", " : "") +
-            (authoritiesName != null ? "authoritiesName=" + authoritiesName + ", " : "") +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalServiceName().map(f -> "serviceName=" + f + ", ").orElse("") +
+            optionalName().map(f -> "name=" + f + ", ").orElse("") +
+            optionalCode().map(f -> "code=" + f + ", ").orElse("") +
+            optionalDescription().map(f -> "description=" + f + ", ").orElse("") +
+            optionalType().map(f -> "type=" + f + ", ").orElse("") +
+            optionalMethod().map(f -> "method=" + f + ", ").orElse("") +
+            optionalUrl().map(f -> "url=" + f + ", ").orElse("") +
+            optionalStatus().map(f -> "status=" + f + ", ").orElse("") +
+            optionalChildrenId().map(f -> "childrenId=" + f + ", ").orElse("") +
+            optionalChildrenName().map(f -> "childrenName=" + f + ", ").orElse("") +
+            optionalParentId().map(f -> "parentId=" + f + ", ").orElse("") +
+            optionalParentName().map(f -> "parentName=" + f + ", ").orElse("") +
+            optionalAuthoritiesId().map(f -> "authoritiesId=" + f + ", ").orElse("") +
+            optionalAuthoritiesName().map(f -> "authoritiesName=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +
             (or != null ? "or=" + or + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
     }
 }

@@ -5,6 +5,7 @@ import com.begcode.monolith.domain.enumeration.OperateType;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
@@ -22,36 +23,12 @@ import tech.jhipster.service.filter.*;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class SysLogCriteria implements Serializable, Criteria {
 
-    @BindQuery(ignore = true)
-    private String jhiCommonSearchKeywords;
-
-    @BindQuery(ignore = true)
-    private Boolean useOr = false;
-
-    @BindQuery(ignore = true)
-    private SysLogCriteria and;
-
-    @BindQuery(ignore = true)
-    private SysLogCriteria or;
-
     /**
      * Class for filtering LogType
      */
     public static class LogTypeFilter extends Filter<LogType> {
 
         public LogTypeFilter() {}
-
-        public LogTypeFilter(String value) {
-            LogType enumValue = LogType.getByValue(value);
-            if (enumValue != null) {
-                setEquals(enumValue);
-            } else {
-                enumValue = LogType.getByDesc(value);
-                if (enumValue != null) {
-                    setEquals(enumValue);
-                }
-            }
-        }
 
         public LogTypeFilter(LogTypeFilter filter) {
             super(filter);
@@ -69,18 +46,6 @@ public class SysLogCriteria implements Serializable, Criteria {
     public static class OperateTypeFilter extends Filter<OperateType> {
 
         public OperateTypeFilter() {}
-
-        public OperateTypeFilter(String value) {
-            OperateType enumValue = OperateType.getByValue(value);
-            if (enumValue != null) {
-                setEquals(enumValue);
-            } else {
-                enumValue = OperateType.getByDesc(value);
-                if (enumValue != null) {
-                    setEquals(enumValue);
-                }
-            }
-        }
 
         public OperateTypeFilter(OperateTypeFilter filter) {
             super(filter);
@@ -140,32 +105,328 @@ public class SysLogCriteria implements Serializable, Criteria {
     private InstantFilter lastModifiedDate;
 
     @BindQuery(ignore = true)
+    private String jhiCommonSearchKeywords;
+
+    @BindQuery(ignore = true)
+    private Boolean useOr = false;
+
+    @BindQuery(ignore = true)
+    private SysLogCriteria and;
+
+    @BindQuery(ignore = true)
+    private SysLogCriteria or;
+
     private Boolean distinct;
 
     public SysLogCriteria() {}
 
     public SysLogCriteria(SysLogCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.logType = other.logType == null ? null : other.logType.copy();
-        this.logContent = other.logContent == null ? null : other.logContent.copy();
-        this.operateType = other.operateType == null ? null : other.operateType.copy();
-        this.userid = other.userid == null ? null : other.userid.copy();
-        this.username = other.username == null ? null : other.username.copy();
-        this.ip = other.ip == null ? null : other.ip.copy();
-        this.method = other.method == null ? null : other.method.copy();
-        this.requestUrl = other.requestUrl == null ? null : other.requestUrl.copy();
-        this.requestType = other.requestType == null ? null : other.requestType.copy();
-        this.costTime = other.costTime == null ? null : other.costTime.copy();
-        this.createdBy = other.createdBy == null ? null : other.createdBy.copy();
-        this.createdDate = other.createdDate == null ? null : other.createdDate.copy();
-        this.lastModifiedBy = other.lastModifiedBy == null ? null : other.lastModifiedBy.copy();
-        this.lastModifiedDate = other.lastModifiedDate == null ? null : other.lastModifiedDate.copy();
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.logType = other.optionalLogType().map(LogTypeFilter::copy).orElse(null);
+        this.logContent = other.optionalLogContent().map(StringFilter::copy).orElse(null);
+        this.operateType = other.optionalOperateType().map(OperateTypeFilter::copy).orElse(null);
+        this.userid = other.optionalUserid().map(StringFilter::copy).orElse(null);
+        this.username = other.optionalUsername().map(StringFilter::copy).orElse(null);
+        this.ip = other.optionalIp().map(StringFilter::copy).orElse(null);
+        this.method = other.optionalMethod().map(StringFilter::copy).orElse(null);
+        this.requestUrl = other.optionalRequestUrl().map(StringFilter::copy).orElse(null);
+        this.requestType = other.optionalRequestType().map(StringFilter::copy).orElse(null);
+        this.costTime = other.optionalCostTime().map(LongFilter::copy).orElse(null);
+        this.createdBy = other.optionalCreatedBy().map(LongFilter::copy).orElse(null);
+        this.createdDate = other.optionalCreatedDate().map(InstantFilter::copy).orElse(null);
+        this.lastModifiedBy = other.optionalLastModifiedBy().map(LongFilter::copy).orElse(null);
+        this.lastModifiedDate = other.optionalLastModifiedDate().map(InstantFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
     public SysLogCriteria copy() {
         return new SysLogCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public LogTypeFilter getLogType() {
+        return logType;
+    }
+
+    public Optional<LogTypeFilter> optionalLogType() {
+        return Optional.ofNullable(logType);
+    }
+
+    public LogTypeFilter logType() {
+        if (logType == null) {
+            setLogType(new LogTypeFilter());
+        }
+        return logType;
+    }
+
+    public void setLogType(LogTypeFilter logType) {
+        this.logType = logType;
+    }
+
+    public StringFilter getLogContent() {
+        return logContent;
+    }
+
+    public Optional<StringFilter> optionalLogContent() {
+        return Optional.ofNullable(logContent);
+    }
+
+    public StringFilter logContent() {
+        if (logContent == null) {
+            setLogContent(new StringFilter());
+        }
+        return logContent;
+    }
+
+    public void setLogContent(StringFilter logContent) {
+        this.logContent = logContent;
+    }
+
+    public OperateTypeFilter getOperateType() {
+        return operateType;
+    }
+
+    public Optional<OperateTypeFilter> optionalOperateType() {
+        return Optional.ofNullable(operateType);
+    }
+
+    public OperateTypeFilter operateType() {
+        if (operateType == null) {
+            setOperateType(new OperateTypeFilter());
+        }
+        return operateType;
+    }
+
+    public void setOperateType(OperateTypeFilter operateType) {
+        this.operateType = operateType;
+    }
+
+    public StringFilter getUserid() {
+        return userid;
+    }
+
+    public Optional<StringFilter> optionalUserid() {
+        return Optional.ofNullable(userid);
+    }
+
+    public StringFilter userid() {
+        if (userid == null) {
+            setUserid(new StringFilter());
+        }
+        return userid;
+    }
+
+    public void setUserid(StringFilter userid) {
+        this.userid = userid;
+    }
+
+    public StringFilter getUsername() {
+        return username;
+    }
+
+    public Optional<StringFilter> optionalUsername() {
+        return Optional.ofNullable(username);
+    }
+
+    public StringFilter username() {
+        if (username == null) {
+            setUsername(new StringFilter());
+        }
+        return username;
+    }
+
+    public void setUsername(StringFilter username) {
+        this.username = username;
+    }
+
+    public StringFilter getIp() {
+        return ip;
+    }
+
+    public Optional<StringFilter> optionalIp() {
+        return Optional.ofNullable(ip);
+    }
+
+    public StringFilter ip() {
+        if (ip == null) {
+            setIp(new StringFilter());
+        }
+        return ip;
+    }
+
+    public void setIp(StringFilter ip) {
+        this.ip = ip;
+    }
+
+    public StringFilter getMethod() {
+        return method;
+    }
+
+    public Optional<StringFilter> optionalMethod() {
+        return Optional.ofNullable(method);
+    }
+
+    public StringFilter method() {
+        if (method == null) {
+            setMethod(new StringFilter());
+        }
+        return method;
+    }
+
+    public void setMethod(StringFilter method) {
+        this.method = method;
+    }
+
+    public StringFilter getRequestUrl() {
+        return requestUrl;
+    }
+
+    public Optional<StringFilter> optionalRequestUrl() {
+        return Optional.ofNullable(requestUrl);
+    }
+
+    public StringFilter requestUrl() {
+        if (requestUrl == null) {
+            setRequestUrl(new StringFilter());
+        }
+        return requestUrl;
+    }
+
+    public void setRequestUrl(StringFilter requestUrl) {
+        this.requestUrl = requestUrl;
+    }
+
+    public StringFilter getRequestType() {
+        return requestType;
+    }
+
+    public Optional<StringFilter> optionalRequestType() {
+        return Optional.ofNullable(requestType);
+    }
+
+    public StringFilter requestType() {
+        if (requestType == null) {
+            setRequestType(new StringFilter());
+        }
+        return requestType;
+    }
+
+    public void setRequestType(StringFilter requestType) {
+        this.requestType = requestType;
+    }
+
+    public LongFilter getCostTime() {
+        return costTime;
+    }
+
+    public Optional<LongFilter> optionalCostTime() {
+        return Optional.ofNullable(costTime);
+    }
+
+    public LongFilter costTime() {
+        if (costTime == null) {
+            setCostTime(new LongFilter());
+        }
+        return costTime;
+    }
+
+    public void setCostTime(LongFilter costTime) {
+        this.costTime = costTime;
+    }
+
+    public LongFilter getCreatedBy() {
+        return createdBy;
+    }
+
+    public Optional<LongFilter> optionalCreatedBy() {
+        return Optional.ofNullable(createdBy);
+    }
+
+    public LongFilter createdBy() {
+        if (createdBy == null) {
+            setCreatedBy(new LongFilter());
+        }
+        return createdBy;
+    }
+
+    public void setCreatedBy(LongFilter createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public InstantFilter getCreatedDate() {
+        return createdDate;
+    }
+
+    public Optional<InstantFilter> optionalCreatedDate() {
+        return Optional.ofNullable(createdDate);
+    }
+
+    public InstantFilter createdDate() {
+        if (createdDate == null) {
+            setCreatedDate(new InstantFilter());
+        }
+        return createdDate;
+    }
+
+    public void setCreatedDate(InstantFilter createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LongFilter getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public Optional<LongFilter> optionalLastModifiedBy() {
+        return Optional.ofNullable(lastModifiedBy);
+    }
+
+    public LongFilter lastModifiedBy() {
+        if (lastModifiedBy == null) {
+            setLastModifiedBy(new LongFilter());
+        }
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(LongFilter lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public InstantFilter getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public Optional<InstantFilter> optionalLastModifiedDate() {
+        return Optional.ofNullable(lastModifiedDate);
+    }
+
+    public InstantFilter lastModifiedDate() {
+        if (lastModifiedDate == null) {
+            setLastModifiedDate(new InstantFilter());
+        }
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(InstantFilter lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public void setAnd(SysLogCriteria and) {
@@ -198,231 +459,6 @@ public class SysLogCriteria implements Serializable, Criteria {
         return or;
     }
 
-    public LongFilter getId() {
-        return id;
-    }
-
-    public LongFilter id() {
-        if (id == null) {
-            id = new LongFilter();
-        }
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
-    }
-
-    public LogTypeFilter getLogType() {
-        return logType;
-    }
-
-    public LogTypeFilter logType() {
-        if (logType == null) {
-            logType = new LogTypeFilter();
-        }
-        return logType;
-    }
-
-    public void setLogType(LogTypeFilter logType) {
-        this.logType = logType;
-    }
-
-    public StringFilter getLogContent() {
-        return logContent;
-    }
-
-    public StringFilter logContent() {
-        if (logContent == null) {
-            logContent = new StringFilter();
-        }
-        return logContent;
-    }
-
-    public void setLogContent(StringFilter logContent) {
-        this.logContent = logContent;
-    }
-
-    public OperateTypeFilter getOperateType() {
-        return operateType;
-    }
-
-    public OperateTypeFilter operateType() {
-        if (operateType == null) {
-            operateType = new OperateTypeFilter();
-        }
-        return operateType;
-    }
-
-    public void setOperateType(OperateTypeFilter operateType) {
-        this.operateType = operateType;
-    }
-
-    public StringFilter getUserid() {
-        return userid;
-    }
-
-    public StringFilter userid() {
-        if (userid == null) {
-            userid = new StringFilter();
-        }
-        return userid;
-    }
-
-    public void setUserid(StringFilter userid) {
-        this.userid = userid;
-    }
-
-    public StringFilter getUsername() {
-        return username;
-    }
-
-    public StringFilter username() {
-        if (username == null) {
-            username = new StringFilter();
-        }
-        return username;
-    }
-
-    public void setUsername(StringFilter username) {
-        this.username = username;
-    }
-
-    public StringFilter getIp() {
-        return ip;
-    }
-
-    public StringFilter ip() {
-        if (ip == null) {
-            ip = new StringFilter();
-        }
-        return ip;
-    }
-
-    public void setIp(StringFilter ip) {
-        this.ip = ip;
-    }
-
-    public StringFilter getMethod() {
-        return method;
-    }
-
-    public StringFilter method() {
-        if (method == null) {
-            method = new StringFilter();
-        }
-        return method;
-    }
-
-    public void setMethod(StringFilter method) {
-        this.method = method;
-    }
-
-    public StringFilter getRequestUrl() {
-        return requestUrl;
-    }
-
-    public StringFilter requestUrl() {
-        if (requestUrl == null) {
-            requestUrl = new StringFilter();
-        }
-        return requestUrl;
-    }
-
-    public void setRequestUrl(StringFilter requestUrl) {
-        this.requestUrl = requestUrl;
-    }
-
-    public StringFilter getRequestType() {
-        return requestType;
-    }
-
-    public StringFilter requestType() {
-        if (requestType == null) {
-            requestType = new StringFilter();
-        }
-        return requestType;
-    }
-
-    public void setRequestType(StringFilter requestType) {
-        this.requestType = requestType;
-    }
-
-    public LongFilter getCostTime() {
-        return costTime;
-    }
-
-    public LongFilter costTime() {
-        if (costTime == null) {
-            costTime = new LongFilter();
-        }
-        return costTime;
-    }
-
-    public void setCostTime(LongFilter costTime) {
-        this.costTime = costTime;
-    }
-
-    public LongFilter getCreatedBy() {
-        return createdBy;
-    }
-
-    public LongFilter createdBy() {
-        if (createdBy == null) {
-            createdBy = new LongFilter();
-        }
-        return createdBy;
-    }
-
-    public void setCreatedBy(LongFilter createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public InstantFilter getCreatedDate() {
-        return createdDate;
-    }
-
-    public InstantFilter createdDate() {
-        if (createdDate == null) {
-            createdDate = new InstantFilter();
-        }
-        return createdDate;
-    }
-
-    public void setCreatedDate(InstantFilter createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public LongFilter getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public LongFilter lastModifiedBy() {
-        if (lastModifiedBy == null) {
-            lastModifiedBy = new LongFilter();
-        }
-        return lastModifiedBy;
-    }
-
-    public void setLastModifiedBy(LongFilter lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public InstantFilter getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public InstantFilter lastModifiedDate() {
-        if (lastModifiedDate == null) {
-            lastModifiedDate = new InstantFilter();
-        }
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(InstantFilter lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
     public String getJhiCommonSearchKeywords() {
         return jhiCommonSearchKeywords;
     }
@@ -440,6 +476,17 @@ public class SysLogCriteria implements Serializable, Criteria {
     }
 
     public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
         return distinct;
     }
 
@@ -502,26 +549,26 @@ public class SysLogCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "SysLogCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (logType != null ? "logType=" + logType + ", " : "") +
-            (logContent != null ? "logContent=" + logContent + ", " : "") +
-            (operateType != null ? "operateType=" + operateType + ", " : "") +
-            (userid != null ? "userid=" + userid + ", " : "") +
-            (username != null ? "username=" + username + ", " : "") +
-            (ip != null ? "ip=" + ip + ", " : "") +
-            (method != null ? "method=" + method + ", " : "") +
-            (requestUrl != null ? "requestUrl=" + requestUrl + ", " : "") +
-            (requestType != null ? "requestType=" + requestType + ", " : "") +
-            (costTime != null ? "costTime=" + costTime + ", " : "") +
-            (createdBy != null ? "createdBy=" + createdBy + ", " : "") +
-            (createdDate != null ? "createdDate=" + createdDate + ", " : "") +
-            (lastModifiedBy != null ? "lastModifiedBy=" + lastModifiedBy + ", " : "") +
-            (lastModifiedDate != null ? "lastModifiedDate=" + lastModifiedDate + ", " : "") +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalLogType().map(f -> "logType=" + f + ", ").orElse("") +
+            optionalLogContent().map(f -> "logContent=" + f + ", ").orElse("") +
+            optionalOperateType().map(f -> "operateType=" + f + ", ").orElse("") +
+            optionalUserid().map(f -> "userid=" + f + ", ").orElse("") +
+            optionalUsername().map(f -> "username=" + f + ", ").orElse("") +
+            optionalIp().map(f -> "ip=" + f + ", ").orElse("") +
+            optionalMethod().map(f -> "method=" + f + ", ").orElse("") +
+            optionalRequestUrl().map(f -> "requestUrl=" + f + ", ").orElse("") +
+            optionalRequestType().map(f -> "requestType=" + f + ", ").orElse("") +
+            optionalCostTime().map(f -> "costTime=" + f + ", ").orElse("") +
+            optionalCreatedBy().map(f -> "createdBy=" + f + ", ").orElse("") +
+            optionalCreatedDate().map(f -> "createdDate=" + f + ", ").orElse("") +
+            optionalLastModifiedBy().map(f -> "lastModifiedBy=" + f + ", ").orElse("") +
+            optionalLastModifiedDate().map(f -> "lastModifiedDate=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +
             (or != null ? "or=" + or + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
     }
 }

@@ -5,6 +5,7 @@ import com.begcode.monolith.domain.enumeration.SendStatus;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
@@ -22,36 +23,12 @@ import tech.jhipster.service.filter.*;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class SmsMessageCriteria implements Serializable, Criteria {
 
-    @BindQuery(ignore = true)
-    private String jhiCommonSearchKeywords;
-
-    @BindQuery(ignore = true)
-    private Boolean useOr = false;
-
-    @BindQuery(ignore = true)
-    private SmsMessageCriteria and;
-
-    @BindQuery(ignore = true)
-    private SmsMessageCriteria or;
-
     /**
      * Class for filtering MessageSendType
      */
     public static class MessageSendTypeFilter extends Filter<MessageSendType> {
 
         public MessageSendTypeFilter() {}
-
-        public MessageSendTypeFilter(String value) {
-            MessageSendType enumValue = MessageSendType.getByValue(value);
-            if (enumValue != null) {
-                setEquals(enumValue);
-            } else {
-                enumValue = MessageSendType.getByDesc(value);
-                if (enumValue != null) {
-                    setEquals(enumValue);
-                }
-            }
-        }
 
         public MessageSendTypeFilter(MessageSendTypeFilter filter) {
             super(filter);
@@ -69,18 +46,6 @@ public class SmsMessageCriteria implements Serializable, Criteria {
     public static class SendStatusFilter extends Filter<SendStatus> {
 
         public SendStatusFilter() {}
-
-        public SendStatusFilter(String value) {
-            SendStatus enumValue = SendStatus.getByValue(value);
-            if (enumValue != null) {
-                setEquals(enumValue);
-            } else {
-                enumValue = SendStatus.getByDesc(value);
-                if (enumValue != null) {
-                    setEquals(enumValue);
-                }
-            }
-        }
 
         public SendStatusFilter(SendStatusFilter filter) {
             super(filter);
@@ -137,31 +102,308 @@ public class SmsMessageCriteria implements Serializable, Criteria {
     private InstantFilter lastModifiedDate;
 
     @BindQuery(ignore = true)
+    private String jhiCommonSearchKeywords;
+
+    @BindQuery(ignore = true)
+    private Boolean useOr = false;
+
+    @BindQuery(ignore = true)
+    private SmsMessageCriteria and;
+
+    @BindQuery(ignore = true)
+    private SmsMessageCriteria or;
+
     private Boolean distinct;
 
     public SmsMessageCriteria() {}
 
     public SmsMessageCriteria(SmsMessageCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.title = other.title == null ? null : other.title.copy();
-        this.sendType = other.sendType == null ? null : other.sendType.copy();
-        this.receiver = other.receiver == null ? null : other.receiver.copy();
-        this.params = other.params == null ? null : other.params.copy();
-        this.sendTime = other.sendTime == null ? null : other.sendTime.copy();
-        this.sendStatus = other.sendStatus == null ? null : other.sendStatus.copy();
-        this.retryNum = other.retryNum == null ? null : other.retryNum.copy();
-        this.failResult = other.failResult == null ? null : other.failResult.copy();
-        this.remark = other.remark == null ? null : other.remark.copy();
-        this.createdBy = other.createdBy == null ? null : other.createdBy.copy();
-        this.createdDate = other.createdDate == null ? null : other.createdDate.copy();
-        this.lastModifiedBy = other.lastModifiedBy == null ? null : other.lastModifiedBy.copy();
-        this.lastModifiedDate = other.lastModifiedDate == null ? null : other.lastModifiedDate.copy();
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.title = other.optionalTitle().map(StringFilter::copy).orElse(null);
+        this.sendType = other.optionalSendType().map(MessageSendTypeFilter::copy).orElse(null);
+        this.receiver = other.optionalReceiver().map(StringFilter::copy).orElse(null);
+        this.params = other.optionalParams().map(StringFilter::copy).orElse(null);
+        this.sendTime = other.optionalSendTime().map(ZonedDateTimeFilter::copy).orElse(null);
+        this.sendStatus = other.optionalSendStatus().map(SendStatusFilter::copy).orElse(null);
+        this.retryNum = other.optionalRetryNum().map(IntegerFilter::copy).orElse(null);
+        this.failResult = other.optionalFailResult().map(StringFilter::copy).orElse(null);
+        this.remark = other.optionalRemark().map(StringFilter::copy).orElse(null);
+        this.createdBy = other.optionalCreatedBy().map(LongFilter::copy).orElse(null);
+        this.createdDate = other.optionalCreatedDate().map(InstantFilter::copy).orElse(null);
+        this.lastModifiedBy = other.optionalLastModifiedBy().map(LongFilter::copy).orElse(null);
+        this.lastModifiedDate = other.optionalLastModifiedDate().map(InstantFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
     public SmsMessageCriteria copy() {
         return new SmsMessageCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public StringFilter getTitle() {
+        return title;
+    }
+
+    public Optional<StringFilter> optionalTitle() {
+        return Optional.ofNullable(title);
+    }
+
+    public StringFilter title() {
+        if (title == null) {
+            setTitle(new StringFilter());
+        }
+        return title;
+    }
+
+    public void setTitle(StringFilter title) {
+        this.title = title;
+    }
+
+    public MessageSendTypeFilter getSendType() {
+        return sendType;
+    }
+
+    public Optional<MessageSendTypeFilter> optionalSendType() {
+        return Optional.ofNullable(sendType);
+    }
+
+    public MessageSendTypeFilter sendType() {
+        if (sendType == null) {
+            setSendType(new MessageSendTypeFilter());
+        }
+        return sendType;
+    }
+
+    public void setSendType(MessageSendTypeFilter sendType) {
+        this.sendType = sendType;
+    }
+
+    public StringFilter getReceiver() {
+        return receiver;
+    }
+
+    public Optional<StringFilter> optionalReceiver() {
+        return Optional.ofNullable(receiver);
+    }
+
+    public StringFilter receiver() {
+        if (receiver == null) {
+            setReceiver(new StringFilter());
+        }
+        return receiver;
+    }
+
+    public void setReceiver(StringFilter receiver) {
+        this.receiver = receiver;
+    }
+
+    public StringFilter getParams() {
+        return params;
+    }
+
+    public Optional<StringFilter> optionalParams() {
+        return Optional.ofNullable(params);
+    }
+
+    public StringFilter params() {
+        if (params == null) {
+            setParams(new StringFilter());
+        }
+        return params;
+    }
+
+    public void setParams(StringFilter params) {
+        this.params = params;
+    }
+
+    public ZonedDateTimeFilter getSendTime() {
+        return sendTime;
+    }
+
+    public Optional<ZonedDateTimeFilter> optionalSendTime() {
+        return Optional.ofNullable(sendTime);
+    }
+
+    public ZonedDateTimeFilter sendTime() {
+        if (sendTime == null) {
+            setSendTime(new ZonedDateTimeFilter());
+        }
+        return sendTime;
+    }
+
+    public void setSendTime(ZonedDateTimeFilter sendTime) {
+        this.sendTime = sendTime;
+    }
+
+    public SendStatusFilter getSendStatus() {
+        return sendStatus;
+    }
+
+    public Optional<SendStatusFilter> optionalSendStatus() {
+        return Optional.ofNullable(sendStatus);
+    }
+
+    public SendStatusFilter sendStatus() {
+        if (sendStatus == null) {
+            setSendStatus(new SendStatusFilter());
+        }
+        return sendStatus;
+    }
+
+    public void setSendStatus(SendStatusFilter sendStatus) {
+        this.sendStatus = sendStatus;
+    }
+
+    public IntegerFilter getRetryNum() {
+        return retryNum;
+    }
+
+    public Optional<IntegerFilter> optionalRetryNum() {
+        return Optional.ofNullable(retryNum);
+    }
+
+    public IntegerFilter retryNum() {
+        if (retryNum == null) {
+            setRetryNum(new IntegerFilter());
+        }
+        return retryNum;
+    }
+
+    public void setRetryNum(IntegerFilter retryNum) {
+        this.retryNum = retryNum;
+    }
+
+    public StringFilter getFailResult() {
+        return failResult;
+    }
+
+    public Optional<StringFilter> optionalFailResult() {
+        return Optional.ofNullable(failResult);
+    }
+
+    public StringFilter failResult() {
+        if (failResult == null) {
+            setFailResult(new StringFilter());
+        }
+        return failResult;
+    }
+
+    public void setFailResult(StringFilter failResult) {
+        this.failResult = failResult;
+    }
+
+    public StringFilter getRemark() {
+        return remark;
+    }
+
+    public Optional<StringFilter> optionalRemark() {
+        return Optional.ofNullable(remark);
+    }
+
+    public StringFilter remark() {
+        if (remark == null) {
+            setRemark(new StringFilter());
+        }
+        return remark;
+    }
+
+    public void setRemark(StringFilter remark) {
+        this.remark = remark;
+    }
+
+    public LongFilter getCreatedBy() {
+        return createdBy;
+    }
+
+    public Optional<LongFilter> optionalCreatedBy() {
+        return Optional.ofNullable(createdBy);
+    }
+
+    public LongFilter createdBy() {
+        if (createdBy == null) {
+            setCreatedBy(new LongFilter());
+        }
+        return createdBy;
+    }
+
+    public void setCreatedBy(LongFilter createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public InstantFilter getCreatedDate() {
+        return createdDate;
+    }
+
+    public Optional<InstantFilter> optionalCreatedDate() {
+        return Optional.ofNullable(createdDate);
+    }
+
+    public InstantFilter createdDate() {
+        if (createdDate == null) {
+            setCreatedDate(new InstantFilter());
+        }
+        return createdDate;
+    }
+
+    public void setCreatedDate(InstantFilter createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LongFilter getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public Optional<LongFilter> optionalLastModifiedBy() {
+        return Optional.ofNullable(lastModifiedBy);
+    }
+
+    public LongFilter lastModifiedBy() {
+        if (lastModifiedBy == null) {
+            setLastModifiedBy(new LongFilter());
+        }
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(LongFilter lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public InstantFilter getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public Optional<InstantFilter> optionalLastModifiedDate() {
+        return Optional.ofNullable(lastModifiedDate);
+    }
+
+    public InstantFilter lastModifiedDate() {
+        if (lastModifiedDate == null) {
+            setLastModifiedDate(new InstantFilter());
+        }
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(InstantFilter lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public void setAnd(SmsMessageCriteria and) {
@@ -194,216 +436,6 @@ public class SmsMessageCriteria implements Serializable, Criteria {
         return or;
     }
 
-    public LongFilter getId() {
-        return id;
-    }
-
-    public LongFilter id() {
-        if (id == null) {
-            id = new LongFilter();
-        }
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
-    }
-
-    public StringFilter getTitle() {
-        return title;
-    }
-
-    public StringFilter title() {
-        if (title == null) {
-            title = new StringFilter();
-        }
-        return title;
-    }
-
-    public void setTitle(StringFilter title) {
-        this.title = title;
-    }
-
-    public MessageSendTypeFilter getSendType() {
-        return sendType;
-    }
-
-    public MessageSendTypeFilter sendType() {
-        if (sendType == null) {
-            sendType = new MessageSendTypeFilter();
-        }
-        return sendType;
-    }
-
-    public void setSendType(MessageSendTypeFilter sendType) {
-        this.sendType = sendType;
-    }
-
-    public StringFilter getReceiver() {
-        return receiver;
-    }
-
-    public StringFilter receiver() {
-        if (receiver == null) {
-            receiver = new StringFilter();
-        }
-        return receiver;
-    }
-
-    public void setReceiver(StringFilter receiver) {
-        this.receiver = receiver;
-    }
-
-    public StringFilter getParams() {
-        return params;
-    }
-
-    public StringFilter params() {
-        if (params == null) {
-            params = new StringFilter();
-        }
-        return params;
-    }
-
-    public void setParams(StringFilter params) {
-        this.params = params;
-    }
-
-    public ZonedDateTimeFilter getSendTime() {
-        return sendTime;
-    }
-
-    public ZonedDateTimeFilter sendTime() {
-        if (sendTime == null) {
-            sendTime = new ZonedDateTimeFilter();
-        }
-        return sendTime;
-    }
-
-    public void setSendTime(ZonedDateTimeFilter sendTime) {
-        this.sendTime = sendTime;
-    }
-
-    public SendStatusFilter getSendStatus() {
-        return sendStatus;
-    }
-
-    public SendStatusFilter sendStatus() {
-        if (sendStatus == null) {
-            sendStatus = new SendStatusFilter();
-        }
-        return sendStatus;
-    }
-
-    public void setSendStatus(SendStatusFilter sendStatus) {
-        this.sendStatus = sendStatus;
-    }
-
-    public IntegerFilter getRetryNum() {
-        return retryNum;
-    }
-
-    public IntegerFilter retryNum() {
-        if (retryNum == null) {
-            retryNum = new IntegerFilter();
-        }
-        return retryNum;
-    }
-
-    public void setRetryNum(IntegerFilter retryNum) {
-        this.retryNum = retryNum;
-    }
-
-    public StringFilter getFailResult() {
-        return failResult;
-    }
-
-    public StringFilter failResult() {
-        if (failResult == null) {
-            failResult = new StringFilter();
-        }
-        return failResult;
-    }
-
-    public void setFailResult(StringFilter failResult) {
-        this.failResult = failResult;
-    }
-
-    public StringFilter getRemark() {
-        return remark;
-    }
-
-    public StringFilter remark() {
-        if (remark == null) {
-            remark = new StringFilter();
-        }
-        return remark;
-    }
-
-    public void setRemark(StringFilter remark) {
-        this.remark = remark;
-    }
-
-    public LongFilter getCreatedBy() {
-        return createdBy;
-    }
-
-    public LongFilter createdBy() {
-        if (createdBy == null) {
-            createdBy = new LongFilter();
-        }
-        return createdBy;
-    }
-
-    public void setCreatedBy(LongFilter createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public InstantFilter getCreatedDate() {
-        return createdDate;
-    }
-
-    public InstantFilter createdDate() {
-        if (createdDate == null) {
-            createdDate = new InstantFilter();
-        }
-        return createdDate;
-    }
-
-    public void setCreatedDate(InstantFilter createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public LongFilter getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public LongFilter lastModifiedBy() {
-        if (lastModifiedBy == null) {
-            lastModifiedBy = new LongFilter();
-        }
-        return lastModifiedBy;
-    }
-
-    public void setLastModifiedBy(LongFilter lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public InstantFilter getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public InstantFilter lastModifiedDate() {
-        if (lastModifiedDate == null) {
-            lastModifiedDate = new InstantFilter();
-        }
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(InstantFilter lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
     public String getJhiCommonSearchKeywords() {
         return jhiCommonSearchKeywords;
     }
@@ -421,6 +453,17 @@ public class SmsMessageCriteria implements Serializable, Criteria {
     }
 
     public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
         return distinct;
     }
 
@@ -481,25 +524,25 @@ public class SmsMessageCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "SmsMessageCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (title != null ? "title=" + title + ", " : "") +
-            (sendType != null ? "sendType=" + sendType + ", " : "") +
-            (receiver != null ? "receiver=" + receiver + ", " : "") +
-            (params != null ? "params=" + params + ", " : "") +
-            (sendTime != null ? "sendTime=" + sendTime + ", " : "") +
-            (sendStatus != null ? "sendStatus=" + sendStatus + ", " : "") +
-            (retryNum != null ? "retryNum=" + retryNum + ", " : "") +
-            (failResult != null ? "failResult=" + failResult + ", " : "") +
-            (remark != null ? "remark=" + remark + ", " : "") +
-            (createdBy != null ? "createdBy=" + createdBy + ", " : "") +
-            (createdDate != null ? "createdDate=" + createdDate + ", " : "") +
-            (lastModifiedBy != null ? "lastModifiedBy=" + lastModifiedBy + ", " : "") +
-            (lastModifiedDate != null ? "lastModifiedDate=" + lastModifiedDate + ", " : "") +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalTitle().map(f -> "title=" + f + ", ").orElse("") +
+            optionalSendType().map(f -> "sendType=" + f + ", ").orElse("") +
+            optionalReceiver().map(f -> "receiver=" + f + ", ").orElse("") +
+            optionalParams().map(f -> "params=" + f + ", ").orElse("") +
+            optionalSendTime().map(f -> "sendTime=" + f + ", ").orElse("") +
+            optionalSendStatus().map(f -> "sendStatus=" + f + ", ").orElse("") +
+            optionalRetryNum().map(f -> "retryNum=" + f + ", ").orElse("") +
+            optionalFailResult().map(f -> "failResult=" + f + ", ").orElse("") +
+            optionalRemark().map(f -> "remark=" + f + ", ").orElse("") +
+            optionalCreatedBy().map(f -> "createdBy=" + f + ", ").orElse("") +
+            optionalCreatedDate().map(f -> "createdDate=" + f + ", ").orElse("") +
+            optionalLastModifiedBy().map(f -> "lastModifiedBy=" + f + ", ").orElse("") +
+            optionalLastModifiedDate().map(f -> "lastModifiedDate=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +
             (or != null ? "or=" + or + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
     }
 }

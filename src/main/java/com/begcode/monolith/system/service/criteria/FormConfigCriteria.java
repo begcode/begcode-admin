@@ -1,6 +1,6 @@
-package com.begcode.monolith.taskjob.service.criteria;
+package com.begcode.monolith.system.service.criteria;
 
-import com.begcode.monolith.domain.enumeration.JobStatus;
+import com.begcode.monolith.domain.BusinessType;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
@@ -10,57 +10,28 @@ import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
 
 /**
- * Criteria class for the {@link com.begcode.monolith.taskjob.domain.TaskJobConfig} entity. This class is used
- * in {@link com.begcode.monolith.taskjob.web.rest.TaskJobConfigResource} to receive all the possible filtering options from
+ * Criteria class for the {@link com.begcode.monolith.system.domain.FormConfig} entity. This class is used
+ * in {@link com.begcode.monolith.system.web.rest.FormConfigResource} to receive all the possible filtering options from
  * the Http GET request parameters.
  * For example the following could be a valid request:
- * {@code /task-job-configs?id.greaterThan=5&attr1.contains=something&attr2.specified=false}
+ * {@code /form-configs?id.greaterThan=5&attr1.contains=something&attr2.specified=false}
  * As Spring is unable to properly convert the types, unless specific {@link Filter} class are used, we need to use
  * fix type specific filters.
  */
 @ParameterObject
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class TaskJobConfigCriteria implements Serializable, Criteria {
-
-    /**
-     * Class for filtering JobStatus
-     */
-    public static class JobStatusFilter extends Filter<JobStatus> {
-
-        public JobStatusFilter() {}
-
-        public JobStatusFilter(JobStatusFilter filter) {
-            super(filter);
-        }
-
-        @Override
-        public JobStatusFilter copy() {
-            return new JobStatusFilter(this);
-        }
-    }
+public class FormConfigCriteria implements Serializable, Criteria {
 
     private static final long serialVersionUID = 1L;
 
     @BindQuery(column = "self.id")
     private LongFilter id;
 
-    @BindQuery(column = "self.name")
-    private StringFilter name;
+    @BindQuery(column = "self.form_key")
+    private StringFilter formKey;
 
-    @BindQuery(column = "self.job_class_name")
-    private StringFilter jobClassName;
-
-    @BindQuery(column = "self.cron_expression")
-    private StringFilter cronExpression;
-
-    @BindQuery(column = "self.parameter")
-    private StringFilter parameter;
-
-    @BindQuery(column = "self.description")
-    private StringFilter description;
-
-    @BindQuery(column = "self.job_status")
-    private JobStatusFilter jobStatus;
+    @BindQuery(column = "self.form_name")
+    private StringFilter formName;
 
     @BindQuery(column = "self.created_by")
     private LongFilter createdBy;
@@ -74,6 +45,12 @@ public class TaskJobConfigCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.last_modified_date")
     private InstantFilter lastModifiedDate;
 
+    @BindQuery(entity = BusinessType.class, column = "id", condition = "this.business_type_id=id")
+    private LongFilter businessTypeId;
+
+    @BindQuery(entity = BusinessType.class, column = "name", condition = "this.business_type_id=id")
+    private StringFilter businessTypeName;
+
     @BindQuery(ignore = true)
     private String jhiCommonSearchKeywords;
 
@@ -81,33 +58,31 @@ public class TaskJobConfigCriteria implements Serializable, Criteria {
     private Boolean useOr = false;
 
     @BindQuery(ignore = true)
-    private TaskJobConfigCriteria and;
+    private FormConfigCriteria and;
 
     @BindQuery(ignore = true)
-    private TaskJobConfigCriteria or;
+    private FormConfigCriteria or;
 
     private Boolean distinct;
 
-    public TaskJobConfigCriteria() {}
+    public FormConfigCriteria() {}
 
-    public TaskJobConfigCriteria(TaskJobConfigCriteria other) {
+    public FormConfigCriteria(FormConfigCriteria other) {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
-        this.name = other.optionalName().map(StringFilter::copy).orElse(null);
-        this.jobClassName = other.optionalJobClassName().map(StringFilter::copy).orElse(null);
-        this.cronExpression = other.optionalCronExpression().map(StringFilter::copy).orElse(null);
-        this.parameter = other.optionalParameter().map(StringFilter::copy).orElse(null);
-        this.description = other.optionalDescription().map(StringFilter::copy).orElse(null);
-        this.jobStatus = other.optionalJobStatus().map(JobStatusFilter::copy).orElse(null);
+        this.formKey = other.optionalFormKey().map(StringFilter::copy).orElse(null);
+        this.formName = other.optionalFormName().map(StringFilter::copy).orElse(null);
         this.createdBy = other.optionalCreatedBy().map(LongFilter::copy).orElse(null);
         this.createdDate = other.optionalCreatedDate().map(InstantFilter::copy).orElse(null);
         this.lastModifiedBy = other.optionalLastModifiedBy().map(LongFilter::copy).orElse(null);
         this.lastModifiedDate = other.optionalLastModifiedDate().map(InstantFilter::copy).orElse(null);
+        this.businessTypeId = other.optionalBusinessTypeId().map(LongFilter::copy).orElse(null);
+        this.businessTypeName = other.optionalBusinessTypeName().map(StringFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
-    public TaskJobConfigCriteria copy() {
-        return new TaskJobConfigCriteria(this);
+    public FormConfigCriteria copy() {
+        return new FormConfigCriteria(this);
     }
 
     public LongFilter getId() {
@@ -129,118 +104,42 @@ public class TaskJobConfigCriteria implements Serializable, Criteria {
         this.id = id;
     }
 
-    public StringFilter getName() {
-        return name;
+    public StringFilter getFormKey() {
+        return formKey;
     }
 
-    public Optional<StringFilter> optionalName() {
-        return Optional.ofNullable(name);
+    public Optional<StringFilter> optionalFormKey() {
+        return Optional.ofNullable(formKey);
     }
 
-    public StringFilter name() {
-        if (name == null) {
-            setName(new StringFilter());
+    public StringFilter formKey() {
+        if (formKey == null) {
+            setFormKey(new StringFilter());
         }
-        return name;
+        return formKey;
     }
 
-    public void setName(StringFilter name) {
-        this.name = name;
+    public void setFormKey(StringFilter formKey) {
+        this.formKey = formKey;
     }
 
-    public StringFilter getJobClassName() {
-        return jobClassName;
+    public StringFilter getFormName() {
+        return formName;
     }
 
-    public Optional<StringFilter> optionalJobClassName() {
-        return Optional.ofNullable(jobClassName);
+    public Optional<StringFilter> optionalFormName() {
+        return Optional.ofNullable(formName);
     }
 
-    public StringFilter jobClassName() {
-        if (jobClassName == null) {
-            setJobClassName(new StringFilter());
+    public StringFilter formName() {
+        if (formName == null) {
+            setFormName(new StringFilter());
         }
-        return jobClassName;
+        return formName;
     }
 
-    public void setJobClassName(StringFilter jobClassName) {
-        this.jobClassName = jobClassName;
-    }
-
-    public StringFilter getCronExpression() {
-        return cronExpression;
-    }
-
-    public Optional<StringFilter> optionalCronExpression() {
-        return Optional.ofNullable(cronExpression);
-    }
-
-    public StringFilter cronExpression() {
-        if (cronExpression == null) {
-            setCronExpression(new StringFilter());
-        }
-        return cronExpression;
-    }
-
-    public void setCronExpression(StringFilter cronExpression) {
-        this.cronExpression = cronExpression;
-    }
-
-    public StringFilter getParameter() {
-        return parameter;
-    }
-
-    public Optional<StringFilter> optionalParameter() {
-        return Optional.ofNullable(parameter);
-    }
-
-    public StringFilter parameter() {
-        if (parameter == null) {
-            setParameter(new StringFilter());
-        }
-        return parameter;
-    }
-
-    public void setParameter(StringFilter parameter) {
-        this.parameter = parameter;
-    }
-
-    public StringFilter getDescription() {
-        return description;
-    }
-
-    public Optional<StringFilter> optionalDescription() {
-        return Optional.ofNullable(description);
-    }
-
-    public StringFilter description() {
-        if (description == null) {
-            setDescription(new StringFilter());
-        }
-        return description;
-    }
-
-    public void setDescription(StringFilter description) {
-        this.description = description;
-    }
-
-    public JobStatusFilter getJobStatus() {
-        return jobStatus;
-    }
-
-    public Optional<JobStatusFilter> optionalJobStatus() {
-        return Optional.ofNullable(jobStatus);
-    }
-
-    public JobStatusFilter jobStatus() {
-        if (jobStatus == null) {
-            setJobStatus(new JobStatusFilter());
-        }
-        return jobStatus;
-    }
-
-    public void setJobStatus(JobStatusFilter jobStatus) {
-        this.jobStatus = jobStatus;
+    public void setFormName(StringFilter formName) {
+        this.formName = formName;
     }
 
     public LongFilter getCreatedBy() {
@@ -319,32 +218,70 @@ public class TaskJobConfigCriteria implements Serializable, Criteria {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    public void setAnd(TaskJobConfigCriteria and) {
+    public LongFilter getBusinessTypeId() {
+        return businessTypeId;
+    }
+
+    public Optional<LongFilter> optionalBusinessTypeId() {
+        return Optional.ofNullable(businessTypeId);
+    }
+
+    public LongFilter businessTypeId() {
+        if (businessTypeId == null) {
+            setBusinessTypeId(new LongFilter());
+        }
+        return businessTypeId;
+    }
+
+    public void setBusinessTypeId(LongFilter businessTypeId) {
+        this.businessTypeId = businessTypeId;
+    }
+
+    public StringFilter getBusinessTypeName() {
+        return businessTypeName;
+    }
+
+    public Optional<StringFilter> optionalBusinessTypeName() {
+        return Optional.ofNullable(businessTypeName);
+    }
+
+    public StringFilter businessTypeName() {
+        if (businessTypeName == null) {
+            setBusinessTypeName(new StringFilter());
+        }
+        return businessTypeName;
+    }
+
+    public void setBusinessTypeName(StringFilter businessTypeName) {
+        this.businessTypeName = businessTypeName;
+    }
+
+    public void setAnd(FormConfigCriteria and) {
         this.and = and;
     }
 
-    public TaskJobConfigCriteria getAnd() {
+    public FormConfigCriteria getAnd() {
         return and;
     }
 
-    public TaskJobConfigCriteria and() {
+    public FormConfigCriteria and() {
         if (and == null) {
-            and = new TaskJobConfigCriteria();
+            and = new FormConfigCriteria();
         }
         return and;
     }
 
-    public void setOr(TaskJobConfigCriteria or) {
+    public void setOr(FormConfigCriteria or) {
         this.or = or;
     }
 
-    public TaskJobConfigCriteria getOr() {
+    public FormConfigCriteria getOr() {
         return or;
     }
 
-    public TaskJobConfigCriteria or() {
+    public FormConfigCriteria or() {
         if (or == null) {
-            or = new TaskJobConfigCriteria();
+            or = new FormConfigCriteria();
         }
         return or;
     }
@@ -392,56 +329,38 @@ public class TaskJobConfigCriteria implements Serializable, Criteria {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final TaskJobConfigCriteria that = (TaskJobConfigCriteria) o;
+        final FormConfigCriteria that = (FormConfigCriteria) o;
         return (
             Objects.equals(id, that.id) &&
-            Objects.equals(name, that.name) &&
-            Objects.equals(jobClassName, that.jobClassName) &&
-            Objects.equals(cronExpression, that.cronExpression) &&
-            Objects.equals(parameter, that.parameter) &&
-            Objects.equals(description, that.description) &&
-            Objects.equals(jobStatus, that.jobStatus) &&
+            Objects.equals(formKey, that.formKey) &&
+            Objects.equals(formName, that.formName) &&
             Objects.equals(createdBy, that.createdBy) &&
             Objects.equals(createdDate, that.createdDate) &&
             Objects.equals(lastModifiedBy, that.lastModifiedBy) &&
             Objects.equals(lastModifiedDate, that.lastModifiedDate) &&
+            Objects.equals(businessTypeId, that.businessTypeId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-            id,
-            name,
-            jobClassName,
-            cronExpression,
-            parameter,
-            description,
-            jobStatus,
-            createdBy,
-            createdDate,
-            lastModifiedBy,
-            lastModifiedDate,
-            distinct
-        );
+        return Objects.hash(id, formKey, formName, createdBy, createdDate, lastModifiedBy, lastModifiedDate, businessTypeId, distinct);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
-        return "TaskJobConfigCriteria{" +
+        return "FormConfigCriteria{" +
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
-            optionalName().map(f -> "name=" + f + ", ").orElse("") +
-            optionalJobClassName().map(f -> "jobClassName=" + f + ", ").orElse("") +
-            optionalCronExpression().map(f -> "cronExpression=" + f + ", ").orElse("") +
-            optionalParameter().map(f -> "parameter=" + f + ", ").orElse("") +
-            optionalDescription().map(f -> "description=" + f + ", ").orElse("") +
-            optionalJobStatus().map(f -> "jobStatus=" + f + ", ").orElse("") +
+            optionalFormKey().map(f -> "formKey=" + f + ", ").orElse("") +
+            optionalFormName().map(f -> "formName=" + f + ", ").orElse("") +
             optionalCreatedBy().map(f -> "createdBy=" + f + ", ").orElse("") +
             optionalCreatedDate().map(f -> "createdDate=" + f + ", ").orElse("") +
             optionalLastModifiedBy().map(f -> "lastModifiedBy=" + f + ", ").orElse("") +
             optionalLastModifiedDate().map(f -> "lastModifiedDate=" + f + ", ").orElse("") +
+            optionalBusinessTypeId().map(f -> "businessTypeId=" + f + ", ").orElse("") +
+            optionalBusinessTypeName().map(f -> "businessTypeName=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +

@@ -7,6 +7,7 @@ import com.begcode.monolith.domain.UploadImage;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
@@ -23,18 +24,6 @@ import tech.jhipster.service.filter.*;
 @ParameterObject
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ResourceCategoryCriteria implements Serializable, Criteria {
-
-    @BindQuery(ignore = true)
-    private String jhiCommonSearchKeywords;
-
-    @BindQuery(ignore = true)
-    private Boolean useOr = false;
-
-    @BindQuery(ignore = true)
-    private ResourceCategoryCriteria and;
-
-    @BindQuery(ignore = true)
-    private ResourceCategoryCriteria or;
 
     private static final long serialVersionUID = 1L;
 
@@ -56,7 +45,7 @@ public class ResourceCategoryCriteria implements Serializable, Criteria {
     @BindQuery(entity = ResourceCategory.class, column = "title", condition = "id=parent_id")
     private StringFilter childrenTitle;
 
-    @BindQuery(column = "self.parent_id")
+    @BindQuery(entity = ResourceCategory.class, column = "id", condition = "this.parent_id=id")
     private LongFilter parentId;
 
     @BindQuery(entity = ResourceCategory.class, column = "title", condition = "this.parent_id=id")
@@ -75,29 +64,268 @@ public class ResourceCategoryCriteria implements Serializable, Criteria {
     private StringFilter filesUrl;
 
     @BindQuery(ignore = true)
+    private String jhiCommonSearchKeywords;
+
+    @BindQuery(ignore = true)
+    private Boolean useOr = false;
+
+    @BindQuery(ignore = true)
+    private ResourceCategoryCriteria and;
+
+    @BindQuery(ignore = true)
+    private ResourceCategoryCriteria or;
+
     private Boolean distinct;
 
     public ResourceCategoryCriteria() {}
 
     public ResourceCategoryCriteria(ResourceCategoryCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.title = other.title == null ? null : other.title.copy();
-        this.code = other.code == null ? null : other.code.copy();
-        this.orderNumber = other.orderNumber == null ? null : other.orderNumber.copy();
-        this.childrenId = other.childrenId == null ? null : other.childrenId.copy();
-        this.childrenTitle = other.childrenTitle == null ? null : other.childrenTitle.copy();
-        this.parentId = other.parentId == null ? null : other.parentId.copy();
-        this.parentTitle = other.parentTitle == null ? null : other.parentTitle.copy();
-        this.imagesId = other.imagesId == null ? null : other.imagesId.copy();
-        this.imagesUrl = other.imagesUrl == null ? null : other.imagesUrl.copy();
-        this.filesId = other.filesId == null ? null : other.filesId.copy();
-        this.filesUrl = other.filesUrl == null ? null : other.filesUrl.copy();
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.title = other.optionalTitle().map(StringFilter::copy).orElse(null);
+        this.code = other.optionalCode().map(StringFilter::copy).orElse(null);
+        this.orderNumber = other.optionalOrderNumber().map(IntegerFilter::copy).orElse(null);
+        this.childrenId = other.optionalChildrenId().map(LongFilter::copy).orElse(null);
+        this.childrenTitle = other.optionalChildrenTitle().map(StringFilter::copy).orElse(null);
+        this.parentId = other.optionalParentId().map(LongFilter::copy).orElse(null);
+        this.parentTitle = other.optionalParentTitle().map(StringFilter::copy).orElse(null);
+        this.imagesId = other.optionalImagesId().map(LongFilter::copy).orElse(null);
+        this.imagesUrl = other.optionalImagesUrl().map(StringFilter::copy).orElse(null);
+        this.filesId = other.optionalFilesId().map(LongFilter::copy).orElse(null);
+        this.filesUrl = other.optionalFilesUrl().map(StringFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
     public ResourceCategoryCriteria copy() {
         return new ResourceCategoryCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public StringFilter getTitle() {
+        return title;
+    }
+
+    public Optional<StringFilter> optionalTitle() {
+        return Optional.ofNullable(title);
+    }
+
+    public StringFilter title() {
+        if (title == null) {
+            setTitle(new StringFilter());
+        }
+        return title;
+    }
+
+    public void setTitle(StringFilter title) {
+        this.title = title;
+    }
+
+    public StringFilter getCode() {
+        return code;
+    }
+
+    public Optional<StringFilter> optionalCode() {
+        return Optional.ofNullable(code);
+    }
+
+    public StringFilter code() {
+        if (code == null) {
+            setCode(new StringFilter());
+        }
+        return code;
+    }
+
+    public void setCode(StringFilter code) {
+        this.code = code;
+    }
+
+    public IntegerFilter getOrderNumber() {
+        return orderNumber;
+    }
+
+    public Optional<IntegerFilter> optionalOrderNumber() {
+        return Optional.ofNullable(orderNumber);
+    }
+
+    public IntegerFilter orderNumber() {
+        if (orderNumber == null) {
+            setOrderNumber(new IntegerFilter());
+        }
+        return orderNumber;
+    }
+
+    public void setOrderNumber(IntegerFilter orderNumber) {
+        this.orderNumber = orderNumber;
+    }
+
+    public LongFilter getChildrenId() {
+        return childrenId;
+    }
+
+    public Optional<LongFilter> optionalChildrenId() {
+        return Optional.ofNullable(childrenId);
+    }
+
+    public LongFilter childrenId() {
+        if (childrenId == null) {
+            setChildrenId(new LongFilter());
+        }
+        return childrenId;
+    }
+
+    public void setChildrenId(LongFilter childrenId) {
+        this.childrenId = childrenId;
+    }
+
+    public StringFilter getChildrenTitle() {
+        return childrenTitle;
+    }
+
+    public Optional<StringFilter> optionalChildrenTitle() {
+        return Optional.ofNullable(childrenTitle);
+    }
+
+    public StringFilter childrenTitle() {
+        if (childrenTitle == null) {
+            setChildrenTitle(new StringFilter());
+        }
+        return childrenTitle;
+    }
+
+    public void setChildrenTitle(StringFilter childrenTitle) {
+        this.childrenTitle = childrenTitle;
+    }
+
+    public LongFilter getParentId() {
+        return parentId;
+    }
+
+    public Optional<LongFilter> optionalParentId() {
+        return Optional.ofNullable(parentId);
+    }
+
+    public LongFilter parentId() {
+        if (parentId == null) {
+            setParentId(new LongFilter());
+        }
+        return parentId;
+    }
+
+    public void setParentId(LongFilter parentId) {
+        this.parentId = parentId;
+    }
+
+    public StringFilter getParentTitle() {
+        return parentTitle;
+    }
+
+    public Optional<StringFilter> optionalParentTitle() {
+        return Optional.ofNullable(parentTitle);
+    }
+
+    public StringFilter parentTitle() {
+        if (parentTitle == null) {
+            setParentTitle(new StringFilter());
+        }
+        return parentTitle;
+    }
+
+    public void setParentTitle(StringFilter parentTitle) {
+        this.parentTitle = parentTitle;
+    }
+
+    public LongFilter getImagesId() {
+        return imagesId;
+    }
+
+    public Optional<LongFilter> optionalImagesId() {
+        return Optional.ofNullable(imagesId);
+    }
+
+    public LongFilter imagesId() {
+        if (imagesId == null) {
+            setImagesId(new LongFilter());
+        }
+        return imagesId;
+    }
+
+    public void setImagesId(LongFilter imagesId) {
+        this.imagesId = imagesId;
+    }
+
+    public StringFilter getImagesUrl() {
+        return imagesUrl;
+    }
+
+    public Optional<StringFilter> optionalImagesUrl() {
+        return Optional.ofNullable(imagesUrl);
+    }
+
+    public StringFilter imagesUrl() {
+        if (imagesUrl == null) {
+            setImagesUrl(new StringFilter());
+        }
+        return imagesUrl;
+    }
+
+    public void setImagesUrl(StringFilter imagesUrl) {
+        this.imagesUrl = imagesUrl;
+    }
+
+    public LongFilter getFilesId() {
+        return filesId;
+    }
+
+    public Optional<LongFilter> optionalFilesId() {
+        return Optional.ofNullable(filesId);
+    }
+
+    public LongFilter filesId() {
+        if (filesId == null) {
+            setFilesId(new LongFilter());
+        }
+        return filesId;
+    }
+
+    public void setFilesId(LongFilter filesId) {
+        this.filesId = filesId;
+    }
+
+    public StringFilter getFilesUrl() {
+        return filesUrl;
+    }
+
+    public Optional<StringFilter> optionalFilesUrl() {
+        return Optional.ofNullable(filesUrl);
+    }
+
+    public StringFilter filesUrl() {
+        if (filesUrl == null) {
+            setFilesUrl(new StringFilter());
+        }
+        return filesUrl;
+    }
+
+    public void setFilesUrl(StringFilter filesUrl) {
+        this.filesUrl = filesUrl;
     }
 
     public void setAnd(ResourceCategoryCriteria and) {
@@ -130,186 +358,6 @@ public class ResourceCategoryCriteria implements Serializable, Criteria {
         return or;
     }
 
-    public LongFilter getId() {
-        return id;
-    }
-
-    public LongFilter id() {
-        if (id == null) {
-            id = new LongFilter();
-        }
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
-    }
-
-    public StringFilter getTitle() {
-        return title;
-    }
-
-    public StringFilter title() {
-        if (title == null) {
-            title = new StringFilter();
-        }
-        return title;
-    }
-
-    public void setTitle(StringFilter title) {
-        this.title = title;
-    }
-
-    public StringFilter getCode() {
-        return code;
-    }
-
-    public StringFilter code() {
-        if (code == null) {
-            code = new StringFilter();
-        }
-        return code;
-    }
-
-    public void setCode(StringFilter code) {
-        this.code = code;
-    }
-
-    public IntegerFilter getOrderNumber() {
-        return orderNumber;
-    }
-
-    public IntegerFilter orderNumber() {
-        if (orderNumber == null) {
-            orderNumber = new IntegerFilter();
-        }
-        return orderNumber;
-    }
-
-    public void setOrderNumber(IntegerFilter orderNumber) {
-        this.orderNumber = orderNumber;
-    }
-
-    public LongFilter getChildrenId() {
-        return childrenId;
-    }
-
-    public LongFilter childrenId() {
-        if (childrenId == null) {
-            childrenId = new LongFilter();
-        }
-        return childrenId;
-    }
-
-    public void setChildrenId(LongFilter childrenId) {
-        this.childrenId = childrenId;
-    }
-
-    public StringFilter getChildrenTitle() {
-        return childrenTitle;
-    }
-
-    public StringFilter childrenTitle() {
-        if (childrenTitle == null) {
-            childrenTitle = new StringFilter();
-        }
-        return childrenTitle;
-    }
-
-    public void setChildrenTitle(StringFilter childrenTitle) {
-        this.childrenTitle = childrenTitle;
-    }
-
-    public LongFilter getParentId() {
-        return parentId;
-    }
-
-    public LongFilter parentId() {
-        if (parentId == null) {
-            parentId = new LongFilter();
-        }
-        return parentId;
-    }
-
-    public void setParentId(LongFilter parentId) {
-        this.parentId = parentId;
-    }
-
-    public StringFilter getParentTitle() {
-        return parentTitle;
-    }
-
-    public StringFilter parentTitle() {
-        if (parentTitle == null) {
-            parentTitle = new StringFilter();
-        }
-        return parentTitle;
-    }
-
-    public void setParentTitle(StringFilter parentTitle) {
-        this.parentTitle = parentTitle;
-    }
-
-    public LongFilter getImagesId() {
-        return imagesId;
-    }
-
-    public LongFilter imagesId() {
-        if (imagesId == null) {
-            imagesId = new LongFilter();
-        }
-        return imagesId;
-    }
-
-    public void setImagesId(LongFilter imagesId) {
-        this.imagesId = imagesId;
-    }
-
-    public StringFilter getImagesUrl() {
-        return imagesUrl;
-    }
-
-    public StringFilter imagesUrl() {
-        if (imagesUrl == null) {
-            imagesUrl = new StringFilter();
-        }
-        return imagesUrl;
-    }
-
-    public void setImagesUrl(StringFilter imagesUrl) {
-        this.imagesUrl = imagesUrl;
-    }
-
-    public LongFilter getFilesId() {
-        return filesId;
-    }
-
-    public LongFilter filesId() {
-        if (filesId == null) {
-            filesId = new LongFilter();
-        }
-        return filesId;
-    }
-
-    public void setFilesId(LongFilter filesId) {
-        this.filesId = filesId;
-    }
-
-    public StringFilter getFilesUrl() {
-        return filesUrl;
-    }
-
-    public StringFilter filesUrl() {
-        if (filesUrl == null) {
-            filesUrl = new StringFilter();
-        }
-        return filesUrl;
-    }
-
-    public void setFilesUrl(StringFilter filesUrl) {
-        this.filesUrl = filesUrl;
-    }
-
     public String getJhiCommonSearchKeywords() {
         return jhiCommonSearchKeywords;
     }
@@ -327,6 +375,17 @@ public class ResourceCategoryCriteria implements Serializable, Criteria {
     }
 
     public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
         return distinct;
     }
 
@@ -349,57 +408,39 @@ public class ResourceCategoryCriteria implements Serializable, Criteria {
             Objects.equals(code, that.code) &&
             Objects.equals(orderNumber, that.orderNumber) &&
             Objects.equals(childrenId, that.childrenId) &&
-            Objects.equals(childrenTitle, that.childrenTitle) &&
             Objects.equals(parentId, that.parentId) &&
-            Objects.equals(parentTitle, that.parentTitle) &&
             Objects.equals(imagesId, that.imagesId) &&
-            Objects.equals(imagesUrl, that.imagesUrl) &&
             Objects.equals(filesId, that.filesId) &&
-            Objects.equals(filesUrl, that.filesUrl) &&
             Objects.equals(distinct, that.distinct)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-            id,
-            title,
-            code,
-            orderNumber,
-            childrenId,
-            childrenTitle,
-            parentId,
-            parentTitle,
-            imagesId,
-            imagesUrl,
-            filesId,
-            filesUrl,
-            distinct
-        );
+        return Objects.hash(id, title, code, orderNumber, childrenId, parentId, imagesId, filesId, distinct);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "ResourceCategoryCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (title != null ? "title=" + title + ", " : "") +
-            (code != null ? "code=" + code + ", " : "") +
-            (orderNumber != null ? "orderNumber=" + orderNumber + ", " : "") +
-            (childrenId != null ? "childrenId=" + childrenId + ", " : "") +
-            (childrenTitle != null ? "childrenTitle=" + childrenTitle + ", " : "") +
-            (parentId != null ? "parentId=" + parentId + ", " : "") +
-            (parentTitle != null ? "parentTitle=" + parentTitle + ", " : "") +
-            (imagesId != null ? "imagesId=" + imagesId + ", " : "") +
-            (imagesUrl != null ? "imagesUrl=" + imagesUrl + ", " : "") +
-            (filesId != null ? "filesId=" + filesId + ", " : "") +
-            (filesUrl != null ? "filesUrl=" + filesUrl + ", " : "") +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalTitle().map(f -> "title=" + f + ", ").orElse("") +
+            optionalCode().map(f -> "code=" + f + ", ").orElse("") +
+            optionalOrderNumber().map(f -> "orderNumber=" + f + ", ").orElse("") +
+            optionalChildrenId().map(f -> "childrenId=" + f + ", ").orElse("") +
+            optionalChildrenTitle().map(f -> "childrenTitle=" + f + ", ").orElse("") +
+            optionalParentId().map(f -> "parentId=" + f + ", ").orElse("") +
+            optionalParentTitle().map(f -> "parentTitle=" + f + ", ").orElse("") +
+            optionalImagesId().map(f -> "imagesId=" + f + ", ").orElse("") +
+            optionalImagesUrl().map(f -> "imagesUrl=" + f + ", ").orElse("") +
+            optionalFilesId().map(f -> "filesId=" + f + ", ").orElse("") +
+            optionalFilesUrl().map(f -> "filesUrl=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +
             (or != null ? "or=" + or + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
     }
 }

@@ -7,6 +7,7 @@ import com.begcode.monolith.domain.ViewPermission;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
@@ -23,18 +24,6 @@ import tech.jhipster.service.filter.*;
 @ParameterObject
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class AuthorityCriteria implements Serializable, Criteria {
-
-    @BindQuery(ignore = true)
-    private String jhiCommonSearchKeywords;
-
-    @BindQuery(ignore = true)
-    private Boolean useOr = false;
-
-    @BindQuery(ignore = true)
-    private AuthorityCriteria and;
-
-    @BindQuery(ignore = true)
-    private AuthorityCriteria or;
 
     private static final long serialVersionUID = 1L;
 
@@ -65,32 +54,32 @@ public class AuthorityCriteria implements Serializable, Criteria {
     @BindQuery(
         entity = ViewPermission.class,
         column = "id",
-        condition = "this.id=rel_jhi_authority__view_permissions.jhi_authority_id AND rel_jhi_authority__view_permissions.view_permissions_id=id"
+        condition = "this.id=rel_jhi_authority__view_permissions.jhi_authority_id AND rel_jhi_authority__view_permissions.view_permissions_id=[object Object]"
     )
     private LongFilter viewPermissionsId;
 
     @BindQuery(
         entity = ViewPermission.class,
         column = "text",
-        condition = "this.id=rel_jhi_authority__view_permissions.jhi_authority_id AND rel_jhi_authority__view_permissions.view_permissions_id=id"
+        condition = "this.id=rel_jhi_authority__view_permissions.jhi_authority_id AND rel_jhi_authority__view_permissions.view_permissions_id=[object Object]"
     )
     private StringFilter viewPermissionsText;
 
     @BindQuery(
         entity = ApiPermission.class,
         column = "id",
-        condition = "this.id=rel_jhi_authority__api_permissions.jhi_authority_id AND rel_jhi_authority__api_permissions.api_permissions_id=id"
+        condition = "this.id=rel_jhi_authority__api_permissions.jhi_authority_id AND rel_jhi_authority__api_permissions.api_permissions_id=[object Object]"
     )
     private LongFilter apiPermissionsId;
 
     @BindQuery(
         entity = ApiPermission.class,
         column = "name",
-        condition = "this.id=rel_jhi_authority__api_permissions.jhi_authority_id AND rel_jhi_authority__api_permissions.api_permissions_id=id"
+        condition = "this.id=rel_jhi_authority__api_permissions.jhi_authority_id AND rel_jhi_authority__api_permissions.api_permissions_id=[object Object]"
     )
     private StringFilter apiPermissionsName;
 
-    @BindQuery(column = "self.parent_id")
+    @BindQuery(entity = Authority.class, column = "id", condition = "this.parent_id=id")
     private LongFilter parentId;
 
     @BindQuery(entity = Authority.class, column = "name", condition = "this.parent_id=id")
@@ -103,34 +92,368 @@ public class AuthorityCriteria implements Serializable, Criteria {
     private LongFilter departmentId;
 
     @BindQuery(ignore = true)
+    private String jhiCommonSearchKeywords;
+
+    @BindQuery(ignore = true)
+    private Boolean useOr = false;
+
+    @BindQuery(ignore = true)
+    private AuthorityCriteria and;
+
+    @BindQuery(ignore = true)
+    private AuthorityCriteria or;
+
     private Boolean distinct;
 
     public AuthorityCriteria() {}
 
     public AuthorityCriteria(AuthorityCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.name = other.name == null ? null : other.name.copy();
-        this.code = other.code == null ? null : other.code.copy();
-        this.info = other.info == null ? null : other.info.copy();
-        this.order = other.order == null ? null : other.order.copy();
-        this.display = other.display == null ? null : other.display.copy();
-        this.childrenId = other.childrenId == null ? null : other.childrenId.copy();
-        this.childrenName = other.childrenName == null ? null : other.childrenName.copy();
-        this.viewPermissionsId = other.viewPermissionsId == null ? null : other.viewPermissionsId.copy();
-        this.viewPermissionsText = other.viewPermissionsText == null ? null : other.viewPermissionsText.copy();
-        this.apiPermissionsId = other.apiPermissionsId == null ? null : other.apiPermissionsId.copy();
-        this.apiPermissionsName = other.apiPermissionsName == null ? null : other.apiPermissionsName.copy();
-        this.parentId = other.parentId == null ? null : other.parentId.copy();
-        this.parentName = other.parentName == null ? null : other.parentName.copy();
-        this.usersId = other.usersId == null ? null : other.usersId.copy();
-        this.usersFirstName = other.usersFirstName == null ? null : other.usersFirstName.copy();
-        this.departmentId = other.departmentId == null ? null : other.departmentId.copy();
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.name = other.optionalName().map(StringFilter::copy).orElse(null);
+        this.code = other.optionalCode().map(StringFilter::copy).orElse(null);
+        this.info = other.optionalInfo().map(StringFilter::copy).orElse(null);
+        this.order = other.optionalOrder().map(IntegerFilter::copy).orElse(null);
+        this.display = other.optionalDisplay().map(BooleanFilter::copy).orElse(null);
+        this.childrenId = other.optionalChildrenId().map(LongFilter::copy).orElse(null);
+        this.childrenName = other.optionalChildrenName().map(StringFilter::copy).orElse(null);
+        this.viewPermissionsId = other.optionalViewPermissionsId().map(LongFilter::copy).orElse(null);
+        this.viewPermissionsText = other.optionalViewPermissionsText().map(StringFilter::copy).orElse(null);
+        this.apiPermissionsId = other.optionalApiPermissionsId().map(LongFilter::copy).orElse(null);
+        this.apiPermissionsName = other.optionalApiPermissionsName().map(StringFilter::copy).orElse(null);
+        this.parentId = other.optionalParentId().map(LongFilter::copy).orElse(null);
+        this.parentName = other.optionalParentName().map(StringFilter::copy).orElse(null);
+        this.usersId = other.optionalUsersId().map(LongFilter::copy).orElse(null);
+        this.usersFirstName = other.optionalUsersFirstName().map(StringFilter::copy).orElse(null);
+        this.departmentId = other.optionalDepartmentId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
     public AuthorityCriteria copy() {
         return new AuthorityCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public StringFilter getName() {
+        return name;
+    }
+
+    public Optional<StringFilter> optionalName() {
+        return Optional.ofNullable(name);
+    }
+
+    public StringFilter name() {
+        if (name == null) {
+            setName(new StringFilter());
+        }
+        return name;
+    }
+
+    public void setName(StringFilter name) {
+        this.name = name;
+    }
+
+    public StringFilter getCode() {
+        return code;
+    }
+
+    public Optional<StringFilter> optionalCode() {
+        return Optional.ofNullable(code);
+    }
+
+    public StringFilter code() {
+        if (code == null) {
+            setCode(new StringFilter());
+        }
+        return code;
+    }
+
+    public void setCode(StringFilter code) {
+        this.code = code;
+    }
+
+    public StringFilter getInfo() {
+        return info;
+    }
+
+    public Optional<StringFilter> optionalInfo() {
+        return Optional.ofNullable(info);
+    }
+
+    public StringFilter info() {
+        if (info == null) {
+            setInfo(new StringFilter());
+        }
+        return info;
+    }
+
+    public void setInfo(StringFilter info) {
+        this.info = info;
+    }
+
+    public IntegerFilter getOrder() {
+        return order;
+    }
+
+    public Optional<IntegerFilter> optionalOrder() {
+        return Optional.ofNullable(order);
+    }
+
+    public IntegerFilter order() {
+        if (order == null) {
+            setOrder(new IntegerFilter());
+        }
+        return order;
+    }
+
+    public void setOrder(IntegerFilter order) {
+        this.order = order;
+    }
+
+    public BooleanFilter getDisplay() {
+        return display;
+    }
+
+    public Optional<BooleanFilter> optionalDisplay() {
+        return Optional.ofNullable(display);
+    }
+
+    public BooleanFilter display() {
+        if (display == null) {
+            setDisplay(new BooleanFilter());
+        }
+        return display;
+    }
+
+    public void setDisplay(BooleanFilter display) {
+        this.display = display;
+    }
+
+    public LongFilter getChildrenId() {
+        return childrenId;
+    }
+
+    public Optional<LongFilter> optionalChildrenId() {
+        return Optional.ofNullable(childrenId);
+    }
+
+    public LongFilter childrenId() {
+        if (childrenId == null) {
+            setChildrenId(new LongFilter());
+        }
+        return childrenId;
+    }
+
+    public void setChildrenId(LongFilter childrenId) {
+        this.childrenId = childrenId;
+    }
+
+    public StringFilter getChildrenName() {
+        return childrenName;
+    }
+
+    public Optional<StringFilter> optionalChildrenName() {
+        return Optional.ofNullable(childrenName);
+    }
+
+    public StringFilter childrenName() {
+        if (childrenName == null) {
+            setChildrenName(new StringFilter());
+        }
+        return childrenName;
+    }
+
+    public void setChildrenName(StringFilter childrenName) {
+        this.childrenName = childrenName;
+    }
+
+    public LongFilter getViewPermissionsId() {
+        return viewPermissionsId;
+    }
+
+    public Optional<LongFilter> optionalViewPermissionsId() {
+        return Optional.ofNullable(viewPermissionsId);
+    }
+
+    public LongFilter viewPermissionsId() {
+        if (viewPermissionsId == null) {
+            setViewPermissionsId(new LongFilter());
+        }
+        return viewPermissionsId;
+    }
+
+    public void setViewPermissionsId(LongFilter viewPermissionsId) {
+        this.viewPermissionsId = viewPermissionsId;
+    }
+
+    public StringFilter getViewPermissionsText() {
+        return viewPermissionsText;
+    }
+
+    public Optional<StringFilter> optionalViewPermissionsText() {
+        return Optional.ofNullable(viewPermissionsText);
+    }
+
+    public StringFilter viewPermissionsText() {
+        if (viewPermissionsText == null) {
+            setViewPermissionsText(new StringFilter());
+        }
+        return viewPermissionsText;
+    }
+
+    public void setViewPermissionsText(StringFilter viewPermissionsText) {
+        this.viewPermissionsText = viewPermissionsText;
+    }
+
+    public LongFilter getApiPermissionsId() {
+        return apiPermissionsId;
+    }
+
+    public Optional<LongFilter> optionalApiPermissionsId() {
+        return Optional.ofNullable(apiPermissionsId);
+    }
+
+    public LongFilter apiPermissionsId() {
+        if (apiPermissionsId == null) {
+            setApiPermissionsId(new LongFilter());
+        }
+        return apiPermissionsId;
+    }
+
+    public void setApiPermissionsId(LongFilter apiPermissionsId) {
+        this.apiPermissionsId = apiPermissionsId;
+    }
+
+    public StringFilter getApiPermissionsName() {
+        return apiPermissionsName;
+    }
+
+    public Optional<StringFilter> optionalApiPermissionsName() {
+        return Optional.ofNullable(apiPermissionsName);
+    }
+
+    public StringFilter apiPermissionsName() {
+        if (apiPermissionsName == null) {
+            setApiPermissionsName(new StringFilter());
+        }
+        return apiPermissionsName;
+    }
+
+    public void setApiPermissionsName(StringFilter apiPermissionsName) {
+        this.apiPermissionsName = apiPermissionsName;
+    }
+
+    public LongFilter getParentId() {
+        return parentId;
+    }
+
+    public Optional<LongFilter> optionalParentId() {
+        return Optional.ofNullable(parentId);
+    }
+
+    public LongFilter parentId() {
+        if (parentId == null) {
+            setParentId(new LongFilter());
+        }
+        return parentId;
+    }
+
+    public void setParentId(LongFilter parentId) {
+        this.parentId = parentId;
+    }
+
+    public StringFilter getParentName() {
+        return parentName;
+    }
+
+    public Optional<StringFilter> optionalParentName() {
+        return Optional.ofNullable(parentName);
+    }
+
+    public StringFilter parentName() {
+        if (parentName == null) {
+            setParentName(new StringFilter());
+        }
+        return parentName;
+    }
+
+    public void setParentName(StringFilter parentName) {
+        this.parentName = parentName;
+    }
+
+    public LongFilter getUsersId() {
+        return usersId;
+    }
+
+    public Optional<LongFilter> optionalUsersId() {
+        return Optional.ofNullable(usersId);
+    }
+
+    public LongFilter usersId() {
+        if (usersId == null) {
+            setUsersId(new LongFilter());
+        }
+        return usersId;
+    }
+
+    public void setUsersId(LongFilter usersId) {
+        this.usersId = usersId;
+    }
+
+    public StringFilter getUsersFirstName() {
+        return usersFirstName;
+    }
+
+    public Optional<StringFilter> optionalUsersFirstName() {
+        return Optional.ofNullable(usersFirstName);
+    }
+
+    public StringFilter usersFirstName() {
+        if (usersFirstName == null) {
+            setUsersFirstName(new StringFilter());
+        }
+        return usersFirstName;
+    }
+
+    public void setUsersFirstName(StringFilter usersFirstName) {
+        this.usersFirstName = usersFirstName;
+    }
+
+    public LongFilter getDepartmentId() {
+        return departmentId;
+    }
+
+    public Optional<LongFilter> optionalDepartmentId() {
+        return Optional.ofNullable(departmentId);
+    }
+
+    public LongFilter departmentId() {
+        if (departmentId == null) {
+            setDepartmentId(new LongFilter());
+        }
+        return departmentId;
+    }
+
+    public void setDepartmentId(LongFilter departmentId) {
+        this.departmentId = departmentId;
     }
 
     public void setAnd(AuthorityCriteria and) {
@@ -163,261 +486,6 @@ public class AuthorityCriteria implements Serializable, Criteria {
         return or;
     }
 
-    public LongFilter getId() {
-        return id;
-    }
-
-    public LongFilter id() {
-        if (id == null) {
-            id = new LongFilter();
-        }
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
-    }
-
-    public StringFilter getName() {
-        return name;
-    }
-
-    public StringFilter name() {
-        if (name == null) {
-            name = new StringFilter();
-        }
-        return name;
-    }
-
-    public void setName(StringFilter name) {
-        this.name = name;
-    }
-
-    public StringFilter getCode() {
-        return code;
-    }
-
-    public StringFilter code() {
-        if (code == null) {
-            code = new StringFilter();
-        }
-        return code;
-    }
-
-    public void setCode(StringFilter code) {
-        this.code = code;
-    }
-
-    public StringFilter getInfo() {
-        return info;
-    }
-
-    public StringFilter info() {
-        if (info == null) {
-            info = new StringFilter();
-        }
-        return info;
-    }
-
-    public void setInfo(StringFilter info) {
-        this.info = info;
-    }
-
-    public IntegerFilter getOrder() {
-        return order;
-    }
-
-    public IntegerFilter order() {
-        if (order == null) {
-            order = new IntegerFilter();
-        }
-        return order;
-    }
-
-    public void setOrder(IntegerFilter order) {
-        this.order = order;
-    }
-
-    public BooleanFilter getDisplay() {
-        return display;
-    }
-
-    public BooleanFilter display() {
-        if (display == null) {
-            display = new BooleanFilter();
-        }
-        return display;
-    }
-
-    public void setDisplay(BooleanFilter display) {
-        this.display = display;
-    }
-
-    public LongFilter getChildrenId() {
-        return childrenId;
-    }
-
-    public LongFilter childrenId() {
-        if (childrenId == null) {
-            childrenId = new LongFilter();
-        }
-        return childrenId;
-    }
-
-    public void setChildrenId(LongFilter childrenId) {
-        this.childrenId = childrenId;
-    }
-
-    public StringFilter getChildrenName() {
-        return childrenName;
-    }
-
-    public StringFilter childrenName() {
-        if (childrenName == null) {
-            childrenName = new StringFilter();
-        }
-        return childrenName;
-    }
-
-    public void setChildrenName(StringFilter childrenName) {
-        this.childrenName = childrenName;
-    }
-
-    public LongFilter getViewPermissionsId() {
-        return viewPermissionsId;
-    }
-
-    public LongFilter viewPermissionsId() {
-        if (viewPermissionsId == null) {
-            viewPermissionsId = new LongFilter();
-        }
-        return viewPermissionsId;
-    }
-
-    public void setViewPermissionsId(LongFilter viewPermissionsId) {
-        this.viewPermissionsId = viewPermissionsId;
-    }
-
-    public StringFilter getViewPermissionsText() {
-        return viewPermissionsText;
-    }
-
-    public StringFilter viewPermissionsText() {
-        if (viewPermissionsText == null) {
-            viewPermissionsText = new StringFilter();
-        }
-        return viewPermissionsText;
-    }
-
-    public void setViewPermissionsText(StringFilter viewPermissionsText) {
-        this.viewPermissionsText = viewPermissionsText;
-    }
-
-    public LongFilter getApiPermissionsId() {
-        return apiPermissionsId;
-    }
-
-    public LongFilter apiPermissionsId() {
-        if (apiPermissionsId == null) {
-            apiPermissionsId = new LongFilter();
-        }
-        return apiPermissionsId;
-    }
-
-    public void setApiPermissionsId(LongFilter apiPermissionsId) {
-        this.apiPermissionsId = apiPermissionsId;
-    }
-
-    public StringFilter getApiPermissionsName() {
-        return apiPermissionsName;
-    }
-
-    public StringFilter apiPermissionsName() {
-        if (apiPermissionsName == null) {
-            apiPermissionsName = new StringFilter();
-        }
-        return apiPermissionsName;
-    }
-
-    public void setApiPermissionsName(StringFilter apiPermissionsName) {
-        this.apiPermissionsName = apiPermissionsName;
-    }
-
-    public LongFilter getParentId() {
-        return parentId;
-    }
-
-    public LongFilter parentId() {
-        if (parentId == null) {
-            parentId = new LongFilter();
-        }
-        return parentId;
-    }
-
-    public void setParentId(LongFilter parentId) {
-        this.parentId = parentId;
-    }
-
-    public StringFilter getParentName() {
-        return parentName;
-    }
-
-    public StringFilter parentName() {
-        if (parentName == null) {
-            parentName = new StringFilter();
-        }
-        return parentName;
-    }
-
-    public void setParentName(StringFilter parentName) {
-        this.parentName = parentName;
-    }
-
-    public LongFilter getUsersId() {
-        return usersId;
-    }
-
-    public LongFilter usersId() {
-        if (usersId == null) {
-            usersId = new LongFilter();
-        }
-        return usersId;
-    }
-
-    public void setUsersId(LongFilter usersId) {
-        this.usersId = usersId;
-    }
-
-    public StringFilter getUsersFirstName() {
-        return usersFirstName;
-    }
-
-    public StringFilter usersFirstName() {
-        if (usersFirstName == null) {
-            usersFirstName = new StringFilter();
-        }
-        return usersFirstName;
-    }
-
-    public void setUsersFirstName(StringFilter usersFirstName) {
-        this.usersFirstName = usersFirstName;
-    }
-
-    public LongFilter getDepartmentId() {
-        return departmentId;
-    }
-
-    public LongFilter departmentId() {
-        if (departmentId == null) {
-            departmentId = new LongFilter();
-        }
-        return departmentId;
-    }
-
-    public void setDepartmentId(LongFilter departmentId) {
-        this.departmentId = departmentId;
-    }
-
     public String getJhiCommonSearchKeywords() {
         return jhiCommonSearchKeywords;
     }
@@ -435,6 +503,17 @@ public class AuthorityCriteria implements Serializable, Criteria {
     }
 
     public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
         return distinct;
     }
 
@@ -459,15 +538,10 @@ public class AuthorityCriteria implements Serializable, Criteria {
             Objects.equals(order, that.order) &&
             Objects.equals(display, that.display) &&
             Objects.equals(childrenId, that.childrenId) &&
-            Objects.equals(childrenName, that.childrenName) &&
             Objects.equals(viewPermissionsId, that.viewPermissionsId) &&
-            Objects.equals(viewPermissionsText, that.viewPermissionsText) &&
             Objects.equals(apiPermissionsId, that.apiPermissionsId) &&
-            Objects.equals(apiPermissionsName, that.apiPermissionsName) &&
             Objects.equals(parentId, that.parentId) &&
-            Objects.equals(parentName, that.parentName) &&
             Objects.equals(usersId, that.usersId) &&
-            Objects.equals(usersFirstName, that.usersFirstName) &&
             Objects.equals(departmentId, that.departmentId) &&
             Objects.equals(distinct, that.distinct)
         );
@@ -483,15 +557,10 @@ public class AuthorityCriteria implements Serializable, Criteria {
             order,
             display,
             childrenId,
-            childrenName,
             viewPermissionsId,
-            viewPermissionsText,
             apiPermissionsId,
-            apiPermissionsName,
             parentId,
-            parentName,
             usersId,
-            usersFirstName,
             departmentId,
             distinct
         );
@@ -501,28 +570,28 @@ public class AuthorityCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "AuthorityCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (name != null ? "name=" + name + ", " : "") +
-            (code != null ? "code=" + code + ", " : "") +
-            (info != null ? "info=" + info + ", " : "") +
-            (order != null ? "order=" + order + ", " : "") +
-            (display != null ? "display=" + display + ", " : "") +
-            (childrenId != null ? "childrenId=" + childrenId + ", " : "") +
-            (childrenName != null ? "childrenName=" + childrenName + ", " : "") +
-            (viewPermissionsId != null ? "viewPermissionsId=" + viewPermissionsId + ", " : "") +
-            (viewPermissionsText != null ? "viewPermissionsText=" + viewPermissionsText + ", " : "") +
-            (apiPermissionsId != null ? "apiPermissionsId=" + apiPermissionsId + ", " : "") +
-            (apiPermissionsName != null ? "apiPermissionsName=" + apiPermissionsName + ", " : "") +
-            (parentId != null ? "parentId=" + parentId + ", " : "") +
-            (parentName != null ? "parentName=" + parentName + ", " : "") +
-            (usersId != null ? "usersId=" + usersId + ", " : "") +
-            (usersFirstName != null ? "usersFirstName=" + usersFirstName + ", " : "") +
-            (departmentId != null ? "departmentId=" + departmentId + ", " : "") +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalName().map(f -> "name=" + f + ", ").orElse("") +
+            optionalCode().map(f -> "code=" + f + ", ").orElse("") +
+            optionalInfo().map(f -> "info=" + f + ", ").orElse("") +
+            optionalOrder().map(f -> "order=" + f + ", ").orElse("") +
+            optionalDisplay().map(f -> "display=" + f + ", ").orElse("") +
+            optionalChildrenId().map(f -> "childrenId=" + f + ", ").orElse("") +
+            optionalChildrenName().map(f -> "childrenName=" + f + ", ").orElse("") +
+            optionalViewPermissionsId().map(f -> "viewPermissionsId=" + f + ", ").orElse("") +
+            optionalViewPermissionsText().map(f -> "viewPermissionsText=" + f + ", ").orElse("") +
+            optionalApiPermissionsId().map(f -> "apiPermissionsId=" + f + ", ").orElse("") +
+            optionalApiPermissionsName().map(f -> "apiPermissionsName=" + f + ", ").orElse("") +
+            optionalParentId().map(f -> "parentId=" + f + ", ").orElse("") +
+            optionalParentName().map(f -> "parentName=" + f + ", ").orElse("") +
+            optionalUsersId().map(f -> "usersId=" + f + ", ").orElse("") +
+            optionalUsersFirstName().map(f -> "usersFirstName=" + f + ", ").orElse("") +
+            optionalDepartmentId().map(f -> "departmentId=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +
             (or != null ? "or=" + or + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
     }
 }

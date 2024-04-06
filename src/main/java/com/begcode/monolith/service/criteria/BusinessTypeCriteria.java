@@ -3,6 +3,7 @@ package com.begcode.monolith.service.criteria;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
@@ -19,18 +20,6 @@ import tech.jhipster.service.filter.*;
 @ParameterObject
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class BusinessTypeCriteria implements Serializable, Criteria {
-
-    @BindQuery(ignore = true)
-    private String jhiCommonSearchKeywords;
-
-    @BindQuery(ignore = true)
-    private Boolean useOr = false;
-
-    @BindQuery(ignore = true)
-    private BusinessTypeCriteria and;
-
-    @BindQuery(ignore = true)
-    private BusinessTypeCriteria or;
 
     private static final long serialVersionUID = 1L;
 
@@ -50,22 +39,128 @@ public class BusinessTypeCriteria implements Serializable, Criteria {
     private StringFilter icon;
 
     @BindQuery(ignore = true)
+    private String jhiCommonSearchKeywords;
+
+    @BindQuery(ignore = true)
+    private Boolean useOr = false;
+
+    @BindQuery(ignore = true)
+    private BusinessTypeCriteria and;
+
+    @BindQuery(ignore = true)
+    private BusinessTypeCriteria or;
+
     private Boolean distinct;
 
     public BusinessTypeCriteria() {}
 
     public BusinessTypeCriteria(BusinessTypeCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.name = other.name == null ? null : other.name.copy();
-        this.code = other.code == null ? null : other.code.copy();
-        this.description = other.description == null ? null : other.description.copy();
-        this.icon = other.icon == null ? null : other.icon.copy();
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.name = other.optionalName().map(StringFilter::copy).orElse(null);
+        this.code = other.optionalCode().map(StringFilter::copy).orElse(null);
+        this.description = other.optionalDescription().map(StringFilter::copy).orElse(null);
+        this.icon = other.optionalIcon().map(StringFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
     public BusinessTypeCriteria copy() {
         return new BusinessTypeCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public StringFilter getName() {
+        return name;
+    }
+
+    public Optional<StringFilter> optionalName() {
+        return Optional.ofNullable(name);
+    }
+
+    public StringFilter name() {
+        if (name == null) {
+            setName(new StringFilter());
+        }
+        return name;
+    }
+
+    public void setName(StringFilter name) {
+        this.name = name;
+    }
+
+    public StringFilter getCode() {
+        return code;
+    }
+
+    public Optional<StringFilter> optionalCode() {
+        return Optional.ofNullable(code);
+    }
+
+    public StringFilter code() {
+        if (code == null) {
+            setCode(new StringFilter());
+        }
+        return code;
+    }
+
+    public void setCode(StringFilter code) {
+        this.code = code;
+    }
+
+    public StringFilter getDescription() {
+        return description;
+    }
+
+    public Optional<StringFilter> optionalDescription() {
+        return Optional.ofNullable(description);
+    }
+
+    public StringFilter description() {
+        if (description == null) {
+            setDescription(new StringFilter());
+        }
+        return description;
+    }
+
+    public void setDescription(StringFilter description) {
+        this.description = description;
+    }
+
+    public StringFilter getIcon() {
+        return icon;
+    }
+
+    public Optional<StringFilter> optionalIcon() {
+        return Optional.ofNullable(icon);
+    }
+
+    public StringFilter icon() {
+        if (icon == null) {
+            setIcon(new StringFilter());
+        }
+        return icon;
+    }
+
+    public void setIcon(StringFilter icon) {
+        this.icon = icon;
     }
 
     public void setAnd(BusinessTypeCriteria and) {
@@ -98,81 +193,6 @@ public class BusinessTypeCriteria implements Serializable, Criteria {
         return or;
     }
 
-    public LongFilter getId() {
-        return id;
-    }
-
-    public LongFilter id() {
-        if (id == null) {
-            id = new LongFilter();
-        }
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
-    }
-
-    public StringFilter getName() {
-        return name;
-    }
-
-    public StringFilter name() {
-        if (name == null) {
-            name = new StringFilter();
-        }
-        return name;
-    }
-
-    public void setName(StringFilter name) {
-        this.name = name;
-    }
-
-    public StringFilter getCode() {
-        return code;
-    }
-
-    public StringFilter code() {
-        if (code == null) {
-            code = new StringFilter();
-        }
-        return code;
-    }
-
-    public void setCode(StringFilter code) {
-        this.code = code;
-    }
-
-    public StringFilter getDescription() {
-        return description;
-    }
-
-    public StringFilter description() {
-        if (description == null) {
-            description = new StringFilter();
-        }
-        return description;
-    }
-
-    public void setDescription(StringFilter description) {
-        this.description = description;
-    }
-
-    public StringFilter getIcon() {
-        return icon;
-    }
-
-    public StringFilter icon() {
-        if (icon == null) {
-            icon = new StringFilter();
-        }
-        return icon;
-    }
-
-    public void setIcon(StringFilter icon) {
-        this.icon = icon;
-    }
-
     public String getJhiCommonSearchKeywords() {
         return jhiCommonSearchKeywords;
     }
@@ -190,6 +210,17 @@ public class BusinessTypeCriteria implements Serializable, Criteria {
     }
 
     public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
         return distinct;
     }
 
@@ -225,16 +256,16 @@ public class BusinessTypeCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "BusinessTypeCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (name != null ? "name=" + name + ", " : "") +
-            (code != null ? "code=" + code + ", " : "") +
-            (description != null ? "description=" + description + ", " : "") +
-            (icon != null ? "icon=" + icon + ", " : "") +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalName().map(f -> "name=" + f + ", ").orElse("") +
+            optionalCode().map(f -> "code=" + f + ", ").orElse("") +
+            optionalDescription().map(f -> "description=" + f + ", ").orElse("") +
+            optionalIcon().map(f -> "icon=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +
             (or != null ? "or=" + or + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
     }
 }

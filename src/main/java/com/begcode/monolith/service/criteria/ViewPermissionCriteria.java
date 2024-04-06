@@ -7,6 +7,7 @@ import com.begcode.monolith.domain.enumeration.ViewPermissionType;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
@@ -24,36 +25,12 @@ import tech.jhipster.service.filter.*;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ViewPermissionCriteria implements Serializable, Criteria {
 
-    @BindQuery(ignore = true)
-    private String jhiCommonSearchKeywords;
-
-    @BindQuery(ignore = true)
-    private Boolean useOr = false;
-
-    @BindQuery(ignore = true)
-    private ViewPermissionCriteria and;
-
-    @BindQuery(ignore = true)
-    private ViewPermissionCriteria or;
-
     /**
      * Class for filtering ViewPermissionType
      */
     public static class ViewPermissionTypeFilter extends Filter<ViewPermissionType> {
 
         public ViewPermissionTypeFilter() {}
-
-        public ViewPermissionTypeFilter(String value) {
-            ViewPermissionType enumValue = ViewPermissionType.getByValue(value);
-            if (enumValue != null) {
-                setEquals(enumValue);
-            } else {
-                enumValue = ViewPermissionType.getByDesc(value);
-                if (enumValue != null) {
-                    setEquals(enumValue);
-                }
-            }
-        }
 
         public ViewPermissionTypeFilter(ViewPermissionTypeFilter filter) {
             super(filter);
@@ -71,18 +48,6 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
     public static class TargetTypeFilter extends Filter<TargetType> {
 
         public TargetTypeFilter() {}
-
-        public TargetTypeFilter(String value) {
-            TargetType enumValue = TargetType.getByValue(value);
-            if (enumValue != null) {
-                setEquals(enumValue);
-            } else {
-                enumValue = TargetType.getByDesc(value);
-                if (enumValue != null) {
-                    setEquals(enumValue);
-                }
-            }
-        }
 
         public TargetTypeFilter(TargetTypeFilter filter) {
             super(filter);
@@ -165,7 +130,7 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
     @BindQuery(entity = ViewPermission.class, column = "text", condition = "id=parent_id")
     private StringFilter childrenText;
 
-    @BindQuery(column = "self.parent_id")
+    @BindQuery(entity = ViewPermission.class, column = "id", condition = "this.parent_id=id")
     private LongFilter parentId;
 
     @BindQuery(entity = ViewPermission.class, column = "text", condition = "this.parent_id=id")
@@ -176,44 +141,568 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
     private StringFilter authoritiesName;
 
     @BindQuery(ignore = true)
+    private String jhiCommonSearchKeywords;
+
+    @BindQuery(ignore = true)
+    private Boolean useOr = false;
+
+    @BindQuery(ignore = true)
+    private ViewPermissionCriteria and;
+
+    @BindQuery(ignore = true)
+    private ViewPermissionCriteria or;
+
     private Boolean distinct;
 
     public ViewPermissionCriteria() {}
 
     public ViewPermissionCriteria(ViewPermissionCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.text = other.text == null ? null : other.text.copy();
-        this.type = other.type == null ? null : other.type.copy();
-        this.i18n = other.i18n == null ? null : other.i18n.copy();
-        this.group = other.group == null ? null : other.group.copy();
-        this.link = other.link == null ? null : other.link.copy();
-        this.externalLink = other.externalLink == null ? null : other.externalLink.copy();
-        this.target = other.target == null ? null : other.target.copy();
-        this.icon = other.icon == null ? null : other.icon.copy();
-        this.disabled = other.disabled == null ? null : other.disabled.copy();
-        this.hide = other.hide == null ? null : other.hide.copy();
-        this.hideInBreadcrumb = other.hideInBreadcrumb == null ? null : other.hideInBreadcrumb.copy();
-        this.shortcut = other.shortcut == null ? null : other.shortcut.copy();
-        this.shortcutRoot = other.shortcutRoot == null ? null : other.shortcutRoot.copy();
-        this.reuse = other.reuse == null ? null : other.reuse.copy();
-        this.code = other.code == null ? null : other.code.copy();
-        this.description = other.description == null ? null : other.description.copy();
-        this.order = other.order == null ? null : other.order.copy();
-        this.apiPermissionCodes = other.apiPermissionCodes == null ? null : other.apiPermissionCodes.copy();
-        this.componentFile = other.componentFile == null ? null : other.componentFile.copy();
-        this.redirect = other.redirect == null ? null : other.redirect.copy();
-        this.childrenId = other.childrenId == null ? null : other.childrenId.copy();
-        this.childrenText = other.childrenText == null ? null : other.childrenText.copy();
-        this.parentId = other.parentId == null ? null : other.parentId.copy();
-        this.parentText = other.parentText == null ? null : other.parentText.copy();
-        this.authoritiesId = other.authoritiesId == null ? null : other.authoritiesId.copy();
-        this.authoritiesName = other.authoritiesName == null ? null : other.authoritiesName.copy();
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.text = other.optionalText().map(StringFilter::copy).orElse(null);
+        this.type = other.optionalType().map(ViewPermissionTypeFilter::copy).orElse(null);
+        this.i18n = other.optionalI18n().map(StringFilter::copy).orElse(null);
+        this.group = other.optionalGroup().map(BooleanFilter::copy).orElse(null);
+        this.link = other.optionalLink().map(StringFilter::copy).orElse(null);
+        this.externalLink = other.optionalExternalLink().map(StringFilter::copy).orElse(null);
+        this.target = other.optionalTarget().map(TargetTypeFilter::copy).orElse(null);
+        this.icon = other.optionalIcon().map(StringFilter::copy).orElse(null);
+        this.disabled = other.optionalDisabled().map(BooleanFilter::copy).orElse(null);
+        this.hide = other.optionalHide().map(BooleanFilter::copy).orElse(null);
+        this.hideInBreadcrumb = other.optionalHideInBreadcrumb().map(BooleanFilter::copy).orElse(null);
+        this.shortcut = other.optionalShortcut().map(BooleanFilter::copy).orElse(null);
+        this.shortcutRoot = other.optionalShortcutRoot().map(BooleanFilter::copy).orElse(null);
+        this.reuse = other.optionalReuse().map(BooleanFilter::copy).orElse(null);
+        this.code = other.optionalCode().map(StringFilter::copy).orElse(null);
+        this.description = other.optionalDescription().map(StringFilter::copy).orElse(null);
+        this.order = other.optionalOrder().map(IntegerFilter::copy).orElse(null);
+        this.apiPermissionCodes = other.optionalApiPermissionCodes().map(StringFilter::copy).orElse(null);
+        this.componentFile = other.optionalComponentFile().map(StringFilter::copy).orElse(null);
+        this.redirect = other.optionalRedirect().map(StringFilter::copy).orElse(null);
+        this.childrenId = other.optionalChildrenId().map(LongFilter::copy).orElse(null);
+        this.childrenText = other.optionalChildrenText().map(StringFilter::copy).orElse(null);
+        this.parentId = other.optionalParentId().map(LongFilter::copy).orElse(null);
+        this.parentText = other.optionalParentText().map(StringFilter::copy).orElse(null);
+        this.authoritiesId = other.optionalAuthoritiesId().map(LongFilter::copy).orElse(null);
+        this.authoritiesName = other.optionalAuthoritiesName().map(StringFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
     public ViewPermissionCriteria copy() {
         return new ViewPermissionCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public StringFilter getText() {
+        return text;
+    }
+
+    public Optional<StringFilter> optionalText() {
+        return Optional.ofNullable(text);
+    }
+
+    public StringFilter text() {
+        if (text == null) {
+            setText(new StringFilter());
+        }
+        return text;
+    }
+
+    public void setText(StringFilter text) {
+        this.text = text;
+    }
+
+    public ViewPermissionTypeFilter getType() {
+        return type;
+    }
+
+    public Optional<ViewPermissionTypeFilter> optionalType() {
+        return Optional.ofNullable(type);
+    }
+
+    public ViewPermissionTypeFilter type() {
+        if (type == null) {
+            setType(new ViewPermissionTypeFilter());
+        }
+        return type;
+    }
+
+    public void setType(ViewPermissionTypeFilter type) {
+        this.type = type;
+    }
+
+    public StringFilter getI18n() {
+        return i18n;
+    }
+
+    public Optional<StringFilter> optionalI18n() {
+        return Optional.ofNullable(i18n);
+    }
+
+    public StringFilter i18n() {
+        if (i18n == null) {
+            setI18n(new StringFilter());
+        }
+        return i18n;
+    }
+
+    public void setI18n(StringFilter i18n) {
+        this.i18n = i18n;
+    }
+
+    public BooleanFilter getGroup() {
+        return group;
+    }
+
+    public Optional<BooleanFilter> optionalGroup() {
+        return Optional.ofNullable(group);
+    }
+
+    public BooleanFilter group() {
+        if (group == null) {
+            setGroup(new BooleanFilter());
+        }
+        return group;
+    }
+
+    public void setGroup(BooleanFilter group) {
+        this.group = group;
+    }
+
+    public StringFilter getLink() {
+        return link;
+    }
+
+    public Optional<StringFilter> optionalLink() {
+        return Optional.ofNullable(link);
+    }
+
+    public StringFilter link() {
+        if (link == null) {
+            setLink(new StringFilter());
+        }
+        return link;
+    }
+
+    public void setLink(StringFilter link) {
+        this.link = link;
+    }
+
+    public StringFilter getExternalLink() {
+        return externalLink;
+    }
+
+    public Optional<StringFilter> optionalExternalLink() {
+        return Optional.ofNullable(externalLink);
+    }
+
+    public StringFilter externalLink() {
+        if (externalLink == null) {
+            setExternalLink(new StringFilter());
+        }
+        return externalLink;
+    }
+
+    public void setExternalLink(StringFilter externalLink) {
+        this.externalLink = externalLink;
+    }
+
+    public TargetTypeFilter getTarget() {
+        return target;
+    }
+
+    public Optional<TargetTypeFilter> optionalTarget() {
+        return Optional.ofNullable(target);
+    }
+
+    public TargetTypeFilter target() {
+        if (target == null) {
+            setTarget(new TargetTypeFilter());
+        }
+        return target;
+    }
+
+    public void setTarget(TargetTypeFilter target) {
+        this.target = target;
+    }
+
+    public StringFilter getIcon() {
+        return icon;
+    }
+
+    public Optional<StringFilter> optionalIcon() {
+        return Optional.ofNullable(icon);
+    }
+
+    public StringFilter icon() {
+        if (icon == null) {
+            setIcon(new StringFilter());
+        }
+        return icon;
+    }
+
+    public void setIcon(StringFilter icon) {
+        this.icon = icon;
+    }
+
+    public BooleanFilter getDisabled() {
+        return disabled;
+    }
+
+    public Optional<BooleanFilter> optionalDisabled() {
+        return Optional.ofNullable(disabled);
+    }
+
+    public BooleanFilter disabled() {
+        if (disabled == null) {
+            setDisabled(new BooleanFilter());
+        }
+        return disabled;
+    }
+
+    public void setDisabled(BooleanFilter disabled) {
+        this.disabled = disabled;
+    }
+
+    public BooleanFilter getHide() {
+        return hide;
+    }
+
+    public Optional<BooleanFilter> optionalHide() {
+        return Optional.ofNullable(hide);
+    }
+
+    public BooleanFilter hide() {
+        if (hide == null) {
+            setHide(new BooleanFilter());
+        }
+        return hide;
+    }
+
+    public void setHide(BooleanFilter hide) {
+        this.hide = hide;
+    }
+
+    public BooleanFilter getHideInBreadcrumb() {
+        return hideInBreadcrumb;
+    }
+
+    public Optional<BooleanFilter> optionalHideInBreadcrumb() {
+        return Optional.ofNullable(hideInBreadcrumb);
+    }
+
+    public BooleanFilter hideInBreadcrumb() {
+        if (hideInBreadcrumb == null) {
+            setHideInBreadcrumb(new BooleanFilter());
+        }
+        return hideInBreadcrumb;
+    }
+
+    public void setHideInBreadcrumb(BooleanFilter hideInBreadcrumb) {
+        this.hideInBreadcrumb = hideInBreadcrumb;
+    }
+
+    public BooleanFilter getShortcut() {
+        return shortcut;
+    }
+
+    public Optional<BooleanFilter> optionalShortcut() {
+        return Optional.ofNullable(shortcut);
+    }
+
+    public BooleanFilter shortcut() {
+        if (shortcut == null) {
+            setShortcut(new BooleanFilter());
+        }
+        return shortcut;
+    }
+
+    public void setShortcut(BooleanFilter shortcut) {
+        this.shortcut = shortcut;
+    }
+
+    public BooleanFilter getShortcutRoot() {
+        return shortcutRoot;
+    }
+
+    public Optional<BooleanFilter> optionalShortcutRoot() {
+        return Optional.ofNullable(shortcutRoot);
+    }
+
+    public BooleanFilter shortcutRoot() {
+        if (shortcutRoot == null) {
+            setShortcutRoot(new BooleanFilter());
+        }
+        return shortcutRoot;
+    }
+
+    public void setShortcutRoot(BooleanFilter shortcutRoot) {
+        this.shortcutRoot = shortcutRoot;
+    }
+
+    public BooleanFilter getReuse() {
+        return reuse;
+    }
+
+    public Optional<BooleanFilter> optionalReuse() {
+        return Optional.ofNullable(reuse);
+    }
+
+    public BooleanFilter reuse() {
+        if (reuse == null) {
+            setReuse(new BooleanFilter());
+        }
+        return reuse;
+    }
+
+    public void setReuse(BooleanFilter reuse) {
+        this.reuse = reuse;
+    }
+
+    public StringFilter getCode() {
+        return code;
+    }
+
+    public Optional<StringFilter> optionalCode() {
+        return Optional.ofNullable(code);
+    }
+
+    public StringFilter code() {
+        if (code == null) {
+            setCode(new StringFilter());
+        }
+        return code;
+    }
+
+    public void setCode(StringFilter code) {
+        this.code = code;
+    }
+
+    public StringFilter getDescription() {
+        return description;
+    }
+
+    public Optional<StringFilter> optionalDescription() {
+        return Optional.ofNullable(description);
+    }
+
+    public StringFilter description() {
+        if (description == null) {
+            setDescription(new StringFilter());
+        }
+        return description;
+    }
+
+    public void setDescription(StringFilter description) {
+        this.description = description;
+    }
+
+    public IntegerFilter getOrder() {
+        return order;
+    }
+
+    public Optional<IntegerFilter> optionalOrder() {
+        return Optional.ofNullable(order);
+    }
+
+    public IntegerFilter order() {
+        if (order == null) {
+            setOrder(new IntegerFilter());
+        }
+        return order;
+    }
+
+    public void setOrder(IntegerFilter order) {
+        this.order = order;
+    }
+
+    public StringFilter getApiPermissionCodes() {
+        return apiPermissionCodes;
+    }
+
+    public Optional<StringFilter> optionalApiPermissionCodes() {
+        return Optional.ofNullable(apiPermissionCodes);
+    }
+
+    public StringFilter apiPermissionCodes() {
+        if (apiPermissionCodes == null) {
+            setApiPermissionCodes(new StringFilter());
+        }
+        return apiPermissionCodes;
+    }
+
+    public void setApiPermissionCodes(StringFilter apiPermissionCodes) {
+        this.apiPermissionCodes = apiPermissionCodes;
+    }
+
+    public StringFilter getComponentFile() {
+        return componentFile;
+    }
+
+    public Optional<StringFilter> optionalComponentFile() {
+        return Optional.ofNullable(componentFile);
+    }
+
+    public StringFilter componentFile() {
+        if (componentFile == null) {
+            setComponentFile(new StringFilter());
+        }
+        return componentFile;
+    }
+
+    public void setComponentFile(StringFilter componentFile) {
+        this.componentFile = componentFile;
+    }
+
+    public StringFilter getRedirect() {
+        return redirect;
+    }
+
+    public Optional<StringFilter> optionalRedirect() {
+        return Optional.ofNullable(redirect);
+    }
+
+    public StringFilter redirect() {
+        if (redirect == null) {
+            setRedirect(new StringFilter());
+        }
+        return redirect;
+    }
+
+    public void setRedirect(StringFilter redirect) {
+        this.redirect = redirect;
+    }
+
+    public LongFilter getChildrenId() {
+        return childrenId;
+    }
+
+    public Optional<LongFilter> optionalChildrenId() {
+        return Optional.ofNullable(childrenId);
+    }
+
+    public LongFilter childrenId() {
+        if (childrenId == null) {
+            setChildrenId(new LongFilter());
+        }
+        return childrenId;
+    }
+
+    public void setChildrenId(LongFilter childrenId) {
+        this.childrenId = childrenId;
+    }
+
+    public StringFilter getChildrenText() {
+        return childrenText;
+    }
+
+    public Optional<StringFilter> optionalChildrenText() {
+        return Optional.ofNullable(childrenText);
+    }
+
+    public StringFilter childrenText() {
+        if (childrenText == null) {
+            setChildrenText(new StringFilter());
+        }
+        return childrenText;
+    }
+
+    public void setChildrenText(StringFilter childrenText) {
+        this.childrenText = childrenText;
+    }
+
+    public LongFilter getParentId() {
+        return parentId;
+    }
+
+    public Optional<LongFilter> optionalParentId() {
+        return Optional.ofNullable(parentId);
+    }
+
+    public LongFilter parentId() {
+        if (parentId == null) {
+            setParentId(new LongFilter());
+        }
+        return parentId;
+    }
+
+    public void setParentId(LongFilter parentId) {
+        this.parentId = parentId;
+    }
+
+    public StringFilter getParentText() {
+        return parentText;
+    }
+
+    public Optional<StringFilter> optionalParentText() {
+        return Optional.ofNullable(parentText);
+    }
+
+    public StringFilter parentText() {
+        if (parentText == null) {
+            setParentText(new StringFilter());
+        }
+        return parentText;
+    }
+
+    public void setParentText(StringFilter parentText) {
+        this.parentText = parentText;
+    }
+
+    public LongFilter getAuthoritiesId() {
+        return authoritiesId;
+    }
+
+    public Optional<LongFilter> optionalAuthoritiesId() {
+        return Optional.ofNullable(authoritiesId);
+    }
+
+    public LongFilter authoritiesId() {
+        if (authoritiesId == null) {
+            setAuthoritiesId(new LongFilter());
+        }
+        return authoritiesId;
+    }
+
+    public void setAuthoritiesId(LongFilter authoritiesId) {
+        this.authoritiesId = authoritiesId;
+    }
+
+    public StringFilter getAuthoritiesName() {
+        return authoritiesName;
+    }
+
+    public Optional<StringFilter> optionalAuthoritiesName() {
+        return Optional.ofNullable(authoritiesName);
+    }
+
+    public StringFilter authoritiesName() {
+        if (authoritiesName == null) {
+            setAuthoritiesName(new StringFilter());
+        }
+        return authoritiesName;
+    }
+
+    public void setAuthoritiesName(StringFilter authoritiesName) {
+        this.authoritiesName = authoritiesName;
     }
 
     public void setAnd(ViewPermissionCriteria and) {
@@ -246,411 +735,6 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
         return or;
     }
 
-    public LongFilter getId() {
-        return id;
-    }
-
-    public LongFilter id() {
-        if (id == null) {
-            id = new LongFilter();
-        }
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
-    }
-
-    public StringFilter getText() {
-        return text;
-    }
-
-    public StringFilter text() {
-        if (text == null) {
-            text = new StringFilter();
-        }
-        return text;
-    }
-
-    public void setText(StringFilter text) {
-        this.text = text;
-    }
-
-    public ViewPermissionTypeFilter getType() {
-        return type;
-    }
-
-    public ViewPermissionTypeFilter type() {
-        if (type == null) {
-            type = new ViewPermissionTypeFilter();
-        }
-        return type;
-    }
-
-    public void setType(ViewPermissionTypeFilter type) {
-        this.type = type;
-    }
-
-    public StringFilter getI18n() {
-        return i18n;
-    }
-
-    public StringFilter i18n() {
-        if (i18n == null) {
-            i18n = new StringFilter();
-        }
-        return i18n;
-    }
-
-    public void setI18n(StringFilter i18n) {
-        this.i18n = i18n;
-    }
-
-    public BooleanFilter getGroup() {
-        return group;
-    }
-
-    public BooleanFilter group() {
-        if (group == null) {
-            group = new BooleanFilter();
-        }
-        return group;
-    }
-
-    public void setGroup(BooleanFilter group) {
-        this.group = group;
-    }
-
-    public StringFilter getLink() {
-        return link;
-    }
-
-    public StringFilter link() {
-        if (link == null) {
-            link = new StringFilter();
-        }
-        return link;
-    }
-
-    public void setLink(StringFilter link) {
-        this.link = link;
-    }
-
-    public StringFilter getExternalLink() {
-        return externalLink;
-    }
-
-    public StringFilter externalLink() {
-        if (externalLink == null) {
-            externalLink = new StringFilter();
-        }
-        return externalLink;
-    }
-
-    public void setExternalLink(StringFilter externalLink) {
-        this.externalLink = externalLink;
-    }
-
-    public TargetTypeFilter getTarget() {
-        return target;
-    }
-
-    public TargetTypeFilter target() {
-        if (target == null) {
-            target = new TargetTypeFilter();
-        }
-        return target;
-    }
-
-    public void setTarget(TargetTypeFilter target) {
-        this.target = target;
-    }
-
-    public StringFilter getIcon() {
-        return icon;
-    }
-
-    public StringFilter icon() {
-        if (icon == null) {
-            icon = new StringFilter();
-        }
-        return icon;
-    }
-
-    public void setIcon(StringFilter icon) {
-        this.icon = icon;
-    }
-
-    public BooleanFilter getDisabled() {
-        return disabled;
-    }
-
-    public BooleanFilter disabled() {
-        if (disabled == null) {
-            disabled = new BooleanFilter();
-        }
-        return disabled;
-    }
-
-    public void setDisabled(BooleanFilter disabled) {
-        this.disabled = disabled;
-    }
-
-    public BooleanFilter getHide() {
-        return hide;
-    }
-
-    public BooleanFilter hide() {
-        if (hide == null) {
-            hide = new BooleanFilter();
-        }
-        return hide;
-    }
-
-    public void setHide(BooleanFilter hide) {
-        this.hide = hide;
-    }
-
-    public BooleanFilter getHideInBreadcrumb() {
-        return hideInBreadcrumb;
-    }
-
-    public BooleanFilter hideInBreadcrumb() {
-        if (hideInBreadcrumb == null) {
-            hideInBreadcrumb = new BooleanFilter();
-        }
-        return hideInBreadcrumb;
-    }
-
-    public void setHideInBreadcrumb(BooleanFilter hideInBreadcrumb) {
-        this.hideInBreadcrumb = hideInBreadcrumb;
-    }
-
-    public BooleanFilter getShortcut() {
-        return shortcut;
-    }
-
-    public BooleanFilter shortcut() {
-        if (shortcut == null) {
-            shortcut = new BooleanFilter();
-        }
-        return shortcut;
-    }
-
-    public void setShortcut(BooleanFilter shortcut) {
-        this.shortcut = shortcut;
-    }
-
-    public BooleanFilter getShortcutRoot() {
-        return shortcutRoot;
-    }
-
-    public BooleanFilter shortcutRoot() {
-        if (shortcutRoot == null) {
-            shortcutRoot = new BooleanFilter();
-        }
-        return shortcutRoot;
-    }
-
-    public void setShortcutRoot(BooleanFilter shortcutRoot) {
-        this.shortcutRoot = shortcutRoot;
-    }
-
-    public BooleanFilter getReuse() {
-        return reuse;
-    }
-
-    public BooleanFilter reuse() {
-        if (reuse == null) {
-            reuse = new BooleanFilter();
-        }
-        return reuse;
-    }
-
-    public void setReuse(BooleanFilter reuse) {
-        this.reuse = reuse;
-    }
-
-    public StringFilter getCode() {
-        return code;
-    }
-
-    public StringFilter code() {
-        if (code == null) {
-            code = new StringFilter();
-        }
-        return code;
-    }
-
-    public void setCode(StringFilter code) {
-        this.code = code;
-    }
-
-    public StringFilter getDescription() {
-        return description;
-    }
-
-    public StringFilter description() {
-        if (description == null) {
-            description = new StringFilter();
-        }
-        return description;
-    }
-
-    public void setDescription(StringFilter description) {
-        this.description = description;
-    }
-
-    public IntegerFilter getOrder() {
-        return order;
-    }
-
-    public IntegerFilter order() {
-        if (order == null) {
-            order = new IntegerFilter();
-        }
-        return order;
-    }
-
-    public void setOrder(IntegerFilter order) {
-        this.order = order;
-    }
-
-    public StringFilter getApiPermissionCodes() {
-        return apiPermissionCodes;
-    }
-
-    public StringFilter apiPermissionCodes() {
-        if (apiPermissionCodes == null) {
-            apiPermissionCodes = new StringFilter();
-        }
-        return apiPermissionCodes;
-    }
-
-    public void setApiPermissionCodes(StringFilter apiPermissionCodes) {
-        this.apiPermissionCodes = apiPermissionCodes;
-    }
-
-    public StringFilter getComponentFile() {
-        return componentFile;
-    }
-
-    public StringFilter componentFile() {
-        if (componentFile == null) {
-            componentFile = new StringFilter();
-        }
-        return componentFile;
-    }
-
-    public void setComponentFile(StringFilter componentFile) {
-        this.componentFile = componentFile;
-    }
-
-    public StringFilter getRedirect() {
-        return redirect;
-    }
-
-    public StringFilter redirect() {
-        if (redirect == null) {
-            redirect = new StringFilter();
-        }
-        return redirect;
-    }
-
-    public void setRedirect(StringFilter redirect) {
-        this.redirect = redirect;
-    }
-
-    public LongFilter getChildrenId() {
-        return childrenId;
-    }
-
-    public LongFilter childrenId() {
-        if (childrenId == null) {
-            childrenId = new LongFilter();
-        }
-        return childrenId;
-    }
-
-    public void setChildrenId(LongFilter childrenId) {
-        this.childrenId = childrenId;
-    }
-
-    public StringFilter getChildrenText() {
-        return childrenText;
-    }
-
-    public StringFilter childrenText() {
-        if (childrenText == null) {
-            childrenText = new StringFilter();
-        }
-        return childrenText;
-    }
-
-    public void setChildrenText(StringFilter childrenText) {
-        this.childrenText = childrenText;
-    }
-
-    public LongFilter getParentId() {
-        return parentId;
-    }
-
-    public LongFilter parentId() {
-        if (parentId == null) {
-            parentId = new LongFilter();
-        }
-        return parentId;
-    }
-
-    public void setParentId(LongFilter parentId) {
-        this.parentId = parentId;
-    }
-
-    public StringFilter getParentText() {
-        return parentText;
-    }
-
-    public StringFilter parentText() {
-        if (parentText == null) {
-            parentText = new StringFilter();
-        }
-        return parentText;
-    }
-
-    public void setParentText(StringFilter parentText) {
-        this.parentText = parentText;
-    }
-
-    public LongFilter getAuthoritiesId() {
-        return authoritiesId;
-    }
-
-    public LongFilter authoritiesId() {
-        if (authoritiesId == null) {
-            authoritiesId = new LongFilter();
-        }
-        return authoritiesId;
-    }
-
-    public void setAuthoritiesId(LongFilter authoritiesId) {
-        this.authoritiesId = authoritiesId;
-    }
-
-    public StringFilter getAuthoritiesName() {
-        return authoritiesName;
-    }
-
-    public StringFilter authoritiesName() {
-        if (authoritiesName == null) {
-            authoritiesName = new StringFilter();
-        }
-        return authoritiesName;
-    }
-
-    public void setAuthoritiesName(StringFilter authoritiesName) {
-        this.authoritiesName = authoritiesName;
-    }
-
     public String getJhiCommonSearchKeywords() {
         return jhiCommonSearchKeywords;
     }
@@ -668,6 +752,17 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
     }
 
     public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
         return distinct;
     }
 
@@ -707,11 +802,8 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
             Objects.equals(componentFile, that.componentFile) &&
             Objects.equals(redirect, that.redirect) &&
             Objects.equals(childrenId, that.childrenId) &&
-            Objects.equals(childrenText, that.childrenText) &&
             Objects.equals(parentId, that.parentId) &&
-            Objects.equals(parentText, that.parentText) &&
             Objects.equals(authoritiesId, that.authoritiesId) &&
-            Objects.equals(authoritiesName, that.authoritiesName) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -741,11 +833,8 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
             componentFile,
             redirect,
             childrenId,
-            childrenText,
             parentId,
-            parentText,
             authoritiesId,
-            authoritiesName,
             distinct
         );
     }
@@ -754,38 +843,38 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "ViewPermissionCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (text != null ? "text=" + text + ", " : "") +
-            (type != null ? "type=" + type + ", " : "") +
-            (i18n != null ? "i18n=" + i18n + ", " : "") +
-            (group != null ? "group=" + group + ", " : "") +
-            (link != null ? "link=" + link + ", " : "") +
-            (externalLink != null ? "externalLink=" + externalLink + ", " : "") +
-            (target != null ? "target=" + target + ", " : "") +
-            (icon != null ? "icon=" + icon + ", " : "") +
-            (disabled != null ? "disabled=" + disabled + ", " : "") +
-            (hide != null ? "hide=" + hide + ", " : "") +
-            (hideInBreadcrumb != null ? "hideInBreadcrumb=" + hideInBreadcrumb + ", " : "") +
-            (shortcut != null ? "shortcut=" + shortcut + ", " : "") +
-            (shortcutRoot != null ? "shortcutRoot=" + shortcutRoot + ", " : "") +
-            (reuse != null ? "reuse=" + reuse + ", " : "") +
-            (code != null ? "code=" + code + ", " : "") +
-            (description != null ? "description=" + description + ", " : "") +
-            (order != null ? "order=" + order + ", " : "") +
-            (apiPermissionCodes != null ? "apiPermissionCodes=" + apiPermissionCodes + ", " : "") +
-            (componentFile != null ? "componentFile=" + componentFile + ", " : "") +
-            (redirect != null ? "redirect=" + redirect + ", " : "") +
-            (childrenId != null ? "childrenId=" + childrenId + ", " : "") +
-            (childrenText != null ? "childrenText=" + childrenText + ", " : "") +
-            (parentId != null ? "parentId=" + parentId + ", " : "") +
-            (parentText != null ? "parentText=" + parentText + ", " : "") +
-            (authoritiesId != null ? "authoritiesId=" + authoritiesId + ", " : "") +
-            (authoritiesName != null ? "authoritiesName=" + authoritiesName + ", " : "") +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalText().map(f -> "text=" + f + ", ").orElse("") +
+            optionalType().map(f -> "type=" + f + ", ").orElse("") +
+            optionalI18n().map(f -> "i18n=" + f + ", ").orElse("") +
+            optionalGroup().map(f -> "group=" + f + ", ").orElse("") +
+            optionalLink().map(f -> "link=" + f + ", ").orElse("") +
+            optionalExternalLink().map(f -> "externalLink=" + f + ", ").orElse("") +
+            optionalTarget().map(f -> "target=" + f + ", ").orElse("") +
+            optionalIcon().map(f -> "icon=" + f + ", ").orElse("") +
+            optionalDisabled().map(f -> "disabled=" + f + ", ").orElse("") +
+            optionalHide().map(f -> "hide=" + f + ", ").orElse("") +
+            optionalHideInBreadcrumb().map(f -> "hideInBreadcrumb=" + f + ", ").orElse("") +
+            optionalShortcut().map(f -> "shortcut=" + f + ", ").orElse("") +
+            optionalShortcutRoot().map(f -> "shortcutRoot=" + f + ", ").orElse("") +
+            optionalReuse().map(f -> "reuse=" + f + ", ").orElse("") +
+            optionalCode().map(f -> "code=" + f + ", ").orElse("") +
+            optionalDescription().map(f -> "description=" + f + ", ").orElse("") +
+            optionalOrder().map(f -> "order=" + f + ", ").orElse("") +
+            optionalApiPermissionCodes().map(f -> "apiPermissionCodes=" + f + ", ").orElse("") +
+            optionalComponentFile().map(f -> "componentFile=" + f + ", ").orElse("") +
+            optionalRedirect().map(f -> "redirect=" + f + ", ").orElse("") +
+            optionalChildrenId().map(f -> "childrenId=" + f + ", ").orElse("") +
+            optionalChildrenText().map(f -> "childrenText=" + f + ", ").orElse("") +
+            optionalParentId().map(f -> "parentId=" + f + ", ").orElse("") +
+            optionalParentText().map(f -> "parentText=" + f + ", ").orElse("") +
+            optionalAuthoritiesId().map(f -> "authoritiesId=" + f + ", ").orElse("") +
+            optionalAuthoritiesName().map(f -> "authoritiesName=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +
             (or != null ? "or=" + or + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
     }
 }

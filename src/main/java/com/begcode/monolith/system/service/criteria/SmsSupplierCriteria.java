@@ -4,6 +4,7 @@ import com.begcode.monolith.domain.enumeration.SmsProvider;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
@@ -21,36 +22,12 @@ import tech.jhipster.service.filter.*;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class SmsSupplierCriteria implements Serializable, Criteria {
 
-    @BindQuery(ignore = true)
-    private String jhiCommonSearchKeywords;
-
-    @BindQuery(ignore = true)
-    private Boolean useOr = false;
-
-    @BindQuery(ignore = true)
-    private SmsSupplierCriteria and;
-
-    @BindQuery(ignore = true)
-    private SmsSupplierCriteria or;
-
     /**
      * Class for filtering SmsProvider
      */
     public static class SmsProviderFilter extends Filter<SmsProvider> {
 
         public SmsProviderFilter() {}
-
-        public SmsProviderFilter(String value) {
-            SmsProvider enumValue = SmsProvider.getByValue(value);
-            if (enumValue != null) {
-                setEquals(enumValue);
-            } else {
-                enumValue = SmsProvider.getByDesc(value);
-                if (enumValue != null) {
-                    setEquals(enumValue);
-                }
-            }
-        }
 
         public SmsProviderFilter(SmsProviderFilter filter) {
             super(filter);
@@ -83,23 +60,148 @@ public class SmsSupplierCriteria implements Serializable, Criteria {
     private BooleanFilter enabled;
 
     @BindQuery(ignore = true)
+    private String jhiCommonSearchKeywords;
+
+    @BindQuery(ignore = true)
+    private Boolean useOr = false;
+
+    @BindQuery(ignore = true)
+    private SmsSupplierCriteria and;
+
+    @BindQuery(ignore = true)
+    private SmsSupplierCriteria or;
+
     private Boolean distinct;
 
     public SmsSupplierCriteria() {}
 
     public SmsSupplierCriteria(SmsSupplierCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.provider = other.provider == null ? null : other.provider.copy();
-        this.configData = other.configData == null ? null : other.configData.copy();
-        this.signName = other.signName == null ? null : other.signName.copy();
-        this.remark = other.remark == null ? null : other.remark.copy();
-        this.enabled = other.enabled == null ? null : other.enabled.copy();
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.provider = other.optionalProvider().map(SmsProviderFilter::copy).orElse(null);
+        this.configData = other.optionalConfigData().map(StringFilter::copy).orElse(null);
+        this.signName = other.optionalSignName().map(StringFilter::copy).orElse(null);
+        this.remark = other.optionalRemark().map(StringFilter::copy).orElse(null);
+        this.enabled = other.optionalEnabled().map(BooleanFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
     public SmsSupplierCriteria copy() {
         return new SmsSupplierCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public SmsProviderFilter getProvider() {
+        return provider;
+    }
+
+    public Optional<SmsProviderFilter> optionalProvider() {
+        return Optional.ofNullable(provider);
+    }
+
+    public SmsProviderFilter provider() {
+        if (provider == null) {
+            setProvider(new SmsProviderFilter());
+        }
+        return provider;
+    }
+
+    public void setProvider(SmsProviderFilter provider) {
+        this.provider = provider;
+    }
+
+    public StringFilter getConfigData() {
+        return configData;
+    }
+
+    public Optional<StringFilter> optionalConfigData() {
+        return Optional.ofNullable(configData);
+    }
+
+    public StringFilter configData() {
+        if (configData == null) {
+            setConfigData(new StringFilter());
+        }
+        return configData;
+    }
+
+    public void setConfigData(StringFilter configData) {
+        this.configData = configData;
+    }
+
+    public StringFilter getSignName() {
+        return signName;
+    }
+
+    public Optional<StringFilter> optionalSignName() {
+        return Optional.ofNullable(signName);
+    }
+
+    public StringFilter signName() {
+        if (signName == null) {
+            setSignName(new StringFilter());
+        }
+        return signName;
+    }
+
+    public void setSignName(StringFilter signName) {
+        this.signName = signName;
+    }
+
+    public StringFilter getRemark() {
+        return remark;
+    }
+
+    public Optional<StringFilter> optionalRemark() {
+        return Optional.ofNullable(remark);
+    }
+
+    public StringFilter remark() {
+        if (remark == null) {
+            setRemark(new StringFilter());
+        }
+        return remark;
+    }
+
+    public void setRemark(StringFilter remark) {
+        this.remark = remark;
+    }
+
+    public BooleanFilter getEnabled() {
+        return enabled;
+    }
+
+    public Optional<BooleanFilter> optionalEnabled() {
+        return Optional.ofNullable(enabled);
+    }
+
+    public BooleanFilter enabled() {
+        if (enabled == null) {
+            setEnabled(new BooleanFilter());
+        }
+        return enabled;
+    }
+
+    public void setEnabled(BooleanFilter enabled) {
+        this.enabled = enabled;
     }
 
     public void setAnd(SmsSupplierCriteria and) {
@@ -132,96 +234,6 @@ public class SmsSupplierCriteria implements Serializable, Criteria {
         return or;
     }
 
-    public LongFilter getId() {
-        return id;
-    }
-
-    public LongFilter id() {
-        if (id == null) {
-            id = new LongFilter();
-        }
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
-    }
-
-    public SmsProviderFilter getProvider() {
-        return provider;
-    }
-
-    public SmsProviderFilter provider() {
-        if (provider == null) {
-            provider = new SmsProviderFilter();
-        }
-        return provider;
-    }
-
-    public void setProvider(SmsProviderFilter provider) {
-        this.provider = provider;
-    }
-
-    public StringFilter getConfigData() {
-        return configData;
-    }
-
-    public StringFilter configData() {
-        if (configData == null) {
-            configData = new StringFilter();
-        }
-        return configData;
-    }
-
-    public void setConfigData(StringFilter configData) {
-        this.configData = configData;
-    }
-
-    public StringFilter getSignName() {
-        return signName;
-    }
-
-    public StringFilter signName() {
-        if (signName == null) {
-            signName = new StringFilter();
-        }
-        return signName;
-    }
-
-    public void setSignName(StringFilter signName) {
-        this.signName = signName;
-    }
-
-    public StringFilter getRemark() {
-        return remark;
-    }
-
-    public StringFilter remark() {
-        if (remark == null) {
-            remark = new StringFilter();
-        }
-        return remark;
-    }
-
-    public void setRemark(StringFilter remark) {
-        this.remark = remark;
-    }
-
-    public BooleanFilter getEnabled() {
-        return enabled;
-    }
-
-    public BooleanFilter enabled() {
-        if (enabled == null) {
-            enabled = new BooleanFilter();
-        }
-        return enabled;
-    }
-
-    public void setEnabled(BooleanFilter enabled) {
-        this.enabled = enabled;
-    }
-
     public String getJhiCommonSearchKeywords() {
         return jhiCommonSearchKeywords;
     }
@@ -239,6 +251,17 @@ public class SmsSupplierCriteria implements Serializable, Criteria {
     }
 
     public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
         return distinct;
     }
 
@@ -275,17 +298,17 @@ public class SmsSupplierCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "SmsSupplierCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (provider != null ? "provider=" + provider + ", " : "") +
-            (configData != null ? "configData=" + configData + ", " : "") +
-            (signName != null ? "signName=" + signName + ", " : "") +
-            (remark != null ? "remark=" + remark + ", " : "") +
-            (enabled != null ? "enabled=" + enabled + ", " : "") +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalProvider().map(f -> "provider=" + f + ", ").orElse("") +
+            optionalConfigData().map(f -> "configData=" + f + ", ").orElse("") +
+            optionalSignName().map(f -> "signName=" + f + ", ").orElse("") +
+            optionalRemark().map(f -> "remark=" + f + ", ").orElse("") +
+            optionalEnabled().map(f -> "enabled=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +
             (or != null ? "or=" + or + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
     }
 }
