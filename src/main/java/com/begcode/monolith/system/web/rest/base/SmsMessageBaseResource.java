@@ -86,11 +86,10 @@ public class SmsMessageBaseResource {
         if (smsMessageDTO.getId() != null) {
             throw new BadRequestAlertException("A new smsMessage cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        SmsMessageDTO result = smsMessageService.save(smsMessageDTO);
-        return ResponseEntity
-            .created(new URI("/api/sms-messages/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        smsMessageDTO = smsMessageService.save(smsMessageDTO);
+        return ResponseEntity.created(new URI("/api/sms-messages/" + smsMessageDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, smsMessageDTO.getId().toString()))
+            .body(smsMessageDTO);
     }
 
     /**
@@ -101,6 +100,7 @@ public class SmsMessageBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated smsMessageDTO,
      * or with status {@code 400 (Bad Request)} if the smsMessageDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the smsMessageDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新短信消息", description = "根据主键更新并返回一个更新后的短信消息")
@@ -123,21 +123,19 @@ public class SmsMessageBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        SmsMessageDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             smsMessageService.updateBatch(smsMessageDTO, batchFields, batchIds);
-            result = smsMessageService.findOne(id).orElseThrow();
+            smsMessageDTO = smsMessageService.findOne(id).orElseThrow();
         } else {
-            result = smsMessageService.update(smsMessageDTO);
+            smsMessageDTO = smsMessageService.update(smsMessageDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, smsMessageDTO.getId().toString()))
-            .body(result);
+            .body(smsMessageDTO);
     }
 
     /**
@@ -177,6 +175,7 @@ public class SmsMessageBaseResource {
      * or with status {@code 400 (Bad Request)} if the smsMessageDTO is not valid,
      * or with status {@code 404 (Not Found)} if the smsMessageDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the smsMessageDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(tags = "部分更新短信消息", description = "根据主键及实体信息实现部分更新，值为null的属性将忽略，并返回一个更新后的短信消息")
@@ -269,8 +268,7 @@ public class SmsMessageBaseResource {
         log.debug("REST request to delete SmsMessage : {}", id);
 
         smsMessageService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -325,8 +323,7 @@ public class SmsMessageBaseResource {
         if (ids != null) {
             ids.forEach(smsMessageService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }

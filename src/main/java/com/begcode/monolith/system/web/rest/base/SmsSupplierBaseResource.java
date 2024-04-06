@@ -86,11 +86,10 @@ public class SmsSupplierBaseResource {
         if (smsSupplierDTO.getId() != null) {
             throw new BadRequestAlertException("A new smsSupplier cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        SmsSupplierDTO result = smsSupplierService.save(smsSupplierDTO);
-        return ResponseEntity
-            .created(new URI("/api/sms-suppliers/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        smsSupplierDTO = smsSupplierService.save(smsSupplierDTO);
+        return ResponseEntity.created(new URI("/api/sms-suppliers/" + smsSupplierDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, smsSupplierDTO.getId().toString()))
+            .body(smsSupplierDTO);
     }
 
     /**
@@ -101,6 +100,7 @@ public class SmsSupplierBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated smsSupplierDTO,
      * or with status {@code 400 (Bad Request)} if the smsSupplierDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the smsSupplierDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新短信服务商配置", description = "根据主键更新并返回一个更新后的短信服务商配置")
@@ -123,21 +123,19 @@ public class SmsSupplierBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        SmsSupplierDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             smsSupplierService.updateBatch(smsSupplierDTO, batchFields, batchIds);
-            result = smsSupplierService.findOne(id).orElseThrow();
+            smsSupplierDTO = smsSupplierService.findOne(id).orElseThrow();
         } else {
-            result = smsSupplierService.update(smsSupplierDTO);
+            smsSupplierDTO = smsSupplierService.update(smsSupplierDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, smsSupplierDTO.getId().toString()))
-            .body(result);
+            .body(smsSupplierDTO);
     }
 
     /**
@@ -177,6 +175,7 @@ public class SmsSupplierBaseResource {
      * or with status {@code 400 (Bad Request)} if the smsSupplierDTO is not valid,
      * or with status {@code 404 (Not Found)} if the smsSupplierDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the smsSupplierDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(
@@ -272,8 +271,7 @@ public class SmsSupplierBaseResource {
         log.debug("REST request to delete SmsSupplier : {}", id);
 
         smsSupplierService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -332,8 +330,7 @@ public class SmsSupplierBaseResource {
         if (ids != null) {
             ids.forEach(smsSupplierService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }

@@ -92,11 +92,10 @@ public class DictionaryBaseResource {
         if (dictionaryDTO.getId() != null) {
             throw new BadRequestAlertException("A new dictionary cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        DictionaryDTO result = dictionaryService.save(dictionaryDTO);
-        return ResponseEntity
-            .created(new URI("/api/dictionaries/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        dictionaryDTO = dictionaryService.save(dictionaryDTO);
+        return ResponseEntity.created(new URI("/api/dictionaries/" + dictionaryDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, dictionaryDTO.getId().toString()))
+            .body(dictionaryDTO);
     }
 
     /**
@@ -107,6 +106,7 @@ public class DictionaryBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated dictionaryDTO,
      * or with status {@code 400 (Bad Request)} if the dictionaryDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the dictionaryDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新数据字典", description = "根据主键更新并返回一个更新后的数据字典")
@@ -129,21 +129,19 @@ public class DictionaryBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        DictionaryDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             dictionaryService.updateBatch(dictionaryDTO, batchFields, batchIds);
-            result = dictionaryService.findOne(id).orElseThrow();
+            dictionaryDTO = dictionaryService.findOne(id).orElseThrow();
         } else {
-            result = dictionaryService.update(dictionaryDTO);
+            dictionaryDTO = dictionaryService.update(dictionaryDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, dictionaryDTO.getId().toString()))
-            .body(result);
+            .body(dictionaryDTO);
     }
 
     /**
@@ -219,6 +217,7 @@ public class DictionaryBaseResource {
      * or with status {@code 400 (Bad Request)} if the dictionaryDTO is not valid,
      * or with status {@code 404 (Not Found)} if the dictionaryDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the dictionaryDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(tags = "部分更新数据字典", description = "根据主键及实体信息实现部分更新，值为null的属性将忽略，并返回一个更新后的数据字典")
@@ -311,8 +310,7 @@ public class DictionaryBaseResource {
         log.debug("REST request to delete Dictionary : {}", id);
 
         dictionaryService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -367,8 +365,7 @@ public class DictionaryBaseResource {
         if (ids != null) {
             ids.forEach(dictionaryService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }

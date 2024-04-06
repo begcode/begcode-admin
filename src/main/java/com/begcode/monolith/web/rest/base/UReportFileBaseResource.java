@@ -88,11 +88,10 @@ public class UReportFileBaseResource {
         if (uReportFileDTO.getId() != null) {
             throw new BadRequestAlertException("A new uReportFile cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        UReportFileDTO result = uReportFileService.save(uReportFileDTO);
-        return ResponseEntity
-            .created(new URI("/api/u-report-files/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        uReportFileDTO = uReportFileService.save(uReportFileDTO);
+        return ResponseEntity.created(new URI("/api/u-report-files/" + uReportFileDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, uReportFileDTO.getId().toString()))
+            .body(uReportFileDTO);
     }
 
     /**
@@ -103,6 +102,7 @@ public class UReportFileBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated uReportFileDTO,
      * or with status {@code 400 (Bad Request)} if the uReportFileDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the uReportFileDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新报表存储", description = "根据主键更新并返回一个更新后的报表存储")
@@ -125,21 +125,19 @@ public class UReportFileBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        UReportFileDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             uReportFileService.updateBatch(uReportFileDTO, batchFields, batchIds);
-            result = uReportFileService.findOne(id).orElseThrow();
+            uReportFileDTO = uReportFileService.findOne(id).orElseThrow();
         } else {
-            result = uReportFileService.update(uReportFileDTO);
+            uReportFileDTO = uReportFileService.update(uReportFileDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, uReportFileDTO.getId().toString()))
-            .body(result);
+            .body(uReportFileDTO);
     }
 
     /**
@@ -179,6 +177,7 @@ public class UReportFileBaseResource {
      * or with status {@code 400 (Bad Request)} if the uReportFileDTO is not valid,
      * or with status {@code 404 (Not Found)} if the uReportFileDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the uReportFileDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(tags = "部分更新报表存储", description = "根据主键及实体信息实现部分更新，值为null的属性将忽略，并返回一个更新后的报表存储")
@@ -271,8 +270,7 @@ public class UReportFileBaseResource {
         log.debug("REST request to delete UReportFile : {}", id);
 
         uReportFileService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -327,8 +325,7 @@ public class UReportFileBaseResource {
         if (ids != null) {
             ids.forEach(uReportFileService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }

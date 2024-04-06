@@ -4,6 +4,7 @@ import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.begcode.monolith.aop.logging.AutoLog;
@@ -28,6 +29,7 @@ import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +83,7 @@ public class UploadImageBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated uploadImageDTO,
      * or with status {@code 400 (Bad Request)} if the uploadImageDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the uploadImageDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新上传图片", description = "根据主键更新并返回一个更新后的上传图片")
@@ -103,21 +106,19 @@ public class UploadImageBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        UploadImageDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             uploadImageService.updateBatch(uploadImageDTO, batchFields, batchIds);
-            result = uploadImageService.findOne(id).orElseThrow();
+            uploadImageDTO = uploadImageService.findOne(id).orElseThrow();
         } else {
-            result = uploadImageService.update(uploadImageDTO);
+            uploadImageDTO = uploadImageService.update(uploadImageDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, uploadImageDTO.getId().toString()))
-            .body(result);
+            .body(uploadImageDTO);
     }
 
     /**
@@ -157,6 +158,7 @@ public class UploadImageBaseResource {
      * or with status {@code 400 (Bad Request)} if the uploadImageDTO is not valid,
      * or with status {@code 404 (Not Found)} if the uploadImageDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the uploadImageDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(tags = "部分更新上传图片", description = "根据主键及实体信息实现部分更新，值为null的属性将忽略，并返回一个更新后的上传图片")
@@ -249,8 +251,7 @@ public class UploadImageBaseResource {
         log.debug("REST request to delete UploadImage : {}", id);
 
         uploadImageService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -305,8 +306,7 @@ public class UploadImageBaseResource {
         if (ids != null) {
             ids.forEach(uploadImageService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }
@@ -331,24 +331,31 @@ public class UploadImageBaseResource {
     @PostMapping("")
     public ResponseEntity<UploadImageDTO> createUploadImage(
         @RequestPart(required = false) UploadImageDTO uploadImageDTO,
-        @RequestPart("image") MultipartFile image
+        @RequestPart("image") MultipartFile image,
+        @RequestPart("images") MultipartFile[] images
     ) throws URISyntaxException {
         log.debug("REST request to save UploadImage : {}", image.getOriginalFilename());
-        if (image.isEmpty()) {
+        if (image.isEmpty() && ArrayUtils.isEmpty(images)) {
             throw new BadRequestAlertException("A new uploadImage cannot null", ENTITY_NAME, "imageisnull");
         }
         if (Objects.isNull(uploadImageDTO)) {
             uploadImageDTO = new UploadImageDTO();
         }
-        uploadImageDTO.setImage(image);
-        UploadImageDTO result = null;
-        try {
-            result = uploadImageService.save(uploadImageDTO);
-        } catch (Exception e) {
-            throw new BadRequestAlertException("UploadImageError", ENTITY_NAME, "fileError");
+        List<MultipartFile> uploadImages = new ArrayList<>();
+        if (!image.isEmpty()) {
+            uploadImages.add(image);
         }
-        return ResponseEntity
-            .created(new URI("/api/upload-images/" + result.getId()))
+        if (ArrayUtils.isNotEmpty(images)) {
+            uploadImages.addAll(Arrays.asList(images));
+        }
+        List<UploadImageDTO> allUploadImageDTOS = new ArrayList<>();
+        for (MultipartFile uploadImage : uploadImages) {
+            uploadImageDTO.setImage(uploadImage);
+            allUploadImageDTOS.add(uploadImageService.save(uploadImageDTO));
+            uploadImageDTO = BeanUtil.toBean(uploadImageDTO, UploadImageDTO.class);
+        }
+        UploadImageDTO result = allUploadImageDTOS.get(0);
+        return ResponseEntity.created(new URI("/api/upload-images/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
             .body(result);
     }

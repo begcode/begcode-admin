@@ -138,8 +138,7 @@ public class AccountResource {
      */
     @PostMapping("/account")
     public void saveAccount(@Valid @RequestBody AdminUserDTO userDTO) {
-        String userLogin = SecurityUtils
-            .getCurrentUserLogin()
+        String userLogin = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new AccountResourceException("Current user login not found"));
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
         if (existingUser.isPresent() && (!existingUser.orElseThrow().getLogin().equalsIgnoreCase(userLogin))) {
@@ -211,20 +210,20 @@ public class AccountResource {
 
     @PutMapping(path = "/account/imageUrl")
     public void updateImageUrl(@RequestParam("imageUrl") String imageUrl) {
-        String userLogin = SecurityUtils
-            .getCurrentUserLogin()
+        String userLogin = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new AccountResourceException("Current user login not found"));
         userRepository
             .findOneByLogin(userLogin)
-            .ifPresent(user ->
-                userService.updateUser(
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getEmail(),
-                    user.getLangKey(),
-                    imageUrl,
-                    user.getMobile()
-                )
+            .ifPresent(
+                user ->
+                    userService.updateUser(
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getEmail(),
+                        user.getLangKey(),
+                        imageUrl,
+                        user.getMobile()
+                    )
             );
     }
 

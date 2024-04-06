@@ -86,11 +86,10 @@ public class BusinessTypeBaseResource {
         if (businessTypeDTO.getId() != null) {
             throw new BadRequestAlertException("A new businessType cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        BusinessTypeDTO result = businessTypeService.save(businessTypeDTO);
-        return ResponseEntity
-            .created(new URI("/api/business-types/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        businessTypeDTO = businessTypeService.save(businessTypeDTO);
+        return ResponseEntity.created(new URI("/api/business-types/" + businessTypeDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, businessTypeDTO.getId().toString()))
+            .body(businessTypeDTO);
     }
 
     /**
@@ -101,6 +100,7 @@ public class BusinessTypeBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated businessTypeDTO,
      * or with status {@code 400 (Bad Request)} if the businessTypeDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the businessTypeDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新业务类型", description = "根据主键更新并返回一个更新后的业务类型")
@@ -123,21 +123,19 @@ public class BusinessTypeBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        BusinessTypeDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             businessTypeService.updateBatch(businessTypeDTO, batchFields, batchIds);
-            result = businessTypeService.findOne(id).orElseThrow();
+            businessTypeDTO = businessTypeService.findOne(id).orElseThrow();
         } else {
-            result = businessTypeService.update(businessTypeDTO);
+            businessTypeDTO = businessTypeService.update(businessTypeDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, businessTypeDTO.getId().toString()))
-            .body(result);
+            .body(businessTypeDTO);
     }
 
     /**
@@ -177,6 +175,7 @@ public class BusinessTypeBaseResource {
      * or with status {@code 400 (Bad Request)} if the businessTypeDTO is not valid,
      * or with status {@code 404 (Not Found)} if the businessTypeDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the businessTypeDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(tags = "部分更新业务类型", description = "根据主键及实体信息实现部分更新，值为null的属性将忽略，并返回一个更新后的业务类型")
@@ -269,8 +268,7 @@ public class BusinessTypeBaseResource {
         log.debug("REST request to delete BusinessType : {}", id);
 
         businessTypeService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -325,8 +323,7 @@ public class BusinessTypeBaseResource {
         if (ids != null) {
             ids.forEach(businessTypeService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }

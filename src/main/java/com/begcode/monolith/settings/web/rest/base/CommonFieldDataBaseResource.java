@@ -91,11 +91,10 @@ public class CommonFieldDataBaseResource {
         if (commonFieldDataDTO.getId() != null) {
             throw new BadRequestAlertException("A new commonFieldData cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        CommonFieldDataDTO result = commonFieldDataService.save(commonFieldDataDTO);
-        return ResponseEntity
-            .created(new URI("/api/common-field-data/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        commonFieldDataDTO = commonFieldDataService.save(commonFieldDataDTO);
+        return ResponseEntity.created(new URI("/api/common-field-data/" + commonFieldDataDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, commonFieldDataDTO.getId().toString()))
+            .body(commonFieldDataDTO);
     }
 
     /**
@@ -106,6 +105,7 @@ public class CommonFieldDataBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated commonFieldDataDTO,
      * or with status {@code 400 (Bad Request)} if the commonFieldDataDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the commonFieldDataDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新通用字段数据", description = "根据主键更新并返回一个更新后的通用字段数据")
@@ -128,21 +128,19 @@ public class CommonFieldDataBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        CommonFieldDataDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             commonFieldDataService.updateBatch(commonFieldDataDTO, batchFields, batchIds);
-            result = commonFieldDataService.findOne(id).orElseThrow();
+            commonFieldDataDTO = commonFieldDataService.findOne(id).orElseThrow();
         } else {
-            result = commonFieldDataService.update(commonFieldDataDTO);
+            commonFieldDataDTO = commonFieldDataService.update(commonFieldDataDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, commonFieldDataDTO.getId().toString()))
-            .body(result);
+            .body(commonFieldDataDTO);
     }
 
     /**
@@ -218,6 +216,7 @@ public class CommonFieldDataBaseResource {
      * or with status {@code 400 (Bad Request)} if the commonFieldDataDTO is not valid,
      * or with status {@code 404 (Not Found)} if the commonFieldDataDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the commonFieldDataDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(
@@ -313,8 +312,7 @@ public class CommonFieldDataBaseResource {
         log.debug("REST request to delete CommonFieldData : {}", id);
 
         commonFieldDataService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -373,8 +371,7 @@ public class CommonFieldDataBaseResource {
         if (ids != null) {
             ids.forEach(commonFieldDataService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }

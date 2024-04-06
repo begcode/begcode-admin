@@ -93,11 +93,10 @@ public class ViewPermissionBaseResource {
         if (viewPermissionDTO.getId() != null) {
             throw new BadRequestAlertException("A new viewPermission cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        ViewPermissionDTO result = viewPermissionService.save(viewPermissionDTO);
-        return ResponseEntity
-            .created(new URI("/api/view-permissions/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        viewPermissionDTO = viewPermissionService.save(viewPermissionDTO);
+        return ResponseEntity.created(new URI("/api/view-permissions/" + viewPermissionDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, viewPermissionDTO.getId().toString()))
+            .body(viewPermissionDTO);
     }
 
     /**
@@ -108,6 +107,7 @@ public class ViewPermissionBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated viewPermissionDTO,
      * or with status {@code 400 (Bad Request)} if the viewPermissionDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the viewPermissionDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新可视权限", description = "根据主键更新并返回一个更新后的可视权限")
@@ -130,21 +130,19 @@ public class ViewPermissionBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        ViewPermissionDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             viewPermissionService.updateBatch(viewPermissionDTO, batchFields, batchIds);
-            result = viewPermissionService.findOne(id).orElseThrow();
+            viewPermissionDTO = viewPermissionService.findOne(id).orElseThrow();
         } else {
-            result = viewPermissionService.update(viewPermissionDTO);
+            viewPermissionDTO = viewPermissionService.update(viewPermissionDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, viewPermissionDTO.getId().toString()))
-            .body(result);
+            .body(viewPermissionDTO);
     }
 
     /**
@@ -220,6 +218,7 @@ public class ViewPermissionBaseResource {
      * or with status {@code 400 (Bad Request)} if the viewPermissionDTO is not valid,
      * or with status {@code 404 (Not Found)} if the viewPermissionDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the viewPermissionDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(tags = "部分更新可视权限", description = "根据主键及实体信息实现部分更新，值为null的属性将忽略，并返回一个更新后的可视权限")
@@ -312,8 +311,7 @@ public class ViewPermissionBaseResource {
         log.debug("REST request to delete ViewPermission : {}", id);
 
         viewPermissionService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -401,8 +399,7 @@ public class ViewPermissionBaseResource {
         if (ids != null) {
             ids.forEach(viewPermissionService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }

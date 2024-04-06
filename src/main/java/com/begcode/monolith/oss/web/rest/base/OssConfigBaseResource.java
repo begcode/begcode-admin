@@ -88,11 +88,10 @@ public class OssConfigBaseResource {
         if (ossConfigDTO.getId() != null) {
             throw new BadRequestAlertException("A new ossConfig cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        OssConfigDTO result = ossConfigService.save(ossConfigDTO);
-        return ResponseEntity
-            .created(new URI("/api/oss-configs/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        ossConfigDTO = ossConfigService.save(ossConfigDTO);
+        return ResponseEntity.created(new URI("/api/oss-configs/" + ossConfigDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, ossConfigDTO.getId().toString()))
+            .body(ossConfigDTO);
     }
 
     /**
@@ -103,6 +102,7 @@ public class OssConfigBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated ossConfigDTO,
      * or with status {@code 400 (Bad Request)} if the ossConfigDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the ossConfigDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新对象存储配置", description = "根据主键更新并返回一个更新后的对象存储配置")
@@ -125,21 +125,19 @@ public class OssConfigBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        OssConfigDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             ossConfigService.updateBatch(ossConfigDTO, batchFields, batchIds);
-            result = ossConfigService.findOne(id).orElseThrow();
+            ossConfigDTO = ossConfigService.findOne(id).orElseThrow();
         } else {
-            result = ossConfigService.update(ossConfigDTO);
+            ossConfigDTO = ossConfigService.update(ossConfigDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, ossConfigDTO.getId().toString()))
-            .body(result);
+            .body(ossConfigDTO);
     }
 
     /**
@@ -179,6 +177,7 @@ public class OssConfigBaseResource {
      * or with status {@code 400 (Bad Request)} if the ossConfigDTO is not valid,
      * or with status {@code 404 (Not Found)} if the ossConfigDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the ossConfigDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(
@@ -274,8 +273,7 @@ public class OssConfigBaseResource {
         log.debug("REST request to delete OssConfig : {}", id);
 
         ossConfigService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -330,8 +328,7 @@ public class OssConfigBaseResource {
         if (ids != null) {
             ids.forEach(ossConfigService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }

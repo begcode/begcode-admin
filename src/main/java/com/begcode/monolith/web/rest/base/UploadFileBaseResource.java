@@ -4,6 +4,7 @@ import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.begcode.monolith.aop.logging.AutoLog;
@@ -28,6 +29,7 @@ import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +83,7 @@ public class UploadFileBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated uploadFileDTO,
      * or with status {@code 400 (Bad Request)} if the uploadFileDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the uploadFileDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新上传文件", description = "根据主键更新并返回一个更新后的上传文件")
@@ -103,21 +106,19 @@ public class UploadFileBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        UploadFileDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             uploadFileService.updateBatch(uploadFileDTO, batchFields, batchIds);
-            result = uploadFileService.findOne(id).orElseThrow();
+            uploadFileDTO = uploadFileService.findOne(id).orElseThrow();
         } else {
-            result = uploadFileService.update(uploadFileDTO);
+            uploadFileDTO = uploadFileService.update(uploadFileDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, uploadFileDTO.getId().toString()))
-            .body(result);
+            .body(uploadFileDTO);
     }
 
     /**
@@ -157,6 +158,7 @@ public class UploadFileBaseResource {
      * or with status {@code 400 (Bad Request)} if the uploadFileDTO is not valid,
      * or with status {@code 404 (Not Found)} if the uploadFileDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the uploadFileDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(tags = "部分更新上传文件", description = "根据主键及实体信息实现部分更新，值为null的属性将忽略，并返回一个更新后的上传文件")
@@ -249,8 +251,7 @@ public class UploadFileBaseResource {
         log.debug("REST request to delete UploadFile : {}", id);
 
         uploadFileService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -305,8 +306,7 @@ public class UploadFileBaseResource {
         if (ids != null) {
             ids.forEach(uploadFileService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }
@@ -331,19 +331,31 @@ public class UploadFileBaseResource {
     @PostMapping("")
     public ResponseEntity<UploadFileDTO> createUploadFile(
         @RequestPart(required = false) UploadFileDTO uploadFileDTO,
-        @RequestPart("file") MultipartFile file
+        @RequestPart("file") MultipartFile file,
+        @RequestPart("files") MultipartFile[] files
     ) throws Exception {
-        log.debug("REST request to save UploadFile : {}", file.getOriginalFilename());
-        if (file.isEmpty()) {
+        log.debug("REST request to save UploadFile : {}, {}", file.getOriginalFilename(), files);
+        if (file.isEmpty() && ArrayUtils.isEmpty(files)) {
             throw new BadRequestAlertException("A new uploadImage cannot null", ENTITY_NAME, "imageisnull");
         }
         if (Objects.isNull(uploadFileDTO)) {
             uploadFileDTO = new UploadFileDTO();
         }
-        uploadFileDTO.setFile(file);
-        UploadFileDTO result = uploadFileService.save(uploadFileDTO);
-        return ResponseEntity
-            .created(new URI("/api/upload-files/" + result.getId()))
+        List<MultipartFile> uploadFiles = new ArrayList<>();
+        if (!file.isEmpty()) {
+            uploadFiles.add(file);
+        }
+        if (ArrayUtils.isNotEmpty(files)) {
+            uploadFiles.addAll(Arrays.asList(files));
+        }
+        List<UploadFileDTO> allUploadFileDTOS = new ArrayList<>();
+        for (MultipartFile uploadFile : uploadFiles) {
+            uploadFileDTO.setFile(uploadFile);
+            allUploadFileDTOS.add(uploadFileService.save(uploadFileDTO));
+            uploadFileDTO = BeanUtil.toBean(uploadFileDTO, UploadFileDTO.class);
+        }
+        UploadFileDTO result = allUploadFileDTOS.get(0);
+        return ResponseEntity.created(new URI("/api/upload-files/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
             .body(result);
     }

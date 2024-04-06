@@ -86,11 +86,10 @@ public class ApiPermissionBaseResource {
         if (apiPermissionDTO.getId() != null) {
             throw new BadRequestAlertException("A new apiPermission cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        ApiPermissionDTO result = apiPermissionService.save(apiPermissionDTO);
-        return ResponseEntity
-            .created(new URI("/api/api-permissions/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        apiPermissionDTO = apiPermissionService.save(apiPermissionDTO);
+        return ResponseEntity.created(new URI("/api/api-permissions/" + apiPermissionDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, apiPermissionDTO.getId().toString()))
+            .body(apiPermissionDTO);
     }
 
     /**
@@ -101,6 +100,7 @@ public class ApiPermissionBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated apiPermissionDTO,
      * or with status {@code 400 (Bad Request)} if the apiPermissionDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the apiPermissionDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新API权限", description = "根据主键更新并返回一个更新后的API权限")
@@ -123,21 +123,19 @@ public class ApiPermissionBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        ApiPermissionDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             apiPermissionService.updateBatch(apiPermissionDTO, batchFields, batchIds);
-            result = apiPermissionService.findOne(id).orElseThrow();
+            apiPermissionDTO = apiPermissionService.findOne(id).orElseThrow();
         } else {
-            result = apiPermissionService.update(apiPermissionDTO);
+            apiPermissionDTO = apiPermissionService.update(apiPermissionDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, apiPermissionDTO.getId().toString()))
-            .body(result);
+            .body(apiPermissionDTO);
     }
 
     /**
@@ -177,6 +175,7 @@ public class ApiPermissionBaseResource {
      * or with status {@code 400 (Bad Request)} if the apiPermissionDTO is not valid,
      * or with status {@code 404 (Not Found)} if the apiPermissionDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the apiPermissionDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(tags = "部分更新API权限", description = "根据主键及实体信息实现部分更新，值为null的属性将忽略，并返回一个更新后的API权限")
@@ -269,8 +268,7 @@ public class ApiPermissionBaseResource {
         log.debug("REST request to delete ApiPermission : {}", id);
 
         apiPermissionService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -358,8 +356,7 @@ public class ApiPermissionBaseResource {
         if (ids != null) {
             ids.forEach(apiPermissionService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }

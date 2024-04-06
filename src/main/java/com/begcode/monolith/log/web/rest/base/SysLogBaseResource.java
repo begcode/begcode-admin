@@ -82,11 +82,10 @@ public class SysLogBaseResource {
         if (sysLogDTO.getId() != null) {
             throw new BadRequestAlertException("A new sysLog cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        SysLogDTO result = sysLogService.save(sysLogDTO);
-        return ResponseEntity
-            .created(new URI("/api/sys-logs/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        sysLogDTO = sysLogService.save(sysLogDTO);
+        return ResponseEntity.created(new URI("/api/sys-logs/" + sysLogDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, sysLogDTO.getId().toString()))
+            .body(sysLogDTO);
     }
 
     /**
@@ -97,6 +96,7 @@ public class SysLogBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated sysLogDTO,
      * or with status {@code 400 (Bad Request)} if the sysLogDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the sysLogDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新系统日志", description = "根据主键更新并返回一个更新后的系统日志")
@@ -119,21 +119,19 @@ public class SysLogBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        SysLogDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             sysLogService.updateBatch(sysLogDTO, batchFields, batchIds);
-            result = sysLogService.findOne(id).orElseThrow();
+            sysLogDTO = sysLogService.findOne(id).orElseThrow();
         } else {
-            result = sysLogService.update(sysLogDTO);
+            sysLogDTO = sysLogService.update(sysLogDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, sysLogDTO.getId().toString()))
-            .body(result);
+            .body(sysLogDTO);
     }
 
     /**
@@ -173,6 +171,7 @@ public class SysLogBaseResource {
      * or with status {@code 400 (Bad Request)} if the sysLogDTO is not valid,
      * or with status {@code 404 (Not Found)} if the sysLogDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the sysLogDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(tags = "部分更新系统日志", description = "根据主键及实体信息实现部分更新，值为null的属性将忽略，并返回一个更新后的系统日志")
@@ -265,8 +264,7 @@ public class SysLogBaseResource {
         log.debug("REST request to delete SysLog : {}", id);
 
         sysLogService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -321,8 +319,7 @@ public class SysLogBaseResource {
         if (ids != null) {
             ids.forEach(sysLogService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }

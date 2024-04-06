@@ -107,11 +107,10 @@ public class AnnouncementBaseResource {
         if (announcementDTO.getId() != null) {
             throw new BadRequestAlertException("A new announcement cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        AnnouncementDTO result = announcementService.save(announcementDTO);
-        return ResponseEntity
-            .created(new URI("/api/announcements/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        announcementDTO = announcementService.save(announcementDTO);
+        return ResponseEntity.created(new URI("/api/announcements/" + announcementDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, announcementDTO.getId().toString()))
+            .body(announcementDTO);
     }
 
     /**
@@ -122,6 +121,7 @@ public class AnnouncementBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated announcementDTO,
      * or with status {@code 400 (Bad Request)} if the announcementDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the announcementDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新系统通告", description = "根据主键更新并返回一个更新后的系统通告")
@@ -144,21 +144,19 @@ public class AnnouncementBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        AnnouncementDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             announcementService.updateBatch(announcementDTO, batchFields, batchIds);
-            result = announcementService.findOne(id).orElseThrow();
+            announcementDTO = announcementService.findOne(id).orElseThrow();
         } else {
-            result = announcementService.update(announcementDTO);
+            announcementDTO = announcementService.update(announcementDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, announcementDTO.getId().toString()))
-            .body(result);
+            .body(announcementDTO);
     }
 
     /**
@@ -198,6 +196,7 @@ public class AnnouncementBaseResource {
      * or with status {@code 400 (Bad Request)} if the announcementDTO is not valid,
      * or with status {@code 404 (Not Found)} if the announcementDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the announcementDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(tags = "部分更新系统通告", description = "根据主键及实体信息实现部分更新，值为null的属性将忽略，并返回一个更新后的系统通告")
@@ -290,8 +289,7 @@ public class AnnouncementBaseResource {
         log.debug("REST request to delete Announcement : {}", id);
 
         announcementService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -346,8 +344,7 @@ public class AnnouncementBaseResource {
         if (ids != null) {
             ids.forEach(announcementService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }

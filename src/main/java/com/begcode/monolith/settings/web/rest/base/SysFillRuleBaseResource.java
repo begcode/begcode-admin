@@ -86,11 +86,10 @@ public class SysFillRuleBaseResource {
         if (sysFillRuleDTO.getId() != null) {
             throw new BadRequestAlertException("A new sysFillRule cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        SysFillRuleDTO result = sysFillRuleService.save(sysFillRuleDTO);
-        return ResponseEntity
-            .created(new URI("/api/sys-fill-rules/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        sysFillRuleDTO = sysFillRuleService.save(sysFillRuleDTO);
+        return ResponseEntity.created(new URI("/api/sys-fill-rules/" + sysFillRuleDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, sysFillRuleDTO.getId().toString()))
+            .body(sysFillRuleDTO);
     }
 
     /**
@@ -101,6 +100,7 @@ public class SysFillRuleBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated sysFillRuleDTO,
      * or with status {@code 400 (Bad Request)} if the sysFillRuleDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the sysFillRuleDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新填充规则", description = "根据主键更新并返回一个更新后的填充规则")
@@ -123,21 +123,19 @@ public class SysFillRuleBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        SysFillRuleDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             sysFillRuleService.updateBatch(sysFillRuleDTO, batchFields, batchIds);
-            result = sysFillRuleService.findOne(id).orElseThrow();
+            sysFillRuleDTO = sysFillRuleService.findOne(id).orElseThrow();
         } else {
-            result = sysFillRuleService.update(sysFillRuleDTO);
+            sysFillRuleDTO = sysFillRuleService.update(sysFillRuleDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, sysFillRuleDTO.getId().toString()))
-            .body(result);
+            .body(sysFillRuleDTO);
     }
 
     /**
@@ -177,6 +175,7 @@ public class SysFillRuleBaseResource {
      * or with status {@code 400 (Bad Request)} if the sysFillRuleDTO is not valid,
      * or with status {@code 404 (Not Found)} if the sysFillRuleDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the sysFillRuleDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(tags = "部分更新填充规则", description = "根据主键及实体信息实现部分更新，值为null的属性将忽略，并返回一个更新后的填充规则")
@@ -269,8 +268,7 @@ public class SysFillRuleBaseResource {
         log.debug("REST request to delete SysFillRule : {}", id);
 
         sysFillRuleService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -325,8 +323,7 @@ public class SysFillRuleBaseResource {
         if (ids != null) {
             ids.forEach(sysFillRuleService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }

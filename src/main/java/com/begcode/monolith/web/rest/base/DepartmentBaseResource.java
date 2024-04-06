@@ -86,11 +86,10 @@ public class DepartmentBaseResource {
         if (departmentDTO.getId() != null) {
             throw new BadRequestAlertException("A new department cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        DepartmentDTO result = departmentService.save(departmentDTO);
-        return ResponseEntity
-            .created(new URI("/api/departments/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        departmentDTO = departmentService.save(departmentDTO);
+        return ResponseEntity.created(new URI("/api/departments/" + departmentDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, departmentDTO.getId().toString()))
+            .body(departmentDTO);
     }
 
     /**
@@ -101,6 +100,7 @@ public class DepartmentBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated departmentDTO,
      * or with status {@code 400 (Bad Request)} if the departmentDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the departmentDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新部门", description = "根据主键更新并返回一个更新后的部门")
@@ -123,21 +123,19 @@ public class DepartmentBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        DepartmentDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             departmentService.updateBatch(departmentDTO, batchFields, batchIds);
-            result = departmentService.findOne(id).orElseThrow();
+            departmentDTO = departmentService.findOne(id).orElseThrow();
         } else {
-            result = departmentService.update(departmentDTO);
+            departmentDTO = departmentService.update(departmentDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, departmentDTO.getId().toString()))
-            .body(result);
+            .body(departmentDTO);
     }
 
     /**
@@ -177,6 +175,7 @@ public class DepartmentBaseResource {
      * or with status {@code 400 (Bad Request)} if the departmentDTO is not valid,
      * or with status {@code 404 (Not Found)} if the departmentDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the departmentDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(tags = "部分更新部门", description = "根据主键及实体信息实现部分更新，值为null的属性将忽略，并返回一个更新后的部门")
@@ -269,8 +268,7 @@ public class DepartmentBaseResource {
         log.debug("REST request to delete Department : {}", id);
 
         departmentService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -358,8 +356,7 @@ public class DepartmentBaseResource {
         if (ids != null) {
             ids.forEach(departmentService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }

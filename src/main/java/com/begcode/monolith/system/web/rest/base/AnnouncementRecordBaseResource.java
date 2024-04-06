@@ -87,11 +87,10 @@ public class AnnouncementRecordBaseResource {
         if (announcementRecordDTO.getId() != null) {
             throw new BadRequestAlertException("A new announcementRecord cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        AnnouncementRecordDTO result = announcementRecordService.save(announcementRecordDTO);
-        return ResponseEntity
-            .created(new URI("/api/announcement-records/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        announcementRecordDTO = announcementRecordService.save(announcementRecordDTO);
+        return ResponseEntity.created(new URI("/api/announcement-records/" + announcementRecordDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, announcementRecordDTO.getId().toString()))
+            .body(announcementRecordDTO);
     }
 
     /**
@@ -102,6 +101,7 @@ public class AnnouncementRecordBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated announcementRecordDTO,
      * or with status {@code 400 (Bad Request)} if the announcementRecordDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the announcementRecordDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新通告阅读记录", description = "根据主键更新并返回一个更新后的通告阅读记录")
@@ -124,21 +124,19 @@ public class AnnouncementRecordBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        AnnouncementRecordDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             announcementRecordService.updateBatch(announcementRecordDTO, batchFields, batchIds);
-            result = announcementRecordService.findOne(id).orElseThrow();
+            announcementRecordDTO = announcementRecordService.findOne(id).orElseThrow();
         } else {
-            result = announcementRecordService.update(announcementRecordDTO);
+            announcementRecordDTO = announcementRecordService.update(announcementRecordDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, announcementRecordDTO.getId().toString()))
-            .body(result);
+            .body(announcementRecordDTO);
     }
 
     /**
@@ -178,6 +176,7 @@ public class AnnouncementRecordBaseResource {
      * or with status {@code 400 (Bad Request)} if the announcementRecordDTO is not valid,
      * or with status {@code 404 (Not Found)} if the announcementRecordDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the announcementRecordDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(
@@ -273,8 +272,7 @@ public class AnnouncementRecordBaseResource {
         log.debug("REST request to delete AnnouncementRecord : {}", id);
 
         announcementRecordService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -333,8 +331,7 @@ public class AnnouncementRecordBaseResource {
         if (ids != null) {
             ids.forEach(announcementRecordService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }

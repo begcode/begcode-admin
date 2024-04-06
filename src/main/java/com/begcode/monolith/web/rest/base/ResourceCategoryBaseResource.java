@@ -89,11 +89,10 @@ public class ResourceCategoryBaseResource {
         if (resourceCategoryDTO.getId() != null) {
             throw new BadRequestAlertException("A new resourceCategory cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        ResourceCategoryDTO result = resourceCategoryService.save(resourceCategoryDTO);
-        return ResponseEntity
-            .created(new URI("/api/resource-categories/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        resourceCategoryDTO = resourceCategoryService.save(resourceCategoryDTO);
+        return ResponseEntity.created(new URI("/api/resource-categories/" + resourceCategoryDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, resourceCategoryDTO.getId().toString()))
+            .body(resourceCategoryDTO);
     }
 
     /**
@@ -104,6 +103,7 @@ public class ResourceCategoryBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated resourceCategoryDTO,
      * or with status {@code 400 (Bad Request)} if the resourceCategoryDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the resourceCategoryDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新资源分类", description = "根据主键更新并返回一个更新后的资源分类")
@@ -126,21 +126,19 @@ public class ResourceCategoryBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        ResourceCategoryDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             resourceCategoryService.updateBatch(resourceCategoryDTO, batchFields, batchIds);
-            result = resourceCategoryService.findOne(id).orElseThrow();
+            resourceCategoryDTO = resourceCategoryService.findOne(id).orElseThrow();
         } else {
-            result = resourceCategoryService.update(resourceCategoryDTO);
+            resourceCategoryDTO = resourceCategoryService.update(resourceCategoryDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, resourceCategoryDTO.getId().toString()))
-            .body(result);
+            .body(resourceCategoryDTO);
     }
 
     /**
@@ -180,6 +178,7 @@ public class ResourceCategoryBaseResource {
      * or with status {@code 400 (Bad Request)} if the resourceCategoryDTO is not valid,
      * or with status {@code 404 (Not Found)} if the resourceCategoryDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the resourceCategoryDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(tags = "部分更新资源分类", description = "根据主键及实体信息实现部分更新，值为null的属性将忽略，并返回一个更新后的资源分类")
@@ -272,8 +271,7 @@ public class ResourceCategoryBaseResource {
         log.debug("REST request to delete ResourceCategory : {}", id);
 
         resourceCategoryService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -364,8 +362,7 @@ public class ResourceCategoryBaseResource {
         if (ids != null) {
             ids.forEach(resourceCategoryService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }

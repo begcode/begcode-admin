@@ -90,11 +90,10 @@ public class FillRuleItemBaseResource {
         if (fillRuleItemDTO.getId() != null) {
             throw new BadRequestAlertException("A new fillRuleItem cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        FillRuleItemDTO result = fillRuleItemService.save(fillRuleItemDTO);
-        return ResponseEntity
-            .created(new URI("/api/fill-rule-items/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        fillRuleItemDTO = fillRuleItemService.save(fillRuleItemDTO);
+        return ResponseEntity.created(new URI("/api/fill-rule-items/" + fillRuleItemDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, fillRuleItemDTO.getId().toString()))
+            .body(fillRuleItemDTO);
     }
 
     /**
@@ -105,6 +104,7 @@ public class FillRuleItemBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated fillRuleItemDTO,
      * or with status {@code 400 (Bad Request)} if the fillRuleItemDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the fillRuleItemDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新填充规则条目", description = "根据主键更新并返回一个更新后的填充规则条目")
@@ -127,21 +127,19 @@ public class FillRuleItemBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        FillRuleItemDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             fillRuleItemService.updateBatch(fillRuleItemDTO, batchFields, batchIds);
-            result = fillRuleItemService.findOne(id).orElseThrow();
+            fillRuleItemDTO = fillRuleItemService.findOne(id).orElseThrow();
         } else {
-            result = fillRuleItemService.update(fillRuleItemDTO);
+            fillRuleItemDTO = fillRuleItemService.update(fillRuleItemDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, fillRuleItemDTO.getId().toString()))
-            .body(result);
+            .body(fillRuleItemDTO);
     }
 
     /**
@@ -217,6 +215,7 @@ public class FillRuleItemBaseResource {
      * or with status {@code 400 (Bad Request)} if the fillRuleItemDTO is not valid,
      * or with status {@code 404 (Not Found)} if the fillRuleItemDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the fillRuleItemDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(
@@ -312,8 +311,7 @@ public class FillRuleItemBaseResource {
         log.debug("REST request to delete FillRuleItem : {}", id);
 
         fillRuleItemService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -372,8 +370,7 @@ public class FillRuleItemBaseResource {
         if (ids != null) {
             ids.forEach(fillRuleItemService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }

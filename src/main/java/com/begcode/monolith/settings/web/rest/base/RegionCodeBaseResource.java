@@ -86,11 +86,10 @@ public class RegionCodeBaseResource {
         if (regionCodeDTO.getId() != null) {
             throw new BadRequestAlertException("A new regionCode cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        RegionCodeDTO result = regionCodeService.save(regionCodeDTO);
-        return ResponseEntity
-            .created(new URI("/api/region-codes/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        regionCodeDTO = regionCodeService.save(regionCodeDTO);
+        return ResponseEntity.created(new URI("/api/region-codes/" + regionCodeDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, regionCodeDTO.getId().toString()))
+            .body(regionCodeDTO);
     }
 
     /**
@@ -101,6 +100,7 @@ public class RegionCodeBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated regionCodeDTO,
      * or with status {@code 400 (Bad Request)} if the regionCodeDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the regionCodeDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @Operation(tags = "更新行政区划码", description = "根据主键更新并返回一个更新后的行政区划码")
@@ -123,21 +123,19 @@ public class RegionCodeBaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        RegionCodeDTO result = null;
         if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
             batchIds = new ArrayList<>(batchIds);
             if (!batchIds.contains(id)) {
                 batchIds.add(id);
             }
             regionCodeService.updateBatch(regionCodeDTO, batchFields, batchIds);
-            result = regionCodeService.findOne(id).orElseThrow();
+            regionCodeDTO = regionCodeService.findOne(id).orElseThrow();
         } else {
-            result = regionCodeService.update(regionCodeDTO);
+            regionCodeDTO = regionCodeService.update(regionCodeDTO);
         }
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, regionCodeDTO.getId().toString()))
-            .body(result);
+            .body(regionCodeDTO);
     }
 
     /**
@@ -177,6 +175,7 @@ public class RegionCodeBaseResource {
      * or with status {@code 400 (Bad Request)} if the regionCodeDTO is not valid,
      * or with status {@code 404 (Not Found)} if the regionCodeDTO is not found,
      * or with status {@code 500 (Internal Server Error)} if the regionCodeDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     @Operation(
@@ -272,8 +271,7 @@ public class RegionCodeBaseResource {
         log.debug("REST request to delete RegionCode : {}", id);
 
         regionCodeService.delete(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
@@ -361,8 +359,7 @@ public class RegionCodeBaseResource {
         if (ids != null) {
             ids.forEach(regionCodeService::delete);
         }
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, (ids != null ? ids.toString() : "NoIds")))
             .build();
     }
