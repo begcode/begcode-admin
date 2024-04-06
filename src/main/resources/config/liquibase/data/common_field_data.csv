@@ -112,3 +112,4 @@ id;name;value;label;value_type;remark;sort_value;disabled;owner_entity_name;owne
 111;审核;AUDIT;审核;String;审核;111;0;Dictionary;22
 112;工作流;WORK_FLOW;工作流;String;工作流;112;0;Dictionary;22
 113;UUID;UUID_STRING;UUID;String;UUID;113;0;Dictionary;9
+114;已撤销;CANCELED;已撤销;String;已撤销;114;0;Dictionary;17
