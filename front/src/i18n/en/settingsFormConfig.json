@@ -1,0 +1,40 @@
+{
+  "monolithMybatisApp": {
+    "settingsFormConfig": {
+      "home": {
+        "title": "Form Configs",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Form Config",
+        "createOrEditLabel": "Create or edit a Form Config",
+        "notFound": "No Form Configs found"
+      },
+      "created": "A new Form Config is created with identifier { param }",
+      "updated": "A Form Config is updated with identifier { param }",
+      "deleted": "A Form Config is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Form Config { id }?"
+      },
+      "detail": {
+        "title": "Form Config"
+      },
+      "id": "ID",
+      "formKey": "Form Key",
+      "formName": "Form Name",
+      "formJson": "Form Json",
+      "createdBy": "Created By",
+      "createdDate": "Created Date",
+      "lastModifiedBy": "Last Modified By",
+      "lastModifiedDate": "Last Modified Date",
+      "businessType": "Business Type",
+      "help": {
+        "formKey": "表单Key",
+        "formName": "名称",
+        "formJson": "表单配置",
+        "createdBy": "创建者Id",
+        "createdDate": "创建时间",
+        "lastModifiedBy": "修改者Id",
+        "lastModifiedDate": "修改时间"
+      }
+    }
+  }
+}

@@ -15,10 +15,13 @@
       "tooltipNotify": "Notification",
       "tooltipEntryFull": "Full Screen",
       "tooltipExitFull": "Exit Full Screen",
-      "lockScreenPassword": "Lock screen password",
+      "lockScreenPassword": "Password",
       "lockScreen": "Lock screen",
       "lockScreenBtn": "Locking",
-      "home": "Home"
+      "home": "Home",
+      "welcomeIn": "Welcome in",
+      "refreshCacheComplete": "Refresh cache complete",
+      "refreshCacheFailure": "Refresh cache failure"
     },
     "multipleTab": {
       "reload": "Refresh current",
@@ -75,7 +78,7 @@
       "tabDetail": "Tab Detail",
       "tabsQuickBtn": "Tabs quick button",
       "tabsRedoBtn": "Tabs redo button",
-      "tabsFoldBtn": "Tabs flod button",
+      "tabsFoldBtn": "Tabs fold button",
       "tabsTheme": "tabs theme",
       "tabsThemeSmooth": "Smooth",
       "tabsThemeCard": "Card",
@@ -99,6 +102,13 @@
       "triggerClick": "Click",
       "mixSidebarFixed": "Fixed expanded menu",
       "autoCollapseTabsInFold": "Auto collapse tabs in fold"
+    },
+    "changePassword": {
+      "changePassword": "Change password",
+      "oldPassword": "Old password",
+      "newPassword": "New password",
+      "confirmNewPassword": "Confirm new password",
+      "pleaseEnterNewPassword": "Please enter new password"
     }
   }
 }

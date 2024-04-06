@@ -10,7 +10,6 @@
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
         "systemViewPermission": "View Permission",
         "systemAuthority": "Authority",
-        "systemUser": "User",
         "systemApiPermission": "Api Permission",
         "settingsDepartment": "Department",
         "settingsPosition": "Position",
@@ -32,7 +31,8 @@
         "systemAnnouncement": "Announcement",
         "systemAnnouncementRecord": "Announcement Record",
         "taskjobTaskJobConfig": "Task Job Config",
-        "logSysLog": "Sys Log"
+        "logSysLog": "Sys Log",
+        "settingsFormConfig": "Form Config"
       },
       "account": {
         "main": "账号",
