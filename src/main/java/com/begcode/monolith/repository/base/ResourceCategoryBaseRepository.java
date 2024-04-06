@@ -18,12 +18,10 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface ResourceCategoryBaseRepository<E extends ResourceCategory> extends BaseCrudMapper<ResourceCategory> {
     default Optional<ResourceCategory> findOneWithEagerRelationships(Long id) {
-        return Optional
-            .ofNullable(this.selectById(id))
-            .map(resourceCategory -> {
-                Binder.bindRelations(resourceCategory, new String[] { "children", "parent", "images", "files" });
-                return resourceCategory;
-            });
+        return Optional.ofNullable(this.selectById(id)).map(resourceCategory -> {
+            Binder.bindRelations(resourceCategory, new String[] { "children", "parent", "images", "files" });
+            return resourceCategory;
+        });
     }
 
     default List<ResourceCategory> findAll() {

@@ -16,12 +16,10 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface UploadImageBaseRepository<E extends UploadImage> extends BaseCrudMapper<UploadImage> {
     default Optional<UploadImage> findOneWithEagerRelationships(Long id) {
-        return Optional
-            .ofNullable(this.selectById(id))
-            .map(uploadImage -> {
-                Binder.bindRelations(uploadImage, new String[] { "category" });
-                return uploadImage;
-            });
+        return Optional.ofNullable(this.selectById(id)).map(uploadImage -> {
+            Binder.bindRelations(uploadImage, new String[] { "category" });
+            return uploadImage;
+        });
     }
 
     default List<UploadImage> findAll() {

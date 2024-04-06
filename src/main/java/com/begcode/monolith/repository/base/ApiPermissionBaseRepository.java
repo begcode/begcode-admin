@@ -21,12 +21,10 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface ApiPermissionBaseRepository<E extends ApiPermission> extends BaseCrudMapper<ApiPermission> {
     default Optional<ApiPermission> findOneWithEagerRelationships(Long id) {
-        return Optional
-            .ofNullable(this.selectById(id))
-            .map(apiPermission -> {
-                Binder.bindRelations(apiPermission, new String[] { "children", "parent", "authorities" });
-                return apiPermission;
-            });
+        return Optional.ofNullable(this.selectById(id)).map(apiPermission -> {
+            Binder.bindRelations(apiPermission, new String[] { "children", "parent", "authorities" });
+            return apiPermission;
+        });
     }
 
     default List<ApiPermission> findAll() {

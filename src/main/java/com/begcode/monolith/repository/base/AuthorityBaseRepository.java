@@ -22,15 +22,13 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface AuthorityBaseRepository<E extends Authority> extends BaseCrudMapper<Authority> {
     default Optional<Authority> findOneWithEagerRelationships(Long id) {
-        return Optional
-            .ofNullable(this.selectById(id))
-            .map(authority -> {
-                Binder.bindRelations(
-                    authority,
-                    new String[] { "children", "viewPermissions", "apiPermissions", "parent", "users", "department" }
-                );
-                return authority;
-            });
+        return Optional.ofNullable(this.selectById(id)).map(authority -> {
+            Binder.bindRelations(
+                authority,
+                new String[] { "children", "viewPermissions", "apiPermissions", "parent", "users", "department" }
+            );
+            return authority;
+        });
     }
 
     default List<Authority> findAll() {

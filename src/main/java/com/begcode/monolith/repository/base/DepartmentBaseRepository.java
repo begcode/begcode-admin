@@ -21,12 +21,10 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface DepartmentBaseRepository<E extends Department> extends BaseCrudMapper<Department> {
     default Optional<Department> findOneWithEagerRelationships(Long id) {
-        return Optional
-            .ofNullable(this.selectById(id))
-            .map(department -> {
-                Binder.bindRelations(department, new String[] { "children", "authorities", "parent", "users" });
-                return department;
-            });
+        return Optional.ofNullable(this.selectById(id)).map(department -> {
+            Binder.bindRelations(department, new String[] { "children", "authorities", "parent", "users" });
+            return department;
+        });
     }
 
     default List<Department> findAll() {

@@ -19,12 +19,10 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface ViewPermissionBaseRepository<E extends ViewPermission> extends BaseCrudMapper<ViewPermission> {
     default Optional<ViewPermission> findOneWithEagerRelationships(Long id) {
-        return Optional
-            .ofNullable(this.selectById(id))
-            .map(viewPermission -> {
-                Binder.bindRelations(viewPermission, new String[] { "children", "parent", "authorities" });
-                return viewPermission;
-            });
+        return Optional.ofNullable(this.selectById(id)).map(viewPermission -> {
+            Binder.bindRelations(viewPermission, new String[] { "children", "parent", "authorities" });
+            return viewPermission;
+        });
     }
 
     default List<ViewPermission> findAll() {
