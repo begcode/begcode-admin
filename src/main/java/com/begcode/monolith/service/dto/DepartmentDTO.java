@@ -72,6 +72,12 @@ public class DepartmentDTO implements Serializable {
     private Instant createTime;
 
     /**
+     * 下级部门
+     */
+    @Schema(description = "下级部门")
+    private List<DepartmentDTO> children = new ArrayList<>();
+
+    /**
      * 角色列表
      */
     @Schema(description = "角色列表")
@@ -132,6 +138,11 @@ public class DepartmentDTO implements Serializable {
         return this;
     }
 
+    public DepartmentDTO children(List<DepartmentDTO> children) {
+        this.children = children;
+        return this;
+    }
+
     public DepartmentDTO authorities(List<AuthorityDTO> authorities) {
         this.authorities = authorities;
         return this;
@@ -183,6 +194,7 @@ public class DepartmentDTO implements Serializable {
             ", contact='" + getContact() + "'" +
             ", createUserId=" + getCreateUserId() +
             ", createTime='" + getCreateTime() + "'" +
+            ", children=" + getChildren() +
             ", authorities=" + getAuthorities() +
             ", parent=" + getParent() +
             "}";

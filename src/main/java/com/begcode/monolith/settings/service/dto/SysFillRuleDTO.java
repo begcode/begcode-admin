@@ -4,6 +4,8 @@ import com.begcode.monolith.domain.enumeration.ResetFrequency;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
@@ -94,6 +96,12 @@ public class SysFillRuleDTO implements Serializable {
     @Schema(description = "重置时间")
     private ZonedDateTime resetTime;
 
+    /**
+     * 配置项列表
+     */
+    @Schema(description = "配置项列表")
+    private List<FillRuleItemDTO> ruleItems = new ArrayList<>();
+
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove
 
     public SysFillRuleDTO id(Long id) {
@@ -161,6 +169,11 @@ public class SysFillRuleDTO implements Serializable {
         return this;
     }
 
+    public SysFillRuleDTO ruleItems(List<FillRuleItemDTO> ruleItems) {
+        this.ruleItems = ruleItems;
+        return this;
+    }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -201,6 +214,7 @@ public class SysFillRuleDTO implements Serializable {
             ", resetStartTime='" + getResetStartTime() + "'" +
             ", resetEndTime='" + getResetEndTime() + "'" +
             ", resetTime='" + getResetTime() + "'" +
+            ", ruleItems=" + getRuleItems() +
             "}";
     }
 }

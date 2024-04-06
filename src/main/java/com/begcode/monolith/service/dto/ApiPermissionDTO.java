@@ -4,6 +4,8 @@ import com.begcode.monolith.domain.enumeration.ApiPermissionState;
 import com.begcode.monolith.domain.enumeration.ApiPermissionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
@@ -67,6 +69,12 @@ public class ApiPermissionDTO implements Serializable {
     private ApiPermissionState status;
 
     /**
+     * 子节点
+     */
+    @Schema(description = "子节点")
+    private List<ApiPermissionDTO> children = new ArrayList<>();
+
+    /**
      * 上级
      */
     @Schema(description = "上级")
@@ -121,6 +129,11 @@ public class ApiPermissionDTO implements Serializable {
         return this;
     }
 
+    public ApiPermissionDTO children(List<ApiPermissionDTO> children) {
+        this.children = children;
+        return this;
+    }
+
     public ApiPermissionDTO parent(ApiPermissionDTO parent) {
         this.parent = parent;
         return this;
@@ -167,6 +180,7 @@ public class ApiPermissionDTO implements Serializable {
             ", method='" + getMethod() + "'" +
             ", url='" + getUrl() + "'" +
             ", status='" + getStatus() + "'" +
+            ", children=" + getChildren() +
             ", parent=" + getParent() +
             "}";
     }

@@ -3,6 +3,8 @@ package com.begcode.monolith.settings.service.dto;
 import com.begcode.monolith.domain.enumeration.RegionCodeLevel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
@@ -76,6 +78,12 @@ public class RegionCodeDTO implements Serializable {
     private Double lat;
 
     /**
+     * 子节点
+     */
+    @Schema(description = "子节点")
+    private List<RegionCodeDTO> children = new ArrayList<>();
+
+    /**
      * 上级节点
      */
     @Schema(description = "上级节点")
@@ -135,6 +143,11 @@ public class RegionCodeDTO implements Serializable {
         return this;
     }
 
+    public RegionCodeDTO children(List<RegionCodeDTO> children) {
+        this.children = children;
+        return this;
+    }
+
     public RegionCodeDTO parent(RegionCodeDTO parent) {
         this.parent = parent;
         return this;
@@ -182,6 +195,7 @@ public class RegionCodeDTO implements Serializable {
             ", level='" + getLevel() + "'" +
             ", lng=" + getLng() +
             ", lat=" + getLat() +
+            ", children=" + getChildren() +
             ", parent=" + getParent() +
             "}";
     }

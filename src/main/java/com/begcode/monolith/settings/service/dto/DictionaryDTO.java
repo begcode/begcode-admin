@@ -3,6 +3,8 @@ package com.begcode.monolith.settings.service.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
@@ -59,6 +61,12 @@ public class DictionaryDTO implements Serializable {
     @Schema(description = "更新枚举")
     private Boolean syncEnum;
 
+    /**
+     * 字典项列表
+     */
+    @Schema(description = "字典项列表")
+    private List<CommonFieldDataDTO> items = new ArrayList<>();
+
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove
 
     public DictionaryDTO id(Long id) {
@@ -96,6 +104,11 @@ public class DictionaryDTO implements Serializable {
         return this;
     }
 
+    public DictionaryDTO items(List<CommonFieldDataDTO> items) {
+        this.items = items;
+        return this;
+    }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -130,6 +143,7 @@ public class DictionaryDTO implements Serializable {
             ", sortValue=" + getSortValue() +
             ", builtIn='" + getBuiltIn() + "'" +
             ", syncEnum='" + getSyncEnum() + "'" +
+            ", items=" + getItems() +
             "}";
     }
 }

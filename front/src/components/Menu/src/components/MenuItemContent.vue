@@ -17,6 +17,8 @@ defineOptions({ name: 'MenuItemContent' });
 
 const props = defineProps(contentProps);
 
+console.log('props.item', props.item);
+
 const { t } = useI18n();
 
 const { prefixCls } = useDesign('basic-menu-item-content');

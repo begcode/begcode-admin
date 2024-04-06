@@ -3,6 +3,8 @@ package com.begcode.monolith.service.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,6 +44,12 @@ public class ResourceCategoryDTO implements Serializable {
     private Integer orderNumber;
 
     /**
+     * 下级列表
+     */
+    @Schema(description = "下级列表")
+    private List<ResourceCategoryDTO> children = new ArrayList<>();
+
+    /**
      * 上级
      */
     @Schema(description = "上级")
@@ -68,6 +76,11 @@ public class ResourceCategoryDTO implements Serializable {
 
     public ResourceCategoryDTO orderNumber(Integer orderNumber) {
         this.orderNumber = orderNumber;
+        return this;
+    }
+
+    public ResourceCategoryDTO children(List<ResourceCategoryDTO> children) {
+        this.children = children;
         return this;
     }
 
@@ -112,6 +125,7 @@ public class ResourceCategoryDTO implements Serializable {
             ", title='" + getTitle() + "'" +
             ", code='" + getCode() + "'" +
             ", orderNumber=" + getOrderNumber() +
+            ", children=" + getChildren() +
             ", parent=" + getParent() +
             "}";
     }

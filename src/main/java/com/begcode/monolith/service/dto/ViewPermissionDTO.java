@@ -5,6 +5,8 @@ import com.begcode.monolith.domain.enumeration.ViewPermissionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
@@ -147,6 +149,12 @@ public class ViewPermissionDTO implements Serializable {
     private String redirect;
 
     /**
+     * 子节点
+     */
+    @Schema(description = "子节点")
+    private List<ViewPermissionDTO> children = new ArrayList<>();
+
+    /**
      * 上级
      */
     @Schema(description = "上级")
@@ -261,6 +269,11 @@ public class ViewPermissionDTO implements Serializable {
         return this;
     }
 
+    public ViewPermissionDTO children(List<ViewPermissionDTO> children) {
+        this.children = children;
+        return this;
+    }
+
     public ViewPermissionDTO parent(ViewPermissionDTO parent) {
         this.parent = parent;
         return this;
@@ -319,6 +332,7 @@ public class ViewPermissionDTO implements Serializable {
             ", apiPermissionCodes='" + getApiPermissionCodes() + "'" +
             ", componentFile='" + getComponentFile() + "'" +
             ", redirect='" + getRedirect() + "'" +
+            ", children=" + getChildren() +
             ", parent=" + getParent() +
             "}";
     }

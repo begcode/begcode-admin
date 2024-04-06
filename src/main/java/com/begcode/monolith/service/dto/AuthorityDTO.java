@@ -53,6 +53,12 @@ public class AuthorityDTO implements Serializable {
     private Boolean display;
 
     /**
+     * 子节点
+     */
+    @Schema(description = "子节点")
+    private List<AuthorityDTO> children = new ArrayList<>();
+
+    /**
      * 菜单列表
      */
     @Schema(description = "菜单列表")
@@ -101,6 +107,11 @@ public class AuthorityDTO implements Serializable {
 
     public AuthorityDTO display(Boolean display) {
         this.display = display;
+        return this;
+    }
+
+    public AuthorityDTO children(List<AuthorityDTO> children) {
+        this.children = children;
         return this;
     }
 
@@ -157,6 +168,7 @@ public class AuthorityDTO implements Serializable {
             ", info='" + getInfo() + "'" +
             ", order=" + getOrder() +
             ", display='" + getDisplay() + "'" +
+            ", children=" + getChildren() +
             ", viewPermissions=" + getViewPermissions() +
             ", apiPermissions=" + getApiPermissions() +
             ", parent=" + getParent() +

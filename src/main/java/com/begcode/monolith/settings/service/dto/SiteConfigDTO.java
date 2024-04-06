@@ -4,6 +4,8 @@ import com.begcode.monolith.domain.AbstractAuditingEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
@@ -78,6 +80,12 @@ public class SiteConfigDTO extends AbstractAuditingEntity<Long, SiteConfigDTO> {
     @Schema(description = "修改时间")
     private Instant lastModifiedDate;
 
+    /**
+     * 配置项列表
+     */
+    @Schema(description = "配置项列表")
+    private List<CommonFieldDataDTO> items = new ArrayList<>();
+
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove
 
     public SiteConfigDTO id(Long id) {
@@ -130,6 +138,11 @@ public class SiteConfigDTO extends AbstractAuditingEntity<Long, SiteConfigDTO> {
         return this;
     }
 
+    public SiteConfigDTO items(List<CommonFieldDataDTO> items) {
+        this.items = items;
+        return this;
+    }
+
     // jhipster-needle-dto-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -167,6 +180,7 @@ public class SiteConfigDTO extends AbstractAuditingEntity<Long, SiteConfigDTO> {
             ", createdDate='" + getCreatedDate() + "'" +
             ", lastModifiedBy=" + getLastModifiedBy() +
             ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            ", items=" + getItems() +
             "}";
     }
 }
