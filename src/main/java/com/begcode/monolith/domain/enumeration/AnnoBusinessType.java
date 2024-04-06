@@ -7,7 +7,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 业务类型
  */
 public enum AnnoBusinessType {
+    /**
+     * 邮件
+     */
     EMAIL("EMAIL", "邮件"),
+    /**
+     * 工作流
+     */
     WORKFLOW("WORKFLOW", "工作流");
 
     @EnumValue

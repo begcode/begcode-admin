@@ -217,8 +217,7 @@ public class UserService extends BaseServiceImpl<UserRepository, User> {
      * @return updated user.
      */
     public Optional<AdminUserDTO> updateUser(AdminUserDTO userDTO) {
-        return Optional
-            .of(userRepository.findById(userDTO.getId()))
+        return Optional.of(userRepository.findById(userDTO.getId()))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .map(user -> {
@@ -273,8 +272,7 @@ public class UserService extends BaseServiceImpl<UserRepository, User> {
      * @param imageUrl  image URL of user.
      */
     public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl, String mobile) {
-        SecurityUtils
-            .getCurrentUserLogin()
+        SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findOneByLogin)
             .ifPresent(user -> {
                 user.setFirstName(firstName);
@@ -293,8 +291,7 @@ public class UserService extends BaseServiceImpl<UserRepository, User> {
 
     @Transactional
     public void changePassword(String currentClearTextPassword, String newPassword) {
-        SecurityUtils
-            .getCurrentUserLogin()
+        SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findOneByLogin)
             .ifPresent(user -> {
                 String currentEncryptedPassword = user.getPassword();
@@ -364,8 +361,7 @@ public class UserService extends BaseServiceImpl<UserRepository, User> {
      */
     @Transactional
     public Optional<AdminUserDTO> updateUserMobile(String mobile) {
-        return Optional
-            .of(userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin().orElseThrow()))
+        return Optional.of(userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin().orElseThrow()))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .map(user -> {

@@ -30,7 +30,7 @@ class ApiPermissionTest {
         ApiPermission apiPermission = getApiPermissionRandomSampleGenerator();
         ApiPermission apiPermissionBack = getApiPermissionRandomSampleGenerator();
 
-        // apiPermission.addChildren(apiPermissionBack);
+        // todo apiPermission.addChildren(apiPermissionBack);
         // assertThat(apiPermission.getChildren()).containsOnly(apiPermissionBack);
         assertThat(apiPermissionBack.getParent()).isEqualTo(apiPermission);
 
@@ -64,7 +64,7 @@ class ApiPermissionTest {
         ApiPermission apiPermission = getApiPermissionRandomSampleGenerator();
         Authority authorityBack = getAuthorityRandomSampleGenerator();
 
-        // apiPermission.addAuthorities(authorityBack);
+        // todo apiPermission.addAuthorities(authorityBack);
         // assertThat(apiPermission.getAuthorities()).containsOnly(authorityBack);
         assertThat(authorityBack.getApiPermissions()).containsOnly(apiPermission);
 

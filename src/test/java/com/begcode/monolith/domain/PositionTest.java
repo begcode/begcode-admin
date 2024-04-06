@@ -29,7 +29,7 @@ class PositionTest {
         Position position = getPositionRandomSampleGenerator();
         User userBack = getUserRandomSampleGenerator();
 
-        // position.addUsers(userBack);
+        // todo position.addUsers(userBack);
         // assertThat(position.getUsers()).containsOnly(userBack);
         assertThat(userBack.getPosition()).isEqualTo(position);
 

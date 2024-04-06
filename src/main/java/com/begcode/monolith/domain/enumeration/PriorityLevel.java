@@ -7,8 +7,17 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 优先级
  */
 public enum PriorityLevel {
+    /**
+     * 高
+     */
     HIGH("HIGH", "高"),
+    /**
+     * 中
+     */
     MEDIUM("MEDIUM", "中"),
+    /**
+     * 低
+     */
     LOW("LOW", "低");
 
     @EnumValue

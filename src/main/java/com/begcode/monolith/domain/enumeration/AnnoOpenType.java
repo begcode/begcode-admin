@@ -7,8 +7,17 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 打开方式
  */
 public enum AnnoOpenType {
+    /**
+     * URL地址
+     */
     URL("URL", "URL地址"),
+    /**
+     * 组件
+     */
     COMPONENT("COMPONENT", "组件"),
+    /**
+     * 弹窗详情
+     */
     MODAL_DETAIL("MODAL_DETAIL", "弹窗详情");
 
     @EnumValue

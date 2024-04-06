@@ -76,12 +76,10 @@ public class ViewPermissionQueryService implements QueryService<ViewPermission> 
     public IPage<ViewPermissionDTO> findByCriteria(ViewPermissionCriteria criteria, Page<ViewPermission> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<ViewPermission> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, ViewPermission.class, page)
-            .convert(viewPermission -> {
-                Binder.bindRelations(viewPermission, new String[] { "children", "authorities" });
-                return viewPermissionMapper.toDto(viewPermission);
-            });
+        return Binder.joinQueryPage(queryWrapper, ViewPermission.class, page).convert(viewPermission -> {
+            Binder.bindRelations(viewPermission, new String[] { "children", "authorities" });
+            return viewPermissionMapper.toDto(viewPermission);
+        });
     }
 
     /**
@@ -105,12 +103,10 @@ public class ViewPermissionQueryService implements QueryService<ViewPermission> 
         log.debug("find by criteria : {}, page: {}", criteria, page);
         criteria.parentId().setSpecified(false);
         final QueryWrapper<ViewPermission> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, ViewPermission.class, page)
-            .convert(viewPermission -> {
-                Binder.bindRelations(viewPermission, new String[] { "parent", "authorities" });
-                return viewPermissionMapper.toDto(viewPermission);
-            });
+        return Binder.joinQueryPage(queryWrapper, ViewPermission.class, page).convert(viewPermission -> {
+            Binder.bindRelations(viewPermission, new String[] { "parent", "authorities" });
+            return viewPermissionMapper.toDto(viewPermission);
+        });
     }
 
     /**

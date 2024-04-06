@@ -31,7 +31,7 @@ class DepartmentTest {
         Department department = getDepartmentRandomSampleGenerator();
         Department departmentBack = getDepartmentRandomSampleGenerator();
 
-        // department.addChildren(departmentBack);
+        // todo department.addChildren(departmentBack);
         // assertThat(department.getChildren()).containsOnly(departmentBack);
         assertThat(departmentBack.getParent()).isEqualTo(department);
 
@@ -53,7 +53,7 @@ class DepartmentTest {
         Department department = getDepartmentRandomSampleGenerator();
         Authority authorityBack = getAuthorityRandomSampleGenerator();
 
-        // department.addAuthorities(authorityBack);
+        // todo department.addAuthorities(authorityBack);
         // assertThat(department.getAuthorities()).containsOnly(authorityBack);
 
         // department.removeAuthorities(authorityBack);
@@ -83,7 +83,7 @@ class DepartmentTest {
         Department department = getDepartmentRandomSampleGenerator();
         User userBack = getUserRandomSampleGenerator();
 
-        // department.addUsers(userBack);
+        // todo department.addUsers(userBack);
         // assertThat(department.getUsers()).containsOnly(userBack);
         assertThat(userBack.getDepartment()).isEqualTo(department);
 

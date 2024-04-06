@@ -33,7 +33,7 @@ class AuthorityTest {
         Authority authority = getAuthorityRandomSampleGenerator();
         Authority authorityBack = getAuthorityRandomSampleGenerator();
 
-        // authority.addChildren(authorityBack);
+        // todo authority.addChildren(authorityBack);
         // assertThat(authority.getChildren()).containsOnly(authorityBack);
         assertThat(authorityBack.getParent()).isEqualTo(authority);
 
@@ -55,7 +55,7 @@ class AuthorityTest {
         Authority authority = getAuthorityRandomSampleGenerator();
         ViewPermission viewPermissionBack = getViewPermissionRandomSampleGenerator();
 
-        // authority.addViewPermissions(viewPermissionBack);
+        // todo authority.addViewPermissions(viewPermissionBack);
         // assertThat(authority.getViewPermissions()).containsOnly(viewPermissionBack);
 
         // authority.removeViewPermissions(viewPermissionBack);
@@ -73,7 +73,7 @@ class AuthorityTest {
         Authority authority = getAuthorityRandomSampleGenerator();
         ApiPermission apiPermissionBack = getApiPermissionRandomSampleGenerator();
 
-        // authority.addApiPermissions(apiPermissionBack);
+        // todo authority.addApiPermissions(apiPermissionBack);
         // assertThat(authority.getApiPermissions()).containsOnly(apiPermissionBack);
 
         // authority.removeApiPermissions(apiPermissionBack);
@@ -103,7 +103,7 @@ class AuthorityTest {
         Authority authority = getAuthorityRandomSampleGenerator();
         User userBack = getUserRandomSampleGenerator();
 
-        // authority.addUsers(userBack);
+        // todo authority.addUsers(userBack);
         // assertThat(authority.getUsers()).containsOnly(userBack);
         assertThat(userBack.getAuthorities()).containsOnly(authority);
 
@@ -125,7 +125,7 @@ class AuthorityTest {
         Authority authority = getAuthorityRandomSampleGenerator();
         Department departmentBack = getDepartmentRandomSampleGenerator();
 
-        // authority.addDepartment(departmentBack);
+        // todo authority.addDepartment(departmentBack);
         // assertThat(authority.getDepartments()).containsOnly(departmentBack);
         assertThat(departmentBack.getAuthorities()).containsOnly(authority);
 

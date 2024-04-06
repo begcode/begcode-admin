@@ -74,12 +74,10 @@ public class SysFillRuleQueryService implements QueryService<SysFillRule> {
     public IPage<SysFillRuleDTO> findByCriteria(SysFillRuleCriteria criteria, Page<SysFillRule> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<SysFillRule> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, SysFillRule.class, page)
-            .convert(sysFillRule -> {
-                Binder.bindRelations(sysFillRule, new String[] {});
-                return sysFillRuleMapper.toDto(sysFillRule);
-            });
+        return Binder.joinQueryPage(queryWrapper, SysFillRule.class, page).convert(sysFillRule -> {
+            Binder.bindRelations(sysFillRule, new String[] {});
+            return sysFillRuleMapper.toDto(sysFillRule);
+        });
     }
 
     /**

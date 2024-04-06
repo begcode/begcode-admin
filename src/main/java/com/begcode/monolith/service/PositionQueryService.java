@@ -74,12 +74,10 @@ public class PositionQueryService implements QueryService<Position> {
     public IPage<PositionDTO> findByCriteria(PositionCriteria criteria, Page<Position> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<Position> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, Position.class, page)
-            .convert(position -> {
-                Binder.bindRelations(position, new String[] {});
-                return positionMapper.toDto(position);
-            });
+        return Binder.joinQueryPage(queryWrapper, Position.class, page).convert(position -> {
+            Binder.bindRelations(position, new String[] {});
+            return positionMapper.toDto(position);
+        });
     }
 
     /**

@@ -7,9 +7,21 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Api权限状态
  */
 public enum ApiPermissionState {
+    /**
+     * 可配置
+     */
     CONFIGURABLE("CONFIGURABLE", "可配置"),
+    /**
+     * 允许所有
+     */
     PERMIT_ALL("PERMIT_ALL", "允许所有"),
+    /**
+     * 不可达
+     */
     UNREACHABLE("UNREACHABLE", "不可达"),
+    /**
+     * 认证
+     */
     AUTHENTICATE("AUTHENTICATE", "认证");
 
     @EnumValue

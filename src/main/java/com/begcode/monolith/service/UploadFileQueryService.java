@@ -74,12 +74,10 @@ public class UploadFileQueryService implements QueryService<UploadFile> {
     public IPage<UploadFileDTO> findByCriteria(UploadFileCriteria criteria, Page<UploadFile> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<UploadFile> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, UploadFile.class, page)
-            .convert(uploadFile -> {
-                Binder.bindRelations(uploadFile, new String[] {});
-                return uploadFileMapper.toDto(uploadFile);
-            });
+        return Binder.joinQueryPage(queryWrapper, UploadFile.class, page).convert(uploadFile -> {
+            Binder.bindRelations(uploadFile, new String[] {});
+            return uploadFileMapper.toDto(uploadFile);
+        });
     }
 
     /**

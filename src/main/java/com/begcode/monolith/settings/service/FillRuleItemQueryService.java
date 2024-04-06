@@ -74,12 +74,10 @@ public class FillRuleItemQueryService implements QueryService<FillRuleItem> {
     public IPage<FillRuleItemDTO> findByCriteria(FillRuleItemCriteria criteria, Page<FillRuleItem> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<FillRuleItem> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, FillRuleItem.class, page)
-            .convert(fillRuleItem -> {
-                Binder.bindRelations(fillRuleItem, new String[] { "fillRule" });
-                return fillRuleItemMapper.toDto(fillRuleItem);
-            });
+        return Binder.joinQueryPage(queryWrapper, FillRuleItem.class, page).convert(fillRuleItem -> {
+            Binder.bindRelations(fillRuleItem, new String[] { "fillRule" });
+            return fillRuleItemMapper.toDto(fillRuleItem);
+        });
     }
 
     /**

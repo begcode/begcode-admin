@@ -74,12 +74,10 @@ public class UserQueryService implements QueryService<User> {
     public IPage<UserDTO> findByCriteria(UserCriteria criteria, Page<User> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<User> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, User.class, page)
-            .convert(user -> {
-                Binder.bindRelations(user, new String[] {});
-                return userMapper.toDto(user);
-            });
+        return Binder.joinQueryPage(queryWrapper, User.class, page).convert(user -> {
+            Binder.bindRelations(user, new String[] {});
+            return userMapper.toDto(user);
+        });
     }
 
     /**

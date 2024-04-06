@@ -74,12 +74,10 @@ public class CommonFieldDataQueryService implements QueryService<CommonFieldData
     public IPage<CommonFieldDataDTO> findByCriteria(CommonFieldDataCriteria criteria, Page<CommonFieldData> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<CommonFieldData> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, CommonFieldData.class, page)
-            .convert(commonFieldData -> {
-                Binder.bindRelations(commonFieldData, new String[] {});
-                return commonFieldDataMapper.toDto(commonFieldData);
-            });
+        return Binder.joinQueryPage(queryWrapper, CommonFieldData.class, page).convert(commonFieldData -> {
+            Binder.bindRelations(commonFieldData, new String[] {});
+            return commonFieldDataMapper.toDto(commonFieldData);
+        });
     }
 
     /**

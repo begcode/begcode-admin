@@ -5,6 +5,7 @@ import com.begcode.monolith.settings.domain.FillRuleItem;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
@@ -22,36 +23,12 @@ import tech.jhipster.service.filter.*;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class SysFillRuleCriteria implements Serializable, Criteria {
 
-    @BindQuery(ignore = true)
-    private String jhiCommonSearchKeywords;
-
-    @BindQuery(ignore = true)
-    private Boolean useOr = false;
-
-    @BindQuery(ignore = true)
-    private SysFillRuleCriteria and;
-
-    @BindQuery(ignore = true)
-    private SysFillRuleCriteria or;
-
     /**
      * Class for filtering ResetFrequency
      */
     public static class ResetFrequencyFilter extends Filter<ResetFrequency> {
 
         public ResetFrequencyFilter() {}
-
-        public ResetFrequencyFilter(String value) {
-            ResetFrequency enumValue = ResetFrequency.getByValue(value);
-            if (enumValue != null) {
-                setEquals(enumValue);
-            } else {
-                enumValue = ResetFrequency.getByDesc(value);
-                if (enumValue != null) {
-                    setEquals(enumValue);
-                }
-            }
-        }
 
         public ResetFrequencyFilter(ResetFrequencyFilter filter) {
             super(filter);
@@ -111,32 +88,328 @@ public class SysFillRuleCriteria implements Serializable, Criteria {
     private StringFilter ruleItemsDatePattern;
 
     @BindQuery(ignore = true)
+    private String jhiCommonSearchKeywords;
+
+    @BindQuery(ignore = true)
+    private Boolean useOr = false;
+
+    @BindQuery(ignore = true)
+    private SysFillRuleCriteria and;
+
+    @BindQuery(ignore = true)
+    private SysFillRuleCriteria or;
+
     private Boolean distinct;
 
     public SysFillRuleCriteria() {}
 
     public SysFillRuleCriteria(SysFillRuleCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.name = other.name == null ? null : other.name.copy();
-        this.code = other.code == null ? null : other.code.copy();
-        this.desc = other.desc == null ? null : other.desc.copy();
-        this.enabled = other.enabled == null ? null : other.enabled.copy();
-        this.resetFrequency = other.resetFrequency == null ? null : other.resetFrequency.copy();
-        this.seqValue = other.seqValue == null ? null : other.seqValue.copy();
-        this.fillValue = other.fillValue == null ? null : other.fillValue.copy();
-        this.implClass = other.implClass == null ? null : other.implClass.copy();
-        this.params = other.params == null ? null : other.params.copy();
-        this.resetStartTime = other.resetStartTime == null ? null : other.resetStartTime.copy();
-        this.resetEndTime = other.resetEndTime == null ? null : other.resetEndTime.copy();
-        this.resetTime = other.resetTime == null ? null : other.resetTime.copy();
-        this.ruleItemsId = other.ruleItemsId == null ? null : other.ruleItemsId.copy();
-        this.ruleItemsDatePattern = other.ruleItemsDatePattern == null ? null : other.ruleItemsDatePattern.copy();
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.name = other.optionalName().map(StringFilter::copy).orElse(null);
+        this.code = other.optionalCode().map(StringFilter::copy).orElse(null);
+        this.desc = other.optionalDesc().map(StringFilter::copy).orElse(null);
+        this.enabled = other.optionalEnabled().map(BooleanFilter::copy).orElse(null);
+        this.resetFrequency = other.optionalResetFrequency().map(ResetFrequencyFilter::copy).orElse(null);
+        this.seqValue = other.optionalSeqValue().map(LongFilter::copy).orElse(null);
+        this.fillValue = other.optionalFillValue().map(StringFilter::copy).orElse(null);
+        this.implClass = other.optionalImplClass().map(StringFilter::copy).orElse(null);
+        this.params = other.optionalParams().map(StringFilter::copy).orElse(null);
+        this.resetStartTime = other.optionalResetStartTime().map(ZonedDateTimeFilter::copy).orElse(null);
+        this.resetEndTime = other.optionalResetEndTime().map(ZonedDateTimeFilter::copy).orElse(null);
+        this.resetTime = other.optionalResetTime().map(ZonedDateTimeFilter::copy).orElse(null);
+        this.ruleItemsId = other.optionalRuleItemsId().map(LongFilter::copy).orElse(null);
+        this.ruleItemsDatePattern = other.optionalRuleItemsDatePattern().map(StringFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
     public SysFillRuleCriteria copy() {
         return new SysFillRuleCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public StringFilter getName() {
+        return name;
+    }
+
+    public Optional<StringFilter> optionalName() {
+        return Optional.ofNullable(name);
+    }
+
+    public StringFilter name() {
+        if (name == null) {
+            setName(new StringFilter());
+        }
+        return name;
+    }
+
+    public void setName(StringFilter name) {
+        this.name = name;
+    }
+
+    public StringFilter getCode() {
+        return code;
+    }
+
+    public Optional<StringFilter> optionalCode() {
+        return Optional.ofNullable(code);
+    }
+
+    public StringFilter code() {
+        if (code == null) {
+            setCode(new StringFilter());
+        }
+        return code;
+    }
+
+    public void setCode(StringFilter code) {
+        this.code = code;
+    }
+
+    public StringFilter getDesc() {
+        return desc;
+    }
+
+    public Optional<StringFilter> optionalDesc() {
+        return Optional.ofNullable(desc);
+    }
+
+    public StringFilter desc() {
+        if (desc == null) {
+            setDesc(new StringFilter());
+        }
+        return desc;
+    }
+
+    public void setDesc(StringFilter desc) {
+        this.desc = desc;
+    }
+
+    public BooleanFilter getEnabled() {
+        return enabled;
+    }
+
+    public Optional<BooleanFilter> optionalEnabled() {
+        return Optional.ofNullable(enabled);
+    }
+
+    public BooleanFilter enabled() {
+        if (enabled == null) {
+            setEnabled(new BooleanFilter());
+        }
+        return enabled;
+    }
+
+    public void setEnabled(BooleanFilter enabled) {
+        this.enabled = enabled;
+    }
+
+    public ResetFrequencyFilter getResetFrequency() {
+        return resetFrequency;
+    }
+
+    public Optional<ResetFrequencyFilter> optionalResetFrequency() {
+        return Optional.ofNullable(resetFrequency);
+    }
+
+    public ResetFrequencyFilter resetFrequency() {
+        if (resetFrequency == null) {
+            setResetFrequency(new ResetFrequencyFilter());
+        }
+        return resetFrequency;
+    }
+
+    public void setResetFrequency(ResetFrequencyFilter resetFrequency) {
+        this.resetFrequency = resetFrequency;
+    }
+
+    public LongFilter getSeqValue() {
+        return seqValue;
+    }
+
+    public Optional<LongFilter> optionalSeqValue() {
+        return Optional.ofNullable(seqValue);
+    }
+
+    public LongFilter seqValue() {
+        if (seqValue == null) {
+            setSeqValue(new LongFilter());
+        }
+        return seqValue;
+    }
+
+    public void setSeqValue(LongFilter seqValue) {
+        this.seqValue = seqValue;
+    }
+
+    public StringFilter getFillValue() {
+        return fillValue;
+    }
+
+    public Optional<StringFilter> optionalFillValue() {
+        return Optional.ofNullable(fillValue);
+    }
+
+    public StringFilter fillValue() {
+        if (fillValue == null) {
+            setFillValue(new StringFilter());
+        }
+        return fillValue;
+    }
+
+    public void setFillValue(StringFilter fillValue) {
+        this.fillValue = fillValue;
+    }
+
+    public StringFilter getImplClass() {
+        return implClass;
+    }
+
+    public Optional<StringFilter> optionalImplClass() {
+        return Optional.ofNullable(implClass);
+    }
+
+    public StringFilter implClass() {
+        if (implClass == null) {
+            setImplClass(new StringFilter());
+        }
+        return implClass;
+    }
+
+    public void setImplClass(StringFilter implClass) {
+        this.implClass = implClass;
+    }
+
+    public StringFilter getParams() {
+        return params;
+    }
+
+    public Optional<StringFilter> optionalParams() {
+        return Optional.ofNullable(params);
+    }
+
+    public StringFilter params() {
+        if (params == null) {
+            setParams(new StringFilter());
+        }
+        return params;
+    }
+
+    public void setParams(StringFilter params) {
+        this.params = params;
+    }
+
+    public ZonedDateTimeFilter getResetStartTime() {
+        return resetStartTime;
+    }
+
+    public Optional<ZonedDateTimeFilter> optionalResetStartTime() {
+        return Optional.ofNullable(resetStartTime);
+    }
+
+    public ZonedDateTimeFilter resetStartTime() {
+        if (resetStartTime == null) {
+            setResetStartTime(new ZonedDateTimeFilter());
+        }
+        return resetStartTime;
+    }
+
+    public void setResetStartTime(ZonedDateTimeFilter resetStartTime) {
+        this.resetStartTime = resetStartTime;
+    }
+
+    public ZonedDateTimeFilter getResetEndTime() {
+        return resetEndTime;
+    }
+
+    public Optional<ZonedDateTimeFilter> optionalResetEndTime() {
+        return Optional.ofNullable(resetEndTime);
+    }
+
+    public ZonedDateTimeFilter resetEndTime() {
+        if (resetEndTime == null) {
+            setResetEndTime(new ZonedDateTimeFilter());
+        }
+        return resetEndTime;
+    }
+
+    public void setResetEndTime(ZonedDateTimeFilter resetEndTime) {
+        this.resetEndTime = resetEndTime;
+    }
+
+    public ZonedDateTimeFilter getResetTime() {
+        return resetTime;
+    }
+
+    public Optional<ZonedDateTimeFilter> optionalResetTime() {
+        return Optional.ofNullable(resetTime);
+    }
+
+    public ZonedDateTimeFilter resetTime() {
+        if (resetTime == null) {
+            setResetTime(new ZonedDateTimeFilter());
+        }
+        return resetTime;
+    }
+
+    public void setResetTime(ZonedDateTimeFilter resetTime) {
+        this.resetTime = resetTime;
+    }
+
+    public LongFilter getRuleItemsId() {
+        return ruleItemsId;
+    }
+
+    public Optional<LongFilter> optionalRuleItemsId() {
+        return Optional.ofNullable(ruleItemsId);
+    }
+
+    public LongFilter ruleItemsId() {
+        if (ruleItemsId == null) {
+            setRuleItemsId(new LongFilter());
+        }
+        return ruleItemsId;
+    }
+
+    public void setRuleItemsId(LongFilter ruleItemsId) {
+        this.ruleItemsId = ruleItemsId;
+    }
+
+    public StringFilter getRuleItemsDatePattern() {
+        return ruleItemsDatePattern;
+    }
+
+    public Optional<StringFilter> optionalRuleItemsDatePattern() {
+        return Optional.ofNullable(ruleItemsDatePattern);
+    }
+
+    public StringFilter ruleItemsDatePattern() {
+        if (ruleItemsDatePattern == null) {
+            setRuleItemsDatePattern(new StringFilter());
+        }
+        return ruleItemsDatePattern;
+    }
+
+    public void setRuleItemsDatePattern(StringFilter ruleItemsDatePattern) {
+        this.ruleItemsDatePattern = ruleItemsDatePattern;
     }
 
     public void setAnd(SysFillRuleCriteria and) {
@@ -169,231 +442,6 @@ public class SysFillRuleCriteria implements Serializable, Criteria {
         return or;
     }
 
-    public LongFilter getId() {
-        return id;
-    }
-
-    public LongFilter id() {
-        if (id == null) {
-            id = new LongFilter();
-        }
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
-    }
-
-    public StringFilter getName() {
-        return name;
-    }
-
-    public StringFilter name() {
-        if (name == null) {
-            name = new StringFilter();
-        }
-        return name;
-    }
-
-    public void setName(StringFilter name) {
-        this.name = name;
-    }
-
-    public StringFilter getCode() {
-        return code;
-    }
-
-    public StringFilter code() {
-        if (code == null) {
-            code = new StringFilter();
-        }
-        return code;
-    }
-
-    public void setCode(StringFilter code) {
-        this.code = code;
-    }
-
-    public StringFilter getDesc() {
-        return desc;
-    }
-
-    public StringFilter desc() {
-        if (desc == null) {
-            desc = new StringFilter();
-        }
-        return desc;
-    }
-
-    public void setDesc(StringFilter desc) {
-        this.desc = desc;
-    }
-
-    public BooleanFilter getEnabled() {
-        return enabled;
-    }
-
-    public BooleanFilter enabled() {
-        if (enabled == null) {
-            enabled = new BooleanFilter();
-        }
-        return enabled;
-    }
-
-    public void setEnabled(BooleanFilter enabled) {
-        this.enabled = enabled;
-    }
-
-    public ResetFrequencyFilter getResetFrequency() {
-        return resetFrequency;
-    }
-
-    public ResetFrequencyFilter resetFrequency() {
-        if (resetFrequency == null) {
-            resetFrequency = new ResetFrequencyFilter();
-        }
-        return resetFrequency;
-    }
-
-    public void setResetFrequency(ResetFrequencyFilter resetFrequency) {
-        this.resetFrequency = resetFrequency;
-    }
-
-    public LongFilter getSeqValue() {
-        return seqValue;
-    }
-
-    public LongFilter seqValue() {
-        if (seqValue == null) {
-            seqValue = new LongFilter();
-        }
-        return seqValue;
-    }
-
-    public void setSeqValue(LongFilter seqValue) {
-        this.seqValue = seqValue;
-    }
-
-    public StringFilter getFillValue() {
-        return fillValue;
-    }
-
-    public StringFilter fillValue() {
-        if (fillValue == null) {
-            fillValue = new StringFilter();
-        }
-        return fillValue;
-    }
-
-    public void setFillValue(StringFilter fillValue) {
-        this.fillValue = fillValue;
-    }
-
-    public StringFilter getImplClass() {
-        return implClass;
-    }
-
-    public StringFilter implClass() {
-        if (implClass == null) {
-            implClass = new StringFilter();
-        }
-        return implClass;
-    }
-
-    public void setImplClass(StringFilter implClass) {
-        this.implClass = implClass;
-    }
-
-    public StringFilter getParams() {
-        return params;
-    }
-
-    public StringFilter params() {
-        if (params == null) {
-            params = new StringFilter();
-        }
-        return params;
-    }
-
-    public void setParams(StringFilter params) {
-        this.params = params;
-    }
-
-    public ZonedDateTimeFilter getResetStartTime() {
-        return resetStartTime;
-    }
-
-    public ZonedDateTimeFilter resetStartTime() {
-        if (resetStartTime == null) {
-            resetStartTime = new ZonedDateTimeFilter();
-        }
-        return resetStartTime;
-    }
-
-    public void setResetStartTime(ZonedDateTimeFilter resetStartTime) {
-        this.resetStartTime = resetStartTime;
-    }
-
-    public ZonedDateTimeFilter getResetEndTime() {
-        return resetEndTime;
-    }
-
-    public ZonedDateTimeFilter resetEndTime() {
-        if (resetEndTime == null) {
-            resetEndTime = new ZonedDateTimeFilter();
-        }
-        return resetEndTime;
-    }
-
-    public void setResetEndTime(ZonedDateTimeFilter resetEndTime) {
-        this.resetEndTime = resetEndTime;
-    }
-
-    public ZonedDateTimeFilter getResetTime() {
-        return resetTime;
-    }
-
-    public ZonedDateTimeFilter resetTime() {
-        if (resetTime == null) {
-            resetTime = new ZonedDateTimeFilter();
-        }
-        return resetTime;
-    }
-
-    public void setResetTime(ZonedDateTimeFilter resetTime) {
-        this.resetTime = resetTime;
-    }
-
-    public LongFilter getRuleItemsId() {
-        return ruleItemsId;
-    }
-
-    public LongFilter ruleItemsId() {
-        if (ruleItemsId == null) {
-            ruleItemsId = new LongFilter();
-        }
-        return ruleItemsId;
-    }
-
-    public void setRuleItemsId(LongFilter ruleItemsId) {
-        this.ruleItemsId = ruleItemsId;
-    }
-
-    public StringFilter getRuleItemsDatePattern() {
-        return ruleItemsDatePattern;
-    }
-
-    public StringFilter ruleItemsDatePattern() {
-        if (ruleItemsDatePattern == null) {
-            ruleItemsDatePattern = new StringFilter();
-        }
-        return ruleItemsDatePattern;
-    }
-
-    public void setRuleItemsDatePattern(StringFilter ruleItemsDatePattern) {
-        this.ruleItemsDatePattern = ruleItemsDatePattern;
-    }
-
     public String getJhiCommonSearchKeywords() {
         return jhiCommonSearchKeywords;
     }
@@ -411,6 +459,17 @@ public class SysFillRuleCriteria implements Serializable, Criteria {
     }
 
     public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
         return distinct;
     }
 
@@ -442,7 +501,6 @@ public class SysFillRuleCriteria implements Serializable, Criteria {
             Objects.equals(resetEndTime, that.resetEndTime) &&
             Objects.equals(resetTime, that.resetTime) &&
             Objects.equals(ruleItemsId, that.ruleItemsId) &&
-            Objects.equals(ruleItemsDatePattern, that.ruleItemsDatePattern) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -464,7 +522,6 @@ public class SysFillRuleCriteria implements Serializable, Criteria {
             resetEndTime,
             resetTime,
             ruleItemsId,
-            ruleItemsDatePattern,
             distinct
         );
     }
@@ -473,26 +530,26 @@ public class SysFillRuleCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "SysFillRuleCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (name != null ? "name=" + name + ", " : "") +
-            (code != null ? "code=" + code + ", " : "") +
-            (desc != null ? "desc=" + desc + ", " : "") +
-            (enabled != null ? "enabled=" + enabled + ", " : "") +
-            (resetFrequency != null ? "resetFrequency=" + resetFrequency + ", " : "") +
-            (seqValue != null ? "seqValue=" + seqValue + ", " : "") +
-            (fillValue != null ? "fillValue=" + fillValue + ", " : "") +
-            (implClass != null ? "implClass=" + implClass + ", " : "") +
-            (params != null ? "params=" + params + ", " : "") +
-            (resetStartTime != null ? "resetStartTime=" + resetStartTime + ", " : "") +
-            (resetEndTime != null ? "resetEndTime=" + resetEndTime + ", " : "") +
-            (resetTime != null ? "resetTime=" + resetTime + ", " : "") +
-            (ruleItemsId != null ? "ruleItemsId=" + ruleItemsId + ", " : "") +
-            (ruleItemsDatePattern != null ? "ruleItemsDatePattern=" + ruleItemsDatePattern + ", " : "") +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalName().map(f -> "name=" + f + ", ").orElse("") +
+            optionalCode().map(f -> "code=" + f + ", ").orElse("") +
+            optionalDesc().map(f -> "desc=" + f + ", ").orElse("") +
+            optionalEnabled().map(f -> "enabled=" + f + ", ").orElse("") +
+            optionalResetFrequency().map(f -> "resetFrequency=" + f + ", ").orElse("") +
+            optionalSeqValue().map(f -> "seqValue=" + f + ", ").orElse("") +
+            optionalFillValue().map(f -> "fillValue=" + f + ", ").orElse("") +
+            optionalImplClass().map(f -> "implClass=" + f + ", ").orElse("") +
+            optionalParams().map(f -> "params=" + f + ", ").orElse("") +
+            optionalResetStartTime().map(f -> "resetStartTime=" + f + ", ").orElse("") +
+            optionalResetEndTime().map(f -> "resetEndTime=" + f + ", ").orElse("") +
+            optionalResetTime().map(f -> "resetTime=" + f + ", ").orElse("") +
+            optionalRuleItemsId().map(f -> "ruleItemsId=" + f + ", ").orElse("") +
+            optionalRuleItemsDatePattern().map(f -> "ruleItemsDatePattern=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +
             (or != null ? "or=" + or + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
     }
 }

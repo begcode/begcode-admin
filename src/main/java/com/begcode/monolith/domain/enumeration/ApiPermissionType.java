@@ -7,9 +7,21 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Api权限类型
  */
 public enum ApiPermissionType {
+    /**
+     * 业务
+     */
     BUSINESS("BUSINESS", "业务"),
+    /**
+     * API接口
+     */
     API("API", "API接口"),
+    /**
+     * 实体
+     */
     ENTITY("ENTITY", "实体"),
+    /**
+     * 微服务
+     */
     MICRO_SERVICE("MICRO_SERVICE", "微服务");
 
     @EnumValue

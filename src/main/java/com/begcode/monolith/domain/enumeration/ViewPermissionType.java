@@ -7,7 +7,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 可视权限类型
  */
 public enum ViewPermissionType {
+    /**
+     * 菜单
+     */
     MENU("MENU", "菜单"),
+    /**
+     * 按钮
+     */
     BUTTON("BUTTON", "按钮");
 
     @EnumValue

@@ -74,12 +74,10 @@ public class UReportFileQueryService implements QueryService<UReportFile> {
     public IPage<UReportFileDTO> findByCriteria(UReportFileCriteria criteria, Page<UReportFile> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<UReportFile> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, UReportFile.class, page)
-            .convert(uReportFile -> {
-                Binder.bindRelations(uReportFile, new String[] {});
-                return uReportFileMapper.toDto(uReportFile);
-            });
+        return Binder.joinQueryPage(queryWrapper, UReportFile.class, page).convert(uReportFile -> {
+            Binder.bindRelations(uReportFile, new String[] {});
+            return uReportFileMapper.toDto(uReportFile);
+        });
     }
 
     /**

@@ -79,12 +79,10 @@ public class ResourceCategoryQueryService implements QueryService<ResourceCatego
     public IPage<ResourceCategoryDTO> findByCriteria(ResourceCategoryCriteria criteria, Page<ResourceCategory> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<ResourceCategory> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, ResourceCategory.class, page)
-            .convert(resourceCategory -> {
-                Binder.bindRelations(resourceCategory, new String[] { "children" });
-                return resourceCategoryMapper.toDto(resourceCategory);
-            });
+        return Binder.joinQueryPage(queryWrapper, ResourceCategory.class, page).convert(resourceCategory -> {
+            Binder.bindRelations(resourceCategory, new String[] { "children" });
+            return resourceCategoryMapper.toDto(resourceCategory);
+        });
     }
 
     /**
@@ -108,12 +106,10 @@ public class ResourceCategoryQueryService implements QueryService<ResourceCatego
         log.debug("find by criteria : {}, page: {}", criteria, page);
         criteria.parentId().setSpecified(false);
         final QueryWrapper<ResourceCategory> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, ResourceCategory.class, page)
-            .convert(resourceCategory -> {
-                Binder.bindRelations(resourceCategory, new String[] { "parent" });
-                return resourceCategoryMapper.toDto(resourceCategory);
-            });
+        return Binder.joinQueryPage(queryWrapper, ResourceCategory.class, page).convert(resourceCategory -> {
+            Binder.bindRelations(resourceCategory, new String[] { "parent" });
+            return resourceCategoryMapper.toDto(resourceCategory);
+        });
     }
 
     /**

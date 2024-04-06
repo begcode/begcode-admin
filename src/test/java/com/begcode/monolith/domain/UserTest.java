@@ -55,7 +55,7 @@ class UserTest {
         User user = getUserRandomSampleGenerator();
         Authority authorityBack = getAuthorityRandomSampleGenerator();
 
-        // user.addAuthorities(authorityBack);
+        // todo user.addAuthorities(authorityBack);
         // assertThat(user.getAuthorities()).containsOnly(authorityBack);
 
         // user.removeAuthorities(authorityBack);

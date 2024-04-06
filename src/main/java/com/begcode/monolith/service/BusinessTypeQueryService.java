@@ -74,12 +74,10 @@ public class BusinessTypeQueryService implements QueryService<BusinessType> {
     public IPage<BusinessTypeDTO> findByCriteria(BusinessTypeCriteria criteria, Page<BusinessType> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<BusinessType> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, BusinessType.class, page)
-            .convert(businessType -> {
-                Binder.bindRelations(businessType, new String[] {});
-                return businessTypeMapper.toDto(businessType);
-            });
+        return Binder.joinQueryPage(queryWrapper, BusinessType.class, page).convert(businessType -> {
+            Binder.bindRelations(businessType, new String[] {});
+            return businessTypeMapper.toDto(businessType);
+        });
     }
 
     /**

@@ -4,6 +4,7 @@ import com.begcode.monolith.settings.domain.CommonFieldData;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
@@ -20,18 +21,6 @@ import tech.jhipster.service.filter.*;
 @ParameterObject
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class SiteConfigCriteria implements Serializable, Criteria {
-
-    @BindQuery(ignore = true)
-    private String jhiCommonSearchKeywords;
-
-    @BindQuery(ignore = true)
-    private Boolean useOr = false;
-
-    @BindQuery(ignore = true)
-    private SiteConfigCriteria and;
-
-    @BindQuery(ignore = true)
-    private SiteConfigCriteria or;
 
     private static final long serialVersionUID = 1L;
 
@@ -72,29 +61,268 @@ public class SiteConfigCriteria implements Serializable, Criteria {
     private StringFilter itemsName;
 
     @BindQuery(ignore = true)
+    private String jhiCommonSearchKeywords;
+
+    @BindQuery(ignore = true)
+    private Boolean useOr = false;
+
+    @BindQuery(ignore = true)
+    private SiteConfigCriteria and;
+
+    @BindQuery(ignore = true)
+    private SiteConfigCriteria or;
+
     private Boolean distinct;
 
     public SiteConfigCriteria() {}
 
     public SiteConfigCriteria(SiteConfigCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.categoryName = other.categoryName == null ? null : other.categoryName.copy();
-        this.categoryKey = other.categoryKey == null ? null : other.categoryKey.copy();
-        this.disabled = other.disabled == null ? null : other.disabled.copy();
-        this.sortValue = other.sortValue == null ? null : other.sortValue.copy();
-        this.builtIn = other.builtIn == null ? null : other.builtIn.copy();
-        this.createdBy = other.createdBy == null ? null : other.createdBy.copy();
-        this.createdDate = other.createdDate == null ? null : other.createdDate.copy();
-        this.lastModifiedBy = other.lastModifiedBy == null ? null : other.lastModifiedBy.copy();
-        this.lastModifiedDate = other.lastModifiedDate == null ? null : other.lastModifiedDate.copy();
-        this.itemsId = other.itemsId == null ? null : other.itemsId.copy();
-        this.itemsName = other.itemsName == null ? null : other.itemsName.copy();
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.categoryName = other.optionalCategoryName().map(StringFilter::copy).orElse(null);
+        this.categoryKey = other.optionalCategoryKey().map(StringFilter::copy).orElse(null);
+        this.disabled = other.optionalDisabled().map(BooleanFilter::copy).orElse(null);
+        this.sortValue = other.optionalSortValue().map(IntegerFilter::copy).orElse(null);
+        this.builtIn = other.optionalBuiltIn().map(BooleanFilter::copy).orElse(null);
+        this.createdBy = other.optionalCreatedBy().map(LongFilter::copy).orElse(null);
+        this.createdDate = other.optionalCreatedDate().map(InstantFilter::copy).orElse(null);
+        this.lastModifiedBy = other.optionalLastModifiedBy().map(LongFilter::copy).orElse(null);
+        this.lastModifiedDate = other.optionalLastModifiedDate().map(InstantFilter::copy).orElse(null);
+        this.itemsId = other.optionalItemsId().map(LongFilter::copy).orElse(null);
+        this.itemsName = other.optionalItemsName().map(StringFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
     public SiteConfigCriteria copy() {
         return new SiteConfigCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public StringFilter getCategoryName() {
+        return categoryName;
+    }
+
+    public Optional<StringFilter> optionalCategoryName() {
+        return Optional.ofNullable(categoryName);
+    }
+
+    public StringFilter categoryName() {
+        if (categoryName == null) {
+            setCategoryName(new StringFilter());
+        }
+        return categoryName;
+    }
+
+    public void setCategoryName(StringFilter categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public StringFilter getCategoryKey() {
+        return categoryKey;
+    }
+
+    public Optional<StringFilter> optionalCategoryKey() {
+        return Optional.ofNullable(categoryKey);
+    }
+
+    public StringFilter categoryKey() {
+        if (categoryKey == null) {
+            setCategoryKey(new StringFilter());
+        }
+        return categoryKey;
+    }
+
+    public void setCategoryKey(StringFilter categoryKey) {
+        this.categoryKey = categoryKey;
+    }
+
+    public BooleanFilter getDisabled() {
+        return disabled;
+    }
+
+    public Optional<BooleanFilter> optionalDisabled() {
+        return Optional.ofNullable(disabled);
+    }
+
+    public BooleanFilter disabled() {
+        if (disabled == null) {
+            setDisabled(new BooleanFilter());
+        }
+        return disabled;
+    }
+
+    public void setDisabled(BooleanFilter disabled) {
+        this.disabled = disabled;
+    }
+
+    public IntegerFilter getSortValue() {
+        return sortValue;
+    }
+
+    public Optional<IntegerFilter> optionalSortValue() {
+        return Optional.ofNullable(sortValue);
+    }
+
+    public IntegerFilter sortValue() {
+        if (sortValue == null) {
+            setSortValue(new IntegerFilter());
+        }
+        return sortValue;
+    }
+
+    public void setSortValue(IntegerFilter sortValue) {
+        this.sortValue = sortValue;
+    }
+
+    public BooleanFilter getBuiltIn() {
+        return builtIn;
+    }
+
+    public Optional<BooleanFilter> optionalBuiltIn() {
+        return Optional.ofNullable(builtIn);
+    }
+
+    public BooleanFilter builtIn() {
+        if (builtIn == null) {
+            setBuiltIn(new BooleanFilter());
+        }
+        return builtIn;
+    }
+
+    public void setBuiltIn(BooleanFilter builtIn) {
+        this.builtIn = builtIn;
+    }
+
+    public LongFilter getCreatedBy() {
+        return createdBy;
+    }
+
+    public Optional<LongFilter> optionalCreatedBy() {
+        return Optional.ofNullable(createdBy);
+    }
+
+    public LongFilter createdBy() {
+        if (createdBy == null) {
+            setCreatedBy(new LongFilter());
+        }
+        return createdBy;
+    }
+
+    public void setCreatedBy(LongFilter createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public InstantFilter getCreatedDate() {
+        return createdDate;
+    }
+
+    public Optional<InstantFilter> optionalCreatedDate() {
+        return Optional.ofNullable(createdDate);
+    }
+
+    public InstantFilter createdDate() {
+        if (createdDate == null) {
+            setCreatedDate(new InstantFilter());
+        }
+        return createdDate;
+    }
+
+    public void setCreatedDate(InstantFilter createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LongFilter getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public Optional<LongFilter> optionalLastModifiedBy() {
+        return Optional.ofNullable(lastModifiedBy);
+    }
+
+    public LongFilter lastModifiedBy() {
+        if (lastModifiedBy == null) {
+            setLastModifiedBy(new LongFilter());
+        }
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(LongFilter lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public InstantFilter getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public Optional<InstantFilter> optionalLastModifiedDate() {
+        return Optional.ofNullable(lastModifiedDate);
+    }
+
+    public InstantFilter lastModifiedDate() {
+        if (lastModifiedDate == null) {
+            setLastModifiedDate(new InstantFilter());
+        }
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(InstantFilter lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public LongFilter getItemsId() {
+        return itemsId;
+    }
+
+    public Optional<LongFilter> optionalItemsId() {
+        return Optional.ofNullable(itemsId);
+    }
+
+    public LongFilter itemsId() {
+        if (itemsId == null) {
+            setItemsId(new LongFilter());
+        }
+        return itemsId;
+    }
+
+    public void setItemsId(LongFilter itemsId) {
+        this.itemsId = itemsId;
+    }
+
+    public StringFilter getItemsName() {
+        return itemsName;
+    }
+
+    public Optional<StringFilter> optionalItemsName() {
+        return Optional.ofNullable(itemsName);
+    }
+
+    public StringFilter itemsName() {
+        if (itemsName == null) {
+            setItemsName(new StringFilter());
+        }
+        return itemsName;
+    }
+
+    public void setItemsName(StringFilter itemsName) {
+        this.itemsName = itemsName;
     }
 
     public void setAnd(SiteConfigCriteria and) {
@@ -127,186 +355,6 @@ public class SiteConfigCriteria implements Serializable, Criteria {
         return or;
     }
 
-    public LongFilter getId() {
-        return id;
-    }
-
-    public LongFilter id() {
-        if (id == null) {
-            id = new LongFilter();
-        }
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
-    }
-
-    public StringFilter getCategoryName() {
-        return categoryName;
-    }
-
-    public StringFilter categoryName() {
-        if (categoryName == null) {
-            categoryName = new StringFilter();
-        }
-        return categoryName;
-    }
-
-    public void setCategoryName(StringFilter categoryName) {
-        this.categoryName = categoryName;
-    }
-
-    public StringFilter getCategoryKey() {
-        return categoryKey;
-    }
-
-    public StringFilter categoryKey() {
-        if (categoryKey == null) {
-            categoryKey = new StringFilter();
-        }
-        return categoryKey;
-    }
-
-    public void setCategoryKey(StringFilter categoryKey) {
-        this.categoryKey = categoryKey;
-    }
-
-    public BooleanFilter getDisabled() {
-        return disabled;
-    }
-
-    public BooleanFilter disabled() {
-        if (disabled == null) {
-            disabled = new BooleanFilter();
-        }
-        return disabled;
-    }
-
-    public void setDisabled(BooleanFilter disabled) {
-        this.disabled = disabled;
-    }
-
-    public IntegerFilter getSortValue() {
-        return sortValue;
-    }
-
-    public IntegerFilter sortValue() {
-        if (sortValue == null) {
-            sortValue = new IntegerFilter();
-        }
-        return sortValue;
-    }
-
-    public void setSortValue(IntegerFilter sortValue) {
-        this.sortValue = sortValue;
-    }
-
-    public BooleanFilter getBuiltIn() {
-        return builtIn;
-    }
-
-    public BooleanFilter builtIn() {
-        if (builtIn == null) {
-            builtIn = new BooleanFilter();
-        }
-        return builtIn;
-    }
-
-    public void setBuiltIn(BooleanFilter builtIn) {
-        this.builtIn = builtIn;
-    }
-
-    public LongFilter getCreatedBy() {
-        return createdBy;
-    }
-
-    public LongFilter createdBy() {
-        if (createdBy == null) {
-            createdBy = new LongFilter();
-        }
-        return createdBy;
-    }
-
-    public void setCreatedBy(LongFilter createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public InstantFilter getCreatedDate() {
-        return createdDate;
-    }
-
-    public InstantFilter createdDate() {
-        if (createdDate == null) {
-            createdDate = new InstantFilter();
-        }
-        return createdDate;
-    }
-
-    public void setCreatedDate(InstantFilter createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public LongFilter getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public LongFilter lastModifiedBy() {
-        if (lastModifiedBy == null) {
-            lastModifiedBy = new LongFilter();
-        }
-        return lastModifiedBy;
-    }
-
-    public void setLastModifiedBy(LongFilter lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public InstantFilter getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public InstantFilter lastModifiedDate() {
-        if (lastModifiedDate == null) {
-            lastModifiedDate = new InstantFilter();
-        }
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(InstantFilter lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    public LongFilter getItemsId() {
-        return itemsId;
-    }
-
-    public LongFilter itemsId() {
-        if (itemsId == null) {
-            itemsId = new LongFilter();
-        }
-        return itemsId;
-    }
-
-    public void setItemsId(LongFilter itemsId) {
-        this.itemsId = itemsId;
-    }
-
-    public StringFilter getItemsName() {
-        return itemsName;
-    }
-
-    public StringFilter itemsName() {
-        if (itemsName == null) {
-            itemsName = new StringFilter();
-        }
-        return itemsName;
-    }
-
-    public void setItemsName(StringFilter itemsName) {
-        this.itemsName = itemsName;
-    }
-
     public String getJhiCommonSearchKeywords() {
         return jhiCommonSearchKeywords;
     }
@@ -324,6 +372,17 @@ public class SiteConfigCriteria implements Serializable, Criteria {
     }
 
     public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
         return distinct;
     }
 
@@ -352,7 +411,6 @@ public class SiteConfigCriteria implements Serializable, Criteria {
             Objects.equals(lastModifiedBy, that.lastModifiedBy) &&
             Objects.equals(lastModifiedDate, that.lastModifiedDate) &&
             Objects.equals(itemsId, that.itemsId) &&
-            Objects.equals(itemsName, that.itemsName) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -371,7 +429,6 @@ public class SiteConfigCriteria implements Serializable, Criteria {
             lastModifiedBy,
             lastModifiedDate,
             itemsId,
-            itemsName,
             distinct
         );
     }
@@ -380,23 +437,23 @@ public class SiteConfigCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "SiteConfigCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (categoryName != null ? "categoryName=" + categoryName + ", " : "") +
-            (categoryKey != null ? "categoryKey=" + categoryKey + ", " : "") +
-            (disabled != null ? "disabled=" + disabled + ", " : "") +
-            (sortValue != null ? "sortValue=" + sortValue + ", " : "") +
-            (builtIn != null ? "builtIn=" + builtIn + ", " : "") +
-            (createdBy != null ? "createdBy=" + createdBy + ", " : "") +
-            (createdDate != null ? "createdDate=" + createdDate + ", " : "") +
-            (lastModifiedBy != null ? "lastModifiedBy=" + lastModifiedBy + ", " : "") +
-            (lastModifiedDate != null ? "lastModifiedDate=" + lastModifiedDate + ", " : "") +
-            (itemsId != null ? "itemsId=" + itemsId + ", " : "") +
-            (itemsName != null ? "itemsName=" + itemsName + ", " : "") +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalCategoryName().map(f -> "categoryName=" + f + ", ").orElse("") +
+            optionalCategoryKey().map(f -> "categoryKey=" + f + ", ").orElse("") +
+            optionalDisabled().map(f -> "disabled=" + f + ", ").orElse("") +
+            optionalSortValue().map(f -> "sortValue=" + f + ", ").orElse("") +
+            optionalBuiltIn().map(f -> "builtIn=" + f + ", ").orElse("") +
+            optionalCreatedBy().map(f -> "createdBy=" + f + ", ").orElse("") +
+            optionalCreatedDate().map(f -> "createdDate=" + f + ", ").orElse("") +
+            optionalLastModifiedBy().map(f -> "lastModifiedBy=" + f + ", ").orElse("") +
+            optionalLastModifiedDate().map(f -> "lastModifiedDate=" + f + ", ").orElse("") +
+            optionalItemsId().map(f -> "itemsId=" + f + ", ").orElse("") +
+            optionalItemsName().map(f -> "itemsName=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +
             (or != null ? "or=" + or + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
     }
 }

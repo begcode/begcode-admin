@@ -7,9 +7,21 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 链接目标
  */
 public enum TargetType {
+    /**
+     * 新窗口
+     */
     BLANK("BLANK", "新窗口"),
+    /**
+     * 当前窗口
+     */
     SELF("SELF", "当前窗口"),
+    /**
+     * 父窗口
+     */
     PARENT("PARENT", "父窗口"),
+    /**
+     * 顶层窗口
+     */
     TOP("TOP", "顶层窗口");
 
     @EnumValue

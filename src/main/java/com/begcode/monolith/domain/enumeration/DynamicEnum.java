@@ -40,8 +40,10 @@ public class DynamicEnum {
             unsafeField.setAccessible(true);
             unsafe = (Unsafe) unsafeField.get(null);
             Field implLookupField = MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP");
-            implLookup =
-                (MethodHandles.Lookup) unsafe.getObject(unsafe.staticFieldBase(implLookupField), unsafe.staticFieldOffset(implLookupField));
+            implLookup = (MethodHandles.Lookup) unsafe.getObject(
+                unsafe.staticFieldBase(implLookupField),
+                unsafe.staticFieldOffset(implLookupField)
+            );
         } catch (Exception ignored) {}
 
         isSetup = true;

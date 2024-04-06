@@ -7,8 +7,17 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 短信模板类型
  */
 public enum SmsTemplateType {
+    /**
+     * 通知短信
+     */
     MESSAGE("MESSAGE", "通知短信"),
+    /**
+     * 验证码
+     */
     VERIFICATION("VERIFICATION", "验证码"),
+    /**
+     * 推广短信
+     */
     PROMOTION("PROMOTION", "推广短信");
 
     @EnumValue

@@ -18,12 +18,10 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface RegionCodeBaseRepository<E extends RegionCode> extends BaseCrudMapper<RegionCode> {
     default Optional<RegionCode> findOneWithEagerRelationships(Long id) {
-        return Optional
-            .ofNullable(this.selectById(id))
-            .map(regionCode -> {
-                Binder.bindRelations(regionCode, new String[] { "children", "parent" });
-                return regionCode;
-            });
+        return Optional.ofNullable(this.selectById(id)).map(regionCode -> {
+            Binder.bindRelations(regionCode, new String[] { "children", "parent" });
+            return regionCode;
+        });
     }
 
     default List<RegionCode> findAll() {

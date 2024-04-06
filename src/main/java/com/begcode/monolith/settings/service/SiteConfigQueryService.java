@@ -74,12 +74,10 @@ public class SiteConfigQueryService implements QueryService<SiteConfig> {
     public IPage<SiteConfigDTO> findByCriteria(SiteConfigCriteria criteria, Page<SiteConfig> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<SiteConfig> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, SiteConfig.class, page)
-            .convert(siteConfig -> {
-                Binder.bindRelations(siteConfig, new String[] {});
-                return siteConfigMapper.toDto(siteConfig);
-            });
+        return Binder.joinQueryPage(queryWrapper, SiteConfig.class, page).convert(siteConfig -> {
+            Binder.bindRelations(siteConfig, new String[] {});
+            return siteConfigMapper.toDto(siteConfig);
+        });
     }
 
     /**

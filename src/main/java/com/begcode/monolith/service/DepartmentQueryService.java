@@ -76,12 +76,10 @@ public class DepartmentQueryService implements QueryService<Department> {
     public IPage<DepartmentDTO> findByCriteria(DepartmentCriteria criteria, Page<Department> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<Department> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, Department.class, page)
-            .convert(department -> {
-                Binder.bindRelations(department, new String[] { "children" });
-                return departmentMapper.toDto(department);
-            });
+        return Binder.joinQueryPage(queryWrapper, Department.class, page).convert(department -> {
+            Binder.bindRelations(department, new String[] { "children" });
+            return departmentMapper.toDto(department);
+        });
     }
 
     /**
@@ -105,12 +103,10 @@ public class DepartmentQueryService implements QueryService<Department> {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         criteria.parentId().setSpecified(false);
         final QueryWrapper<Department> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, Department.class, page)
-            .convert(department -> {
-                Binder.bindRelations(department, new String[] { "parent" });
-                return departmentMapper.toDto(department);
-            });
+        return Binder.joinQueryPage(queryWrapper, Department.class, page).convert(department -> {
+            Binder.bindRelations(department, new String[] { "parent" });
+            return departmentMapper.toDto(department);
+        });
     }
 
     /**

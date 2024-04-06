@@ -7,10 +7,25 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 任务状态
  */
 public enum JobStatus {
+    /**
+     * 正常
+     */
     NORMAL("NORMAL", "正常"),
+    /**
+     * 暂停
+     */
     PAUSED("PAUSED", "暂停"),
+    /**
+     * 完成
+     */
     COMPLETE("COMPLETE", "完成"),
+    /**
+     * 错误
+     */
     ERROR("ERROR", "错误"),
+    /**
+     * 阻塞
+     */
     BLOCKED("BLOCKED", "阻塞");
 
     @EnumValue

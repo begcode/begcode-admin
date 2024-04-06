@@ -7,10 +7,25 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 通告对象类型
  */
 public enum ReceiverType {
+    /**
+     * 全部
+     */
     ALL("ALL", "全部"),
+    /**
+     * 用户
+     */
     USER("USER", "用户"),
+    /**
+     * 部门
+     */
     DEPARTMENT("DEPARTMENT", "部门"),
+    /**
+     * 角色
+     */
     AUTHORITY("AUTHORITY", "角色"),
+    /**
+     * 岗位
+     */
     POSITION("POSITION", "岗位");
 
     @EnumValue

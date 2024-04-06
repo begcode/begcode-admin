@@ -7,11 +7,29 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 重置频率
  */
 public enum ResetFrequency {
+    /**
+     * 不重置
+     */
     NONE("NONE", "不重置"),
+    /**
+     * 每天重置
+     */
     DAILY("DAILY", "每天重置"),
+    /**
+     * 每周重置
+     */
     WEEKLY("WEEKLY", "每周重置"),
+    /**
+     * 每月重置
+     */
     MONTHLY("MONTHLY", "每月重置"),
+    /**
+     * 每年重置
+     */
     YEARLY("YEARLY", "每年重置"),
+    /**
+     * 自定义重置
+     */
     CUSTOM("CUSTOM", "自定义重置");
 
     @EnumValue

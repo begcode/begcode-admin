@@ -16,12 +16,10 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface FillRuleItemBaseRepository<E extends FillRuleItem> extends BaseCrudMapper<FillRuleItem> {
     default Optional<FillRuleItem> findOneWithEagerRelationships(Long id) {
-        return Optional
-            .ofNullable(this.selectById(id))
-            .map(fillRuleItem -> {
-                Binder.bindRelations(fillRuleItem, new String[] { "fillRule" });
-                return fillRuleItem;
-            });
+        return Optional.ofNullable(this.selectById(id)).map(fillRuleItem -> {
+            Binder.bindRelations(fillRuleItem, new String[] { "fillRule" });
+            return fillRuleItem;
+        });
     }
 
     default List<FillRuleItem> findAll() {

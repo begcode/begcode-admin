@@ -7,7 +7,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 日志类型
  */
 public enum LogType {
+    /**
+     * 登录日志
+     */
     LOGIN("LOGIN", "登录日志"),
+    /**
+     * 操作日志
+     */
     OPERATE("OPERATE", "操作日志");
 
     @EnumValue

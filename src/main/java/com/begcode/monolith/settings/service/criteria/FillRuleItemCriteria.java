@@ -5,6 +5,7 @@ import com.begcode.monolith.settings.domain.SysFillRule;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
@@ -22,36 +23,12 @@ import tech.jhipster.service.filter.*;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class FillRuleItemCriteria implements Serializable, Criteria {
 
-    @BindQuery(ignore = true)
-    private String jhiCommonSearchKeywords;
-
-    @BindQuery(ignore = true)
-    private Boolean useOr = false;
-
-    @BindQuery(ignore = true)
-    private FillRuleItemCriteria and;
-
-    @BindQuery(ignore = true)
-    private FillRuleItemCriteria or;
-
     /**
      * Class for filtering FieldParamType
      */
     public static class FieldParamTypeFilter extends Filter<FieldParamType> {
 
         public FieldParamTypeFilter() {}
-
-        public FieldParamTypeFilter(String value) {
-            FieldParamType enumValue = FieldParamType.getByValue(value);
-            if (enumValue != null) {
-                setEquals(enumValue);
-            } else {
-                enumValue = FieldParamType.getByDesc(value);
-                if (enumValue != null) {
-                    setEquals(enumValue);
-                }
-            }
-        }
 
         public FieldParamTypeFilter(FieldParamTypeFilter filter) {
             super(filter);
@@ -89,34 +66,235 @@ public class FillRuleItemCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.seq_start_value")
     private IntegerFilter seqStartValue;
 
-    @BindQuery(column = "self.fill_rule_id")
+    @BindQuery(entity = SysFillRule.class, column = "id", condition = "this.fill_rule_id=id")
     private LongFilter fillRuleId;
 
     @BindQuery(entity = SysFillRule.class, column = "name", condition = "this.fill_rule_id=id")
     private StringFilter fillRuleName;
 
     @BindQuery(ignore = true)
+    private String jhiCommonSearchKeywords;
+
+    @BindQuery(ignore = true)
+    private Boolean useOr = false;
+
+    @BindQuery(ignore = true)
+    private FillRuleItemCriteria and;
+
+    @BindQuery(ignore = true)
+    private FillRuleItemCriteria or;
+
     private Boolean distinct;
 
     public FillRuleItemCriteria() {}
 
     public FillRuleItemCriteria(FillRuleItemCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.sortValue = other.sortValue == null ? null : other.sortValue.copy();
-        this.fieldParamType = other.fieldParamType == null ? null : other.fieldParamType.copy();
-        this.fieldParamValue = other.fieldParamValue == null ? null : other.fieldParamValue.copy();
-        this.datePattern = other.datePattern == null ? null : other.datePattern.copy();
-        this.seqLength = other.seqLength == null ? null : other.seqLength.copy();
-        this.seqIncrement = other.seqIncrement == null ? null : other.seqIncrement.copy();
-        this.seqStartValue = other.seqStartValue == null ? null : other.seqStartValue.copy();
-        this.fillRuleId = other.fillRuleId == null ? null : other.fillRuleId.copy();
-        this.fillRuleName = other.fillRuleName == null ? null : other.fillRuleName.copy();
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.sortValue = other.optionalSortValue().map(IntegerFilter::copy).orElse(null);
+        this.fieldParamType = other.optionalFieldParamType().map(FieldParamTypeFilter::copy).orElse(null);
+        this.fieldParamValue = other.optionalFieldParamValue().map(StringFilter::copy).orElse(null);
+        this.datePattern = other.optionalDatePattern().map(StringFilter::copy).orElse(null);
+        this.seqLength = other.optionalSeqLength().map(IntegerFilter::copy).orElse(null);
+        this.seqIncrement = other.optionalSeqIncrement().map(IntegerFilter::copy).orElse(null);
+        this.seqStartValue = other.optionalSeqStartValue().map(IntegerFilter::copy).orElse(null);
+        this.fillRuleId = other.optionalFillRuleId().map(LongFilter::copy).orElse(null);
+        this.fillRuleName = other.optionalFillRuleName().map(StringFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
     @Override
     public FillRuleItemCriteria copy() {
         return new FillRuleItemCriteria(this);
+    }
+
+    public LongFilter getId() {
+        return id;
+    }
+
+    public Optional<LongFilter> optionalId() {
+        return Optional.ofNullable(id);
+    }
+
+    public LongFilter id() {
+        if (id == null) {
+            setId(new LongFilter());
+        }
+        return id;
+    }
+
+    public void setId(LongFilter id) {
+        this.id = id;
+    }
+
+    public IntegerFilter getSortValue() {
+        return sortValue;
+    }
+
+    public Optional<IntegerFilter> optionalSortValue() {
+        return Optional.ofNullable(sortValue);
+    }
+
+    public IntegerFilter sortValue() {
+        if (sortValue == null) {
+            setSortValue(new IntegerFilter());
+        }
+        return sortValue;
+    }
+
+    public void setSortValue(IntegerFilter sortValue) {
+        this.sortValue = sortValue;
+    }
+
+    public FieldParamTypeFilter getFieldParamType() {
+        return fieldParamType;
+    }
+
+    public Optional<FieldParamTypeFilter> optionalFieldParamType() {
+        return Optional.ofNullable(fieldParamType);
+    }
+
+    public FieldParamTypeFilter fieldParamType() {
+        if (fieldParamType == null) {
+            setFieldParamType(new FieldParamTypeFilter());
+        }
+        return fieldParamType;
+    }
+
+    public void setFieldParamType(FieldParamTypeFilter fieldParamType) {
+        this.fieldParamType = fieldParamType;
+    }
+
+    public StringFilter getFieldParamValue() {
+        return fieldParamValue;
+    }
+
+    public Optional<StringFilter> optionalFieldParamValue() {
+        return Optional.ofNullable(fieldParamValue);
+    }
+
+    public StringFilter fieldParamValue() {
+        if (fieldParamValue == null) {
+            setFieldParamValue(new StringFilter());
+        }
+        return fieldParamValue;
+    }
+
+    public void setFieldParamValue(StringFilter fieldParamValue) {
+        this.fieldParamValue = fieldParamValue;
+    }
+
+    public StringFilter getDatePattern() {
+        return datePattern;
+    }
+
+    public Optional<StringFilter> optionalDatePattern() {
+        return Optional.ofNullable(datePattern);
+    }
+
+    public StringFilter datePattern() {
+        if (datePattern == null) {
+            setDatePattern(new StringFilter());
+        }
+        return datePattern;
+    }
+
+    public void setDatePattern(StringFilter datePattern) {
+        this.datePattern = datePattern;
+    }
+
+    public IntegerFilter getSeqLength() {
+        return seqLength;
+    }
+
+    public Optional<IntegerFilter> optionalSeqLength() {
+        return Optional.ofNullable(seqLength);
+    }
+
+    public IntegerFilter seqLength() {
+        if (seqLength == null) {
+            setSeqLength(new IntegerFilter());
+        }
+        return seqLength;
+    }
+
+    public void setSeqLength(IntegerFilter seqLength) {
+        this.seqLength = seqLength;
+    }
+
+    public IntegerFilter getSeqIncrement() {
+        return seqIncrement;
+    }
+
+    public Optional<IntegerFilter> optionalSeqIncrement() {
+        return Optional.ofNullable(seqIncrement);
+    }
+
+    public IntegerFilter seqIncrement() {
+        if (seqIncrement == null) {
+            setSeqIncrement(new IntegerFilter());
+        }
+        return seqIncrement;
+    }
+
+    public void setSeqIncrement(IntegerFilter seqIncrement) {
+        this.seqIncrement = seqIncrement;
+    }
+
+    public IntegerFilter getSeqStartValue() {
+        return seqStartValue;
+    }
+
+    public Optional<IntegerFilter> optionalSeqStartValue() {
+        return Optional.ofNullable(seqStartValue);
+    }
+
+    public IntegerFilter seqStartValue() {
+        if (seqStartValue == null) {
+            setSeqStartValue(new IntegerFilter());
+        }
+        return seqStartValue;
+    }
+
+    public void setSeqStartValue(IntegerFilter seqStartValue) {
+        this.seqStartValue = seqStartValue;
+    }
+
+    public LongFilter getFillRuleId() {
+        return fillRuleId;
+    }
+
+    public Optional<LongFilter> optionalFillRuleId() {
+        return Optional.ofNullable(fillRuleId);
+    }
+
+    public LongFilter fillRuleId() {
+        if (fillRuleId == null) {
+            setFillRuleId(new LongFilter());
+        }
+        return fillRuleId;
+    }
+
+    public void setFillRuleId(LongFilter fillRuleId) {
+        this.fillRuleId = fillRuleId;
+    }
+
+    public StringFilter getFillRuleName() {
+        return fillRuleName;
+    }
+
+    public Optional<StringFilter> optionalFillRuleName() {
+        return Optional.ofNullable(fillRuleName);
+    }
+
+    public StringFilter fillRuleName() {
+        if (fillRuleName == null) {
+            setFillRuleName(new StringFilter());
+        }
+        return fillRuleName;
+    }
+
+    public void setFillRuleName(StringFilter fillRuleName) {
+        this.fillRuleName = fillRuleName;
     }
 
     public void setAnd(FillRuleItemCriteria and) {
@@ -149,156 +327,6 @@ public class FillRuleItemCriteria implements Serializable, Criteria {
         return or;
     }
 
-    public LongFilter getId() {
-        return id;
-    }
-
-    public LongFilter id() {
-        if (id == null) {
-            id = new LongFilter();
-        }
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
-    }
-
-    public IntegerFilter getSortValue() {
-        return sortValue;
-    }
-
-    public IntegerFilter sortValue() {
-        if (sortValue == null) {
-            sortValue = new IntegerFilter();
-        }
-        return sortValue;
-    }
-
-    public void setSortValue(IntegerFilter sortValue) {
-        this.sortValue = sortValue;
-    }
-
-    public FieldParamTypeFilter getFieldParamType() {
-        return fieldParamType;
-    }
-
-    public FieldParamTypeFilter fieldParamType() {
-        if (fieldParamType == null) {
-            fieldParamType = new FieldParamTypeFilter();
-        }
-        return fieldParamType;
-    }
-
-    public void setFieldParamType(FieldParamTypeFilter fieldParamType) {
-        this.fieldParamType = fieldParamType;
-    }
-
-    public StringFilter getFieldParamValue() {
-        return fieldParamValue;
-    }
-
-    public StringFilter fieldParamValue() {
-        if (fieldParamValue == null) {
-            fieldParamValue = new StringFilter();
-        }
-        return fieldParamValue;
-    }
-
-    public void setFieldParamValue(StringFilter fieldParamValue) {
-        this.fieldParamValue = fieldParamValue;
-    }
-
-    public StringFilter getDatePattern() {
-        return datePattern;
-    }
-
-    public StringFilter datePattern() {
-        if (datePattern == null) {
-            datePattern = new StringFilter();
-        }
-        return datePattern;
-    }
-
-    public void setDatePattern(StringFilter datePattern) {
-        this.datePattern = datePattern;
-    }
-
-    public IntegerFilter getSeqLength() {
-        return seqLength;
-    }
-
-    public IntegerFilter seqLength() {
-        if (seqLength == null) {
-            seqLength = new IntegerFilter();
-        }
-        return seqLength;
-    }
-
-    public void setSeqLength(IntegerFilter seqLength) {
-        this.seqLength = seqLength;
-    }
-
-    public IntegerFilter getSeqIncrement() {
-        return seqIncrement;
-    }
-
-    public IntegerFilter seqIncrement() {
-        if (seqIncrement == null) {
-            seqIncrement = new IntegerFilter();
-        }
-        return seqIncrement;
-    }
-
-    public void setSeqIncrement(IntegerFilter seqIncrement) {
-        this.seqIncrement = seqIncrement;
-    }
-
-    public IntegerFilter getSeqStartValue() {
-        return seqStartValue;
-    }
-
-    public IntegerFilter seqStartValue() {
-        if (seqStartValue == null) {
-            seqStartValue = new IntegerFilter();
-        }
-        return seqStartValue;
-    }
-
-    public void setSeqStartValue(IntegerFilter seqStartValue) {
-        this.seqStartValue = seqStartValue;
-    }
-
-    public LongFilter getFillRuleId() {
-        return fillRuleId;
-    }
-
-    public LongFilter fillRuleId() {
-        if (fillRuleId == null) {
-            fillRuleId = new LongFilter();
-        }
-        return fillRuleId;
-    }
-
-    public void setFillRuleId(LongFilter fillRuleId) {
-        this.fillRuleId = fillRuleId;
-    }
-
-    public StringFilter getFillRuleName() {
-        return fillRuleName;
-    }
-
-    public StringFilter fillRuleName() {
-        if (fillRuleName == null) {
-            fillRuleName = new StringFilter();
-        }
-        return fillRuleName;
-    }
-
-    public void setFillRuleName(StringFilter fillRuleName) {
-        this.fillRuleName = fillRuleName;
-    }
-
     public String getJhiCommonSearchKeywords() {
         return jhiCommonSearchKeywords;
     }
@@ -316,6 +344,17 @@ public class FillRuleItemCriteria implements Serializable, Criteria {
     }
 
     public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public Optional<Boolean> optionalDistinct() {
+        return Optional.ofNullable(distinct);
+    }
+
+    public Boolean distinct() {
+        if (distinct == null) {
+            setDistinct(true);
+        }
         return distinct;
     }
 
@@ -342,7 +381,6 @@ public class FillRuleItemCriteria implements Serializable, Criteria {
             Objects.equals(seqIncrement, that.seqIncrement) &&
             Objects.equals(seqStartValue, that.seqStartValue) &&
             Objects.equals(fillRuleId, that.fillRuleId) &&
-            Objects.equals(fillRuleName, that.fillRuleName) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -359,7 +397,6 @@ public class FillRuleItemCriteria implements Serializable, Criteria {
             seqIncrement,
             seqStartValue,
             fillRuleId,
-            fillRuleName,
             distinct
         );
     }
@@ -368,21 +405,21 @@ public class FillRuleItemCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "FillRuleItemCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (sortValue != null ? "sortValue=" + sortValue + ", " : "") +
-            (fieldParamType != null ? "fieldParamType=" + fieldParamType + ", " : "") +
-            (fieldParamValue != null ? "fieldParamValue=" + fieldParamValue + ", " : "") +
-            (datePattern != null ? "datePattern=" + datePattern + ", " : "") +
-            (seqLength != null ? "seqLength=" + seqLength + ", " : "") +
-            (seqIncrement != null ? "seqIncrement=" + seqIncrement + ", " : "") +
-            (seqStartValue != null ? "seqStartValue=" + seqStartValue + ", " : "") +
-            (fillRuleId != null ? "fillRuleId=" + fillRuleId + ", " : "") +
-            (fillRuleName != null ? "fillRuleName=" + fillRuleName + ", " : "") +
+            optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalSortValue().map(f -> "sortValue=" + f + ", ").orElse("") +
+            optionalFieldParamType().map(f -> "fieldParamType=" + f + ", ").orElse("") +
+            optionalFieldParamValue().map(f -> "fieldParamValue=" + f + ", ").orElse("") +
+            optionalDatePattern().map(f -> "datePattern=" + f + ", ").orElse("") +
+            optionalSeqLength().map(f -> "seqLength=" + f + ", ").orElse("") +
+            optionalSeqIncrement().map(f -> "seqIncrement=" + f + ", ").orElse("") +
+            optionalSeqStartValue().map(f -> "seqStartValue=" + f + ", ").orElse("") +
+            optionalFillRuleId().map(f -> "fillRuleId=" + f + ", ").orElse("") +
+            optionalFillRuleName().map(f -> "fillRuleName=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +
             (or != null ? "or=" + or + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
+        "}";
     }
 }

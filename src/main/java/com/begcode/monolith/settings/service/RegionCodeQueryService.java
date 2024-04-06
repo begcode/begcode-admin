@@ -76,12 +76,10 @@ public class RegionCodeQueryService implements QueryService<RegionCode> {
     public IPage<RegionCodeDTO> findByCriteria(RegionCodeCriteria criteria, Page<RegionCode> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<RegionCode> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, RegionCode.class, page)
-            .convert(regionCode -> {
-                Binder.bindRelations(regionCode, new String[] { "children" });
-                return regionCodeMapper.toDto(regionCode);
-            });
+        return Binder.joinQueryPage(queryWrapper, RegionCode.class, page).convert(regionCode -> {
+            Binder.bindRelations(regionCode, new String[] { "children" });
+            return regionCodeMapper.toDto(regionCode);
+        });
     }
 
     /**
@@ -105,12 +103,10 @@ public class RegionCodeQueryService implements QueryService<RegionCode> {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         criteria.parentId().setSpecified(false);
         final QueryWrapper<RegionCode> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, RegionCode.class, page)
-            .convert(regionCode -> {
-                Binder.bindRelations(regionCode, new String[] { "parent" });
-                return regionCodeMapper.toDto(regionCode);
-            });
+        return Binder.joinQueryPage(queryWrapper, RegionCode.class, page).convert(regionCode -> {
+            Binder.bindRelations(regionCode, new String[] { "parent" });
+            return regionCodeMapper.toDto(regionCode);
+        });
     }
 
     /**

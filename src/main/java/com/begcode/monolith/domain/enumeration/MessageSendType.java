@@ -7,8 +7,17 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 通知类型
  */
 public enum MessageSendType {
+    /**
+     * 邮件
+     */
     EMAIL("EMAIL", "邮件"),
+    /**
+     * 短信
+     */
     SMS("SMS", "短信"),
+    /**
+     * 微信
+     */
     WECHAT("WECHAT", "微信");
 
     @EnumValue

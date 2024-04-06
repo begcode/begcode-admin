@@ -7,9 +7,18 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 发布状态
  */
 public enum AnnoSendStatus {
+    /**
+     * 未发布
+     */
     NOT_RELEASE("NOT_RELEASE", "未发布"),
+    /**
+     * 已发布
+     */
     RELEASED("RELEASED", "已发布"),
-    CANCELED("CANCELED", "已取消");
+    /**
+     * 已撤销
+     */
+    CANCELED("CANCELED", "已撤销");
 
     @EnumValue
     @JsonValue

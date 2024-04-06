@@ -7,13 +7,37 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 短信厂商
  */
 public enum SmsProvider {
+    /**
+     * 阿里云
+     */
     ALIBABA("ALIBABA", "阿里云"),
+    /**
+     * 华为云
+     */
     HUAWEI("HUAWEI", "华为云"),
+    /**
+     * 云片
+     */
     YUNPIAN("YUNPIAN", "云片"),
+    /**
+     * 腾讯云
+     */
     TENCENT("TENCENT", "腾讯云"),
+    /**
+     * 合一
+     */
     UNI_SMS("UNI_SMS", "合一"),
+    /**
+     * 京东云
+     */
     JD_CLOUD("JD_CLOUD", "京东云"),
+    /**
+     * 容联云
+     */
     CLOOPEN("CLOOPEN", "容联云"),
+    /**
+     * 亿美软通
+     */
     EMAY("EMAY", "亿美软通");
 
     @EnumValue

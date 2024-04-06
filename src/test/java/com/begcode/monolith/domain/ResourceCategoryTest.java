@@ -31,7 +31,7 @@ class ResourceCategoryTest {
         ResourceCategory resourceCategory = getResourceCategoryRandomSampleGenerator();
         ResourceCategory resourceCategoryBack = getResourceCategoryRandomSampleGenerator();
 
-        // resourceCategory.addChildren(resourceCategoryBack);
+        // todo resourceCategory.addChildren(resourceCategoryBack);
         // assertThat(resourceCategory.getChildren()).containsOnly(resourceCategoryBack);
         assertThat(resourceCategoryBack.getParent()).isEqualTo(resourceCategory);
 
@@ -65,7 +65,7 @@ class ResourceCategoryTest {
         ResourceCategory resourceCategory = getResourceCategoryRandomSampleGenerator();
         UploadImage uploadImageBack = getUploadImageRandomSampleGenerator();
 
-        // resourceCategory.addImages(uploadImageBack);
+        // todo resourceCategory.addImages(uploadImageBack);
         // assertThat(resourceCategory.getImages()).containsOnly(uploadImageBack);
         assertThat(uploadImageBack.getCategory()).isEqualTo(resourceCategory);
 
@@ -87,7 +87,7 @@ class ResourceCategoryTest {
         ResourceCategory resourceCategory = getResourceCategoryRandomSampleGenerator();
         UploadFile uploadFileBack = getUploadFileRandomSampleGenerator();
 
-        // resourceCategory.addFiles(uploadFileBack);
+        // todo resourceCategory.addFiles(uploadFileBack);
         // assertThat(resourceCategory.getFiles()).containsOnly(uploadFileBack);
         assertThat(uploadFileBack.getCategory()).isEqualTo(resourceCategory);
 

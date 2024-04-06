@@ -7,17 +7,53 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 操作类型
  */
 public enum OperateType {
+    /**
+     * 列表
+     */
     LIST("LIST", "列表"),
+    /**
+     * 新增
+     */
     ADD("ADD", "新增"),
+    /**
+     * 编辑
+     */
     EDIT("EDIT", "编辑"),
+    /**
+     * 删除
+     */
     DELETE("DELETE", "删除"),
+    /**
+     * 导入
+     */
     IMPORT("IMPORT", "导入"),
+    /**
+     * 导出
+     */
     EXPORT("EXPORT", "导出"),
+    /**
+     * 其他
+     */
     OTHER("OTHER", "其他"),
+    /**
+     * 登录
+     */
     LOGIN("LOGIN", "登录"),
+    /**
+     * 统计
+     */
     STATS("STATS", "统计"),
+    /**
+     * 查看
+     */
     VIEW("VIEW", "查看"),
+    /**
+     * 审核
+     */
     AUDIT("AUDIT", "审核"),
+    /**
+     * 工作流
+     */
     WORK_FLOW("WORK_FLOW", "工作流");
 
     @EnumValue

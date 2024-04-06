@@ -30,7 +30,7 @@ class ViewPermissionTest {
         ViewPermission viewPermission = getViewPermissionRandomSampleGenerator();
         ViewPermission viewPermissionBack = getViewPermissionRandomSampleGenerator();
 
-        // viewPermission.addChildren(viewPermissionBack);
+        // todo viewPermission.addChildren(viewPermissionBack);
         // assertThat(viewPermission.getChildren()).containsOnly(viewPermissionBack);
         assertThat(viewPermissionBack.getParent()).isEqualTo(viewPermission);
 
@@ -64,7 +64,7 @@ class ViewPermissionTest {
         ViewPermission viewPermission = getViewPermissionRandomSampleGenerator();
         Authority authorityBack = getAuthorityRandomSampleGenerator();
 
-        // viewPermission.addAuthorities(authorityBack);
+        // todo viewPermission.addAuthorities(authorityBack);
         // assertThat(viewPermission.getAuthorities()).containsOnly(authorityBack);
         assertThat(authorityBack.getViewPermissions()).containsOnly(viewPermission);
 

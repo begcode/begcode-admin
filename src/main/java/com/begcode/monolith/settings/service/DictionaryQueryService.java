@@ -74,12 +74,10 @@ public class DictionaryQueryService implements QueryService<Dictionary> {
     public IPage<DictionaryDTO> findByCriteria(DictionaryCriteria criteria, Page<Dictionary> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<Dictionary> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, Dictionary.class, page)
-            .convert(dictionary -> {
-                Binder.bindRelations(dictionary, new String[] {});
-                return dictionaryMapper.toDto(dictionary);
-            });
+        return Binder.joinQueryPage(queryWrapper, Dictionary.class, page).convert(dictionary -> {
+            Binder.bindRelations(dictionary, new String[] {});
+            return dictionaryMapper.toDto(dictionary);
+        });
     }
 
     /**

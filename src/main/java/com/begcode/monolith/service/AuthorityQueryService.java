@@ -76,12 +76,10 @@ public class AuthorityQueryService implements QueryService<Authority> {
     public IPage<AuthorityDTO> findByCriteria(AuthorityCriteria criteria, Page<Authority> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<Authority> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, Authority.class, page)
-            .convert(authority -> {
-                Binder.bindRelations(authority, new String[] { "children", "department" });
-                return authorityMapper.toDto(authority);
-            });
+        return Binder.joinQueryPage(queryWrapper, Authority.class, page).convert(authority -> {
+            Binder.bindRelations(authority, new String[] { "children", "department" });
+            return authorityMapper.toDto(authority);
+        });
     }
 
     /**
@@ -105,12 +103,10 @@ public class AuthorityQueryService implements QueryService<Authority> {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         criteria.parentId().setSpecified(false);
         final QueryWrapper<Authority> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, Authority.class, page)
-            .convert(authority -> {
-                Binder.bindRelations(authority, new String[] { "parent", "department" });
-                return authorityMapper.toDto(authority);
-            });
+        return Binder.joinQueryPage(queryWrapper, Authority.class, page).convert(authority -> {
+            Binder.bindRelations(authority, new String[] { "parent", "department" });
+            return authorityMapper.toDto(authority);
+        });
     }
 
     /**

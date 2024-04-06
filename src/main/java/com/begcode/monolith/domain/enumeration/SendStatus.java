@@ -7,9 +7,21 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 推送状态
  */
 public enum SendStatus {
+    /**
+     * 未推送
+     */
     WAITING("WAITING", "未推送"),
+    /**
+     * 推送成功
+     */
     SUCCESS("SUCCESS", "推送成功"),
+    /**
+     * 推送失败
+     */
     FAILURE("FAILURE", "推送失败"),
+    /**
+     * 失败不再发送
+     */
     NOT_TRY("NOT_TRY", "失败不再发送");
 
     @EnumValue
