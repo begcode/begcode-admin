@@ -2,11 +2,11 @@
   "monolithMybatisApp": {
     "JobStatus": {
       "null": "",
-      "NORMAL": "正常",
-      "PAUSED": "暂停",
-      "COMPLETE": "完成",
-      "ERROR": "错误",
-      "BLOCKED": "阻塞"
+      "NORMAL": "NORMAL",
+      "PAUSED": "PAUSED",
+      "COMPLETE": "COMPLETE",
+      "ERROR": "ERROR",
+      "BLOCKED": "BLOCKED"
     }
   }
 }

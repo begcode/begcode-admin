@@ -2,9 +2,9 @@
   "monolithMybatisApp": {
     "SmsTemplateType": {
       "null": "",
-      "MESSAGE": "通知短信",
-      "VERIFICATION": "验证码",
-      "PROMOTION": "推广短信"
+      "MESSAGE": "MESSAGE",
+      "VERIFICATION": "VERIFICATION",
+      "PROMOTION": "PROMOTION"
     }
   }
 }

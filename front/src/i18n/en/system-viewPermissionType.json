@@ -2,8 +2,8 @@
   "monolithMybatisApp": {
     "ViewPermissionType": {
       "null": "",
-      "MENU": "菜单",
-      "BUTTON": "按钮"
+      "MENU": "MENU",
+      "BUTTON": "BUTTON"
     }
   }
 }

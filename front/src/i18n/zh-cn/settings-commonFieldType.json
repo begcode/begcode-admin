@@ -11,7 +11,6 @@
       "ZONED_DATE_TIME": "日期时间",
       "LOCATE_DATE": "本地日期",
       "BIG_DECIMA": "大数字",
-      "L": "L",
       "TEXTBLOB": "大文本",
       "IMAGEBLOB": "大图片",
       "ARRAY": "数组",

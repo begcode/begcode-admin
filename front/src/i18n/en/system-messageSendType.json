@@ -2,9 +2,9 @@
   "monolithMybatisApp": {
     "MessageSendType": {
       "null": "",
-      "EMAIL": "邮件",
-      "SMS": "短信",
-      "WECHAT": "微信"
+      "EMAIL": "EMAIL",
+      "SMS": "SMS",
+      "WECHAT": "WECHAT"
     }
   }
 }

@@ -2,18 +2,18 @@
   "monolithMybatisApp": {
     "OperateType": {
       "null": "",
-      "LIST": "列表",
-      "ADD": "新增",
-      "EDIT": "编辑",
-      "DELETE": "删除",
-      "IMPORT": "导入",
-      "EXPORT": "导出",
-      "OTHER": "其他",
-      "LOGIN": "登录",
-      "STATS": "统计",
-      "VIEW": "查看",
-      "AUDIT": "审核",
-      "WORK_FLOW": "工作流"
+      "LIST": "LIST",
+      "ADD": "ADD",
+      "EDIT": "EDIT",
+      "DELETE": "DELETE",
+      "IMPORT": "IMPORT",
+      "EXPORT": "EXPORT",
+      "OTHER": "OTHER",
+      "LOGIN": "LOGIN",
+      "STATS": "STATS",
+      "VIEW": "VIEW",
+      "AUDIT": "AUDIT",
+      "WORK_FLOW": "WORK_FLOW"
     }
   }
 }

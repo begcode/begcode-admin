@@ -2,10 +2,10 @@
   "monolithMybatisApp": {
     "ApiPermissionState": {
       "null": "",
-      "CONFIGURABLE": "可配置",
-      "PERMIT_ALL": "允许所有",
-      "UNREACHABLE": "不可达",
-      "AUTHENTICATE": "认证"
+      "CONFIGURABLE": "CONFIGURABLE",
+      "PERMIT_ALL": "PERMIT_ALL",
+      "UNREACHABLE": "UNREACHABLE",
+      "AUTHENTICATE": "AUTHENTICATE"
     }
   }
 }

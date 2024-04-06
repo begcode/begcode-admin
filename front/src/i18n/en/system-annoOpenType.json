@@ -2,9 +2,9 @@
   "monolithMybatisApp": {
     "AnnoOpenType": {
       "null": "",
-      "URL": "URL地址",
-      "COMPONENT": "组件",
-      "MODAL_DETAIL": "弹窗详情"
+      "URL": "URL",
+      "COMPONENT": "COMPONENT",
+      "MODAL_DETAIL": "MODAL_DETAIL"
     }
   }
 }

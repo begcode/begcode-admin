@@ -2,10 +2,10 @@
   "monolithMybatisApp": {
     "ApiPermissionType": {
       "null": "",
-      "BUSINESS": "业务",
-      "API": "API接口",
-      "ENTITY": "实体",
-      "MICRO_SERVICE": "微服务"
+      "BUSINESS": "BUSINESS",
+      "API": "API",
+      "ENTITY": "ENTITY",
+      "MICRO_SERVICE": "MICRO_SERVICE"
     }
   }
 }

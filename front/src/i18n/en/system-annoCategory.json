@@ -2,9 +2,9 @@
   "monolithMybatisApp": {
     "AnnoCategory": {
       "null": "",
-      "SYSTEM_INFO": "系统消息",
-      "NOTICE": "通知",
-      "TODO": "待办"
+      "SYSTEM_INFO": "SYSTEM_INFO",
+      "NOTICE": "NOTICE",
+      "TODO": "TODO"
     }
   }
 }

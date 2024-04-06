@@ -2,8 +2,8 @@
   "monolithMybatisApp": {
     "AnnoBusinessType": {
       "null": "",
-      "EMAIL": "邮件",
-      "WORKFLOW": "工作流"
+      "EMAIL": "EMAIL",
+      "WORKFLOW": "WORKFLOW"
     }
   }
 }
