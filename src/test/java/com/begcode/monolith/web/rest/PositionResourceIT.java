@@ -1,5 +1,7 @@
 package com.begcode.monolith.web.rest;
 
+import static com.begcode.monolith.domain.PositionAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -11,8 +13,8 @@ import com.begcode.monolith.domain.Position;
 import com.begcode.monolith.repository.PositionRepository;
 import com.begcode.monolith.service.dto.PositionDTO;
 import com.begcode.monolith.service.mapper.PositionMapper;
-import java.util.List;
-import java.util.Random;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,8 +48,11 @@ public class PositionResourceIT {
     private static final String ENTITY_API_URL = "/api/positions";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private PositionRepository positionRepository;
@@ -90,21 +95,23 @@ public class PositionResourceIT {
     @Test
     @Transactional
     void createPosition() throws Exception {
-        int databaseSizeBeforeCreate = positionRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the Position
         PositionDTO positionDTO = positionMapper.toDto(position);
-        restPositionMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(positionDTO)))
-            .andExpect(status().isCreated());
+        var returnedPositionDTO = om.readValue(
+            restPositionMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(positionDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            PositionDTO.class
+        );
 
         // Validate the Position in the database
-        List<Position> positionList = positionRepository.findAll();
-        assertThat(positionList).hasSize(databaseSizeBeforeCreate + 1);
-        Position testPosition = positionList.get(positionList.size() - 1);
-        assertThat(testPosition.getCode()).isEqualTo(DEFAULT_CODE);
-        assertThat(testPosition.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testPosition.getSortNo()).isEqualTo(DEFAULT_SORT_NO);
-        assertThat(testPosition.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedPosition = positionMapper.toEntity(returnedPositionDTO);
+        assertPositionUpdatableFieldsEquals(returnedPosition, getPersistedPosition(returnedPosition));
     }
 
     @Test
@@ -114,22 +121,21 @@ public class PositionResourceIT {
         position.setId(1L);
         PositionDTO positionDTO = positionMapper.toDto(position);
 
-        int databaseSizeBeforeCreate = positionRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restPositionMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(positionDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(positionDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Position in the database
-        List<Position> positionList = positionRepository.findAll();
-        assertThat(positionList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
     @Transactional
     void checkCodeIsRequired() throws Exception {
-        int databaseSizeBeforeTest = positionRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         position.setCode(null);
 
@@ -137,17 +143,16 @@ public class PositionResourceIT {
         PositionDTO positionDTO = positionMapper.toDto(position);
 
         restPositionMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(positionDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(positionDTO)))
             .andExpect(status().isBadRequest());
 
-        List<Position> positionList = positionRepository.findAll();
-        assertThat(positionList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void checkNameIsRequired() throws Exception {
-        int databaseSizeBeforeTest = positionRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         position.setName(null);
 
@@ -155,11 +160,10 @@ public class PositionResourceIT {
         PositionDTO positionDTO = positionMapper.toDto(position);
 
         restPositionMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(positionDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(positionDTO)))
             .andExpect(status().isBadRequest());
 
-        List<Position> positionList = positionRepository.findAll();
-        assertThat(positionList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
@@ -206,14 +210,11 @@ public class PositionResourceIT {
 
         Long id = position.getId();
 
-        defaultPositionShouldBeFound("id.equals=" + id);
-        defaultPositionShouldNotBeFound("id.notEquals=" + id);
+        defaultPositionFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultPositionShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultPositionShouldNotBeFound("id.greaterThan=" + id);
+        defaultPositionFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultPositionShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultPositionShouldNotBeFound("id.lessThan=" + id);
+        defaultPositionFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -222,11 +223,8 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where code equals to DEFAULT_CODE
-        defaultPositionShouldBeFound("code.equals=" + DEFAULT_CODE);
-
-        // Get all the positionList where code equals to UPDATED_CODE
-        defaultPositionShouldNotBeFound("code.equals=" + UPDATED_CODE);
+        // Get all the positionList where code equals to
+        defaultPositionFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
     }
 
     @Test
@@ -235,11 +233,8 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where code in DEFAULT_CODE or UPDATED_CODE
-        defaultPositionShouldBeFound("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE);
-
-        // Get all the positionList where code equals to UPDATED_CODE
-        defaultPositionShouldNotBeFound("code.in=" + UPDATED_CODE);
+        // Get all the positionList where code in
+        defaultPositionFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
     }
 
     @Test
@@ -249,10 +244,7 @@ public class PositionResourceIT {
         positionRepository.save(position);
 
         // Get all the positionList where code is not null
-        defaultPositionShouldBeFound("code.specified=true");
-
-        // Get all the positionList where code is null
-        defaultPositionShouldNotBeFound("code.specified=false");
+        defaultPositionFiltering("code.specified=true", "code.specified=false");
     }
 
     @Test
@@ -261,11 +253,8 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where code contains DEFAULT_CODE
-        defaultPositionShouldBeFound("code.contains=" + DEFAULT_CODE);
-
-        // Get all the positionList where code contains UPDATED_CODE
-        defaultPositionShouldNotBeFound("code.contains=" + UPDATED_CODE);
+        // Get all the positionList where code contains
+        defaultPositionFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
     }
 
     @Test
@@ -274,11 +263,8 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where code does not contain DEFAULT_CODE
-        defaultPositionShouldNotBeFound("code.doesNotContain=" + DEFAULT_CODE);
-
-        // Get all the positionList where code does not contain UPDATED_CODE
-        defaultPositionShouldBeFound("code.doesNotContain=" + UPDATED_CODE);
+        // Get all the positionList where code does not contain
+        defaultPositionFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
     }
 
     @Test
@@ -287,11 +273,8 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where name equals to DEFAULT_NAME
-        defaultPositionShouldBeFound("name.equals=" + DEFAULT_NAME);
-
-        // Get all the positionList where name equals to UPDATED_NAME
-        defaultPositionShouldNotBeFound("name.equals=" + UPDATED_NAME);
+        // Get all the positionList where name equals to
+        defaultPositionFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
     }
 
     @Test
@@ -300,11 +283,8 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where name in DEFAULT_NAME or UPDATED_NAME
-        defaultPositionShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
-
-        // Get all the positionList where name equals to UPDATED_NAME
-        defaultPositionShouldNotBeFound("name.in=" + UPDATED_NAME);
+        // Get all the positionList where name in
+        defaultPositionFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
     }
 
     @Test
@@ -314,10 +294,7 @@ public class PositionResourceIT {
         positionRepository.save(position);
 
         // Get all the positionList where name is not null
-        defaultPositionShouldBeFound("name.specified=true");
-
-        // Get all the positionList where name is null
-        defaultPositionShouldNotBeFound("name.specified=false");
+        defaultPositionFiltering("name.specified=true", "name.specified=false");
     }
 
     @Test
@@ -326,11 +303,8 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where name contains DEFAULT_NAME
-        defaultPositionShouldBeFound("name.contains=" + DEFAULT_NAME);
-
-        // Get all the positionList where name contains UPDATED_NAME
-        defaultPositionShouldNotBeFound("name.contains=" + UPDATED_NAME);
+        // Get all the positionList where name contains
+        defaultPositionFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
     }
 
     @Test
@@ -339,11 +313,8 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where name does not contain DEFAULT_NAME
-        defaultPositionShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
-
-        // Get all the positionList where name does not contain UPDATED_NAME
-        defaultPositionShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+        // Get all the positionList where name does not contain
+        defaultPositionFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
     }
 
     @Test
@@ -352,11 +323,8 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where sortNo equals to DEFAULT_SORT_NO
-        defaultPositionShouldBeFound("sortNo.equals=" + DEFAULT_SORT_NO);
-
-        // Get all the positionList where sortNo equals to UPDATED_SORT_NO
-        defaultPositionShouldNotBeFound("sortNo.equals=" + UPDATED_SORT_NO);
+        // Get all the positionList where sortNo equals to
+        defaultPositionFiltering("sortNo.equals=" + DEFAULT_SORT_NO, "sortNo.equals=" + UPDATED_SORT_NO);
     }
 
     @Test
@@ -365,11 +333,8 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where sortNo in DEFAULT_SORT_NO or UPDATED_SORT_NO
-        defaultPositionShouldBeFound("sortNo.in=" + DEFAULT_SORT_NO + "," + UPDATED_SORT_NO);
-
-        // Get all the positionList where sortNo equals to UPDATED_SORT_NO
-        defaultPositionShouldNotBeFound("sortNo.in=" + UPDATED_SORT_NO);
+        // Get all the positionList where sortNo in
+        defaultPositionFiltering("sortNo.in=" + DEFAULT_SORT_NO + "," + UPDATED_SORT_NO, "sortNo.in=" + UPDATED_SORT_NO);
     }
 
     @Test
@@ -379,10 +344,7 @@ public class PositionResourceIT {
         positionRepository.save(position);
 
         // Get all the positionList where sortNo is not null
-        defaultPositionShouldBeFound("sortNo.specified=true");
-
-        // Get all the positionList where sortNo is null
-        defaultPositionShouldNotBeFound("sortNo.specified=false");
+        defaultPositionFiltering("sortNo.specified=true", "sortNo.specified=false");
     }
 
     @Test
@@ -391,11 +353,8 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where sortNo is greater than or equal to DEFAULT_SORT_NO
-        defaultPositionShouldBeFound("sortNo.greaterThanOrEqual=" + DEFAULT_SORT_NO);
-
-        // Get all the positionList where sortNo is greater than or equal to UPDATED_SORT_NO
-        defaultPositionShouldNotBeFound("sortNo.greaterThanOrEqual=" + UPDATED_SORT_NO);
+        // Get all the positionList where sortNo is greater than or equal to
+        defaultPositionFiltering("sortNo.greaterThanOrEqual=" + DEFAULT_SORT_NO, "sortNo.greaterThanOrEqual=" + UPDATED_SORT_NO);
     }
 
     @Test
@@ -404,11 +363,8 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where sortNo is less than or equal to DEFAULT_SORT_NO
-        defaultPositionShouldBeFound("sortNo.lessThanOrEqual=" + DEFAULT_SORT_NO);
-
-        // Get all the positionList where sortNo is less than or equal to SMALLER_SORT_NO
-        defaultPositionShouldNotBeFound("sortNo.lessThanOrEqual=" + SMALLER_SORT_NO);
+        // Get all the positionList where sortNo is less than or equal to
+        defaultPositionFiltering("sortNo.lessThanOrEqual=" + DEFAULT_SORT_NO, "sortNo.lessThanOrEqual=" + SMALLER_SORT_NO);
     }
 
     @Test
@@ -417,11 +373,8 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where sortNo is less than DEFAULT_SORT_NO
-        defaultPositionShouldNotBeFound("sortNo.lessThan=" + DEFAULT_SORT_NO);
-
-        // Get all the positionList where sortNo is less than UPDATED_SORT_NO
-        defaultPositionShouldBeFound("sortNo.lessThan=" + UPDATED_SORT_NO);
+        // Get all the positionList where sortNo is less than
+        defaultPositionFiltering("sortNo.lessThan=" + UPDATED_SORT_NO, "sortNo.lessThan=" + DEFAULT_SORT_NO);
     }
 
     @Test
@@ -430,11 +383,8 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where sortNo is greater than DEFAULT_SORT_NO
-        defaultPositionShouldNotBeFound("sortNo.greaterThan=" + DEFAULT_SORT_NO);
-
-        // Get all the positionList where sortNo is greater than SMALLER_SORT_NO
-        defaultPositionShouldBeFound("sortNo.greaterThan=" + SMALLER_SORT_NO);
+        // Get all the positionList where sortNo is greater than
+        defaultPositionFiltering("sortNo.greaterThan=" + SMALLER_SORT_NO, "sortNo.greaterThan=" + DEFAULT_SORT_NO);
     }
 
     @Test
@@ -443,11 +393,8 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where description equals to DEFAULT_DESCRIPTION
-        defaultPositionShouldBeFound("description.equals=" + DEFAULT_DESCRIPTION);
-
-        // Get all the positionList where description equals to UPDATED_DESCRIPTION
-        defaultPositionShouldNotBeFound("description.equals=" + UPDATED_DESCRIPTION);
+        // Get all the positionList where description equals to
+        defaultPositionFiltering("description.equals=" + DEFAULT_DESCRIPTION, "description.equals=" + UPDATED_DESCRIPTION);
     }
 
     @Test
@@ -456,11 +403,11 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where description in DEFAULT_DESCRIPTION or UPDATED_DESCRIPTION
-        defaultPositionShouldBeFound("description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION);
-
-        // Get all the positionList where description equals to UPDATED_DESCRIPTION
-        defaultPositionShouldNotBeFound("description.in=" + UPDATED_DESCRIPTION);
+        // Get all the positionList where description in
+        defaultPositionFiltering(
+            "description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION,
+            "description.in=" + UPDATED_DESCRIPTION
+        );
     }
 
     @Test
@@ -470,10 +417,7 @@ public class PositionResourceIT {
         positionRepository.save(position);
 
         // Get all the positionList where description is not null
-        defaultPositionShouldBeFound("description.specified=true");
-
-        // Get all the positionList where description is null
-        defaultPositionShouldNotBeFound("description.specified=false");
+        defaultPositionFiltering("description.specified=true", "description.specified=false");
     }
 
     @Test
@@ -482,11 +426,8 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where description contains DEFAULT_DESCRIPTION
-        defaultPositionShouldBeFound("description.contains=" + DEFAULT_DESCRIPTION);
-
-        // Get all the positionList where description contains UPDATED_DESCRIPTION
-        defaultPositionShouldNotBeFound("description.contains=" + UPDATED_DESCRIPTION);
+        // Get all the positionList where description contains
+        defaultPositionFiltering("description.contains=" + DEFAULT_DESCRIPTION, "description.contains=" + UPDATED_DESCRIPTION);
     }
 
     @Test
@@ -495,11 +436,13 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        // Get all the positionList where description does not contain DEFAULT_DESCRIPTION
-        defaultPositionShouldNotBeFound("description.doesNotContain=" + DEFAULT_DESCRIPTION);
+        // Get all the positionList where description does not contain
+        defaultPositionFiltering("description.doesNotContain=" + UPDATED_DESCRIPTION, "description.doesNotContain=" + DEFAULT_DESCRIPTION);
+    }
 
-        // Get all the positionList where description does not contain UPDATED_DESCRIPTION
-        defaultPositionShouldBeFound("description.doesNotContain=" + UPDATED_DESCRIPTION);
+    private void defaultPositionFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultPositionShouldBeFound(shouldBeFound);
+        defaultPositionShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -556,7 +499,7 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        int databaseSizeBeforeUpdate = positionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the position
         Position updatedPosition = positionRepository.findById(position.getId()).orElseThrow();
@@ -567,24 +510,19 @@ public class PositionResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, positionDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(positionDTO))
+                    .content(om.writeValueAsBytes(positionDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the Position in the database
-        List<Position> positionList = positionRepository.findAll();
-        assertThat(positionList).hasSize(databaseSizeBeforeUpdate);
-        Position testPosition = positionList.get(positionList.size() - 1);
-        assertThat(testPosition.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testPosition.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testPosition.getSortNo()).isEqualTo(UPDATED_SORT_NO);
-        assertThat(testPosition.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedPositionToMatchAllProperties(updatedPosition);
     }
 
     @Test
     @Transactional
     void putNonExistingPosition() throws Exception {
-        int databaseSizeBeforeUpdate = positionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         position.setId(longCount.incrementAndGet());
 
         // Create the Position
@@ -595,19 +533,18 @@ public class PositionResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, positionDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(positionDTO))
+                    .content(om.writeValueAsBytes(positionDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Position in the database
-        List<Position> positionList = positionRepository.findAll();
-        assertThat(positionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchPosition() throws Exception {
-        int databaseSizeBeforeUpdate = positionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         position.setId(longCount.incrementAndGet());
 
         // Create the Position
@@ -618,19 +555,18 @@ public class PositionResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(positionDTO))
+                    .content(om.writeValueAsBytes(positionDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Position in the database
-        List<Position> positionList = positionRepository.findAll();
-        assertThat(positionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamPosition() throws Exception {
-        int databaseSizeBeforeUpdate = positionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         position.setId(longCount.incrementAndGet());
 
         // Create the Position
@@ -638,12 +574,11 @@ public class PositionResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restPositionMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(positionDTO)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(positionDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Position in the database
-        List<Position> positionList = positionRepository.findAll();
-        assertThat(positionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -652,30 +587,26 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        int databaseSizeBeforeUpdate = positionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the position using partial update
         Position partialUpdatedPosition = new Position();
         partialUpdatedPosition.setId(position.getId());
 
-        partialUpdatedPosition.code(UPDATED_CODE).name(UPDATED_NAME);
+        partialUpdatedPosition.code(UPDATED_CODE).description(UPDATED_DESCRIPTION);
 
         restPositionMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedPosition.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedPosition))
+                    .content(om.writeValueAsBytes(partialUpdatedPosition))
             )
             .andExpect(status().isOk());
 
         // Validate the Position in the database
-        List<Position> positionList = positionRepository.findAll();
-        assertThat(positionList).hasSize(databaseSizeBeforeUpdate);
-        Position testPosition = positionList.get(positionList.size() - 1);
-        assertThat(testPosition.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testPosition.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testPosition.getSortNo()).isEqualTo(DEFAULT_SORT_NO);
-        assertThat(testPosition.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPositionUpdatableFieldsEquals(createUpdateProxyForBean(partialUpdatedPosition, position), getPersistedPosition(position));
     }
 
     @Test
@@ -684,7 +615,7 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        int databaseSizeBeforeUpdate = positionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the position using partial update
         Position partialUpdatedPosition = new Position();
@@ -696,24 +627,20 @@ public class PositionResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedPosition.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedPosition))
+                    .content(om.writeValueAsBytes(partialUpdatedPosition))
             )
             .andExpect(status().isOk());
 
         // Validate the Position in the database
-        List<Position> positionList = positionRepository.findAll();
-        assertThat(positionList).hasSize(databaseSizeBeforeUpdate);
-        Position testPosition = positionList.get(positionList.size() - 1);
-        assertThat(testPosition.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testPosition.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testPosition.getSortNo()).isEqualTo(UPDATED_SORT_NO);
-        assertThat(testPosition.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPositionUpdatableFieldsEquals(partialUpdatedPosition, getPersistedPosition(partialUpdatedPosition));
     }
 
     @Test
     @Transactional
     void patchNonExistingPosition() throws Exception {
-        int databaseSizeBeforeUpdate = positionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         position.setId(longCount.incrementAndGet());
 
         // Create the Position
@@ -724,19 +651,18 @@ public class PositionResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, positionDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(positionDTO))
+                    .content(om.writeValueAsBytes(positionDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Position in the database
-        List<Position> positionList = positionRepository.findAll();
-        assertThat(positionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchPosition() throws Exception {
-        int databaseSizeBeforeUpdate = positionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         position.setId(longCount.incrementAndGet());
 
         // Create the Position
@@ -747,19 +673,18 @@ public class PositionResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(positionDTO))
+                    .content(om.writeValueAsBytes(positionDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Position in the database
-        List<Position> positionList = positionRepository.findAll();
-        assertThat(positionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamPosition() throws Exception {
-        int databaseSizeBeforeUpdate = positionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         position.setId(longCount.incrementAndGet());
 
         // Create the Position
@@ -767,14 +692,11 @@ public class PositionResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restPositionMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(positionDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(positionDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Position in the database
-        List<Position> positionList = positionRepository.findAll();
-        assertThat(positionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -783,7 +705,7 @@ public class PositionResourceIT {
         // Initialize the database
         positionRepository.save(position);
 
-        int databaseSizeBeforeDelete = positionRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the position
         restPositionMockMvc
@@ -791,7 +713,34 @@ public class PositionResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<Position> positionList = positionRepository.findAll();
-        assertThat(positionList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return positionRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected Position getPersistedPosition(Position position) {
+        return positionRepository.findById(position.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedPositionToMatchAllProperties(Position expectedPosition) {
+        assertPositionAllPropertiesEquals(expectedPosition, getPersistedPosition(expectedPosition));
+    }
+
+    protected void assertPersistedPositionToMatchUpdatableProperties(Position expectedPosition) {
+        assertPositionAllUpdatablePropertiesEquals(expectedPosition, getPersistedPosition(expectedPosition));
     }
 }

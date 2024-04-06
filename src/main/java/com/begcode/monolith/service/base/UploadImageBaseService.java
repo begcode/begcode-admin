@@ -15,10 +15,10 @@ import com.diboot.core.binding.Binder;
 import com.diboot.core.service.impl.BaseServiceImpl;
 import com.google.common.base.CaseFormat;
 import java.io.File;
+import java.net.URL;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.Arrays;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,13 +31,14 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Service Implementation for managing {@link com.begcode.monolith.domain.UploadImage}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class UploadImageBaseService<R extends UploadImageRepository, E extends UploadImage>
     extends BaseServiceImpl<UploadImageRepository, UploadImage> {
 
     private final Logger log = LoggerFactory.getLogger(UploadImageBaseService.class);
 
-    private final List<String> relationCacheNames = Arrays.asList(com.begcode.monolith.domain.ResourceCategory.class.getName() + ".images");
-    private final List<String> relationNames = Arrays.asList("category");
+    private final List<String> relationCacheNames = List.of(com.begcode.monolith.domain.ResourceCategory.class.getName() + ".images");
+    private final List<String> relationNames = List.of("category");
 
     protected final FileStorageService fileStorageService;
 
@@ -68,11 +69,10 @@ public class UploadImageBaseService<R extends UploadImageRepository, E extends U
     @Transactional(rollbackFor = Exception.class)
     public UploadImageDTO update(UploadImageDTO uploadImageDTO) {
         log.debug("Request to update UploadImage : {}", uploadImageDTO);
-
         UploadImage uploadImage = uploadImageMapper.toEntity(uploadImageDTO);
 
-        uploadImageRepository.updateById(uploadImage);
-        return findOne(uploadImageDTO.getId()).orElseThrow();
+        this.saveOrUpdate(uploadImage);
+        return findOne(uploadImage.getId()).orElseThrow();
     }
 
     /**
@@ -117,8 +117,7 @@ public class UploadImageBaseService<R extends UploadImageRepository, E extends U
      */
     public Optional<UploadImageDTO> findOne(Long id) {
         log.debug("Request to get UploadImage : {}", id);
-        return Optional
-            .ofNullable(uploadImageRepository.selectById(id))
+        return Optional.ofNullable(uploadImageRepository.selectById(id))
             .map(uploadImage -> {
                 Binder.bindRelations(uploadImage);
                 return uploadImage;
@@ -165,6 +164,46 @@ public class UploadImageBaseService<R extends UploadImageRepository, E extends U
         return uploadImageMapper.toDto(this.getById(uploadImage.getId()));
     }
 
+    @Transactional
+    public UploadImageDTO save(File file) {
+        log.debug("Request to save UploadImage : {}", file.getName());
+        if (file.exists()) {
+            UploadImageDTO uploadImageDTO = new UploadImageDTO();
+            final String yearAndMonth = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM"));
+            uploadImageDTO.setCreateAt(ZonedDateTime.now());
+            uploadImageDTO.setFullName(file.getName());
+            uploadImageDTO.setName(file.getName());
+            uploadImageDTO.setFolder(yearAndMonth + File.separator);
+            uploadImageDTO.setFileSize(file.length());
+            FileInfo upload = fileStorageService.of(file).setPlatform("local").upload();
+            uploadImageDTO.setUrl(upload.getUrl());
+            uploadImageDTO.setExt(upload.getExt());
+            UploadImage uploadImage = uploadImageMapper.toEntity(uploadImageDTO);
+            this.saveOrUpdate(uploadImage);
+            return uploadImageMapper.toDto(this.getById(uploadImage.getId()));
+        } else {
+            throw new BadRequestAlertException("Invalid file", "UploadFile", "imagesnull");
+        }
+    }
+
+    @Transactional
+    public UploadImageDTO save(URL url) {
+        log.debug("Request to save UploadImage : {}", url.getPath());
+        UploadImageDTO uploadImageDTO = new UploadImageDTO();
+        final String yearAndMonth = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM"));
+        uploadImageDTO.setCreateAt(ZonedDateTime.now());
+        uploadImageDTO.setFolder(yearAndMonth + File.separator);
+        FileInfo upload = fileStorageService.of(url).setPlatform("local").upload();
+        uploadImageDTO.setFullName(upload.getFilename());
+        uploadImageDTO.setName(upload.getFilename());
+        uploadImageDTO.setUrl(upload.getUrl());
+        uploadImageDTO.setExt(upload.getExt());
+        uploadImageDTO.setFileSize(upload.getSize());
+        UploadImage uploadImage = uploadImageMapper.toEntity(uploadImageDTO);
+        this.saveOrUpdate(uploadImage);
+        return uploadImageMapper.toDto(this.getById(uploadImage.getId()));
+    }
+
     /**
      * Update specified field by uploadImage
      */
@@ -175,23 +214,25 @@ public class UploadImageBaseService<R extends UploadImageRepository, E extends U
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             UpdateWrapper<UploadImage> updateWrapper = new UpdateWrapper<>();
             updateWrapper.in("id", ids);
-            fieldNames.forEach(fieldName ->
-                updateWrapper.set(
-                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
-                    BeanUtil.getFieldValue(changeUploadImageDTO, fieldName)
-                )
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changeUploadImageDTO, fieldName)
+                    )
             );
             this.update(updateWrapper);
         } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
             List<UploadImage> uploadImageList = this.listByIds(ids);
             if (CollectionUtils.isNotEmpty(uploadImageList)) {
                 uploadImageList.forEach(uploadImage -> {
-                    relationshipNames.forEach(relationName ->
-                        BeanUtil.setFieldValue(
-                            uploadImage,
-                            relationName,
-                            BeanUtil.getFieldValue(uploadImageMapper.toEntity(changeUploadImageDTO), relationName)
-                        )
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                uploadImage,
+                                relationName,
+                                BeanUtil.getFieldValue(uploadImageMapper.toEntity(changeUploadImageDTO), relationName)
+                            )
                     );
                     this.createOrUpdateAndRelatedRelations(uploadImage, relationshipNames);
                 });

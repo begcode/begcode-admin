@@ -16,12 +16,10 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface SmsTemplateBaseRepository<E extends SmsTemplate> extends BaseCrudMapper<SmsTemplate> {
     default Optional<SmsTemplate> findOneWithEagerRelationships(Long id) {
-        return Optional
-            .ofNullable(this.selectById(id))
-            .map(smsTemplate -> {
-                Binder.bindRelations(smsTemplate, new String[] { "supplier" });
-                return smsTemplate;
-            });
+        return Optional.ofNullable(this.selectById(id)).map(smsTemplate -> {
+            Binder.bindRelations(smsTemplate, new String[] { "supplier" });
+            return smsTemplate;
+        });
     }
 
     default List<SmsTemplate> findAll() {

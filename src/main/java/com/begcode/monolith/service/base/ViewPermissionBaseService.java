@@ -16,7 +16,6 @@ import com.diboot.core.binding.Binder;
 import com.diboot.core.service.impl.BaseServiceImpl;
 import com.google.common.base.CaseFormat;
 import java.util.*;
-import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -31,17 +30,18 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Service Implementation for managing {@link com.begcode.monolith.domain.ViewPermission}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class ViewPermissionBaseService<R extends ViewPermissionRepository, E extends ViewPermission>
     extends BaseServiceImpl<ViewPermissionRepository, ViewPermission> {
 
     private final Logger log = LoggerFactory.getLogger(ViewPermissionBaseService.class);
 
-    private final List<String> relationCacheNames = Arrays.asList(
+    private final List<String> relationCacheNames = List.of(
         com.begcode.monolith.domain.ViewPermission.class.getName() + ".parent",
         com.begcode.monolith.domain.ViewPermission.class.getName() + ".children",
         com.begcode.monolith.domain.Authority.class.getName() + ".viewPermissions"
     );
-    private final List<String> relationNames = Arrays.asList("children", "parent", "authorities");
+    private final List<String> relationNames = List.of("children", "parent", "authorities");
 
     protected final ViewPermissionRepository viewPermissionRepository;
 
@@ -84,11 +84,11 @@ public class ViewPermissionBaseService<R extends ViewPermissionRepository, E ext
     @Transactional(rollbackFor = Exception.class)
     public ViewPermissionDTO update(ViewPermissionDTO viewPermissionDTO) {
         log.debug("Request to update ViewPermission : {}", viewPermissionDTO);
-
         ViewPermission viewPermission = viewPermissionMapper.toEntity(viewPermissionDTO);
+        clearChildrenCache();
 
-        viewPermissionRepository.updateById(viewPermission);
-        return findOne(viewPermissionDTO.getId()).orElseThrow();
+        this.saveOrUpdate(viewPermission);
+        return findOne(viewPermission.getId()).orElseThrow();
     }
 
     /**
@@ -133,8 +133,7 @@ public class ViewPermissionBaseService<R extends ViewPermissionRepository, E ext
      */
     public Optional<ViewPermissionDTO> findOne(Long id) {
         log.debug("Request to get ViewPermission : {}", id);
-        return Optional
-            .ofNullable(viewPermissionRepository.selectById(id))
+        return Optional.ofNullable(viewPermissionRepository.selectById(id))
             .map(viewPermission -> {
                 Binder.bindRelations(viewPermission);
                 return viewPermission;
@@ -168,8 +167,7 @@ public class ViewPermissionBaseService<R extends ViewPermissionRepository, E ext
     public List<ViewPermissionDTO> getAllByLogin() {
         List<ViewPermission> resultList = new ArrayList<>();
         // 根据login获得用户的角色
-        SecurityUtils
-            .getCurrentUserId()
+        SecurityUtils.getCurrentUserId()
             .ifPresent(userId -> {
                 List<ViewPermission> viewPermissionsByUserId = this.viewPermissionRepository.findAllViewPermissionsByUserId(userId);
                 List<ViewPermission> addViewPermissions = new ArrayList<>();
@@ -269,23 +267,25 @@ public class ViewPermissionBaseService<R extends ViewPermissionRepository, E ext
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             UpdateWrapper<ViewPermission> updateWrapper = new UpdateWrapper<>();
             updateWrapper.in("id", ids);
-            fieldNames.forEach(fieldName ->
-                updateWrapper.set(
-                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
-                    BeanUtil.getFieldValue(changeViewPermissionDTO, fieldName)
-                )
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changeViewPermissionDTO, fieldName)
+                    )
             );
             this.update(updateWrapper);
         } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
             List<ViewPermission> viewPermissionList = this.listByIds(ids);
             if (CollectionUtils.isNotEmpty(viewPermissionList)) {
                 viewPermissionList.forEach(viewPermission -> {
-                    relationshipNames.forEach(relationName ->
-                        BeanUtil.setFieldValue(
-                            viewPermission,
-                            relationName,
-                            BeanUtil.getFieldValue(viewPermissionMapper.toEntity(changeViewPermissionDTO), relationName)
-                        )
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                viewPermission,
+                                relationName,
+                                BeanUtil.getFieldValue(viewPermissionMapper.toEntity(changeViewPermissionDTO), relationName)
+                            )
                     );
                     this.createOrUpdateAndRelatedRelations(viewPermission, relationshipNames);
                 });
@@ -319,131 +319,119 @@ public class ViewPermissionBaseService<R extends ViewPermissionRepository, E ext
         SortValueOperateType type
     ) {
         switch (type) {
-            case VALUE:
-                {
-                    if (ObjectUtils.isNotEmpty(changeSortValue)) {
-                        return lambdaUpdate().set(ViewPermission::getOrder, changeSortValue).eq(ViewPermission::getId, id).update();
-                    } else {
-                        return false;
-                    }
+            case VALUE: {
+                if (ObjectUtils.isNotEmpty(changeSortValue)) {
+                    return lambdaUpdate().set(ViewPermission::getOrder, changeSortValue).eq(ViewPermission::getId, id).update();
+                } else {
+                    return false;
                 }
-            case STEP:
-                {
-                    if (ObjectUtils.allNotNull(id, beforeId)) {
-                        Set<Long> ids = new HashSet<>();
-                        ids.add(id);
-                        ids.add(beforeId);
-                        Map<Long, Integer> idSortValueMap = listByIds(ids)
-                            .stream()
-                            .filter(viewPermission -> viewPermission.getOrder() != null)
-                            .collect(Collectors.toMap(ViewPermission::getId, ViewPermission::getOrder));
-                        return (
-                            lambdaUpdate()
-                                .set(ViewPermission::getOrder, idSortValueMap.get(beforeId))
-                                .eq(ViewPermission::getId, id)
-                                .update() &&
-                            lambdaUpdate()
-                                .set(ViewPermission::getOrder, idSortValueMap.get(id))
-                                .eq(ViewPermission::getId, beforeId)
-                                .update()
-                        );
-                    } else if (ObjectUtils.allNotNull(id, afterId)) {
-                        Set<Long> ids = new HashSet<>();
-                        ids.add(id);
-                        ids.add(afterId);
-                        Map<Long, Integer> idSortValueMap = listByIds(ids)
-                            .stream()
-                            .filter(viewPermission -> viewPermission.getOrder() != null)
-                            .collect(Collectors.toMap(ViewPermission::getId, ViewPermission::getOrder));
-                        return (
-                            lambdaUpdate()
-                                .set(ViewPermission::getOrder, idSortValueMap.get(afterId))
-                                .eq(ViewPermission::getId, id)
-                                .update() &&
-                            lambdaUpdate().set(ViewPermission::getOrder, idSortValueMap.get(id)).eq(ViewPermission::getId, afterId).update()
-                        );
-                    } else {
-                        return false;
-                    }
-                }
-            case DROP:
-                {
+            }
+            case STEP: {
+                if (ObjectUtils.allNotNull(id, beforeId)) {
                     Set<Long> ids = new HashSet<>();
                     ids.add(id);
-                    if (ObjectUtils.isNotEmpty(beforeId)) {
-                        ids.add(beforeId);
-                    }
-                    if (ObjectUtils.isNotEmpty(afterId)) {
-                        ids.add(afterId);
-                    }
+                    ids.add(beforeId);
                     Map<Long, Integer> idSortValueMap = listByIds(ids)
                         .stream()
                         .filter(viewPermission -> viewPermission.getOrder() != null)
                         .collect(Collectors.toMap(ViewPermission::getId, ViewPermission::getOrder));
-                    if (ObjectUtils.allNotNull(beforeId, afterId)) {
-                        // 计算中间值
-                        Integer beforeSortValue = idSortValueMap.get(beforeId);
-                        Integer afterSortValue = idSortValueMap.get(afterId);
-                        Integer newSortValue = (beforeSortValue + afterSortValue) / 2;
-                        if (!newSortValue.equals(afterSortValue) && !newSortValue.equals(beforeSortValue)) {
-                            // 正常值，保存到数据库。
-                            return lambdaUpdate().set(ViewPermission::getOrder, newSortValue).eq(ViewPermission::getId, id).update();
-                        } else {
-                            // 没有排序值插入空间了，重新对相关的所有记录的排序值进行计算。然后再插入相关的值。
-                            // 需要确定相应的记录范围
-                            List<ViewPermission> list = this.list(queryWrapper.orderByAsc("order"));
-                            Integer newBeforeSortValue = 0;
-                            Integer newAfterSortValue = 0;
-                            for (int i = 0; i < list.size(); i++) {
-                                list.get(i).setOrder(100 * (i + 1));
-                                if (afterId.equals(list.get(i).getId())) {
-                                    newBeforeSortValue = list.get(i).getOrder();
-                                }
-                                if (beforeId.equals(list.get(i).getId())) {
-                                    newAfterSortValue = list.get(i).getOrder();
-                                }
-                            }
-                            newSortValue = (newBeforeSortValue + newAfterSortValue) / 2;
-                            updateBatchById(list);
-                            return lambdaUpdate().set(ViewPermission::getOrder, newSortValue).eq(ViewPermission::getId, id).update();
-                        }
-                    } else if (ObjectUtils.isNotEmpty(beforeId)) {
-                        // 计算比beforeId实体大的排序值
-                        Integer beforeSortValue = idSortValueMap.get(beforeId);
-                        Integer newSortValue = (beforeSortValue + 100) - ((beforeSortValue + 100) % 100);
+                    return (
+                        lambdaUpdate().set(ViewPermission::getOrder, idSortValueMap.get(beforeId)).eq(ViewPermission::getId, id).update() &&
+                        lambdaUpdate().set(ViewPermission::getOrder, idSortValueMap.get(id)).eq(ViewPermission::getId, beforeId).update()
+                    );
+                } else if (ObjectUtils.allNotNull(id, afterId)) {
+                    Set<Long> ids = new HashSet<>();
+                    ids.add(id);
+                    ids.add(afterId);
+                    Map<Long, Integer> idSortValueMap = listByIds(ids)
+                        .stream()
+                        .filter(viewPermission -> viewPermission.getOrder() != null)
+                        .collect(Collectors.toMap(ViewPermission::getId, ViewPermission::getOrder));
+                    return (
+                        lambdaUpdate().set(ViewPermission::getOrder, idSortValueMap.get(afterId)).eq(ViewPermission::getId, id).update() &&
+                        lambdaUpdate().set(ViewPermission::getOrder, idSortValueMap.get(id)).eq(ViewPermission::getId, afterId).update()
+                    );
+                } else {
+                    return false;
+                }
+            }
+            case DROP: {
+                Set<Long> ids = new HashSet<>();
+                ids.add(id);
+                if (ObjectUtils.isNotEmpty(beforeId)) {
+                    ids.add(beforeId);
+                }
+                if (ObjectUtils.isNotEmpty(afterId)) {
+                    ids.add(afterId);
+                }
+                Map<Long, Integer> idSortValueMap = listByIds(ids)
+                    .stream()
+                    .filter(viewPermission -> viewPermission.getOrder() != null)
+                    .collect(Collectors.toMap(ViewPermission::getId, ViewPermission::getOrder));
+                if (ObjectUtils.allNotNull(beforeId, afterId)) {
+                    // 计算中间值
+                    Integer beforeSortValue = idSortValueMap.get(beforeId);
+                    Integer afterSortValue = idSortValueMap.get(afterId);
+                    Integer newSortValue = (beforeSortValue + afterSortValue) / 2;
+                    if (!newSortValue.equals(afterSortValue) && !newSortValue.equals(beforeSortValue)) {
                         // 正常值，保存到数据库。
                         return lambdaUpdate().set(ViewPermission::getOrder, newSortValue).eq(ViewPermission::getId, id).update();
-                    } else if (ObjectUtils.isNotEmpty(afterId)) {
-                        // 计算比afterId实体小的排序值
-                        Integer afterSortValue = idSortValueMap.get(afterId);
-                        Integer newSortValue = (afterSortValue - 100) - ((afterSortValue - 100) % 100);
-                        if (newSortValue <= 0) {
-                            // 没有排序值插入空间了，重新对相关的所有记录的排序值进行计算。然后再插入相关的值。
-                            // 需要确定相应的记录范围
-                            List<ViewPermission> list = this.list(queryWrapper.orderByAsc("order"));
-                            Integer newBeforeSortValue = 0;
-                            Integer newAfterSortValue = 0;
-                            for (int i = 0; i < list.size(); i++) {
-                                list.get(i).setOrder(100 * (i + 1));
-                                if (afterId.equals(list.get(i).getId())) {
-                                    newBeforeSortValue = list.get(i).getOrder();
-                                }
-                                if (beforeId.equals(list.get(i).getId())) {
-                                    newAfterSortValue = list.get(i).getOrder();
-                                }
-                            }
-                            newSortValue = (newBeforeSortValue + newAfterSortValue) / 2;
-                            updateBatchById(list);
-                            return lambdaUpdate().set(ViewPermission::getOrder, newSortValue).eq(ViewPermission::getId, id).update();
-                        } else {
-                            // 正常值，保存到数据库。
-                            return lambdaUpdate().set(ViewPermission::getOrder, newSortValue).eq(ViewPermission::getId, id).update();
-                        }
                     } else {
-                        // todo 异常
-                        return false;
+                        // 没有排序值插入空间了，重新对相关的所有记录的排序值进行计算。然后再插入相关的值。
+                        // 需要确定相应的记录范围
+                        List<ViewPermission> list = this.list(queryWrapper.orderByAsc("order"));
+                        Integer newBeforeSortValue = 0;
+                        Integer newAfterSortValue = 0;
+                        for (int i = 0; i < list.size(); i++) {
+                            list.get(i).setOrder(100 * (i + 1));
+                            if (afterId.equals(list.get(i).getId())) {
+                                newBeforeSortValue = list.get(i).getOrder();
+                            }
+                            if (beforeId.equals(list.get(i).getId())) {
+                                newAfterSortValue = list.get(i).getOrder();
+                            }
+                        }
+                        newSortValue = (newBeforeSortValue + newAfterSortValue) / 2;
+                        updateBatchById(list);
+                        return lambdaUpdate().set(ViewPermission::getOrder, newSortValue).eq(ViewPermission::getId, id).update();
                     }
+                } else if (ObjectUtils.isNotEmpty(beforeId)) {
+                    // 计算比beforeId实体大的排序值
+                    Integer beforeSortValue = idSortValueMap.get(beforeId);
+                    Integer newSortValue = (beforeSortValue + 100) - ((beforeSortValue + 100) % 100);
+                    // 正常值，保存到数据库。
+                    return lambdaUpdate().set(ViewPermission::getOrder, newSortValue).eq(ViewPermission::getId, id).update();
+                } else if (ObjectUtils.isNotEmpty(afterId)) {
+                    // 计算比afterId实体小的排序值
+                    Integer afterSortValue = idSortValueMap.get(afterId);
+                    Integer newSortValue = (afterSortValue - 100) - ((afterSortValue - 100) % 100);
+                    if (newSortValue <= 0) {
+                        // 没有排序值插入空间了，重新对相关的所有记录的排序值进行计算。然后再插入相关的值。
+                        // 需要确定相应的记录范围
+                        List<ViewPermission> list = this.list(queryWrapper.orderByAsc("order"));
+                        Integer newBeforeSortValue = 0;
+                        Integer newAfterSortValue = 0;
+                        for (int i = 0; i < list.size(); i++) {
+                            list.get(i).setOrder(100 * (i + 1));
+                            if (afterId.equals(list.get(i).getId())) {
+                                newBeforeSortValue = list.get(i).getOrder();
+                            }
+                            if (beforeId.equals(list.get(i).getId())) {
+                                newAfterSortValue = list.get(i).getOrder();
+                            }
+                        }
+                        newSortValue = (newBeforeSortValue + newAfterSortValue) / 2;
+                        updateBatchById(list);
+                        return lambdaUpdate().set(ViewPermission::getOrder, newSortValue).eq(ViewPermission::getId, id).update();
+                    } else {
+                        // 正常值，保存到数据库。
+                        return lambdaUpdate().set(ViewPermission::getOrder, newSortValue).eq(ViewPermission::getId, id).update();
+                    }
+                } else {
+                    // todo 异常
+                    return false;
                 }
+            }
             default:
                 return false;
         }

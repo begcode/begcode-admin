@@ -74,12 +74,10 @@ public class SmsTemplateQueryService implements QueryService<SmsTemplate> {
     public IPage<SmsTemplateDTO> findByCriteria(SmsTemplateCriteria criteria, Page<SmsTemplate> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<SmsTemplate> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, SmsTemplate.class, page)
-            .convert(smsTemplate -> {
-                Binder.bindRelations(smsTemplate, new String[] {});
-                return smsTemplateMapper.toDto(smsTemplate);
-            });
+        return Binder.joinQueryPage(queryWrapper, SmsTemplate.class, page).convert(smsTemplate -> {
+            Binder.bindRelations(smsTemplate, new String[] {});
+            return smsTemplateMapper.toDto(smsTemplate);
+        });
     }
 
     /**

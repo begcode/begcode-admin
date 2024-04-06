@@ -1,5 +1,7 @@
 package com.begcode.monolith.taskjob.web.rest;
 
+import static com.begcode.monolith.taskjob.domain.TaskJobConfigAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -12,12 +14,10 @@ import com.begcode.monolith.taskjob.domain.TaskJobConfig;
 import com.begcode.monolith.taskjob.repository.TaskJobConfigRepository;
 import com.begcode.monolith.taskjob.service.dto.TaskJobConfigDTO;
 import com.begcode.monolith.taskjob.service.mapper.TaskJobConfigMapper;
-import com.begcode.monolith.web.rest.TestUtil;
-import com.begcode.monolith.web.rest.TestUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,8 +70,11 @@ public class TaskJobConfigResourceIT {
     private static final String ENTITY_API_URL = "/api/task-job-configs";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private TaskJobConfigRepository taskJobConfigRepository;
@@ -134,29 +137,23 @@ public class TaskJobConfigResourceIT {
     @Test
     @Transactional
     void createTaskJobConfig() throws Exception {
-        int databaseSizeBeforeCreate = taskJobConfigRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the TaskJobConfig
         TaskJobConfigDTO taskJobConfigDTO = taskJobConfigMapper.toDto(taskJobConfig);
-        restTaskJobConfigMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(taskJobConfigDTO))
-            )
-            .andExpect(status().isCreated());
+        var returnedTaskJobConfigDTO = om.readValue(
+            restTaskJobConfigMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(taskJobConfigDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            TaskJobConfigDTO.class
+        );
 
         // Validate the TaskJobConfig in the database
-        List<TaskJobConfig> taskJobConfigList = taskJobConfigRepository.findAll();
-        assertThat(taskJobConfigList).hasSize(databaseSizeBeforeCreate + 1);
-        TaskJobConfig testTaskJobConfig = taskJobConfigList.get(taskJobConfigList.size() - 1);
-        assertThat(testTaskJobConfig.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testTaskJobConfig.getJobClassName()).isEqualTo(DEFAULT_JOB_CLASS_NAME);
-        assertThat(testTaskJobConfig.getCronExpression()).isEqualTo(DEFAULT_CRON_EXPRESSION);
-        assertThat(testTaskJobConfig.getParameter()).isEqualTo(DEFAULT_PARAMETER);
-        assertThat(testTaskJobConfig.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
-        assertThat(testTaskJobConfig.getJobStatus()).isEqualTo(DEFAULT_JOB_STATUS);
-        assertThat(testTaskJobConfig.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY);
-        assertThat(testTaskJobConfig.getCreatedDate()).isEqualTo(DEFAULT_CREATED_DATE);
-        assertThat(testTaskJobConfig.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
-        assertThat(testTaskJobConfig.getLastModifiedDate()).isEqualTo(DEFAULT_LAST_MODIFIED_DATE);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedTaskJobConfig = taskJobConfigMapper.toEntity(returnedTaskJobConfigDTO);
+        assertTaskJobConfigUpdatableFieldsEquals(returnedTaskJobConfig, getPersistedTaskJobConfig(returnedTaskJobConfig));
     }
 
     @Test
@@ -166,18 +163,15 @@ public class TaskJobConfigResourceIT {
         taskJobConfig.setId(1L);
         TaskJobConfigDTO taskJobConfigDTO = taskJobConfigMapper.toDto(taskJobConfig);
 
-        int databaseSizeBeforeCreate = taskJobConfigRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restTaskJobConfigMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(taskJobConfigDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(taskJobConfigDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the TaskJobConfig in the database
-        List<TaskJobConfig> taskJobConfigList = taskJobConfigRepository.findAll();
-        assertThat(taskJobConfigList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
@@ -236,14 +230,11 @@ public class TaskJobConfigResourceIT {
 
         Long id = taskJobConfig.getId();
 
-        defaultTaskJobConfigShouldBeFound("id.equals=" + id);
-        defaultTaskJobConfigShouldNotBeFound("id.notEquals=" + id);
+        defaultTaskJobConfigFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultTaskJobConfigShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultTaskJobConfigShouldNotBeFound("id.greaterThan=" + id);
+        defaultTaskJobConfigFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultTaskJobConfigShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultTaskJobConfigShouldNotBeFound("id.lessThan=" + id);
+        defaultTaskJobConfigFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -252,11 +243,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where name equals to DEFAULT_NAME
-        defaultTaskJobConfigShouldBeFound("name.equals=" + DEFAULT_NAME);
-
-        // Get all the taskJobConfigList where name equals to UPDATED_NAME
-        defaultTaskJobConfigShouldNotBeFound("name.equals=" + UPDATED_NAME);
+        // Get all the taskJobConfigList where name equals to
+        defaultTaskJobConfigFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
     }
 
     @Test
@@ -265,11 +253,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where name in DEFAULT_NAME or UPDATED_NAME
-        defaultTaskJobConfigShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
-
-        // Get all the taskJobConfigList where name equals to UPDATED_NAME
-        defaultTaskJobConfigShouldNotBeFound("name.in=" + UPDATED_NAME);
+        // Get all the taskJobConfigList where name in
+        defaultTaskJobConfigFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
     }
 
     @Test
@@ -279,10 +264,7 @@ public class TaskJobConfigResourceIT {
         taskJobConfigRepository.save(taskJobConfig);
 
         // Get all the taskJobConfigList where name is not null
-        defaultTaskJobConfigShouldBeFound("name.specified=true");
-
-        // Get all the taskJobConfigList where name is null
-        defaultTaskJobConfigShouldNotBeFound("name.specified=false");
+        defaultTaskJobConfigFiltering("name.specified=true", "name.specified=false");
     }
 
     @Test
@@ -291,11 +273,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where name contains DEFAULT_NAME
-        defaultTaskJobConfigShouldBeFound("name.contains=" + DEFAULT_NAME);
-
-        // Get all the taskJobConfigList where name contains UPDATED_NAME
-        defaultTaskJobConfigShouldNotBeFound("name.contains=" + UPDATED_NAME);
+        // Get all the taskJobConfigList where name contains
+        defaultTaskJobConfigFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
     }
 
     @Test
@@ -304,11 +283,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where name does not contain DEFAULT_NAME
-        defaultTaskJobConfigShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
-
-        // Get all the taskJobConfigList where name does not contain UPDATED_NAME
-        defaultTaskJobConfigShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+        // Get all the taskJobConfigList where name does not contain
+        defaultTaskJobConfigFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
     }
 
     @Test
@@ -317,11 +293,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where jobClassName equals to DEFAULT_JOB_CLASS_NAME
-        defaultTaskJobConfigShouldBeFound("jobClassName.equals=" + DEFAULT_JOB_CLASS_NAME);
-
-        // Get all the taskJobConfigList where jobClassName equals to UPDATED_JOB_CLASS_NAME
-        defaultTaskJobConfigShouldNotBeFound("jobClassName.equals=" + UPDATED_JOB_CLASS_NAME);
+        // Get all the taskJobConfigList where jobClassName equals to
+        defaultTaskJobConfigFiltering("jobClassName.equals=" + DEFAULT_JOB_CLASS_NAME, "jobClassName.equals=" + UPDATED_JOB_CLASS_NAME);
     }
 
     @Test
@@ -330,11 +303,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where jobClassName in DEFAULT_JOB_CLASS_NAME or UPDATED_JOB_CLASS_NAME
-        defaultTaskJobConfigShouldBeFound("jobClassName.in=" + DEFAULT_JOB_CLASS_NAME + "," + UPDATED_JOB_CLASS_NAME);
-
-        // Get all the taskJobConfigList where jobClassName equals to UPDATED_JOB_CLASS_NAME
-        defaultTaskJobConfigShouldNotBeFound("jobClassName.in=" + UPDATED_JOB_CLASS_NAME);
+        // Get all the taskJobConfigList where jobClassName in
+        defaultTaskJobConfigFiltering(
+            "jobClassName.in=" + DEFAULT_JOB_CLASS_NAME + "," + UPDATED_JOB_CLASS_NAME,
+            "jobClassName.in=" + UPDATED_JOB_CLASS_NAME
+        );
     }
 
     @Test
@@ -344,10 +317,7 @@ public class TaskJobConfigResourceIT {
         taskJobConfigRepository.save(taskJobConfig);
 
         // Get all the taskJobConfigList where jobClassName is not null
-        defaultTaskJobConfigShouldBeFound("jobClassName.specified=true");
-
-        // Get all the taskJobConfigList where jobClassName is null
-        defaultTaskJobConfigShouldNotBeFound("jobClassName.specified=false");
+        defaultTaskJobConfigFiltering("jobClassName.specified=true", "jobClassName.specified=false");
     }
 
     @Test
@@ -356,11 +326,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where jobClassName contains DEFAULT_JOB_CLASS_NAME
-        defaultTaskJobConfigShouldBeFound("jobClassName.contains=" + DEFAULT_JOB_CLASS_NAME);
-
-        // Get all the taskJobConfigList where jobClassName contains UPDATED_JOB_CLASS_NAME
-        defaultTaskJobConfigShouldNotBeFound("jobClassName.contains=" + UPDATED_JOB_CLASS_NAME);
+        // Get all the taskJobConfigList where jobClassName contains
+        defaultTaskJobConfigFiltering("jobClassName.contains=" + DEFAULT_JOB_CLASS_NAME, "jobClassName.contains=" + UPDATED_JOB_CLASS_NAME);
     }
 
     @Test
@@ -369,11 +336,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where jobClassName does not contain DEFAULT_JOB_CLASS_NAME
-        defaultTaskJobConfigShouldNotBeFound("jobClassName.doesNotContain=" + DEFAULT_JOB_CLASS_NAME);
-
-        // Get all the taskJobConfigList where jobClassName does not contain UPDATED_JOB_CLASS_NAME
-        defaultTaskJobConfigShouldBeFound("jobClassName.doesNotContain=" + UPDATED_JOB_CLASS_NAME);
+        // Get all the taskJobConfigList where jobClassName does not contain
+        defaultTaskJobConfigFiltering(
+            "jobClassName.doesNotContain=" + UPDATED_JOB_CLASS_NAME,
+            "jobClassName.doesNotContain=" + DEFAULT_JOB_CLASS_NAME
+        );
     }
 
     @Test
@@ -382,11 +349,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where cronExpression equals to DEFAULT_CRON_EXPRESSION
-        defaultTaskJobConfigShouldBeFound("cronExpression.equals=" + DEFAULT_CRON_EXPRESSION);
-
-        // Get all the taskJobConfigList where cronExpression equals to UPDATED_CRON_EXPRESSION
-        defaultTaskJobConfigShouldNotBeFound("cronExpression.equals=" + UPDATED_CRON_EXPRESSION);
+        // Get all the taskJobConfigList where cronExpression equals to
+        defaultTaskJobConfigFiltering(
+            "cronExpression.equals=" + DEFAULT_CRON_EXPRESSION,
+            "cronExpression.equals=" + UPDATED_CRON_EXPRESSION
+        );
     }
 
     @Test
@@ -395,11 +362,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where cronExpression in DEFAULT_CRON_EXPRESSION or UPDATED_CRON_EXPRESSION
-        defaultTaskJobConfigShouldBeFound("cronExpression.in=" + DEFAULT_CRON_EXPRESSION + "," + UPDATED_CRON_EXPRESSION);
-
-        // Get all the taskJobConfigList where cronExpression equals to UPDATED_CRON_EXPRESSION
-        defaultTaskJobConfigShouldNotBeFound("cronExpression.in=" + UPDATED_CRON_EXPRESSION);
+        // Get all the taskJobConfigList where cronExpression in
+        defaultTaskJobConfigFiltering(
+            "cronExpression.in=" + DEFAULT_CRON_EXPRESSION + "," + UPDATED_CRON_EXPRESSION,
+            "cronExpression.in=" + UPDATED_CRON_EXPRESSION
+        );
     }
 
     @Test
@@ -409,10 +376,7 @@ public class TaskJobConfigResourceIT {
         taskJobConfigRepository.save(taskJobConfig);
 
         // Get all the taskJobConfigList where cronExpression is not null
-        defaultTaskJobConfigShouldBeFound("cronExpression.specified=true");
-
-        // Get all the taskJobConfigList where cronExpression is null
-        defaultTaskJobConfigShouldNotBeFound("cronExpression.specified=false");
+        defaultTaskJobConfigFiltering("cronExpression.specified=true", "cronExpression.specified=false");
     }
 
     @Test
@@ -421,11 +385,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where cronExpression contains DEFAULT_CRON_EXPRESSION
-        defaultTaskJobConfigShouldBeFound("cronExpression.contains=" + DEFAULT_CRON_EXPRESSION);
-
-        // Get all the taskJobConfigList where cronExpression contains UPDATED_CRON_EXPRESSION
-        defaultTaskJobConfigShouldNotBeFound("cronExpression.contains=" + UPDATED_CRON_EXPRESSION);
+        // Get all the taskJobConfigList where cronExpression contains
+        defaultTaskJobConfigFiltering(
+            "cronExpression.contains=" + DEFAULT_CRON_EXPRESSION,
+            "cronExpression.contains=" + UPDATED_CRON_EXPRESSION
+        );
     }
 
     @Test
@@ -434,11 +398,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where cronExpression does not contain DEFAULT_CRON_EXPRESSION
-        defaultTaskJobConfigShouldNotBeFound("cronExpression.doesNotContain=" + DEFAULT_CRON_EXPRESSION);
-
-        // Get all the taskJobConfigList where cronExpression does not contain UPDATED_CRON_EXPRESSION
-        defaultTaskJobConfigShouldBeFound("cronExpression.doesNotContain=" + UPDATED_CRON_EXPRESSION);
+        // Get all the taskJobConfigList where cronExpression does not contain
+        defaultTaskJobConfigFiltering(
+            "cronExpression.doesNotContain=" + UPDATED_CRON_EXPRESSION,
+            "cronExpression.doesNotContain=" + DEFAULT_CRON_EXPRESSION
+        );
     }
 
     @Test
@@ -447,11 +411,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where parameter equals to DEFAULT_PARAMETER
-        defaultTaskJobConfigShouldBeFound("parameter.equals=" + DEFAULT_PARAMETER);
-
-        // Get all the taskJobConfigList where parameter equals to UPDATED_PARAMETER
-        defaultTaskJobConfigShouldNotBeFound("parameter.equals=" + UPDATED_PARAMETER);
+        // Get all the taskJobConfigList where parameter equals to
+        defaultTaskJobConfigFiltering("parameter.equals=" + DEFAULT_PARAMETER, "parameter.equals=" + UPDATED_PARAMETER);
     }
 
     @Test
@@ -460,11 +421,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where parameter in DEFAULT_PARAMETER or UPDATED_PARAMETER
-        defaultTaskJobConfigShouldBeFound("parameter.in=" + DEFAULT_PARAMETER + "," + UPDATED_PARAMETER);
-
-        // Get all the taskJobConfigList where parameter equals to UPDATED_PARAMETER
-        defaultTaskJobConfigShouldNotBeFound("parameter.in=" + UPDATED_PARAMETER);
+        // Get all the taskJobConfigList where parameter in
+        defaultTaskJobConfigFiltering("parameter.in=" + DEFAULT_PARAMETER + "," + UPDATED_PARAMETER, "parameter.in=" + UPDATED_PARAMETER);
     }
 
     @Test
@@ -474,10 +432,7 @@ public class TaskJobConfigResourceIT {
         taskJobConfigRepository.save(taskJobConfig);
 
         // Get all the taskJobConfigList where parameter is not null
-        defaultTaskJobConfigShouldBeFound("parameter.specified=true");
-
-        // Get all the taskJobConfigList where parameter is null
-        defaultTaskJobConfigShouldNotBeFound("parameter.specified=false");
+        defaultTaskJobConfigFiltering("parameter.specified=true", "parameter.specified=false");
     }
 
     @Test
@@ -486,11 +441,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where parameter contains DEFAULT_PARAMETER
-        defaultTaskJobConfigShouldBeFound("parameter.contains=" + DEFAULT_PARAMETER);
-
-        // Get all the taskJobConfigList where parameter contains UPDATED_PARAMETER
-        defaultTaskJobConfigShouldNotBeFound("parameter.contains=" + UPDATED_PARAMETER);
+        // Get all the taskJobConfigList where parameter contains
+        defaultTaskJobConfigFiltering("parameter.contains=" + DEFAULT_PARAMETER, "parameter.contains=" + UPDATED_PARAMETER);
     }
 
     @Test
@@ -499,11 +451,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where parameter does not contain DEFAULT_PARAMETER
-        defaultTaskJobConfigShouldNotBeFound("parameter.doesNotContain=" + DEFAULT_PARAMETER);
-
-        // Get all the taskJobConfigList where parameter does not contain UPDATED_PARAMETER
-        defaultTaskJobConfigShouldBeFound("parameter.doesNotContain=" + UPDATED_PARAMETER);
+        // Get all the taskJobConfigList where parameter does not contain
+        defaultTaskJobConfigFiltering("parameter.doesNotContain=" + UPDATED_PARAMETER, "parameter.doesNotContain=" + DEFAULT_PARAMETER);
     }
 
     @Test
@@ -512,11 +461,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where description equals to DEFAULT_DESCRIPTION
-        defaultTaskJobConfigShouldBeFound("description.equals=" + DEFAULT_DESCRIPTION);
-
-        // Get all the taskJobConfigList where description equals to UPDATED_DESCRIPTION
-        defaultTaskJobConfigShouldNotBeFound("description.equals=" + UPDATED_DESCRIPTION);
+        // Get all the taskJobConfigList where description equals to
+        defaultTaskJobConfigFiltering("description.equals=" + DEFAULT_DESCRIPTION, "description.equals=" + UPDATED_DESCRIPTION);
     }
 
     @Test
@@ -525,11 +471,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where description in DEFAULT_DESCRIPTION or UPDATED_DESCRIPTION
-        defaultTaskJobConfigShouldBeFound("description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION);
-
-        // Get all the taskJobConfigList where description equals to UPDATED_DESCRIPTION
-        defaultTaskJobConfigShouldNotBeFound("description.in=" + UPDATED_DESCRIPTION);
+        // Get all the taskJobConfigList where description in
+        defaultTaskJobConfigFiltering(
+            "description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION,
+            "description.in=" + UPDATED_DESCRIPTION
+        );
     }
 
     @Test
@@ -539,10 +485,7 @@ public class TaskJobConfigResourceIT {
         taskJobConfigRepository.save(taskJobConfig);
 
         // Get all the taskJobConfigList where description is not null
-        defaultTaskJobConfigShouldBeFound("description.specified=true");
-
-        // Get all the taskJobConfigList where description is null
-        defaultTaskJobConfigShouldNotBeFound("description.specified=false");
+        defaultTaskJobConfigFiltering("description.specified=true", "description.specified=false");
     }
 
     @Test
@@ -551,11 +494,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where description contains DEFAULT_DESCRIPTION
-        defaultTaskJobConfigShouldBeFound("description.contains=" + DEFAULT_DESCRIPTION);
-
-        // Get all the taskJobConfigList where description contains UPDATED_DESCRIPTION
-        defaultTaskJobConfigShouldNotBeFound("description.contains=" + UPDATED_DESCRIPTION);
+        // Get all the taskJobConfigList where description contains
+        defaultTaskJobConfigFiltering("description.contains=" + DEFAULT_DESCRIPTION, "description.contains=" + UPDATED_DESCRIPTION);
     }
 
     @Test
@@ -564,11 +504,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where description does not contain DEFAULT_DESCRIPTION
-        defaultTaskJobConfigShouldNotBeFound("description.doesNotContain=" + DEFAULT_DESCRIPTION);
-
-        // Get all the taskJobConfigList where description does not contain UPDATED_DESCRIPTION
-        defaultTaskJobConfigShouldBeFound("description.doesNotContain=" + UPDATED_DESCRIPTION);
+        // Get all the taskJobConfigList where description does not contain
+        defaultTaskJobConfigFiltering(
+            "description.doesNotContain=" + UPDATED_DESCRIPTION,
+            "description.doesNotContain=" + DEFAULT_DESCRIPTION
+        );
     }
 
     @Test
@@ -577,11 +517,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where jobStatus equals to DEFAULT_JOB_STATUS
-        defaultTaskJobConfigShouldBeFound("jobStatus.equals=" + DEFAULT_JOB_STATUS);
-
-        // Get all the taskJobConfigList where jobStatus equals to UPDATED_JOB_STATUS
-        defaultTaskJobConfigShouldNotBeFound("jobStatus.equals=" + UPDATED_JOB_STATUS);
+        // Get all the taskJobConfigList where jobStatus equals to
+        defaultTaskJobConfigFiltering("jobStatus.equals=" + DEFAULT_JOB_STATUS, "jobStatus.equals=" + UPDATED_JOB_STATUS);
     }
 
     @Test
@@ -590,11 +527,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where jobStatus in DEFAULT_JOB_STATUS or UPDATED_JOB_STATUS
-        defaultTaskJobConfigShouldBeFound("jobStatus.in=" + DEFAULT_JOB_STATUS + "," + UPDATED_JOB_STATUS);
-
-        // Get all the taskJobConfigList where jobStatus equals to UPDATED_JOB_STATUS
-        defaultTaskJobConfigShouldNotBeFound("jobStatus.in=" + UPDATED_JOB_STATUS);
+        // Get all the taskJobConfigList where jobStatus in
+        defaultTaskJobConfigFiltering(
+            "jobStatus.in=" + DEFAULT_JOB_STATUS + "," + UPDATED_JOB_STATUS,
+            "jobStatus.in=" + UPDATED_JOB_STATUS
+        );
     }
 
     @Test
@@ -604,10 +541,7 @@ public class TaskJobConfigResourceIT {
         taskJobConfigRepository.save(taskJobConfig);
 
         // Get all the taskJobConfigList where jobStatus is not null
-        defaultTaskJobConfigShouldBeFound("jobStatus.specified=true");
-
-        // Get all the taskJobConfigList where jobStatus is null
-        defaultTaskJobConfigShouldNotBeFound("jobStatus.specified=false");
+        defaultTaskJobConfigFiltering("jobStatus.specified=true", "jobStatus.specified=false");
     }
 
     @Test
@@ -616,11 +550,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where createdBy equals to DEFAULT_CREATED_BY
-        defaultTaskJobConfigShouldBeFound("createdBy.equals=" + DEFAULT_CREATED_BY);
-
-        // Get all the taskJobConfigList where createdBy equals to UPDATED_CREATED_BY
-        defaultTaskJobConfigShouldNotBeFound("createdBy.equals=" + UPDATED_CREATED_BY);
+        // Get all the taskJobConfigList where createdBy equals to
+        defaultTaskJobConfigFiltering("createdBy.equals=" + DEFAULT_CREATED_BY, "createdBy.equals=" + UPDATED_CREATED_BY);
     }
 
     @Test
@@ -629,11 +560,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where createdBy in DEFAULT_CREATED_BY or UPDATED_CREATED_BY
-        defaultTaskJobConfigShouldBeFound("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY);
-
-        // Get all the taskJobConfigList where createdBy equals to UPDATED_CREATED_BY
-        defaultTaskJobConfigShouldNotBeFound("createdBy.in=" + UPDATED_CREATED_BY);
+        // Get all the taskJobConfigList where createdBy in
+        defaultTaskJobConfigFiltering(
+            "createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY,
+            "createdBy.in=" + UPDATED_CREATED_BY
+        );
     }
 
     @Test
@@ -643,10 +574,7 @@ public class TaskJobConfigResourceIT {
         taskJobConfigRepository.save(taskJobConfig);
 
         // Get all the taskJobConfigList where createdBy is not null
-        defaultTaskJobConfigShouldBeFound("createdBy.specified=true");
-
-        // Get all the taskJobConfigList where createdBy is null
-        defaultTaskJobConfigShouldNotBeFound("createdBy.specified=false");
+        defaultTaskJobConfigFiltering("createdBy.specified=true", "createdBy.specified=false");
     }
 
     @Test
@@ -655,11 +583,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where createdBy is greater than or equal to DEFAULT_CREATED_BY
-        defaultTaskJobConfigShouldBeFound("createdBy.greaterThanOrEqual=" + DEFAULT_CREATED_BY);
-
-        // Get all the taskJobConfigList where createdBy is greater than or equal to UPDATED_CREATED_BY
-        defaultTaskJobConfigShouldNotBeFound("createdBy.greaterThanOrEqual=" + UPDATED_CREATED_BY);
+        // Get all the taskJobConfigList where createdBy is greater than or equal to
+        defaultTaskJobConfigFiltering(
+            "createdBy.greaterThanOrEqual=" + DEFAULT_CREATED_BY,
+            "createdBy.greaterThanOrEqual=" + UPDATED_CREATED_BY
+        );
     }
 
     @Test
@@ -668,11 +596,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where createdBy is less than or equal to DEFAULT_CREATED_BY
-        defaultTaskJobConfigShouldBeFound("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY);
-
-        // Get all the taskJobConfigList where createdBy is less than or equal to SMALLER_CREATED_BY
-        defaultTaskJobConfigShouldNotBeFound("createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
+        // Get all the taskJobConfigList where createdBy is less than or equal to
+        defaultTaskJobConfigFiltering("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
     }
 
     @Test
@@ -681,11 +606,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where createdBy is less than DEFAULT_CREATED_BY
-        defaultTaskJobConfigShouldNotBeFound("createdBy.lessThan=" + DEFAULT_CREATED_BY);
-
-        // Get all the taskJobConfigList where createdBy is less than UPDATED_CREATED_BY
-        defaultTaskJobConfigShouldBeFound("createdBy.lessThan=" + UPDATED_CREATED_BY);
+        // Get all the taskJobConfigList where createdBy is less than
+        defaultTaskJobConfigFiltering("createdBy.lessThan=" + UPDATED_CREATED_BY, "createdBy.lessThan=" + DEFAULT_CREATED_BY);
     }
 
     @Test
@@ -694,11 +616,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where createdBy is greater than DEFAULT_CREATED_BY
-        defaultTaskJobConfigShouldNotBeFound("createdBy.greaterThan=" + DEFAULT_CREATED_BY);
-
-        // Get all the taskJobConfigList where createdBy is greater than SMALLER_CREATED_BY
-        defaultTaskJobConfigShouldBeFound("createdBy.greaterThan=" + SMALLER_CREATED_BY);
+        // Get all the taskJobConfigList where createdBy is greater than
+        defaultTaskJobConfigFiltering("createdBy.greaterThan=" + SMALLER_CREATED_BY, "createdBy.greaterThan=" + DEFAULT_CREATED_BY);
     }
 
     @Test
@@ -707,11 +626,8 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where createdDate equals to DEFAULT_CREATED_DATE
-        defaultTaskJobConfigShouldBeFound("createdDate.equals=" + DEFAULT_CREATED_DATE);
-
-        // Get all the taskJobConfigList where createdDate equals to UPDATED_CREATED_DATE
-        defaultTaskJobConfigShouldNotBeFound("createdDate.equals=" + UPDATED_CREATED_DATE);
+        // Get all the taskJobConfigList where createdDate equals to
+        defaultTaskJobConfigFiltering("createdDate.equals=" + DEFAULT_CREATED_DATE, "createdDate.equals=" + UPDATED_CREATED_DATE);
     }
 
     @Test
@@ -720,11 +636,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where createdDate in DEFAULT_CREATED_DATE or UPDATED_CREATED_DATE
-        defaultTaskJobConfigShouldBeFound("createdDate.in=" + DEFAULT_CREATED_DATE + "," + UPDATED_CREATED_DATE);
-
-        // Get all the taskJobConfigList where createdDate equals to UPDATED_CREATED_DATE
-        defaultTaskJobConfigShouldNotBeFound("createdDate.in=" + UPDATED_CREATED_DATE);
+        // Get all the taskJobConfigList where createdDate in
+        defaultTaskJobConfigFiltering(
+            "createdDate.in=" + DEFAULT_CREATED_DATE + "," + UPDATED_CREATED_DATE,
+            "createdDate.in=" + UPDATED_CREATED_DATE
+        );
     }
 
     @Test
@@ -734,10 +650,7 @@ public class TaskJobConfigResourceIT {
         taskJobConfigRepository.save(taskJobConfig);
 
         // Get all the taskJobConfigList where createdDate is not null
-        defaultTaskJobConfigShouldBeFound("createdDate.specified=true");
-
-        // Get all the taskJobConfigList where createdDate is null
-        defaultTaskJobConfigShouldNotBeFound("createdDate.specified=false");
+        defaultTaskJobConfigFiltering("createdDate.specified=true", "createdDate.specified=false");
     }
 
     @Test
@@ -746,11 +659,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where lastModifiedBy equals to DEFAULT_LAST_MODIFIED_BY
-        defaultTaskJobConfigShouldBeFound("lastModifiedBy.equals=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the taskJobConfigList where lastModifiedBy equals to UPDATED_LAST_MODIFIED_BY
-        defaultTaskJobConfigShouldNotBeFound("lastModifiedBy.equals=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the taskJobConfigList where lastModifiedBy equals to
+        defaultTaskJobConfigFiltering(
+            "lastModifiedBy.equals=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.equals=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -759,11 +672,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where lastModifiedBy in DEFAULT_LAST_MODIFIED_BY or UPDATED_LAST_MODIFIED_BY
-        defaultTaskJobConfigShouldBeFound("lastModifiedBy.in=" + DEFAULT_LAST_MODIFIED_BY + "," + UPDATED_LAST_MODIFIED_BY);
-
-        // Get all the taskJobConfigList where lastModifiedBy equals to UPDATED_LAST_MODIFIED_BY
-        defaultTaskJobConfigShouldNotBeFound("lastModifiedBy.in=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the taskJobConfigList where lastModifiedBy in
+        defaultTaskJobConfigFiltering(
+            "lastModifiedBy.in=" + DEFAULT_LAST_MODIFIED_BY + "," + UPDATED_LAST_MODIFIED_BY,
+            "lastModifiedBy.in=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -773,10 +686,7 @@ public class TaskJobConfigResourceIT {
         taskJobConfigRepository.save(taskJobConfig);
 
         // Get all the taskJobConfigList where lastModifiedBy is not null
-        defaultTaskJobConfigShouldBeFound("lastModifiedBy.specified=true");
-
-        // Get all the taskJobConfigList where lastModifiedBy is null
-        defaultTaskJobConfigShouldNotBeFound("lastModifiedBy.specified=false");
+        defaultTaskJobConfigFiltering("lastModifiedBy.specified=true", "lastModifiedBy.specified=false");
     }
 
     @Test
@@ -785,11 +695,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where lastModifiedBy is greater than or equal to DEFAULT_LAST_MODIFIED_BY
-        defaultTaskJobConfigShouldBeFound("lastModifiedBy.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the taskJobConfigList where lastModifiedBy is greater than or equal to UPDATED_LAST_MODIFIED_BY
-        defaultTaskJobConfigShouldNotBeFound("lastModifiedBy.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the taskJobConfigList where lastModifiedBy is greater than or equal to
+        defaultTaskJobConfigFiltering(
+            "lastModifiedBy.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -798,11 +708,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where lastModifiedBy is less than or equal to DEFAULT_LAST_MODIFIED_BY
-        defaultTaskJobConfigShouldBeFound("lastModifiedBy.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the taskJobConfigList where lastModifiedBy is less than or equal to SMALLER_LAST_MODIFIED_BY
-        defaultTaskJobConfigShouldNotBeFound("lastModifiedBy.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_BY);
+        // Get all the taskJobConfigList where lastModifiedBy is less than or equal to
+        defaultTaskJobConfigFiltering(
+            "lastModifiedBy.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -811,11 +721,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where lastModifiedBy is less than DEFAULT_LAST_MODIFIED_BY
-        defaultTaskJobConfigShouldNotBeFound("lastModifiedBy.lessThan=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the taskJobConfigList where lastModifiedBy is less than UPDATED_LAST_MODIFIED_BY
-        defaultTaskJobConfigShouldBeFound("lastModifiedBy.lessThan=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the taskJobConfigList where lastModifiedBy is less than
+        defaultTaskJobConfigFiltering(
+            "lastModifiedBy.lessThan=" + UPDATED_LAST_MODIFIED_BY,
+            "lastModifiedBy.lessThan=" + DEFAULT_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -824,11 +734,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where lastModifiedBy is greater than DEFAULT_LAST_MODIFIED_BY
-        defaultTaskJobConfigShouldNotBeFound("lastModifiedBy.greaterThan=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the taskJobConfigList where lastModifiedBy is greater than SMALLER_LAST_MODIFIED_BY
-        defaultTaskJobConfigShouldBeFound("lastModifiedBy.greaterThan=" + SMALLER_LAST_MODIFIED_BY);
+        // Get all the taskJobConfigList where lastModifiedBy is greater than
+        defaultTaskJobConfigFiltering(
+            "lastModifiedBy.greaterThan=" + SMALLER_LAST_MODIFIED_BY,
+            "lastModifiedBy.greaterThan=" + DEFAULT_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -837,11 +747,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where lastModifiedDate equals to DEFAULT_LAST_MODIFIED_DATE
-        defaultTaskJobConfigShouldBeFound("lastModifiedDate.equals=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the taskJobConfigList where lastModifiedDate equals to UPDATED_LAST_MODIFIED_DATE
-        defaultTaskJobConfigShouldNotBeFound("lastModifiedDate.equals=" + UPDATED_LAST_MODIFIED_DATE);
+        // Get all the taskJobConfigList where lastModifiedDate equals to
+        defaultTaskJobConfigFiltering(
+            "lastModifiedDate.equals=" + DEFAULT_LAST_MODIFIED_DATE,
+            "lastModifiedDate.equals=" + UPDATED_LAST_MODIFIED_DATE
+        );
     }
 
     @Test
@@ -850,11 +760,11 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        // Get all the taskJobConfigList where lastModifiedDate in DEFAULT_LAST_MODIFIED_DATE or UPDATED_LAST_MODIFIED_DATE
-        defaultTaskJobConfigShouldBeFound("lastModifiedDate.in=" + DEFAULT_LAST_MODIFIED_DATE + "," + UPDATED_LAST_MODIFIED_DATE);
-
-        // Get all the taskJobConfigList where lastModifiedDate equals to UPDATED_LAST_MODIFIED_DATE
-        defaultTaskJobConfigShouldNotBeFound("lastModifiedDate.in=" + UPDATED_LAST_MODIFIED_DATE);
+        // Get all the taskJobConfigList where lastModifiedDate in
+        defaultTaskJobConfigFiltering(
+            "lastModifiedDate.in=" + DEFAULT_LAST_MODIFIED_DATE + "," + UPDATED_LAST_MODIFIED_DATE,
+            "lastModifiedDate.in=" + UPDATED_LAST_MODIFIED_DATE
+        );
     }
 
     @Test
@@ -864,10 +774,12 @@ public class TaskJobConfigResourceIT {
         taskJobConfigRepository.save(taskJobConfig);
 
         // Get all the taskJobConfigList where lastModifiedDate is not null
-        defaultTaskJobConfigShouldBeFound("lastModifiedDate.specified=true");
+        defaultTaskJobConfigFiltering("lastModifiedDate.specified=true", "lastModifiedDate.specified=false");
+    }
 
-        // Get all the taskJobConfigList where lastModifiedDate is null
-        defaultTaskJobConfigShouldNotBeFound("lastModifiedDate.specified=false");
+    private void defaultTaskJobConfigFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultTaskJobConfigShouldBeFound(shouldBeFound);
+        defaultTaskJobConfigShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -930,7 +842,7 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        int databaseSizeBeforeUpdate = taskJobConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the taskJobConfig
         TaskJobConfig updatedTaskJobConfig = taskJobConfigRepository.findById(taskJobConfig.getId()).orElseThrow();
@@ -951,30 +863,19 @@ public class TaskJobConfigResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, taskJobConfigDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(taskJobConfigDTO))
+                    .content(om.writeValueAsBytes(taskJobConfigDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the TaskJobConfig in the database
-        List<TaskJobConfig> taskJobConfigList = taskJobConfigRepository.findAll();
-        assertThat(taskJobConfigList).hasSize(databaseSizeBeforeUpdate);
-        TaskJobConfig testTaskJobConfig = taskJobConfigList.get(taskJobConfigList.size() - 1);
-        assertThat(testTaskJobConfig.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testTaskJobConfig.getJobClassName()).isEqualTo(UPDATED_JOB_CLASS_NAME);
-        assertThat(testTaskJobConfig.getCronExpression()).isEqualTo(UPDATED_CRON_EXPRESSION);
-        assertThat(testTaskJobConfig.getParameter()).isEqualTo(UPDATED_PARAMETER);
-        assertThat(testTaskJobConfig.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-        assertThat(testTaskJobConfig.getJobStatus()).isEqualTo(UPDATED_JOB_STATUS);
-        assertThat(testTaskJobConfig.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testTaskJobConfig.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testTaskJobConfig.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testTaskJobConfig.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedTaskJobConfigToMatchAllProperties(updatedTaskJobConfig);
     }
 
     @Test
     @Transactional
     void putNonExistingTaskJobConfig() throws Exception {
-        int databaseSizeBeforeUpdate = taskJobConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         taskJobConfig.setId(longCount.incrementAndGet());
 
         // Create the TaskJobConfig
@@ -985,19 +886,18 @@ public class TaskJobConfigResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, taskJobConfigDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(taskJobConfigDTO))
+                    .content(om.writeValueAsBytes(taskJobConfigDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the TaskJobConfig in the database
-        List<TaskJobConfig> taskJobConfigList = taskJobConfigRepository.findAll();
-        assertThat(taskJobConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchTaskJobConfig() throws Exception {
-        int databaseSizeBeforeUpdate = taskJobConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         taskJobConfig.setId(longCount.incrementAndGet());
 
         // Create the TaskJobConfig
@@ -1008,19 +908,18 @@ public class TaskJobConfigResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(taskJobConfigDTO))
+                    .content(om.writeValueAsBytes(taskJobConfigDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the TaskJobConfig in the database
-        List<TaskJobConfig> taskJobConfigList = taskJobConfigRepository.findAll();
-        assertThat(taskJobConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamTaskJobConfig() throws Exception {
-        int databaseSizeBeforeUpdate = taskJobConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         taskJobConfig.setId(longCount.incrementAndGet());
 
         // Create the TaskJobConfig
@@ -1028,14 +927,11 @@ public class TaskJobConfigResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTaskJobConfigMockMvc
-            .perform(
-                put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(taskJobConfigDTO))
-            )
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(taskJobConfigDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the TaskJobConfig in the database
-        List<TaskJobConfig> taskJobConfigList = taskJobConfigRepository.findAll();
-        assertThat(taskJobConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1044,7 +940,7 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        int databaseSizeBeforeUpdate = taskJobConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the taskJobConfig using partial update
         TaskJobConfig partialUpdatedTaskJobConfig = new TaskJobConfig();
@@ -1053,33 +949,26 @@ public class TaskJobConfigResourceIT {
         partialUpdatedTaskJobConfig
             .name(UPDATED_NAME)
             .jobClassName(UPDATED_JOB_CLASS_NAME)
-            .cronExpression(UPDATED_CRON_EXPRESSION)
             .parameter(UPDATED_PARAMETER)
             .description(UPDATED_DESCRIPTION)
-            .createdBy(UPDATED_CREATED_BY);
+            .jobStatus(UPDATED_JOB_STATUS)
+            .createdDate(UPDATED_CREATED_DATE);
 
         restTaskJobConfigMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedTaskJobConfig.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTaskJobConfig))
+                    .content(om.writeValueAsBytes(partialUpdatedTaskJobConfig))
             )
             .andExpect(status().isOk());
 
         // Validate the TaskJobConfig in the database
-        List<TaskJobConfig> taskJobConfigList = taskJobConfigRepository.findAll();
-        assertThat(taskJobConfigList).hasSize(databaseSizeBeforeUpdate);
-        TaskJobConfig testTaskJobConfig = taskJobConfigList.get(taskJobConfigList.size() - 1);
-        assertThat(testTaskJobConfig.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testTaskJobConfig.getJobClassName()).isEqualTo(UPDATED_JOB_CLASS_NAME);
-        assertThat(testTaskJobConfig.getCronExpression()).isEqualTo(UPDATED_CRON_EXPRESSION);
-        assertThat(testTaskJobConfig.getParameter()).isEqualTo(UPDATED_PARAMETER);
-        assertThat(testTaskJobConfig.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-        assertThat(testTaskJobConfig.getJobStatus()).isEqualTo(DEFAULT_JOB_STATUS);
-        assertThat(testTaskJobConfig.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testTaskJobConfig.getCreatedDate()).isEqualTo(DEFAULT_CREATED_DATE);
-        assertThat(testTaskJobConfig.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
-        assertThat(testTaskJobConfig.getLastModifiedDate()).isEqualTo(DEFAULT_LAST_MODIFIED_DATE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertTaskJobConfigUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedTaskJobConfig, taskJobConfig),
+            getPersistedTaskJobConfig(taskJobConfig)
+        );
     }
 
     @Test
@@ -1088,7 +977,7 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        int databaseSizeBeforeUpdate = taskJobConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the taskJobConfig using partial update
         TaskJobConfig partialUpdatedTaskJobConfig = new TaskJobConfig();
@@ -1110,30 +999,20 @@ public class TaskJobConfigResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedTaskJobConfig.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTaskJobConfig))
+                    .content(om.writeValueAsBytes(partialUpdatedTaskJobConfig))
             )
             .andExpect(status().isOk());
 
         // Validate the TaskJobConfig in the database
-        List<TaskJobConfig> taskJobConfigList = taskJobConfigRepository.findAll();
-        assertThat(taskJobConfigList).hasSize(databaseSizeBeforeUpdate);
-        TaskJobConfig testTaskJobConfig = taskJobConfigList.get(taskJobConfigList.size() - 1);
-        assertThat(testTaskJobConfig.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testTaskJobConfig.getJobClassName()).isEqualTo(UPDATED_JOB_CLASS_NAME);
-        assertThat(testTaskJobConfig.getCronExpression()).isEqualTo(UPDATED_CRON_EXPRESSION);
-        assertThat(testTaskJobConfig.getParameter()).isEqualTo(UPDATED_PARAMETER);
-        assertThat(testTaskJobConfig.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-        assertThat(testTaskJobConfig.getJobStatus()).isEqualTo(UPDATED_JOB_STATUS);
-        assertThat(testTaskJobConfig.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testTaskJobConfig.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testTaskJobConfig.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testTaskJobConfig.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertTaskJobConfigUpdatableFieldsEquals(partialUpdatedTaskJobConfig, getPersistedTaskJobConfig(partialUpdatedTaskJobConfig));
     }
 
     @Test
     @Transactional
     void patchNonExistingTaskJobConfig() throws Exception {
-        int databaseSizeBeforeUpdate = taskJobConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         taskJobConfig.setId(longCount.incrementAndGet());
 
         // Create the TaskJobConfig
@@ -1144,19 +1023,18 @@ public class TaskJobConfigResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, taskJobConfigDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(taskJobConfigDTO))
+                    .content(om.writeValueAsBytes(taskJobConfigDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the TaskJobConfig in the database
-        List<TaskJobConfig> taskJobConfigList = taskJobConfigRepository.findAll();
-        assertThat(taskJobConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchTaskJobConfig() throws Exception {
-        int databaseSizeBeforeUpdate = taskJobConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         taskJobConfig.setId(longCount.incrementAndGet());
 
         // Create the TaskJobConfig
@@ -1167,19 +1045,18 @@ public class TaskJobConfigResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(taskJobConfigDTO))
+                    .content(om.writeValueAsBytes(taskJobConfigDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the TaskJobConfig in the database
-        List<TaskJobConfig> taskJobConfigList = taskJobConfigRepository.findAll();
-        assertThat(taskJobConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamTaskJobConfig() throws Exception {
-        int databaseSizeBeforeUpdate = taskJobConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         taskJobConfig.setId(longCount.incrementAndGet());
 
         // Create the TaskJobConfig
@@ -1187,16 +1064,11 @@ public class TaskJobConfigResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTaskJobConfigMockMvc
-            .perform(
-                patch(ENTITY_API_URL)
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(taskJobConfigDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(taskJobConfigDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the TaskJobConfig in the database
-        List<TaskJobConfig> taskJobConfigList = taskJobConfigRepository.findAll();
-        assertThat(taskJobConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1205,7 +1077,7 @@ public class TaskJobConfigResourceIT {
         // Initialize the database
         taskJobConfigRepository.save(taskJobConfig);
 
-        int databaseSizeBeforeDelete = taskJobConfigRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the taskJobConfig
         restTaskJobConfigMockMvc
@@ -1213,7 +1085,34 @@ public class TaskJobConfigResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<TaskJobConfig> taskJobConfigList = taskJobConfigRepository.findAll();
-        assertThat(taskJobConfigList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return taskJobConfigRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected TaskJobConfig getPersistedTaskJobConfig(TaskJobConfig taskJobConfig) {
+        return taskJobConfigRepository.findById(taskJobConfig.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedTaskJobConfigToMatchAllProperties(TaskJobConfig expectedTaskJobConfig) {
+        assertTaskJobConfigAllPropertiesEquals(expectedTaskJobConfig, getPersistedTaskJobConfig(expectedTaskJobConfig));
+    }
+
+    protected void assertPersistedTaskJobConfigToMatchUpdatableProperties(TaskJobConfig expectedTaskJobConfig) {
+        assertTaskJobConfigAllUpdatablePropertiesEquals(expectedTaskJobConfig, getPersistedTaskJobConfig(expectedTaskJobConfig));
     }
 }

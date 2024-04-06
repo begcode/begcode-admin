@@ -12,7 +12,6 @@ import com.diboot.core.binding.Binder;
 import com.diboot.core.service.impl.BaseServiceImpl;
 import com.google.common.base.CaseFormat;
 import java.util.*;
-import java.util.Arrays;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,16 +24,17 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Service Implementation for managing {@link com.begcode.monolith.settings.domain.RegionCode}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class RegionCodeBaseService<R extends RegionCodeRepository, E extends RegionCode>
     extends BaseServiceImpl<RegionCodeRepository, RegionCode> {
 
     private final Logger log = LoggerFactory.getLogger(RegionCodeBaseService.class);
 
-    private final List<String> relationCacheNames = Arrays.asList(
+    private final List<String> relationCacheNames = List.of(
         com.begcode.monolith.settings.domain.RegionCode.class.getName() + ".parent",
         com.begcode.monolith.settings.domain.RegionCode.class.getName() + ".children"
     );
-    private final List<String> relationNames = Arrays.asList("children", "parent");
+    private final List<String> relationNames = List.of("children", "parent");
 
     protected final RegionCodeRepository regionCodeRepository;
 
@@ -73,11 +73,11 @@ public class RegionCodeBaseService<R extends RegionCodeRepository, E extends Reg
     @Transactional(rollbackFor = Exception.class)
     public RegionCodeDTO update(RegionCodeDTO regionCodeDTO) {
         log.debug("Request to update RegionCode : {}", regionCodeDTO);
-
         RegionCode regionCode = regionCodeMapper.toEntity(regionCodeDTO);
+        clearChildrenCache();
 
-        regionCodeRepository.updateById(regionCode);
-        return findOne(regionCodeDTO.getId()).orElseThrow();
+        this.saveOrUpdate(regionCode);
+        return findOne(regionCode.getId()).orElseThrow();
     }
 
     /**
@@ -122,8 +122,7 @@ public class RegionCodeBaseService<R extends RegionCodeRepository, E extends Reg
      */
     public Optional<RegionCodeDTO> findOne(Long id) {
         log.debug("Request to get RegionCode : {}", id);
-        return Optional
-            .ofNullable(regionCodeRepository.selectById(id))
+        return Optional.ofNullable(regionCodeRepository.selectById(id))
             .map(regionCode -> {
                 Binder.bindRelations(regionCode);
                 return regionCode;
@@ -159,23 +158,25 @@ public class RegionCodeBaseService<R extends RegionCodeRepository, E extends Reg
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             UpdateWrapper<RegionCode> updateWrapper = new UpdateWrapper<>();
             updateWrapper.in("id", ids);
-            fieldNames.forEach(fieldName ->
-                updateWrapper.set(
-                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
-                    BeanUtil.getFieldValue(changeRegionCodeDTO, fieldName)
-                )
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changeRegionCodeDTO, fieldName)
+                    )
             );
             this.update(updateWrapper);
         } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
             List<RegionCode> regionCodeList = this.listByIds(ids);
             if (CollectionUtils.isNotEmpty(regionCodeList)) {
                 regionCodeList.forEach(regionCode -> {
-                    relationshipNames.forEach(relationName ->
-                        BeanUtil.setFieldValue(
-                            regionCode,
-                            relationName,
-                            BeanUtil.getFieldValue(regionCodeMapper.toEntity(changeRegionCodeDTO), relationName)
-                        )
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                regionCode,
+                                relationName,
+                                BeanUtil.getFieldValue(regionCodeMapper.toEntity(changeRegionCodeDTO), relationName)
+                            )
                     );
                     this.createOrUpdateAndRelatedRelations(regionCode, relationshipNames);
                 });
@@ -185,9 +186,9 @@ public class RegionCodeBaseService<R extends RegionCodeRepository, E extends Reg
 
     // 清除children缓存
     private void clearChildrenCache() {
-        Objects
-            .requireNonNull(cacheManager.getCache(com.begcode.monolith.settings.domain.RegionCode.class.getName() + ".children"))
-            .clear();
+        Objects.requireNonNull(
+            cacheManager.getCache(com.begcode.monolith.settings.domain.RegionCode.class.getName() + ".children")
+        ).clear();
     }
 
     protected void clearRelationsCache() {

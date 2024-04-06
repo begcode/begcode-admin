@@ -27,10 +27,11 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Service Implementation for managing {@link com.begcode.monolith.domain.Position}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class PositionBaseService<R extends PositionRepository, E extends Position> extends BaseServiceImpl<PositionRepository, Position> {
 
     private final Logger log = LoggerFactory.getLogger(PositionBaseService.class);
-    private final List<String> relationNames = Arrays.asList("users");
+    private final List<String> relationNames = List.of("users");
 
     protected final PositionRepository positionRepository;
 
@@ -68,11 +69,10 @@ public class PositionBaseService<R extends PositionRepository, E extends Positio
     @Transactional(rollbackFor = Exception.class)
     public PositionDTO update(PositionDTO positionDTO) {
         log.debug("Request to update Position : {}", positionDTO);
-
         Position position = positionMapper.toEntity(positionDTO);
 
-        positionRepository.updateById(position);
-        return findOne(positionDTO.getId()).orElseThrow();
+        this.saveOrUpdate(position);
+        return findOne(position.getId()).orElseThrow();
     }
 
     /**
@@ -117,8 +117,7 @@ public class PositionBaseService<R extends PositionRepository, E extends Positio
      */
     public Optional<PositionDTO> findOne(Long id) {
         log.debug("Request to get Position : {}", id);
-        return Optional
-            .ofNullable(positionRepository.selectById(id))
+        return Optional.ofNullable(positionRepository.selectById(id))
             .map(position -> {
                 Binder.bindRelations(position);
                 return position;
@@ -148,23 +147,25 @@ public class PositionBaseService<R extends PositionRepository, E extends Positio
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             UpdateWrapper<Position> updateWrapper = new UpdateWrapper<>();
             updateWrapper.in("id", ids);
-            fieldNames.forEach(fieldName ->
-                updateWrapper.set(
-                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
-                    BeanUtil.getFieldValue(changePositionDTO, fieldName)
-                )
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changePositionDTO, fieldName)
+                    )
             );
             this.update(updateWrapper);
         } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
             List<Position> positionList = this.listByIds(ids);
             if (CollectionUtils.isNotEmpty(positionList)) {
                 positionList.forEach(position -> {
-                    relationshipNames.forEach(relationName ->
-                        BeanUtil.setFieldValue(
-                            position,
-                            relationName,
-                            BeanUtil.getFieldValue(positionMapper.toEntity(changePositionDTO), relationName)
-                        )
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                position,
+                                relationName,
+                                BeanUtil.getFieldValue(positionMapper.toEntity(changePositionDTO), relationName)
+                            )
                     );
                     this.createOrUpdateAndRelatedRelations(position, relationshipNames);
                 });
@@ -189,122 +190,119 @@ public class PositionBaseService<R extends PositionRepository, E extends Positio
         SortValueOperateType type
     ) {
         switch (type) {
-            case VALUE:
-                {
-                    if (ObjectUtils.isNotEmpty(changeSortValue)) {
-                        return lambdaUpdate().set(Position::getSortNo, changeSortValue).eq(Position::getId, id).update();
-                    } else {
-                        return false;
-                    }
+            case VALUE: {
+                if (ObjectUtils.isNotEmpty(changeSortValue)) {
+                    return lambdaUpdate().set(Position::getSortNo, changeSortValue).eq(Position::getId, id).update();
+                } else {
+                    return false;
                 }
-            case STEP:
-                {
-                    if (ObjectUtils.allNotNull(id, beforeId)) {
-                        Set<Long> ids = new HashSet<>();
-                        ids.add(id);
-                        ids.add(beforeId);
-                        Map<Long, Integer> idSortValueMap = listByIds(ids)
-                            .stream()
-                            .filter(position -> position.getSortNo() != null)
-                            .collect(Collectors.toMap(Position::getId, Position::getSortNo));
-                        return (
-                            lambdaUpdate().set(Position::getSortNo, idSortValueMap.get(beforeId)).eq(Position::getId, id).update() &&
-                            lambdaUpdate().set(Position::getSortNo, idSortValueMap.get(id)).eq(Position::getId, beforeId).update()
-                        );
-                    } else if (ObjectUtils.allNotNull(id, afterId)) {
-                        Set<Long> ids = new HashSet<>();
-                        ids.add(id);
-                        ids.add(afterId);
-                        Map<Long, Integer> idSortValueMap = listByIds(ids)
-                            .stream()
-                            .filter(position -> position.getSortNo() != null)
-                            .collect(Collectors.toMap(Position::getId, Position::getSortNo));
-                        return (
-                            lambdaUpdate().set(Position::getSortNo, idSortValueMap.get(afterId)).eq(Position::getId, id).update() &&
-                            lambdaUpdate().set(Position::getSortNo, idSortValueMap.get(id)).eq(Position::getId, afterId).update()
-                        );
-                    } else {
-                        return false;
-                    }
-                }
-            case DROP:
-                {
+            }
+            case STEP: {
+                if (ObjectUtils.allNotNull(id, beforeId)) {
                     Set<Long> ids = new HashSet<>();
                     ids.add(id);
-                    if (ObjectUtils.isNotEmpty(beforeId)) {
-                        ids.add(beforeId);
-                    }
-                    if (ObjectUtils.isNotEmpty(afterId)) {
-                        ids.add(afterId);
-                    }
+                    ids.add(beforeId);
                     Map<Long, Integer> idSortValueMap = listByIds(ids)
                         .stream()
                         .filter(position -> position.getSortNo() != null)
                         .collect(Collectors.toMap(Position::getId, Position::getSortNo));
-                    if (ObjectUtils.allNotNull(beforeId, afterId)) {
-                        // 计算中间值
-                        Integer beforeSortValue = idSortValueMap.get(beforeId);
-                        Integer afterSortValue = idSortValueMap.get(afterId);
-                        Integer newSortValue = (beforeSortValue + afterSortValue) / 2;
-                        if (!newSortValue.equals(afterSortValue) && !newSortValue.equals(beforeSortValue)) {
-                            // 正常值，保存到数据库。
-                            return lambdaUpdate().set(Position::getSortNo, newSortValue).eq(Position::getId, id).update();
-                        } else {
-                            // 没有排序值插入空间了，重新对相关的所有记录的排序值进行计算。然后再插入相关的值。
-                            // 需要确定相应的记录范围
-                            List<Position> list = this.list(queryWrapper.orderByAsc("sort_no"));
-                            Integer newBeforeSortValue = 0;
-                            Integer newAfterSortValue = 0;
-                            for (int i = 0; i < list.size(); i++) {
-                                list.get(i).setSortNo(100 * (i + 1));
-                                if (afterId.equals(list.get(i).getId())) {
-                                    newBeforeSortValue = list.get(i).getSortNo();
-                                }
-                                if (beforeId.equals(list.get(i).getId())) {
-                                    newAfterSortValue = list.get(i).getSortNo();
-                                }
-                            }
-                            newSortValue = (newBeforeSortValue + newAfterSortValue) / 2;
-                            updateBatchById(list);
-                            return lambdaUpdate().set(Position::getSortNo, newSortValue).eq(Position::getId, id).update();
-                        }
-                    } else if (ObjectUtils.isNotEmpty(beforeId)) {
-                        // 计算比beforeId实体大的排序值
-                        Integer beforeSortValue = idSortValueMap.get(beforeId);
-                        Integer newSortValue = (beforeSortValue + 100) - ((beforeSortValue + 100) % 100);
+                    return (
+                        lambdaUpdate().set(Position::getSortNo, idSortValueMap.get(beforeId)).eq(Position::getId, id).update() &&
+                        lambdaUpdate().set(Position::getSortNo, idSortValueMap.get(id)).eq(Position::getId, beforeId).update()
+                    );
+                } else if (ObjectUtils.allNotNull(id, afterId)) {
+                    Set<Long> ids = new HashSet<>();
+                    ids.add(id);
+                    ids.add(afterId);
+                    Map<Long, Integer> idSortValueMap = listByIds(ids)
+                        .stream()
+                        .filter(position -> position.getSortNo() != null)
+                        .collect(Collectors.toMap(Position::getId, Position::getSortNo));
+                    return (
+                        lambdaUpdate().set(Position::getSortNo, idSortValueMap.get(afterId)).eq(Position::getId, id).update() &&
+                        lambdaUpdate().set(Position::getSortNo, idSortValueMap.get(id)).eq(Position::getId, afterId).update()
+                    );
+                } else {
+                    return false;
+                }
+            }
+            case DROP: {
+                Set<Long> ids = new HashSet<>();
+                ids.add(id);
+                if (ObjectUtils.isNotEmpty(beforeId)) {
+                    ids.add(beforeId);
+                }
+                if (ObjectUtils.isNotEmpty(afterId)) {
+                    ids.add(afterId);
+                }
+                Map<Long, Integer> idSortValueMap = listByIds(ids)
+                    .stream()
+                    .filter(position -> position.getSortNo() != null)
+                    .collect(Collectors.toMap(Position::getId, Position::getSortNo));
+                if (ObjectUtils.allNotNull(beforeId, afterId)) {
+                    // 计算中间值
+                    Integer beforeSortValue = idSortValueMap.get(beforeId);
+                    Integer afterSortValue = idSortValueMap.get(afterId);
+                    Integer newSortValue = (beforeSortValue + afterSortValue) / 2;
+                    if (!newSortValue.equals(afterSortValue) && !newSortValue.equals(beforeSortValue)) {
                         // 正常值，保存到数据库。
                         return lambdaUpdate().set(Position::getSortNo, newSortValue).eq(Position::getId, id).update();
-                    } else if (ObjectUtils.isNotEmpty(afterId)) {
-                        // 计算比afterId实体小的排序值
-                        Integer afterSortValue = idSortValueMap.get(afterId);
-                        Integer newSortValue = (afterSortValue - 100) - ((afterSortValue - 100) % 100);
-                        if (newSortValue <= 0) {
-                            // 没有排序值插入空间了，重新对相关的所有记录的排序值进行计算。然后再插入相关的值。
-                            // 需要确定相应的记录范围
-                            List<Position> list = this.list(queryWrapper.orderByAsc("sort_no"));
-                            Integer newBeforeSortValue = 0;
-                            Integer newAfterSortValue = 0;
-                            for (int i = 0; i < list.size(); i++) {
-                                list.get(i).setSortNo(100 * (i + 1));
-                                if (afterId.equals(list.get(i).getId())) {
-                                    newBeforeSortValue = list.get(i).getSortNo();
-                                }
-                                if (beforeId.equals(list.get(i).getId())) {
-                                    newAfterSortValue = list.get(i).getSortNo();
-                                }
-                            }
-                            newSortValue = (newBeforeSortValue + newAfterSortValue) / 2;
-                            updateBatchById(list);
-                            return lambdaUpdate().set(Position::getSortNo, newSortValue).eq(Position::getId, id).update();
-                        } else {
-                            // 正常值，保存到数据库。
-                            return lambdaUpdate().set(Position::getSortNo, newSortValue).eq(Position::getId, id).update();
-                        }
                     } else {
-                        // todo 异常
-                        return false;
+                        // 没有排序值插入空间了，重新对相关的所有记录的排序值进行计算。然后再插入相关的值。
+                        // 需要确定相应的记录范围
+                        List<Position> list = this.list(queryWrapper.orderByAsc("sort_no"));
+                        Integer newBeforeSortValue = 0;
+                        Integer newAfterSortValue = 0;
+                        for (int i = 0; i < list.size(); i++) {
+                            list.get(i).setSortNo(100 * (i + 1));
+                            if (afterId.equals(list.get(i).getId())) {
+                                newBeforeSortValue = list.get(i).getSortNo();
+                            }
+                            if (beforeId.equals(list.get(i).getId())) {
+                                newAfterSortValue = list.get(i).getSortNo();
+                            }
+                        }
+                        newSortValue = (newBeforeSortValue + newAfterSortValue) / 2;
+                        updateBatchById(list);
+                        return lambdaUpdate().set(Position::getSortNo, newSortValue).eq(Position::getId, id).update();
                     }
+                } else if (ObjectUtils.isNotEmpty(beforeId)) {
+                    // 计算比beforeId实体大的排序值
+                    Integer beforeSortValue = idSortValueMap.get(beforeId);
+                    Integer newSortValue = (beforeSortValue + 100) - ((beforeSortValue + 100) % 100);
+                    // 正常值，保存到数据库。
+                    return lambdaUpdate().set(Position::getSortNo, newSortValue).eq(Position::getId, id).update();
+                } else if (ObjectUtils.isNotEmpty(afterId)) {
+                    // 计算比afterId实体小的排序值
+                    Integer afterSortValue = idSortValueMap.get(afterId);
+                    Integer newSortValue = (afterSortValue - 100) - ((afterSortValue - 100) % 100);
+                    if (newSortValue <= 0) {
+                        // 没有排序值插入空间了，重新对相关的所有记录的排序值进行计算。然后再插入相关的值。
+                        // 需要确定相应的记录范围
+                        List<Position> list = this.list(queryWrapper.orderByAsc("sort_no"));
+                        Integer newBeforeSortValue = 0;
+                        Integer newAfterSortValue = 0;
+                        for (int i = 0; i < list.size(); i++) {
+                            list.get(i).setSortNo(100 * (i + 1));
+                            if (afterId.equals(list.get(i).getId())) {
+                                newBeforeSortValue = list.get(i).getSortNo();
+                            }
+                            if (beforeId.equals(list.get(i).getId())) {
+                                newAfterSortValue = list.get(i).getSortNo();
+                            }
+                        }
+                        newSortValue = (newBeforeSortValue + newAfterSortValue) / 2;
+                        updateBatchById(list);
+                        return lambdaUpdate().set(Position::getSortNo, newSortValue).eq(Position::getId, id).update();
+                    } else {
+                        // 正常值，保存到数据库。
+                        return lambdaUpdate().set(Position::getSortNo, newSortValue).eq(Position::getId, id).update();
+                    }
+                } else {
+                    // todo 异常
+                    return false;
                 }
+            }
             default:
                 return false;
         }

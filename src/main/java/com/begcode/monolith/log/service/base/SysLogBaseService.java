@@ -23,10 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Service Implementation for managing {@link com.begcode.monolith.log.domain.SysLog}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class SysLogBaseService<R extends SysLogRepository, E extends SysLog> extends BaseServiceImpl<SysLogRepository, SysLog> {
 
     private final Logger log = LoggerFactory.getLogger(SysLogBaseService.class);
-    private final List<String> relationNames = Arrays.asList();
+    private final List<String> relationNames = List.of();
 
     protected final SysLogRepository sysLogRepository;
 
@@ -64,11 +65,10 @@ public class SysLogBaseService<R extends SysLogRepository, E extends SysLog> ext
     @Transactional(rollbackFor = Exception.class)
     public SysLogDTO update(SysLogDTO sysLogDTO) {
         log.debug("Request to update SysLog : {}", sysLogDTO);
-
         SysLog sysLog = sysLogMapper.toEntity(sysLogDTO);
 
-        sysLogRepository.updateById(sysLog);
-        return findOne(sysLogDTO.getId()).orElseThrow();
+        this.saveOrUpdate(sysLog);
+        return findOne(sysLog.getId()).orElseThrow();
     }
 
     /**
@@ -113,8 +113,7 @@ public class SysLogBaseService<R extends SysLogRepository, E extends SysLog> ext
      */
     public Optional<SysLogDTO> findOne(Long id) {
         log.debug("Request to get SysLog : {}", id);
-        return Optional
-            .ofNullable(sysLogRepository.selectById(id))
+        return Optional.ofNullable(sysLogRepository.selectById(id))
             .map(sysLog -> {
                 Binder.bindRelations(sysLog);
                 return sysLog;
@@ -144,23 +143,25 @@ public class SysLogBaseService<R extends SysLogRepository, E extends SysLog> ext
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             UpdateWrapper<SysLog> updateWrapper = new UpdateWrapper<>();
             updateWrapper.in("id", ids);
-            fieldNames.forEach(fieldName ->
-                updateWrapper.set(
-                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
-                    BeanUtil.getFieldValue(changeSysLogDTO, fieldName)
-                )
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changeSysLogDTO, fieldName)
+                    )
             );
             this.update(updateWrapper);
         } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
             List<SysLog> sysLogList = this.listByIds(ids);
             if (CollectionUtils.isNotEmpty(sysLogList)) {
                 sysLogList.forEach(sysLog -> {
-                    relationshipNames.forEach(relationName ->
-                        BeanUtil.setFieldValue(
-                            sysLog,
-                            relationName,
-                            BeanUtil.getFieldValue(sysLogMapper.toEntity(changeSysLogDTO), relationName)
-                        )
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                sysLog,
+                                relationName,
+                                BeanUtil.getFieldValue(sysLogMapper.toEntity(changeSysLogDTO), relationName)
+                            )
                     );
                     this.createOrUpdateAndRelatedRelations(sysLog, relationshipNames);
                 });

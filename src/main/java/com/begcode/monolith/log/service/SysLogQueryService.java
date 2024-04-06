@@ -79,12 +79,10 @@ public class SysLogQueryService implements QueryService<SysLog> {
     public IPage<SysLogDTO> findByCriteria(SysLogCriteria criteria, Page<SysLog> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<SysLog> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, SysLog.class, page)
-            .convert(sysLog -> {
-                Binder.bindRelations(sysLog, new String[] {});
-                return sysLogMapper.toDto(sysLog);
-            });
+        return Binder.joinQueryPage(queryWrapper, SysLog.class, page).convert(sysLog -> {
+            Binder.bindRelations(sysLog, new String[] {});
+            return sysLogMapper.toDto(sysLog);
+        });
     }
 
     /**

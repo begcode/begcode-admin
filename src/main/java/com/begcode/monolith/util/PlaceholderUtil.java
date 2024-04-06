@@ -79,12 +79,9 @@ public class PlaceholderUtil {
     }
 
     public String resolveByMap(String content, final Map<String, Object> valueMap) {
-        return this.resolveByRule(
-                content,
-                placeholderValue -> {
-                    return String.valueOf(valueMap.get(placeholderValue));
-                }
-            );
+        return this.resolveByRule(content, placeholderValue -> {
+                return String.valueOf(valueMap.get(placeholderValue));
+            });
     }
 
     public String resolveByProperties(String content, final Properties properties) {

@@ -1,5 +1,7 @@
 package com.begcode.monolith.settings.web.rest;
 
+import static com.begcode.monolith.settings.domain.DictionaryAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -11,10 +13,8 @@ import com.begcode.monolith.settings.domain.Dictionary;
 import com.begcode.monolith.settings.repository.DictionaryRepository;
 import com.begcode.monolith.settings.service.dto.DictionaryDTO;
 import com.begcode.monolith.settings.service.mapper.DictionaryMapper;
-import com.begcode.monolith.web.rest.TestUtil;
-import com.begcode.monolith.web.rest.TestUtil;
-import java.util.List;
-import java.util.Random;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,8 +54,11 @@ public class DictionaryResourceIT {
     private static final String ENTITY_API_URL = "/api/dictionaries";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private DictionaryRepository dictionaryRepository;
@@ -110,23 +113,23 @@ public class DictionaryResourceIT {
     @Test
     @Transactional
     void createDictionary() throws Exception {
-        int databaseSizeBeforeCreate = dictionaryRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the Dictionary
         DictionaryDTO dictionaryDTO = dictionaryMapper.toDto(dictionary);
-        restDictionaryMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(dictionaryDTO)))
-            .andExpect(status().isCreated());
+        var returnedDictionaryDTO = om.readValue(
+            restDictionaryMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(dictionaryDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            DictionaryDTO.class
+        );
 
         // Validate the Dictionary in the database
-        List<Dictionary> dictionaryList = dictionaryRepository.findAll();
-        assertThat(dictionaryList).hasSize(databaseSizeBeforeCreate + 1);
-        Dictionary testDictionary = dictionaryList.get(dictionaryList.size() - 1);
-        assertThat(testDictionary.getDictName()).isEqualTo(DEFAULT_DICT_NAME);
-        assertThat(testDictionary.getDictKey()).isEqualTo(DEFAULT_DICT_KEY);
-        assertThat(testDictionary.getDisabled()).isEqualTo(DEFAULT_DISABLED);
-        assertThat(testDictionary.getSortValue()).isEqualTo(DEFAULT_SORT_VALUE);
-        assertThat(testDictionary.getBuiltIn()).isEqualTo(DEFAULT_BUILT_IN);
-        assertThat(testDictionary.getSyncEnum()).isEqualTo(DEFAULT_SYNC_ENUM);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedDictionary = dictionaryMapper.toEntity(returnedDictionaryDTO);
+        assertDictionaryUpdatableFieldsEquals(returnedDictionary, getPersistedDictionary(returnedDictionary));
     }
 
     @Test
@@ -136,22 +139,21 @@ public class DictionaryResourceIT {
         dictionary.setId(1L);
         DictionaryDTO dictionaryDTO = dictionaryMapper.toDto(dictionary);
 
-        int databaseSizeBeforeCreate = dictionaryRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restDictionaryMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(dictionaryDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(dictionaryDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Dictionary in the database
-        List<Dictionary> dictionaryList = dictionaryRepository.findAll();
-        assertThat(dictionaryList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
     @Transactional
     void checkDictNameIsRequired() throws Exception {
-        int databaseSizeBeforeTest = dictionaryRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         dictionary.setDictName(null);
 
@@ -159,17 +161,16 @@ public class DictionaryResourceIT {
         DictionaryDTO dictionaryDTO = dictionaryMapper.toDto(dictionary);
 
         restDictionaryMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(dictionaryDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(dictionaryDTO)))
             .andExpect(status().isBadRequest());
 
-        List<Dictionary> dictionaryList = dictionaryRepository.findAll();
-        assertThat(dictionaryList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void checkDictKeyIsRequired() throws Exception {
-        int databaseSizeBeforeTest = dictionaryRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         dictionary.setDictKey(null);
 
@@ -177,11 +178,10 @@ public class DictionaryResourceIT {
         DictionaryDTO dictionaryDTO = dictionaryMapper.toDto(dictionary);
 
         restDictionaryMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(dictionaryDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(dictionaryDTO)))
             .andExpect(status().isBadRequest());
 
-        List<Dictionary> dictionaryList = dictionaryRepository.findAll();
-        assertThat(dictionaryList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
@@ -232,14 +232,11 @@ public class DictionaryResourceIT {
 
         Long id = dictionary.getId();
 
-        defaultDictionaryShouldBeFound("id.equals=" + id);
-        defaultDictionaryShouldNotBeFound("id.notEquals=" + id);
+        defaultDictionaryFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultDictionaryShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultDictionaryShouldNotBeFound("id.greaterThan=" + id);
+        defaultDictionaryFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultDictionaryShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultDictionaryShouldNotBeFound("id.lessThan=" + id);
+        defaultDictionaryFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -248,11 +245,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where dictName equals to DEFAULT_DICT_NAME
-        defaultDictionaryShouldBeFound("dictName.equals=" + DEFAULT_DICT_NAME);
-
-        // Get all the dictionaryList where dictName equals to UPDATED_DICT_NAME
-        defaultDictionaryShouldNotBeFound("dictName.equals=" + UPDATED_DICT_NAME);
+        // Get all the dictionaryList where dictName equals to
+        defaultDictionaryFiltering("dictName.equals=" + DEFAULT_DICT_NAME, "dictName.equals=" + UPDATED_DICT_NAME);
     }
 
     @Test
@@ -261,11 +255,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where dictName in DEFAULT_DICT_NAME or UPDATED_DICT_NAME
-        defaultDictionaryShouldBeFound("dictName.in=" + DEFAULT_DICT_NAME + "," + UPDATED_DICT_NAME);
-
-        // Get all the dictionaryList where dictName equals to UPDATED_DICT_NAME
-        defaultDictionaryShouldNotBeFound("dictName.in=" + UPDATED_DICT_NAME);
+        // Get all the dictionaryList where dictName in
+        defaultDictionaryFiltering("dictName.in=" + DEFAULT_DICT_NAME + "," + UPDATED_DICT_NAME, "dictName.in=" + UPDATED_DICT_NAME);
     }
 
     @Test
@@ -275,10 +266,7 @@ public class DictionaryResourceIT {
         dictionaryRepository.save(dictionary);
 
         // Get all the dictionaryList where dictName is not null
-        defaultDictionaryShouldBeFound("dictName.specified=true");
-
-        // Get all the dictionaryList where dictName is null
-        defaultDictionaryShouldNotBeFound("dictName.specified=false");
+        defaultDictionaryFiltering("dictName.specified=true", "dictName.specified=false");
     }
 
     @Test
@@ -287,11 +275,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where dictName contains DEFAULT_DICT_NAME
-        defaultDictionaryShouldBeFound("dictName.contains=" + DEFAULT_DICT_NAME);
-
-        // Get all the dictionaryList where dictName contains UPDATED_DICT_NAME
-        defaultDictionaryShouldNotBeFound("dictName.contains=" + UPDATED_DICT_NAME);
+        // Get all the dictionaryList where dictName contains
+        defaultDictionaryFiltering("dictName.contains=" + DEFAULT_DICT_NAME, "dictName.contains=" + UPDATED_DICT_NAME);
     }
 
     @Test
@@ -300,11 +285,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where dictName does not contain DEFAULT_DICT_NAME
-        defaultDictionaryShouldNotBeFound("dictName.doesNotContain=" + DEFAULT_DICT_NAME);
-
-        // Get all the dictionaryList where dictName does not contain UPDATED_DICT_NAME
-        defaultDictionaryShouldBeFound("dictName.doesNotContain=" + UPDATED_DICT_NAME);
+        // Get all the dictionaryList where dictName does not contain
+        defaultDictionaryFiltering("dictName.doesNotContain=" + UPDATED_DICT_NAME, "dictName.doesNotContain=" + DEFAULT_DICT_NAME);
     }
 
     @Test
@@ -313,11 +295,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where dictKey equals to DEFAULT_DICT_KEY
-        defaultDictionaryShouldBeFound("dictKey.equals=" + DEFAULT_DICT_KEY);
-
-        // Get all the dictionaryList where dictKey equals to UPDATED_DICT_KEY
-        defaultDictionaryShouldNotBeFound("dictKey.equals=" + UPDATED_DICT_KEY);
+        // Get all the dictionaryList where dictKey equals to
+        defaultDictionaryFiltering("dictKey.equals=" + DEFAULT_DICT_KEY, "dictKey.equals=" + UPDATED_DICT_KEY);
     }
 
     @Test
@@ -326,11 +305,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where dictKey in DEFAULT_DICT_KEY or UPDATED_DICT_KEY
-        defaultDictionaryShouldBeFound("dictKey.in=" + DEFAULT_DICT_KEY + "," + UPDATED_DICT_KEY);
-
-        // Get all the dictionaryList where dictKey equals to UPDATED_DICT_KEY
-        defaultDictionaryShouldNotBeFound("dictKey.in=" + UPDATED_DICT_KEY);
+        // Get all the dictionaryList where dictKey in
+        defaultDictionaryFiltering("dictKey.in=" + DEFAULT_DICT_KEY + "," + UPDATED_DICT_KEY, "dictKey.in=" + UPDATED_DICT_KEY);
     }
 
     @Test
@@ -340,10 +316,7 @@ public class DictionaryResourceIT {
         dictionaryRepository.save(dictionary);
 
         // Get all the dictionaryList where dictKey is not null
-        defaultDictionaryShouldBeFound("dictKey.specified=true");
-
-        // Get all the dictionaryList where dictKey is null
-        defaultDictionaryShouldNotBeFound("dictKey.specified=false");
+        defaultDictionaryFiltering("dictKey.specified=true", "dictKey.specified=false");
     }
 
     @Test
@@ -352,11 +325,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where dictKey contains DEFAULT_DICT_KEY
-        defaultDictionaryShouldBeFound("dictKey.contains=" + DEFAULT_DICT_KEY);
-
-        // Get all the dictionaryList where dictKey contains UPDATED_DICT_KEY
-        defaultDictionaryShouldNotBeFound("dictKey.contains=" + UPDATED_DICT_KEY);
+        // Get all the dictionaryList where dictKey contains
+        defaultDictionaryFiltering("dictKey.contains=" + DEFAULT_DICT_KEY, "dictKey.contains=" + UPDATED_DICT_KEY);
     }
 
     @Test
@@ -365,11 +335,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where dictKey does not contain DEFAULT_DICT_KEY
-        defaultDictionaryShouldNotBeFound("dictKey.doesNotContain=" + DEFAULT_DICT_KEY);
-
-        // Get all the dictionaryList where dictKey does not contain UPDATED_DICT_KEY
-        defaultDictionaryShouldBeFound("dictKey.doesNotContain=" + UPDATED_DICT_KEY);
+        // Get all the dictionaryList where dictKey does not contain
+        defaultDictionaryFiltering("dictKey.doesNotContain=" + UPDATED_DICT_KEY, "dictKey.doesNotContain=" + DEFAULT_DICT_KEY);
     }
 
     @Test
@@ -378,11 +345,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where disabled equals to DEFAULT_DISABLED
-        defaultDictionaryShouldBeFound("disabled.equals=" + DEFAULT_DISABLED);
-
-        // Get all the dictionaryList where disabled equals to UPDATED_DISABLED
-        defaultDictionaryShouldNotBeFound("disabled.equals=" + UPDATED_DISABLED);
+        // Get all the dictionaryList where disabled equals to
+        defaultDictionaryFiltering("disabled.equals=" + DEFAULT_DISABLED, "disabled.equals=" + UPDATED_DISABLED);
     }
 
     @Test
@@ -391,11 +355,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where disabled in DEFAULT_DISABLED or UPDATED_DISABLED
-        defaultDictionaryShouldBeFound("disabled.in=" + DEFAULT_DISABLED + "," + UPDATED_DISABLED);
-
-        // Get all the dictionaryList where disabled equals to UPDATED_DISABLED
-        defaultDictionaryShouldNotBeFound("disabled.in=" + UPDATED_DISABLED);
+        // Get all the dictionaryList where disabled in
+        defaultDictionaryFiltering("disabled.in=" + DEFAULT_DISABLED + "," + UPDATED_DISABLED, "disabled.in=" + UPDATED_DISABLED);
     }
 
     @Test
@@ -405,10 +366,7 @@ public class DictionaryResourceIT {
         dictionaryRepository.save(dictionary);
 
         // Get all the dictionaryList where disabled is not null
-        defaultDictionaryShouldBeFound("disabled.specified=true");
-
-        // Get all the dictionaryList where disabled is null
-        defaultDictionaryShouldNotBeFound("disabled.specified=false");
+        defaultDictionaryFiltering("disabled.specified=true", "disabled.specified=false");
     }
 
     @Test
@@ -417,11 +375,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where sortValue equals to DEFAULT_SORT_VALUE
-        defaultDictionaryShouldBeFound("sortValue.equals=" + DEFAULT_SORT_VALUE);
-
-        // Get all the dictionaryList where sortValue equals to UPDATED_SORT_VALUE
-        defaultDictionaryShouldNotBeFound("sortValue.equals=" + UPDATED_SORT_VALUE);
+        // Get all the dictionaryList where sortValue equals to
+        defaultDictionaryFiltering("sortValue.equals=" + DEFAULT_SORT_VALUE, "sortValue.equals=" + UPDATED_SORT_VALUE);
     }
 
     @Test
@@ -430,11 +385,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where sortValue in DEFAULT_SORT_VALUE or UPDATED_SORT_VALUE
-        defaultDictionaryShouldBeFound("sortValue.in=" + DEFAULT_SORT_VALUE + "," + UPDATED_SORT_VALUE);
-
-        // Get all the dictionaryList where sortValue equals to UPDATED_SORT_VALUE
-        defaultDictionaryShouldNotBeFound("sortValue.in=" + UPDATED_SORT_VALUE);
+        // Get all the dictionaryList where sortValue in
+        defaultDictionaryFiltering("sortValue.in=" + DEFAULT_SORT_VALUE + "," + UPDATED_SORT_VALUE, "sortValue.in=" + UPDATED_SORT_VALUE);
     }
 
     @Test
@@ -444,10 +396,7 @@ public class DictionaryResourceIT {
         dictionaryRepository.save(dictionary);
 
         // Get all the dictionaryList where sortValue is not null
-        defaultDictionaryShouldBeFound("sortValue.specified=true");
-
-        // Get all the dictionaryList where sortValue is null
-        defaultDictionaryShouldNotBeFound("sortValue.specified=false");
+        defaultDictionaryFiltering("sortValue.specified=true", "sortValue.specified=false");
     }
 
     @Test
@@ -456,11 +405,11 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where sortValue is greater than or equal to DEFAULT_SORT_VALUE
-        defaultDictionaryShouldBeFound("sortValue.greaterThanOrEqual=" + DEFAULT_SORT_VALUE);
-
-        // Get all the dictionaryList where sortValue is greater than or equal to UPDATED_SORT_VALUE
-        defaultDictionaryShouldNotBeFound("sortValue.greaterThanOrEqual=" + UPDATED_SORT_VALUE);
+        // Get all the dictionaryList where sortValue is greater than or equal to
+        defaultDictionaryFiltering(
+            "sortValue.greaterThanOrEqual=" + DEFAULT_SORT_VALUE,
+            "sortValue.greaterThanOrEqual=" + UPDATED_SORT_VALUE
+        );
     }
 
     @Test
@@ -469,11 +418,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where sortValue is less than or equal to DEFAULT_SORT_VALUE
-        defaultDictionaryShouldBeFound("sortValue.lessThanOrEqual=" + DEFAULT_SORT_VALUE);
-
-        // Get all the dictionaryList where sortValue is less than or equal to SMALLER_SORT_VALUE
-        defaultDictionaryShouldNotBeFound("sortValue.lessThanOrEqual=" + SMALLER_SORT_VALUE);
+        // Get all the dictionaryList where sortValue is less than or equal to
+        defaultDictionaryFiltering("sortValue.lessThanOrEqual=" + DEFAULT_SORT_VALUE, "sortValue.lessThanOrEqual=" + SMALLER_SORT_VALUE);
     }
 
     @Test
@@ -482,11 +428,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where sortValue is less than DEFAULT_SORT_VALUE
-        defaultDictionaryShouldNotBeFound("sortValue.lessThan=" + DEFAULT_SORT_VALUE);
-
-        // Get all the dictionaryList where sortValue is less than UPDATED_SORT_VALUE
-        defaultDictionaryShouldBeFound("sortValue.lessThan=" + UPDATED_SORT_VALUE);
+        // Get all the dictionaryList where sortValue is less than
+        defaultDictionaryFiltering("sortValue.lessThan=" + UPDATED_SORT_VALUE, "sortValue.lessThan=" + DEFAULT_SORT_VALUE);
     }
 
     @Test
@@ -495,11 +438,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where sortValue is greater than DEFAULT_SORT_VALUE
-        defaultDictionaryShouldNotBeFound("sortValue.greaterThan=" + DEFAULT_SORT_VALUE);
-
-        // Get all the dictionaryList where sortValue is greater than SMALLER_SORT_VALUE
-        defaultDictionaryShouldBeFound("sortValue.greaterThan=" + SMALLER_SORT_VALUE);
+        // Get all the dictionaryList where sortValue is greater than
+        defaultDictionaryFiltering("sortValue.greaterThan=" + SMALLER_SORT_VALUE, "sortValue.greaterThan=" + DEFAULT_SORT_VALUE);
     }
 
     @Test
@@ -508,11 +448,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where builtIn equals to DEFAULT_BUILT_IN
-        defaultDictionaryShouldBeFound("builtIn.equals=" + DEFAULT_BUILT_IN);
-
-        // Get all the dictionaryList where builtIn equals to UPDATED_BUILT_IN
-        defaultDictionaryShouldNotBeFound("builtIn.equals=" + UPDATED_BUILT_IN);
+        // Get all the dictionaryList where builtIn equals to
+        defaultDictionaryFiltering("builtIn.equals=" + DEFAULT_BUILT_IN, "builtIn.equals=" + UPDATED_BUILT_IN);
     }
 
     @Test
@@ -521,11 +458,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where builtIn in DEFAULT_BUILT_IN or UPDATED_BUILT_IN
-        defaultDictionaryShouldBeFound("builtIn.in=" + DEFAULT_BUILT_IN + "," + UPDATED_BUILT_IN);
-
-        // Get all the dictionaryList where builtIn equals to UPDATED_BUILT_IN
-        defaultDictionaryShouldNotBeFound("builtIn.in=" + UPDATED_BUILT_IN);
+        // Get all the dictionaryList where builtIn in
+        defaultDictionaryFiltering("builtIn.in=" + DEFAULT_BUILT_IN + "," + UPDATED_BUILT_IN, "builtIn.in=" + UPDATED_BUILT_IN);
     }
 
     @Test
@@ -535,10 +469,7 @@ public class DictionaryResourceIT {
         dictionaryRepository.save(dictionary);
 
         // Get all the dictionaryList where builtIn is not null
-        defaultDictionaryShouldBeFound("builtIn.specified=true");
-
-        // Get all the dictionaryList where builtIn is null
-        defaultDictionaryShouldNotBeFound("builtIn.specified=false");
+        defaultDictionaryFiltering("builtIn.specified=true", "builtIn.specified=false");
     }
 
     @Test
@@ -547,11 +478,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where syncEnum equals to DEFAULT_SYNC_ENUM
-        defaultDictionaryShouldBeFound("syncEnum.equals=" + DEFAULT_SYNC_ENUM);
-
-        // Get all the dictionaryList where syncEnum equals to UPDATED_SYNC_ENUM
-        defaultDictionaryShouldNotBeFound("syncEnum.equals=" + UPDATED_SYNC_ENUM);
+        // Get all the dictionaryList where syncEnum equals to
+        defaultDictionaryFiltering("syncEnum.equals=" + DEFAULT_SYNC_ENUM, "syncEnum.equals=" + UPDATED_SYNC_ENUM);
     }
 
     @Test
@@ -560,11 +488,8 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        // Get all the dictionaryList where syncEnum in DEFAULT_SYNC_ENUM or UPDATED_SYNC_ENUM
-        defaultDictionaryShouldBeFound("syncEnum.in=" + DEFAULT_SYNC_ENUM + "," + UPDATED_SYNC_ENUM);
-
-        // Get all the dictionaryList where syncEnum equals to UPDATED_SYNC_ENUM
-        defaultDictionaryShouldNotBeFound("syncEnum.in=" + UPDATED_SYNC_ENUM);
+        // Get all the dictionaryList where syncEnum in
+        defaultDictionaryFiltering("syncEnum.in=" + DEFAULT_SYNC_ENUM + "," + UPDATED_SYNC_ENUM, "syncEnum.in=" + UPDATED_SYNC_ENUM);
     }
 
     @Test
@@ -574,10 +499,12 @@ public class DictionaryResourceIT {
         dictionaryRepository.save(dictionary);
 
         // Get all the dictionaryList where syncEnum is not null
-        defaultDictionaryShouldBeFound("syncEnum.specified=true");
+        defaultDictionaryFiltering("syncEnum.specified=true", "syncEnum.specified=false");
+    }
 
-        // Get all the dictionaryList where syncEnum is null
-        defaultDictionaryShouldNotBeFound("syncEnum.specified=false");
+    private void defaultDictionaryFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultDictionaryShouldBeFound(shouldBeFound);
+        defaultDictionaryShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -636,7 +563,7 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        int databaseSizeBeforeUpdate = dictionaryRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the dictionary
         Dictionary updatedDictionary = dictionaryRepository.findById(dictionary.getId()).orElseThrow();
@@ -653,26 +580,19 @@ public class DictionaryResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, dictionaryDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(dictionaryDTO))
+                    .content(om.writeValueAsBytes(dictionaryDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the Dictionary in the database
-        List<Dictionary> dictionaryList = dictionaryRepository.findAll();
-        assertThat(dictionaryList).hasSize(databaseSizeBeforeUpdate);
-        Dictionary testDictionary = dictionaryList.get(dictionaryList.size() - 1);
-        assertThat(testDictionary.getDictName()).isEqualTo(UPDATED_DICT_NAME);
-        assertThat(testDictionary.getDictKey()).isEqualTo(UPDATED_DICT_KEY);
-        assertThat(testDictionary.getDisabled()).isEqualTo(UPDATED_DISABLED);
-        assertThat(testDictionary.getSortValue()).isEqualTo(UPDATED_SORT_VALUE);
-        assertThat(testDictionary.getBuiltIn()).isEqualTo(UPDATED_BUILT_IN);
-        assertThat(testDictionary.getSyncEnum()).isEqualTo(UPDATED_SYNC_ENUM);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedDictionaryToMatchAllProperties(updatedDictionary);
     }
 
     @Test
     @Transactional
     void putNonExistingDictionary() throws Exception {
-        int databaseSizeBeforeUpdate = dictionaryRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         dictionary.setId(longCount.incrementAndGet());
 
         // Create the Dictionary
@@ -683,19 +603,18 @@ public class DictionaryResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, dictionaryDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(dictionaryDTO))
+                    .content(om.writeValueAsBytes(dictionaryDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Dictionary in the database
-        List<Dictionary> dictionaryList = dictionaryRepository.findAll();
-        assertThat(dictionaryList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchDictionary() throws Exception {
-        int databaseSizeBeforeUpdate = dictionaryRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         dictionary.setId(longCount.incrementAndGet());
 
         // Create the Dictionary
@@ -706,19 +625,18 @@ public class DictionaryResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(dictionaryDTO))
+                    .content(om.writeValueAsBytes(dictionaryDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Dictionary in the database
-        List<Dictionary> dictionaryList = dictionaryRepository.findAll();
-        assertThat(dictionaryList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamDictionary() throws Exception {
-        int databaseSizeBeforeUpdate = dictionaryRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         dictionary.setId(longCount.incrementAndGet());
 
         // Create the Dictionary
@@ -726,12 +644,11 @@ public class DictionaryResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restDictionaryMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(dictionaryDTO)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(dictionaryDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Dictionary in the database
-        List<Dictionary> dictionaryList = dictionaryRepository.findAll();
-        assertThat(dictionaryList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -740,32 +657,29 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        int databaseSizeBeforeUpdate = dictionaryRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the dictionary using partial update
         Dictionary partialUpdatedDictionary = new Dictionary();
         partialUpdatedDictionary.setId(dictionary.getId());
 
-        partialUpdatedDictionary.builtIn(UPDATED_BUILT_IN).syncEnum(UPDATED_SYNC_ENUM);
+        partialUpdatedDictionary.dictName(UPDATED_DICT_NAME).syncEnum(UPDATED_SYNC_ENUM);
 
         restDictionaryMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedDictionary.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedDictionary))
+                    .content(om.writeValueAsBytes(partialUpdatedDictionary))
             )
             .andExpect(status().isOk());
 
         // Validate the Dictionary in the database
-        List<Dictionary> dictionaryList = dictionaryRepository.findAll();
-        assertThat(dictionaryList).hasSize(databaseSizeBeforeUpdate);
-        Dictionary testDictionary = dictionaryList.get(dictionaryList.size() - 1);
-        assertThat(testDictionary.getDictName()).isEqualTo(DEFAULT_DICT_NAME);
-        assertThat(testDictionary.getDictKey()).isEqualTo(DEFAULT_DICT_KEY);
-        assertThat(testDictionary.getDisabled()).isEqualTo(DEFAULT_DISABLED);
-        assertThat(testDictionary.getSortValue()).isEqualTo(DEFAULT_SORT_VALUE);
-        assertThat(testDictionary.getBuiltIn()).isEqualTo(UPDATED_BUILT_IN);
-        assertThat(testDictionary.getSyncEnum()).isEqualTo(UPDATED_SYNC_ENUM);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertDictionaryUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedDictionary, dictionary),
+            getPersistedDictionary(dictionary)
+        );
     }
 
     @Test
@@ -774,7 +688,7 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        int databaseSizeBeforeUpdate = dictionaryRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the dictionary using partial update
         Dictionary partialUpdatedDictionary = new Dictionary();
@@ -792,26 +706,20 @@ public class DictionaryResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedDictionary.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedDictionary))
+                    .content(om.writeValueAsBytes(partialUpdatedDictionary))
             )
             .andExpect(status().isOk());
 
         // Validate the Dictionary in the database
-        List<Dictionary> dictionaryList = dictionaryRepository.findAll();
-        assertThat(dictionaryList).hasSize(databaseSizeBeforeUpdate);
-        Dictionary testDictionary = dictionaryList.get(dictionaryList.size() - 1);
-        assertThat(testDictionary.getDictName()).isEqualTo(UPDATED_DICT_NAME);
-        assertThat(testDictionary.getDictKey()).isEqualTo(UPDATED_DICT_KEY);
-        assertThat(testDictionary.getDisabled()).isEqualTo(UPDATED_DISABLED);
-        assertThat(testDictionary.getSortValue()).isEqualTo(UPDATED_SORT_VALUE);
-        assertThat(testDictionary.getBuiltIn()).isEqualTo(UPDATED_BUILT_IN);
-        assertThat(testDictionary.getSyncEnum()).isEqualTo(UPDATED_SYNC_ENUM);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertDictionaryUpdatableFieldsEquals(partialUpdatedDictionary, getPersistedDictionary(partialUpdatedDictionary));
     }
 
     @Test
     @Transactional
     void patchNonExistingDictionary() throws Exception {
-        int databaseSizeBeforeUpdate = dictionaryRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         dictionary.setId(longCount.incrementAndGet());
 
         // Create the Dictionary
@@ -822,19 +730,18 @@ public class DictionaryResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, dictionaryDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(dictionaryDTO))
+                    .content(om.writeValueAsBytes(dictionaryDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Dictionary in the database
-        List<Dictionary> dictionaryList = dictionaryRepository.findAll();
-        assertThat(dictionaryList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchDictionary() throws Exception {
-        int databaseSizeBeforeUpdate = dictionaryRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         dictionary.setId(longCount.incrementAndGet());
 
         // Create the Dictionary
@@ -845,19 +752,18 @@ public class DictionaryResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(dictionaryDTO))
+                    .content(om.writeValueAsBytes(dictionaryDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Dictionary in the database
-        List<Dictionary> dictionaryList = dictionaryRepository.findAll();
-        assertThat(dictionaryList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamDictionary() throws Exception {
-        int databaseSizeBeforeUpdate = dictionaryRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         dictionary.setId(longCount.incrementAndGet());
 
         // Create the Dictionary
@@ -865,14 +771,11 @@ public class DictionaryResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restDictionaryMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(dictionaryDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(dictionaryDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Dictionary in the database
-        List<Dictionary> dictionaryList = dictionaryRepository.findAll();
-        assertThat(dictionaryList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -881,7 +784,7 @@ public class DictionaryResourceIT {
         // Initialize the database
         dictionaryRepository.save(dictionary);
 
-        int databaseSizeBeforeDelete = dictionaryRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the dictionary
         restDictionaryMockMvc
@@ -889,7 +792,34 @@ public class DictionaryResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<Dictionary> dictionaryList = dictionaryRepository.findAll();
-        assertThat(dictionaryList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return dictionaryRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected Dictionary getPersistedDictionary(Dictionary dictionary) {
+        return dictionaryRepository.findById(dictionary.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedDictionaryToMatchAllProperties(Dictionary expectedDictionary) {
+        assertDictionaryAllPropertiesEquals(expectedDictionary, getPersistedDictionary(expectedDictionary));
+    }
+
+    protected void assertPersistedDictionaryToMatchUpdatableProperties(Dictionary expectedDictionary) {
+        assertDictionaryAllUpdatablePropertiesEquals(expectedDictionary, getPersistedDictionary(expectedDictionary));
     }
 }

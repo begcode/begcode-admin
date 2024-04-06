@@ -1,5 +1,7 @@
 package com.begcode.monolith.web.rest;
 
+import static com.begcode.monolith.domain.UploadImageAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static com.begcode.monolith.web.rest.TestUtil.sameInstant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -16,14 +18,13 @@ import com.begcode.monolith.repository.UploadImageRepository;
 import com.begcode.monolith.service.UploadImageService;
 import com.begcode.monolith.service.dto.UploadImageDTO;
 import com.begcode.monolith.service.mapper.UploadImageMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -117,8 +118,11 @@ public class UploadImageResourceIT {
     private static final String ENTITY_API_URL = "/api/upload-images";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private UploadImageRepository uploadImageRepository;
@@ -209,40 +213,23 @@ public class UploadImageResourceIT {
     @Test
     @Transactional
     void createUploadImage() throws Exception {
-        int databaseSizeBeforeCreate = uploadImageRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the UploadImage
         UploadImageDTO uploadImageDTO = uploadImageMapper.toDto(uploadImage);
-        restUploadImageMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(uploadImageDTO))
-            )
-            .andExpect(status().isCreated());
+        var returnedUploadImageDTO = om.readValue(
+            restUploadImageMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(uploadImageDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            UploadImageDTO.class
+        );
 
         // Validate the UploadImage in the database
-        List<UploadImage> uploadImageList = uploadImageRepository.findAll();
-        assertThat(uploadImageList).hasSize(databaseSizeBeforeCreate + 1);
-        UploadImage testUploadImage = uploadImageList.get(uploadImageList.size() - 1);
-        assertThat(testUploadImage.getUrl()).isEqualTo(DEFAULT_URL);
-        assertThat(testUploadImage.getFullName()).isEqualTo(DEFAULT_FULL_NAME);
-        assertThat(testUploadImage.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testUploadImage.getExt()).isEqualTo(DEFAULT_EXT);
-        assertThat(testUploadImage.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testUploadImage.getPath()).isEqualTo(DEFAULT_PATH);
-        assertThat(testUploadImage.getFolder()).isEqualTo(DEFAULT_FOLDER);
-        assertThat(testUploadImage.getOwnerEntityName()).isEqualTo(DEFAULT_OWNER_ENTITY_NAME);
-        assertThat(testUploadImage.getOwnerEntityId()).isEqualTo(DEFAULT_OWNER_ENTITY_ID);
-        assertThat(testUploadImage.getBusinessTitle()).isEqualTo(DEFAULT_BUSINESS_TITLE);
-        assertThat(testUploadImage.getBusinessDesc()).isEqualTo(DEFAULT_BUSINESS_DESC);
-        assertThat(testUploadImage.getBusinessStatus()).isEqualTo(DEFAULT_BUSINESS_STATUS);
-        assertThat(testUploadImage.getCreateAt()).isEqualTo(DEFAULT_CREATE_AT);
-        assertThat(testUploadImage.getFileSize()).isEqualTo(DEFAULT_FILE_SIZE);
-        assertThat(testUploadImage.getSmartUrl()).isEqualTo(DEFAULT_SMART_URL);
-        assertThat(testUploadImage.getMediumUrl()).isEqualTo(DEFAULT_MEDIUM_URL);
-        assertThat(testUploadImage.getReferenceCount()).isEqualTo(DEFAULT_REFERENCE_COUNT);
-        assertThat(testUploadImage.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY);
-        assertThat(testUploadImage.getCreatedDate()).isEqualTo(DEFAULT_CREATED_DATE);
-        assertThat(testUploadImage.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
-        assertThat(testUploadImage.getLastModifiedDate()).isEqualTo(DEFAULT_LAST_MODIFIED_DATE);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedUploadImage = uploadImageMapper.toEntity(returnedUploadImageDTO);
+        assertUploadImageUpdatableFieldsEquals(returnedUploadImage, getPersistedUploadImage(returnedUploadImage));
     }
 
     @Test
@@ -252,24 +239,21 @@ public class UploadImageResourceIT {
         uploadImage.setId(1L);
         UploadImageDTO uploadImageDTO = uploadImageMapper.toDto(uploadImage);
 
-        int databaseSizeBeforeCreate = uploadImageRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restUploadImageMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(uploadImageDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(uploadImageDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the UploadImage in the database
-        List<UploadImage> uploadImageList = uploadImageRepository.findAll();
-        assertThat(uploadImageList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
     @Transactional
     void checkUrlIsRequired() throws Exception {
-        int databaseSizeBeforeTest = uploadImageRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         uploadImage.setUrl(null);
 
@@ -277,13 +261,10 @@ public class UploadImageResourceIT {
         UploadImageDTO uploadImageDTO = uploadImageMapper.toDto(uploadImage);
 
         restUploadImageMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(uploadImageDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(uploadImageDTO)))
             .andExpect(status().isBadRequest());
 
-        List<UploadImage> uploadImageList = uploadImageRepository.findAll();
-        assertThat(uploadImageList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
@@ -381,14 +362,11 @@ public class UploadImageResourceIT {
 
         Long id = uploadImage.getId();
 
-        defaultUploadImageShouldBeFound("id.equals=" + id);
-        defaultUploadImageShouldNotBeFound("id.notEquals=" + id);
+        defaultUploadImageFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultUploadImageShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultUploadImageShouldNotBeFound("id.greaterThan=" + id);
+        defaultUploadImageFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultUploadImageShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultUploadImageShouldNotBeFound("id.lessThan=" + id);
+        defaultUploadImageFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -397,11 +375,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where url equals to DEFAULT_URL
-        defaultUploadImageShouldBeFound("url.equals=" + DEFAULT_URL);
-
-        // Get all the uploadImageList where url equals to UPDATED_URL
-        defaultUploadImageShouldNotBeFound("url.equals=" + UPDATED_URL);
+        // Get all the uploadImageList where url equals to
+        defaultUploadImageFiltering("url.equals=" + DEFAULT_URL, "url.equals=" + UPDATED_URL);
     }
 
     @Test
@@ -410,11 +385,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where url in DEFAULT_URL or UPDATED_URL
-        defaultUploadImageShouldBeFound("url.in=" + DEFAULT_URL + "," + UPDATED_URL);
-
-        // Get all the uploadImageList where url equals to UPDATED_URL
-        defaultUploadImageShouldNotBeFound("url.in=" + UPDATED_URL);
+        // Get all the uploadImageList where url in
+        defaultUploadImageFiltering("url.in=" + DEFAULT_URL + "," + UPDATED_URL, "url.in=" + UPDATED_URL);
     }
 
     @Test
@@ -424,10 +396,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where url is not null
-        defaultUploadImageShouldBeFound("url.specified=true");
-
-        // Get all the uploadImageList where url is null
-        defaultUploadImageShouldNotBeFound("url.specified=false");
+        defaultUploadImageFiltering("url.specified=true", "url.specified=false");
     }
 
     @Test
@@ -436,11 +405,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where url contains DEFAULT_URL
-        defaultUploadImageShouldBeFound("url.contains=" + DEFAULT_URL);
-
-        // Get all the uploadImageList where url contains UPDATED_URL
-        defaultUploadImageShouldNotBeFound("url.contains=" + UPDATED_URL);
+        // Get all the uploadImageList where url contains
+        defaultUploadImageFiltering("url.contains=" + DEFAULT_URL, "url.contains=" + UPDATED_URL);
     }
 
     @Test
@@ -449,11 +415,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where url does not contain DEFAULT_URL
-        defaultUploadImageShouldNotBeFound("url.doesNotContain=" + DEFAULT_URL);
-
-        // Get all the uploadImageList where url does not contain UPDATED_URL
-        defaultUploadImageShouldBeFound("url.doesNotContain=" + UPDATED_URL);
+        // Get all the uploadImageList where url does not contain
+        defaultUploadImageFiltering("url.doesNotContain=" + UPDATED_URL, "url.doesNotContain=" + DEFAULT_URL);
     }
 
     @Test
@@ -462,11 +425,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where fullName equals to DEFAULT_FULL_NAME
-        defaultUploadImageShouldBeFound("fullName.equals=" + DEFAULT_FULL_NAME);
-
-        // Get all the uploadImageList where fullName equals to UPDATED_FULL_NAME
-        defaultUploadImageShouldNotBeFound("fullName.equals=" + UPDATED_FULL_NAME);
+        // Get all the uploadImageList where fullName equals to
+        defaultUploadImageFiltering("fullName.equals=" + DEFAULT_FULL_NAME, "fullName.equals=" + UPDATED_FULL_NAME);
     }
 
     @Test
@@ -475,11 +435,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where fullName in DEFAULT_FULL_NAME or UPDATED_FULL_NAME
-        defaultUploadImageShouldBeFound("fullName.in=" + DEFAULT_FULL_NAME + "," + UPDATED_FULL_NAME);
-
-        // Get all the uploadImageList where fullName equals to UPDATED_FULL_NAME
-        defaultUploadImageShouldNotBeFound("fullName.in=" + UPDATED_FULL_NAME);
+        // Get all the uploadImageList where fullName in
+        defaultUploadImageFiltering("fullName.in=" + DEFAULT_FULL_NAME + "," + UPDATED_FULL_NAME, "fullName.in=" + UPDATED_FULL_NAME);
     }
 
     @Test
@@ -489,10 +446,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where fullName is not null
-        defaultUploadImageShouldBeFound("fullName.specified=true");
-
-        // Get all the uploadImageList where fullName is null
-        defaultUploadImageShouldNotBeFound("fullName.specified=false");
+        defaultUploadImageFiltering("fullName.specified=true", "fullName.specified=false");
     }
 
     @Test
@@ -501,11 +455,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where fullName contains DEFAULT_FULL_NAME
-        defaultUploadImageShouldBeFound("fullName.contains=" + DEFAULT_FULL_NAME);
-
-        // Get all the uploadImageList where fullName contains UPDATED_FULL_NAME
-        defaultUploadImageShouldNotBeFound("fullName.contains=" + UPDATED_FULL_NAME);
+        // Get all the uploadImageList where fullName contains
+        defaultUploadImageFiltering("fullName.contains=" + DEFAULT_FULL_NAME, "fullName.contains=" + UPDATED_FULL_NAME);
     }
 
     @Test
@@ -514,11 +465,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where fullName does not contain DEFAULT_FULL_NAME
-        defaultUploadImageShouldNotBeFound("fullName.doesNotContain=" + DEFAULT_FULL_NAME);
-
-        // Get all the uploadImageList where fullName does not contain UPDATED_FULL_NAME
-        defaultUploadImageShouldBeFound("fullName.doesNotContain=" + UPDATED_FULL_NAME);
+        // Get all the uploadImageList where fullName does not contain
+        defaultUploadImageFiltering("fullName.doesNotContain=" + UPDATED_FULL_NAME, "fullName.doesNotContain=" + DEFAULT_FULL_NAME);
     }
 
     @Test
@@ -527,11 +475,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where name equals to DEFAULT_NAME
-        defaultUploadImageShouldBeFound("name.equals=" + DEFAULT_NAME);
-
-        // Get all the uploadImageList where name equals to UPDATED_NAME
-        defaultUploadImageShouldNotBeFound("name.equals=" + UPDATED_NAME);
+        // Get all the uploadImageList where name equals to
+        defaultUploadImageFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
     }
 
     @Test
@@ -540,11 +485,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where name in DEFAULT_NAME or UPDATED_NAME
-        defaultUploadImageShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
-
-        // Get all the uploadImageList where name equals to UPDATED_NAME
-        defaultUploadImageShouldNotBeFound("name.in=" + UPDATED_NAME);
+        // Get all the uploadImageList where name in
+        defaultUploadImageFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
     }
 
     @Test
@@ -554,10 +496,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where name is not null
-        defaultUploadImageShouldBeFound("name.specified=true");
-
-        // Get all the uploadImageList where name is null
-        defaultUploadImageShouldNotBeFound("name.specified=false");
+        defaultUploadImageFiltering("name.specified=true", "name.specified=false");
     }
 
     @Test
@@ -566,11 +505,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where name contains DEFAULT_NAME
-        defaultUploadImageShouldBeFound("name.contains=" + DEFAULT_NAME);
-
-        // Get all the uploadImageList where name contains UPDATED_NAME
-        defaultUploadImageShouldNotBeFound("name.contains=" + UPDATED_NAME);
+        // Get all the uploadImageList where name contains
+        defaultUploadImageFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
     }
 
     @Test
@@ -579,11 +515,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where name does not contain DEFAULT_NAME
-        defaultUploadImageShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
-
-        // Get all the uploadImageList where name does not contain UPDATED_NAME
-        defaultUploadImageShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+        // Get all the uploadImageList where name does not contain
+        defaultUploadImageFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
     }
 
     @Test
@@ -592,11 +525,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where ext equals to DEFAULT_EXT
-        defaultUploadImageShouldBeFound("ext.equals=" + DEFAULT_EXT);
-
-        // Get all the uploadImageList where ext equals to UPDATED_EXT
-        defaultUploadImageShouldNotBeFound("ext.equals=" + UPDATED_EXT);
+        // Get all the uploadImageList where ext equals to
+        defaultUploadImageFiltering("ext.equals=" + DEFAULT_EXT, "ext.equals=" + UPDATED_EXT);
     }
 
     @Test
@@ -605,11 +535,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where ext in DEFAULT_EXT or UPDATED_EXT
-        defaultUploadImageShouldBeFound("ext.in=" + DEFAULT_EXT + "," + UPDATED_EXT);
-
-        // Get all the uploadImageList where ext equals to UPDATED_EXT
-        defaultUploadImageShouldNotBeFound("ext.in=" + UPDATED_EXT);
+        // Get all the uploadImageList where ext in
+        defaultUploadImageFiltering("ext.in=" + DEFAULT_EXT + "," + UPDATED_EXT, "ext.in=" + UPDATED_EXT);
     }
 
     @Test
@@ -619,10 +546,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where ext is not null
-        defaultUploadImageShouldBeFound("ext.specified=true");
-
-        // Get all the uploadImageList where ext is null
-        defaultUploadImageShouldNotBeFound("ext.specified=false");
+        defaultUploadImageFiltering("ext.specified=true", "ext.specified=false");
     }
 
     @Test
@@ -631,11 +555,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where ext contains DEFAULT_EXT
-        defaultUploadImageShouldBeFound("ext.contains=" + DEFAULT_EXT);
-
-        // Get all the uploadImageList where ext contains UPDATED_EXT
-        defaultUploadImageShouldNotBeFound("ext.contains=" + UPDATED_EXT);
+        // Get all the uploadImageList where ext contains
+        defaultUploadImageFiltering("ext.contains=" + DEFAULT_EXT, "ext.contains=" + UPDATED_EXT);
     }
 
     @Test
@@ -644,11 +565,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where ext does not contain DEFAULT_EXT
-        defaultUploadImageShouldNotBeFound("ext.doesNotContain=" + DEFAULT_EXT);
-
-        // Get all the uploadImageList where ext does not contain UPDATED_EXT
-        defaultUploadImageShouldBeFound("ext.doesNotContain=" + UPDATED_EXT);
+        // Get all the uploadImageList where ext does not contain
+        defaultUploadImageFiltering("ext.doesNotContain=" + UPDATED_EXT, "ext.doesNotContain=" + DEFAULT_EXT);
     }
 
     @Test
@@ -657,11 +575,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where type equals to DEFAULT_TYPE
-        defaultUploadImageShouldBeFound("type.equals=" + DEFAULT_TYPE);
-
-        // Get all the uploadImageList where type equals to UPDATED_TYPE
-        defaultUploadImageShouldNotBeFound("type.equals=" + UPDATED_TYPE);
+        // Get all the uploadImageList where type equals to
+        defaultUploadImageFiltering("type.equals=" + DEFAULT_TYPE, "type.equals=" + UPDATED_TYPE);
     }
 
     @Test
@@ -670,11 +585,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where type in DEFAULT_TYPE or UPDATED_TYPE
-        defaultUploadImageShouldBeFound("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE);
-
-        // Get all the uploadImageList where type equals to UPDATED_TYPE
-        defaultUploadImageShouldNotBeFound("type.in=" + UPDATED_TYPE);
+        // Get all the uploadImageList where type in
+        defaultUploadImageFiltering("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE, "type.in=" + UPDATED_TYPE);
     }
 
     @Test
@@ -684,10 +596,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where type is not null
-        defaultUploadImageShouldBeFound("type.specified=true");
-
-        // Get all the uploadImageList where type is null
-        defaultUploadImageShouldNotBeFound("type.specified=false");
+        defaultUploadImageFiltering("type.specified=true", "type.specified=false");
     }
 
     @Test
@@ -696,11 +605,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where type contains DEFAULT_TYPE
-        defaultUploadImageShouldBeFound("type.contains=" + DEFAULT_TYPE);
-
-        // Get all the uploadImageList where type contains UPDATED_TYPE
-        defaultUploadImageShouldNotBeFound("type.contains=" + UPDATED_TYPE);
+        // Get all the uploadImageList where type contains
+        defaultUploadImageFiltering("type.contains=" + DEFAULT_TYPE, "type.contains=" + UPDATED_TYPE);
     }
 
     @Test
@@ -709,11 +615,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where type does not contain DEFAULT_TYPE
-        defaultUploadImageShouldNotBeFound("type.doesNotContain=" + DEFAULT_TYPE);
-
-        // Get all the uploadImageList where type does not contain UPDATED_TYPE
-        defaultUploadImageShouldBeFound("type.doesNotContain=" + UPDATED_TYPE);
+        // Get all the uploadImageList where type does not contain
+        defaultUploadImageFiltering("type.doesNotContain=" + UPDATED_TYPE, "type.doesNotContain=" + DEFAULT_TYPE);
     }
 
     @Test
@@ -722,11 +625,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where path equals to DEFAULT_PATH
-        defaultUploadImageShouldBeFound("path.equals=" + DEFAULT_PATH);
-
-        // Get all the uploadImageList where path equals to UPDATED_PATH
-        defaultUploadImageShouldNotBeFound("path.equals=" + UPDATED_PATH);
+        // Get all the uploadImageList where path equals to
+        defaultUploadImageFiltering("path.equals=" + DEFAULT_PATH, "path.equals=" + UPDATED_PATH);
     }
 
     @Test
@@ -735,11 +635,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where path in DEFAULT_PATH or UPDATED_PATH
-        defaultUploadImageShouldBeFound("path.in=" + DEFAULT_PATH + "," + UPDATED_PATH);
-
-        // Get all the uploadImageList where path equals to UPDATED_PATH
-        defaultUploadImageShouldNotBeFound("path.in=" + UPDATED_PATH);
+        // Get all the uploadImageList where path in
+        defaultUploadImageFiltering("path.in=" + DEFAULT_PATH + "," + UPDATED_PATH, "path.in=" + UPDATED_PATH);
     }
 
     @Test
@@ -749,10 +646,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where path is not null
-        defaultUploadImageShouldBeFound("path.specified=true");
-
-        // Get all the uploadImageList where path is null
-        defaultUploadImageShouldNotBeFound("path.specified=false");
+        defaultUploadImageFiltering("path.specified=true", "path.specified=false");
     }
 
     @Test
@@ -761,11 +655,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where path contains DEFAULT_PATH
-        defaultUploadImageShouldBeFound("path.contains=" + DEFAULT_PATH);
-
-        // Get all the uploadImageList where path contains UPDATED_PATH
-        defaultUploadImageShouldNotBeFound("path.contains=" + UPDATED_PATH);
+        // Get all the uploadImageList where path contains
+        defaultUploadImageFiltering("path.contains=" + DEFAULT_PATH, "path.contains=" + UPDATED_PATH);
     }
 
     @Test
@@ -774,11 +665,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where path does not contain DEFAULT_PATH
-        defaultUploadImageShouldNotBeFound("path.doesNotContain=" + DEFAULT_PATH);
-
-        // Get all the uploadImageList where path does not contain UPDATED_PATH
-        defaultUploadImageShouldBeFound("path.doesNotContain=" + UPDATED_PATH);
+        // Get all the uploadImageList where path does not contain
+        defaultUploadImageFiltering("path.doesNotContain=" + UPDATED_PATH, "path.doesNotContain=" + DEFAULT_PATH);
     }
 
     @Test
@@ -787,11 +675,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where folder equals to DEFAULT_FOLDER
-        defaultUploadImageShouldBeFound("folder.equals=" + DEFAULT_FOLDER);
-
-        // Get all the uploadImageList where folder equals to UPDATED_FOLDER
-        defaultUploadImageShouldNotBeFound("folder.equals=" + UPDATED_FOLDER);
+        // Get all the uploadImageList where folder equals to
+        defaultUploadImageFiltering("folder.equals=" + DEFAULT_FOLDER, "folder.equals=" + UPDATED_FOLDER);
     }
 
     @Test
@@ -800,11 +685,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where folder in DEFAULT_FOLDER or UPDATED_FOLDER
-        defaultUploadImageShouldBeFound("folder.in=" + DEFAULT_FOLDER + "," + UPDATED_FOLDER);
-
-        // Get all the uploadImageList where folder equals to UPDATED_FOLDER
-        defaultUploadImageShouldNotBeFound("folder.in=" + UPDATED_FOLDER);
+        // Get all the uploadImageList where folder in
+        defaultUploadImageFiltering("folder.in=" + DEFAULT_FOLDER + "," + UPDATED_FOLDER, "folder.in=" + UPDATED_FOLDER);
     }
 
     @Test
@@ -814,10 +696,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where folder is not null
-        defaultUploadImageShouldBeFound("folder.specified=true");
-
-        // Get all the uploadImageList where folder is null
-        defaultUploadImageShouldNotBeFound("folder.specified=false");
+        defaultUploadImageFiltering("folder.specified=true", "folder.specified=false");
     }
 
     @Test
@@ -826,11 +705,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where folder contains DEFAULT_FOLDER
-        defaultUploadImageShouldBeFound("folder.contains=" + DEFAULT_FOLDER);
-
-        // Get all the uploadImageList where folder contains UPDATED_FOLDER
-        defaultUploadImageShouldNotBeFound("folder.contains=" + UPDATED_FOLDER);
+        // Get all the uploadImageList where folder contains
+        defaultUploadImageFiltering("folder.contains=" + DEFAULT_FOLDER, "folder.contains=" + UPDATED_FOLDER);
     }
 
     @Test
@@ -839,11 +715,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where folder does not contain DEFAULT_FOLDER
-        defaultUploadImageShouldNotBeFound("folder.doesNotContain=" + DEFAULT_FOLDER);
-
-        // Get all the uploadImageList where folder does not contain UPDATED_FOLDER
-        defaultUploadImageShouldBeFound("folder.doesNotContain=" + UPDATED_FOLDER);
+        // Get all the uploadImageList where folder does not contain
+        defaultUploadImageFiltering("folder.doesNotContain=" + UPDATED_FOLDER, "folder.doesNotContain=" + DEFAULT_FOLDER);
     }
 
     @Test
@@ -852,11 +725,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where ownerEntityName equals to DEFAULT_OWNER_ENTITY_NAME
-        defaultUploadImageShouldBeFound("ownerEntityName.equals=" + DEFAULT_OWNER_ENTITY_NAME);
-
-        // Get all the uploadImageList where ownerEntityName equals to UPDATED_OWNER_ENTITY_NAME
-        defaultUploadImageShouldNotBeFound("ownerEntityName.equals=" + UPDATED_OWNER_ENTITY_NAME);
+        // Get all the uploadImageList where ownerEntityName equals to
+        defaultUploadImageFiltering(
+            "ownerEntityName.equals=" + DEFAULT_OWNER_ENTITY_NAME,
+            "ownerEntityName.equals=" + UPDATED_OWNER_ENTITY_NAME
+        );
     }
 
     @Test
@@ -865,11 +738,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where ownerEntityName in DEFAULT_OWNER_ENTITY_NAME or UPDATED_OWNER_ENTITY_NAME
-        defaultUploadImageShouldBeFound("ownerEntityName.in=" + DEFAULT_OWNER_ENTITY_NAME + "," + UPDATED_OWNER_ENTITY_NAME);
-
-        // Get all the uploadImageList where ownerEntityName equals to UPDATED_OWNER_ENTITY_NAME
-        defaultUploadImageShouldNotBeFound("ownerEntityName.in=" + UPDATED_OWNER_ENTITY_NAME);
+        // Get all the uploadImageList where ownerEntityName in
+        defaultUploadImageFiltering(
+            "ownerEntityName.in=" + DEFAULT_OWNER_ENTITY_NAME + "," + UPDATED_OWNER_ENTITY_NAME,
+            "ownerEntityName.in=" + UPDATED_OWNER_ENTITY_NAME
+        );
     }
 
     @Test
@@ -879,10 +752,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where ownerEntityName is not null
-        defaultUploadImageShouldBeFound("ownerEntityName.specified=true");
-
-        // Get all the uploadImageList where ownerEntityName is null
-        defaultUploadImageShouldNotBeFound("ownerEntityName.specified=false");
+        defaultUploadImageFiltering("ownerEntityName.specified=true", "ownerEntityName.specified=false");
     }
 
     @Test
@@ -891,11 +761,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where ownerEntityName contains DEFAULT_OWNER_ENTITY_NAME
-        defaultUploadImageShouldBeFound("ownerEntityName.contains=" + DEFAULT_OWNER_ENTITY_NAME);
-
-        // Get all the uploadImageList where ownerEntityName contains UPDATED_OWNER_ENTITY_NAME
-        defaultUploadImageShouldNotBeFound("ownerEntityName.contains=" + UPDATED_OWNER_ENTITY_NAME);
+        // Get all the uploadImageList where ownerEntityName contains
+        defaultUploadImageFiltering(
+            "ownerEntityName.contains=" + DEFAULT_OWNER_ENTITY_NAME,
+            "ownerEntityName.contains=" + UPDATED_OWNER_ENTITY_NAME
+        );
     }
 
     @Test
@@ -904,11 +774,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where ownerEntityName does not contain DEFAULT_OWNER_ENTITY_NAME
-        defaultUploadImageShouldNotBeFound("ownerEntityName.doesNotContain=" + DEFAULT_OWNER_ENTITY_NAME);
-
-        // Get all the uploadImageList where ownerEntityName does not contain UPDATED_OWNER_ENTITY_NAME
-        defaultUploadImageShouldBeFound("ownerEntityName.doesNotContain=" + UPDATED_OWNER_ENTITY_NAME);
+        // Get all the uploadImageList where ownerEntityName does not contain
+        defaultUploadImageFiltering(
+            "ownerEntityName.doesNotContain=" + UPDATED_OWNER_ENTITY_NAME,
+            "ownerEntityName.doesNotContain=" + DEFAULT_OWNER_ENTITY_NAME
+        );
     }
 
     @Test
@@ -917,11 +787,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where ownerEntityId equals to DEFAULT_OWNER_ENTITY_ID
-        defaultUploadImageShouldBeFound("ownerEntityId.equals=" + DEFAULT_OWNER_ENTITY_ID);
-
-        // Get all the uploadImageList where ownerEntityId equals to UPDATED_OWNER_ENTITY_ID
-        defaultUploadImageShouldNotBeFound("ownerEntityId.equals=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the uploadImageList where ownerEntityId equals to
+        defaultUploadImageFiltering("ownerEntityId.equals=" + DEFAULT_OWNER_ENTITY_ID, "ownerEntityId.equals=" + UPDATED_OWNER_ENTITY_ID);
     }
 
     @Test
@@ -930,11 +797,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where ownerEntityId in DEFAULT_OWNER_ENTITY_ID or UPDATED_OWNER_ENTITY_ID
-        defaultUploadImageShouldBeFound("ownerEntityId.in=" + DEFAULT_OWNER_ENTITY_ID + "," + UPDATED_OWNER_ENTITY_ID);
-
-        // Get all the uploadImageList where ownerEntityId equals to UPDATED_OWNER_ENTITY_ID
-        defaultUploadImageShouldNotBeFound("ownerEntityId.in=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the uploadImageList where ownerEntityId in
+        defaultUploadImageFiltering(
+            "ownerEntityId.in=" + DEFAULT_OWNER_ENTITY_ID + "," + UPDATED_OWNER_ENTITY_ID,
+            "ownerEntityId.in=" + UPDATED_OWNER_ENTITY_ID
+        );
     }
 
     @Test
@@ -944,10 +811,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where ownerEntityId is not null
-        defaultUploadImageShouldBeFound("ownerEntityId.specified=true");
-
-        // Get all the uploadImageList where ownerEntityId is null
-        defaultUploadImageShouldNotBeFound("ownerEntityId.specified=false");
+        defaultUploadImageFiltering("ownerEntityId.specified=true", "ownerEntityId.specified=false");
     }
 
     @Test
@@ -956,11 +820,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where ownerEntityId is greater than or equal to DEFAULT_OWNER_ENTITY_ID
-        defaultUploadImageShouldBeFound("ownerEntityId.greaterThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID);
-
-        // Get all the uploadImageList where ownerEntityId is greater than or equal to UPDATED_OWNER_ENTITY_ID
-        defaultUploadImageShouldNotBeFound("ownerEntityId.greaterThanOrEqual=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the uploadImageList where ownerEntityId is greater than or equal to
+        defaultUploadImageFiltering(
+            "ownerEntityId.greaterThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID,
+            "ownerEntityId.greaterThanOrEqual=" + UPDATED_OWNER_ENTITY_ID
+        );
     }
 
     @Test
@@ -969,11 +833,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where ownerEntityId is less than or equal to DEFAULT_OWNER_ENTITY_ID
-        defaultUploadImageShouldBeFound("ownerEntityId.lessThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID);
-
-        // Get all the uploadImageList where ownerEntityId is less than or equal to SMALLER_OWNER_ENTITY_ID
-        defaultUploadImageShouldNotBeFound("ownerEntityId.lessThanOrEqual=" + SMALLER_OWNER_ENTITY_ID);
+        // Get all the uploadImageList where ownerEntityId is less than or equal to
+        defaultUploadImageFiltering(
+            "ownerEntityId.lessThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID,
+            "ownerEntityId.lessThanOrEqual=" + SMALLER_OWNER_ENTITY_ID
+        );
     }
 
     @Test
@@ -982,11 +846,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where ownerEntityId is less than DEFAULT_OWNER_ENTITY_ID
-        defaultUploadImageShouldNotBeFound("ownerEntityId.lessThan=" + DEFAULT_OWNER_ENTITY_ID);
-
-        // Get all the uploadImageList where ownerEntityId is less than UPDATED_OWNER_ENTITY_ID
-        defaultUploadImageShouldBeFound("ownerEntityId.lessThan=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the uploadImageList where ownerEntityId is less than
+        defaultUploadImageFiltering(
+            "ownerEntityId.lessThan=" + UPDATED_OWNER_ENTITY_ID,
+            "ownerEntityId.lessThan=" + DEFAULT_OWNER_ENTITY_ID
+        );
     }
 
     @Test
@@ -995,11 +859,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where ownerEntityId is greater than DEFAULT_OWNER_ENTITY_ID
-        defaultUploadImageShouldNotBeFound("ownerEntityId.greaterThan=" + DEFAULT_OWNER_ENTITY_ID);
-
-        // Get all the uploadImageList where ownerEntityId is greater than SMALLER_OWNER_ENTITY_ID
-        defaultUploadImageShouldBeFound("ownerEntityId.greaterThan=" + SMALLER_OWNER_ENTITY_ID);
+        // Get all the uploadImageList where ownerEntityId is greater than
+        defaultUploadImageFiltering(
+            "ownerEntityId.greaterThan=" + SMALLER_OWNER_ENTITY_ID,
+            "ownerEntityId.greaterThan=" + DEFAULT_OWNER_ENTITY_ID
+        );
     }
 
     @Test
@@ -1008,11 +872,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where businessTitle equals to DEFAULT_BUSINESS_TITLE
-        defaultUploadImageShouldBeFound("businessTitle.equals=" + DEFAULT_BUSINESS_TITLE);
-
-        // Get all the uploadImageList where businessTitle equals to UPDATED_BUSINESS_TITLE
-        defaultUploadImageShouldNotBeFound("businessTitle.equals=" + UPDATED_BUSINESS_TITLE);
+        // Get all the uploadImageList where businessTitle equals to
+        defaultUploadImageFiltering("businessTitle.equals=" + DEFAULT_BUSINESS_TITLE, "businessTitle.equals=" + UPDATED_BUSINESS_TITLE);
     }
 
     @Test
@@ -1021,11 +882,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where businessTitle in DEFAULT_BUSINESS_TITLE or UPDATED_BUSINESS_TITLE
-        defaultUploadImageShouldBeFound("businessTitle.in=" + DEFAULT_BUSINESS_TITLE + "," + UPDATED_BUSINESS_TITLE);
-
-        // Get all the uploadImageList where businessTitle equals to UPDATED_BUSINESS_TITLE
-        defaultUploadImageShouldNotBeFound("businessTitle.in=" + UPDATED_BUSINESS_TITLE);
+        // Get all the uploadImageList where businessTitle in
+        defaultUploadImageFiltering(
+            "businessTitle.in=" + DEFAULT_BUSINESS_TITLE + "," + UPDATED_BUSINESS_TITLE,
+            "businessTitle.in=" + UPDATED_BUSINESS_TITLE
+        );
     }
 
     @Test
@@ -1035,10 +896,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where businessTitle is not null
-        defaultUploadImageShouldBeFound("businessTitle.specified=true");
-
-        // Get all the uploadImageList where businessTitle is null
-        defaultUploadImageShouldNotBeFound("businessTitle.specified=false");
+        defaultUploadImageFiltering("businessTitle.specified=true", "businessTitle.specified=false");
     }
 
     @Test
@@ -1047,11 +905,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where businessTitle contains DEFAULT_BUSINESS_TITLE
-        defaultUploadImageShouldBeFound("businessTitle.contains=" + DEFAULT_BUSINESS_TITLE);
-
-        // Get all the uploadImageList where businessTitle contains UPDATED_BUSINESS_TITLE
-        defaultUploadImageShouldNotBeFound("businessTitle.contains=" + UPDATED_BUSINESS_TITLE);
+        // Get all the uploadImageList where businessTitle contains
+        defaultUploadImageFiltering("businessTitle.contains=" + DEFAULT_BUSINESS_TITLE, "businessTitle.contains=" + UPDATED_BUSINESS_TITLE);
     }
 
     @Test
@@ -1060,11 +915,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where businessTitle does not contain DEFAULT_BUSINESS_TITLE
-        defaultUploadImageShouldNotBeFound("businessTitle.doesNotContain=" + DEFAULT_BUSINESS_TITLE);
-
-        // Get all the uploadImageList where businessTitle does not contain UPDATED_BUSINESS_TITLE
-        defaultUploadImageShouldBeFound("businessTitle.doesNotContain=" + UPDATED_BUSINESS_TITLE);
+        // Get all the uploadImageList where businessTitle does not contain
+        defaultUploadImageFiltering(
+            "businessTitle.doesNotContain=" + UPDATED_BUSINESS_TITLE,
+            "businessTitle.doesNotContain=" + DEFAULT_BUSINESS_TITLE
+        );
     }
 
     @Test
@@ -1073,11 +928,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where businessDesc equals to DEFAULT_BUSINESS_DESC
-        defaultUploadImageShouldBeFound("businessDesc.equals=" + DEFAULT_BUSINESS_DESC);
-
-        // Get all the uploadImageList where businessDesc equals to UPDATED_BUSINESS_DESC
-        defaultUploadImageShouldNotBeFound("businessDesc.equals=" + UPDATED_BUSINESS_DESC);
+        // Get all the uploadImageList where businessDesc equals to
+        defaultUploadImageFiltering("businessDesc.equals=" + DEFAULT_BUSINESS_DESC, "businessDesc.equals=" + UPDATED_BUSINESS_DESC);
     }
 
     @Test
@@ -1086,11 +938,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where businessDesc in DEFAULT_BUSINESS_DESC or UPDATED_BUSINESS_DESC
-        defaultUploadImageShouldBeFound("businessDesc.in=" + DEFAULT_BUSINESS_DESC + "," + UPDATED_BUSINESS_DESC);
-
-        // Get all the uploadImageList where businessDesc equals to UPDATED_BUSINESS_DESC
-        defaultUploadImageShouldNotBeFound("businessDesc.in=" + UPDATED_BUSINESS_DESC);
+        // Get all the uploadImageList where businessDesc in
+        defaultUploadImageFiltering(
+            "businessDesc.in=" + DEFAULT_BUSINESS_DESC + "," + UPDATED_BUSINESS_DESC,
+            "businessDesc.in=" + UPDATED_BUSINESS_DESC
+        );
     }
 
     @Test
@@ -1100,10 +952,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where businessDesc is not null
-        defaultUploadImageShouldBeFound("businessDesc.specified=true");
-
-        // Get all the uploadImageList where businessDesc is null
-        defaultUploadImageShouldNotBeFound("businessDesc.specified=false");
+        defaultUploadImageFiltering("businessDesc.specified=true", "businessDesc.specified=false");
     }
 
     @Test
@@ -1112,11 +961,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where businessDesc contains DEFAULT_BUSINESS_DESC
-        defaultUploadImageShouldBeFound("businessDesc.contains=" + DEFAULT_BUSINESS_DESC);
-
-        // Get all the uploadImageList where businessDesc contains UPDATED_BUSINESS_DESC
-        defaultUploadImageShouldNotBeFound("businessDesc.contains=" + UPDATED_BUSINESS_DESC);
+        // Get all the uploadImageList where businessDesc contains
+        defaultUploadImageFiltering("businessDesc.contains=" + DEFAULT_BUSINESS_DESC, "businessDesc.contains=" + UPDATED_BUSINESS_DESC);
     }
 
     @Test
@@ -1125,11 +971,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where businessDesc does not contain DEFAULT_BUSINESS_DESC
-        defaultUploadImageShouldNotBeFound("businessDesc.doesNotContain=" + DEFAULT_BUSINESS_DESC);
-
-        // Get all the uploadImageList where businessDesc does not contain UPDATED_BUSINESS_DESC
-        defaultUploadImageShouldBeFound("businessDesc.doesNotContain=" + UPDATED_BUSINESS_DESC);
+        // Get all the uploadImageList where businessDesc does not contain
+        defaultUploadImageFiltering(
+            "businessDesc.doesNotContain=" + UPDATED_BUSINESS_DESC,
+            "businessDesc.doesNotContain=" + DEFAULT_BUSINESS_DESC
+        );
     }
 
     @Test
@@ -1138,11 +984,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where businessStatus equals to DEFAULT_BUSINESS_STATUS
-        defaultUploadImageShouldBeFound("businessStatus.equals=" + DEFAULT_BUSINESS_STATUS);
-
-        // Get all the uploadImageList where businessStatus equals to UPDATED_BUSINESS_STATUS
-        defaultUploadImageShouldNotBeFound("businessStatus.equals=" + UPDATED_BUSINESS_STATUS);
+        // Get all the uploadImageList where businessStatus equals to
+        defaultUploadImageFiltering("businessStatus.equals=" + DEFAULT_BUSINESS_STATUS, "businessStatus.equals=" + UPDATED_BUSINESS_STATUS);
     }
 
     @Test
@@ -1151,11 +994,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where businessStatus in DEFAULT_BUSINESS_STATUS or UPDATED_BUSINESS_STATUS
-        defaultUploadImageShouldBeFound("businessStatus.in=" + DEFAULT_BUSINESS_STATUS + "," + UPDATED_BUSINESS_STATUS);
-
-        // Get all the uploadImageList where businessStatus equals to UPDATED_BUSINESS_STATUS
-        defaultUploadImageShouldNotBeFound("businessStatus.in=" + UPDATED_BUSINESS_STATUS);
+        // Get all the uploadImageList where businessStatus in
+        defaultUploadImageFiltering(
+            "businessStatus.in=" + DEFAULT_BUSINESS_STATUS + "," + UPDATED_BUSINESS_STATUS,
+            "businessStatus.in=" + UPDATED_BUSINESS_STATUS
+        );
     }
 
     @Test
@@ -1165,10 +1008,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where businessStatus is not null
-        defaultUploadImageShouldBeFound("businessStatus.specified=true");
-
-        // Get all the uploadImageList where businessStatus is null
-        defaultUploadImageShouldNotBeFound("businessStatus.specified=false");
+        defaultUploadImageFiltering("businessStatus.specified=true", "businessStatus.specified=false");
     }
 
     @Test
@@ -1177,11 +1017,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where businessStatus contains DEFAULT_BUSINESS_STATUS
-        defaultUploadImageShouldBeFound("businessStatus.contains=" + DEFAULT_BUSINESS_STATUS);
-
-        // Get all the uploadImageList where businessStatus contains UPDATED_BUSINESS_STATUS
-        defaultUploadImageShouldNotBeFound("businessStatus.contains=" + UPDATED_BUSINESS_STATUS);
+        // Get all the uploadImageList where businessStatus contains
+        defaultUploadImageFiltering(
+            "businessStatus.contains=" + DEFAULT_BUSINESS_STATUS,
+            "businessStatus.contains=" + UPDATED_BUSINESS_STATUS
+        );
     }
 
     @Test
@@ -1190,11 +1030,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where businessStatus does not contain DEFAULT_BUSINESS_STATUS
-        defaultUploadImageShouldNotBeFound("businessStatus.doesNotContain=" + DEFAULT_BUSINESS_STATUS);
-
-        // Get all the uploadImageList where businessStatus does not contain UPDATED_BUSINESS_STATUS
-        defaultUploadImageShouldBeFound("businessStatus.doesNotContain=" + UPDATED_BUSINESS_STATUS);
+        // Get all the uploadImageList where businessStatus does not contain
+        defaultUploadImageFiltering(
+            "businessStatus.doesNotContain=" + UPDATED_BUSINESS_STATUS,
+            "businessStatus.doesNotContain=" + DEFAULT_BUSINESS_STATUS
+        );
     }
 
     @Test
@@ -1203,11 +1043,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where createAt equals to DEFAULT_CREATE_AT
-        defaultUploadImageShouldBeFound("createAt.equals=" + DEFAULT_CREATE_AT);
-
-        // Get all the uploadImageList where createAt equals to UPDATED_CREATE_AT
-        defaultUploadImageShouldNotBeFound("createAt.equals=" + UPDATED_CREATE_AT);
+        // Get all the uploadImageList where createAt equals to
+        defaultUploadImageFiltering("createAt.equals=" + DEFAULT_CREATE_AT, "createAt.equals=" + UPDATED_CREATE_AT);
     }
 
     @Test
@@ -1216,11 +1053,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where createAt in DEFAULT_CREATE_AT or UPDATED_CREATE_AT
-        defaultUploadImageShouldBeFound("createAt.in=" + DEFAULT_CREATE_AT + "," + UPDATED_CREATE_AT);
-
-        // Get all the uploadImageList where createAt equals to UPDATED_CREATE_AT
-        defaultUploadImageShouldNotBeFound("createAt.in=" + UPDATED_CREATE_AT);
+        // Get all the uploadImageList where createAt in
+        defaultUploadImageFiltering("createAt.in=" + DEFAULT_CREATE_AT + "," + UPDATED_CREATE_AT, "createAt.in=" + UPDATED_CREATE_AT);
     }
 
     @Test
@@ -1230,10 +1064,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where createAt is not null
-        defaultUploadImageShouldBeFound("createAt.specified=true");
-
-        // Get all the uploadImageList where createAt is null
-        defaultUploadImageShouldNotBeFound("createAt.specified=false");
+        defaultUploadImageFiltering("createAt.specified=true", "createAt.specified=false");
     }
 
     @Test
@@ -1242,11 +1073,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where createAt is greater than or equal to DEFAULT_CREATE_AT
-        defaultUploadImageShouldBeFound("createAt.greaterThanOrEqual=" + DEFAULT_CREATE_AT);
-
-        // Get all the uploadImageList where createAt is greater than or equal to UPDATED_CREATE_AT
-        defaultUploadImageShouldNotBeFound("createAt.greaterThanOrEqual=" + UPDATED_CREATE_AT);
+        // Get all the uploadImageList where createAt is greater than or equal to
+        defaultUploadImageFiltering("createAt.greaterThanOrEqual=" + DEFAULT_CREATE_AT, "createAt.greaterThanOrEqual=" + UPDATED_CREATE_AT);
     }
 
     @Test
@@ -1255,11 +1083,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where createAt is less than or equal to DEFAULT_CREATE_AT
-        defaultUploadImageShouldBeFound("createAt.lessThanOrEqual=" + DEFAULT_CREATE_AT);
-
-        // Get all the uploadImageList where createAt is less than or equal to SMALLER_CREATE_AT
-        defaultUploadImageShouldNotBeFound("createAt.lessThanOrEqual=" + SMALLER_CREATE_AT);
+        // Get all the uploadImageList where createAt is less than or equal to
+        defaultUploadImageFiltering("createAt.lessThanOrEqual=" + DEFAULT_CREATE_AT, "createAt.lessThanOrEqual=" + SMALLER_CREATE_AT);
     }
 
     @Test
@@ -1268,11 +1093,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where createAt is less than DEFAULT_CREATE_AT
-        defaultUploadImageShouldNotBeFound("createAt.lessThan=" + DEFAULT_CREATE_AT);
-
-        // Get all the uploadImageList where createAt is less than UPDATED_CREATE_AT
-        defaultUploadImageShouldBeFound("createAt.lessThan=" + UPDATED_CREATE_AT);
+        // Get all the uploadImageList where createAt is less than
+        defaultUploadImageFiltering("createAt.lessThan=" + UPDATED_CREATE_AT, "createAt.lessThan=" + DEFAULT_CREATE_AT);
     }
 
     @Test
@@ -1281,11 +1103,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where createAt is greater than DEFAULT_CREATE_AT
-        defaultUploadImageShouldNotBeFound("createAt.greaterThan=" + DEFAULT_CREATE_AT);
-
-        // Get all the uploadImageList where createAt is greater than SMALLER_CREATE_AT
-        defaultUploadImageShouldBeFound("createAt.greaterThan=" + SMALLER_CREATE_AT);
+        // Get all the uploadImageList where createAt is greater than
+        defaultUploadImageFiltering("createAt.greaterThan=" + SMALLER_CREATE_AT, "createAt.greaterThan=" + DEFAULT_CREATE_AT);
     }
 
     @Test
@@ -1294,11 +1113,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where fileSize equals to DEFAULT_FILE_SIZE
-        defaultUploadImageShouldBeFound("fileSize.equals=" + DEFAULT_FILE_SIZE);
-
-        // Get all the uploadImageList where fileSize equals to UPDATED_FILE_SIZE
-        defaultUploadImageShouldNotBeFound("fileSize.equals=" + UPDATED_FILE_SIZE);
+        // Get all the uploadImageList where fileSize equals to
+        defaultUploadImageFiltering("fileSize.equals=" + DEFAULT_FILE_SIZE, "fileSize.equals=" + UPDATED_FILE_SIZE);
     }
 
     @Test
@@ -1307,11 +1123,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where fileSize in DEFAULT_FILE_SIZE or UPDATED_FILE_SIZE
-        defaultUploadImageShouldBeFound("fileSize.in=" + DEFAULT_FILE_SIZE + "," + UPDATED_FILE_SIZE);
-
-        // Get all the uploadImageList where fileSize equals to UPDATED_FILE_SIZE
-        defaultUploadImageShouldNotBeFound("fileSize.in=" + UPDATED_FILE_SIZE);
+        // Get all the uploadImageList where fileSize in
+        defaultUploadImageFiltering("fileSize.in=" + DEFAULT_FILE_SIZE + "," + UPDATED_FILE_SIZE, "fileSize.in=" + UPDATED_FILE_SIZE);
     }
 
     @Test
@@ -1321,10 +1134,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where fileSize is not null
-        defaultUploadImageShouldBeFound("fileSize.specified=true");
-
-        // Get all the uploadImageList where fileSize is null
-        defaultUploadImageShouldNotBeFound("fileSize.specified=false");
+        defaultUploadImageFiltering("fileSize.specified=true", "fileSize.specified=false");
     }
 
     @Test
@@ -1333,11 +1143,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where fileSize is greater than or equal to DEFAULT_FILE_SIZE
-        defaultUploadImageShouldBeFound("fileSize.greaterThanOrEqual=" + DEFAULT_FILE_SIZE);
-
-        // Get all the uploadImageList where fileSize is greater than or equal to UPDATED_FILE_SIZE
-        defaultUploadImageShouldNotBeFound("fileSize.greaterThanOrEqual=" + UPDATED_FILE_SIZE);
+        // Get all the uploadImageList where fileSize is greater than or equal to
+        defaultUploadImageFiltering("fileSize.greaterThanOrEqual=" + DEFAULT_FILE_SIZE, "fileSize.greaterThanOrEqual=" + UPDATED_FILE_SIZE);
     }
 
     @Test
@@ -1346,11 +1153,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where fileSize is less than or equal to DEFAULT_FILE_SIZE
-        defaultUploadImageShouldBeFound("fileSize.lessThanOrEqual=" + DEFAULT_FILE_SIZE);
-
-        // Get all the uploadImageList where fileSize is less than or equal to SMALLER_FILE_SIZE
-        defaultUploadImageShouldNotBeFound("fileSize.lessThanOrEqual=" + SMALLER_FILE_SIZE);
+        // Get all the uploadImageList where fileSize is less than or equal to
+        defaultUploadImageFiltering("fileSize.lessThanOrEqual=" + DEFAULT_FILE_SIZE, "fileSize.lessThanOrEqual=" + SMALLER_FILE_SIZE);
     }
 
     @Test
@@ -1359,11 +1163,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where fileSize is less than DEFAULT_FILE_SIZE
-        defaultUploadImageShouldNotBeFound("fileSize.lessThan=" + DEFAULT_FILE_SIZE);
-
-        // Get all the uploadImageList where fileSize is less than UPDATED_FILE_SIZE
-        defaultUploadImageShouldBeFound("fileSize.lessThan=" + UPDATED_FILE_SIZE);
+        // Get all the uploadImageList where fileSize is less than
+        defaultUploadImageFiltering("fileSize.lessThan=" + UPDATED_FILE_SIZE, "fileSize.lessThan=" + DEFAULT_FILE_SIZE);
     }
 
     @Test
@@ -1372,11 +1173,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where fileSize is greater than DEFAULT_FILE_SIZE
-        defaultUploadImageShouldNotBeFound("fileSize.greaterThan=" + DEFAULT_FILE_SIZE);
-
-        // Get all the uploadImageList where fileSize is greater than SMALLER_FILE_SIZE
-        defaultUploadImageShouldBeFound("fileSize.greaterThan=" + SMALLER_FILE_SIZE);
+        // Get all the uploadImageList where fileSize is greater than
+        defaultUploadImageFiltering("fileSize.greaterThan=" + SMALLER_FILE_SIZE, "fileSize.greaterThan=" + DEFAULT_FILE_SIZE);
     }
 
     @Test
@@ -1385,11 +1183,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where smartUrl equals to DEFAULT_SMART_URL
-        defaultUploadImageShouldBeFound("smartUrl.equals=" + DEFAULT_SMART_URL);
-
-        // Get all the uploadImageList where smartUrl equals to UPDATED_SMART_URL
-        defaultUploadImageShouldNotBeFound("smartUrl.equals=" + UPDATED_SMART_URL);
+        // Get all the uploadImageList where smartUrl equals to
+        defaultUploadImageFiltering("smartUrl.equals=" + DEFAULT_SMART_URL, "smartUrl.equals=" + UPDATED_SMART_URL);
     }
 
     @Test
@@ -1398,11 +1193,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where smartUrl in DEFAULT_SMART_URL or UPDATED_SMART_URL
-        defaultUploadImageShouldBeFound("smartUrl.in=" + DEFAULT_SMART_URL + "," + UPDATED_SMART_URL);
-
-        // Get all the uploadImageList where smartUrl equals to UPDATED_SMART_URL
-        defaultUploadImageShouldNotBeFound("smartUrl.in=" + UPDATED_SMART_URL);
+        // Get all the uploadImageList where smartUrl in
+        defaultUploadImageFiltering("smartUrl.in=" + DEFAULT_SMART_URL + "," + UPDATED_SMART_URL, "smartUrl.in=" + UPDATED_SMART_URL);
     }
 
     @Test
@@ -1412,10 +1204,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where smartUrl is not null
-        defaultUploadImageShouldBeFound("smartUrl.specified=true");
-
-        // Get all the uploadImageList where smartUrl is null
-        defaultUploadImageShouldNotBeFound("smartUrl.specified=false");
+        defaultUploadImageFiltering("smartUrl.specified=true", "smartUrl.specified=false");
     }
 
     @Test
@@ -1424,11 +1213,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where smartUrl contains DEFAULT_SMART_URL
-        defaultUploadImageShouldBeFound("smartUrl.contains=" + DEFAULT_SMART_URL);
-
-        // Get all the uploadImageList where smartUrl contains UPDATED_SMART_URL
-        defaultUploadImageShouldNotBeFound("smartUrl.contains=" + UPDATED_SMART_URL);
+        // Get all the uploadImageList where smartUrl contains
+        defaultUploadImageFiltering("smartUrl.contains=" + DEFAULT_SMART_URL, "smartUrl.contains=" + UPDATED_SMART_URL);
     }
 
     @Test
@@ -1437,11 +1223,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where smartUrl does not contain DEFAULT_SMART_URL
-        defaultUploadImageShouldNotBeFound("smartUrl.doesNotContain=" + DEFAULT_SMART_URL);
-
-        // Get all the uploadImageList where smartUrl does not contain UPDATED_SMART_URL
-        defaultUploadImageShouldBeFound("smartUrl.doesNotContain=" + UPDATED_SMART_URL);
+        // Get all the uploadImageList where smartUrl does not contain
+        defaultUploadImageFiltering("smartUrl.doesNotContain=" + UPDATED_SMART_URL, "smartUrl.doesNotContain=" + DEFAULT_SMART_URL);
     }
 
     @Test
@@ -1450,11 +1233,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where mediumUrl equals to DEFAULT_MEDIUM_URL
-        defaultUploadImageShouldBeFound("mediumUrl.equals=" + DEFAULT_MEDIUM_URL);
-
-        // Get all the uploadImageList where mediumUrl equals to UPDATED_MEDIUM_URL
-        defaultUploadImageShouldNotBeFound("mediumUrl.equals=" + UPDATED_MEDIUM_URL);
+        // Get all the uploadImageList where mediumUrl equals to
+        defaultUploadImageFiltering("mediumUrl.equals=" + DEFAULT_MEDIUM_URL, "mediumUrl.equals=" + UPDATED_MEDIUM_URL);
     }
 
     @Test
@@ -1463,11 +1243,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where mediumUrl in DEFAULT_MEDIUM_URL or UPDATED_MEDIUM_URL
-        defaultUploadImageShouldBeFound("mediumUrl.in=" + DEFAULT_MEDIUM_URL + "," + UPDATED_MEDIUM_URL);
-
-        // Get all the uploadImageList where mediumUrl equals to UPDATED_MEDIUM_URL
-        defaultUploadImageShouldNotBeFound("mediumUrl.in=" + UPDATED_MEDIUM_URL);
+        // Get all the uploadImageList where mediumUrl in
+        defaultUploadImageFiltering("mediumUrl.in=" + DEFAULT_MEDIUM_URL + "," + UPDATED_MEDIUM_URL, "mediumUrl.in=" + UPDATED_MEDIUM_URL);
     }
 
     @Test
@@ -1477,10 +1254,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where mediumUrl is not null
-        defaultUploadImageShouldBeFound("mediumUrl.specified=true");
-
-        // Get all the uploadImageList where mediumUrl is null
-        defaultUploadImageShouldNotBeFound("mediumUrl.specified=false");
+        defaultUploadImageFiltering("mediumUrl.specified=true", "mediumUrl.specified=false");
     }
 
     @Test
@@ -1489,11 +1263,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where mediumUrl contains DEFAULT_MEDIUM_URL
-        defaultUploadImageShouldBeFound("mediumUrl.contains=" + DEFAULT_MEDIUM_URL);
-
-        // Get all the uploadImageList where mediumUrl contains UPDATED_MEDIUM_URL
-        defaultUploadImageShouldNotBeFound("mediumUrl.contains=" + UPDATED_MEDIUM_URL);
+        // Get all the uploadImageList where mediumUrl contains
+        defaultUploadImageFiltering("mediumUrl.contains=" + DEFAULT_MEDIUM_URL, "mediumUrl.contains=" + UPDATED_MEDIUM_URL);
     }
 
     @Test
@@ -1502,11 +1273,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where mediumUrl does not contain DEFAULT_MEDIUM_URL
-        defaultUploadImageShouldNotBeFound("mediumUrl.doesNotContain=" + DEFAULT_MEDIUM_URL);
-
-        // Get all the uploadImageList where mediumUrl does not contain UPDATED_MEDIUM_URL
-        defaultUploadImageShouldBeFound("mediumUrl.doesNotContain=" + UPDATED_MEDIUM_URL);
+        // Get all the uploadImageList where mediumUrl does not contain
+        defaultUploadImageFiltering("mediumUrl.doesNotContain=" + UPDATED_MEDIUM_URL, "mediumUrl.doesNotContain=" + DEFAULT_MEDIUM_URL);
     }
 
     @Test
@@ -1515,11 +1283,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where referenceCount equals to DEFAULT_REFERENCE_COUNT
-        defaultUploadImageShouldBeFound("referenceCount.equals=" + DEFAULT_REFERENCE_COUNT);
-
-        // Get all the uploadImageList where referenceCount equals to UPDATED_REFERENCE_COUNT
-        defaultUploadImageShouldNotBeFound("referenceCount.equals=" + UPDATED_REFERENCE_COUNT);
+        // Get all the uploadImageList where referenceCount equals to
+        defaultUploadImageFiltering("referenceCount.equals=" + DEFAULT_REFERENCE_COUNT, "referenceCount.equals=" + UPDATED_REFERENCE_COUNT);
     }
 
     @Test
@@ -1528,11 +1293,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where referenceCount in DEFAULT_REFERENCE_COUNT or UPDATED_REFERENCE_COUNT
-        defaultUploadImageShouldBeFound("referenceCount.in=" + DEFAULT_REFERENCE_COUNT + "," + UPDATED_REFERENCE_COUNT);
-
-        // Get all the uploadImageList where referenceCount equals to UPDATED_REFERENCE_COUNT
-        defaultUploadImageShouldNotBeFound("referenceCount.in=" + UPDATED_REFERENCE_COUNT);
+        // Get all the uploadImageList where referenceCount in
+        defaultUploadImageFiltering(
+            "referenceCount.in=" + DEFAULT_REFERENCE_COUNT + "," + UPDATED_REFERENCE_COUNT,
+            "referenceCount.in=" + UPDATED_REFERENCE_COUNT
+        );
     }
 
     @Test
@@ -1542,10 +1307,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where referenceCount is not null
-        defaultUploadImageShouldBeFound("referenceCount.specified=true");
-
-        // Get all the uploadImageList where referenceCount is null
-        defaultUploadImageShouldNotBeFound("referenceCount.specified=false");
+        defaultUploadImageFiltering("referenceCount.specified=true", "referenceCount.specified=false");
     }
 
     @Test
@@ -1554,11 +1316,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where referenceCount is greater than or equal to DEFAULT_REFERENCE_COUNT
-        defaultUploadImageShouldBeFound("referenceCount.greaterThanOrEqual=" + DEFAULT_REFERENCE_COUNT);
-
-        // Get all the uploadImageList where referenceCount is greater than or equal to UPDATED_REFERENCE_COUNT
-        defaultUploadImageShouldNotBeFound("referenceCount.greaterThanOrEqual=" + UPDATED_REFERENCE_COUNT);
+        // Get all the uploadImageList where referenceCount is greater than or equal to
+        defaultUploadImageFiltering(
+            "referenceCount.greaterThanOrEqual=" + DEFAULT_REFERENCE_COUNT,
+            "referenceCount.greaterThanOrEqual=" + UPDATED_REFERENCE_COUNT
+        );
     }
 
     @Test
@@ -1567,11 +1329,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where referenceCount is less than or equal to DEFAULT_REFERENCE_COUNT
-        defaultUploadImageShouldBeFound("referenceCount.lessThanOrEqual=" + DEFAULT_REFERENCE_COUNT);
-
-        // Get all the uploadImageList where referenceCount is less than or equal to SMALLER_REFERENCE_COUNT
-        defaultUploadImageShouldNotBeFound("referenceCount.lessThanOrEqual=" + SMALLER_REFERENCE_COUNT);
+        // Get all the uploadImageList where referenceCount is less than or equal to
+        defaultUploadImageFiltering(
+            "referenceCount.lessThanOrEqual=" + DEFAULT_REFERENCE_COUNT,
+            "referenceCount.lessThanOrEqual=" + SMALLER_REFERENCE_COUNT
+        );
     }
 
     @Test
@@ -1580,11 +1342,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where referenceCount is less than DEFAULT_REFERENCE_COUNT
-        defaultUploadImageShouldNotBeFound("referenceCount.lessThan=" + DEFAULT_REFERENCE_COUNT);
-
-        // Get all the uploadImageList where referenceCount is less than UPDATED_REFERENCE_COUNT
-        defaultUploadImageShouldBeFound("referenceCount.lessThan=" + UPDATED_REFERENCE_COUNT);
+        // Get all the uploadImageList where referenceCount is less than
+        defaultUploadImageFiltering(
+            "referenceCount.lessThan=" + UPDATED_REFERENCE_COUNT,
+            "referenceCount.lessThan=" + DEFAULT_REFERENCE_COUNT
+        );
     }
 
     @Test
@@ -1593,11 +1355,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where referenceCount is greater than DEFAULT_REFERENCE_COUNT
-        defaultUploadImageShouldNotBeFound("referenceCount.greaterThan=" + DEFAULT_REFERENCE_COUNT);
-
-        // Get all the uploadImageList where referenceCount is greater than SMALLER_REFERENCE_COUNT
-        defaultUploadImageShouldBeFound("referenceCount.greaterThan=" + SMALLER_REFERENCE_COUNT);
+        // Get all the uploadImageList where referenceCount is greater than
+        defaultUploadImageFiltering(
+            "referenceCount.greaterThan=" + SMALLER_REFERENCE_COUNT,
+            "referenceCount.greaterThan=" + DEFAULT_REFERENCE_COUNT
+        );
     }
 
     @Test
@@ -1606,11 +1368,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where createdBy equals to DEFAULT_CREATED_BY
-        defaultUploadImageShouldBeFound("createdBy.equals=" + DEFAULT_CREATED_BY);
-
-        // Get all the uploadImageList where createdBy equals to UPDATED_CREATED_BY
-        defaultUploadImageShouldNotBeFound("createdBy.equals=" + UPDATED_CREATED_BY);
+        // Get all the uploadImageList where createdBy equals to
+        defaultUploadImageFiltering("createdBy.equals=" + DEFAULT_CREATED_BY, "createdBy.equals=" + UPDATED_CREATED_BY);
     }
 
     @Test
@@ -1619,11 +1378,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where createdBy in DEFAULT_CREATED_BY or UPDATED_CREATED_BY
-        defaultUploadImageShouldBeFound("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY);
-
-        // Get all the uploadImageList where createdBy equals to UPDATED_CREATED_BY
-        defaultUploadImageShouldNotBeFound("createdBy.in=" + UPDATED_CREATED_BY);
+        // Get all the uploadImageList where createdBy in
+        defaultUploadImageFiltering("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY, "createdBy.in=" + UPDATED_CREATED_BY);
     }
 
     @Test
@@ -1633,10 +1389,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where createdBy is not null
-        defaultUploadImageShouldBeFound("createdBy.specified=true");
-
-        // Get all the uploadImageList where createdBy is null
-        defaultUploadImageShouldNotBeFound("createdBy.specified=false");
+        defaultUploadImageFiltering("createdBy.specified=true", "createdBy.specified=false");
     }
 
     @Test
@@ -1645,11 +1398,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where createdBy is greater than or equal to DEFAULT_CREATED_BY
-        defaultUploadImageShouldBeFound("createdBy.greaterThanOrEqual=" + DEFAULT_CREATED_BY);
-
-        // Get all the uploadImageList where createdBy is greater than or equal to UPDATED_CREATED_BY
-        defaultUploadImageShouldNotBeFound("createdBy.greaterThanOrEqual=" + UPDATED_CREATED_BY);
+        // Get all the uploadImageList where createdBy is greater than or equal to
+        defaultUploadImageFiltering(
+            "createdBy.greaterThanOrEqual=" + DEFAULT_CREATED_BY,
+            "createdBy.greaterThanOrEqual=" + UPDATED_CREATED_BY
+        );
     }
 
     @Test
@@ -1658,11 +1411,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where createdBy is less than or equal to DEFAULT_CREATED_BY
-        defaultUploadImageShouldBeFound("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY);
-
-        // Get all the uploadImageList where createdBy is less than or equal to SMALLER_CREATED_BY
-        defaultUploadImageShouldNotBeFound("createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
+        // Get all the uploadImageList where createdBy is less than or equal to
+        defaultUploadImageFiltering("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
     }
 
     @Test
@@ -1671,11 +1421,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where createdBy is less than DEFAULT_CREATED_BY
-        defaultUploadImageShouldNotBeFound("createdBy.lessThan=" + DEFAULT_CREATED_BY);
-
-        // Get all the uploadImageList where createdBy is less than UPDATED_CREATED_BY
-        defaultUploadImageShouldBeFound("createdBy.lessThan=" + UPDATED_CREATED_BY);
+        // Get all the uploadImageList where createdBy is less than
+        defaultUploadImageFiltering("createdBy.lessThan=" + UPDATED_CREATED_BY, "createdBy.lessThan=" + DEFAULT_CREATED_BY);
     }
 
     @Test
@@ -1684,11 +1431,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where createdBy is greater than DEFAULT_CREATED_BY
-        defaultUploadImageShouldNotBeFound("createdBy.greaterThan=" + DEFAULT_CREATED_BY);
-
-        // Get all the uploadImageList where createdBy is greater than SMALLER_CREATED_BY
-        defaultUploadImageShouldBeFound("createdBy.greaterThan=" + SMALLER_CREATED_BY);
+        // Get all the uploadImageList where createdBy is greater than
+        defaultUploadImageFiltering("createdBy.greaterThan=" + SMALLER_CREATED_BY, "createdBy.greaterThan=" + DEFAULT_CREATED_BY);
     }
 
     @Test
@@ -1697,11 +1441,8 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where createdDate equals to DEFAULT_CREATED_DATE
-        defaultUploadImageShouldBeFound("createdDate.equals=" + DEFAULT_CREATED_DATE);
-
-        // Get all the uploadImageList where createdDate equals to UPDATED_CREATED_DATE
-        defaultUploadImageShouldNotBeFound("createdDate.equals=" + UPDATED_CREATED_DATE);
+        // Get all the uploadImageList where createdDate equals to
+        defaultUploadImageFiltering("createdDate.equals=" + DEFAULT_CREATED_DATE, "createdDate.equals=" + UPDATED_CREATED_DATE);
     }
 
     @Test
@@ -1710,11 +1451,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where createdDate in DEFAULT_CREATED_DATE or UPDATED_CREATED_DATE
-        defaultUploadImageShouldBeFound("createdDate.in=" + DEFAULT_CREATED_DATE + "," + UPDATED_CREATED_DATE);
-
-        // Get all the uploadImageList where createdDate equals to UPDATED_CREATED_DATE
-        defaultUploadImageShouldNotBeFound("createdDate.in=" + UPDATED_CREATED_DATE);
+        // Get all the uploadImageList where createdDate in
+        defaultUploadImageFiltering(
+            "createdDate.in=" + DEFAULT_CREATED_DATE + "," + UPDATED_CREATED_DATE,
+            "createdDate.in=" + UPDATED_CREATED_DATE
+        );
     }
 
     @Test
@@ -1724,10 +1465,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where createdDate is not null
-        defaultUploadImageShouldBeFound("createdDate.specified=true");
-
-        // Get all the uploadImageList where createdDate is null
-        defaultUploadImageShouldNotBeFound("createdDate.specified=false");
+        defaultUploadImageFiltering("createdDate.specified=true", "createdDate.specified=false");
     }
 
     @Test
@@ -1736,11 +1474,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where lastModifiedBy equals to DEFAULT_LAST_MODIFIED_BY
-        defaultUploadImageShouldBeFound("lastModifiedBy.equals=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the uploadImageList where lastModifiedBy equals to UPDATED_LAST_MODIFIED_BY
-        defaultUploadImageShouldNotBeFound("lastModifiedBy.equals=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the uploadImageList where lastModifiedBy equals to
+        defaultUploadImageFiltering(
+            "lastModifiedBy.equals=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.equals=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1749,11 +1487,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where lastModifiedBy in DEFAULT_LAST_MODIFIED_BY or UPDATED_LAST_MODIFIED_BY
-        defaultUploadImageShouldBeFound("lastModifiedBy.in=" + DEFAULT_LAST_MODIFIED_BY + "," + UPDATED_LAST_MODIFIED_BY);
-
-        // Get all the uploadImageList where lastModifiedBy equals to UPDATED_LAST_MODIFIED_BY
-        defaultUploadImageShouldNotBeFound("lastModifiedBy.in=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the uploadImageList where lastModifiedBy in
+        defaultUploadImageFiltering(
+            "lastModifiedBy.in=" + DEFAULT_LAST_MODIFIED_BY + "," + UPDATED_LAST_MODIFIED_BY,
+            "lastModifiedBy.in=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1763,10 +1501,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where lastModifiedBy is not null
-        defaultUploadImageShouldBeFound("lastModifiedBy.specified=true");
-
-        // Get all the uploadImageList where lastModifiedBy is null
-        defaultUploadImageShouldNotBeFound("lastModifiedBy.specified=false");
+        defaultUploadImageFiltering("lastModifiedBy.specified=true", "lastModifiedBy.specified=false");
     }
 
     @Test
@@ -1775,11 +1510,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where lastModifiedBy is greater than or equal to DEFAULT_LAST_MODIFIED_BY
-        defaultUploadImageShouldBeFound("lastModifiedBy.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the uploadImageList where lastModifiedBy is greater than or equal to UPDATED_LAST_MODIFIED_BY
-        defaultUploadImageShouldNotBeFound("lastModifiedBy.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the uploadImageList where lastModifiedBy is greater than or equal to
+        defaultUploadImageFiltering(
+            "lastModifiedBy.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1788,11 +1523,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where lastModifiedBy is less than or equal to DEFAULT_LAST_MODIFIED_BY
-        defaultUploadImageShouldBeFound("lastModifiedBy.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the uploadImageList where lastModifiedBy is less than or equal to SMALLER_LAST_MODIFIED_BY
-        defaultUploadImageShouldNotBeFound("lastModifiedBy.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_BY);
+        // Get all the uploadImageList where lastModifiedBy is less than or equal to
+        defaultUploadImageFiltering(
+            "lastModifiedBy.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1801,11 +1536,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where lastModifiedBy is less than DEFAULT_LAST_MODIFIED_BY
-        defaultUploadImageShouldNotBeFound("lastModifiedBy.lessThan=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the uploadImageList where lastModifiedBy is less than UPDATED_LAST_MODIFIED_BY
-        defaultUploadImageShouldBeFound("lastModifiedBy.lessThan=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the uploadImageList where lastModifiedBy is less than
+        defaultUploadImageFiltering(
+            "lastModifiedBy.lessThan=" + UPDATED_LAST_MODIFIED_BY,
+            "lastModifiedBy.lessThan=" + DEFAULT_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1814,11 +1549,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where lastModifiedBy is greater than DEFAULT_LAST_MODIFIED_BY
-        defaultUploadImageShouldNotBeFound("lastModifiedBy.greaterThan=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the uploadImageList where lastModifiedBy is greater than SMALLER_LAST_MODIFIED_BY
-        defaultUploadImageShouldBeFound("lastModifiedBy.greaterThan=" + SMALLER_LAST_MODIFIED_BY);
+        // Get all the uploadImageList where lastModifiedBy is greater than
+        defaultUploadImageFiltering(
+            "lastModifiedBy.greaterThan=" + SMALLER_LAST_MODIFIED_BY,
+            "lastModifiedBy.greaterThan=" + DEFAULT_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1827,11 +1562,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where lastModifiedDate equals to DEFAULT_LAST_MODIFIED_DATE
-        defaultUploadImageShouldBeFound("lastModifiedDate.equals=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the uploadImageList where lastModifiedDate equals to UPDATED_LAST_MODIFIED_DATE
-        defaultUploadImageShouldNotBeFound("lastModifiedDate.equals=" + UPDATED_LAST_MODIFIED_DATE);
+        // Get all the uploadImageList where lastModifiedDate equals to
+        defaultUploadImageFiltering(
+            "lastModifiedDate.equals=" + DEFAULT_LAST_MODIFIED_DATE,
+            "lastModifiedDate.equals=" + UPDATED_LAST_MODIFIED_DATE
+        );
     }
 
     @Test
@@ -1840,11 +1575,11 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        // Get all the uploadImageList where lastModifiedDate in DEFAULT_LAST_MODIFIED_DATE or UPDATED_LAST_MODIFIED_DATE
-        defaultUploadImageShouldBeFound("lastModifiedDate.in=" + DEFAULT_LAST_MODIFIED_DATE + "," + UPDATED_LAST_MODIFIED_DATE);
-
-        // Get all the uploadImageList where lastModifiedDate equals to UPDATED_LAST_MODIFIED_DATE
-        defaultUploadImageShouldNotBeFound("lastModifiedDate.in=" + UPDATED_LAST_MODIFIED_DATE);
+        // Get all the uploadImageList where lastModifiedDate in
+        defaultUploadImageFiltering(
+            "lastModifiedDate.in=" + DEFAULT_LAST_MODIFIED_DATE + "," + UPDATED_LAST_MODIFIED_DATE,
+            "lastModifiedDate.in=" + UPDATED_LAST_MODIFIED_DATE
+        );
     }
 
     @Test
@@ -1854,10 +1589,7 @@ public class UploadImageResourceIT {
         uploadImageRepository.save(uploadImage);
 
         // Get all the uploadImageList where lastModifiedDate is not null
-        defaultUploadImageShouldBeFound("lastModifiedDate.specified=true");
-
-        // Get all the uploadImageList where lastModifiedDate is null
-        defaultUploadImageShouldNotBeFound("lastModifiedDate.specified=false");
+        defaultUploadImageFiltering("lastModifiedDate.specified=true", "lastModifiedDate.specified=false");
     }
 
     @Test
@@ -1872,6 +1604,11 @@ public class UploadImageResourceIT {
 
         // Get all the uploadImageList where category equals to (categoryId + 1)
         defaultUploadImageShouldNotBeFound("categoryId.equals=" + (categoryId + 1));
+    }
+
+    private void defaultUploadImageFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultUploadImageShouldBeFound(shouldBeFound);
+        defaultUploadImageShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -1945,7 +1682,7 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        int databaseSizeBeforeUpdate = uploadImageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the uploadImage
         UploadImage updatedUploadImage = uploadImageRepository.findById(uploadImage.getId()).orElseThrow();
@@ -1977,41 +1714,19 @@ public class UploadImageResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, uploadImageDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(uploadImageDTO))
+                    .content(om.writeValueAsBytes(uploadImageDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the UploadImage in the database
-        List<UploadImage> uploadImageList = uploadImageRepository.findAll();
-        assertThat(uploadImageList).hasSize(databaseSizeBeforeUpdate);
-        UploadImage testUploadImage = uploadImageList.get(uploadImageList.size() - 1);
-        assertThat(testUploadImage.getUrl()).isEqualTo(UPDATED_URL);
-        assertThat(testUploadImage.getFullName()).isEqualTo(UPDATED_FULL_NAME);
-        assertThat(testUploadImage.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testUploadImage.getExt()).isEqualTo(UPDATED_EXT);
-        assertThat(testUploadImage.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testUploadImage.getPath()).isEqualTo(UPDATED_PATH);
-        assertThat(testUploadImage.getFolder()).isEqualTo(UPDATED_FOLDER);
-        assertThat(testUploadImage.getOwnerEntityName()).isEqualTo(UPDATED_OWNER_ENTITY_NAME);
-        assertThat(testUploadImage.getOwnerEntityId()).isEqualTo(UPDATED_OWNER_ENTITY_ID);
-        assertThat(testUploadImage.getBusinessTitle()).isEqualTo(UPDATED_BUSINESS_TITLE);
-        assertThat(testUploadImage.getBusinessDesc()).isEqualTo(UPDATED_BUSINESS_DESC);
-        assertThat(testUploadImage.getBusinessStatus()).isEqualTo(UPDATED_BUSINESS_STATUS);
-        assertThat(testUploadImage.getCreateAt()).isEqualTo(UPDATED_CREATE_AT);
-        assertThat(testUploadImage.getFileSize()).isEqualTo(UPDATED_FILE_SIZE);
-        assertThat(testUploadImage.getSmartUrl()).isEqualTo(UPDATED_SMART_URL);
-        assertThat(testUploadImage.getMediumUrl()).isEqualTo(UPDATED_MEDIUM_URL);
-        assertThat(testUploadImage.getReferenceCount()).isEqualTo(UPDATED_REFERENCE_COUNT);
-        assertThat(testUploadImage.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testUploadImage.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testUploadImage.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testUploadImage.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedUploadImageToMatchAllProperties(updatedUploadImage);
     }
 
     @Test
     @Transactional
     void putNonExistingUploadImage() throws Exception {
-        int databaseSizeBeforeUpdate = uploadImageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uploadImage.setId(longCount.incrementAndGet());
 
         // Create the UploadImage
@@ -2022,19 +1737,18 @@ public class UploadImageResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, uploadImageDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(uploadImageDTO))
+                    .content(om.writeValueAsBytes(uploadImageDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the UploadImage in the database
-        List<UploadImage> uploadImageList = uploadImageRepository.findAll();
-        assertThat(uploadImageList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchUploadImage() throws Exception {
-        int databaseSizeBeforeUpdate = uploadImageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uploadImage.setId(longCount.incrementAndGet());
 
         // Create the UploadImage
@@ -2045,19 +1759,18 @@ public class UploadImageResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(uploadImageDTO))
+                    .content(om.writeValueAsBytes(uploadImageDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the UploadImage in the database
-        List<UploadImage> uploadImageList = uploadImageRepository.findAll();
-        assertThat(uploadImageList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamUploadImage() throws Exception {
-        int databaseSizeBeforeUpdate = uploadImageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uploadImage.setId(longCount.incrementAndGet());
 
         // Create the UploadImage
@@ -2065,12 +1778,11 @@ public class UploadImageResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restUploadImageMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(uploadImageDTO)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(uploadImageDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the UploadImage in the database
-        List<UploadImage> uploadImageList = uploadImageRepository.findAll();
-        assertThat(uploadImageList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -2079,7 +1791,7 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        int databaseSizeBeforeUpdate = uploadImageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the uploadImage using partial update
         UploadImage partialUpdatedUploadImage = new UploadImage();
@@ -2088,14 +1800,13 @@ public class UploadImageResourceIT {
         partialUpdatedUploadImage
             .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
+            .type(UPDATED_TYPE)
             .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
-            .ownerEntityId(UPDATED_OWNER_ENTITY_ID)
-            .businessTitle(UPDATED_BUSINESS_TITLE)
-            .businessDesc(UPDATED_BUSINESS_DESC)
             .businessStatus(UPDATED_BUSINESS_STATUS)
             .createAt(UPDATED_CREATE_AT)
-            .smartUrl(UPDATED_SMART_URL)
+            .fileSize(UPDATED_FILE_SIZE)
             .mediumUrl(UPDATED_MEDIUM_URL)
+            .referenceCount(UPDATED_REFERENCE_COUNT)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY);
@@ -2104,35 +1815,17 @@ public class UploadImageResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedUploadImage.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedUploadImage))
+                    .content(om.writeValueAsBytes(partialUpdatedUploadImage))
             )
             .andExpect(status().isOk());
 
         // Validate the UploadImage in the database
-        List<UploadImage> uploadImageList = uploadImageRepository.findAll();
-        assertThat(uploadImageList).hasSize(databaseSizeBeforeUpdate);
-        UploadImage testUploadImage = uploadImageList.get(uploadImageList.size() - 1);
-        assertThat(testUploadImage.getUrl()).isEqualTo(UPDATED_URL);
-        assertThat(testUploadImage.getFullName()).isEqualTo(UPDATED_FULL_NAME);
-        assertThat(testUploadImage.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testUploadImage.getExt()).isEqualTo(DEFAULT_EXT);
-        assertThat(testUploadImage.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testUploadImage.getPath()).isEqualTo(DEFAULT_PATH);
-        assertThat(testUploadImage.getFolder()).isEqualTo(DEFAULT_FOLDER);
-        assertThat(testUploadImage.getOwnerEntityName()).isEqualTo(UPDATED_OWNER_ENTITY_NAME);
-        assertThat(testUploadImage.getOwnerEntityId()).isEqualTo(UPDATED_OWNER_ENTITY_ID);
-        assertThat(testUploadImage.getBusinessTitle()).isEqualTo(UPDATED_BUSINESS_TITLE);
-        assertThat(testUploadImage.getBusinessDesc()).isEqualTo(UPDATED_BUSINESS_DESC);
-        assertThat(testUploadImage.getBusinessStatus()).isEqualTo(UPDATED_BUSINESS_STATUS);
-        assertThat(testUploadImage.getCreateAt()).isEqualTo(UPDATED_CREATE_AT);
-        assertThat(testUploadImage.getFileSize()).isEqualTo(DEFAULT_FILE_SIZE);
-        assertThat(testUploadImage.getSmartUrl()).isEqualTo(UPDATED_SMART_URL);
-        assertThat(testUploadImage.getMediumUrl()).isEqualTo(UPDATED_MEDIUM_URL);
-        assertThat(testUploadImage.getReferenceCount()).isEqualTo(DEFAULT_REFERENCE_COUNT);
-        assertThat(testUploadImage.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testUploadImage.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testUploadImage.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testUploadImage.getLastModifiedDate()).isEqualTo(DEFAULT_LAST_MODIFIED_DATE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertUploadImageUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedUploadImage, uploadImage),
+            getPersistedUploadImage(uploadImage)
+        );
     }
 
     @Test
@@ -2141,7 +1834,7 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        int databaseSizeBeforeUpdate = uploadImageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the uploadImage using partial update
         UploadImage partialUpdatedUploadImage = new UploadImage();
@@ -2174,41 +1867,20 @@ public class UploadImageResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedUploadImage.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedUploadImage))
+                    .content(om.writeValueAsBytes(partialUpdatedUploadImage))
             )
             .andExpect(status().isOk());
 
         // Validate the UploadImage in the database
-        List<UploadImage> uploadImageList = uploadImageRepository.findAll();
-        assertThat(uploadImageList).hasSize(databaseSizeBeforeUpdate);
-        UploadImage testUploadImage = uploadImageList.get(uploadImageList.size() - 1);
-        assertThat(testUploadImage.getUrl()).isEqualTo(UPDATED_URL);
-        assertThat(testUploadImage.getFullName()).isEqualTo(UPDATED_FULL_NAME);
-        assertThat(testUploadImage.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testUploadImage.getExt()).isEqualTo(UPDATED_EXT);
-        assertThat(testUploadImage.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testUploadImage.getPath()).isEqualTo(UPDATED_PATH);
-        assertThat(testUploadImage.getFolder()).isEqualTo(UPDATED_FOLDER);
-        assertThat(testUploadImage.getOwnerEntityName()).isEqualTo(UPDATED_OWNER_ENTITY_NAME);
-        assertThat(testUploadImage.getOwnerEntityId()).isEqualTo(UPDATED_OWNER_ENTITY_ID);
-        assertThat(testUploadImage.getBusinessTitle()).isEqualTo(UPDATED_BUSINESS_TITLE);
-        assertThat(testUploadImage.getBusinessDesc()).isEqualTo(UPDATED_BUSINESS_DESC);
-        assertThat(testUploadImage.getBusinessStatus()).isEqualTo(UPDATED_BUSINESS_STATUS);
-        assertThat(testUploadImage.getCreateAt()).isEqualTo(UPDATED_CREATE_AT);
-        assertThat(testUploadImage.getFileSize()).isEqualTo(UPDATED_FILE_SIZE);
-        assertThat(testUploadImage.getSmartUrl()).isEqualTo(UPDATED_SMART_URL);
-        assertThat(testUploadImage.getMediumUrl()).isEqualTo(UPDATED_MEDIUM_URL);
-        assertThat(testUploadImage.getReferenceCount()).isEqualTo(UPDATED_REFERENCE_COUNT);
-        assertThat(testUploadImage.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testUploadImage.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testUploadImage.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testUploadImage.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertUploadImageUpdatableFieldsEquals(partialUpdatedUploadImage, getPersistedUploadImage(partialUpdatedUploadImage));
     }
 
     @Test
     @Transactional
     void patchNonExistingUploadImage() throws Exception {
-        int databaseSizeBeforeUpdate = uploadImageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uploadImage.setId(longCount.incrementAndGet());
 
         // Create the UploadImage
@@ -2219,19 +1891,18 @@ public class UploadImageResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, uploadImageDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(uploadImageDTO))
+                    .content(om.writeValueAsBytes(uploadImageDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the UploadImage in the database
-        List<UploadImage> uploadImageList = uploadImageRepository.findAll();
-        assertThat(uploadImageList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchUploadImage() throws Exception {
-        int databaseSizeBeforeUpdate = uploadImageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uploadImage.setId(longCount.incrementAndGet());
 
         // Create the UploadImage
@@ -2242,19 +1913,18 @@ public class UploadImageResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(uploadImageDTO))
+                    .content(om.writeValueAsBytes(uploadImageDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the UploadImage in the database
-        List<UploadImage> uploadImageList = uploadImageRepository.findAll();
-        assertThat(uploadImageList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamUploadImage() throws Exception {
-        int databaseSizeBeforeUpdate = uploadImageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uploadImage.setId(longCount.incrementAndGet());
 
         // Create the UploadImage
@@ -2262,14 +1932,11 @@ public class UploadImageResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restUploadImageMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(uploadImageDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(uploadImageDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the UploadImage in the database
-        List<UploadImage> uploadImageList = uploadImageRepository.findAll();
-        assertThat(uploadImageList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -2278,7 +1945,7 @@ public class UploadImageResourceIT {
         // Initialize the database
         uploadImageRepository.save(uploadImage);
 
-        int databaseSizeBeforeDelete = uploadImageRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the uploadImage
         restUploadImageMockMvc
@@ -2286,7 +1953,34 @@ public class UploadImageResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<UploadImage> uploadImageList = uploadImageRepository.findAll();
-        assertThat(uploadImageList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return uploadImageRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected UploadImage getPersistedUploadImage(UploadImage uploadImage) {
+        return uploadImageRepository.findById(uploadImage.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedUploadImageToMatchAllProperties(UploadImage expectedUploadImage) {
+        assertUploadImageAllPropertiesEquals(expectedUploadImage, getPersistedUploadImage(expectedUploadImage));
+    }
+
+    protected void assertPersistedUploadImageToMatchUpdatableProperties(UploadImage expectedUploadImage) {
+        assertUploadImageAllUpdatablePropertiesEquals(expectedUploadImage, getPersistedUploadImage(expectedUploadImage));
     }
 }

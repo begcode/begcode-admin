@@ -74,12 +74,10 @@ public class OssConfigQueryService implements QueryService<OssConfig> {
     public IPage<OssConfigDTO> findByCriteria(OssConfigCriteria criteria, Page<OssConfig> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<OssConfig> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, OssConfig.class, page)
-            .convert(ossConfig -> {
-                Binder.bindRelations(ossConfig, new String[] {});
-                return ossConfigMapper.toDto(ossConfig);
-            });
+        return Binder.joinQueryPage(queryWrapper, OssConfig.class, page).convert(ossConfig -> {
+            Binder.bindRelations(ossConfig, new String[] {});
+            return ossConfigMapper.toDto(ossConfig);
+        });
     }
 
     /**

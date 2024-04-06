@@ -1,5 +1,7 @@
 package com.begcode.monolith.web.rest;
 
+import static com.begcode.monolith.domain.ApiPermissionAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.*;
@@ -19,9 +21,8 @@ import com.begcode.monolith.repository.ApiPermissionRepository;
 import com.begcode.monolith.service.ApiPermissionService;
 import com.begcode.monolith.service.dto.ApiPermissionDTO;
 import com.begcode.monolith.service.mapper.ApiPermissionMapper;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,8 +71,11 @@ public class ApiPermissionResourceIT {
     private static final String ENTITY_API_URL = "/api/api-permissions";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private ApiPermissionRepository apiPermissionRepository;
@@ -136,27 +140,23 @@ public class ApiPermissionResourceIT {
     @Test
     @Transactional
     void createApiPermission() throws Exception {
-        int databaseSizeBeforeCreate = apiPermissionRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the ApiPermission
         ApiPermissionDTO apiPermissionDTO = apiPermissionMapper.toDto(apiPermission);
-        restApiPermissionMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(apiPermissionDTO))
-            )
-            .andExpect(status().isCreated());
+        var returnedApiPermissionDTO = om.readValue(
+            restApiPermissionMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(apiPermissionDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            ApiPermissionDTO.class
+        );
 
         // Validate the ApiPermission in the database
-        List<ApiPermission> apiPermissionList = apiPermissionRepository.findAll();
-        assertThat(apiPermissionList).hasSize(databaseSizeBeforeCreate + 1);
-        ApiPermission testApiPermission = apiPermissionList.get(apiPermissionList.size() - 1);
-        assertThat(testApiPermission.getServiceName()).isEqualTo(DEFAULT_SERVICE_NAME);
-        assertThat(testApiPermission.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testApiPermission.getCode()).isEqualTo(DEFAULT_CODE);
-        assertThat(testApiPermission.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
-        assertThat(testApiPermission.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testApiPermission.getMethod()).isEqualTo(DEFAULT_METHOD);
-        assertThat(testApiPermission.getUrl()).isEqualTo(DEFAULT_URL);
-        assertThat(testApiPermission.getStatus()).isEqualTo(DEFAULT_STATUS);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedApiPermission = apiPermissionMapper.toEntity(returnedApiPermissionDTO);
+        assertApiPermissionUpdatableFieldsEquals(returnedApiPermission, getPersistedApiPermission(returnedApiPermission));
     }
 
     @Test
@@ -166,18 +166,15 @@ public class ApiPermissionResourceIT {
         apiPermission.setId(1L);
         ApiPermissionDTO apiPermissionDTO = apiPermissionMapper.toDto(apiPermission);
 
-        int databaseSizeBeforeCreate = apiPermissionRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restApiPermissionMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(apiPermissionDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(apiPermissionDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the ApiPermission in the database
-        List<ApiPermission> apiPermissionList = apiPermissionRepository.findAll();
-        assertThat(apiPermissionList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
@@ -249,14 +246,11 @@ public class ApiPermissionResourceIT {
 
         Long id = apiPermission.getId();
 
-        defaultApiPermissionShouldBeFound("id.equals=" + id);
-        defaultApiPermissionShouldNotBeFound("id.notEquals=" + id);
+        defaultApiPermissionFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultApiPermissionShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultApiPermissionShouldNotBeFound("id.greaterThan=" + id);
+        defaultApiPermissionFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultApiPermissionShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultApiPermissionShouldNotBeFound("id.lessThan=" + id);
+        defaultApiPermissionFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -265,11 +259,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where serviceName equals to DEFAULT_SERVICE_NAME
-        defaultApiPermissionShouldBeFound("serviceName.equals=" + DEFAULT_SERVICE_NAME);
-
-        // Get all the apiPermissionList where serviceName equals to UPDATED_SERVICE_NAME
-        defaultApiPermissionShouldNotBeFound("serviceName.equals=" + UPDATED_SERVICE_NAME);
+        // Get all the apiPermissionList where serviceName equals to
+        defaultApiPermissionFiltering("serviceName.equals=" + DEFAULT_SERVICE_NAME, "serviceName.equals=" + UPDATED_SERVICE_NAME);
     }
 
     @Test
@@ -278,11 +269,11 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where serviceName in DEFAULT_SERVICE_NAME or UPDATED_SERVICE_NAME
-        defaultApiPermissionShouldBeFound("serviceName.in=" + DEFAULT_SERVICE_NAME + "," + UPDATED_SERVICE_NAME);
-
-        // Get all the apiPermissionList where serviceName equals to UPDATED_SERVICE_NAME
-        defaultApiPermissionShouldNotBeFound("serviceName.in=" + UPDATED_SERVICE_NAME);
+        // Get all the apiPermissionList where serviceName in
+        defaultApiPermissionFiltering(
+            "serviceName.in=" + DEFAULT_SERVICE_NAME + "," + UPDATED_SERVICE_NAME,
+            "serviceName.in=" + UPDATED_SERVICE_NAME
+        );
     }
 
     @Test
@@ -292,10 +283,7 @@ public class ApiPermissionResourceIT {
         apiPermissionRepository.save(apiPermission);
 
         // Get all the apiPermissionList where serviceName is not null
-        defaultApiPermissionShouldBeFound("serviceName.specified=true");
-
-        // Get all the apiPermissionList where serviceName is null
-        defaultApiPermissionShouldNotBeFound("serviceName.specified=false");
+        defaultApiPermissionFiltering("serviceName.specified=true", "serviceName.specified=false");
     }
 
     @Test
@@ -304,11 +292,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where serviceName contains DEFAULT_SERVICE_NAME
-        defaultApiPermissionShouldBeFound("serviceName.contains=" + DEFAULT_SERVICE_NAME);
-
-        // Get all the apiPermissionList where serviceName contains UPDATED_SERVICE_NAME
-        defaultApiPermissionShouldNotBeFound("serviceName.contains=" + UPDATED_SERVICE_NAME);
+        // Get all the apiPermissionList where serviceName contains
+        defaultApiPermissionFiltering("serviceName.contains=" + DEFAULT_SERVICE_NAME, "serviceName.contains=" + UPDATED_SERVICE_NAME);
     }
 
     @Test
@@ -317,11 +302,11 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where serviceName does not contain DEFAULT_SERVICE_NAME
-        defaultApiPermissionShouldNotBeFound("serviceName.doesNotContain=" + DEFAULT_SERVICE_NAME);
-
-        // Get all the apiPermissionList where serviceName does not contain UPDATED_SERVICE_NAME
-        defaultApiPermissionShouldBeFound("serviceName.doesNotContain=" + UPDATED_SERVICE_NAME);
+        // Get all the apiPermissionList where serviceName does not contain
+        defaultApiPermissionFiltering(
+            "serviceName.doesNotContain=" + UPDATED_SERVICE_NAME,
+            "serviceName.doesNotContain=" + DEFAULT_SERVICE_NAME
+        );
     }
 
     @Test
@@ -330,11 +315,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where name equals to DEFAULT_NAME
-        defaultApiPermissionShouldBeFound("name.equals=" + DEFAULT_NAME);
-
-        // Get all the apiPermissionList where name equals to UPDATED_NAME
-        defaultApiPermissionShouldNotBeFound("name.equals=" + UPDATED_NAME);
+        // Get all the apiPermissionList where name equals to
+        defaultApiPermissionFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
     }
 
     @Test
@@ -343,11 +325,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where name in DEFAULT_NAME or UPDATED_NAME
-        defaultApiPermissionShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
-
-        // Get all the apiPermissionList where name equals to UPDATED_NAME
-        defaultApiPermissionShouldNotBeFound("name.in=" + UPDATED_NAME);
+        // Get all the apiPermissionList where name in
+        defaultApiPermissionFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
     }
 
     @Test
@@ -357,10 +336,7 @@ public class ApiPermissionResourceIT {
         apiPermissionRepository.save(apiPermission);
 
         // Get all the apiPermissionList where name is not null
-        defaultApiPermissionShouldBeFound("name.specified=true");
-
-        // Get all the apiPermissionList where name is null
-        defaultApiPermissionShouldNotBeFound("name.specified=false");
+        defaultApiPermissionFiltering("name.specified=true", "name.specified=false");
     }
 
     @Test
@@ -369,11 +345,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where name contains DEFAULT_NAME
-        defaultApiPermissionShouldBeFound("name.contains=" + DEFAULT_NAME);
-
-        // Get all the apiPermissionList where name contains UPDATED_NAME
-        defaultApiPermissionShouldNotBeFound("name.contains=" + UPDATED_NAME);
+        // Get all the apiPermissionList where name contains
+        defaultApiPermissionFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
     }
 
     @Test
@@ -382,11 +355,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where name does not contain DEFAULT_NAME
-        defaultApiPermissionShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
-
-        // Get all the apiPermissionList where name does not contain UPDATED_NAME
-        defaultApiPermissionShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+        // Get all the apiPermissionList where name does not contain
+        defaultApiPermissionFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
     }
 
     @Test
@@ -395,11 +365,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where code equals to DEFAULT_CODE
-        defaultApiPermissionShouldBeFound("code.equals=" + DEFAULT_CODE);
-
-        // Get all the apiPermissionList where code equals to UPDATED_CODE
-        defaultApiPermissionShouldNotBeFound("code.equals=" + UPDATED_CODE);
+        // Get all the apiPermissionList where code equals to
+        defaultApiPermissionFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
     }
 
     @Test
@@ -408,11 +375,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where code in DEFAULT_CODE or UPDATED_CODE
-        defaultApiPermissionShouldBeFound("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE);
-
-        // Get all the apiPermissionList where code equals to UPDATED_CODE
-        defaultApiPermissionShouldNotBeFound("code.in=" + UPDATED_CODE);
+        // Get all the apiPermissionList where code in
+        defaultApiPermissionFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
     }
 
     @Test
@@ -422,10 +386,7 @@ public class ApiPermissionResourceIT {
         apiPermissionRepository.save(apiPermission);
 
         // Get all the apiPermissionList where code is not null
-        defaultApiPermissionShouldBeFound("code.specified=true");
-
-        // Get all the apiPermissionList where code is null
-        defaultApiPermissionShouldNotBeFound("code.specified=false");
+        defaultApiPermissionFiltering("code.specified=true", "code.specified=false");
     }
 
     @Test
@@ -434,11 +395,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where code contains DEFAULT_CODE
-        defaultApiPermissionShouldBeFound("code.contains=" + DEFAULT_CODE);
-
-        // Get all the apiPermissionList where code contains UPDATED_CODE
-        defaultApiPermissionShouldNotBeFound("code.contains=" + UPDATED_CODE);
+        // Get all the apiPermissionList where code contains
+        defaultApiPermissionFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
     }
 
     @Test
@@ -447,11 +405,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where code does not contain DEFAULT_CODE
-        defaultApiPermissionShouldNotBeFound("code.doesNotContain=" + DEFAULT_CODE);
-
-        // Get all the apiPermissionList where code does not contain UPDATED_CODE
-        defaultApiPermissionShouldBeFound("code.doesNotContain=" + UPDATED_CODE);
+        // Get all the apiPermissionList where code does not contain
+        defaultApiPermissionFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
     }
 
     @Test
@@ -460,11 +415,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where description equals to DEFAULT_DESCRIPTION
-        defaultApiPermissionShouldBeFound("description.equals=" + DEFAULT_DESCRIPTION);
-
-        // Get all the apiPermissionList where description equals to UPDATED_DESCRIPTION
-        defaultApiPermissionShouldNotBeFound("description.equals=" + UPDATED_DESCRIPTION);
+        // Get all the apiPermissionList where description equals to
+        defaultApiPermissionFiltering("description.equals=" + DEFAULT_DESCRIPTION, "description.equals=" + UPDATED_DESCRIPTION);
     }
 
     @Test
@@ -473,11 +425,11 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where description in DEFAULT_DESCRIPTION or UPDATED_DESCRIPTION
-        defaultApiPermissionShouldBeFound("description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION);
-
-        // Get all the apiPermissionList where description equals to UPDATED_DESCRIPTION
-        defaultApiPermissionShouldNotBeFound("description.in=" + UPDATED_DESCRIPTION);
+        // Get all the apiPermissionList where description in
+        defaultApiPermissionFiltering(
+            "description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION,
+            "description.in=" + UPDATED_DESCRIPTION
+        );
     }
 
     @Test
@@ -487,10 +439,7 @@ public class ApiPermissionResourceIT {
         apiPermissionRepository.save(apiPermission);
 
         // Get all the apiPermissionList where description is not null
-        defaultApiPermissionShouldBeFound("description.specified=true");
-
-        // Get all the apiPermissionList where description is null
-        defaultApiPermissionShouldNotBeFound("description.specified=false");
+        defaultApiPermissionFiltering("description.specified=true", "description.specified=false");
     }
 
     @Test
@@ -499,11 +448,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where description contains DEFAULT_DESCRIPTION
-        defaultApiPermissionShouldBeFound("description.contains=" + DEFAULT_DESCRIPTION);
-
-        // Get all the apiPermissionList where description contains UPDATED_DESCRIPTION
-        defaultApiPermissionShouldNotBeFound("description.contains=" + UPDATED_DESCRIPTION);
+        // Get all the apiPermissionList where description contains
+        defaultApiPermissionFiltering("description.contains=" + DEFAULT_DESCRIPTION, "description.contains=" + UPDATED_DESCRIPTION);
     }
 
     @Test
@@ -512,11 +458,11 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where description does not contain DEFAULT_DESCRIPTION
-        defaultApiPermissionShouldNotBeFound("description.doesNotContain=" + DEFAULT_DESCRIPTION);
-
-        // Get all the apiPermissionList where description does not contain UPDATED_DESCRIPTION
-        defaultApiPermissionShouldBeFound("description.doesNotContain=" + UPDATED_DESCRIPTION);
+        // Get all the apiPermissionList where description does not contain
+        defaultApiPermissionFiltering(
+            "description.doesNotContain=" + UPDATED_DESCRIPTION,
+            "description.doesNotContain=" + DEFAULT_DESCRIPTION
+        );
     }
 
     @Test
@@ -525,11 +471,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where type equals to DEFAULT_TYPE
-        defaultApiPermissionShouldBeFound("type.equals=" + DEFAULT_TYPE);
-
-        // Get all the apiPermissionList where type equals to UPDATED_TYPE
-        defaultApiPermissionShouldNotBeFound("type.equals=" + UPDATED_TYPE);
+        // Get all the apiPermissionList where type equals to
+        defaultApiPermissionFiltering("type.equals=" + DEFAULT_TYPE, "type.equals=" + UPDATED_TYPE);
     }
 
     @Test
@@ -538,11 +481,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where type in DEFAULT_TYPE or UPDATED_TYPE
-        defaultApiPermissionShouldBeFound("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE);
-
-        // Get all the apiPermissionList where type equals to UPDATED_TYPE
-        defaultApiPermissionShouldNotBeFound("type.in=" + UPDATED_TYPE);
+        // Get all the apiPermissionList where type in
+        defaultApiPermissionFiltering("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE, "type.in=" + UPDATED_TYPE);
     }
 
     @Test
@@ -552,10 +492,7 @@ public class ApiPermissionResourceIT {
         apiPermissionRepository.save(apiPermission);
 
         // Get all the apiPermissionList where type is not null
-        defaultApiPermissionShouldBeFound("type.specified=true");
-
-        // Get all the apiPermissionList where type is null
-        defaultApiPermissionShouldNotBeFound("type.specified=false");
+        defaultApiPermissionFiltering("type.specified=true", "type.specified=false");
     }
 
     @Test
@@ -564,11 +501,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where method equals to DEFAULT_METHOD
-        defaultApiPermissionShouldBeFound("method.equals=" + DEFAULT_METHOD);
-
-        // Get all the apiPermissionList where method equals to UPDATED_METHOD
-        defaultApiPermissionShouldNotBeFound("method.equals=" + UPDATED_METHOD);
+        // Get all the apiPermissionList where method equals to
+        defaultApiPermissionFiltering("method.equals=" + DEFAULT_METHOD, "method.equals=" + UPDATED_METHOD);
     }
 
     @Test
@@ -577,11 +511,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where method in DEFAULT_METHOD or UPDATED_METHOD
-        defaultApiPermissionShouldBeFound("method.in=" + DEFAULT_METHOD + "," + UPDATED_METHOD);
-
-        // Get all the apiPermissionList where method equals to UPDATED_METHOD
-        defaultApiPermissionShouldNotBeFound("method.in=" + UPDATED_METHOD);
+        // Get all the apiPermissionList where method in
+        defaultApiPermissionFiltering("method.in=" + DEFAULT_METHOD + "," + UPDATED_METHOD, "method.in=" + UPDATED_METHOD);
     }
 
     @Test
@@ -591,10 +522,7 @@ public class ApiPermissionResourceIT {
         apiPermissionRepository.save(apiPermission);
 
         // Get all the apiPermissionList where method is not null
-        defaultApiPermissionShouldBeFound("method.specified=true");
-
-        // Get all the apiPermissionList where method is null
-        defaultApiPermissionShouldNotBeFound("method.specified=false");
+        defaultApiPermissionFiltering("method.specified=true", "method.specified=false");
     }
 
     @Test
@@ -603,11 +531,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where method contains DEFAULT_METHOD
-        defaultApiPermissionShouldBeFound("method.contains=" + DEFAULT_METHOD);
-
-        // Get all the apiPermissionList where method contains UPDATED_METHOD
-        defaultApiPermissionShouldNotBeFound("method.contains=" + UPDATED_METHOD);
+        // Get all the apiPermissionList where method contains
+        defaultApiPermissionFiltering("method.contains=" + DEFAULT_METHOD, "method.contains=" + UPDATED_METHOD);
     }
 
     @Test
@@ -616,11 +541,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where method does not contain DEFAULT_METHOD
-        defaultApiPermissionShouldNotBeFound("method.doesNotContain=" + DEFAULT_METHOD);
-
-        // Get all the apiPermissionList where method does not contain UPDATED_METHOD
-        defaultApiPermissionShouldBeFound("method.doesNotContain=" + UPDATED_METHOD);
+        // Get all the apiPermissionList where method does not contain
+        defaultApiPermissionFiltering("method.doesNotContain=" + UPDATED_METHOD, "method.doesNotContain=" + DEFAULT_METHOD);
     }
 
     @Test
@@ -629,11 +551,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where url equals to DEFAULT_URL
-        defaultApiPermissionShouldBeFound("url.equals=" + DEFAULT_URL);
-
-        // Get all the apiPermissionList where url equals to UPDATED_URL
-        defaultApiPermissionShouldNotBeFound("url.equals=" + UPDATED_URL);
+        // Get all the apiPermissionList where url equals to
+        defaultApiPermissionFiltering("url.equals=" + DEFAULT_URL, "url.equals=" + UPDATED_URL);
     }
 
     @Test
@@ -642,11 +561,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where url in DEFAULT_URL or UPDATED_URL
-        defaultApiPermissionShouldBeFound("url.in=" + DEFAULT_URL + "," + UPDATED_URL);
-
-        // Get all the apiPermissionList where url equals to UPDATED_URL
-        defaultApiPermissionShouldNotBeFound("url.in=" + UPDATED_URL);
+        // Get all the apiPermissionList where url in
+        defaultApiPermissionFiltering("url.in=" + DEFAULT_URL + "," + UPDATED_URL, "url.in=" + UPDATED_URL);
     }
 
     @Test
@@ -656,10 +572,7 @@ public class ApiPermissionResourceIT {
         apiPermissionRepository.save(apiPermission);
 
         // Get all the apiPermissionList where url is not null
-        defaultApiPermissionShouldBeFound("url.specified=true");
-
-        // Get all the apiPermissionList where url is null
-        defaultApiPermissionShouldNotBeFound("url.specified=false");
+        defaultApiPermissionFiltering("url.specified=true", "url.specified=false");
     }
 
     @Test
@@ -668,11 +581,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where url contains DEFAULT_URL
-        defaultApiPermissionShouldBeFound("url.contains=" + DEFAULT_URL);
-
-        // Get all the apiPermissionList where url contains UPDATED_URL
-        defaultApiPermissionShouldNotBeFound("url.contains=" + UPDATED_URL);
+        // Get all the apiPermissionList where url contains
+        defaultApiPermissionFiltering("url.contains=" + DEFAULT_URL, "url.contains=" + UPDATED_URL);
     }
 
     @Test
@@ -681,11 +591,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where url does not contain DEFAULT_URL
-        defaultApiPermissionShouldNotBeFound("url.doesNotContain=" + DEFAULT_URL);
-
-        // Get all the apiPermissionList where url does not contain UPDATED_URL
-        defaultApiPermissionShouldBeFound("url.doesNotContain=" + UPDATED_URL);
+        // Get all the apiPermissionList where url does not contain
+        defaultApiPermissionFiltering("url.doesNotContain=" + UPDATED_URL, "url.doesNotContain=" + DEFAULT_URL);
     }
 
     @Test
@@ -694,11 +601,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where status equals to DEFAULT_STATUS
-        defaultApiPermissionShouldBeFound("status.equals=" + DEFAULT_STATUS);
-
-        // Get all the apiPermissionList where status equals to UPDATED_STATUS
-        defaultApiPermissionShouldNotBeFound("status.equals=" + UPDATED_STATUS);
+        // Get all the apiPermissionList where status equals to
+        defaultApiPermissionFiltering("status.equals=" + DEFAULT_STATUS, "status.equals=" + UPDATED_STATUS);
     }
 
     @Test
@@ -707,11 +611,8 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        // Get all the apiPermissionList where status in DEFAULT_STATUS or UPDATED_STATUS
-        defaultApiPermissionShouldBeFound("status.in=" + DEFAULT_STATUS + "," + UPDATED_STATUS);
-
-        // Get all the apiPermissionList where status equals to UPDATED_STATUS
-        defaultApiPermissionShouldNotBeFound("status.in=" + UPDATED_STATUS);
+        // Get all the apiPermissionList where status in
+        defaultApiPermissionFiltering("status.in=" + DEFAULT_STATUS + "," + UPDATED_STATUS, "status.in=" + UPDATED_STATUS);
     }
 
     @Test
@@ -721,10 +622,7 @@ public class ApiPermissionResourceIT {
         apiPermissionRepository.save(apiPermission);
 
         // Get all the apiPermissionList where status is not null
-        defaultApiPermissionShouldBeFound("status.specified=true");
-
-        // Get all the apiPermissionList where status is null
-        defaultApiPermissionShouldNotBeFound("status.specified=false");
+        defaultApiPermissionFiltering("status.specified=true", "status.specified=false");
     }
 
     @Test
@@ -753,6 +651,11 @@ public class ApiPermissionResourceIT {
 
         // Get all the apiPermissionList where authorities equals to (authoritiesId + 1)
         defaultApiPermissionShouldNotBeFound("authoritiesId.equals=" + (authoritiesId + 1));
+    }
+
+    private void defaultApiPermissionFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultApiPermissionShouldBeFound(shouldBeFound);
+        defaultApiPermissionShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -813,7 +716,7 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        int databaseSizeBeforeUpdate = apiPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the apiPermission
         ApiPermission updatedApiPermission = apiPermissionRepository.findById(apiPermission.getId()).orElseThrow();
@@ -832,28 +735,19 @@ public class ApiPermissionResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, apiPermissionDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(apiPermissionDTO))
+                    .content(om.writeValueAsBytes(apiPermissionDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the ApiPermission in the database
-        List<ApiPermission> apiPermissionList = apiPermissionRepository.findAll();
-        assertThat(apiPermissionList).hasSize(databaseSizeBeforeUpdate);
-        ApiPermission testApiPermission = apiPermissionList.get(apiPermissionList.size() - 1);
-        assertThat(testApiPermission.getServiceName()).isEqualTo(UPDATED_SERVICE_NAME);
-        assertThat(testApiPermission.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testApiPermission.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testApiPermission.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-        assertThat(testApiPermission.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testApiPermission.getMethod()).isEqualTo(UPDATED_METHOD);
-        assertThat(testApiPermission.getUrl()).isEqualTo(UPDATED_URL);
-        assertThat(testApiPermission.getStatus()).isEqualTo(UPDATED_STATUS);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedApiPermissionToMatchAllProperties(updatedApiPermission);
     }
 
     @Test
     @Transactional
     void putNonExistingApiPermission() throws Exception {
-        int databaseSizeBeforeUpdate = apiPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         apiPermission.setId(longCount.incrementAndGet());
 
         // Create the ApiPermission
@@ -864,19 +758,18 @@ public class ApiPermissionResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, apiPermissionDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(apiPermissionDTO))
+                    .content(om.writeValueAsBytes(apiPermissionDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the ApiPermission in the database
-        List<ApiPermission> apiPermissionList = apiPermissionRepository.findAll();
-        assertThat(apiPermissionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchApiPermission() throws Exception {
-        int databaseSizeBeforeUpdate = apiPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         apiPermission.setId(longCount.incrementAndGet());
 
         // Create the ApiPermission
@@ -887,19 +780,18 @@ public class ApiPermissionResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(apiPermissionDTO))
+                    .content(om.writeValueAsBytes(apiPermissionDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the ApiPermission in the database
-        List<ApiPermission> apiPermissionList = apiPermissionRepository.findAll();
-        assertThat(apiPermissionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamApiPermission() throws Exception {
-        int databaseSizeBeforeUpdate = apiPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         apiPermission.setId(longCount.incrementAndGet());
 
         // Create the ApiPermission
@@ -907,14 +799,11 @@ public class ApiPermissionResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApiPermissionMockMvc
-            .perform(
-                put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(apiPermissionDTO))
-            )
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(apiPermissionDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the ApiPermission in the database
-        List<ApiPermission> apiPermissionList = apiPermissionRepository.findAll();
-        assertThat(apiPermissionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -923,34 +812,29 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        int databaseSizeBeforeUpdate = apiPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the apiPermission using partial update
         ApiPermission partialUpdatedApiPermission = new ApiPermission();
         partialUpdatedApiPermission.setId(apiPermission.getId());
 
-        partialUpdatedApiPermission.description(UPDATED_DESCRIPTION).method(UPDATED_METHOD).url(UPDATED_URL).status(UPDATED_STATUS);
+        partialUpdatedApiPermission.code(UPDATED_CODE).type(UPDATED_TYPE).method(UPDATED_METHOD);
 
         restApiPermissionMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedApiPermission.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedApiPermission))
+                    .content(om.writeValueAsBytes(partialUpdatedApiPermission))
             )
             .andExpect(status().isOk());
 
         // Validate the ApiPermission in the database
-        List<ApiPermission> apiPermissionList = apiPermissionRepository.findAll();
-        assertThat(apiPermissionList).hasSize(databaseSizeBeforeUpdate);
-        ApiPermission testApiPermission = apiPermissionList.get(apiPermissionList.size() - 1);
-        assertThat(testApiPermission.getServiceName()).isEqualTo(DEFAULT_SERVICE_NAME);
-        assertThat(testApiPermission.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testApiPermission.getCode()).isEqualTo(DEFAULT_CODE);
-        assertThat(testApiPermission.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-        assertThat(testApiPermission.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testApiPermission.getMethod()).isEqualTo(UPDATED_METHOD);
-        assertThat(testApiPermission.getUrl()).isEqualTo(UPDATED_URL);
-        assertThat(testApiPermission.getStatus()).isEqualTo(UPDATED_STATUS);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertApiPermissionUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedApiPermission, apiPermission),
+            getPersistedApiPermission(apiPermission)
+        );
     }
 
     @Test
@@ -959,7 +843,7 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        int databaseSizeBeforeUpdate = apiPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the apiPermission using partial update
         ApiPermission partialUpdatedApiPermission = new ApiPermission();
@@ -979,28 +863,20 @@ public class ApiPermissionResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedApiPermission.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedApiPermission))
+                    .content(om.writeValueAsBytes(partialUpdatedApiPermission))
             )
             .andExpect(status().isOk());
 
         // Validate the ApiPermission in the database
-        List<ApiPermission> apiPermissionList = apiPermissionRepository.findAll();
-        assertThat(apiPermissionList).hasSize(databaseSizeBeforeUpdate);
-        ApiPermission testApiPermission = apiPermissionList.get(apiPermissionList.size() - 1);
-        assertThat(testApiPermission.getServiceName()).isEqualTo(UPDATED_SERVICE_NAME);
-        assertThat(testApiPermission.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testApiPermission.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testApiPermission.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-        assertThat(testApiPermission.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testApiPermission.getMethod()).isEqualTo(UPDATED_METHOD);
-        assertThat(testApiPermission.getUrl()).isEqualTo(UPDATED_URL);
-        assertThat(testApiPermission.getStatus()).isEqualTo(UPDATED_STATUS);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertApiPermissionUpdatableFieldsEquals(partialUpdatedApiPermission, getPersistedApiPermission(partialUpdatedApiPermission));
     }
 
     @Test
     @Transactional
     void patchNonExistingApiPermission() throws Exception {
-        int databaseSizeBeforeUpdate = apiPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         apiPermission.setId(longCount.incrementAndGet());
 
         // Create the ApiPermission
@@ -1011,19 +887,18 @@ public class ApiPermissionResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, apiPermissionDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(apiPermissionDTO))
+                    .content(om.writeValueAsBytes(apiPermissionDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the ApiPermission in the database
-        List<ApiPermission> apiPermissionList = apiPermissionRepository.findAll();
-        assertThat(apiPermissionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchApiPermission() throws Exception {
-        int databaseSizeBeforeUpdate = apiPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         apiPermission.setId(longCount.incrementAndGet());
 
         // Create the ApiPermission
@@ -1034,19 +909,18 @@ public class ApiPermissionResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(apiPermissionDTO))
+                    .content(om.writeValueAsBytes(apiPermissionDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the ApiPermission in the database
-        List<ApiPermission> apiPermissionList = apiPermissionRepository.findAll();
-        assertThat(apiPermissionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamApiPermission() throws Exception {
-        int databaseSizeBeforeUpdate = apiPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         apiPermission.setId(longCount.incrementAndGet());
 
         // Create the ApiPermission
@@ -1054,16 +928,11 @@ public class ApiPermissionResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApiPermissionMockMvc
-            .perform(
-                patch(ENTITY_API_URL)
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(apiPermissionDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(apiPermissionDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the ApiPermission in the database
-        List<ApiPermission> apiPermissionList = apiPermissionRepository.findAll();
-        assertThat(apiPermissionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1072,7 +941,7 @@ public class ApiPermissionResourceIT {
         // Initialize the database
         apiPermissionRepository.save(apiPermission);
 
-        int databaseSizeBeforeDelete = apiPermissionRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the apiPermission
         restApiPermissionMockMvc
@@ -1080,7 +949,34 @@ public class ApiPermissionResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<ApiPermission> apiPermissionList = apiPermissionRepository.findAll();
-        assertThat(apiPermissionList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return apiPermissionRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected ApiPermission getPersistedApiPermission(ApiPermission apiPermission) {
+        return apiPermissionRepository.findById(apiPermission.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedApiPermissionToMatchAllProperties(ApiPermission expectedApiPermission) {
+        assertApiPermissionAllPropertiesEquals(expectedApiPermission, getPersistedApiPermission(expectedApiPermission));
+    }
+
+    protected void assertPersistedApiPermissionToMatchUpdatableProperties(ApiPermission expectedApiPermission) {
+        assertApiPermissionAllUpdatablePropertiesEquals(expectedApiPermission, getPersistedApiPermission(expectedApiPermission));
     }
 }

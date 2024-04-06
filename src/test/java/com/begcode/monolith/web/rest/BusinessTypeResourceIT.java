@@ -1,5 +1,7 @@
 package com.begcode.monolith.web.rest;
 
+import static com.begcode.monolith.domain.BusinessTypeAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -11,8 +13,8 @@ import com.begcode.monolith.domain.BusinessType;
 import com.begcode.monolith.repository.BusinessTypeRepository;
 import com.begcode.monolith.service.dto.BusinessTypeDTO;
 import com.begcode.monolith.service.mapper.BusinessTypeMapper;
-import java.util.List;
-import java.util.Random;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,8 +47,11 @@ public class BusinessTypeResourceIT {
     private static final String ENTITY_API_URL = "/api/business-types";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private BusinessTypeRepository businessTypeRepository;
@@ -97,23 +102,23 @@ public class BusinessTypeResourceIT {
     @Test
     @Transactional
     void createBusinessType() throws Exception {
-        int databaseSizeBeforeCreate = businessTypeRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the BusinessType
         BusinessTypeDTO businessTypeDTO = businessTypeMapper.toDto(businessType);
-        restBusinessTypeMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(businessTypeDTO))
-            )
-            .andExpect(status().isCreated());
+        var returnedBusinessTypeDTO = om.readValue(
+            restBusinessTypeMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(businessTypeDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            BusinessTypeDTO.class
+        );
 
         // Validate the BusinessType in the database
-        List<BusinessType> businessTypeList = businessTypeRepository.findAll();
-        assertThat(businessTypeList).hasSize(databaseSizeBeforeCreate + 1);
-        BusinessType testBusinessType = businessTypeList.get(businessTypeList.size() - 1);
-        assertThat(testBusinessType.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testBusinessType.getCode()).isEqualTo(DEFAULT_CODE);
-        assertThat(testBusinessType.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
-        assertThat(testBusinessType.getIcon()).isEqualTo(DEFAULT_ICON);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedBusinessType = businessTypeMapper.toEntity(returnedBusinessTypeDTO);
+        assertBusinessTypeUpdatableFieldsEquals(returnedBusinessType, getPersistedBusinessType(returnedBusinessType));
     }
 
     @Test
@@ -123,18 +128,15 @@ public class BusinessTypeResourceIT {
         businessType.setId(1L);
         BusinessTypeDTO businessTypeDTO = businessTypeMapper.toDto(businessType);
 
-        int databaseSizeBeforeCreate = businessTypeRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restBusinessTypeMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(businessTypeDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(businessTypeDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the BusinessType in the database
-        List<BusinessType> businessTypeList = businessTypeRepository.findAll();
-        assertThat(businessTypeList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
@@ -181,14 +183,11 @@ public class BusinessTypeResourceIT {
 
         Long id = businessType.getId();
 
-        defaultBusinessTypeShouldBeFound("id.equals=" + id);
-        defaultBusinessTypeShouldNotBeFound("id.notEquals=" + id);
+        defaultBusinessTypeFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultBusinessTypeShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultBusinessTypeShouldNotBeFound("id.greaterThan=" + id);
+        defaultBusinessTypeFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultBusinessTypeShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultBusinessTypeShouldNotBeFound("id.lessThan=" + id);
+        defaultBusinessTypeFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -197,11 +196,8 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        // Get all the businessTypeList where name equals to DEFAULT_NAME
-        defaultBusinessTypeShouldBeFound("name.equals=" + DEFAULT_NAME);
-
-        // Get all the businessTypeList where name equals to UPDATED_NAME
-        defaultBusinessTypeShouldNotBeFound("name.equals=" + UPDATED_NAME);
+        // Get all the businessTypeList where name equals to
+        defaultBusinessTypeFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
     }
 
     @Test
@@ -210,11 +206,8 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        // Get all the businessTypeList where name in DEFAULT_NAME or UPDATED_NAME
-        defaultBusinessTypeShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
-
-        // Get all the businessTypeList where name equals to UPDATED_NAME
-        defaultBusinessTypeShouldNotBeFound("name.in=" + UPDATED_NAME);
+        // Get all the businessTypeList where name in
+        defaultBusinessTypeFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
     }
 
     @Test
@@ -224,10 +217,7 @@ public class BusinessTypeResourceIT {
         businessTypeRepository.save(businessType);
 
         // Get all the businessTypeList where name is not null
-        defaultBusinessTypeShouldBeFound("name.specified=true");
-
-        // Get all the businessTypeList where name is null
-        defaultBusinessTypeShouldNotBeFound("name.specified=false");
+        defaultBusinessTypeFiltering("name.specified=true", "name.specified=false");
     }
 
     @Test
@@ -236,11 +226,8 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        // Get all the businessTypeList where name contains DEFAULT_NAME
-        defaultBusinessTypeShouldBeFound("name.contains=" + DEFAULT_NAME);
-
-        // Get all the businessTypeList where name contains UPDATED_NAME
-        defaultBusinessTypeShouldNotBeFound("name.contains=" + UPDATED_NAME);
+        // Get all the businessTypeList where name contains
+        defaultBusinessTypeFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
     }
 
     @Test
@@ -249,11 +236,8 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        // Get all the businessTypeList where name does not contain DEFAULT_NAME
-        defaultBusinessTypeShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
-
-        // Get all the businessTypeList where name does not contain UPDATED_NAME
-        defaultBusinessTypeShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+        // Get all the businessTypeList where name does not contain
+        defaultBusinessTypeFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
     }
 
     @Test
@@ -262,11 +246,8 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        // Get all the businessTypeList where code equals to DEFAULT_CODE
-        defaultBusinessTypeShouldBeFound("code.equals=" + DEFAULT_CODE);
-
-        // Get all the businessTypeList where code equals to UPDATED_CODE
-        defaultBusinessTypeShouldNotBeFound("code.equals=" + UPDATED_CODE);
+        // Get all the businessTypeList where code equals to
+        defaultBusinessTypeFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
     }
 
     @Test
@@ -275,11 +256,8 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        // Get all the businessTypeList where code in DEFAULT_CODE or UPDATED_CODE
-        defaultBusinessTypeShouldBeFound("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE);
-
-        // Get all the businessTypeList where code equals to UPDATED_CODE
-        defaultBusinessTypeShouldNotBeFound("code.in=" + UPDATED_CODE);
+        // Get all the businessTypeList where code in
+        defaultBusinessTypeFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
     }
 
     @Test
@@ -289,10 +267,7 @@ public class BusinessTypeResourceIT {
         businessTypeRepository.save(businessType);
 
         // Get all the businessTypeList where code is not null
-        defaultBusinessTypeShouldBeFound("code.specified=true");
-
-        // Get all the businessTypeList where code is null
-        defaultBusinessTypeShouldNotBeFound("code.specified=false");
+        defaultBusinessTypeFiltering("code.specified=true", "code.specified=false");
     }
 
     @Test
@@ -301,11 +276,8 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        // Get all the businessTypeList where code contains DEFAULT_CODE
-        defaultBusinessTypeShouldBeFound("code.contains=" + DEFAULT_CODE);
-
-        // Get all the businessTypeList where code contains UPDATED_CODE
-        defaultBusinessTypeShouldNotBeFound("code.contains=" + UPDATED_CODE);
+        // Get all the businessTypeList where code contains
+        defaultBusinessTypeFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
     }
 
     @Test
@@ -314,11 +286,8 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        // Get all the businessTypeList where code does not contain DEFAULT_CODE
-        defaultBusinessTypeShouldNotBeFound("code.doesNotContain=" + DEFAULT_CODE);
-
-        // Get all the businessTypeList where code does not contain UPDATED_CODE
-        defaultBusinessTypeShouldBeFound("code.doesNotContain=" + UPDATED_CODE);
+        // Get all the businessTypeList where code does not contain
+        defaultBusinessTypeFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
     }
 
     @Test
@@ -327,11 +296,8 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        // Get all the businessTypeList where description equals to DEFAULT_DESCRIPTION
-        defaultBusinessTypeShouldBeFound("description.equals=" + DEFAULT_DESCRIPTION);
-
-        // Get all the businessTypeList where description equals to UPDATED_DESCRIPTION
-        defaultBusinessTypeShouldNotBeFound("description.equals=" + UPDATED_DESCRIPTION);
+        // Get all the businessTypeList where description equals to
+        defaultBusinessTypeFiltering("description.equals=" + DEFAULT_DESCRIPTION, "description.equals=" + UPDATED_DESCRIPTION);
     }
 
     @Test
@@ -340,11 +306,11 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        // Get all the businessTypeList where description in DEFAULT_DESCRIPTION or UPDATED_DESCRIPTION
-        defaultBusinessTypeShouldBeFound("description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION);
-
-        // Get all the businessTypeList where description equals to UPDATED_DESCRIPTION
-        defaultBusinessTypeShouldNotBeFound("description.in=" + UPDATED_DESCRIPTION);
+        // Get all the businessTypeList where description in
+        defaultBusinessTypeFiltering(
+            "description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION,
+            "description.in=" + UPDATED_DESCRIPTION
+        );
     }
 
     @Test
@@ -354,10 +320,7 @@ public class BusinessTypeResourceIT {
         businessTypeRepository.save(businessType);
 
         // Get all the businessTypeList where description is not null
-        defaultBusinessTypeShouldBeFound("description.specified=true");
-
-        // Get all the businessTypeList where description is null
-        defaultBusinessTypeShouldNotBeFound("description.specified=false");
+        defaultBusinessTypeFiltering("description.specified=true", "description.specified=false");
     }
 
     @Test
@@ -366,11 +329,8 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        // Get all the businessTypeList where description contains DEFAULT_DESCRIPTION
-        defaultBusinessTypeShouldBeFound("description.contains=" + DEFAULT_DESCRIPTION);
-
-        // Get all the businessTypeList where description contains UPDATED_DESCRIPTION
-        defaultBusinessTypeShouldNotBeFound("description.contains=" + UPDATED_DESCRIPTION);
+        // Get all the businessTypeList where description contains
+        defaultBusinessTypeFiltering("description.contains=" + DEFAULT_DESCRIPTION, "description.contains=" + UPDATED_DESCRIPTION);
     }
 
     @Test
@@ -379,11 +339,11 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        // Get all the businessTypeList where description does not contain DEFAULT_DESCRIPTION
-        defaultBusinessTypeShouldNotBeFound("description.doesNotContain=" + DEFAULT_DESCRIPTION);
-
-        // Get all the businessTypeList where description does not contain UPDATED_DESCRIPTION
-        defaultBusinessTypeShouldBeFound("description.doesNotContain=" + UPDATED_DESCRIPTION);
+        // Get all the businessTypeList where description does not contain
+        defaultBusinessTypeFiltering(
+            "description.doesNotContain=" + UPDATED_DESCRIPTION,
+            "description.doesNotContain=" + DEFAULT_DESCRIPTION
+        );
     }
 
     @Test
@@ -392,11 +352,8 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        // Get all the businessTypeList where icon equals to DEFAULT_ICON
-        defaultBusinessTypeShouldBeFound("icon.equals=" + DEFAULT_ICON);
-
-        // Get all the businessTypeList where icon equals to UPDATED_ICON
-        defaultBusinessTypeShouldNotBeFound("icon.equals=" + UPDATED_ICON);
+        // Get all the businessTypeList where icon equals to
+        defaultBusinessTypeFiltering("icon.equals=" + DEFAULT_ICON, "icon.equals=" + UPDATED_ICON);
     }
 
     @Test
@@ -405,11 +362,8 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        // Get all the businessTypeList where icon in DEFAULT_ICON or UPDATED_ICON
-        defaultBusinessTypeShouldBeFound("icon.in=" + DEFAULT_ICON + "," + UPDATED_ICON);
-
-        // Get all the businessTypeList where icon equals to UPDATED_ICON
-        defaultBusinessTypeShouldNotBeFound("icon.in=" + UPDATED_ICON);
+        // Get all the businessTypeList where icon in
+        defaultBusinessTypeFiltering("icon.in=" + DEFAULT_ICON + "," + UPDATED_ICON, "icon.in=" + UPDATED_ICON);
     }
 
     @Test
@@ -419,10 +373,7 @@ public class BusinessTypeResourceIT {
         businessTypeRepository.save(businessType);
 
         // Get all the businessTypeList where icon is not null
-        defaultBusinessTypeShouldBeFound("icon.specified=true");
-
-        // Get all the businessTypeList where icon is null
-        defaultBusinessTypeShouldNotBeFound("icon.specified=false");
+        defaultBusinessTypeFiltering("icon.specified=true", "icon.specified=false");
     }
 
     @Test
@@ -431,11 +382,8 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        // Get all the businessTypeList where icon contains DEFAULT_ICON
-        defaultBusinessTypeShouldBeFound("icon.contains=" + DEFAULT_ICON);
-
-        // Get all the businessTypeList where icon contains UPDATED_ICON
-        defaultBusinessTypeShouldNotBeFound("icon.contains=" + UPDATED_ICON);
+        // Get all the businessTypeList where icon contains
+        defaultBusinessTypeFiltering("icon.contains=" + DEFAULT_ICON, "icon.contains=" + UPDATED_ICON);
     }
 
     @Test
@@ -444,11 +392,13 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        // Get all the businessTypeList where icon does not contain DEFAULT_ICON
-        defaultBusinessTypeShouldNotBeFound("icon.doesNotContain=" + DEFAULT_ICON);
+        // Get all the businessTypeList where icon does not contain
+        defaultBusinessTypeFiltering("icon.doesNotContain=" + UPDATED_ICON, "icon.doesNotContain=" + DEFAULT_ICON);
+    }
 
-        // Get all the businessTypeList where icon does not contain UPDATED_ICON
-        defaultBusinessTypeShouldBeFound("icon.doesNotContain=" + UPDATED_ICON);
+    private void defaultBusinessTypeFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultBusinessTypeShouldBeFound(shouldBeFound);
+        defaultBusinessTypeShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -505,7 +455,7 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        int databaseSizeBeforeUpdate = businessTypeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the businessType
         BusinessType updatedBusinessType = businessTypeRepository.findById(businessType.getId()).orElseThrow();
@@ -516,24 +466,19 @@ public class BusinessTypeResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, businessTypeDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(businessTypeDTO))
+                    .content(om.writeValueAsBytes(businessTypeDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the BusinessType in the database
-        List<BusinessType> businessTypeList = businessTypeRepository.findAll();
-        assertThat(businessTypeList).hasSize(databaseSizeBeforeUpdate);
-        BusinessType testBusinessType = businessTypeList.get(businessTypeList.size() - 1);
-        assertThat(testBusinessType.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testBusinessType.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testBusinessType.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-        assertThat(testBusinessType.getIcon()).isEqualTo(UPDATED_ICON);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedBusinessTypeToMatchAllProperties(updatedBusinessType);
     }
 
     @Test
     @Transactional
     void putNonExistingBusinessType() throws Exception {
-        int databaseSizeBeforeUpdate = businessTypeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         businessType.setId(longCount.incrementAndGet());
 
         // Create the BusinessType
@@ -544,19 +489,18 @@ public class BusinessTypeResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, businessTypeDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(businessTypeDTO))
+                    .content(om.writeValueAsBytes(businessTypeDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the BusinessType in the database
-        List<BusinessType> businessTypeList = businessTypeRepository.findAll();
-        assertThat(businessTypeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchBusinessType() throws Exception {
-        int databaseSizeBeforeUpdate = businessTypeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         businessType.setId(longCount.incrementAndGet());
 
         // Create the BusinessType
@@ -567,19 +511,18 @@ public class BusinessTypeResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(businessTypeDTO))
+                    .content(om.writeValueAsBytes(businessTypeDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the BusinessType in the database
-        List<BusinessType> businessTypeList = businessTypeRepository.findAll();
-        assertThat(businessTypeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamBusinessType() throws Exception {
-        int databaseSizeBeforeUpdate = businessTypeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         businessType.setId(longCount.incrementAndGet());
 
         // Create the BusinessType
@@ -587,14 +530,11 @@ public class BusinessTypeResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBusinessTypeMockMvc
-            .perform(
-                put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(businessTypeDTO))
-            )
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(businessTypeDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the BusinessType in the database
-        List<BusinessType> businessTypeList = businessTypeRepository.findAll();
-        assertThat(businessTypeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -603,30 +543,29 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        int databaseSizeBeforeUpdate = businessTypeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the businessType using partial update
         BusinessType partialUpdatedBusinessType = new BusinessType();
         partialUpdatedBusinessType.setId(businessType.getId());
 
-        partialUpdatedBusinessType.name(UPDATED_NAME).code(UPDATED_CODE).icon(UPDATED_ICON);
+        partialUpdatedBusinessType.name(UPDATED_NAME).description(UPDATED_DESCRIPTION);
 
         restBusinessTypeMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedBusinessType.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedBusinessType))
+                    .content(om.writeValueAsBytes(partialUpdatedBusinessType))
             )
             .andExpect(status().isOk());
 
         // Validate the BusinessType in the database
-        List<BusinessType> businessTypeList = businessTypeRepository.findAll();
-        assertThat(businessTypeList).hasSize(databaseSizeBeforeUpdate);
-        BusinessType testBusinessType = businessTypeList.get(businessTypeList.size() - 1);
-        assertThat(testBusinessType.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testBusinessType.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testBusinessType.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
-        assertThat(testBusinessType.getIcon()).isEqualTo(UPDATED_ICON);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertBusinessTypeUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedBusinessType, businessType),
+            getPersistedBusinessType(businessType)
+        );
     }
 
     @Test
@@ -635,7 +574,7 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        int databaseSizeBeforeUpdate = businessTypeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the businessType using partial update
         BusinessType partialUpdatedBusinessType = new BusinessType();
@@ -647,24 +586,20 @@ public class BusinessTypeResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedBusinessType.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedBusinessType))
+                    .content(om.writeValueAsBytes(partialUpdatedBusinessType))
             )
             .andExpect(status().isOk());
 
         // Validate the BusinessType in the database
-        List<BusinessType> businessTypeList = businessTypeRepository.findAll();
-        assertThat(businessTypeList).hasSize(databaseSizeBeforeUpdate);
-        BusinessType testBusinessType = businessTypeList.get(businessTypeList.size() - 1);
-        assertThat(testBusinessType.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testBusinessType.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testBusinessType.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-        assertThat(testBusinessType.getIcon()).isEqualTo(UPDATED_ICON);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertBusinessTypeUpdatableFieldsEquals(partialUpdatedBusinessType, getPersistedBusinessType(partialUpdatedBusinessType));
     }
 
     @Test
     @Transactional
     void patchNonExistingBusinessType() throws Exception {
-        int databaseSizeBeforeUpdate = businessTypeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         businessType.setId(longCount.incrementAndGet());
 
         // Create the BusinessType
@@ -675,19 +610,18 @@ public class BusinessTypeResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, businessTypeDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(businessTypeDTO))
+                    .content(om.writeValueAsBytes(businessTypeDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the BusinessType in the database
-        List<BusinessType> businessTypeList = businessTypeRepository.findAll();
-        assertThat(businessTypeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchBusinessType() throws Exception {
-        int databaseSizeBeforeUpdate = businessTypeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         businessType.setId(longCount.incrementAndGet());
 
         // Create the BusinessType
@@ -698,19 +632,18 @@ public class BusinessTypeResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(businessTypeDTO))
+                    .content(om.writeValueAsBytes(businessTypeDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the BusinessType in the database
-        List<BusinessType> businessTypeList = businessTypeRepository.findAll();
-        assertThat(businessTypeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamBusinessType() throws Exception {
-        int databaseSizeBeforeUpdate = businessTypeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         businessType.setId(longCount.incrementAndGet());
 
         // Create the BusinessType
@@ -718,16 +651,11 @@ public class BusinessTypeResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBusinessTypeMockMvc
-            .perform(
-                patch(ENTITY_API_URL)
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(businessTypeDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(businessTypeDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the BusinessType in the database
-        List<BusinessType> businessTypeList = businessTypeRepository.findAll();
-        assertThat(businessTypeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -736,7 +664,7 @@ public class BusinessTypeResourceIT {
         // Initialize the database
         businessTypeRepository.save(businessType);
 
-        int databaseSizeBeforeDelete = businessTypeRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the businessType
         restBusinessTypeMockMvc
@@ -744,7 +672,34 @@ public class BusinessTypeResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<BusinessType> businessTypeList = businessTypeRepository.findAll();
-        assertThat(businessTypeList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return businessTypeRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected BusinessType getPersistedBusinessType(BusinessType businessType) {
+        return businessTypeRepository.findById(businessType.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedBusinessTypeToMatchAllProperties(BusinessType expectedBusinessType) {
+        assertBusinessTypeAllPropertiesEquals(expectedBusinessType, getPersistedBusinessType(expectedBusinessType));
+    }
+
+    protected void assertPersistedBusinessTypeToMatchUpdatableProperties(BusinessType expectedBusinessType) {
+        assertBusinessTypeAllUpdatablePropertiesEquals(expectedBusinessType, getPersistedBusinessType(expectedBusinessType));
     }
 }

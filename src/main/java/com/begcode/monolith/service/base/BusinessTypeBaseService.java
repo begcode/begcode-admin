@@ -23,11 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Service Implementation for managing {@link com.begcode.monolith.domain.BusinessType}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class BusinessTypeBaseService<R extends BusinessTypeRepository, E extends BusinessType>
     extends BaseServiceImpl<BusinessTypeRepository, BusinessType> {
 
     private final Logger log = LoggerFactory.getLogger(BusinessTypeBaseService.class);
-    private final List<String> relationNames = Arrays.asList();
+    private final List<String> relationNames = List.of();
 
     protected final BusinessTypeRepository businessTypeRepository;
 
@@ -69,11 +70,10 @@ public class BusinessTypeBaseService<R extends BusinessTypeRepository, E extends
     @Transactional(rollbackFor = Exception.class)
     public BusinessTypeDTO update(BusinessTypeDTO businessTypeDTO) {
         log.debug("Request to update BusinessType : {}", businessTypeDTO);
-
         BusinessType businessType = businessTypeMapper.toEntity(businessTypeDTO);
 
-        businessTypeRepository.updateById(businessType);
-        return findOne(businessTypeDTO.getId()).orElseThrow();
+        this.saveOrUpdate(businessType);
+        return findOne(businessType.getId()).orElseThrow();
     }
 
     /**
@@ -118,8 +118,7 @@ public class BusinessTypeBaseService<R extends BusinessTypeRepository, E extends
      */
     public Optional<BusinessTypeDTO> findOne(Long id) {
         log.debug("Request to get BusinessType : {}", id);
-        return Optional
-            .ofNullable(businessTypeRepository.selectById(id))
+        return Optional.ofNullable(businessTypeRepository.selectById(id))
             .map(businessType -> {
                 Binder.bindRelations(businessType);
                 return businessType;
@@ -149,23 +148,25 @@ public class BusinessTypeBaseService<R extends BusinessTypeRepository, E extends
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             UpdateWrapper<BusinessType> updateWrapper = new UpdateWrapper<>();
             updateWrapper.in("id", ids);
-            fieldNames.forEach(fieldName ->
-                updateWrapper.set(
-                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
-                    BeanUtil.getFieldValue(changeBusinessTypeDTO, fieldName)
-                )
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changeBusinessTypeDTO, fieldName)
+                    )
             );
             this.update(updateWrapper);
         } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
             List<BusinessType> businessTypeList = this.listByIds(ids);
             if (CollectionUtils.isNotEmpty(businessTypeList)) {
                 businessTypeList.forEach(businessType -> {
-                    relationshipNames.forEach(relationName ->
-                        BeanUtil.setFieldValue(
-                            businessType,
-                            relationName,
-                            BeanUtil.getFieldValue(businessTypeMapper.toEntity(changeBusinessTypeDTO), relationName)
-                        )
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                businessType,
+                                relationName,
+                                BeanUtil.getFieldValue(businessTypeMapper.toEntity(changeBusinessTypeDTO), relationName)
+                            )
                     );
                     this.createOrUpdateAndRelatedRelations(businessType, relationshipNames);
                 });

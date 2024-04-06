@@ -1,5 +1,7 @@
 package com.begcode.monolith.settings.web.rest;
 
+import static com.begcode.monolith.settings.domain.SiteConfigAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -11,12 +13,10 @@ import com.begcode.monolith.settings.domain.SiteConfig;
 import com.begcode.monolith.settings.repository.SiteConfigRepository;
 import com.begcode.monolith.settings.service.dto.SiteConfigDTO;
 import com.begcode.monolith.settings.service.mapper.SiteConfigMapper;
-import com.begcode.monolith.web.rest.TestUtil;
-import com.begcode.monolith.web.rest.TestUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,8 +67,11 @@ public class SiteConfigResourceIT {
     private static final String ENTITY_API_URL = "/api/site-configs";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private SiteConfigRepository siteConfigRepository;
@@ -129,26 +132,23 @@ public class SiteConfigResourceIT {
     @Test
     @Transactional
     void createSiteConfig() throws Exception {
-        int databaseSizeBeforeCreate = siteConfigRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the SiteConfig
         SiteConfigDTO siteConfigDTO = siteConfigMapper.toDto(siteConfig);
-        restSiteConfigMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(siteConfigDTO)))
-            .andExpect(status().isCreated());
+        var returnedSiteConfigDTO = om.readValue(
+            restSiteConfigMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(siteConfigDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            SiteConfigDTO.class
+        );
 
         // Validate the SiteConfig in the database
-        List<SiteConfig> siteConfigList = siteConfigRepository.findAll();
-        assertThat(siteConfigList).hasSize(databaseSizeBeforeCreate + 1);
-        SiteConfig testSiteConfig = siteConfigList.get(siteConfigList.size() - 1);
-        assertThat(testSiteConfig.getCategoryName()).isEqualTo(DEFAULT_CATEGORY_NAME);
-        assertThat(testSiteConfig.getCategoryKey()).isEqualTo(DEFAULT_CATEGORY_KEY);
-        assertThat(testSiteConfig.getDisabled()).isEqualTo(DEFAULT_DISABLED);
-        assertThat(testSiteConfig.getSortValue()).isEqualTo(DEFAULT_SORT_VALUE);
-        assertThat(testSiteConfig.getBuiltIn()).isEqualTo(DEFAULT_BUILT_IN);
-        assertThat(testSiteConfig.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY);
-        assertThat(testSiteConfig.getCreatedDate()).isEqualTo(DEFAULT_CREATED_DATE);
-        assertThat(testSiteConfig.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
-        assertThat(testSiteConfig.getLastModifiedDate()).isEqualTo(DEFAULT_LAST_MODIFIED_DATE);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedSiteConfig = siteConfigMapper.toEntity(returnedSiteConfigDTO);
+        assertSiteConfigUpdatableFieldsEquals(returnedSiteConfig, getPersistedSiteConfig(returnedSiteConfig));
     }
 
     @Test
@@ -158,22 +158,21 @@ public class SiteConfigResourceIT {
         siteConfig.setId(1L);
         SiteConfigDTO siteConfigDTO = siteConfigMapper.toDto(siteConfig);
 
-        int databaseSizeBeforeCreate = siteConfigRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restSiteConfigMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(siteConfigDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(siteConfigDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the SiteConfig in the database
-        List<SiteConfig> siteConfigList = siteConfigRepository.findAll();
-        assertThat(siteConfigList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
     @Transactional
     void checkCategoryNameIsRequired() throws Exception {
-        int databaseSizeBeforeTest = siteConfigRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         siteConfig.setCategoryName(null);
 
@@ -181,17 +180,16 @@ public class SiteConfigResourceIT {
         SiteConfigDTO siteConfigDTO = siteConfigMapper.toDto(siteConfig);
 
         restSiteConfigMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(siteConfigDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(siteConfigDTO)))
             .andExpect(status().isBadRequest());
 
-        List<SiteConfig> siteConfigList = siteConfigRepository.findAll();
-        assertThat(siteConfigList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void checkCategoryKeyIsRequired() throws Exception {
-        int databaseSizeBeforeTest = siteConfigRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         siteConfig.setCategoryKey(null);
 
@@ -199,11 +197,10 @@ public class SiteConfigResourceIT {
         SiteConfigDTO siteConfigDTO = siteConfigMapper.toDto(siteConfig);
 
         restSiteConfigMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(siteConfigDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(siteConfigDTO)))
             .andExpect(status().isBadRequest());
 
-        List<SiteConfig> siteConfigList = siteConfigRepository.findAll();
-        assertThat(siteConfigList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
@@ -260,14 +257,11 @@ public class SiteConfigResourceIT {
 
         Long id = siteConfig.getId();
 
-        defaultSiteConfigShouldBeFound("id.equals=" + id);
-        defaultSiteConfigShouldNotBeFound("id.notEquals=" + id);
+        defaultSiteConfigFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultSiteConfigShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultSiteConfigShouldNotBeFound("id.greaterThan=" + id);
+        defaultSiteConfigFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultSiteConfigShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultSiteConfigShouldNotBeFound("id.lessThan=" + id);
+        defaultSiteConfigFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -276,11 +270,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where categoryName equals to DEFAULT_CATEGORY_NAME
-        defaultSiteConfigShouldBeFound("categoryName.equals=" + DEFAULT_CATEGORY_NAME);
-
-        // Get all the siteConfigList where categoryName equals to UPDATED_CATEGORY_NAME
-        defaultSiteConfigShouldNotBeFound("categoryName.equals=" + UPDATED_CATEGORY_NAME);
+        // Get all the siteConfigList where categoryName equals to
+        defaultSiteConfigFiltering("categoryName.equals=" + DEFAULT_CATEGORY_NAME, "categoryName.equals=" + UPDATED_CATEGORY_NAME);
     }
 
     @Test
@@ -289,11 +280,11 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where categoryName in DEFAULT_CATEGORY_NAME or UPDATED_CATEGORY_NAME
-        defaultSiteConfigShouldBeFound("categoryName.in=" + DEFAULT_CATEGORY_NAME + "," + UPDATED_CATEGORY_NAME);
-
-        // Get all the siteConfigList where categoryName equals to UPDATED_CATEGORY_NAME
-        defaultSiteConfigShouldNotBeFound("categoryName.in=" + UPDATED_CATEGORY_NAME);
+        // Get all the siteConfigList where categoryName in
+        defaultSiteConfigFiltering(
+            "categoryName.in=" + DEFAULT_CATEGORY_NAME + "," + UPDATED_CATEGORY_NAME,
+            "categoryName.in=" + UPDATED_CATEGORY_NAME
+        );
     }
 
     @Test
@@ -303,10 +294,7 @@ public class SiteConfigResourceIT {
         siteConfigRepository.save(siteConfig);
 
         // Get all the siteConfigList where categoryName is not null
-        defaultSiteConfigShouldBeFound("categoryName.specified=true");
-
-        // Get all the siteConfigList where categoryName is null
-        defaultSiteConfigShouldNotBeFound("categoryName.specified=false");
+        defaultSiteConfigFiltering("categoryName.specified=true", "categoryName.specified=false");
     }
 
     @Test
@@ -315,11 +303,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where categoryName contains DEFAULT_CATEGORY_NAME
-        defaultSiteConfigShouldBeFound("categoryName.contains=" + DEFAULT_CATEGORY_NAME);
-
-        // Get all the siteConfigList where categoryName contains UPDATED_CATEGORY_NAME
-        defaultSiteConfigShouldNotBeFound("categoryName.contains=" + UPDATED_CATEGORY_NAME);
+        // Get all the siteConfigList where categoryName contains
+        defaultSiteConfigFiltering("categoryName.contains=" + DEFAULT_CATEGORY_NAME, "categoryName.contains=" + UPDATED_CATEGORY_NAME);
     }
 
     @Test
@@ -328,11 +313,11 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where categoryName does not contain DEFAULT_CATEGORY_NAME
-        defaultSiteConfigShouldNotBeFound("categoryName.doesNotContain=" + DEFAULT_CATEGORY_NAME);
-
-        // Get all the siteConfigList where categoryName does not contain UPDATED_CATEGORY_NAME
-        defaultSiteConfigShouldBeFound("categoryName.doesNotContain=" + UPDATED_CATEGORY_NAME);
+        // Get all the siteConfigList where categoryName does not contain
+        defaultSiteConfigFiltering(
+            "categoryName.doesNotContain=" + UPDATED_CATEGORY_NAME,
+            "categoryName.doesNotContain=" + DEFAULT_CATEGORY_NAME
+        );
     }
 
     @Test
@@ -341,11 +326,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where categoryKey equals to DEFAULT_CATEGORY_KEY
-        defaultSiteConfigShouldBeFound("categoryKey.equals=" + DEFAULT_CATEGORY_KEY);
-
-        // Get all the siteConfigList where categoryKey equals to UPDATED_CATEGORY_KEY
-        defaultSiteConfigShouldNotBeFound("categoryKey.equals=" + UPDATED_CATEGORY_KEY);
+        // Get all the siteConfigList where categoryKey equals to
+        defaultSiteConfigFiltering("categoryKey.equals=" + DEFAULT_CATEGORY_KEY, "categoryKey.equals=" + UPDATED_CATEGORY_KEY);
     }
 
     @Test
@@ -354,11 +336,11 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where categoryKey in DEFAULT_CATEGORY_KEY or UPDATED_CATEGORY_KEY
-        defaultSiteConfigShouldBeFound("categoryKey.in=" + DEFAULT_CATEGORY_KEY + "," + UPDATED_CATEGORY_KEY);
-
-        // Get all the siteConfigList where categoryKey equals to UPDATED_CATEGORY_KEY
-        defaultSiteConfigShouldNotBeFound("categoryKey.in=" + UPDATED_CATEGORY_KEY);
+        // Get all the siteConfigList where categoryKey in
+        defaultSiteConfigFiltering(
+            "categoryKey.in=" + DEFAULT_CATEGORY_KEY + "," + UPDATED_CATEGORY_KEY,
+            "categoryKey.in=" + UPDATED_CATEGORY_KEY
+        );
     }
 
     @Test
@@ -368,10 +350,7 @@ public class SiteConfigResourceIT {
         siteConfigRepository.save(siteConfig);
 
         // Get all the siteConfigList where categoryKey is not null
-        defaultSiteConfigShouldBeFound("categoryKey.specified=true");
-
-        // Get all the siteConfigList where categoryKey is null
-        defaultSiteConfigShouldNotBeFound("categoryKey.specified=false");
+        defaultSiteConfigFiltering("categoryKey.specified=true", "categoryKey.specified=false");
     }
 
     @Test
@@ -380,11 +359,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where categoryKey contains DEFAULT_CATEGORY_KEY
-        defaultSiteConfigShouldBeFound("categoryKey.contains=" + DEFAULT_CATEGORY_KEY);
-
-        // Get all the siteConfigList where categoryKey contains UPDATED_CATEGORY_KEY
-        defaultSiteConfigShouldNotBeFound("categoryKey.contains=" + UPDATED_CATEGORY_KEY);
+        // Get all the siteConfigList where categoryKey contains
+        defaultSiteConfigFiltering("categoryKey.contains=" + DEFAULT_CATEGORY_KEY, "categoryKey.contains=" + UPDATED_CATEGORY_KEY);
     }
 
     @Test
@@ -393,11 +369,11 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where categoryKey does not contain DEFAULT_CATEGORY_KEY
-        defaultSiteConfigShouldNotBeFound("categoryKey.doesNotContain=" + DEFAULT_CATEGORY_KEY);
-
-        // Get all the siteConfigList where categoryKey does not contain UPDATED_CATEGORY_KEY
-        defaultSiteConfigShouldBeFound("categoryKey.doesNotContain=" + UPDATED_CATEGORY_KEY);
+        // Get all the siteConfigList where categoryKey does not contain
+        defaultSiteConfigFiltering(
+            "categoryKey.doesNotContain=" + UPDATED_CATEGORY_KEY,
+            "categoryKey.doesNotContain=" + DEFAULT_CATEGORY_KEY
+        );
     }
 
     @Test
@@ -406,11 +382,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where disabled equals to DEFAULT_DISABLED
-        defaultSiteConfigShouldBeFound("disabled.equals=" + DEFAULT_DISABLED);
-
-        // Get all the siteConfigList where disabled equals to UPDATED_DISABLED
-        defaultSiteConfigShouldNotBeFound("disabled.equals=" + UPDATED_DISABLED);
+        // Get all the siteConfigList where disabled equals to
+        defaultSiteConfigFiltering("disabled.equals=" + DEFAULT_DISABLED, "disabled.equals=" + UPDATED_DISABLED);
     }
 
     @Test
@@ -419,11 +392,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where disabled in DEFAULT_DISABLED or UPDATED_DISABLED
-        defaultSiteConfigShouldBeFound("disabled.in=" + DEFAULT_DISABLED + "," + UPDATED_DISABLED);
-
-        // Get all the siteConfigList where disabled equals to UPDATED_DISABLED
-        defaultSiteConfigShouldNotBeFound("disabled.in=" + UPDATED_DISABLED);
+        // Get all the siteConfigList where disabled in
+        defaultSiteConfigFiltering("disabled.in=" + DEFAULT_DISABLED + "," + UPDATED_DISABLED, "disabled.in=" + UPDATED_DISABLED);
     }
 
     @Test
@@ -433,10 +403,7 @@ public class SiteConfigResourceIT {
         siteConfigRepository.save(siteConfig);
 
         // Get all the siteConfigList where disabled is not null
-        defaultSiteConfigShouldBeFound("disabled.specified=true");
-
-        // Get all the siteConfigList where disabled is null
-        defaultSiteConfigShouldNotBeFound("disabled.specified=false");
+        defaultSiteConfigFiltering("disabled.specified=true", "disabled.specified=false");
     }
 
     @Test
@@ -445,11 +412,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where sortValue equals to DEFAULT_SORT_VALUE
-        defaultSiteConfigShouldBeFound("sortValue.equals=" + DEFAULT_SORT_VALUE);
-
-        // Get all the siteConfigList where sortValue equals to UPDATED_SORT_VALUE
-        defaultSiteConfigShouldNotBeFound("sortValue.equals=" + UPDATED_SORT_VALUE);
+        // Get all the siteConfigList where sortValue equals to
+        defaultSiteConfigFiltering("sortValue.equals=" + DEFAULT_SORT_VALUE, "sortValue.equals=" + UPDATED_SORT_VALUE);
     }
 
     @Test
@@ -458,11 +422,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where sortValue in DEFAULT_SORT_VALUE or UPDATED_SORT_VALUE
-        defaultSiteConfigShouldBeFound("sortValue.in=" + DEFAULT_SORT_VALUE + "," + UPDATED_SORT_VALUE);
-
-        // Get all the siteConfigList where sortValue equals to UPDATED_SORT_VALUE
-        defaultSiteConfigShouldNotBeFound("sortValue.in=" + UPDATED_SORT_VALUE);
+        // Get all the siteConfigList where sortValue in
+        defaultSiteConfigFiltering("sortValue.in=" + DEFAULT_SORT_VALUE + "," + UPDATED_SORT_VALUE, "sortValue.in=" + UPDATED_SORT_VALUE);
     }
 
     @Test
@@ -472,10 +433,7 @@ public class SiteConfigResourceIT {
         siteConfigRepository.save(siteConfig);
 
         // Get all the siteConfigList where sortValue is not null
-        defaultSiteConfigShouldBeFound("sortValue.specified=true");
-
-        // Get all the siteConfigList where sortValue is null
-        defaultSiteConfigShouldNotBeFound("sortValue.specified=false");
+        defaultSiteConfigFiltering("sortValue.specified=true", "sortValue.specified=false");
     }
 
     @Test
@@ -484,11 +442,11 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where sortValue is greater than or equal to DEFAULT_SORT_VALUE
-        defaultSiteConfigShouldBeFound("sortValue.greaterThanOrEqual=" + DEFAULT_SORT_VALUE);
-
-        // Get all the siteConfigList where sortValue is greater than or equal to UPDATED_SORT_VALUE
-        defaultSiteConfigShouldNotBeFound("sortValue.greaterThanOrEqual=" + UPDATED_SORT_VALUE);
+        // Get all the siteConfigList where sortValue is greater than or equal to
+        defaultSiteConfigFiltering(
+            "sortValue.greaterThanOrEqual=" + DEFAULT_SORT_VALUE,
+            "sortValue.greaterThanOrEqual=" + UPDATED_SORT_VALUE
+        );
     }
 
     @Test
@@ -497,11 +455,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where sortValue is less than or equal to DEFAULT_SORT_VALUE
-        defaultSiteConfigShouldBeFound("sortValue.lessThanOrEqual=" + DEFAULT_SORT_VALUE);
-
-        // Get all the siteConfigList where sortValue is less than or equal to SMALLER_SORT_VALUE
-        defaultSiteConfigShouldNotBeFound("sortValue.lessThanOrEqual=" + SMALLER_SORT_VALUE);
+        // Get all the siteConfigList where sortValue is less than or equal to
+        defaultSiteConfigFiltering("sortValue.lessThanOrEqual=" + DEFAULT_SORT_VALUE, "sortValue.lessThanOrEqual=" + SMALLER_SORT_VALUE);
     }
 
     @Test
@@ -510,11 +465,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where sortValue is less than DEFAULT_SORT_VALUE
-        defaultSiteConfigShouldNotBeFound("sortValue.lessThan=" + DEFAULT_SORT_VALUE);
-
-        // Get all the siteConfigList where sortValue is less than UPDATED_SORT_VALUE
-        defaultSiteConfigShouldBeFound("sortValue.lessThan=" + UPDATED_SORT_VALUE);
+        // Get all the siteConfigList where sortValue is less than
+        defaultSiteConfigFiltering("sortValue.lessThan=" + UPDATED_SORT_VALUE, "sortValue.lessThan=" + DEFAULT_SORT_VALUE);
     }
 
     @Test
@@ -523,11 +475,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where sortValue is greater than DEFAULT_SORT_VALUE
-        defaultSiteConfigShouldNotBeFound("sortValue.greaterThan=" + DEFAULT_SORT_VALUE);
-
-        // Get all the siteConfigList where sortValue is greater than SMALLER_SORT_VALUE
-        defaultSiteConfigShouldBeFound("sortValue.greaterThan=" + SMALLER_SORT_VALUE);
+        // Get all the siteConfigList where sortValue is greater than
+        defaultSiteConfigFiltering("sortValue.greaterThan=" + SMALLER_SORT_VALUE, "sortValue.greaterThan=" + DEFAULT_SORT_VALUE);
     }
 
     @Test
@@ -536,11 +485,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where builtIn equals to DEFAULT_BUILT_IN
-        defaultSiteConfigShouldBeFound("builtIn.equals=" + DEFAULT_BUILT_IN);
-
-        // Get all the siteConfigList where builtIn equals to UPDATED_BUILT_IN
-        defaultSiteConfigShouldNotBeFound("builtIn.equals=" + UPDATED_BUILT_IN);
+        // Get all the siteConfigList where builtIn equals to
+        defaultSiteConfigFiltering("builtIn.equals=" + DEFAULT_BUILT_IN, "builtIn.equals=" + UPDATED_BUILT_IN);
     }
 
     @Test
@@ -549,11 +495,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where builtIn in DEFAULT_BUILT_IN or UPDATED_BUILT_IN
-        defaultSiteConfigShouldBeFound("builtIn.in=" + DEFAULT_BUILT_IN + "," + UPDATED_BUILT_IN);
-
-        // Get all the siteConfigList where builtIn equals to UPDATED_BUILT_IN
-        defaultSiteConfigShouldNotBeFound("builtIn.in=" + UPDATED_BUILT_IN);
+        // Get all the siteConfigList where builtIn in
+        defaultSiteConfigFiltering("builtIn.in=" + DEFAULT_BUILT_IN + "," + UPDATED_BUILT_IN, "builtIn.in=" + UPDATED_BUILT_IN);
     }
 
     @Test
@@ -563,10 +506,7 @@ public class SiteConfigResourceIT {
         siteConfigRepository.save(siteConfig);
 
         // Get all the siteConfigList where builtIn is not null
-        defaultSiteConfigShouldBeFound("builtIn.specified=true");
-
-        // Get all the siteConfigList where builtIn is null
-        defaultSiteConfigShouldNotBeFound("builtIn.specified=false");
+        defaultSiteConfigFiltering("builtIn.specified=true", "builtIn.specified=false");
     }
 
     @Test
@@ -575,11 +515,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where createdBy equals to DEFAULT_CREATED_BY
-        defaultSiteConfigShouldBeFound("createdBy.equals=" + DEFAULT_CREATED_BY);
-
-        // Get all the siteConfigList where createdBy equals to UPDATED_CREATED_BY
-        defaultSiteConfigShouldNotBeFound("createdBy.equals=" + UPDATED_CREATED_BY);
+        // Get all the siteConfigList where createdBy equals to
+        defaultSiteConfigFiltering("createdBy.equals=" + DEFAULT_CREATED_BY, "createdBy.equals=" + UPDATED_CREATED_BY);
     }
 
     @Test
@@ -588,11 +525,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where createdBy in DEFAULT_CREATED_BY or UPDATED_CREATED_BY
-        defaultSiteConfigShouldBeFound("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY);
-
-        // Get all the siteConfigList where createdBy equals to UPDATED_CREATED_BY
-        defaultSiteConfigShouldNotBeFound("createdBy.in=" + UPDATED_CREATED_BY);
+        // Get all the siteConfigList where createdBy in
+        defaultSiteConfigFiltering("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY, "createdBy.in=" + UPDATED_CREATED_BY);
     }
 
     @Test
@@ -602,10 +536,7 @@ public class SiteConfigResourceIT {
         siteConfigRepository.save(siteConfig);
 
         // Get all the siteConfigList where createdBy is not null
-        defaultSiteConfigShouldBeFound("createdBy.specified=true");
-
-        // Get all the siteConfigList where createdBy is null
-        defaultSiteConfigShouldNotBeFound("createdBy.specified=false");
+        defaultSiteConfigFiltering("createdBy.specified=true", "createdBy.specified=false");
     }
 
     @Test
@@ -614,11 +545,11 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where createdBy is greater than or equal to DEFAULT_CREATED_BY
-        defaultSiteConfigShouldBeFound("createdBy.greaterThanOrEqual=" + DEFAULT_CREATED_BY);
-
-        // Get all the siteConfigList where createdBy is greater than or equal to UPDATED_CREATED_BY
-        defaultSiteConfigShouldNotBeFound("createdBy.greaterThanOrEqual=" + UPDATED_CREATED_BY);
+        // Get all the siteConfigList where createdBy is greater than or equal to
+        defaultSiteConfigFiltering(
+            "createdBy.greaterThanOrEqual=" + DEFAULT_CREATED_BY,
+            "createdBy.greaterThanOrEqual=" + UPDATED_CREATED_BY
+        );
     }
 
     @Test
@@ -627,11 +558,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where createdBy is less than or equal to DEFAULT_CREATED_BY
-        defaultSiteConfigShouldBeFound("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY);
-
-        // Get all the siteConfigList where createdBy is less than or equal to SMALLER_CREATED_BY
-        defaultSiteConfigShouldNotBeFound("createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
+        // Get all the siteConfigList where createdBy is less than or equal to
+        defaultSiteConfigFiltering("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
     }
 
     @Test
@@ -640,11 +568,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where createdBy is less than DEFAULT_CREATED_BY
-        defaultSiteConfigShouldNotBeFound("createdBy.lessThan=" + DEFAULT_CREATED_BY);
-
-        // Get all the siteConfigList where createdBy is less than UPDATED_CREATED_BY
-        defaultSiteConfigShouldBeFound("createdBy.lessThan=" + UPDATED_CREATED_BY);
+        // Get all the siteConfigList where createdBy is less than
+        defaultSiteConfigFiltering("createdBy.lessThan=" + UPDATED_CREATED_BY, "createdBy.lessThan=" + DEFAULT_CREATED_BY);
     }
 
     @Test
@@ -653,11 +578,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where createdBy is greater than DEFAULT_CREATED_BY
-        defaultSiteConfigShouldNotBeFound("createdBy.greaterThan=" + DEFAULT_CREATED_BY);
-
-        // Get all the siteConfigList where createdBy is greater than SMALLER_CREATED_BY
-        defaultSiteConfigShouldBeFound("createdBy.greaterThan=" + SMALLER_CREATED_BY);
+        // Get all the siteConfigList where createdBy is greater than
+        defaultSiteConfigFiltering("createdBy.greaterThan=" + SMALLER_CREATED_BY, "createdBy.greaterThan=" + DEFAULT_CREATED_BY);
     }
 
     @Test
@@ -666,11 +588,8 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where createdDate equals to DEFAULT_CREATED_DATE
-        defaultSiteConfigShouldBeFound("createdDate.equals=" + DEFAULT_CREATED_DATE);
-
-        // Get all the siteConfigList where createdDate equals to UPDATED_CREATED_DATE
-        defaultSiteConfigShouldNotBeFound("createdDate.equals=" + UPDATED_CREATED_DATE);
+        // Get all the siteConfigList where createdDate equals to
+        defaultSiteConfigFiltering("createdDate.equals=" + DEFAULT_CREATED_DATE, "createdDate.equals=" + UPDATED_CREATED_DATE);
     }
 
     @Test
@@ -679,11 +598,11 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where createdDate in DEFAULT_CREATED_DATE or UPDATED_CREATED_DATE
-        defaultSiteConfigShouldBeFound("createdDate.in=" + DEFAULT_CREATED_DATE + "," + UPDATED_CREATED_DATE);
-
-        // Get all the siteConfigList where createdDate equals to UPDATED_CREATED_DATE
-        defaultSiteConfigShouldNotBeFound("createdDate.in=" + UPDATED_CREATED_DATE);
+        // Get all the siteConfigList where createdDate in
+        defaultSiteConfigFiltering(
+            "createdDate.in=" + DEFAULT_CREATED_DATE + "," + UPDATED_CREATED_DATE,
+            "createdDate.in=" + UPDATED_CREATED_DATE
+        );
     }
 
     @Test
@@ -693,10 +612,7 @@ public class SiteConfigResourceIT {
         siteConfigRepository.save(siteConfig);
 
         // Get all the siteConfigList where createdDate is not null
-        defaultSiteConfigShouldBeFound("createdDate.specified=true");
-
-        // Get all the siteConfigList where createdDate is null
-        defaultSiteConfigShouldNotBeFound("createdDate.specified=false");
+        defaultSiteConfigFiltering("createdDate.specified=true", "createdDate.specified=false");
     }
 
     @Test
@@ -705,11 +621,11 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where lastModifiedBy equals to DEFAULT_LAST_MODIFIED_BY
-        defaultSiteConfigShouldBeFound("lastModifiedBy.equals=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the siteConfigList where lastModifiedBy equals to UPDATED_LAST_MODIFIED_BY
-        defaultSiteConfigShouldNotBeFound("lastModifiedBy.equals=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the siteConfigList where lastModifiedBy equals to
+        defaultSiteConfigFiltering(
+            "lastModifiedBy.equals=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.equals=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -718,11 +634,11 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where lastModifiedBy in DEFAULT_LAST_MODIFIED_BY or UPDATED_LAST_MODIFIED_BY
-        defaultSiteConfigShouldBeFound("lastModifiedBy.in=" + DEFAULT_LAST_MODIFIED_BY + "," + UPDATED_LAST_MODIFIED_BY);
-
-        // Get all the siteConfigList where lastModifiedBy equals to UPDATED_LAST_MODIFIED_BY
-        defaultSiteConfigShouldNotBeFound("lastModifiedBy.in=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the siteConfigList where lastModifiedBy in
+        defaultSiteConfigFiltering(
+            "lastModifiedBy.in=" + DEFAULT_LAST_MODIFIED_BY + "," + UPDATED_LAST_MODIFIED_BY,
+            "lastModifiedBy.in=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -732,10 +648,7 @@ public class SiteConfigResourceIT {
         siteConfigRepository.save(siteConfig);
 
         // Get all the siteConfigList where lastModifiedBy is not null
-        defaultSiteConfigShouldBeFound("lastModifiedBy.specified=true");
-
-        // Get all the siteConfigList where lastModifiedBy is null
-        defaultSiteConfigShouldNotBeFound("lastModifiedBy.specified=false");
+        defaultSiteConfigFiltering("lastModifiedBy.specified=true", "lastModifiedBy.specified=false");
     }
 
     @Test
@@ -744,11 +657,11 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where lastModifiedBy is greater than or equal to DEFAULT_LAST_MODIFIED_BY
-        defaultSiteConfigShouldBeFound("lastModifiedBy.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the siteConfigList where lastModifiedBy is greater than or equal to UPDATED_LAST_MODIFIED_BY
-        defaultSiteConfigShouldNotBeFound("lastModifiedBy.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the siteConfigList where lastModifiedBy is greater than or equal to
+        defaultSiteConfigFiltering(
+            "lastModifiedBy.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -757,11 +670,11 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where lastModifiedBy is less than or equal to DEFAULT_LAST_MODIFIED_BY
-        defaultSiteConfigShouldBeFound("lastModifiedBy.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the siteConfigList where lastModifiedBy is less than or equal to SMALLER_LAST_MODIFIED_BY
-        defaultSiteConfigShouldNotBeFound("lastModifiedBy.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_BY);
+        // Get all the siteConfigList where lastModifiedBy is less than or equal to
+        defaultSiteConfigFiltering(
+            "lastModifiedBy.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -770,11 +683,11 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where lastModifiedBy is less than DEFAULT_LAST_MODIFIED_BY
-        defaultSiteConfigShouldNotBeFound("lastModifiedBy.lessThan=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the siteConfigList where lastModifiedBy is less than UPDATED_LAST_MODIFIED_BY
-        defaultSiteConfigShouldBeFound("lastModifiedBy.lessThan=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the siteConfigList where lastModifiedBy is less than
+        defaultSiteConfigFiltering(
+            "lastModifiedBy.lessThan=" + UPDATED_LAST_MODIFIED_BY,
+            "lastModifiedBy.lessThan=" + DEFAULT_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -783,11 +696,11 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where lastModifiedBy is greater than DEFAULT_LAST_MODIFIED_BY
-        defaultSiteConfigShouldNotBeFound("lastModifiedBy.greaterThan=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the siteConfigList where lastModifiedBy is greater than SMALLER_LAST_MODIFIED_BY
-        defaultSiteConfigShouldBeFound("lastModifiedBy.greaterThan=" + SMALLER_LAST_MODIFIED_BY);
+        // Get all the siteConfigList where lastModifiedBy is greater than
+        defaultSiteConfigFiltering(
+            "lastModifiedBy.greaterThan=" + SMALLER_LAST_MODIFIED_BY,
+            "lastModifiedBy.greaterThan=" + DEFAULT_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -796,11 +709,11 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where lastModifiedDate equals to DEFAULT_LAST_MODIFIED_DATE
-        defaultSiteConfigShouldBeFound("lastModifiedDate.equals=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the siteConfigList where lastModifiedDate equals to UPDATED_LAST_MODIFIED_DATE
-        defaultSiteConfigShouldNotBeFound("lastModifiedDate.equals=" + UPDATED_LAST_MODIFIED_DATE);
+        // Get all the siteConfigList where lastModifiedDate equals to
+        defaultSiteConfigFiltering(
+            "lastModifiedDate.equals=" + DEFAULT_LAST_MODIFIED_DATE,
+            "lastModifiedDate.equals=" + UPDATED_LAST_MODIFIED_DATE
+        );
     }
 
     @Test
@@ -809,11 +722,11 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        // Get all the siteConfigList where lastModifiedDate in DEFAULT_LAST_MODIFIED_DATE or UPDATED_LAST_MODIFIED_DATE
-        defaultSiteConfigShouldBeFound("lastModifiedDate.in=" + DEFAULT_LAST_MODIFIED_DATE + "," + UPDATED_LAST_MODIFIED_DATE);
-
-        // Get all the siteConfigList where lastModifiedDate equals to UPDATED_LAST_MODIFIED_DATE
-        defaultSiteConfigShouldNotBeFound("lastModifiedDate.in=" + UPDATED_LAST_MODIFIED_DATE);
+        // Get all the siteConfigList where lastModifiedDate in
+        defaultSiteConfigFiltering(
+            "lastModifiedDate.in=" + DEFAULT_LAST_MODIFIED_DATE + "," + UPDATED_LAST_MODIFIED_DATE,
+            "lastModifiedDate.in=" + UPDATED_LAST_MODIFIED_DATE
+        );
     }
 
     @Test
@@ -823,10 +736,12 @@ public class SiteConfigResourceIT {
         siteConfigRepository.save(siteConfig);
 
         // Get all the siteConfigList where lastModifiedDate is not null
-        defaultSiteConfigShouldBeFound("lastModifiedDate.specified=true");
+        defaultSiteConfigFiltering("lastModifiedDate.specified=true", "lastModifiedDate.specified=false");
+    }
 
-        // Get all the siteConfigList where lastModifiedDate is null
-        defaultSiteConfigShouldNotBeFound("lastModifiedDate.specified=false");
+    private void defaultSiteConfigFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultSiteConfigShouldBeFound(shouldBeFound);
+        defaultSiteConfigShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -888,7 +803,7 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        int databaseSizeBeforeUpdate = siteConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the siteConfig
         SiteConfig updatedSiteConfig = siteConfigRepository.findById(siteConfig.getId()).orElseThrow();
@@ -908,29 +823,19 @@ public class SiteConfigResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, siteConfigDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(siteConfigDTO))
+                    .content(om.writeValueAsBytes(siteConfigDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the SiteConfig in the database
-        List<SiteConfig> siteConfigList = siteConfigRepository.findAll();
-        assertThat(siteConfigList).hasSize(databaseSizeBeforeUpdate);
-        SiteConfig testSiteConfig = siteConfigList.get(siteConfigList.size() - 1);
-        assertThat(testSiteConfig.getCategoryName()).isEqualTo(UPDATED_CATEGORY_NAME);
-        assertThat(testSiteConfig.getCategoryKey()).isEqualTo(UPDATED_CATEGORY_KEY);
-        assertThat(testSiteConfig.getDisabled()).isEqualTo(UPDATED_DISABLED);
-        assertThat(testSiteConfig.getSortValue()).isEqualTo(UPDATED_SORT_VALUE);
-        assertThat(testSiteConfig.getBuiltIn()).isEqualTo(UPDATED_BUILT_IN);
-        assertThat(testSiteConfig.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testSiteConfig.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testSiteConfig.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testSiteConfig.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedSiteConfigToMatchAllProperties(updatedSiteConfig);
     }
 
     @Test
     @Transactional
     void putNonExistingSiteConfig() throws Exception {
-        int databaseSizeBeforeUpdate = siteConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         siteConfig.setId(longCount.incrementAndGet());
 
         // Create the SiteConfig
@@ -941,19 +846,18 @@ public class SiteConfigResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, siteConfigDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(siteConfigDTO))
+                    .content(om.writeValueAsBytes(siteConfigDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SiteConfig in the database
-        List<SiteConfig> siteConfigList = siteConfigRepository.findAll();
-        assertThat(siteConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchSiteConfig() throws Exception {
-        int databaseSizeBeforeUpdate = siteConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         siteConfig.setId(longCount.incrementAndGet());
 
         // Create the SiteConfig
@@ -964,19 +868,18 @@ public class SiteConfigResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(siteConfigDTO))
+                    .content(om.writeValueAsBytes(siteConfigDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SiteConfig in the database
-        List<SiteConfig> siteConfigList = siteConfigRepository.findAll();
-        assertThat(siteConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamSiteConfig() throws Exception {
-        int databaseSizeBeforeUpdate = siteConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         siteConfig.setId(longCount.incrementAndGet());
 
         // Create the SiteConfig
@@ -984,12 +887,11 @@ public class SiteConfigResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restSiteConfigMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(siteConfigDTO)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(siteConfigDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the SiteConfig in the database
-        List<SiteConfig> siteConfigList = siteConfigRepository.findAll();
-        assertThat(siteConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -998,40 +900,29 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        int databaseSizeBeforeUpdate = siteConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the siteConfig using partial update
         SiteConfig partialUpdatedSiteConfig = new SiteConfig();
         partialUpdatedSiteConfig.setId(siteConfig.getId());
 
-        partialUpdatedSiteConfig
-            .categoryKey(UPDATED_CATEGORY_KEY)
-            .disabled(UPDATED_DISABLED)
-            .sortValue(UPDATED_SORT_VALUE)
-            .createdBy(UPDATED_CREATED_BY)
-            .createdDate(UPDATED_CREATED_DATE);
+        partialUpdatedSiteConfig.categoryKey(UPDATED_CATEGORY_KEY).createdBy(UPDATED_CREATED_BY);
 
         restSiteConfigMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedSiteConfig.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedSiteConfig))
+                    .content(om.writeValueAsBytes(partialUpdatedSiteConfig))
             )
             .andExpect(status().isOk());
 
         // Validate the SiteConfig in the database
-        List<SiteConfig> siteConfigList = siteConfigRepository.findAll();
-        assertThat(siteConfigList).hasSize(databaseSizeBeforeUpdate);
-        SiteConfig testSiteConfig = siteConfigList.get(siteConfigList.size() - 1);
-        assertThat(testSiteConfig.getCategoryName()).isEqualTo(DEFAULT_CATEGORY_NAME);
-        assertThat(testSiteConfig.getCategoryKey()).isEqualTo(UPDATED_CATEGORY_KEY);
-        assertThat(testSiteConfig.getDisabled()).isEqualTo(UPDATED_DISABLED);
-        assertThat(testSiteConfig.getSortValue()).isEqualTo(UPDATED_SORT_VALUE);
-        assertThat(testSiteConfig.getBuiltIn()).isEqualTo(DEFAULT_BUILT_IN);
-        assertThat(testSiteConfig.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testSiteConfig.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testSiteConfig.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
-        assertThat(testSiteConfig.getLastModifiedDate()).isEqualTo(DEFAULT_LAST_MODIFIED_DATE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertSiteConfigUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedSiteConfig, siteConfig),
+            getPersistedSiteConfig(siteConfig)
+        );
     }
 
     @Test
@@ -1040,7 +931,7 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        int databaseSizeBeforeUpdate = siteConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the siteConfig using partial update
         SiteConfig partialUpdatedSiteConfig = new SiteConfig();
@@ -1061,29 +952,20 @@ public class SiteConfigResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedSiteConfig.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedSiteConfig))
+                    .content(om.writeValueAsBytes(partialUpdatedSiteConfig))
             )
             .andExpect(status().isOk());
 
         // Validate the SiteConfig in the database
-        List<SiteConfig> siteConfigList = siteConfigRepository.findAll();
-        assertThat(siteConfigList).hasSize(databaseSizeBeforeUpdate);
-        SiteConfig testSiteConfig = siteConfigList.get(siteConfigList.size() - 1);
-        assertThat(testSiteConfig.getCategoryName()).isEqualTo(UPDATED_CATEGORY_NAME);
-        assertThat(testSiteConfig.getCategoryKey()).isEqualTo(UPDATED_CATEGORY_KEY);
-        assertThat(testSiteConfig.getDisabled()).isEqualTo(UPDATED_DISABLED);
-        assertThat(testSiteConfig.getSortValue()).isEqualTo(UPDATED_SORT_VALUE);
-        assertThat(testSiteConfig.getBuiltIn()).isEqualTo(UPDATED_BUILT_IN);
-        assertThat(testSiteConfig.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testSiteConfig.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testSiteConfig.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testSiteConfig.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertSiteConfigUpdatableFieldsEquals(partialUpdatedSiteConfig, getPersistedSiteConfig(partialUpdatedSiteConfig));
     }
 
     @Test
     @Transactional
     void patchNonExistingSiteConfig() throws Exception {
-        int databaseSizeBeforeUpdate = siteConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         siteConfig.setId(longCount.incrementAndGet());
 
         // Create the SiteConfig
@@ -1094,19 +976,18 @@ public class SiteConfigResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, siteConfigDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(siteConfigDTO))
+                    .content(om.writeValueAsBytes(siteConfigDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SiteConfig in the database
-        List<SiteConfig> siteConfigList = siteConfigRepository.findAll();
-        assertThat(siteConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchSiteConfig() throws Exception {
-        int databaseSizeBeforeUpdate = siteConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         siteConfig.setId(longCount.incrementAndGet());
 
         // Create the SiteConfig
@@ -1117,19 +998,18 @@ public class SiteConfigResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(siteConfigDTO))
+                    .content(om.writeValueAsBytes(siteConfigDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SiteConfig in the database
-        List<SiteConfig> siteConfigList = siteConfigRepository.findAll();
-        assertThat(siteConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamSiteConfig() throws Exception {
-        int databaseSizeBeforeUpdate = siteConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         siteConfig.setId(longCount.incrementAndGet());
 
         // Create the SiteConfig
@@ -1137,14 +1017,11 @@ public class SiteConfigResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restSiteConfigMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(siteConfigDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(siteConfigDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the SiteConfig in the database
-        List<SiteConfig> siteConfigList = siteConfigRepository.findAll();
-        assertThat(siteConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1153,7 +1030,7 @@ public class SiteConfigResourceIT {
         // Initialize the database
         siteConfigRepository.save(siteConfig);
 
-        int databaseSizeBeforeDelete = siteConfigRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the siteConfig
         restSiteConfigMockMvc
@@ -1161,7 +1038,34 @@ public class SiteConfigResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<SiteConfig> siteConfigList = siteConfigRepository.findAll();
-        assertThat(siteConfigList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return siteConfigRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected SiteConfig getPersistedSiteConfig(SiteConfig siteConfig) {
+        return siteConfigRepository.findById(siteConfig.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedSiteConfigToMatchAllProperties(SiteConfig expectedSiteConfig) {
+        assertSiteConfigAllPropertiesEquals(expectedSiteConfig, getPersistedSiteConfig(expectedSiteConfig));
+    }
+
+    protected void assertPersistedSiteConfigToMatchUpdatableProperties(SiteConfig expectedSiteConfig) {
+        assertSiteConfigAllUpdatablePropertiesEquals(expectedSiteConfig, getPersistedSiteConfig(expectedSiteConfig));
     }
 }

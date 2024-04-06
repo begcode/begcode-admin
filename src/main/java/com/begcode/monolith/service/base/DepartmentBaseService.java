@@ -13,7 +13,6 @@ import com.diboot.core.binding.Binder;
 import com.diboot.core.service.impl.BaseServiceImpl;
 import com.google.common.base.CaseFormat;
 import java.util.*;
-import java.util.Arrays;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,18 +25,19 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Service Implementation for managing {@link com.begcode.monolith.domain.Department}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class DepartmentBaseService<R extends DepartmentRepository, E extends Department>
     extends BaseServiceImpl<DepartmentRepository, Department> {
 
     private final Logger log = LoggerFactory.getLogger(DepartmentBaseService.class);
 
-    private final List<String> relationCacheNames = Arrays.asList(
+    private final List<String> relationCacheNames = List.of(
         com.begcode.monolith.domain.Department.class.getName() + ".parent",
         com.begcode.monolith.domain.Authority.class.getName() + ".department",
         com.begcode.monolith.domain.Department.class.getName() + ".children",
         com.begcode.monolith.domain.User.class.getName() + ".department"
     );
-    private final List<String> relationNames = Arrays.asList("children", "authorities", "parent", "users");
+    private final List<String> relationNames = List.of("children", "authorities", "parent", "users");
 
     protected final DepartmentRepository departmentRepository;
 
@@ -76,11 +76,11 @@ public class DepartmentBaseService<R extends DepartmentRepository, E extends Dep
     @Transactional(rollbackFor = Exception.class)
     public DepartmentDTO update(DepartmentDTO departmentDTO) {
         log.debug("Request to update Department : {}", departmentDTO);
-
         Department department = departmentMapper.toEntity(departmentDTO);
+        clearChildrenCache();
 
-        this.createOrUpdateN2NRelations(department, Arrays.asList("authorities"));
-        return findOne(departmentDTO.getId()).orElseThrow();
+        this.createOrUpdateAndRelatedRelations(department, Arrays.asList("authorities"));
+        return findOne(department.getId()).orElseThrow();
     }
 
     /**
@@ -125,8 +125,7 @@ public class DepartmentBaseService<R extends DepartmentRepository, E extends Dep
      */
     public Optional<DepartmentDTO> findOne(Long id) {
         log.debug("Request to get Department : {}", id);
-        return Optional
-            .ofNullable(departmentRepository.selectById(id))
+        return Optional.ofNullable(departmentRepository.selectById(id))
             .map(department -> {
                 Binder.bindRelations(department);
                 return department;
@@ -165,23 +164,25 @@ public class DepartmentBaseService<R extends DepartmentRepository, E extends Dep
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             UpdateWrapper<Department> updateWrapper = new UpdateWrapper<>();
             updateWrapper.in("id", ids);
-            fieldNames.forEach(fieldName ->
-                updateWrapper.set(
-                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
-                    BeanUtil.getFieldValue(changeDepartmentDTO, fieldName)
-                )
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changeDepartmentDTO, fieldName)
+                    )
             );
             this.update(updateWrapper);
         } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
             List<Department> departmentList = this.listByIds(ids);
             if (CollectionUtils.isNotEmpty(departmentList)) {
                 departmentList.forEach(department -> {
-                    relationshipNames.forEach(relationName ->
-                        BeanUtil.setFieldValue(
-                            department,
-                            relationName,
-                            BeanUtil.getFieldValue(departmentMapper.toEntity(changeDepartmentDTO), relationName)
-                        )
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                department,
+                                relationName,
+                                BeanUtil.getFieldValue(departmentMapper.toEntity(changeDepartmentDTO), relationName)
+                            )
                     );
                     this.createOrUpdateAndRelatedRelations(department, relationshipNames);
                 });

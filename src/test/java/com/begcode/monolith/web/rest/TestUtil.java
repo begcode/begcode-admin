@@ -2,17 +2,16 @@ package com.begcode.monolith.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.io.IOException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.springframework.cglib.proxy.Enhancer;
+import org.springframework.cglib.proxy.MethodInterceptor;
+import org.springframework.cglib.proxy.MethodProxy;
 import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.format.support.FormattingConversionService;
@@ -21,27 +20,6 @@ import org.springframework.format.support.FormattingConversionService;
  * Utility class for testing REST controllers.
  */
 public final class TestUtil {
-
-    private static final ObjectMapper mapper = createObjectMapper();
-
-    private static ObjectMapper createObjectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS, false);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-        mapper.registerModule(new JavaTimeModule());
-        return mapper;
-    }
-
-    /**
-     * Convert an object to JSON byte array.
-     *
-     * @param object the object to convert.
-     * @return the JSON byte array.
-     * @throws IOException
-     */
-    public static byte[] convertObjectToJsonBytes(Object object) throws IOException {
-        return mapper.writeValueAsBytes(object);
-    }
 
     /**
      * Create a byte array with a specific size filled with specified data.
@@ -178,6 +156,24 @@ public final class TestUtil {
         registrar.setUseIsoFormat(true);
         registrar.registerFormatters(dfcs);
         return dfcs;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T createUpdateProxyForBean(T update, T original) {
+        Enhancer e = new Enhancer();
+        e.setSuperclass(original.getClass());
+        e.setCallback(
+            new MethodInterceptor() {
+                public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+                    Object val = update.getClass().getMethod(method.getName(), method.getParameterTypes()).invoke(update, args);
+                    if (val == null) {
+                        return original.getClass().getMethod(method.getName(), method.getParameterTypes()).invoke(original, args);
+                    }
+                    return val;
+                }
+            }
+        );
+        return (T) e.create();
     }
 
     private TestUtil() {}

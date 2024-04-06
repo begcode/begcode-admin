@@ -25,11 +25,12 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Service Implementation for managing {@link com.begcode.monolith.system.domain.SmsTemplate}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class SmsTemplateBaseService<R extends SmsTemplateRepository, E extends SmsTemplate>
     extends BaseServiceImpl<SmsTemplateRepository, SmsTemplate> {
 
     private final Logger log = LoggerFactory.getLogger(SmsTemplateBaseService.class);
-    private final List<String> relationNames = Arrays.asList("supplier");
+    private final List<String> relationNames = List.of("supplier");
 
     protected final SmsSupplierService smsSupplierService;
 
@@ -75,11 +76,10 @@ public class SmsTemplateBaseService<R extends SmsTemplateRepository, E extends S
     @Transactional(rollbackFor = Exception.class)
     public SmsTemplateDTO update(SmsTemplateDTO smsTemplateDTO) {
         log.debug("Request to update SmsTemplate : {}", smsTemplateDTO);
-
         SmsTemplate smsTemplate = smsTemplateMapper.toEntity(smsTemplateDTO);
 
-        smsTemplateRepository.updateById(smsTemplate);
-        return findOne(smsTemplateDTO.getId()).orElseThrow();
+        this.saveOrUpdate(smsTemplate);
+        return findOne(smsTemplate.getId()).orElseThrow();
     }
 
     /**
@@ -124,8 +124,7 @@ public class SmsTemplateBaseService<R extends SmsTemplateRepository, E extends S
      */
     public Optional<SmsTemplateDTO> findOne(Long id) {
         log.debug("Request to get SmsTemplate : {}", id);
-        return Optional
-            .ofNullable(smsTemplateRepository.selectById(id))
+        return Optional.ofNullable(smsTemplateRepository.selectById(id))
             .map(smsTemplate -> {
                 Binder.bindRelations(smsTemplate);
                 return smsTemplate;
@@ -154,24 +153,22 @@ public class SmsTemplateBaseService<R extends SmsTemplateRepository, E extends S
                 queryWrapper.clear();
                 queryWrapper.eq(SmsTemplate::getSupplierId, supplierId);
                 queryWrapper.eq(SmsTemplate::getCode, smsTemplates.get(0).getCode());
-                Optional
-                    .ofNullable(smsTemplateRepository.selectOne(queryWrapper))
-                    .ifPresentOrElse(
-                        existSmsTemplate -> {
-                            existSmsTemplate.setContent(smsTemplate.getContent());
-                            existSmsTemplate.setEnabled(smsTemplate.getEnabled());
-                            existSmsTemplate.setName(smsTemplate.getName());
-                            existSmsTemplate.setRemark(smsTemplate.getRemark());
-                            existSmsTemplate.setSendType(smsTemplate.getSendType());
-                            existSmsTemplate.setTestJson(smsTemplate.getTestJson());
-                            existSmsTemplate.setType(smsTemplate.getType());
-                            smsTemplateRepository.updateById(existSmsTemplate);
-                        },
-                        () -> {
-                            smsTemplate.setSupplierId(supplierId);
-                            smsTemplateRepository.insert(smsTemplate);
-                        }
-                    );
+                Optional.ofNullable(smsTemplateRepository.selectOne(queryWrapper)).ifPresentOrElse(
+                    existSmsTemplate -> {
+                        existSmsTemplate.setContent(smsTemplate.getContent());
+                        existSmsTemplate.setEnabled(smsTemplate.getEnabled());
+                        existSmsTemplate.setName(smsTemplate.getName());
+                        existSmsTemplate.setRemark(smsTemplate.getRemark());
+                        existSmsTemplate.setSendType(smsTemplate.getSendType());
+                        existSmsTemplate.setTestJson(smsTemplate.getTestJson());
+                        existSmsTemplate.setType(smsTemplate.getType());
+                        smsTemplateRepository.updateById(existSmsTemplate);
+                    },
+                    () -> {
+                        smsTemplate.setSupplierId(supplierId);
+                        smsTemplateRepository.insert(smsTemplate);
+                    }
+                );
             });
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -188,23 +185,25 @@ public class SmsTemplateBaseService<R extends SmsTemplateRepository, E extends S
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             UpdateWrapper<SmsTemplate> updateWrapper = new UpdateWrapper<>();
             updateWrapper.in("id", ids);
-            fieldNames.forEach(fieldName ->
-                updateWrapper.set(
-                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
-                    BeanUtil.getFieldValue(changeSmsTemplateDTO, fieldName)
-                )
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changeSmsTemplateDTO, fieldName)
+                    )
             );
             this.update(updateWrapper);
         } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
             List<SmsTemplate> smsTemplateList = this.listByIds(ids);
             if (CollectionUtils.isNotEmpty(smsTemplateList)) {
                 smsTemplateList.forEach(smsTemplate -> {
-                    relationshipNames.forEach(relationName ->
-                        BeanUtil.setFieldValue(
-                            smsTemplate,
-                            relationName,
-                            BeanUtil.getFieldValue(smsTemplateMapper.toEntity(changeSmsTemplateDTO), relationName)
-                        )
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                smsTemplate,
+                                relationName,
+                                BeanUtil.getFieldValue(smsTemplateMapper.toEntity(changeSmsTemplateDTO), relationName)
+                            )
                     );
                     this.createOrUpdateAndRelatedRelations(smsTemplate, relationshipNames);
                 });

@@ -1,5 +1,7 @@
 package com.begcode.monolith.web.rest;
 
+import static com.begcode.monolith.domain.AuthorityAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.*;
@@ -20,9 +22,8 @@ import com.begcode.monolith.repository.AuthorityRepository;
 import com.begcode.monolith.service.AuthorityService;
 import com.begcode.monolith.service.dto.AuthorityDTO;
 import com.begcode.monolith.service.mapper.AuthorityMapper;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,8 +64,11 @@ public class AuthorityResourceIT {
     private static final String ENTITY_API_URL = "/api/authorities";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private AuthorityRepository authorityRepository;
@@ -123,22 +127,23 @@ public class AuthorityResourceIT {
     @Test
     @Transactional
     void createAuthority() throws Exception {
-        int databaseSizeBeforeCreate = authorityRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the Authority
         AuthorityDTO authorityDTO = authorityMapper.toDto(authority);
-        restAuthorityMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(authorityDTO)))
-            .andExpect(status().isCreated());
+        var returnedAuthorityDTO = om.readValue(
+            restAuthorityMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(authorityDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            AuthorityDTO.class
+        );
 
         // Validate the Authority in the database
-        List<Authority> authorityList = authorityRepository.findAll();
-        assertThat(authorityList).hasSize(databaseSizeBeforeCreate + 1);
-        Authority testAuthority = authorityList.get(authorityList.size() - 1);
-        assertThat(testAuthority.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testAuthority.getCode()).isEqualTo(DEFAULT_CODE);
-        assertThat(testAuthority.getInfo()).isEqualTo(DEFAULT_INFO);
-        assertThat(testAuthority.getOrder()).isEqualTo(DEFAULT_ORDER);
-        assertThat(testAuthority.getDisplay()).isEqualTo(DEFAULT_DISPLAY);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedAuthority = authorityMapper.toEntity(returnedAuthorityDTO);
+        assertAuthorityUpdatableFieldsEquals(returnedAuthority, getPersistedAuthority(returnedAuthority));
     }
 
     @Test
@@ -148,16 +153,15 @@ public class AuthorityResourceIT {
         authority.setId(1L);
         AuthorityDTO authorityDTO = authorityMapper.toDto(authority);
 
-        int databaseSizeBeforeCreate = authorityRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restAuthorityMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(authorityDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(authorityDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Authority in the database
-        List<Authority> authorityList = authorityRepository.findAll();
-        assertThat(authorityList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
@@ -223,14 +227,11 @@ public class AuthorityResourceIT {
 
         Long id = authority.getId();
 
-        defaultAuthorityShouldBeFound("id.equals=" + id);
-        defaultAuthorityShouldNotBeFound("id.notEquals=" + id);
+        defaultAuthorityFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultAuthorityShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultAuthorityShouldNotBeFound("id.greaterThan=" + id);
+        defaultAuthorityFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultAuthorityShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultAuthorityShouldNotBeFound("id.lessThan=" + id);
+        defaultAuthorityFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -239,11 +240,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where name equals to DEFAULT_NAME
-        defaultAuthorityShouldBeFound("name.equals=" + DEFAULT_NAME);
-
-        // Get all the authorityList where name equals to UPDATED_NAME
-        defaultAuthorityShouldNotBeFound("name.equals=" + UPDATED_NAME);
+        // Get all the authorityList where name equals to
+        defaultAuthorityFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
     }
 
     @Test
@@ -252,11 +250,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where name in DEFAULT_NAME or UPDATED_NAME
-        defaultAuthorityShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
-
-        // Get all the authorityList where name equals to UPDATED_NAME
-        defaultAuthorityShouldNotBeFound("name.in=" + UPDATED_NAME);
+        // Get all the authorityList where name in
+        defaultAuthorityFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
     }
 
     @Test
@@ -266,10 +261,7 @@ public class AuthorityResourceIT {
         authorityRepository.save(authority);
 
         // Get all the authorityList where name is not null
-        defaultAuthorityShouldBeFound("name.specified=true");
-
-        // Get all the authorityList where name is null
-        defaultAuthorityShouldNotBeFound("name.specified=false");
+        defaultAuthorityFiltering("name.specified=true", "name.specified=false");
     }
 
     @Test
@@ -278,11 +270,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where name contains DEFAULT_NAME
-        defaultAuthorityShouldBeFound("name.contains=" + DEFAULT_NAME);
-
-        // Get all the authorityList where name contains UPDATED_NAME
-        defaultAuthorityShouldNotBeFound("name.contains=" + UPDATED_NAME);
+        // Get all the authorityList where name contains
+        defaultAuthorityFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
     }
 
     @Test
@@ -291,11 +280,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where name does not contain DEFAULT_NAME
-        defaultAuthorityShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
-
-        // Get all the authorityList where name does not contain UPDATED_NAME
-        defaultAuthorityShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+        // Get all the authorityList where name does not contain
+        defaultAuthorityFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
     }
 
     @Test
@@ -304,11 +290,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where code equals to DEFAULT_CODE
-        defaultAuthorityShouldBeFound("code.equals=" + DEFAULT_CODE);
-
-        // Get all the authorityList where code equals to UPDATED_CODE
-        defaultAuthorityShouldNotBeFound("code.equals=" + UPDATED_CODE);
+        // Get all the authorityList where code equals to
+        defaultAuthorityFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
     }
 
     @Test
@@ -317,11 +300,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where code in DEFAULT_CODE or UPDATED_CODE
-        defaultAuthorityShouldBeFound("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE);
-
-        // Get all the authorityList where code equals to UPDATED_CODE
-        defaultAuthorityShouldNotBeFound("code.in=" + UPDATED_CODE);
+        // Get all the authorityList where code in
+        defaultAuthorityFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
     }
 
     @Test
@@ -331,10 +311,7 @@ public class AuthorityResourceIT {
         authorityRepository.save(authority);
 
         // Get all the authorityList where code is not null
-        defaultAuthorityShouldBeFound("code.specified=true");
-
-        // Get all the authorityList where code is null
-        defaultAuthorityShouldNotBeFound("code.specified=false");
+        defaultAuthorityFiltering("code.specified=true", "code.specified=false");
     }
 
     @Test
@@ -343,11 +320,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where code contains DEFAULT_CODE
-        defaultAuthorityShouldBeFound("code.contains=" + DEFAULT_CODE);
-
-        // Get all the authorityList where code contains UPDATED_CODE
-        defaultAuthorityShouldNotBeFound("code.contains=" + UPDATED_CODE);
+        // Get all the authorityList where code contains
+        defaultAuthorityFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
     }
 
     @Test
@@ -356,11 +330,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where code does not contain DEFAULT_CODE
-        defaultAuthorityShouldNotBeFound("code.doesNotContain=" + DEFAULT_CODE);
-
-        // Get all the authorityList where code does not contain UPDATED_CODE
-        defaultAuthorityShouldBeFound("code.doesNotContain=" + UPDATED_CODE);
+        // Get all the authorityList where code does not contain
+        defaultAuthorityFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
     }
 
     @Test
@@ -369,11 +340,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where info equals to DEFAULT_INFO
-        defaultAuthorityShouldBeFound("info.equals=" + DEFAULT_INFO);
-
-        // Get all the authorityList where info equals to UPDATED_INFO
-        defaultAuthorityShouldNotBeFound("info.equals=" + UPDATED_INFO);
+        // Get all the authorityList where info equals to
+        defaultAuthorityFiltering("info.equals=" + DEFAULT_INFO, "info.equals=" + UPDATED_INFO);
     }
 
     @Test
@@ -382,11 +350,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where info in DEFAULT_INFO or UPDATED_INFO
-        defaultAuthorityShouldBeFound("info.in=" + DEFAULT_INFO + "," + UPDATED_INFO);
-
-        // Get all the authorityList where info equals to UPDATED_INFO
-        defaultAuthorityShouldNotBeFound("info.in=" + UPDATED_INFO);
+        // Get all the authorityList where info in
+        defaultAuthorityFiltering("info.in=" + DEFAULT_INFO + "," + UPDATED_INFO, "info.in=" + UPDATED_INFO);
     }
 
     @Test
@@ -396,10 +361,7 @@ public class AuthorityResourceIT {
         authorityRepository.save(authority);
 
         // Get all the authorityList where info is not null
-        defaultAuthorityShouldBeFound("info.specified=true");
-
-        // Get all the authorityList where info is null
-        defaultAuthorityShouldNotBeFound("info.specified=false");
+        defaultAuthorityFiltering("info.specified=true", "info.specified=false");
     }
 
     @Test
@@ -408,11 +370,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where info contains DEFAULT_INFO
-        defaultAuthorityShouldBeFound("info.contains=" + DEFAULT_INFO);
-
-        // Get all the authorityList where info contains UPDATED_INFO
-        defaultAuthorityShouldNotBeFound("info.contains=" + UPDATED_INFO);
+        // Get all the authorityList where info contains
+        defaultAuthorityFiltering("info.contains=" + DEFAULT_INFO, "info.contains=" + UPDATED_INFO);
     }
 
     @Test
@@ -421,11 +380,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where info does not contain DEFAULT_INFO
-        defaultAuthorityShouldNotBeFound("info.doesNotContain=" + DEFAULT_INFO);
-
-        // Get all the authorityList where info does not contain UPDATED_INFO
-        defaultAuthorityShouldBeFound("info.doesNotContain=" + UPDATED_INFO);
+        // Get all the authorityList where info does not contain
+        defaultAuthorityFiltering("info.doesNotContain=" + UPDATED_INFO, "info.doesNotContain=" + DEFAULT_INFO);
     }
 
     @Test
@@ -434,11 +390,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where order equals to DEFAULT_ORDER
-        defaultAuthorityShouldBeFound("order.equals=" + DEFAULT_ORDER);
-
-        // Get all the authorityList where order equals to UPDATED_ORDER
-        defaultAuthorityShouldNotBeFound("order.equals=" + UPDATED_ORDER);
+        // Get all the authorityList where order equals to
+        defaultAuthorityFiltering("order.equals=" + DEFAULT_ORDER, "order.equals=" + UPDATED_ORDER);
     }
 
     @Test
@@ -447,11 +400,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where order in DEFAULT_ORDER or UPDATED_ORDER
-        defaultAuthorityShouldBeFound("order.in=" + DEFAULT_ORDER + "," + UPDATED_ORDER);
-
-        // Get all the authorityList where order equals to UPDATED_ORDER
-        defaultAuthorityShouldNotBeFound("order.in=" + UPDATED_ORDER);
+        // Get all the authorityList where order in
+        defaultAuthorityFiltering("order.in=" + DEFAULT_ORDER + "," + UPDATED_ORDER, "order.in=" + UPDATED_ORDER);
     }
 
     @Test
@@ -461,10 +411,7 @@ public class AuthorityResourceIT {
         authorityRepository.save(authority);
 
         // Get all the authorityList where order is not null
-        defaultAuthorityShouldBeFound("order.specified=true");
-
-        // Get all the authorityList where order is null
-        defaultAuthorityShouldNotBeFound("order.specified=false");
+        defaultAuthorityFiltering("order.specified=true", "order.specified=false");
     }
 
     @Test
@@ -473,11 +420,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where order is greater than or equal to DEFAULT_ORDER
-        defaultAuthorityShouldBeFound("order.greaterThanOrEqual=" + DEFAULT_ORDER);
-
-        // Get all the authorityList where order is greater than or equal to UPDATED_ORDER
-        defaultAuthorityShouldNotBeFound("order.greaterThanOrEqual=" + UPDATED_ORDER);
+        // Get all the authorityList where order is greater than or equal to
+        defaultAuthorityFiltering("order.greaterThanOrEqual=" + DEFAULT_ORDER, "order.greaterThanOrEqual=" + UPDATED_ORDER);
     }
 
     @Test
@@ -486,11 +430,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where order is less than or equal to DEFAULT_ORDER
-        defaultAuthorityShouldBeFound("order.lessThanOrEqual=" + DEFAULT_ORDER);
-
-        // Get all the authorityList where order is less than or equal to SMALLER_ORDER
-        defaultAuthorityShouldNotBeFound("order.lessThanOrEqual=" + SMALLER_ORDER);
+        // Get all the authorityList where order is less than or equal to
+        defaultAuthorityFiltering("order.lessThanOrEqual=" + DEFAULT_ORDER, "order.lessThanOrEqual=" + SMALLER_ORDER);
     }
 
     @Test
@@ -499,11 +440,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where order is less than DEFAULT_ORDER
-        defaultAuthorityShouldNotBeFound("order.lessThan=" + DEFAULT_ORDER);
-
-        // Get all the authorityList where order is less than UPDATED_ORDER
-        defaultAuthorityShouldBeFound("order.lessThan=" + UPDATED_ORDER);
+        // Get all the authorityList where order is less than
+        defaultAuthorityFiltering("order.lessThan=" + UPDATED_ORDER, "order.lessThan=" + DEFAULT_ORDER);
     }
 
     @Test
@@ -512,11 +450,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where order is greater than DEFAULT_ORDER
-        defaultAuthorityShouldNotBeFound("order.greaterThan=" + DEFAULT_ORDER);
-
-        // Get all the authorityList where order is greater than SMALLER_ORDER
-        defaultAuthorityShouldBeFound("order.greaterThan=" + SMALLER_ORDER);
+        // Get all the authorityList where order is greater than
+        defaultAuthorityFiltering("order.greaterThan=" + SMALLER_ORDER, "order.greaterThan=" + DEFAULT_ORDER);
     }
 
     @Test
@@ -525,11 +460,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where display equals to DEFAULT_DISPLAY
-        defaultAuthorityShouldBeFound("display.equals=" + DEFAULT_DISPLAY);
-
-        // Get all the authorityList where display equals to UPDATED_DISPLAY
-        defaultAuthorityShouldNotBeFound("display.equals=" + UPDATED_DISPLAY);
+        // Get all the authorityList where display equals to
+        defaultAuthorityFiltering("display.equals=" + DEFAULT_DISPLAY, "display.equals=" + UPDATED_DISPLAY);
     }
 
     @Test
@@ -538,11 +470,8 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        // Get all the authorityList where display in DEFAULT_DISPLAY or UPDATED_DISPLAY
-        defaultAuthorityShouldBeFound("display.in=" + DEFAULT_DISPLAY + "," + UPDATED_DISPLAY);
-
-        // Get all the authorityList where display equals to UPDATED_DISPLAY
-        defaultAuthorityShouldNotBeFound("display.in=" + UPDATED_DISPLAY);
+        // Get all the authorityList where display in
+        defaultAuthorityFiltering("display.in=" + DEFAULT_DISPLAY + "," + UPDATED_DISPLAY, "display.in=" + UPDATED_DISPLAY);
     }
 
     @Test
@@ -552,10 +481,7 @@ public class AuthorityResourceIT {
         authorityRepository.save(authority);
 
         // Get all the authorityList where display is not null
-        defaultAuthorityShouldBeFound("display.specified=true");
-
-        // Get all the authorityList where display is null
-        defaultAuthorityShouldNotBeFound("display.specified=false");
+        defaultAuthorityFiltering("display.specified=true", "display.specified=false");
     }
 
     @Test
@@ -628,6 +554,11 @@ public class AuthorityResourceIT {
         defaultAuthorityShouldNotBeFound("departmentId.equals=" + (departmentId + 1));
     }
 
+    private void defaultAuthorityFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultAuthorityShouldBeFound(shouldBeFound);
+        defaultAuthorityShouldNotBeFound(shouldNotBeFound);
+    }
+
     /**
      * Executes the search, and checks that the default entity is returned.
      */
@@ -683,7 +614,7 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        int databaseSizeBeforeUpdate = authorityRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the authority
         Authority updatedAuthority = authorityRepository.findById(authority.getId()).orElseThrow();
@@ -694,25 +625,19 @@ public class AuthorityResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, authorityDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(authorityDTO))
+                    .content(om.writeValueAsBytes(authorityDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the Authority in the database
-        List<Authority> authorityList = authorityRepository.findAll();
-        assertThat(authorityList).hasSize(databaseSizeBeforeUpdate);
-        Authority testAuthority = authorityList.get(authorityList.size() - 1);
-        assertThat(testAuthority.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testAuthority.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testAuthority.getInfo()).isEqualTo(UPDATED_INFO);
-        assertThat(testAuthority.getOrder()).isEqualTo(UPDATED_ORDER);
-        assertThat(testAuthority.getDisplay()).isEqualTo(UPDATED_DISPLAY);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedAuthorityToMatchAllProperties(updatedAuthority);
     }
 
     @Test
     @Transactional
     void putNonExistingAuthority() throws Exception {
-        int databaseSizeBeforeUpdate = authorityRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         authority.setId(longCount.incrementAndGet());
 
         // Create the Authority
@@ -723,19 +648,18 @@ public class AuthorityResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, authorityDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(authorityDTO))
+                    .content(om.writeValueAsBytes(authorityDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Authority in the database
-        List<Authority> authorityList = authorityRepository.findAll();
-        assertThat(authorityList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchAuthority() throws Exception {
-        int databaseSizeBeforeUpdate = authorityRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         authority.setId(longCount.incrementAndGet());
 
         // Create the Authority
@@ -746,19 +670,18 @@ public class AuthorityResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(authorityDTO))
+                    .content(om.writeValueAsBytes(authorityDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Authority in the database
-        List<Authority> authorityList = authorityRepository.findAll();
-        assertThat(authorityList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamAuthority() throws Exception {
-        int databaseSizeBeforeUpdate = authorityRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         authority.setId(longCount.incrementAndGet());
 
         // Create the Authority
@@ -766,12 +689,11 @@ public class AuthorityResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restAuthorityMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(authorityDTO)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(authorityDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Authority in the database
-        List<Authority> authorityList = authorityRepository.findAll();
-        assertThat(authorityList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -780,31 +702,29 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        int databaseSizeBeforeUpdate = authorityRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the authority using partial update
         Authority partialUpdatedAuthority = new Authority();
         partialUpdatedAuthority.setId(authority.getId());
 
-        partialUpdatedAuthority.order(UPDATED_ORDER);
+        partialUpdatedAuthority.info(UPDATED_INFO).order(UPDATED_ORDER);
 
         restAuthorityMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedAuthority.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedAuthority))
+                    .content(om.writeValueAsBytes(partialUpdatedAuthority))
             )
             .andExpect(status().isOk());
 
         // Validate the Authority in the database
-        List<Authority> authorityList = authorityRepository.findAll();
-        assertThat(authorityList).hasSize(databaseSizeBeforeUpdate);
-        Authority testAuthority = authorityList.get(authorityList.size() - 1);
-        assertThat(testAuthority.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testAuthority.getCode()).isEqualTo(DEFAULT_CODE);
-        assertThat(testAuthority.getInfo()).isEqualTo(DEFAULT_INFO);
-        assertThat(testAuthority.getOrder()).isEqualTo(UPDATED_ORDER);
-        assertThat(testAuthority.getDisplay()).isEqualTo(DEFAULT_DISPLAY);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertAuthorityUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedAuthority, authority),
+            getPersistedAuthority(authority)
+        );
     }
 
     @Test
@@ -813,7 +733,7 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        int databaseSizeBeforeUpdate = authorityRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the authority using partial update
         Authority partialUpdatedAuthority = new Authority();
@@ -825,25 +745,20 @@ public class AuthorityResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedAuthority.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedAuthority))
+                    .content(om.writeValueAsBytes(partialUpdatedAuthority))
             )
             .andExpect(status().isOk());
 
         // Validate the Authority in the database
-        List<Authority> authorityList = authorityRepository.findAll();
-        assertThat(authorityList).hasSize(databaseSizeBeforeUpdate);
-        Authority testAuthority = authorityList.get(authorityList.size() - 1);
-        assertThat(testAuthority.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testAuthority.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testAuthority.getInfo()).isEqualTo(UPDATED_INFO);
-        assertThat(testAuthority.getOrder()).isEqualTo(UPDATED_ORDER);
-        assertThat(testAuthority.getDisplay()).isEqualTo(UPDATED_DISPLAY);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertAuthorityUpdatableFieldsEquals(partialUpdatedAuthority, getPersistedAuthority(partialUpdatedAuthority));
     }
 
     @Test
     @Transactional
     void patchNonExistingAuthority() throws Exception {
-        int databaseSizeBeforeUpdate = authorityRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         authority.setId(longCount.incrementAndGet());
 
         // Create the Authority
@@ -854,19 +769,18 @@ public class AuthorityResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, authorityDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(authorityDTO))
+                    .content(om.writeValueAsBytes(authorityDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Authority in the database
-        List<Authority> authorityList = authorityRepository.findAll();
-        assertThat(authorityList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchAuthority() throws Exception {
-        int databaseSizeBeforeUpdate = authorityRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         authority.setId(longCount.incrementAndGet());
 
         // Create the Authority
@@ -877,19 +791,18 @@ public class AuthorityResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(authorityDTO))
+                    .content(om.writeValueAsBytes(authorityDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Authority in the database
-        List<Authority> authorityList = authorityRepository.findAll();
-        assertThat(authorityList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamAuthority() throws Exception {
-        int databaseSizeBeforeUpdate = authorityRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         authority.setId(longCount.incrementAndGet());
 
         // Create the Authority
@@ -897,14 +810,11 @@ public class AuthorityResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restAuthorityMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(authorityDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(authorityDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Authority in the database
-        List<Authority> authorityList = authorityRepository.findAll();
-        assertThat(authorityList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -913,7 +823,7 @@ public class AuthorityResourceIT {
         // Initialize the database
         authorityRepository.save(authority);
 
-        int databaseSizeBeforeDelete = authorityRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the authority
         restAuthorityMockMvc
@@ -921,7 +831,34 @@ public class AuthorityResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<Authority> authorityList = authorityRepository.findAll();
-        assertThat(authorityList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return authorityRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected Authority getPersistedAuthority(Authority authority) {
+        return authorityRepository.findById(authority.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedAuthorityToMatchAllProperties(Authority expectedAuthority) {
+        assertAuthorityAllPropertiesEquals(expectedAuthority, getPersistedAuthority(expectedAuthority));
+    }
+
+    protected void assertPersistedAuthorityToMatchUpdatableProperties(Authority expectedAuthority) {
+        assertAuthorityAllUpdatablePropertiesEquals(expectedAuthority, getPersistedAuthority(expectedAuthority));
     }
 }

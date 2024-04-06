@@ -1,5 +1,7 @@
 package com.begcode.monolith.web.rest;
 
+import static com.begcode.monolith.domain.ViewPermissionAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.*;
@@ -19,9 +21,8 @@ import com.begcode.monolith.repository.ViewPermissionRepository;
 import com.begcode.monolith.service.ViewPermissionService;
 import com.begcode.monolith.service.dto.ViewPermissionDTO;
 import com.begcode.monolith.service.mapper.ViewPermissionMapper;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -107,8 +108,11 @@ public class ViewPermissionResourceIT {
     private static final String ENTITY_API_URL = "/api/view-permissions";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private ViewPermissionRepository viewPermissionRepository;
@@ -197,39 +201,23 @@ public class ViewPermissionResourceIT {
     @Test
     @Transactional
     void createViewPermission() throws Exception {
-        int databaseSizeBeforeCreate = viewPermissionRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the ViewPermission
         ViewPermissionDTO viewPermissionDTO = viewPermissionMapper.toDto(viewPermission);
-        restViewPermissionMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(viewPermissionDTO))
-            )
-            .andExpect(status().isCreated());
+        var returnedViewPermissionDTO = om.readValue(
+            restViewPermissionMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(viewPermissionDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            ViewPermissionDTO.class
+        );
 
         // Validate the ViewPermission in the database
-        List<ViewPermission> viewPermissionList = viewPermissionRepository.findAll();
-        assertThat(viewPermissionList).hasSize(databaseSizeBeforeCreate + 1);
-        ViewPermission testViewPermission = viewPermissionList.get(viewPermissionList.size() - 1);
-        assertThat(testViewPermission.getText()).isEqualTo(DEFAULT_TEXT);
-        assertThat(testViewPermission.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testViewPermission.getI18n()).isEqualTo(DEFAULT_I_18_N);
-        assertThat(testViewPermission.getGroup()).isEqualTo(DEFAULT_GROUP);
-        assertThat(testViewPermission.getLink()).isEqualTo(DEFAULT_LINK);
-        assertThat(testViewPermission.getExternalLink()).isEqualTo(DEFAULT_EXTERNAL_LINK);
-        assertThat(testViewPermission.getTarget()).isEqualTo(DEFAULT_TARGET);
-        assertThat(testViewPermission.getIcon()).isEqualTo(DEFAULT_ICON);
-        assertThat(testViewPermission.getDisabled()).isEqualTo(DEFAULT_DISABLED);
-        assertThat(testViewPermission.getHide()).isEqualTo(DEFAULT_HIDE);
-        assertThat(testViewPermission.getHideInBreadcrumb()).isEqualTo(DEFAULT_HIDE_IN_BREADCRUMB);
-        assertThat(testViewPermission.getShortcut()).isEqualTo(DEFAULT_SHORTCUT);
-        assertThat(testViewPermission.getShortcutRoot()).isEqualTo(DEFAULT_SHORTCUT_ROOT);
-        assertThat(testViewPermission.getReuse()).isEqualTo(DEFAULT_REUSE);
-        assertThat(testViewPermission.getCode()).isEqualTo(DEFAULT_CODE);
-        assertThat(testViewPermission.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
-        assertThat(testViewPermission.getOrder()).isEqualTo(DEFAULT_ORDER);
-        assertThat(testViewPermission.getApiPermissionCodes()).isEqualTo(DEFAULT_API_PERMISSION_CODES);
-        assertThat(testViewPermission.getComponentFile()).isEqualTo(DEFAULT_COMPONENT_FILE);
-        assertThat(testViewPermission.getRedirect()).isEqualTo(DEFAULT_REDIRECT);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedViewPermission = viewPermissionMapper.toEntity(returnedViewPermissionDTO);
+        assertViewPermissionUpdatableFieldsEquals(returnedViewPermission, getPersistedViewPermission(returnedViewPermission));
     }
 
     @Test
@@ -239,24 +227,21 @@ public class ViewPermissionResourceIT {
         viewPermission.setId(1L);
         ViewPermissionDTO viewPermissionDTO = viewPermissionMapper.toDto(viewPermission);
 
-        int databaseSizeBeforeCreate = viewPermissionRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restViewPermissionMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(viewPermissionDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(viewPermissionDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the ViewPermission in the database
-        List<ViewPermission> viewPermissionList = viewPermissionRepository.findAll();
-        assertThat(viewPermissionList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
     @Transactional
     void checkTextIsRequired() throws Exception {
-        int databaseSizeBeforeTest = viewPermissionRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         viewPermission.setText(null);
 
@@ -264,19 +249,16 @@ public class ViewPermissionResourceIT {
         ViewPermissionDTO viewPermissionDTO = viewPermissionMapper.toDto(viewPermission);
 
         restViewPermissionMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(viewPermissionDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(viewPermissionDTO)))
             .andExpect(status().isBadRequest());
 
-        List<ViewPermission> viewPermissionList = viewPermissionRepository.findAll();
-        assertThat(viewPermissionList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void checkCodeIsRequired() throws Exception {
-        int databaseSizeBeforeTest = viewPermissionRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         viewPermission.setCode(null);
 
@@ -284,13 +266,10 @@ public class ViewPermissionResourceIT {
         ViewPermissionDTO viewPermissionDTO = viewPermissionMapper.toDto(viewPermission);
 
         restViewPermissionMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(viewPermissionDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(viewPermissionDTO)))
             .andExpect(status().isBadRequest());
 
-        List<ViewPermission> viewPermissionList = viewPermissionRepository.findAll();
-        assertThat(viewPermissionList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
@@ -386,14 +365,11 @@ public class ViewPermissionResourceIT {
 
         Long id = viewPermission.getId();
 
-        defaultViewPermissionShouldBeFound("id.equals=" + id);
-        defaultViewPermissionShouldNotBeFound("id.notEquals=" + id);
+        defaultViewPermissionFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultViewPermissionShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultViewPermissionShouldNotBeFound("id.greaterThan=" + id);
+        defaultViewPermissionFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultViewPermissionShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultViewPermissionShouldNotBeFound("id.lessThan=" + id);
+        defaultViewPermissionFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -402,11 +378,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where text equals to DEFAULT_TEXT
-        defaultViewPermissionShouldBeFound("text.equals=" + DEFAULT_TEXT);
-
-        // Get all the viewPermissionList where text equals to UPDATED_TEXT
-        defaultViewPermissionShouldNotBeFound("text.equals=" + UPDATED_TEXT);
+        // Get all the viewPermissionList where text equals to
+        defaultViewPermissionFiltering("text.equals=" + DEFAULT_TEXT, "text.equals=" + UPDATED_TEXT);
     }
 
     @Test
@@ -415,11 +388,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where text in DEFAULT_TEXT or UPDATED_TEXT
-        defaultViewPermissionShouldBeFound("text.in=" + DEFAULT_TEXT + "," + UPDATED_TEXT);
-
-        // Get all the viewPermissionList where text equals to UPDATED_TEXT
-        defaultViewPermissionShouldNotBeFound("text.in=" + UPDATED_TEXT);
+        // Get all the viewPermissionList where text in
+        defaultViewPermissionFiltering("text.in=" + DEFAULT_TEXT + "," + UPDATED_TEXT, "text.in=" + UPDATED_TEXT);
     }
 
     @Test
@@ -429,10 +399,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where text is not null
-        defaultViewPermissionShouldBeFound("text.specified=true");
-
-        // Get all the viewPermissionList where text is null
-        defaultViewPermissionShouldNotBeFound("text.specified=false");
+        defaultViewPermissionFiltering("text.specified=true", "text.specified=false");
     }
 
     @Test
@@ -441,11 +408,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where text contains DEFAULT_TEXT
-        defaultViewPermissionShouldBeFound("text.contains=" + DEFAULT_TEXT);
-
-        // Get all the viewPermissionList where text contains UPDATED_TEXT
-        defaultViewPermissionShouldNotBeFound("text.contains=" + UPDATED_TEXT);
+        // Get all the viewPermissionList where text contains
+        defaultViewPermissionFiltering("text.contains=" + DEFAULT_TEXT, "text.contains=" + UPDATED_TEXT);
     }
 
     @Test
@@ -454,11 +418,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where text does not contain DEFAULT_TEXT
-        defaultViewPermissionShouldNotBeFound("text.doesNotContain=" + DEFAULT_TEXT);
-
-        // Get all the viewPermissionList where text does not contain UPDATED_TEXT
-        defaultViewPermissionShouldBeFound("text.doesNotContain=" + UPDATED_TEXT);
+        // Get all the viewPermissionList where text does not contain
+        defaultViewPermissionFiltering("text.doesNotContain=" + UPDATED_TEXT, "text.doesNotContain=" + DEFAULT_TEXT);
     }
 
     @Test
@@ -467,11 +428,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where type equals to DEFAULT_TYPE
-        defaultViewPermissionShouldBeFound("type.equals=" + DEFAULT_TYPE);
-
-        // Get all the viewPermissionList where type equals to UPDATED_TYPE
-        defaultViewPermissionShouldNotBeFound("type.equals=" + UPDATED_TYPE);
+        // Get all the viewPermissionList where type equals to
+        defaultViewPermissionFiltering("type.equals=" + DEFAULT_TYPE, "type.equals=" + UPDATED_TYPE);
     }
 
     @Test
@@ -480,11 +438,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where type in DEFAULT_TYPE or UPDATED_TYPE
-        defaultViewPermissionShouldBeFound("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE);
-
-        // Get all the viewPermissionList where type equals to UPDATED_TYPE
-        defaultViewPermissionShouldNotBeFound("type.in=" + UPDATED_TYPE);
+        // Get all the viewPermissionList where type in
+        defaultViewPermissionFiltering("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE, "type.in=" + UPDATED_TYPE);
     }
 
     @Test
@@ -494,10 +449,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where type is not null
-        defaultViewPermissionShouldBeFound("type.specified=true");
-
-        // Get all the viewPermissionList where type is null
-        defaultViewPermissionShouldNotBeFound("type.specified=false");
+        defaultViewPermissionFiltering("type.specified=true", "type.specified=false");
     }
 
     @Test
@@ -506,11 +458,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where i18n equals to DEFAULT_I_18_N
-        defaultViewPermissionShouldBeFound("i18n.equals=" + DEFAULT_I_18_N);
-
-        // Get all the viewPermissionList where i18n equals to UPDATED_I_18_N
-        defaultViewPermissionShouldNotBeFound("i18n.equals=" + UPDATED_I_18_N);
+        // Get all the viewPermissionList where i18n equals to
+        defaultViewPermissionFiltering("i18n.equals=" + DEFAULT_I_18_N, "i18n.equals=" + UPDATED_I_18_N);
     }
 
     @Test
@@ -519,11 +468,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where i18n in DEFAULT_I_18_N or UPDATED_I_18_N
-        defaultViewPermissionShouldBeFound("i18n.in=" + DEFAULT_I_18_N + "," + UPDATED_I_18_N);
-
-        // Get all the viewPermissionList where i18n equals to UPDATED_I_18_N
-        defaultViewPermissionShouldNotBeFound("i18n.in=" + UPDATED_I_18_N);
+        // Get all the viewPermissionList where i18n in
+        defaultViewPermissionFiltering("i18n.in=" + DEFAULT_I_18_N + "," + UPDATED_I_18_N, "i18n.in=" + UPDATED_I_18_N);
     }
 
     @Test
@@ -533,10 +479,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where i18n is not null
-        defaultViewPermissionShouldBeFound("i18n.specified=true");
-
-        // Get all the viewPermissionList where i18n is null
-        defaultViewPermissionShouldNotBeFound("i18n.specified=false");
+        defaultViewPermissionFiltering("i18n.specified=true", "i18n.specified=false");
     }
 
     @Test
@@ -545,11 +488,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where i18n contains DEFAULT_I_18_N
-        defaultViewPermissionShouldBeFound("i18n.contains=" + DEFAULT_I_18_N);
-
-        // Get all the viewPermissionList where i18n contains UPDATED_I_18_N
-        defaultViewPermissionShouldNotBeFound("i18n.contains=" + UPDATED_I_18_N);
+        // Get all the viewPermissionList where i18n contains
+        defaultViewPermissionFiltering("i18n.contains=" + DEFAULT_I_18_N, "i18n.contains=" + UPDATED_I_18_N);
     }
 
     @Test
@@ -558,11 +498,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where i18n does not contain DEFAULT_I_18_N
-        defaultViewPermissionShouldNotBeFound("i18n.doesNotContain=" + DEFAULT_I_18_N);
-
-        // Get all the viewPermissionList where i18n does not contain UPDATED_I_18_N
-        defaultViewPermissionShouldBeFound("i18n.doesNotContain=" + UPDATED_I_18_N);
+        // Get all the viewPermissionList where i18n does not contain
+        defaultViewPermissionFiltering("i18n.doesNotContain=" + UPDATED_I_18_N, "i18n.doesNotContain=" + DEFAULT_I_18_N);
     }
 
     @Test
@@ -571,11 +508,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where group equals to DEFAULT_GROUP
-        defaultViewPermissionShouldBeFound("group.equals=" + DEFAULT_GROUP);
-
-        // Get all the viewPermissionList where group equals to UPDATED_GROUP
-        defaultViewPermissionShouldNotBeFound("group.equals=" + UPDATED_GROUP);
+        // Get all the viewPermissionList where group equals to
+        defaultViewPermissionFiltering("group.equals=" + DEFAULT_GROUP, "group.equals=" + UPDATED_GROUP);
     }
 
     @Test
@@ -584,11 +518,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where group in DEFAULT_GROUP or UPDATED_GROUP
-        defaultViewPermissionShouldBeFound("group.in=" + DEFAULT_GROUP + "," + UPDATED_GROUP);
-
-        // Get all the viewPermissionList where group equals to UPDATED_GROUP
-        defaultViewPermissionShouldNotBeFound("group.in=" + UPDATED_GROUP);
+        // Get all the viewPermissionList where group in
+        defaultViewPermissionFiltering("group.in=" + DEFAULT_GROUP + "," + UPDATED_GROUP, "group.in=" + UPDATED_GROUP);
     }
 
     @Test
@@ -598,10 +529,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where group is not null
-        defaultViewPermissionShouldBeFound("group.specified=true");
-
-        // Get all the viewPermissionList where group is null
-        defaultViewPermissionShouldNotBeFound("group.specified=false");
+        defaultViewPermissionFiltering("group.specified=true", "group.specified=false");
     }
 
     @Test
@@ -610,11 +538,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where link equals to DEFAULT_LINK
-        defaultViewPermissionShouldBeFound("link.equals=" + DEFAULT_LINK);
-
-        // Get all the viewPermissionList where link equals to UPDATED_LINK
-        defaultViewPermissionShouldNotBeFound("link.equals=" + UPDATED_LINK);
+        // Get all the viewPermissionList where link equals to
+        defaultViewPermissionFiltering("link.equals=" + DEFAULT_LINK, "link.equals=" + UPDATED_LINK);
     }
 
     @Test
@@ -623,11 +548,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where link in DEFAULT_LINK or UPDATED_LINK
-        defaultViewPermissionShouldBeFound("link.in=" + DEFAULT_LINK + "," + UPDATED_LINK);
-
-        // Get all the viewPermissionList where link equals to UPDATED_LINK
-        defaultViewPermissionShouldNotBeFound("link.in=" + UPDATED_LINK);
+        // Get all the viewPermissionList where link in
+        defaultViewPermissionFiltering("link.in=" + DEFAULT_LINK + "," + UPDATED_LINK, "link.in=" + UPDATED_LINK);
     }
 
     @Test
@@ -637,10 +559,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where link is not null
-        defaultViewPermissionShouldBeFound("link.specified=true");
-
-        // Get all the viewPermissionList where link is null
-        defaultViewPermissionShouldNotBeFound("link.specified=false");
+        defaultViewPermissionFiltering("link.specified=true", "link.specified=false");
     }
 
     @Test
@@ -649,11 +568,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where link contains DEFAULT_LINK
-        defaultViewPermissionShouldBeFound("link.contains=" + DEFAULT_LINK);
-
-        // Get all the viewPermissionList where link contains UPDATED_LINK
-        defaultViewPermissionShouldNotBeFound("link.contains=" + UPDATED_LINK);
+        // Get all the viewPermissionList where link contains
+        defaultViewPermissionFiltering("link.contains=" + DEFAULT_LINK, "link.contains=" + UPDATED_LINK);
     }
 
     @Test
@@ -662,11 +578,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where link does not contain DEFAULT_LINK
-        defaultViewPermissionShouldNotBeFound("link.doesNotContain=" + DEFAULT_LINK);
-
-        // Get all the viewPermissionList where link does not contain UPDATED_LINK
-        defaultViewPermissionShouldBeFound("link.doesNotContain=" + UPDATED_LINK);
+        // Get all the viewPermissionList where link does not contain
+        defaultViewPermissionFiltering("link.doesNotContain=" + UPDATED_LINK, "link.doesNotContain=" + DEFAULT_LINK);
     }
 
     @Test
@@ -675,11 +588,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where externalLink equals to DEFAULT_EXTERNAL_LINK
-        defaultViewPermissionShouldBeFound("externalLink.equals=" + DEFAULT_EXTERNAL_LINK);
-
-        // Get all the viewPermissionList where externalLink equals to UPDATED_EXTERNAL_LINK
-        defaultViewPermissionShouldNotBeFound("externalLink.equals=" + UPDATED_EXTERNAL_LINK);
+        // Get all the viewPermissionList where externalLink equals to
+        defaultViewPermissionFiltering("externalLink.equals=" + DEFAULT_EXTERNAL_LINK, "externalLink.equals=" + UPDATED_EXTERNAL_LINK);
     }
 
     @Test
@@ -688,11 +598,11 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where externalLink in DEFAULT_EXTERNAL_LINK or UPDATED_EXTERNAL_LINK
-        defaultViewPermissionShouldBeFound("externalLink.in=" + DEFAULT_EXTERNAL_LINK + "," + UPDATED_EXTERNAL_LINK);
-
-        // Get all the viewPermissionList where externalLink equals to UPDATED_EXTERNAL_LINK
-        defaultViewPermissionShouldNotBeFound("externalLink.in=" + UPDATED_EXTERNAL_LINK);
+        // Get all the viewPermissionList where externalLink in
+        defaultViewPermissionFiltering(
+            "externalLink.in=" + DEFAULT_EXTERNAL_LINK + "," + UPDATED_EXTERNAL_LINK,
+            "externalLink.in=" + UPDATED_EXTERNAL_LINK
+        );
     }
 
     @Test
@@ -702,10 +612,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where externalLink is not null
-        defaultViewPermissionShouldBeFound("externalLink.specified=true");
-
-        // Get all the viewPermissionList where externalLink is null
-        defaultViewPermissionShouldNotBeFound("externalLink.specified=false");
+        defaultViewPermissionFiltering("externalLink.specified=true", "externalLink.specified=false");
     }
 
     @Test
@@ -714,11 +621,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where externalLink contains DEFAULT_EXTERNAL_LINK
-        defaultViewPermissionShouldBeFound("externalLink.contains=" + DEFAULT_EXTERNAL_LINK);
-
-        // Get all the viewPermissionList where externalLink contains UPDATED_EXTERNAL_LINK
-        defaultViewPermissionShouldNotBeFound("externalLink.contains=" + UPDATED_EXTERNAL_LINK);
+        // Get all the viewPermissionList where externalLink contains
+        defaultViewPermissionFiltering("externalLink.contains=" + DEFAULT_EXTERNAL_LINK, "externalLink.contains=" + UPDATED_EXTERNAL_LINK);
     }
 
     @Test
@@ -727,11 +631,11 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where externalLink does not contain DEFAULT_EXTERNAL_LINK
-        defaultViewPermissionShouldNotBeFound("externalLink.doesNotContain=" + DEFAULT_EXTERNAL_LINK);
-
-        // Get all the viewPermissionList where externalLink does not contain UPDATED_EXTERNAL_LINK
-        defaultViewPermissionShouldBeFound("externalLink.doesNotContain=" + UPDATED_EXTERNAL_LINK);
+        // Get all the viewPermissionList where externalLink does not contain
+        defaultViewPermissionFiltering(
+            "externalLink.doesNotContain=" + UPDATED_EXTERNAL_LINK,
+            "externalLink.doesNotContain=" + DEFAULT_EXTERNAL_LINK
+        );
     }
 
     @Test
@@ -740,11 +644,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where target equals to DEFAULT_TARGET
-        defaultViewPermissionShouldBeFound("target.equals=" + DEFAULT_TARGET);
-
-        // Get all the viewPermissionList where target equals to UPDATED_TARGET
-        defaultViewPermissionShouldNotBeFound("target.equals=" + UPDATED_TARGET);
+        // Get all the viewPermissionList where target equals to
+        defaultViewPermissionFiltering("target.equals=" + DEFAULT_TARGET, "target.equals=" + UPDATED_TARGET);
     }
 
     @Test
@@ -753,11 +654,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where target in DEFAULT_TARGET or UPDATED_TARGET
-        defaultViewPermissionShouldBeFound("target.in=" + DEFAULT_TARGET + "," + UPDATED_TARGET);
-
-        // Get all the viewPermissionList where target equals to UPDATED_TARGET
-        defaultViewPermissionShouldNotBeFound("target.in=" + UPDATED_TARGET);
+        // Get all the viewPermissionList where target in
+        defaultViewPermissionFiltering("target.in=" + DEFAULT_TARGET + "," + UPDATED_TARGET, "target.in=" + UPDATED_TARGET);
     }
 
     @Test
@@ -767,10 +665,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where target is not null
-        defaultViewPermissionShouldBeFound("target.specified=true");
-
-        // Get all the viewPermissionList where target is null
-        defaultViewPermissionShouldNotBeFound("target.specified=false");
+        defaultViewPermissionFiltering("target.specified=true", "target.specified=false");
     }
 
     @Test
@@ -779,11 +674,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where icon equals to DEFAULT_ICON
-        defaultViewPermissionShouldBeFound("icon.equals=" + DEFAULT_ICON);
-
-        // Get all the viewPermissionList where icon equals to UPDATED_ICON
-        defaultViewPermissionShouldNotBeFound("icon.equals=" + UPDATED_ICON);
+        // Get all the viewPermissionList where icon equals to
+        defaultViewPermissionFiltering("icon.equals=" + DEFAULT_ICON, "icon.equals=" + UPDATED_ICON);
     }
 
     @Test
@@ -792,11 +684,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where icon in DEFAULT_ICON or UPDATED_ICON
-        defaultViewPermissionShouldBeFound("icon.in=" + DEFAULT_ICON + "," + UPDATED_ICON);
-
-        // Get all the viewPermissionList where icon equals to UPDATED_ICON
-        defaultViewPermissionShouldNotBeFound("icon.in=" + UPDATED_ICON);
+        // Get all the viewPermissionList where icon in
+        defaultViewPermissionFiltering("icon.in=" + DEFAULT_ICON + "," + UPDATED_ICON, "icon.in=" + UPDATED_ICON);
     }
 
     @Test
@@ -806,10 +695,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where icon is not null
-        defaultViewPermissionShouldBeFound("icon.specified=true");
-
-        // Get all the viewPermissionList where icon is null
-        defaultViewPermissionShouldNotBeFound("icon.specified=false");
+        defaultViewPermissionFiltering("icon.specified=true", "icon.specified=false");
     }
 
     @Test
@@ -818,11 +704,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where icon contains DEFAULT_ICON
-        defaultViewPermissionShouldBeFound("icon.contains=" + DEFAULT_ICON);
-
-        // Get all the viewPermissionList where icon contains UPDATED_ICON
-        defaultViewPermissionShouldNotBeFound("icon.contains=" + UPDATED_ICON);
+        // Get all the viewPermissionList where icon contains
+        defaultViewPermissionFiltering("icon.contains=" + DEFAULT_ICON, "icon.contains=" + UPDATED_ICON);
     }
 
     @Test
@@ -831,11 +714,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where icon does not contain DEFAULT_ICON
-        defaultViewPermissionShouldNotBeFound("icon.doesNotContain=" + DEFAULT_ICON);
-
-        // Get all the viewPermissionList where icon does not contain UPDATED_ICON
-        defaultViewPermissionShouldBeFound("icon.doesNotContain=" + UPDATED_ICON);
+        // Get all the viewPermissionList where icon does not contain
+        defaultViewPermissionFiltering("icon.doesNotContain=" + UPDATED_ICON, "icon.doesNotContain=" + DEFAULT_ICON);
     }
 
     @Test
@@ -844,11 +724,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where disabled equals to DEFAULT_DISABLED
-        defaultViewPermissionShouldBeFound("disabled.equals=" + DEFAULT_DISABLED);
-
-        // Get all the viewPermissionList where disabled equals to UPDATED_DISABLED
-        defaultViewPermissionShouldNotBeFound("disabled.equals=" + UPDATED_DISABLED);
+        // Get all the viewPermissionList where disabled equals to
+        defaultViewPermissionFiltering("disabled.equals=" + DEFAULT_DISABLED, "disabled.equals=" + UPDATED_DISABLED);
     }
 
     @Test
@@ -857,11 +734,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where disabled in DEFAULT_DISABLED or UPDATED_DISABLED
-        defaultViewPermissionShouldBeFound("disabled.in=" + DEFAULT_DISABLED + "," + UPDATED_DISABLED);
-
-        // Get all the viewPermissionList where disabled equals to UPDATED_DISABLED
-        defaultViewPermissionShouldNotBeFound("disabled.in=" + UPDATED_DISABLED);
+        // Get all the viewPermissionList where disabled in
+        defaultViewPermissionFiltering("disabled.in=" + DEFAULT_DISABLED + "," + UPDATED_DISABLED, "disabled.in=" + UPDATED_DISABLED);
     }
 
     @Test
@@ -871,10 +745,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where disabled is not null
-        defaultViewPermissionShouldBeFound("disabled.specified=true");
-
-        // Get all the viewPermissionList where disabled is null
-        defaultViewPermissionShouldNotBeFound("disabled.specified=false");
+        defaultViewPermissionFiltering("disabled.specified=true", "disabled.specified=false");
     }
 
     @Test
@@ -883,11 +754,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where hide equals to DEFAULT_HIDE
-        defaultViewPermissionShouldBeFound("hide.equals=" + DEFAULT_HIDE);
-
-        // Get all the viewPermissionList where hide equals to UPDATED_HIDE
-        defaultViewPermissionShouldNotBeFound("hide.equals=" + UPDATED_HIDE);
+        // Get all the viewPermissionList where hide equals to
+        defaultViewPermissionFiltering("hide.equals=" + DEFAULT_HIDE, "hide.equals=" + UPDATED_HIDE);
     }
 
     @Test
@@ -896,11 +764,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where hide in DEFAULT_HIDE or UPDATED_HIDE
-        defaultViewPermissionShouldBeFound("hide.in=" + DEFAULT_HIDE + "," + UPDATED_HIDE);
-
-        // Get all the viewPermissionList where hide equals to UPDATED_HIDE
-        defaultViewPermissionShouldNotBeFound("hide.in=" + UPDATED_HIDE);
+        // Get all the viewPermissionList where hide in
+        defaultViewPermissionFiltering("hide.in=" + DEFAULT_HIDE + "," + UPDATED_HIDE, "hide.in=" + UPDATED_HIDE);
     }
 
     @Test
@@ -910,10 +775,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where hide is not null
-        defaultViewPermissionShouldBeFound("hide.specified=true");
-
-        // Get all the viewPermissionList where hide is null
-        defaultViewPermissionShouldNotBeFound("hide.specified=false");
+        defaultViewPermissionFiltering("hide.specified=true", "hide.specified=false");
     }
 
     @Test
@@ -922,11 +784,11 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where hideInBreadcrumb equals to DEFAULT_HIDE_IN_BREADCRUMB
-        defaultViewPermissionShouldBeFound("hideInBreadcrumb.equals=" + DEFAULT_HIDE_IN_BREADCRUMB);
-
-        // Get all the viewPermissionList where hideInBreadcrumb equals to UPDATED_HIDE_IN_BREADCRUMB
-        defaultViewPermissionShouldNotBeFound("hideInBreadcrumb.equals=" + UPDATED_HIDE_IN_BREADCRUMB);
+        // Get all the viewPermissionList where hideInBreadcrumb equals to
+        defaultViewPermissionFiltering(
+            "hideInBreadcrumb.equals=" + DEFAULT_HIDE_IN_BREADCRUMB,
+            "hideInBreadcrumb.equals=" + UPDATED_HIDE_IN_BREADCRUMB
+        );
     }
 
     @Test
@@ -935,11 +797,11 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where hideInBreadcrumb in DEFAULT_HIDE_IN_BREADCRUMB or UPDATED_HIDE_IN_BREADCRUMB
-        defaultViewPermissionShouldBeFound("hideInBreadcrumb.in=" + DEFAULT_HIDE_IN_BREADCRUMB + "," + UPDATED_HIDE_IN_BREADCRUMB);
-
-        // Get all the viewPermissionList where hideInBreadcrumb equals to UPDATED_HIDE_IN_BREADCRUMB
-        defaultViewPermissionShouldNotBeFound("hideInBreadcrumb.in=" + UPDATED_HIDE_IN_BREADCRUMB);
+        // Get all the viewPermissionList where hideInBreadcrumb in
+        defaultViewPermissionFiltering(
+            "hideInBreadcrumb.in=" + DEFAULT_HIDE_IN_BREADCRUMB + "," + UPDATED_HIDE_IN_BREADCRUMB,
+            "hideInBreadcrumb.in=" + UPDATED_HIDE_IN_BREADCRUMB
+        );
     }
 
     @Test
@@ -949,10 +811,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where hideInBreadcrumb is not null
-        defaultViewPermissionShouldBeFound("hideInBreadcrumb.specified=true");
-
-        // Get all the viewPermissionList where hideInBreadcrumb is null
-        defaultViewPermissionShouldNotBeFound("hideInBreadcrumb.specified=false");
+        defaultViewPermissionFiltering("hideInBreadcrumb.specified=true", "hideInBreadcrumb.specified=false");
     }
 
     @Test
@@ -961,11 +820,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where shortcut equals to DEFAULT_SHORTCUT
-        defaultViewPermissionShouldBeFound("shortcut.equals=" + DEFAULT_SHORTCUT);
-
-        // Get all the viewPermissionList where shortcut equals to UPDATED_SHORTCUT
-        defaultViewPermissionShouldNotBeFound("shortcut.equals=" + UPDATED_SHORTCUT);
+        // Get all the viewPermissionList where shortcut equals to
+        defaultViewPermissionFiltering("shortcut.equals=" + DEFAULT_SHORTCUT, "shortcut.equals=" + UPDATED_SHORTCUT);
     }
 
     @Test
@@ -974,11 +830,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where shortcut in DEFAULT_SHORTCUT or UPDATED_SHORTCUT
-        defaultViewPermissionShouldBeFound("shortcut.in=" + DEFAULT_SHORTCUT + "," + UPDATED_SHORTCUT);
-
-        // Get all the viewPermissionList where shortcut equals to UPDATED_SHORTCUT
-        defaultViewPermissionShouldNotBeFound("shortcut.in=" + UPDATED_SHORTCUT);
+        // Get all the viewPermissionList where shortcut in
+        defaultViewPermissionFiltering("shortcut.in=" + DEFAULT_SHORTCUT + "," + UPDATED_SHORTCUT, "shortcut.in=" + UPDATED_SHORTCUT);
     }
 
     @Test
@@ -988,10 +841,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where shortcut is not null
-        defaultViewPermissionShouldBeFound("shortcut.specified=true");
-
-        // Get all the viewPermissionList where shortcut is null
-        defaultViewPermissionShouldNotBeFound("shortcut.specified=false");
+        defaultViewPermissionFiltering("shortcut.specified=true", "shortcut.specified=false");
     }
 
     @Test
@@ -1000,11 +850,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where shortcutRoot equals to DEFAULT_SHORTCUT_ROOT
-        defaultViewPermissionShouldBeFound("shortcutRoot.equals=" + DEFAULT_SHORTCUT_ROOT);
-
-        // Get all the viewPermissionList where shortcutRoot equals to UPDATED_SHORTCUT_ROOT
-        defaultViewPermissionShouldNotBeFound("shortcutRoot.equals=" + UPDATED_SHORTCUT_ROOT);
+        // Get all the viewPermissionList where shortcutRoot equals to
+        defaultViewPermissionFiltering("shortcutRoot.equals=" + DEFAULT_SHORTCUT_ROOT, "shortcutRoot.equals=" + UPDATED_SHORTCUT_ROOT);
     }
 
     @Test
@@ -1013,11 +860,11 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where shortcutRoot in DEFAULT_SHORTCUT_ROOT or UPDATED_SHORTCUT_ROOT
-        defaultViewPermissionShouldBeFound("shortcutRoot.in=" + DEFAULT_SHORTCUT_ROOT + "," + UPDATED_SHORTCUT_ROOT);
-
-        // Get all the viewPermissionList where shortcutRoot equals to UPDATED_SHORTCUT_ROOT
-        defaultViewPermissionShouldNotBeFound("shortcutRoot.in=" + UPDATED_SHORTCUT_ROOT);
+        // Get all the viewPermissionList where shortcutRoot in
+        defaultViewPermissionFiltering(
+            "shortcutRoot.in=" + DEFAULT_SHORTCUT_ROOT + "," + UPDATED_SHORTCUT_ROOT,
+            "shortcutRoot.in=" + UPDATED_SHORTCUT_ROOT
+        );
     }
 
     @Test
@@ -1027,10 +874,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where shortcutRoot is not null
-        defaultViewPermissionShouldBeFound("shortcutRoot.specified=true");
-
-        // Get all the viewPermissionList where shortcutRoot is null
-        defaultViewPermissionShouldNotBeFound("shortcutRoot.specified=false");
+        defaultViewPermissionFiltering("shortcutRoot.specified=true", "shortcutRoot.specified=false");
     }
 
     @Test
@@ -1039,11 +883,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where reuse equals to DEFAULT_REUSE
-        defaultViewPermissionShouldBeFound("reuse.equals=" + DEFAULT_REUSE);
-
-        // Get all the viewPermissionList where reuse equals to UPDATED_REUSE
-        defaultViewPermissionShouldNotBeFound("reuse.equals=" + UPDATED_REUSE);
+        // Get all the viewPermissionList where reuse equals to
+        defaultViewPermissionFiltering("reuse.equals=" + DEFAULT_REUSE, "reuse.equals=" + UPDATED_REUSE);
     }
 
     @Test
@@ -1052,11 +893,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where reuse in DEFAULT_REUSE or UPDATED_REUSE
-        defaultViewPermissionShouldBeFound("reuse.in=" + DEFAULT_REUSE + "," + UPDATED_REUSE);
-
-        // Get all the viewPermissionList where reuse equals to UPDATED_REUSE
-        defaultViewPermissionShouldNotBeFound("reuse.in=" + UPDATED_REUSE);
+        // Get all the viewPermissionList where reuse in
+        defaultViewPermissionFiltering("reuse.in=" + DEFAULT_REUSE + "," + UPDATED_REUSE, "reuse.in=" + UPDATED_REUSE);
     }
 
     @Test
@@ -1066,10 +904,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where reuse is not null
-        defaultViewPermissionShouldBeFound("reuse.specified=true");
-
-        // Get all the viewPermissionList where reuse is null
-        defaultViewPermissionShouldNotBeFound("reuse.specified=false");
+        defaultViewPermissionFiltering("reuse.specified=true", "reuse.specified=false");
     }
 
     @Test
@@ -1078,11 +913,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where code equals to DEFAULT_CODE
-        defaultViewPermissionShouldBeFound("code.equals=" + DEFAULT_CODE);
-
-        // Get all the viewPermissionList where code equals to UPDATED_CODE
-        defaultViewPermissionShouldNotBeFound("code.equals=" + UPDATED_CODE);
+        // Get all the viewPermissionList where code equals to
+        defaultViewPermissionFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
     }
 
     @Test
@@ -1091,11 +923,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where code in DEFAULT_CODE or UPDATED_CODE
-        defaultViewPermissionShouldBeFound("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE);
-
-        // Get all the viewPermissionList where code equals to UPDATED_CODE
-        defaultViewPermissionShouldNotBeFound("code.in=" + UPDATED_CODE);
+        // Get all the viewPermissionList where code in
+        defaultViewPermissionFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
     }
 
     @Test
@@ -1105,10 +934,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where code is not null
-        defaultViewPermissionShouldBeFound("code.specified=true");
-
-        // Get all the viewPermissionList where code is null
-        defaultViewPermissionShouldNotBeFound("code.specified=false");
+        defaultViewPermissionFiltering("code.specified=true", "code.specified=false");
     }
 
     @Test
@@ -1117,11 +943,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where code contains DEFAULT_CODE
-        defaultViewPermissionShouldBeFound("code.contains=" + DEFAULT_CODE);
-
-        // Get all the viewPermissionList where code contains UPDATED_CODE
-        defaultViewPermissionShouldNotBeFound("code.contains=" + UPDATED_CODE);
+        // Get all the viewPermissionList where code contains
+        defaultViewPermissionFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
     }
 
     @Test
@@ -1130,11 +953,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where code does not contain DEFAULT_CODE
-        defaultViewPermissionShouldNotBeFound("code.doesNotContain=" + DEFAULT_CODE);
-
-        // Get all the viewPermissionList where code does not contain UPDATED_CODE
-        defaultViewPermissionShouldBeFound("code.doesNotContain=" + UPDATED_CODE);
+        // Get all the viewPermissionList where code does not contain
+        defaultViewPermissionFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
     }
 
     @Test
@@ -1143,11 +963,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where description equals to DEFAULT_DESCRIPTION
-        defaultViewPermissionShouldBeFound("description.equals=" + DEFAULT_DESCRIPTION);
-
-        // Get all the viewPermissionList where description equals to UPDATED_DESCRIPTION
-        defaultViewPermissionShouldNotBeFound("description.equals=" + UPDATED_DESCRIPTION);
+        // Get all the viewPermissionList where description equals to
+        defaultViewPermissionFiltering("description.equals=" + DEFAULT_DESCRIPTION, "description.equals=" + UPDATED_DESCRIPTION);
     }
 
     @Test
@@ -1156,11 +973,11 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where description in DEFAULT_DESCRIPTION or UPDATED_DESCRIPTION
-        defaultViewPermissionShouldBeFound("description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION);
-
-        // Get all the viewPermissionList where description equals to UPDATED_DESCRIPTION
-        defaultViewPermissionShouldNotBeFound("description.in=" + UPDATED_DESCRIPTION);
+        // Get all the viewPermissionList where description in
+        defaultViewPermissionFiltering(
+            "description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION,
+            "description.in=" + UPDATED_DESCRIPTION
+        );
     }
 
     @Test
@@ -1170,10 +987,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where description is not null
-        defaultViewPermissionShouldBeFound("description.specified=true");
-
-        // Get all the viewPermissionList where description is null
-        defaultViewPermissionShouldNotBeFound("description.specified=false");
+        defaultViewPermissionFiltering("description.specified=true", "description.specified=false");
     }
 
     @Test
@@ -1182,11 +996,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where description contains DEFAULT_DESCRIPTION
-        defaultViewPermissionShouldBeFound("description.contains=" + DEFAULT_DESCRIPTION);
-
-        // Get all the viewPermissionList where description contains UPDATED_DESCRIPTION
-        defaultViewPermissionShouldNotBeFound("description.contains=" + UPDATED_DESCRIPTION);
+        // Get all the viewPermissionList where description contains
+        defaultViewPermissionFiltering("description.contains=" + DEFAULT_DESCRIPTION, "description.contains=" + UPDATED_DESCRIPTION);
     }
 
     @Test
@@ -1195,11 +1006,11 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where description does not contain DEFAULT_DESCRIPTION
-        defaultViewPermissionShouldNotBeFound("description.doesNotContain=" + DEFAULT_DESCRIPTION);
-
-        // Get all the viewPermissionList where description does not contain UPDATED_DESCRIPTION
-        defaultViewPermissionShouldBeFound("description.doesNotContain=" + UPDATED_DESCRIPTION);
+        // Get all the viewPermissionList where description does not contain
+        defaultViewPermissionFiltering(
+            "description.doesNotContain=" + UPDATED_DESCRIPTION,
+            "description.doesNotContain=" + DEFAULT_DESCRIPTION
+        );
     }
 
     @Test
@@ -1208,11 +1019,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where order equals to DEFAULT_ORDER
-        defaultViewPermissionShouldBeFound("order.equals=" + DEFAULT_ORDER);
-
-        // Get all the viewPermissionList where order equals to UPDATED_ORDER
-        defaultViewPermissionShouldNotBeFound("order.equals=" + UPDATED_ORDER);
+        // Get all the viewPermissionList where order equals to
+        defaultViewPermissionFiltering("order.equals=" + DEFAULT_ORDER, "order.equals=" + UPDATED_ORDER);
     }
 
     @Test
@@ -1221,11 +1029,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where order in DEFAULT_ORDER or UPDATED_ORDER
-        defaultViewPermissionShouldBeFound("order.in=" + DEFAULT_ORDER + "," + UPDATED_ORDER);
-
-        // Get all the viewPermissionList where order equals to UPDATED_ORDER
-        defaultViewPermissionShouldNotBeFound("order.in=" + UPDATED_ORDER);
+        // Get all the viewPermissionList where order in
+        defaultViewPermissionFiltering("order.in=" + DEFAULT_ORDER + "," + UPDATED_ORDER, "order.in=" + UPDATED_ORDER);
     }
 
     @Test
@@ -1235,10 +1040,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where order is not null
-        defaultViewPermissionShouldBeFound("order.specified=true");
-
-        // Get all the viewPermissionList where order is null
-        defaultViewPermissionShouldNotBeFound("order.specified=false");
+        defaultViewPermissionFiltering("order.specified=true", "order.specified=false");
     }
 
     @Test
@@ -1247,11 +1049,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where order is greater than or equal to DEFAULT_ORDER
-        defaultViewPermissionShouldBeFound("order.greaterThanOrEqual=" + DEFAULT_ORDER);
-
-        // Get all the viewPermissionList where order is greater than or equal to UPDATED_ORDER
-        defaultViewPermissionShouldNotBeFound("order.greaterThanOrEqual=" + UPDATED_ORDER);
+        // Get all the viewPermissionList where order is greater than or equal to
+        defaultViewPermissionFiltering("order.greaterThanOrEqual=" + DEFAULT_ORDER, "order.greaterThanOrEqual=" + UPDATED_ORDER);
     }
 
     @Test
@@ -1260,11 +1059,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where order is less than or equal to DEFAULT_ORDER
-        defaultViewPermissionShouldBeFound("order.lessThanOrEqual=" + DEFAULT_ORDER);
-
-        // Get all the viewPermissionList where order is less than or equal to SMALLER_ORDER
-        defaultViewPermissionShouldNotBeFound("order.lessThanOrEqual=" + SMALLER_ORDER);
+        // Get all the viewPermissionList where order is less than or equal to
+        defaultViewPermissionFiltering("order.lessThanOrEqual=" + DEFAULT_ORDER, "order.lessThanOrEqual=" + SMALLER_ORDER);
     }
 
     @Test
@@ -1273,11 +1069,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where order is less than DEFAULT_ORDER
-        defaultViewPermissionShouldNotBeFound("order.lessThan=" + DEFAULT_ORDER);
-
-        // Get all the viewPermissionList where order is less than UPDATED_ORDER
-        defaultViewPermissionShouldBeFound("order.lessThan=" + UPDATED_ORDER);
+        // Get all the viewPermissionList where order is less than
+        defaultViewPermissionFiltering("order.lessThan=" + UPDATED_ORDER, "order.lessThan=" + DEFAULT_ORDER);
     }
 
     @Test
@@ -1286,11 +1079,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where order is greater than DEFAULT_ORDER
-        defaultViewPermissionShouldNotBeFound("order.greaterThan=" + DEFAULT_ORDER);
-
-        // Get all the viewPermissionList where order is greater than SMALLER_ORDER
-        defaultViewPermissionShouldBeFound("order.greaterThan=" + SMALLER_ORDER);
+        // Get all the viewPermissionList where order is greater than
+        defaultViewPermissionFiltering("order.greaterThan=" + SMALLER_ORDER, "order.greaterThan=" + DEFAULT_ORDER);
     }
 
     @Test
@@ -1299,11 +1089,11 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where apiPermissionCodes equals to DEFAULT_API_PERMISSION_CODES
-        defaultViewPermissionShouldBeFound("apiPermissionCodes.equals=" + DEFAULT_API_PERMISSION_CODES);
-
-        // Get all the viewPermissionList where apiPermissionCodes equals to UPDATED_API_PERMISSION_CODES
-        defaultViewPermissionShouldNotBeFound("apiPermissionCodes.equals=" + UPDATED_API_PERMISSION_CODES);
+        // Get all the viewPermissionList where apiPermissionCodes equals to
+        defaultViewPermissionFiltering(
+            "apiPermissionCodes.equals=" + DEFAULT_API_PERMISSION_CODES,
+            "apiPermissionCodes.equals=" + UPDATED_API_PERMISSION_CODES
+        );
     }
 
     @Test
@@ -1312,11 +1102,11 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where apiPermissionCodes in DEFAULT_API_PERMISSION_CODES or UPDATED_API_PERMISSION_CODES
-        defaultViewPermissionShouldBeFound("apiPermissionCodes.in=" + DEFAULT_API_PERMISSION_CODES + "," + UPDATED_API_PERMISSION_CODES);
-
-        // Get all the viewPermissionList where apiPermissionCodes equals to UPDATED_API_PERMISSION_CODES
-        defaultViewPermissionShouldNotBeFound("apiPermissionCodes.in=" + UPDATED_API_PERMISSION_CODES);
+        // Get all the viewPermissionList where apiPermissionCodes in
+        defaultViewPermissionFiltering(
+            "apiPermissionCodes.in=" + DEFAULT_API_PERMISSION_CODES + "," + UPDATED_API_PERMISSION_CODES,
+            "apiPermissionCodes.in=" + UPDATED_API_PERMISSION_CODES
+        );
     }
 
     @Test
@@ -1326,10 +1116,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where apiPermissionCodes is not null
-        defaultViewPermissionShouldBeFound("apiPermissionCodes.specified=true");
-
-        // Get all the viewPermissionList where apiPermissionCodes is null
-        defaultViewPermissionShouldNotBeFound("apiPermissionCodes.specified=false");
+        defaultViewPermissionFiltering("apiPermissionCodes.specified=true", "apiPermissionCodes.specified=false");
     }
 
     @Test
@@ -1338,11 +1125,11 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where apiPermissionCodes contains DEFAULT_API_PERMISSION_CODES
-        defaultViewPermissionShouldBeFound("apiPermissionCodes.contains=" + DEFAULT_API_PERMISSION_CODES);
-
-        // Get all the viewPermissionList where apiPermissionCodes contains UPDATED_API_PERMISSION_CODES
-        defaultViewPermissionShouldNotBeFound("apiPermissionCodes.contains=" + UPDATED_API_PERMISSION_CODES);
+        // Get all the viewPermissionList where apiPermissionCodes contains
+        defaultViewPermissionFiltering(
+            "apiPermissionCodes.contains=" + DEFAULT_API_PERMISSION_CODES,
+            "apiPermissionCodes.contains=" + UPDATED_API_PERMISSION_CODES
+        );
     }
 
     @Test
@@ -1351,11 +1138,11 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where apiPermissionCodes does not contain DEFAULT_API_PERMISSION_CODES
-        defaultViewPermissionShouldNotBeFound("apiPermissionCodes.doesNotContain=" + DEFAULT_API_PERMISSION_CODES);
-
-        // Get all the viewPermissionList where apiPermissionCodes does not contain UPDATED_API_PERMISSION_CODES
-        defaultViewPermissionShouldBeFound("apiPermissionCodes.doesNotContain=" + UPDATED_API_PERMISSION_CODES);
+        // Get all the viewPermissionList where apiPermissionCodes does not contain
+        defaultViewPermissionFiltering(
+            "apiPermissionCodes.doesNotContain=" + UPDATED_API_PERMISSION_CODES,
+            "apiPermissionCodes.doesNotContain=" + DEFAULT_API_PERMISSION_CODES
+        );
     }
 
     @Test
@@ -1364,11 +1151,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where componentFile equals to DEFAULT_COMPONENT_FILE
-        defaultViewPermissionShouldBeFound("componentFile.equals=" + DEFAULT_COMPONENT_FILE);
-
-        // Get all the viewPermissionList where componentFile equals to UPDATED_COMPONENT_FILE
-        defaultViewPermissionShouldNotBeFound("componentFile.equals=" + UPDATED_COMPONENT_FILE);
+        // Get all the viewPermissionList where componentFile equals to
+        defaultViewPermissionFiltering("componentFile.equals=" + DEFAULT_COMPONENT_FILE, "componentFile.equals=" + UPDATED_COMPONENT_FILE);
     }
 
     @Test
@@ -1377,11 +1161,11 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where componentFile in DEFAULT_COMPONENT_FILE or UPDATED_COMPONENT_FILE
-        defaultViewPermissionShouldBeFound("componentFile.in=" + DEFAULT_COMPONENT_FILE + "," + UPDATED_COMPONENT_FILE);
-
-        // Get all the viewPermissionList where componentFile equals to UPDATED_COMPONENT_FILE
-        defaultViewPermissionShouldNotBeFound("componentFile.in=" + UPDATED_COMPONENT_FILE);
+        // Get all the viewPermissionList where componentFile in
+        defaultViewPermissionFiltering(
+            "componentFile.in=" + DEFAULT_COMPONENT_FILE + "," + UPDATED_COMPONENT_FILE,
+            "componentFile.in=" + UPDATED_COMPONENT_FILE
+        );
     }
 
     @Test
@@ -1391,10 +1175,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where componentFile is not null
-        defaultViewPermissionShouldBeFound("componentFile.specified=true");
-
-        // Get all the viewPermissionList where componentFile is null
-        defaultViewPermissionShouldNotBeFound("componentFile.specified=false");
+        defaultViewPermissionFiltering("componentFile.specified=true", "componentFile.specified=false");
     }
 
     @Test
@@ -1403,11 +1184,11 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where componentFile contains DEFAULT_COMPONENT_FILE
-        defaultViewPermissionShouldBeFound("componentFile.contains=" + DEFAULT_COMPONENT_FILE);
-
-        // Get all the viewPermissionList where componentFile contains UPDATED_COMPONENT_FILE
-        defaultViewPermissionShouldNotBeFound("componentFile.contains=" + UPDATED_COMPONENT_FILE);
+        // Get all the viewPermissionList where componentFile contains
+        defaultViewPermissionFiltering(
+            "componentFile.contains=" + DEFAULT_COMPONENT_FILE,
+            "componentFile.contains=" + UPDATED_COMPONENT_FILE
+        );
     }
 
     @Test
@@ -1416,11 +1197,11 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where componentFile does not contain DEFAULT_COMPONENT_FILE
-        defaultViewPermissionShouldNotBeFound("componentFile.doesNotContain=" + DEFAULT_COMPONENT_FILE);
-
-        // Get all the viewPermissionList where componentFile does not contain UPDATED_COMPONENT_FILE
-        defaultViewPermissionShouldBeFound("componentFile.doesNotContain=" + UPDATED_COMPONENT_FILE);
+        // Get all the viewPermissionList where componentFile does not contain
+        defaultViewPermissionFiltering(
+            "componentFile.doesNotContain=" + UPDATED_COMPONENT_FILE,
+            "componentFile.doesNotContain=" + DEFAULT_COMPONENT_FILE
+        );
     }
 
     @Test
@@ -1429,11 +1210,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where redirect equals to DEFAULT_REDIRECT
-        defaultViewPermissionShouldBeFound("redirect.equals=" + DEFAULT_REDIRECT);
-
-        // Get all the viewPermissionList where redirect equals to UPDATED_REDIRECT
-        defaultViewPermissionShouldNotBeFound("redirect.equals=" + UPDATED_REDIRECT);
+        // Get all the viewPermissionList where redirect equals to
+        defaultViewPermissionFiltering("redirect.equals=" + DEFAULT_REDIRECT, "redirect.equals=" + UPDATED_REDIRECT);
     }
 
     @Test
@@ -1442,11 +1220,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where redirect in DEFAULT_REDIRECT or UPDATED_REDIRECT
-        defaultViewPermissionShouldBeFound("redirect.in=" + DEFAULT_REDIRECT + "," + UPDATED_REDIRECT);
-
-        // Get all the viewPermissionList where redirect equals to UPDATED_REDIRECT
-        defaultViewPermissionShouldNotBeFound("redirect.in=" + UPDATED_REDIRECT);
+        // Get all the viewPermissionList where redirect in
+        defaultViewPermissionFiltering("redirect.in=" + DEFAULT_REDIRECT + "," + UPDATED_REDIRECT, "redirect.in=" + UPDATED_REDIRECT);
     }
 
     @Test
@@ -1456,10 +1231,7 @@ public class ViewPermissionResourceIT {
         viewPermissionRepository.save(viewPermission);
 
         // Get all the viewPermissionList where redirect is not null
-        defaultViewPermissionShouldBeFound("redirect.specified=true");
-
-        // Get all the viewPermissionList where redirect is null
-        defaultViewPermissionShouldNotBeFound("redirect.specified=false");
+        defaultViewPermissionFiltering("redirect.specified=true", "redirect.specified=false");
     }
 
     @Test
@@ -1468,11 +1240,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where redirect contains DEFAULT_REDIRECT
-        defaultViewPermissionShouldBeFound("redirect.contains=" + DEFAULT_REDIRECT);
-
-        // Get all the viewPermissionList where redirect contains UPDATED_REDIRECT
-        defaultViewPermissionShouldNotBeFound("redirect.contains=" + UPDATED_REDIRECT);
+        // Get all the viewPermissionList where redirect contains
+        defaultViewPermissionFiltering("redirect.contains=" + DEFAULT_REDIRECT, "redirect.contains=" + UPDATED_REDIRECT);
     }
 
     @Test
@@ -1481,11 +1250,8 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        // Get all the viewPermissionList where redirect does not contain DEFAULT_REDIRECT
-        defaultViewPermissionShouldNotBeFound("redirect.doesNotContain=" + DEFAULT_REDIRECT);
-
-        // Get all the viewPermissionList where redirect does not contain UPDATED_REDIRECT
-        defaultViewPermissionShouldBeFound("redirect.doesNotContain=" + UPDATED_REDIRECT);
+        // Get all the viewPermissionList where redirect does not contain
+        defaultViewPermissionFiltering("redirect.doesNotContain=" + UPDATED_REDIRECT, "redirect.doesNotContain=" + DEFAULT_REDIRECT);
     }
 
     @Test
@@ -1514,6 +1280,11 @@ public class ViewPermissionResourceIT {
 
         // Get all the viewPermissionList where authorities equals to (authoritiesId + 1)
         defaultViewPermissionShouldNotBeFound("authoritiesId.equals=" + (authoritiesId + 1));
+    }
+
+    private void defaultViewPermissionFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultViewPermissionShouldBeFound(shouldBeFound);
+        defaultViewPermissionShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -1586,7 +1357,7 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        int databaseSizeBeforeUpdate = viewPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the viewPermission
         ViewPermission updatedViewPermission = viewPermissionRepository.findById(viewPermission.getId()).orElseThrow();
@@ -1617,40 +1388,19 @@ public class ViewPermissionResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, viewPermissionDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(viewPermissionDTO))
+                    .content(om.writeValueAsBytes(viewPermissionDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the ViewPermission in the database
-        List<ViewPermission> viewPermissionList = viewPermissionRepository.findAll();
-        assertThat(viewPermissionList).hasSize(databaseSizeBeforeUpdate);
-        ViewPermission testViewPermission = viewPermissionList.get(viewPermissionList.size() - 1);
-        assertThat(testViewPermission.getText()).isEqualTo(UPDATED_TEXT);
-        assertThat(testViewPermission.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testViewPermission.getI18n()).isEqualTo(UPDATED_I_18_N);
-        assertThat(testViewPermission.getGroup()).isEqualTo(UPDATED_GROUP);
-        assertThat(testViewPermission.getLink()).isEqualTo(UPDATED_LINK);
-        assertThat(testViewPermission.getExternalLink()).isEqualTo(UPDATED_EXTERNAL_LINK);
-        assertThat(testViewPermission.getTarget()).isEqualTo(UPDATED_TARGET);
-        assertThat(testViewPermission.getIcon()).isEqualTo(UPDATED_ICON);
-        assertThat(testViewPermission.getDisabled()).isEqualTo(UPDATED_DISABLED);
-        assertThat(testViewPermission.getHide()).isEqualTo(UPDATED_HIDE);
-        assertThat(testViewPermission.getHideInBreadcrumb()).isEqualTo(UPDATED_HIDE_IN_BREADCRUMB);
-        assertThat(testViewPermission.getShortcut()).isEqualTo(UPDATED_SHORTCUT);
-        assertThat(testViewPermission.getShortcutRoot()).isEqualTo(UPDATED_SHORTCUT_ROOT);
-        assertThat(testViewPermission.getReuse()).isEqualTo(UPDATED_REUSE);
-        assertThat(testViewPermission.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testViewPermission.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-        assertThat(testViewPermission.getOrder()).isEqualTo(UPDATED_ORDER);
-        assertThat(testViewPermission.getApiPermissionCodes()).isEqualTo(UPDATED_API_PERMISSION_CODES);
-        assertThat(testViewPermission.getComponentFile()).isEqualTo(UPDATED_COMPONENT_FILE);
-        assertThat(testViewPermission.getRedirect()).isEqualTo(UPDATED_REDIRECT);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedViewPermissionToMatchAllProperties(updatedViewPermission);
     }
 
     @Test
     @Transactional
     void putNonExistingViewPermission() throws Exception {
-        int databaseSizeBeforeUpdate = viewPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         viewPermission.setId(longCount.incrementAndGet());
 
         // Create the ViewPermission
@@ -1661,19 +1411,18 @@ public class ViewPermissionResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, viewPermissionDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(viewPermissionDTO))
+                    .content(om.writeValueAsBytes(viewPermissionDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the ViewPermission in the database
-        List<ViewPermission> viewPermissionList = viewPermissionRepository.findAll();
-        assertThat(viewPermissionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchViewPermission() throws Exception {
-        int databaseSizeBeforeUpdate = viewPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         viewPermission.setId(longCount.incrementAndGet());
 
         // Create the ViewPermission
@@ -1684,19 +1433,18 @@ public class ViewPermissionResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(viewPermissionDTO))
+                    .content(om.writeValueAsBytes(viewPermissionDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the ViewPermission in the database
-        List<ViewPermission> viewPermissionList = viewPermissionRepository.findAll();
-        assertThat(viewPermissionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamViewPermission() throws Exception {
-        int databaseSizeBeforeUpdate = viewPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         viewPermission.setId(longCount.incrementAndGet());
 
         // Create the ViewPermission
@@ -1704,14 +1452,11 @@ public class ViewPermissionResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restViewPermissionMockMvc
-            .perform(
-                put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(viewPermissionDTO))
-            )
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(viewPermissionDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the ViewPermission in the database
-        List<ViewPermission> viewPermissionList = viewPermissionRepository.findAll();
-        assertThat(viewPermissionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1720,53 +1465,38 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        int databaseSizeBeforeUpdate = viewPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the viewPermission using partial update
         ViewPermission partialUpdatedViewPermission = new ViewPermission();
         partialUpdatedViewPermission.setId(viewPermission.getId());
 
         partialUpdatedViewPermission
+            .i18n(UPDATED_I_18_N)
             .group(UPDATED_GROUP)
-            .target(UPDATED_TARGET)
+            .externalLink(UPDATED_EXTERNAL_LINK)
             .disabled(UPDATED_DISABLED)
-            .hide(UPDATED_HIDE)
-            .apiPermissionCodes(UPDATED_API_PERMISSION_CODES)
-            .componentFile(UPDATED_COMPONENT_FILE)
-            .redirect(UPDATED_REDIRECT);
+            .hideInBreadcrumb(UPDATED_HIDE_IN_BREADCRUMB)
+            .shortcutRoot(UPDATED_SHORTCUT_ROOT)
+            .code(UPDATED_CODE)
+            .description(UPDATED_DESCRIPTION)
+            .order(UPDATED_ORDER);
 
         restViewPermissionMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedViewPermission.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedViewPermission))
+                    .content(om.writeValueAsBytes(partialUpdatedViewPermission))
             )
             .andExpect(status().isOk());
 
         // Validate the ViewPermission in the database
-        List<ViewPermission> viewPermissionList = viewPermissionRepository.findAll();
-        assertThat(viewPermissionList).hasSize(databaseSizeBeforeUpdate);
-        ViewPermission testViewPermission = viewPermissionList.get(viewPermissionList.size() - 1);
-        assertThat(testViewPermission.getText()).isEqualTo(DEFAULT_TEXT);
-        assertThat(testViewPermission.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testViewPermission.getI18n()).isEqualTo(DEFAULT_I_18_N);
-        assertThat(testViewPermission.getGroup()).isEqualTo(UPDATED_GROUP);
-        assertThat(testViewPermission.getLink()).isEqualTo(DEFAULT_LINK);
-        assertThat(testViewPermission.getExternalLink()).isEqualTo(DEFAULT_EXTERNAL_LINK);
-        assertThat(testViewPermission.getTarget()).isEqualTo(UPDATED_TARGET);
-        assertThat(testViewPermission.getIcon()).isEqualTo(DEFAULT_ICON);
-        assertThat(testViewPermission.getDisabled()).isEqualTo(UPDATED_DISABLED);
-        assertThat(testViewPermission.getHide()).isEqualTo(UPDATED_HIDE);
-        assertThat(testViewPermission.getHideInBreadcrumb()).isEqualTo(DEFAULT_HIDE_IN_BREADCRUMB);
-        assertThat(testViewPermission.getShortcut()).isEqualTo(DEFAULT_SHORTCUT);
-        assertThat(testViewPermission.getShortcutRoot()).isEqualTo(DEFAULT_SHORTCUT_ROOT);
-        assertThat(testViewPermission.getReuse()).isEqualTo(DEFAULT_REUSE);
-        assertThat(testViewPermission.getCode()).isEqualTo(DEFAULT_CODE);
-        assertThat(testViewPermission.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
-        assertThat(testViewPermission.getOrder()).isEqualTo(DEFAULT_ORDER);
-        assertThat(testViewPermission.getApiPermissionCodes()).isEqualTo(UPDATED_API_PERMISSION_CODES);
-        assertThat(testViewPermission.getComponentFile()).isEqualTo(UPDATED_COMPONENT_FILE);
-        assertThat(testViewPermission.getRedirect()).isEqualTo(UPDATED_REDIRECT);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertViewPermissionUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedViewPermission, viewPermission),
+            getPersistedViewPermission(viewPermission)
+        );
     }
 
     @Test
@@ -1775,7 +1505,7 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        int databaseSizeBeforeUpdate = viewPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the viewPermission using partial update
         ViewPermission partialUpdatedViewPermission = new ViewPermission();
@@ -1807,40 +1537,20 @@ public class ViewPermissionResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedViewPermission.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedViewPermission))
+                    .content(om.writeValueAsBytes(partialUpdatedViewPermission))
             )
             .andExpect(status().isOk());
 
         // Validate the ViewPermission in the database
-        List<ViewPermission> viewPermissionList = viewPermissionRepository.findAll();
-        assertThat(viewPermissionList).hasSize(databaseSizeBeforeUpdate);
-        ViewPermission testViewPermission = viewPermissionList.get(viewPermissionList.size() - 1);
-        assertThat(testViewPermission.getText()).isEqualTo(UPDATED_TEXT);
-        assertThat(testViewPermission.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testViewPermission.getI18n()).isEqualTo(UPDATED_I_18_N);
-        assertThat(testViewPermission.getGroup()).isEqualTo(UPDATED_GROUP);
-        assertThat(testViewPermission.getLink()).isEqualTo(UPDATED_LINK);
-        assertThat(testViewPermission.getExternalLink()).isEqualTo(UPDATED_EXTERNAL_LINK);
-        assertThat(testViewPermission.getTarget()).isEqualTo(UPDATED_TARGET);
-        assertThat(testViewPermission.getIcon()).isEqualTo(UPDATED_ICON);
-        assertThat(testViewPermission.getDisabled()).isEqualTo(UPDATED_DISABLED);
-        assertThat(testViewPermission.getHide()).isEqualTo(UPDATED_HIDE);
-        assertThat(testViewPermission.getHideInBreadcrumb()).isEqualTo(UPDATED_HIDE_IN_BREADCRUMB);
-        assertThat(testViewPermission.getShortcut()).isEqualTo(UPDATED_SHORTCUT);
-        assertThat(testViewPermission.getShortcutRoot()).isEqualTo(UPDATED_SHORTCUT_ROOT);
-        assertThat(testViewPermission.getReuse()).isEqualTo(UPDATED_REUSE);
-        assertThat(testViewPermission.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testViewPermission.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-        assertThat(testViewPermission.getOrder()).isEqualTo(UPDATED_ORDER);
-        assertThat(testViewPermission.getApiPermissionCodes()).isEqualTo(UPDATED_API_PERMISSION_CODES);
-        assertThat(testViewPermission.getComponentFile()).isEqualTo(UPDATED_COMPONENT_FILE);
-        assertThat(testViewPermission.getRedirect()).isEqualTo(UPDATED_REDIRECT);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertViewPermissionUpdatableFieldsEquals(partialUpdatedViewPermission, getPersistedViewPermission(partialUpdatedViewPermission));
     }
 
     @Test
     @Transactional
     void patchNonExistingViewPermission() throws Exception {
-        int databaseSizeBeforeUpdate = viewPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         viewPermission.setId(longCount.incrementAndGet());
 
         // Create the ViewPermission
@@ -1851,19 +1561,18 @@ public class ViewPermissionResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, viewPermissionDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(viewPermissionDTO))
+                    .content(om.writeValueAsBytes(viewPermissionDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the ViewPermission in the database
-        List<ViewPermission> viewPermissionList = viewPermissionRepository.findAll();
-        assertThat(viewPermissionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchViewPermission() throws Exception {
-        int databaseSizeBeforeUpdate = viewPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         viewPermission.setId(longCount.incrementAndGet());
 
         // Create the ViewPermission
@@ -1874,19 +1583,18 @@ public class ViewPermissionResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(viewPermissionDTO))
+                    .content(om.writeValueAsBytes(viewPermissionDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the ViewPermission in the database
-        List<ViewPermission> viewPermissionList = viewPermissionRepository.findAll();
-        assertThat(viewPermissionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamViewPermission() throws Exception {
-        int databaseSizeBeforeUpdate = viewPermissionRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         viewPermission.setId(longCount.incrementAndGet());
 
         // Create the ViewPermission
@@ -1894,16 +1602,11 @@ public class ViewPermissionResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restViewPermissionMockMvc
-            .perform(
-                patch(ENTITY_API_URL)
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(viewPermissionDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(viewPermissionDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the ViewPermission in the database
-        List<ViewPermission> viewPermissionList = viewPermissionRepository.findAll();
-        assertThat(viewPermissionList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1912,7 +1615,7 @@ public class ViewPermissionResourceIT {
         // Initialize the database
         viewPermissionRepository.save(viewPermission);
 
-        int databaseSizeBeforeDelete = viewPermissionRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the viewPermission
         restViewPermissionMockMvc
@@ -1920,7 +1623,34 @@ public class ViewPermissionResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<ViewPermission> viewPermissionList = viewPermissionRepository.findAll();
-        assertThat(viewPermissionList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return viewPermissionRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected ViewPermission getPersistedViewPermission(ViewPermission viewPermission) {
+        return viewPermissionRepository.findById(viewPermission.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedViewPermissionToMatchAllProperties(ViewPermission expectedViewPermission) {
+        assertViewPermissionAllPropertiesEquals(expectedViewPermission, getPersistedViewPermission(expectedViewPermission));
+    }
+
+    protected void assertPersistedViewPermissionToMatchUpdatableProperties(ViewPermission expectedViewPermission) {
+        assertViewPermissionAllUpdatablePropertiesEquals(expectedViewPermission, getPersistedViewPermission(expectedViewPermission));
     }
 }

@@ -23,11 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Service Implementation for managing {@link com.begcode.monolith.domain.UReportFile}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class UReportFileBaseService<R extends UReportFileRepository, E extends UReportFile>
     extends BaseServiceImpl<UReportFileRepository, UReportFile> {
 
     private final Logger log = LoggerFactory.getLogger(UReportFileBaseService.class);
-    private final List<String> relationNames = Arrays.asList();
+    private final List<String> relationNames = List.of();
 
     protected final UReportFileRepository uReportFileRepository;
 
@@ -69,11 +70,10 @@ public class UReportFileBaseService<R extends UReportFileRepository, E extends U
     @Transactional(rollbackFor = Exception.class)
     public UReportFileDTO update(UReportFileDTO uReportFileDTO) {
         log.debug("Request to update UReportFile : {}", uReportFileDTO);
-
         UReportFile uReportFile = uReportFileMapper.toEntity(uReportFileDTO);
 
-        uReportFileRepository.updateById(uReportFile);
-        return findOne(uReportFileDTO.getId()).orElseThrow();
+        this.saveOrUpdate(uReportFile);
+        return findOne(uReportFile.getId()).orElseThrow();
     }
 
     /**
@@ -118,8 +118,7 @@ public class UReportFileBaseService<R extends UReportFileRepository, E extends U
      */
     public Optional<UReportFileDTO> findOne(Long id) {
         log.debug("Request to get UReportFile : {}", id);
-        return Optional
-            .ofNullable(uReportFileRepository.selectById(id))
+        return Optional.ofNullable(uReportFileRepository.selectById(id))
             .map(uReportFile -> {
                 Binder.bindRelations(uReportFile);
                 return uReportFile;
@@ -169,23 +168,25 @@ public class UReportFileBaseService<R extends UReportFileRepository, E extends U
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             UpdateWrapper<UReportFile> updateWrapper = new UpdateWrapper<>();
             updateWrapper.in("id", ids);
-            fieldNames.forEach(fieldName ->
-                updateWrapper.set(
-                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
-                    BeanUtil.getFieldValue(changeUReportFileDTO, fieldName)
-                )
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changeUReportFileDTO, fieldName)
+                    )
             );
             this.update(updateWrapper);
         } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
             List<UReportFile> uReportFileList = this.listByIds(ids);
             if (CollectionUtils.isNotEmpty(uReportFileList)) {
                 uReportFileList.forEach(uReportFile -> {
-                    relationshipNames.forEach(relationName ->
-                        BeanUtil.setFieldValue(
-                            uReportFile,
-                            relationName,
-                            BeanUtil.getFieldValue(uReportFileMapper.toEntity(changeUReportFileDTO), relationName)
-                        )
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                uReportFile,
+                                relationName,
+                                BeanUtil.getFieldValue(uReportFileMapper.toEntity(changeUReportFileDTO), relationName)
+                            )
                     );
                     this.createOrUpdateAndRelatedRelations(uReportFile, relationshipNames);
                 });

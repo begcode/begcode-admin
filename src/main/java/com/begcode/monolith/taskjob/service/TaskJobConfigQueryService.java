@@ -74,12 +74,10 @@ public class TaskJobConfigQueryService implements QueryService<TaskJobConfig> {
     public IPage<TaskJobConfigDTO> findByCriteria(TaskJobConfigCriteria criteria, Page<TaskJobConfig> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<TaskJobConfig> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, TaskJobConfig.class, page)
-            .convert(taskJobConfig -> {
-                Binder.bindRelations(taskJobConfig, new String[] {});
-                return taskJobConfigMapper.toDto(taskJobConfig);
-            });
+        return Binder.joinQueryPage(queryWrapper, TaskJobConfig.class, page).convert(taskJobConfig -> {
+            Binder.bindRelations(taskJobConfig, new String[] {});
+            return taskJobConfigMapper.toDto(taskJobConfig);
+        });
     }
 
     /**

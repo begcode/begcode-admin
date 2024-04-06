@@ -28,11 +28,12 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Service Implementation for managing {@link com.begcode.monolith.system.domain.AnnouncementRecord}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class AnnouncementRecordBaseService<R extends AnnouncementRecordRepository, E extends AnnouncementRecord>
     extends BaseServiceImpl<AnnouncementRecordRepository, AnnouncementRecord> {
 
     private final Logger log = LoggerFactory.getLogger(AnnouncementRecordBaseService.class);
-    private final List<String> relationNames = Arrays.asList();
+    private final List<String> relationNames = List.of();
 
     protected final AnnouncementRecordRepository announcementRecordRepository;
 
@@ -74,11 +75,10 @@ public class AnnouncementRecordBaseService<R extends AnnouncementRecordRepositor
     @Transactional(rollbackFor = Exception.class)
     public AnnouncementRecordDTO update(AnnouncementRecordDTO announcementRecordDTO) {
         log.debug("Request to update AnnouncementRecord : {}", announcementRecordDTO);
-
         AnnouncementRecord announcementRecord = announcementRecordMapper.toEntity(announcementRecordDTO);
 
-        announcementRecordRepository.updateById(announcementRecord);
-        return findOne(announcementRecordDTO.getId()).orElseThrow();
+        this.saveOrUpdate(announcementRecord);
+        return findOne(announcementRecord.getId()).orElseThrow();
     }
 
     /**
@@ -123,8 +123,7 @@ public class AnnouncementRecordBaseService<R extends AnnouncementRecordRepositor
      */
     public Optional<AnnouncementRecordDTO> findOne(Long id) {
         log.debug("Request to get AnnouncementRecord : {}", id);
-        return Optional
-            .ofNullable(announcementRecordRepository.selectById(id))
+        return Optional.ofNullable(announcementRecordRepository.selectById(id))
             .map(announcementRecord -> {
                 Binder.bindRelations(announcementRecord);
                 return announcementRecord;
@@ -184,23 +183,25 @@ public class AnnouncementRecordBaseService<R extends AnnouncementRecordRepositor
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             UpdateWrapper<AnnouncementRecord> updateWrapper = new UpdateWrapper<>();
             updateWrapper.in("id", ids);
-            fieldNames.forEach(fieldName ->
-                updateWrapper.set(
-                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
-                    BeanUtil.getFieldValue(changeAnnouncementRecordDTO, fieldName)
-                )
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changeAnnouncementRecordDTO, fieldName)
+                    )
             );
             this.update(updateWrapper);
         } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
             List<AnnouncementRecord> announcementRecordList = this.listByIds(ids);
             if (CollectionUtils.isNotEmpty(announcementRecordList)) {
                 announcementRecordList.forEach(announcementRecord -> {
-                    relationshipNames.forEach(relationName ->
-                        BeanUtil.setFieldValue(
-                            announcementRecord,
-                            relationName,
-                            BeanUtil.getFieldValue(announcementRecordMapper.toEntity(changeAnnouncementRecordDTO), relationName)
-                        )
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                announcementRecord,
+                                relationName,
+                                BeanUtil.getFieldValue(announcementRecordMapper.toEntity(changeAnnouncementRecordDTO), relationName)
+                            )
                     );
                     this.createOrUpdateAndRelatedRelations(announcementRecord, relationshipNames);
                 });

@@ -1,5 +1,7 @@
 package com.begcode.monolith.settings.web.rest;
 
+import static com.begcode.monolith.settings.domain.SysFillRuleAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static com.begcode.monolith.web.rest.TestUtil.sameInstant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -13,14 +15,12 @@ import com.begcode.monolith.settings.domain.SysFillRule;
 import com.begcode.monolith.settings.repository.SysFillRuleRepository;
 import com.begcode.monolith.settings.service.dto.SysFillRuleDTO;
 import com.begcode.monolith.settings.service.mapper.SysFillRuleMapper;
-import com.begcode.monolith.web.rest.TestUtil;
-import com.begcode.monolith.web.rest.TestUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,8 +81,11 @@ public class SysFillRuleResourceIT {
     private static final String ENTITY_API_URL = "/api/sys-fill-rules";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private SysFillRuleRepository sysFillRuleRepository;
@@ -149,31 +152,23 @@ public class SysFillRuleResourceIT {
     @Test
     @Transactional
     void createSysFillRule() throws Exception {
-        int databaseSizeBeforeCreate = sysFillRuleRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the SysFillRule
         SysFillRuleDTO sysFillRuleDTO = sysFillRuleMapper.toDto(sysFillRule);
-        restSysFillRuleMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(sysFillRuleDTO))
-            )
-            .andExpect(status().isCreated());
+        var returnedSysFillRuleDTO = om.readValue(
+            restSysFillRuleMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(sysFillRuleDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            SysFillRuleDTO.class
+        );
 
         // Validate the SysFillRule in the database
-        List<SysFillRule> sysFillRuleList = sysFillRuleRepository.findAll();
-        assertThat(sysFillRuleList).hasSize(databaseSizeBeforeCreate + 1);
-        SysFillRule testSysFillRule = sysFillRuleList.get(sysFillRuleList.size() - 1);
-        assertThat(testSysFillRule.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testSysFillRule.getCode()).isEqualTo(DEFAULT_CODE);
-        assertThat(testSysFillRule.getDesc()).isEqualTo(DEFAULT_DESC);
-        assertThat(testSysFillRule.getEnabled()).isEqualTo(DEFAULT_ENABLED);
-        assertThat(testSysFillRule.getResetFrequency()).isEqualTo(DEFAULT_RESET_FREQUENCY);
-        assertThat(testSysFillRule.getSeqValue()).isEqualTo(DEFAULT_SEQ_VALUE);
-        assertThat(testSysFillRule.getFillValue()).isEqualTo(DEFAULT_FILL_VALUE);
-        assertThat(testSysFillRule.getImplClass()).isEqualTo(DEFAULT_IMPL_CLASS);
-        assertThat(testSysFillRule.getParams()).isEqualTo(DEFAULT_PARAMS);
-        assertThat(testSysFillRule.getResetStartTime()).isEqualTo(DEFAULT_RESET_START_TIME);
-        assertThat(testSysFillRule.getResetEndTime()).isEqualTo(DEFAULT_RESET_END_TIME);
-        assertThat(testSysFillRule.getResetTime()).isEqualTo(DEFAULT_RESET_TIME);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedSysFillRule = sysFillRuleMapper.toEntity(returnedSysFillRuleDTO);
+        assertSysFillRuleUpdatableFieldsEquals(returnedSysFillRule, getPersistedSysFillRule(returnedSysFillRule));
     }
 
     @Test
@@ -183,18 +178,15 @@ public class SysFillRuleResourceIT {
         sysFillRule.setId(1L);
         SysFillRuleDTO sysFillRuleDTO = sysFillRuleMapper.toDto(sysFillRule);
 
-        int databaseSizeBeforeCreate = sysFillRuleRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restSysFillRuleMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(sysFillRuleDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(sysFillRuleDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the SysFillRule in the database
-        List<SysFillRule> sysFillRuleList = sysFillRuleRepository.findAll();
-        assertThat(sysFillRuleList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
@@ -257,14 +249,11 @@ public class SysFillRuleResourceIT {
 
         Long id = sysFillRule.getId();
 
-        defaultSysFillRuleShouldBeFound("id.equals=" + id);
-        defaultSysFillRuleShouldNotBeFound("id.notEquals=" + id);
+        defaultSysFillRuleFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultSysFillRuleShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultSysFillRuleShouldNotBeFound("id.greaterThan=" + id);
+        defaultSysFillRuleFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultSysFillRuleShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultSysFillRuleShouldNotBeFound("id.lessThan=" + id);
+        defaultSysFillRuleFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -273,11 +262,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where name equals to DEFAULT_NAME
-        defaultSysFillRuleShouldBeFound("name.equals=" + DEFAULT_NAME);
-
-        // Get all the sysFillRuleList where name equals to UPDATED_NAME
-        defaultSysFillRuleShouldNotBeFound("name.equals=" + UPDATED_NAME);
+        // Get all the sysFillRuleList where name equals to
+        defaultSysFillRuleFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
     }
 
     @Test
@@ -286,11 +272,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where name in DEFAULT_NAME or UPDATED_NAME
-        defaultSysFillRuleShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
-
-        // Get all the sysFillRuleList where name equals to UPDATED_NAME
-        defaultSysFillRuleShouldNotBeFound("name.in=" + UPDATED_NAME);
+        // Get all the sysFillRuleList where name in
+        defaultSysFillRuleFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
     }
 
     @Test
@@ -300,10 +283,7 @@ public class SysFillRuleResourceIT {
         sysFillRuleRepository.save(sysFillRule);
 
         // Get all the sysFillRuleList where name is not null
-        defaultSysFillRuleShouldBeFound("name.specified=true");
-
-        // Get all the sysFillRuleList where name is null
-        defaultSysFillRuleShouldNotBeFound("name.specified=false");
+        defaultSysFillRuleFiltering("name.specified=true", "name.specified=false");
     }
 
     @Test
@@ -312,11 +292,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where name contains DEFAULT_NAME
-        defaultSysFillRuleShouldBeFound("name.contains=" + DEFAULT_NAME);
-
-        // Get all the sysFillRuleList where name contains UPDATED_NAME
-        defaultSysFillRuleShouldNotBeFound("name.contains=" + UPDATED_NAME);
+        // Get all the sysFillRuleList where name contains
+        defaultSysFillRuleFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
     }
 
     @Test
@@ -325,11 +302,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where name does not contain DEFAULT_NAME
-        defaultSysFillRuleShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
-
-        // Get all the sysFillRuleList where name does not contain UPDATED_NAME
-        defaultSysFillRuleShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+        // Get all the sysFillRuleList where name does not contain
+        defaultSysFillRuleFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
     }
 
     @Test
@@ -338,11 +312,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where code equals to DEFAULT_CODE
-        defaultSysFillRuleShouldBeFound("code.equals=" + DEFAULT_CODE);
-
-        // Get all the sysFillRuleList where code equals to UPDATED_CODE
-        defaultSysFillRuleShouldNotBeFound("code.equals=" + UPDATED_CODE);
+        // Get all the sysFillRuleList where code equals to
+        defaultSysFillRuleFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
     }
 
     @Test
@@ -351,11 +322,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where code in DEFAULT_CODE or UPDATED_CODE
-        defaultSysFillRuleShouldBeFound("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE);
-
-        // Get all the sysFillRuleList where code equals to UPDATED_CODE
-        defaultSysFillRuleShouldNotBeFound("code.in=" + UPDATED_CODE);
+        // Get all the sysFillRuleList where code in
+        defaultSysFillRuleFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
     }
 
     @Test
@@ -365,10 +333,7 @@ public class SysFillRuleResourceIT {
         sysFillRuleRepository.save(sysFillRule);
 
         // Get all the sysFillRuleList where code is not null
-        defaultSysFillRuleShouldBeFound("code.specified=true");
-
-        // Get all the sysFillRuleList where code is null
-        defaultSysFillRuleShouldNotBeFound("code.specified=false");
+        defaultSysFillRuleFiltering("code.specified=true", "code.specified=false");
     }
 
     @Test
@@ -377,11 +342,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where code contains DEFAULT_CODE
-        defaultSysFillRuleShouldBeFound("code.contains=" + DEFAULT_CODE);
-
-        // Get all the sysFillRuleList where code contains UPDATED_CODE
-        defaultSysFillRuleShouldNotBeFound("code.contains=" + UPDATED_CODE);
+        // Get all the sysFillRuleList where code contains
+        defaultSysFillRuleFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
     }
 
     @Test
@@ -390,11 +352,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where code does not contain DEFAULT_CODE
-        defaultSysFillRuleShouldNotBeFound("code.doesNotContain=" + DEFAULT_CODE);
-
-        // Get all the sysFillRuleList where code does not contain UPDATED_CODE
-        defaultSysFillRuleShouldBeFound("code.doesNotContain=" + UPDATED_CODE);
+        // Get all the sysFillRuleList where code does not contain
+        defaultSysFillRuleFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
     }
 
     @Test
@@ -403,11 +362,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where desc equals to DEFAULT_DESC
-        defaultSysFillRuleShouldBeFound("desc.equals=" + DEFAULT_DESC);
-
-        // Get all the sysFillRuleList where desc equals to UPDATED_DESC
-        defaultSysFillRuleShouldNotBeFound("desc.equals=" + UPDATED_DESC);
+        // Get all the sysFillRuleList where desc equals to
+        defaultSysFillRuleFiltering("desc.equals=" + DEFAULT_DESC, "desc.equals=" + UPDATED_DESC);
     }
 
     @Test
@@ -416,11 +372,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where desc in DEFAULT_DESC or UPDATED_DESC
-        defaultSysFillRuleShouldBeFound("desc.in=" + DEFAULT_DESC + "," + UPDATED_DESC);
-
-        // Get all the sysFillRuleList where desc equals to UPDATED_DESC
-        defaultSysFillRuleShouldNotBeFound("desc.in=" + UPDATED_DESC);
+        // Get all the sysFillRuleList where desc in
+        defaultSysFillRuleFiltering("desc.in=" + DEFAULT_DESC + "," + UPDATED_DESC, "desc.in=" + UPDATED_DESC);
     }
 
     @Test
@@ -430,10 +383,7 @@ public class SysFillRuleResourceIT {
         sysFillRuleRepository.save(sysFillRule);
 
         // Get all the sysFillRuleList where desc is not null
-        defaultSysFillRuleShouldBeFound("desc.specified=true");
-
-        // Get all the sysFillRuleList where desc is null
-        defaultSysFillRuleShouldNotBeFound("desc.specified=false");
+        defaultSysFillRuleFiltering("desc.specified=true", "desc.specified=false");
     }
 
     @Test
@@ -442,11 +392,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where desc contains DEFAULT_DESC
-        defaultSysFillRuleShouldBeFound("desc.contains=" + DEFAULT_DESC);
-
-        // Get all the sysFillRuleList where desc contains UPDATED_DESC
-        defaultSysFillRuleShouldNotBeFound("desc.contains=" + UPDATED_DESC);
+        // Get all the sysFillRuleList where desc contains
+        defaultSysFillRuleFiltering("desc.contains=" + DEFAULT_DESC, "desc.contains=" + UPDATED_DESC);
     }
 
     @Test
@@ -455,11 +402,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where desc does not contain DEFAULT_DESC
-        defaultSysFillRuleShouldNotBeFound("desc.doesNotContain=" + DEFAULT_DESC);
-
-        // Get all the sysFillRuleList where desc does not contain UPDATED_DESC
-        defaultSysFillRuleShouldBeFound("desc.doesNotContain=" + UPDATED_DESC);
+        // Get all the sysFillRuleList where desc does not contain
+        defaultSysFillRuleFiltering("desc.doesNotContain=" + UPDATED_DESC, "desc.doesNotContain=" + DEFAULT_DESC);
     }
 
     @Test
@@ -468,11 +412,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where enabled equals to DEFAULT_ENABLED
-        defaultSysFillRuleShouldBeFound("enabled.equals=" + DEFAULT_ENABLED);
-
-        // Get all the sysFillRuleList where enabled equals to UPDATED_ENABLED
-        defaultSysFillRuleShouldNotBeFound("enabled.equals=" + UPDATED_ENABLED);
+        // Get all the sysFillRuleList where enabled equals to
+        defaultSysFillRuleFiltering("enabled.equals=" + DEFAULT_ENABLED, "enabled.equals=" + UPDATED_ENABLED);
     }
 
     @Test
@@ -481,11 +422,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where enabled in DEFAULT_ENABLED or UPDATED_ENABLED
-        defaultSysFillRuleShouldBeFound("enabled.in=" + DEFAULT_ENABLED + "," + UPDATED_ENABLED);
-
-        // Get all the sysFillRuleList where enabled equals to UPDATED_ENABLED
-        defaultSysFillRuleShouldNotBeFound("enabled.in=" + UPDATED_ENABLED);
+        // Get all the sysFillRuleList where enabled in
+        defaultSysFillRuleFiltering("enabled.in=" + DEFAULT_ENABLED + "," + UPDATED_ENABLED, "enabled.in=" + UPDATED_ENABLED);
     }
 
     @Test
@@ -495,10 +433,7 @@ public class SysFillRuleResourceIT {
         sysFillRuleRepository.save(sysFillRule);
 
         // Get all the sysFillRuleList where enabled is not null
-        defaultSysFillRuleShouldBeFound("enabled.specified=true");
-
-        // Get all the sysFillRuleList where enabled is null
-        defaultSysFillRuleShouldNotBeFound("enabled.specified=false");
+        defaultSysFillRuleFiltering("enabled.specified=true", "enabled.specified=false");
     }
 
     @Test
@@ -507,11 +442,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetFrequency equals to DEFAULT_RESET_FREQUENCY
-        defaultSysFillRuleShouldBeFound("resetFrequency.equals=" + DEFAULT_RESET_FREQUENCY);
-
-        // Get all the sysFillRuleList where resetFrequency equals to UPDATED_RESET_FREQUENCY
-        defaultSysFillRuleShouldNotBeFound("resetFrequency.equals=" + UPDATED_RESET_FREQUENCY);
+        // Get all the sysFillRuleList where resetFrequency equals to
+        defaultSysFillRuleFiltering("resetFrequency.equals=" + DEFAULT_RESET_FREQUENCY, "resetFrequency.equals=" + UPDATED_RESET_FREQUENCY);
     }
 
     @Test
@@ -520,11 +452,11 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetFrequency in DEFAULT_RESET_FREQUENCY or UPDATED_RESET_FREQUENCY
-        defaultSysFillRuleShouldBeFound("resetFrequency.in=" + DEFAULT_RESET_FREQUENCY + "," + UPDATED_RESET_FREQUENCY);
-
-        // Get all the sysFillRuleList where resetFrequency equals to UPDATED_RESET_FREQUENCY
-        defaultSysFillRuleShouldNotBeFound("resetFrequency.in=" + UPDATED_RESET_FREQUENCY);
+        // Get all the sysFillRuleList where resetFrequency in
+        defaultSysFillRuleFiltering(
+            "resetFrequency.in=" + DEFAULT_RESET_FREQUENCY + "," + UPDATED_RESET_FREQUENCY,
+            "resetFrequency.in=" + UPDATED_RESET_FREQUENCY
+        );
     }
 
     @Test
@@ -534,10 +466,7 @@ public class SysFillRuleResourceIT {
         sysFillRuleRepository.save(sysFillRule);
 
         // Get all the sysFillRuleList where resetFrequency is not null
-        defaultSysFillRuleShouldBeFound("resetFrequency.specified=true");
-
-        // Get all the sysFillRuleList where resetFrequency is null
-        defaultSysFillRuleShouldNotBeFound("resetFrequency.specified=false");
+        defaultSysFillRuleFiltering("resetFrequency.specified=true", "resetFrequency.specified=false");
     }
 
     @Test
@@ -546,11 +475,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where seqValue equals to DEFAULT_SEQ_VALUE
-        defaultSysFillRuleShouldBeFound("seqValue.equals=" + DEFAULT_SEQ_VALUE);
-
-        // Get all the sysFillRuleList where seqValue equals to UPDATED_SEQ_VALUE
-        defaultSysFillRuleShouldNotBeFound("seqValue.equals=" + UPDATED_SEQ_VALUE);
+        // Get all the sysFillRuleList where seqValue equals to
+        defaultSysFillRuleFiltering("seqValue.equals=" + DEFAULT_SEQ_VALUE, "seqValue.equals=" + UPDATED_SEQ_VALUE);
     }
 
     @Test
@@ -559,11 +485,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where seqValue in DEFAULT_SEQ_VALUE or UPDATED_SEQ_VALUE
-        defaultSysFillRuleShouldBeFound("seqValue.in=" + DEFAULT_SEQ_VALUE + "," + UPDATED_SEQ_VALUE);
-
-        // Get all the sysFillRuleList where seqValue equals to UPDATED_SEQ_VALUE
-        defaultSysFillRuleShouldNotBeFound("seqValue.in=" + UPDATED_SEQ_VALUE);
+        // Get all the sysFillRuleList where seqValue in
+        defaultSysFillRuleFiltering("seqValue.in=" + DEFAULT_SEQ_VALUE + "," + UPDATED_SEQ_VALUE, "seqValue.in=" + UPDATED_SEQ_VALUE);
     }
 
     @Test
@@ -573,10 +496,7 @@ public class SysFillRuleResourceIT {
         sysFillRuleRepository.save(sysFillRule);
 
         // Get all the sysFillRuleList where seqValue is not null
-        defaultSysFillRuleShouldBeFound("seqValue.specified=true");
-
-        // Get all the sysFillRuleList where seqValue is null
-        defaultSysFillRuleShouldNotBeFound("seqValue.specified=false");
+        defaultSysFillRuleFiltering("seqValue.specified=true", "seqValue.specified=false");
     }
 
     @Test
@@ -585,11 +505,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where seqValue is greater than or equal to DEFAULT_SEQ_VALUE
-        defaultSysFillRuleShouldBeFound("seqValue.greaterThanOrEqual=" + DEFAULT_SEQ_VALUE);
-
-        // Get all the sysFillRuleList where seqValue is greater than or equal to UPDATED_SEQ_VALUE
-        defaultSysFillRuleShouldNotBeFound("seqValue.greaterThanOrEqual=" + UPDATED_SEQ_VALUE);
+        // Get all the sysFillRuleList where seqValue is greater than or equal to
+        defaultSysFillRuleFiltering("seqValue.greaterThanOrEqual=" + DEFAULT_SEQ_VALUE, "seqValue.greaterThanOrEqual=" + UPDATED_SEQ_VALUE);
     }
 
     @Test
@@ -598,11 +515,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where seqValue is less than or equal to DEFAULT_SEQ_VALUE
-        defaultSysFillRuleShouldBeFound("seqValue.lessThanOrEqual=" + DEFAULT_SEQ_VALUE);
-
-        // Get all the sysFillRuleList where seqValue is less than or equal to SMALLER_SEQ_VALUE
-        defaultSysFillRuleShouldNotBeFound("seqValue.lessThanOrEqual=" + SMALLER_SEQ_VALUE);
+        // Get all the sysFillRuleList where seqValue is less than or equal to
+        defaultSysFillRuleFiltering("seqValue.lessThanOrEqual=" + DEFAULT_SEQ_VALUE, "seqValue.lessThanOrEqual=" + SMALLER_SEQ_VALUE);
     }
 
     @Test
@@ -611,11 +525,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where seqValue is less than DEFAULT_SEQ_VALUE
-        defaultSysFillRuleShouldNotBeFound("seqValue.lessThan=" + DEFAULT_SEQ_VALUE);
-
-        // Get all the sysFillRuleList where seqValue is less than UPDATED_SEQ_VALUE
-        defaultSysFillRuleShouldBeFound("seqValue.lessThan=" + UPDATED_SEQ_VALUE);
+        // Get all the sysFillRuleList where seqValue is less than
+        defaultSysFillRuleFiltering("seqValue.lessThan=" + UPDATED_SEQ_VALUE, "seqValue.lessThan=" + DEFAULT_SEQ_VALUE);
     }
 
     @Test
@@ -624,11 +535,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where seqValue is greater than DEFAULT_SEQ_VALUE
-        defaultSysFillRuleShouldNotBeFound("seqValue.greaterThan=" + DEFAULT_SEQ_VALUE);
-
-        // Get all the sysFillRuleList where seqValue is greater than SMALLER_SEQ_VALUE
-        defaultSysFillRuleShouldBeFound("seqValue.greaterThan=" + SMALLER_SEQ_VALUE);
+        // Get all the sysFillRuleList where seqValue is greater than
+        defaultSysFillRuleFiltering("seqValue.greaterThan=" + SMALLER_SEQ_VALUE, "seqValue.greaterThan=" + DEFAULT_SEQ_VALUE);
     }
 
     @Test
@@ -637,11 +545,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where fillValue equals to DEFAULT_FILL_VALUE
-        defaultSysFillRuleShouldBeFound("fillValue.equals=" + DEFAULT_FILL_VALUE);
-
-        // Get all the sysFillRuleList where fillValue equals to UPDATED_FILL_VALUE
-        defaultSysFillRuleShouldNotBeFound("fillValue.equals=" + UPDATED_FILL_VALUE);
+        // Get all the sysFillRuleList where fillValue equals to
+        defaultSysFillRuleFiltering("fillValue.equals=" + DEFAULT_FILL_VALUE, "fillValue.equals=" + UPDATED_FILL_VALUE);
     }
 
     @Test
@@ -650,11 +555,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where fillValue in DEFAULT_FILL_VALUE or UPDATED_FILL_VALUE
-        defaultSysFillRuleShouldBeFound("fillValue.in=" + DEFAULT_FILL_VALUE + "," + UPDATED_FILL_VALUE);
-
-        // Get all the sysFillRuleList where fillValue equals to UPDATED_FILL_VALUE
-        defaultSysFillRuleShouldNotBeFound("fillValue.in=" + UPDATED_FILL_VALUE);
+        // Get all the sysFillRuleList where fillValue in
+        defaultSysFillRuleFiltering("fillValue.in=" + DEFAULT_FILL_VALUE + "," + UPDATED_FILL_VALUE, "fillValue.in=" + UPDATED_FILL_VALUE);
     }
 
     @Test
@@ -664,10 +566,7 @@ public class SysFillRuleResourceIT {
         sysFillRuleRepository.save(sysFillRule);
 
         // Get all the sysFillRuleList where fillValue is not null
-        defaultSysFillRuleShouldBeFound("fillValue.specified=true");
-
-        // Get all the sysFillRuleList where fillValue is null
-        defaultSysFillRuleShouldNotBeFound("fillValue.specified=false");
+        defaultSysFillRuleFiltering("fillValue.specified=true", "fillValue.specified=false");
     }
 
     @Test
@@ -676,11 +575,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where fillValue contains DEFAULT_FILL_VALUE
-        defaultSysFillRuleShouldBeFound("fillValue.contains=" + DEFAULT_FILL_VALUE);
-
-        // Get all the sysFillRuleList where fillValue contains UPDATED_FILL_VALUE
-        defaultSysFillRuleShouldNotBeFound("fillValue.contains=" + UPDATED_FILL_VALUE);
+        // Get all the sysFillRuleList where fillValue contains
+        defaultSysFillRuleFiltering("fillValue.contains=" + DEFAULT_FILL_VALUE, "fillValue.contains=" + UPDATED_FILL_VALUE);
     }
 
     @Test
@@ -689,11 +585,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where fillValue does not contain DEFAULT_FILL_VALUE
-        defaultSysFillRuleShouldNotBeFound("fillValue.doesNotContain=" + DEFAULT_FILL_VALUE);
-
-        // Get all the sysFillRuleList where fillValue does not contain UPDATED_FILL_VALUE
-        defaultSysFillRuleShouldBeFound("fillValue.doesNotContain=" + UPDATED_FILL_VALUE);
+        // Get all the sysFillRuleList where fillValue does not contain
+        defaultSysFillRuleFiltering("fillValue.doesNotContain=" + UPDATED_FILL_VALUE, "fillValue.doesNotContain=" + DEFAULT_FILL_VALUE);
     }
 
     @Test
@@ -702,11 +595,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where implClass equals to DEFAULT_IMPL_CLASS
-        defaultSysFillRuleShouldBeFound("implClass.equals=" + DEFAULT_IMPL_CLASS);
-
-        // Get all the sysFillRuleList where implClass equals to UPDATED_IMPL_CLASS
-        defaultSysFillRuleShouldNotBeFound("implClass.equals=" + UPDATED_IMPL_CLASS);
+        // Get all the sysFillRuleList where implClass equals to
+        defaultSysFillRuleFiltering("implClass.equals=" + DEFAULT_IMPL_CLASS, "implClass.equals=" + UPDATED_IMPL_CLASS);
     }
 
     @Test
@@ -715,11 +605,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where implClass in DEFAULT_IMPL_CLASS or UPDATED_IMPL_CLASS
-        defaultSysFillRuleShouldBeFound("implClass.in=" + DEFAULT_IMPL_CLASS + "," + UPDATED_IMPL_CLASS);
-
-        // Get all the sysFillRuleList where implClass equals to UPDATED_IMPL_CLASS
-        defaultSysFillRuleShouldNotBeFound("implClass.in=" + UPDATED_IMPL_CLASS);
+        // Get all the sysFillRuleList where implClass in
+        defaultSysFillRuleFiltering("implClass.in=" + DEFAULT_IMPL_CLASS + "," + UPDATED_IMPL_CLASS, "implClass.in=" + UPDATED_IMPL_CLASS);
     }
 
     @Test
@@ -729,10 +616,7 @@ public class SysFillRuleResourceIT {
         sysFillRuleRepository.save(sysFillRule);
 
         // Get all the sysFillRuleList where implClass is not null
-        defaultSysFillRuleShouldBeFound("implClass.specified=true");
-
-        // Get all the sysFillRuleList where implClass is null
-        defaultSysFillRuleShouldNotBeFound("implClass.specified=false");
+        defaultSysFillRuleFiltering("implClass.specified=true", "implClass.specified=false");
     }
 
     @Test
@@ -741,11 +625,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where implClass contains DEFAULT_IMPL_CLASS
-        defaultSysFillRuleShouldBeFound("implClass.contains=" + DEFAULT_IMPL_CLASS);
-
-        // Get all the sysFillRuleList where implClass contains UPDATED_IMPL_CLASS
-        defaultSysFillRuleShouldNotBeFound("implClass.contains=" + UPDATED_IMPL_CLASS);
+        // Get all the sysFillRuleList where implClass contains
+        defaultSysFillRuleFiltering("implClass.contains=" + DEFAULT_IMPL_CLASS, "implClass.contains=" + UPDATED_IMPL_CLASS);
     }
 
     @Test
@@ -754,11 +635,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where implClass does not contain DEFAULT_IMPL_CLASS
-        defaultSysFillRuleShouldNotBeFound("implClass.doesNotContain=" + DEFAULT_IMPL_CLASS);
-
-        // Get all the sysFillRuleList where implClass does not contain UPDATED_IMPL_CLASS
-        defaultSysFillRuleShouldBeFound("implClass.doesNotContain=" + UPDATED_IMPL_CLASS);
+        // Get all the sysFillRuleList where implClass does not contain
+        defaultSysFillRuleFiltering("implClass.doesNotContain=" + UPDATED_IMPL_CLASS, "implClass.doesNotContain=" + DEFAULT_IMPL_CLASS);
     }
 
     @Test
@@ -767,11 +645,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where params equals to DEFAULT_PARAMS
-        defaultSysFillRuleShouldBeFound("params.equals=" + DEFAULT_PARAMS);
-
-        // Get all the sysFillRuleList where params equals to UPDATED_PARAMS
-        defaultSysFillRuleShouldNotBeFound("params.equals=" + UPDATED_PARAMS);
+        // Get all the sysFillRuleList where params equals to
+        defaultSysFillRuleFiltering("params.equals=" + DEFAULT_PARAMS, "params.equals=" + UPDATED_PARAMS);
     }
 
     @Test
@@ -780,11 +655,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where params in DEFAULT_PARAMS or UPDATED_PARAMS
-        defaultSysFillRuleShouldBeFound("params.in=" + DEFAULT_PARAMS + "," + UPDATED_PARAMS);
-
-        // Get all the sysFillRuleList where params equals to UPDATED_PARAMS
-        defaultSysFillRuleShouldNotBeFound("params.in=" + UPDATED_PARAMS);
+        // Get all the sysFillRuleList where params in
+        defaultSysFillRuleFiltering("params.in=" + DEFAULT_PARAMS + "," + UPDATED_PARAMS, "params.in=" + UPDATED_PARAMS);
     }
 
     @Test
@@ -794,10 +666,7 @@ public class SysFillRuleResourceIT {
         sysFillRuleRepository.save(sysFillRule);
 
         // Get all the sysFillRuleList where params is not null
-        defaultSysFillRuleShouldBeFound("params.specified=true");
-
-        // Get all the sysFillRuleList where params is null
-        defaultSysFillRuleShouldNotBeFound("params.specified=false");
+        defaultSysFillRuleFiltering("params.specified=true", "params.specified=false");
     }
 
     @Test
@@ -806,11 +675,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where params contains DEFAULT_PARAMS
-        defaultSysFillRuleShouldBeFound("params.contains=" + DEFAULT_PARAMS);
-
-        // Get all the sysFillRuleList where params contains UPDATED_PARAMS
-        defaultSysFillRuleShouldNotBeFound("params.contains=" + UPDATED_PARAMS);
+        // Get all the sysFillRuleList where params contains
+        defaultSysFillRuleFiltering("params.contains=" + DEFAULT_PARAMS, "params.contains=" + UPDATED_PARAMS);
     }
 
     @Test
@@ -819,11 +685,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where params does not contain DEFAULT_PARAMS
-        defaultSysFillRuleShouldNotBeFound("params.doesNotContain=" + DEFAULT_PARAMS);
-
-        // Get all the sysFillRuleList where params does not contain UPDATED_PARAMS
-        defaultSysFillRuleShouldBeFound("params.doesNotContain=" + UPDATED_PARAMS);
+        // Get all the sysFillRuleList where params does not contain
+        defaultSysFillRuleFiltering("params.doesNotContain=" + UPDATED_PARAMS, "params.doesNotContain=" + DEFAULT_PARAMS);
     }
 
     @Test
@@ -832,11 +695,11 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetStartTime equals to DEFAULT_RESET_START_TIME
-        defaultSysFillRuleShouldBeFound("resetStartTime.equals=" + DEFAULT_RESET_START_TIME);
-
-        // Get all the sysFillRuleList where resetStartTime equals to UPDATED_RESET_START_TIME
-        defaultSysFillRuleShouldNotBeFound("resetStartTime.equals=" + UPDATED_RESET_START_TIME);
+        // Get all the sysFillRuleList where resetStartTime equals to
+        defaultSysFillRuleFiltering(
+            "resetStartTime.equals=" + DEFAULT_RESET_START_TIME,
+            "resetStartTime.equals=" + UPDATED_RESET_START_TIME
+        );
     }
 
     @Test
@@ -845,11 +708,11 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetStartTime in DEFAULT_RESET_START_TIME or UPDATED_RESET_START_TIME
-        defaultSysFillRuleShouldBeFound("resetStartTime.in=" + DEFAULT_RESET_START_TIME + "," + UPDATED_RESET_START_TIME);
-
-        // Get all the sysFillRuleList where resetStartTime equals to UPDATED_RESET_START_TIME
-        defaultSysFillRuleShouldNotBeFound("resetStartTime.in=" + UPDATED_RESET_START_TIME);
+        // Get all the sysFillRuleList where resetStartTime in
+        defaultSysFillRuleFiltering(
+            "resetStartTime.in=" + DEFAULT_RESET_START_TIME + "," + UPDATED_RESET_START_TIME,
+            "resetStartTime.in=" + UPDATED_RESET_START_TIME
+        );
     }
 
     @Test
@@ -859,10 +722,7 @@ public class SysFillRuleResourceIT {
         sysFillRuleRepository.save(sysFillRule);
 
         // Get all the sysFillRuleList where resetStartTime is not null
-        defaultSysFillRuleShouldBeFound("resetStartTime.specified=true");
-
-        // Get all the sysFillRuleList where resetStartTime is null
-        defaultSysFillRuleShouldNotBeFound("resetStartTime.specified=false");
+        defaultSysFillRuleFiltering("resetStartTime.specified=true", "resetStartTime.specified=false");
     }
 
     @Test
@@ -871,11 +731,11 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetStartTime is greater than or equal to DEFAULT_RESET_START_TIME
-        defaultSysFillRuleShouldBeFound("resetStartTime.greaterThanOrEqual=" + DEFAULT_RESET_START_TIME);
-
-        // Get all the sysFillRuleList where resetStartTime is greater than or equal to UPDATED_RESET_START_TIME
-        defaultSysFillRuleShouldNotBeFound("resetStartTime.greaterThanOrEqual=" + UPDATED_RESET_START_TIME);
+        // Get all the sysFillRuleList where resetStartTime is greater than or equal to
+        defaultSysFillRuleFiltering(
+            "resetStartTime.greaterThanOrEqual=" + DEFAULT_RESET_START_TIME,
+            "resetStartTime.greaterThanOrEqual=" + UPDATED_RESET_START_TIME
+        );
     }
 
     @Test
@@ -884,11 +744,11 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetStartTime is less than or equal to DEFAULT_RESET_START_TIME
-        defaultSysFillRuleShouldBeFound("resetStartTime.lessThanOrEqual=" + DEFAULT_RESET_START_TIME);
-
-        // Get all the sysFillRuleList where resetStartTime is less than or equal to SMALLER_RESET_START_TIME
-        defaultSysFillRuleShouldNotBeFound("resetStartTime.lessThanOrEqual=" + SMALLER_RESET_START_TIME);
+        // Get all the sysFillRuleList where resetStartTime is less than or equal to
+        defaultSysFillRuleFiltering(
+            "resetStartTime.lessThanOrEqual=" + DEFAULT_RESET_START_TIME,
+            "resetStartTime.lessThanOrEqual=" + SMALLER_RESET_START_TIME
+        );
     }
 
     @Test
@@ -897,11 +757,11 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetStartTime is less than DEFAULT_RESET_START_TIME
-        defaultSysFillRuleShouldNotBeFound("resetStartTime.lessThan=" + DEFAULT_RESET_START_TIME);
-
-        // Get all the sysFillRuleList where resetStartTime is less than UPDATED_RESET_START_TIME
-        defaultSysFillRuleShouldBeFound("resetStartTime.lessThan=" + UPDATED_RESET_START_TIME);
+        // Get all the sysFillRuleList where resetStartTime is less than
+        defaultSysFillRuleFiltering(
+            "resetStartTime.lessThan=" + UPDATED_RESET_START_TIME,
+            "resetStartTime.lessThan=" + DEFAULT_RESET_START_TIME
+        );
     }
 
     @Test
@@ -910,11 +770,11 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetStartTime is greater than DEFAULT_RESET_START_TIME
-        defaultSysFillRuleShouldNotBeFound("resetStartTime.greaterThan=" + DEFAULT_RESET_START_TIME);
-
-        // Get all the sysFillRuleList where resetStartTime is greater than SMALLER_RESET_START_TIME
-        defaultSysFillRuleShouldBeFound("resetStartTime.greaterThan=" + SMALLER_RESET_START_TIME);
+        // Get all the sysFillRuleList where resetStartTime is greater than
+        defaultSysFillRuleFiltering(
+            "resetStartTime.greaterThan=" + SMALLER_RESET_START_TIME,
+            "resetStartTime.greaterThan=" + DEFAULT_RESET_START_TIME
+        );
     }
 
     @Test
@@ -923,11 +783,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetEndTime equals to DEFAULT_RESET_END_TIME
-        defaultSysFillRuleShouldBeFound("resetEndTime.equals=" + DEFAULT_RESET_END_TIME);
-
-        // Get all the sysFillRuleList where resetEndTime equals to UPDATED_RESET_END_TIME
-        defaultSysFillRuleShouldNotBeFound("resetEndTime.equals=" + UPDATED_RESET_END_TIME);
+        // Get all the sysFillRuleList where resetEndTime equals to
+        defaultSysFillRuleFiltering("resetEndTime.equals=" + DEFAULT_RESET_END_TIME, "resetEndTime.equals=" + UPDATED_RESET_END_TIME);
     }
 
     @Test
@@ -936,11 +793,11 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetEndTime in DEFAULT_RESET_END_TIME or UPDATED_RESET_END_TIME
-        defaultSysFillRuleShouldBeFound("resetEndTime.in=" + DEFAULT_RESET_END_TIME + "," + UPDATED_RESET_END_TIME);
-
-        // Get all the sysFillRuleList where resetEndTime equals to UPDATED_RESET_END_TIME
-        defaultSysFillRuleShouldNotBeFound("resetEndTime.in=" + UPDATED_RESET_END_TIME);
+        // Get all the sysFillRuleList where resetEndTime in
+        defaultSysFillRuleFiltering(
+            "resetEndTime.in=" + DEFAULT_RESET_END_TIME + "," + UPDATED_RESET_END_TIME,
+            "resetEndTime.in=" + UPDATED_RESET_END_TIME
+        );
     }
 
     @Test
@@ -950,10 +807,7 @@ public class SysFillRuleResourceIT {
         sysFillRuleRepository.save(sysFillRule);
 
         // Get all the sysFillRuleList where resetEndTime is not null
-        defaultSysFillRuleShouldBeFound("resetEndTime.specified=true");
-
-        // Get all the sysFillRuleList where resetEndTime is null
-        defaultSysFillRuleShouldNotBeFound("resetEndTime.specified=false");
+        defaultSysFillRuleFiltering("resetEndTime.specified=true", "resetEndTime.specified=false");
     }
 
     @Test
@@ -962,11 +816,11 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetEndTime is greater than or equal to DEFAULT_RESET_END_TIME
-        defaultSysFillRuleShouldBeFound("resetEndTime.greaterThanOrEqual=" + DEFAULT_RESET_END_TIME);
-
-        // Get all the sysFillRuleList where resetEndTime is greater than or equal to UPDATED_RESET_END_TIME
-        defaultSysFillRuleShouldNotBeFound("resetEndTime.greaterThanOrEqual=" + UPDATED_RESET_END_TIME);
+        // Get all the sysFillRuleList where resetEndTime is greater than or equal to
+        defaultSysFillRuleFiltering(
+            "resetEndTime.greaterThanOrEqual=" + DEFAULT_RESET_END_TIME,
+            "resetEndTime.greaterThanOrEqual=" + UPDATED_RESET_END_TIME
+        );
     }
 
     @Test
@@ -975,11 +829,11 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetEndTime is less than or equal to DEFAULT_RESET_END_TIME
-        defaultSysFillRuleShouldBeFound("resetEndTime.lessThanOrEqual=" + DEFAULT_RESET_END_TIME);
-
-        // Get all the sysFillRuleList where resetEndTime is less than or equal to SMALLER_RESET_END_TIME
-        defaultSysFillRuleShouldNotBeFound("resetEndTime.lessThanOrEqual=" + SMALLER_RESET_END_TIME);
+        // Get all the sysFillRuleList where resetEndTime is less than or equal to
+        defaultSysFillRuleFiltering(
+            "resetEndTime.lessThanOrEqual=" + DEFAULT_RESET_END_TIME,
+            "resetEndTime.lessThanOrEqual=" + SMALLER_RESET_END_TIME
+        );
     }
 
     @Test
@@ -988,11 +842,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetEndTime is less than DEFAULT_RESET_END_TIME
-        defaultSysFillRuleShouldNotBeFound("resetEndTime.lessThan=" + DEFAULT_RESET_END_TIME);
-
-        // Get all the sysFillRuleList where resetEndTime is less than UPDATED_RESET_END_TIME
-        defaultSysFillRuleShouldBeFound("resetEndTime.lessThan=" + UPDATED_RESET_END_TIME);
+        // Get all the sysFillRuleList where resetEndTime is less than
+        defaultSysFillRuleFiltering("resetEndTime.lessThan=" + UPDATED_RESET_END_TIME, "resetEndTime.lessThan=" + DEFAULT_RESET_END_TIME);
     }
 
     @Test
@@ -1001,11 +852,11 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetEndTime is greater than DEFAULT_RESET_END_TIME
-        defaultSysFillRuleShouldNotBeFound("resetEndTime.greaterThan=" + DEFAULT_RESET_END_TIME);
-
-        // Get all the sysFillRuleList where resetEndTime is greater than SMALLER_RESET_END_TIME
-        defaultSysFillRuleShouldBeFound("resetEndTime.greaterThan=" + SMALLER_RESET_END_TIME);
+        // Get all the sysFillRuleList where resetEndTime is greater than
+        defaultSysFillRuleFiltering(
+            "resetEndTime.greaterThan=" + SMALLER_RESET_END_TIME,
+            "resetEndTime.greaterThan=" + DEFAULT_RESET_END_TIME
+        );
     }
 
     @Test
@@ -1014,11 +865,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetTime equals to DEFAULT_RESET_TIME
-        defaultSysFillRuleShouldBeFound("resetTime.equals=" + DEFAULT_RESET_TIME);
-
-        // Get all the sysFillRuleList where resetTime equals to UPDATED_RESET_TIME
-        defaultSysFillRuleShouldNotBeFound("resetTime.equals=" + UPDATED_RESET_TIME);
+        // Get all the sysFillRuleList where resetTime equals to
+        defaultSysFillRuleFiltering("resetTime.equals=" + DEFAULT_RESET_TIME, "resetTime.equals=" + UPDATED_RESET_TIME);
     }
 
     @Test
@@ -1027,11 +875,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetTime in DEFAULT_RESET_TIME or UPDATED_RESET_TIME
-        defaultSysFillRuleShouldBeFound("resetTime.in=" + DEFAULT_RESET_TIME + "," + UPDATED_RESET_TIME);
-
-        // Get all the sysFillRuleList where resetTime equals to UPDATED_RESET_TIME
-        defaultSysFillRuleShouldNotBeFound("resetTime.in=" + UPDATED_RESET_TIME);
+        // Get all the sysFillRuleList where resetTime in
+        defaultSysFillRuleFiltering("resetTime.in=" + DEFAULT_RESET_TIME + "," + UPDATED_RESET_TIME, "resetTime.in=" + UPDATED_RESET_TIME);
     }
 
     @Test
@@ -1041,10 +886,7 @@ public class SysFillRuleResourceIT {
         sysFillRuleRepository.save(sysFillRule);
 
         // Get all the sysFillRuleList where resetTime is not null
-        defaultSysFillRuleShouldBeFound("resetTime.specified=true");
-
-        // Get all the sysFillRuleList where resetTime is null
-        defaultSysFillRuleShouldNotBeFound("resetTime.specified=false");
+        defaultSysFillRuleFiltering("resetTime.specified=true", "resetTime.specified=false");
     }
 
     @Test
@@ -1053,11 +895,11 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetTime is greater than or equal to DEFAULT_RESET_TIME
-        defaultSysFillRuleShouldBeFound("resetTime.greaterThanOrEqual=" + DEFAULT_RESET_TIME);
-
-        // Get all the sysFillRuleList where resetTime is greater than or equal to UPDATED_RESET_TIME
-        defaultSysFillRuleShouldNotBeFound("resetTime.greaterThanOrEqual=" + UPDATED_RESET_TIME);
+        // Get all the sysFillRuleList where resetTime is greater than or equal to
+        defaultSysFillRuleFiltering(
+            "resetTime.greaterThanOrEqual=" + DEFAULT_RESET_TIME,
+            "resetTime.greaterThanOrEqual=" + UPDATED_RESET_TIME
+        );
     }
 
     @Test
@@ -1066,11 +908,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetTime is less than or equal to DEFAULT_RESET_TIME
-        defaultSysFillRuleShouldBeFound("resetTime.lessThanOrEqual=" + DEFAULT_RESET_TIME);
-
-        // Get all the sysFillRuleList where resetTime is less than or equal to SMALLER_RESET_TIME
-        defaultSysFillRuleShouldNotBeFound("resetTime.lessThanOrEqual=" + SMALLER_RESET_TIME);
+        // Get all the sysFillRuleList where resetTime is less than or equal to
+        defaultSysFillRuleFiltering("resetTime.lessThanOrEqual=" + DEFAULT_RESET_TIME, "resetTime.lessThanOrEqual=" + SMALLER_RESET_TIME);
     }
 
     @Test
@@ -1079,11 +918,8 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetTime is less than DEFAULT_RESET_TIME
-        defaultSysFillRuleShouldNotBeFound("resetTime.lessThan=" + DEFAULT_RESET_TIME);
-
-        // Get all the sysFillRuleList where resetTime is less than UPDATED_RESET_TIME
-        defaultSysFillRuleShouldBeFound("resetTime.lessThan=" + UPDATED_RESET_TIME);
+        // Get all the sysFillRuleList where resetTime is less than
+        defaultSysFillRuleFiltering("resetTime.lessThan=" + UPDATED_RESET_TIME, "resetTime.lessThan=" + DEFAULT_RESET_TIME);
     }
 
     @Test
@@ -1092,11 +928,13 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        // Get all the sysFillRuleList where resetTime is greater than DEFAULT_RESET_TIME
-        defaultSysFillRuleShouldNotBeFound("resetTime.greaterThan=" + DEFAULT_RESET_TIME);
+        // Get all the sysFillRuleList where resetTime is greater than
+        defaultSysFillRuleFiltering("resetTime.greaterThan=" + SMALLER_RESET_TIME, "resetTime.greaterThan=" + DEFAULT_RESET_TIME);
+    }
 
-        // Get all the sysFillRuleList where resetTime is greater than SMALLER_RESET_TIME
-        defaultSysFillRuleShouldBeFound("resetTime.greaterThan=" + SMALLER_RESET_TIME);
+    private void defaultSysFillRuleFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultSysFillRuleShouldBeFound(shouldBeFound);
+        defaultSysFillRuleShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -1161,7 +999,7 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        int databaseSizeBeforeUpdate = sysFillRuleRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the sysFillRule
         SysFillRule updatedSysFillRule = sysFillRuleRepository.findById(sysFillRule.getId()).orElseThrow();
@@ -1184,32 +1022,19 @@ public class SysFillRuleResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, sysFillRuleDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(sysFillRuleDTO))
+                    .content(om.writeValueAsBytes(sysFillRuleDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the SysFillRule in the database
-        List<SysFillRule> sysFillRuleList = sysFillRuleRepository.findAll();
-        assertThat(sysFillRuleList).hasSize(databaseSizeBeforeUpdate);
-        SysFillRule testSysFillRule = sysFillRuleList.get(sysFillRuleList.size() - 1);
-        assertThat(testSysFillRule.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testSysFillRule.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testSysFillRule.getDesc()).isEqualTo(UPDATED_DESC);
-        assertThat(testSysFillRule.getEnabled()).isEqualTo(UPDATED_ENABLED);
-        assertThat(testSysFillRule.getResetFrequency()).isEqualTo(UPDATED_RESET_FREQUENCY);
-        assertThat(testSysFillRule.getSeqValue()).isEqualTo(UPDATED_SEQ_VALUE);
-        assertThat(testSysFillRule.getFillValue()).isEqualTo(UPDATED_FILL_VALUE);
-        assertThat(testSysFillRule.getImplClass()).isEqualTo(UPDATED_IMPL_CLASS);
-        assertThat(testSysFillRule.getParams()).isEqualTo(UPDATED_PARAMS);
-        assertThat(testSysFillRule.getResetStartTime()).isEqualTo(UPDATED_RESET_START_TIME);
-        assertThat(testSysFillRule.getResetEndTime()).isEqualTo(UPDATED_RESET_END_TIME);
-        assertThat(testSysFillRule.getResetTime()).isEqualTo(UPDATED_RESET_TIME);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedSysFillRuleToMatchAllProperties(updatedSysFillRule);
     }
 
     @Test
     @Transactional
     void putNonExistingSysFillRule() throws Exception {
-        int databaseSizeBeforeUpdate = sysFillRuleRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         sysFillRule.setId(longCount.incrementAndGet());
 
         // Create the SysFillRule
@@ -1220,19 +1045,18 @@ public class SysFillRuleResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, sysFillRuleDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(sysFillRuleDTO))
+                    .content(om.writeValueAsBytes(sysFillRuleDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SysFillRule in the database
-        List<SysFillRule> sysFillRuleList = sysFillRuleRepository.findAll();
-        assertThat(sysFillRuleList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchSysFillRule() throws Exception {
-        int databaseSizeBeforeUpdate = sysFillRuleRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         sysFillRule.setId(longCount.incrementAndGet());
 
         // Create the SysFillRule
@@ -1243,19 +1067,18 @@ public class SysFillRuleResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(sysFillRuleDTO))
+                    .content(om.writeValueAsBytes(sysFillRuleDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SysFillRule in the database
-        List<SysFillRule> sysFillRuleList = sysFillRuleRepository.findAll();
-        assertThat(sysFillRuleList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamSysFillRule() throws Exception {
-        int databaseSizeBeforeUpdate = sysFillRuleRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         sysFillRule.setId(longCount.incrementAndGet());
 
         // Create the SysFillRule
@@ -1263,12 +1086,11 @@ public class SysFillRuleResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restSysFillRuleMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(sysFillRuleDTO)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(sysFillRuleDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the SysFillRule in the database
-        List<SysFillRule> sysFillRuleList = sysFillRuleRepository.findAll();
-        assertThat(sysFillRuleList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1277,45 +1099,36 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        int databaseSizeBeforeUpdate = sysFillRuleRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the sysFillRule using partial update
         SysFillRule partialUpdatedSysFillRule = new SysFillRule();
         partialUpdatedSysFillRule.setId(sysFillRule.getId());
 
         partialUpdatedSysFillRule
-            .name(UPDATED_NAME)
-            .desc(UPDATED_DESC)
+            .code(UPDATED_CODE)
             .enabled(UPDATED_ENABLED)
             .resetFrequency(UPDATED_RESET_FREQUENCY)
-            .implClass(UPDATED_IMPL_CLASS)
-            .params(UPDATED_PARAMS)
-            .resetStartTime(UPDATED_RESET_START_TIME);
+            .fillValue(UPDATED_FILL_VALUE)
+            .resetStartTime(UPDATED_RESET_START_TIME)
+            .resetEndTime(UPDATED_RESET_END_TIME)
+            .resetTime(UPDATED_RESET_TIME);
 
         restSysFillRuleMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedSysFillRule.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedSysFillRule))
+                    .content(om.writeValueAsBytes(partialUpdatedSysFillRule))
             )
             .andExpect(status().isOk());
 
         // Validate the SysFillRule in the database
-        List<SysFillRule> sysFillRuleList = sysFillRuleRepository.findAll();
-        assertThat(sysFillRuleList).hasSize(databaseSizeBeforeUpdate);
-        SysFillRule testSysFillRule = sysFillRuleList.get(sysFillRuleList.size() - 1);
-        assertThat(testSysFillRule.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testSysFillRule.getCode()).isEqualTo(DEFAULT_CODE);
-        assertThat(testSysFillRule.getDesc()).isEqualTo(UPDATED_DESC);
-        assertThat(testSysFillRule.getEnabled()).isEqualTo(UPDATED_ENABLED);
-        assertThat(testSysFillRule.getResetFrequency()).isEqualTo(UPDATED_RESET_FREQUENCY);
-        assertThat(testSysFillRule.getSeqValue()).isEqualTo(DEFAULT_SEQ_VALUE);
-        assertThat(testSysFillRule.getFillValue()).isEqualTo(DEFAULT_FILL_VALUE);
-        assertThat(testSysFillRule.getImplClass()).isEqualTo(UPDATED_IMPL_CLASS);
-        assertThat(testSysFillRule.getParams()).isEqualTo(UPDATED_PARAMS);
-        assertThat(testSysFillRule.getResetStartTime()).isEqualTo(UPDATED_RESET_START_TIME);
-        assertThat(testSysFillRule.getResetEndTime()).isEqualTo(DEFAULT_RESET_END_TIME);
-        assertThat(testSysFillRule.getResetTime()).isEqualTo(DEFAULT_RESET_TIME);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertSysFillRuleUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedSysFillRule, sysFillRule),
+            getPersistedSysFillRule(sysFillRule)
+        );
     }
 
     @Test
@@ -1324,7 +1137,7 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        int databaseSizeBeforeUpdate = sysFillRuleRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the sysFillRule using partial update
         SysFillRule partialUpdatedSysFillRule = new SysFillRule();
@@ -1348,32 +1161,20 @@ public class SysFillRuleResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedSysFillRule.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedSysFillRule))
+                    .content(om.writeValueAsBytes(partialUpdatedSysFillRule))
             )
             .andExpect(status().isOk());
 
         // Validate the SysFillRule in the database
-        List<SysFillRule> sysFillRuleList = sysFillRuleRepository.findAll();
-        assertThat(sysFillRuleList).hasSize(databaseSizeBeforeUpdate);
-        SysFillRule testSysFillRule = sysFillRuleList.get(sysFillRuleList.size() - 1);
-        assertThat(testSysFillRule.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testSysFillRule.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testSysFillRule.getDesc()).isEqualTo(UPDATED_DESC);
-        assertThat(testSysFillRule.getEnabled()).isEqualTo(UPDATED_ENABLED);
-        assertThat(testSysFillRule.getResetFrequency()).isEqualTo(UPDATED_RESET_FREQUENCY);
-        assertThat(testSysFillRule.getSeqValue()).isEqualTo(UPDATED_SEQ_VALUE);
-        assertThat(testSysFillRule.getFillValue()).isEqualTo(UPDATED_FILL_VALUE);
-        assertThat(testSysFillRule.getImplClass()).isEqualTo(UPDATED_IMPL_CLASS);
-        assertThat(testSysFillRule.getParams()).isEqualTo(UPDATED_PARAMS);
-        assertThat(testSysFillRule.getResetStartTime()).isEqualTo(UPDATED_RESET_START_TIME);
-        assertThat(testSysFillRule.getResetEndTime()).isEqualTo(UPDATED_RESET_END_TIME);
-        assertThat(testSysFillRule.getResetTime()).isEqualTo(UPDATED_RESET_TIME);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertSysFillRuleUpdatableFieldsEquals(partialUpdatedSysFillRule, getPersistedSysFillRule(partialUpdatedSysFillRule));
     }
 
     @Test
     @Transactional
     void patchNonExistingSysFillRule() throws Exception {
-        int databaseSizeBeforeUpdate = sysFillRuleRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         sysFillRule.setId(longCount.incrementAndGet());
 
         // Create the SysFillRule
@@ -1384,19 +1185,18 @@ public class SysFillRuleResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, sysFillRuleDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(sysFillRuleDTO))
+                    .content(om.writeValueAsBytes(sysFillRuleDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SysFillRule in the database
-        List<SysFillRule> sysFillRuleList = sysFillRuleRepository.findAll();
-        assertThat(sysFillRuleList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchSysFillRule() throws Exception {
-        int databaseSizeBeforeUpdate = sysFillRuleRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         sysFillRule.setId(longCount.incrementAndGet());
 
         // Create the SysFillRule
@@ -1407,19 +1207,18 @@ public class SysFillRuleResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(sysFillRuleDTO))
+                    .content(om.writeValueAsBytes(sysFillRuleDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SysFillRule in the database
-        List<SysFillRule> sysFillRuleList = sysFillRuleRepository.findAll();
-        assertThat(sysFillRuleList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamSysFillRule() throws Exception {
-        int databaseSizeBeforeUpdate = sysFillRuleRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         sysFillRule.setId(longCount.incrementAndGet());
 
         // Create the SysFillRule
@@ -1427,14 +1226,11 @@ public class SysFillRuleResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restSysFillRuleMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(sysFillRuleDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(sysFillRuleDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the SysFillRule in the database
-        List<SysFillRule> sysFillRuleList = sysFillRuleRepository.findAll();
-        assertThat(sysFillRuleList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1443,7 +1239,7 @@ public class SysFillRuleResourceIT {
         // Initialize the database
         sysFillRuleRepository.save(sysFillRule);
 
-        int databaseSizeBeforeDelete = sysFillRuleRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the sysFillRule
         restSysFillRuleMockMvc
@@ -1451,7 +1247,34 @@ public class SysFillRuleResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<SysFillRule> sysFillRuleList = sysFillRuleRepository.findAll();
-        assertThat(sysFillRuleList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return sysFillRuleRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected SysFillRule getPersistedSysFillRule(SysFillRule sysFillRule) {
+        return sysFillRuleRepository.findById(sysFillRule.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedSysFillRuleToMatchAllProperties(SysFillRule expectedSysFillRule) {
+        assertSysFillRuleAllPropertiesEquals(expectedSysFillRule, getPersistedSysFillRule(expectedSysFillRule));
+    }
+
+    protected void assertPersistedSysFillRuleToMatchUpdatableProperties(SysFillRule expectedSysFillRule) {
+        assertSysFillRuleAllUpdatablePropertiesEquals(expectedSysFillRule, getPersistedSysFillRule(expectedSysFillRule));
     }
 }

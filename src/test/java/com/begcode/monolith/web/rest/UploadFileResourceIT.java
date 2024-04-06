@@ -1,5 +1,7 @@
 package com.begcode.monolith.web.rest;
 
+import static com.begcode.monolith.domain.UploadFileAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static com.begcode.monolith.web.rest.TestUtil.sameInstant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -16,14 +18,13 @@ import com.begcode.monolith.repository.UploadFileRepository;
 import com.begcode.monolith.service.UploadFileService;
 import com.begcode.monolith.service.dto.UploadFileDTO;
 import com.begcode.monolith.service.mapper.UploadFileMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -114,8 +115,11 @@ public class UploadFileResourceIT {
     private static final String ENTITY_API_URL = "/api/upload-files";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private UploadFileRepository uploadFileRepository;
@@ -204,37 +208,23 @@ public class UploadFileResourceIT {
     @Test
     @Transactional
     void createUploadFile() throws Exception {
-        int databaseSizeBeforeCreate = uploadFileRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the UploadFile
         UploadFileDTO uploadFileDTO = uploadFileMapper.toDto(uploadFile);
-        restUploadFileMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(uploadFileDTO)))
-            .andExpect(status().isCreated());
+        var returnedUploadFileDTO = om.readValue(
+            restUploadFileMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(uploadFileDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            UploadFileDTO.class
+        );
 
         // Validate the UploadFile in the database
-        List<UploadFile> uploadFileList = uploadFileRepository.findAll();
-        assertThat(uploadFileList).hasSize(databaseSizeBeforeCreate + 1);
-        UploadFile testUploadFile = uploadFileList.get(uploadFileList.size() - 1);
-        assertThat(testUploadFile.getUrl()).isEqualTo(DEFAULT_URL);
-        assertThat(testUploadFile.getFullName()).isEqualTo(DEFAULT_FULL_NAME);
-        assertThat(testUploadFile.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testUploadFile.getThumb()).isEqualTo(DEFAULT_THUMB);
-        assertThat(testUploadFile.getExt()).isEqualTo(DEFAULT_EXT);
-        assertThat(testUploadFile.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testUploadFile.getPath()).isEqualTo(DEFAULT_PATH);
-        assertThat(testUploadFile.getFolder()).isEqualTo(DEFAULT_FOLDER);
-        assertThat(testUploadFile.getOwnerEntityName()).isEqualTo(DEFAULT_OWNER_ENTITY_NAME);
-        assertThat(testUploadFile.getOwnerEntityId()).isEqualTo(DEFAULT_OWNER_ENTITY_ID);
-        assertThat(testUploadFile.getBusinessTitle()).isEqualTo(DEFAULT_BUSINESS_TITLE);
-        assertThat(testUploadFile.getBusinessDesc()).isEqualTo(DEFAULT_BUSINESS_DESC);
-        assertThat(testUploadFile.getBusinessStatus()).isEqualTo(DEFAULT_BUSINESS_STATUS);
-        assertThat(testUploadFile.getCreateAt()).isEqualTo(DEFAULT_CREATE_AT);
-        assertThat(testUploadFile.getFileSize()).isEqualTo(DEFAULT_FILE_SIZE);
-        assertThat(testUploadFile.getReferenceCount()).isEqualTo(DEFAULT_REFERENCE_COUNT);
-        assertThat(testUploadFile.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY);
-        assertThat(testUploadFile.getCreatedDate()).isEqualTo(DEFAULT_CREATED_DATE);
-        assertThat(testUploadFile.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
-        assertThat(testUploadFile.getLastModifiedDate()).isEqualTo(DEFAULT_LAST_MODIFIED_DATE);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedUploadFile = uploadFileMapper.toEntity(returnedUploadFileDTO);
+        assertUploadFileUpdatableFieldsEquals(returnedUploadFile, getPersistedUploadFile(returnedUploadFile));
     }
 
     @Test
@@ -244,22 +234,21 @@ public class UploadFileResourceIT {
         uploadFile.setId(1L);
         UploadFileDTO uploadFileDTO = uploadFileMapper.toDto(uploadFile);
 
-        int databaseSizeBeforeCreate = uploadFileRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restUploadFileMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(uploadFileDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(uploadFileDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the UploadFile in the database
-        List<UploadFile> uploadFileList = uploadFileRepository.findAll();
-        assertThat(uploadFileList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
     @Transactional
     void checkUrlIsRequired() throws Exception {
-        int databaseSizeBeforeTest = uploadFileRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         uploadFile.setUrl(null);
 
@@ -267,11 +256,10 @@ public class UploadFileResourceIT {
         UploadFileDTO uploadFileDTO = uploadFileMapper.toDto(uploadFile);
 
         restUploadFileMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(uploadFileDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(uploadFileDTO)))
             .andExpect(status().isBadRequest());
 
-        List<UploadFile> uploadFileList = uploadFileRepository.findAll();
-        assertThat(uploadFileList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
@@ -367,14 +355,11 @@ public class UploadFileResourceIT {
 
         Long id = uploadFile.getId();
 
-        defaultUploadFileShouldBeFound("id.equals=" + id);
-        defaultUploadFileShouldNotBeFound("id.notEquals=" + id);
+        defaultUploadFileFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultUploadFileShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultUploadFileShouldNotBeFound("id.greaterThan=" + id);
+        defaultUploadFileFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultUploadFileShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultUploadFileShouldNotBeFound("id.lessThan=" + id);
+        defaultUploadFileFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -383,11 +368,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where url equals to DEFAULT_URL
-        defaultUploadFileShouldBeFound("url.equals=" + DEFAULT_URL);
-
-        // Get all the uploadFileList where url equals to UPDATED_URL
-        defaultUploadFileShouldNotBeFound("url.equals=" + UPDATED_URL);
+        // Get all the uploadFileList where url equals to
+        defaultUploadFileFiltering("url.equals=" + DEFAULT_URL, "url.equals=" + UPDATED_URL);
     }
 
     @Test
@@ -396,11 +378,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where url in DEFAULT_URL or UPDATED_URL
-        defaultUploadFileShouldBeFound("url.in=" + DEFAULT_URL + "," + UPDATED_URL);
-
-        // Get all the uploadFileList where url equals to UPDATED_URL
-        defaultUploadFileShouldNotBeFound("url.in=" + UPDATED_URL);
+        // Get all the uploadFileList where url in
+        defaultUploadFileFiltering("url.in=" + DEFAULT_URL + "," + UPDATED_URL, "url.in=" + UPDATED_URL);
     }
 
     @Test
@@ -410,10 +389,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where url is not null
-        defaultUploadFileShouldBeFound("url.specified=true");
-
-        // Get all the uploadFileList where url is null
-        defaultUploadFileShouldNotBeFound("url.specified=false");
+        defaultUploadFileFiltering("url.specified=true", "url.specified=false");
     }
 
     @Test
@@ -422,11 +398,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where url contains DEFAULT_URL
-        defaultUploadFileShouldBeFound("url.contains=" + DEFAULT_URL);
-
-        // Get all the uploadFileList where url contains UPDATED_URL
-        defaultUploadFileShouldNotBeFound("url.contains=" + UPDATED_URL);
+        // Get all the uploadFileList where url contains
+        defaultUploadFileFiltering("url.contains=" + DEFAULT_URL, "url.contains=" + UPDATED_URL);
     }
 
     @Test
@@ -435,11 +408,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where url does not contain DEFAULT_URL
-        defaultUploadFileShouldNotBeFound("url.doesNotContain=" + DEFAULT_URL);
-
-        // Get all the uploadFileList where url does not contain UPDATED_URL
-        defaultUploadFileShouldBeFound("url.doesNotContain=" + UPDATED_URL);
+        // Get all the uploadFileList where url does not contain
+        defaultUploadFileFiltering("url.doesNotContain=" + UPDATED_URL, "url.doesNotContain=" + DEFAULT_URL);
     }
 
     @Test
@@ -448,11 +418,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where fullName equals to DEFAULT_FULL_NAME
-        defaultUploadFileShouldBeFound("fullName.equals=" + DEFAULT_FULL_NAME);
-
-        // Get all the uploadFileList where fullName equals to UPDATED_FULL_NAME
-        defaultUploadFileShouldNotBeFound("fullName.equals=" + UPDATED_FULL_NAME);
+        // Get all the uploadFileList where fullName equals to
+        defaultUploadFileFiltering("fullName.equals=" + DEFAULT_FULL_NAME, "fullName.equals=" + UPDATED_FULL_NAME);
     }
 
     @Test
@@ -461,11 +428,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where fullName in DEFAULT_FULL_NAME or UPDATED_FULL_NAME
-        defaultUploadFileShouldBeFound("fullName.in=" + DEFAULT_FULL_NAME + "," + UPDATED_FULL_NAME);
-
-        // Get all the uploadFileList where fullName equals to UPDATED_FULL_NAME
-        defaultUploadFileShouldNotBeFound("fullName.in=" + UPDATED_FULL_NAME);
+        // Get all the uploadFileList where fullName in
+        defaultUploadFileFiltering("fullName.in=" + DEFAULT_FULL_NAME + "," + UPDATED_FULL_NAME, "fullName.in=" + UPDATED_FULL_NAME);
     }
 
     @Test
@@ -475,10 +439,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where fullName is not null
-        defaultUploadFileShouldBeFound("fullName.specified=true");
-
-        // Get all the uploadFileList where fullName is null
-        defaultUploadFileShouldNotBeFound("fullName.specified=false");
+        defaultUploadFileFiltering("fullName.specified=true", "fullName.specified=false");
     }
 
     @Test
@@ -487,11 +448,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where fullName contains DEFAULT_FULL_NAME
-        defaultUploadFileShouldBeFound("fullName.contains=" + DEFAULT_FULL_NAME);
-
-        // Get all the uploadFileList where fullName contains UPDATED_FULL_NAME
-        defaultUploadFileShouldNotBeFound("fullName.contains=" + UPDATED_FULL_NAME);
+        // Get all the uploadFileList where fullName contains
+        defaultUploadFileFiltering("fullName.contains=" + DEFAULT_FULL_NAME, "fullName.contains=" + UPDATED_FULL_NAME);
     }
 
     @Test
@@ -500,11 +458,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where fullName does not contain DEFAULT_FULL_NAME
-        defaultUploadFileShouldNotBeFound("fullName.doesNotContain=" + DEFAULT_FULL_NAME);
-
-        // Get all the uploadFileList where fullName does not contain UPDATED_FULL_NAME
-        defaultUploadFileShouldBeFound("fullName.doesNotContain=" + UPDATED_FULL_NAME);
+        // Get all the uploadFileList where fullName does not contain
+        defaultUploadFileFiltering("fullName.doesNotContain=" + UPDATED_FULL_NAME, "fullName.doesNotContain=" + DEFAULT_FULL_NAME);
     }
 
     @Test
@@ -513,11 +468,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where name equals to DEFAULT_NAME
-        defaultUploadFileShouldBeFound("name.equals=" + DEFAULT_NAME);
-
-        // Get all the uploadFileList where name equals to UPDATED_NAME
-        defaultUploadFileShouldNotBeFound("name.equals=" + UPDATED_NAME);
+        // Get all the uploadFileList where name equals to
+        defaultUploadFileFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
     }
 
     @Test
@@ -526,11 +478,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where name in DEFAULT_NAME or UPDATED_NAME
-        defaultUploadFileShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
-
-        // Get all the uploadFileList where name equals to UPDATED_NAME
-        defaultUploadFileShouldNotBeFound("name.in=" + UPDATED_NAME);
+        // Get all the uploadFileList where name in
+        defaultUploadFileFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
     }
 
     @Test
@@ -540,10 +489,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where name is not null
-        defaultUploadFileShouldBeFound("name.specified=true");
-
-        // Get all the uploadFileList where name is null
-        defaultUploadFileShouldNotBeFound("name.specified=false");
+        defaultUploadFileFiltering("name.specified=true", "name.specified=false");
     }
 
     @Test
@@ -552,11 +498,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where name contains DEFAULT_NAME
-        defaultUploadFileShouldBeFound("name.contains=" + DEFAULT_NAME);
-
-        // Get all the uploadFileList where name contains UPDATED_NAME
-        defaultUploadFileShouldNotBeFound("name.contains=" + UPDATED_NAME);
+        // Get all the uploadFileList where name contains
+        defaultUploadFileFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
     }
 
     @Test
@@ -565,11 +508,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where name does not contain DEFAULT_NAME
-        defaultUploadFileShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
-
-        // Get all the uploadFileList where name does not contain UPDATED_NAME
-        defaultUploadFileShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+        // Get all the uploadFileList where name does not contain
+        defaultUploadFileFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
     }
 
     @Test
@@ -578,11 +518,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where thumb equals to DEFAULT_THUMB
-        defaultUploadFileShouldBeFound("thumb.equals=" + DEFAULT_THUMB);
-
-        // Get all the uploadFileList where thumb equals to UPDATED_THUMB
-        defaultUploadFileShouldNotBeFound("thumb.equals=" + UPDATED_THUMB);
+        // Get all the uploadFileList where thumb equals to
+        defaultUploadFileFiltering("thumb.equals=" + DEFAULT_THUMB, "thumb.equals=" + UPDATED_THUMB);
     }
 
     @Test
@@ -591,11 +528,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where thumb in DEFAULT_THUMB or UPDATED_THUMB
-        defaultUploadFileShouldBeFound("thumb.in=" + DEFAULT_THUMB + "," + UPDATED_THUMB);
-
-        // Get all the uploadFileList where thumb equals to UPDATED_THUMB
-        defaultUploadFileShouldNotBeFound("thumb.in=" + UPDATED_THUMB);
+        // Get all the uploadFileList where thumb in
+        defaultUploadFileFiltering("thumb.in=" + DEFAULT_THUMB + "," + UPDATED_THUMB, "thumb.in=" + UPDATED_THUMB);
     }
 
     @Test
@@ -605,10 +539,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where thumb is not null
-        defaultUploadFileShouldBeFound("thumb.specified=true");
-
-        // Get all the uploadFileList where thumb is null
-        defaultUploadFileShouldNotBeFound("thumb.specified=false");
+        defaultUploadFileFiltering("thumb.specified=true", "thumb.specified=false");
     }
 
     @Test
@@ -617,11 +548,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where thumb contains DEFAULT_THUMB
-        defaultUploadFileShouldBeFound("thumb.contains=" + DEFAULT_THUMB);
-
-        // Get all the uploadFileList where thumb contains UPDATED_THUMB
-        defaultUploadFileShouldNotBeFound("thumb.contains=" + UPDATED_THUMB);
+        // Get all the uploadFileList where thumb contains
+        defaultUploadFileFiltering("thumb.contains=" + DEFAULT_THUMB, "thumb.contains=" + UPDATED_THUMB);
     }
 
     @Test
@@ -630,11 +558,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where thumb does not contain DEFAULT_THUMB
-        defaultUploadFileShouldNotBeFound("thumb.doesNotContain=" + DEFAULT_THUMB);
-
-        // Get all the uploadFileList where thumb does not contain UPDATED_THUMB
-        defaultUploadFileShouldBeFound("thumb.doesNotContain=" + UPDATED_THUMB);
+        // Get all the uploadFileList where thumb does not contain
+        defaultUploadFileFiltering("thumb.doesNotContain=" + UPDATED_THUMB, "thumb.doesNotContain=" + DEFAULT_THUMB);
     }
 
     @Test
@@ -643,11 +568,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where ext equals to DEFAULT_EXT
-        defaultUploadFileShouldBeFound("ext.equals=" + DEFAULT_EXT);
-
-        // Get all the uploadFileList where ext equals to UPDATED_EXT
-        defaultUploadFileShouldNotBeFound("ext.equals=" + UPDATED_EXT);
+        // Get all the uploadFileList where ext equals to
+        defaultUploadFileFiltering("ext.equals=" + DEFAULT_EXT, "ext.equals=" + UPDATED_EXT);
     }
 
     @Test
@@ -656,11 +578,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where ext in DEFAULT_EXT or UPDATED_EXT
-        defaultUploadFileShouldBeFound("ext.in=" + DEFAULT_EXT + "," + UPDATED_EXT);
-
-        // Get all the uploadFileList where ext equals to UPDATED_EXT
-        defaultUploadFileShouldNotBeFound("ext.in=" + UPDATED_EXT);
+        // Get all the uploadFileList where ext in
+        defaultUploadFileFiltering("ext.in=" + DEFAULT_EXT + "," + UPDATED_EXT, "ext.in=" + UPDATED_EXT);
     }
 
     @Test
@@ -670,10 +589,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where ext is not null
-        defaultUploadFileShouldBeFound("ext.specified=true");
-
-        // Get all the uploadFileList where ext is null
-        defaultUploadFileShouldNotBeFound("ext.specified=false");
+        defaultUploadFileFiltering("ext.specified=true", "ext.specified=false");
     }
 
     @Test
@@ -682,11 +598,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where ext contains DEFAULT_EXT
-        defaultUploadFileShouldBeFound("ext.contains=" + DEFAULT_EXT);
-
-        // Get all the uploadFileList where ext contains UPDATED_EXT
-        defaultUploadFileShouldNotBeFound("ext.contains=" + UPDATED_EXT);
+        // Get all the uploadFileList where ext contains
+        defaultUploadFileFiltering("ext.contains=" + DEFAULT_EXT, "ext.contains=" + UPDATED_EXT);
     }
 
     @Test
@@ -695,11 +608,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where ext does not contain DEFAULT_EXT
-        defaultUploadFileShouldNotBeFound("ext.doesNotContain=" + DEFAULT_EXT);
-
-        // Get all the uploadFileList where ext does not contain UPDATED_EXT
-        defaultUploadFileShouldBeFound("ext.doesNotContain=" + UPDATED_EXT);
+        // Get all the uploadFileList where ext does not contain
+        defaultUploadFileFiltering("ext.doesNotContain=" + UPDATED_EXT, "ext.doesNotContain=" + DEFAULT_EXT);
     }
 
     @Test
@@ -708,11 +618,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where type equals to DEFAULT_TYPE
-        defaultUploadFileShouldBeFound("type.equals=" + DEFAULT_TYPE);
-
-        // Get all the uploadFileList where type equals to UPDATED_TYPE
-        defaultUploadFileShouldNotBeFound("type.equals=" + UPDATED_TYPE);
+        // Get all the uploadFileList where type equals to
+        defaultUploadFileFiltering("type.equals=" + DEFAULT_TYPE, "type.equals=" + UPDATED_TYPE);
     }
 
     @Test
@@ -721,11 +628,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where type in DEFAULT_TYPE or UPDATED_TYPE
-        defaultUploadFileShouldBeFound("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE);
-
-        // Get all the uploadFileList where type equals to UPDATED_TYPE
-        defaultUploadFileShouldNotBeFound("type.in=" + UPDATED_TYPE);
+        // Get all the uploadFileList where type in
+        defaultUploadFileFiltering("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE, "type.in=" + UPDATED_TYPE);
     }
 
     @Test
@@ -735,10 +639,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where type is not null
-        defaultUploadFileShouldBeFound("type.specified=true");
-
-        // Get all the uploadFileList where type is null
-        defaultUploadFileShouldNotBeFound("type.specified=false");
+        defaultUploadFileFiltering("type.specified=true", "type.specified=false");
     }
 
     @Test
@@ -747,11 +648,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where type contains DEFAULT_TYPE
-        defaultUploadFileShouldBeFound("type.contains=" + DEFAULT_TYPE);
-
-        // Get all the uploadFileList where type contains UPDATED_TYPE
-        defaultUploadFileShouldNotBeFound("type.contains=" + UPDATED_TYPE);
+        // Get all the uploadFileList where type contains
+        defaultUploadFileFiltering("type.contains=" + DEFAULT_TYPE, "type.contains=" + UPDATED_TYPE);
     }
 
     @Test
@@ -760,11 +658,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where type does not contain DEFAULT_TYPE
-        defaultUploadFileShouldNotBeFound("type.doesNotContain=" + DEFAULT_TYPE);
-
-        // Get all the uploadFileList where type does not contain UPDATED_TYPE
-        defaultUploadFileShouldBeFound("type.doesNotContain=" + UPDATED_TYPE);
+        // Get all the uploadFileList where type does not contain
+        defaultUploadFileFiltering("type.doesNotContain=" + UPDATED_TYPE, "type.doesNotContain=" + DEFAULT_TYPE);
     }
 
     @Test
@@ -773,11 +668,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where path equals to DEFAULT_PATH
-        defaultUploadFileShouldBeFound("path.equals=" + DEFAULT_PATH);
-
-        // Get all the uploadFileList where path equals to UPDATED_PATH
-        defaultUploadFileShouldNotBeFound("path.equals=" + UPDATED_PATH);
+        // Get all the uploadFileList where path equals to
+        defaultUploadFileFiltering("path.equals=" + DEFAULT_PATH, "path.equals=" + UPDATED_PATH);
     }
 
     @Test
@@ -786,11 +678,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where path in DEFAULT_PATH or UPDATED_PATH
-        defaultUploadFileShouldBeFound("path.in=" + DEFAULT_PATH + "," + UPDATED_PATH);
-
-        // Get all the uploadFileList where path equals to UPDATED_PATH
-        defaultUploadFileShouldNotBeFound("path.in=" + UPDATED_PATH);
+        // Get all the uploadFileList where path in
+        defaultUploadFileFiltering("path.in=" + DEFAULT_PATH + "," + UPDATED_PATH, "path.in=" + UPDATED_PATH);
     }
 
     @Test
@@ -800,10 +689,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where path is not null
-        defaultUploadFileShouldBeFound("path.specified=true");
-
-        // Get all the uploadFileList where path is null
-        defaultUploadFileShouldNotBeFound("path.specified=false");
+        defaultUploadFileFiltering("path.specified=true", "path.specified=false");
     }
 
     @Test
@@ -812,11 +698,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where path contains DEFAULT_PATH
-        defaultUploadFileShouldBeFound("path.contains=" + DEFAULT_PATH);
-
-        // Get all the uploadFileList where path contains UPDATED_PATH
-        defaultUploadFileShouldNotBeFound("path.contains=" + UPDATED_PATH);
+        // Get all the uploadFileList where path contains
+        defaultUploadFileFiltering("path.contains=" + DEFAULT_PATH, "path.contains=" + UPDATED_PATH);
     }
 
     @Test
@@ -825,11 +708,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where path does not contain DEFAULT_PATH
-        defaultUploadFileShouldNotBeFound("path.doesNotContain=" + DEFAULT_PATH);
-
-        // Get all the uploadFileList where path does not contain UPDATED_PATH
-        defaultUploadFileShouldBeFound("path.doesNotContain=" + UPDATED_PATH);
+        // Get all the uploadFileList where path does not contain
+        defaultUploadFileFiltering("path.doesNotContain=" + UPDATED_PATH, "path.doesNotContain=" + DEFAULT_PATH);
     }
 
     @Test
@@ -838,11 +718,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where folder equals to DEFAULT_FOLDER
-        defaultUploadFileShouldBeFound("folder.equals=" + DEFAULT_FOLDER);
-
-        // Get all the uploadFileList where folder equals to UPDATED_FOLDER
-        defaultUploadFileShouldNotBeFound("folder.equals=" + UPDATED_FOLDER);
+        // Get all the uploadFileList where folder equals to
+        defaultUploadFileFiltering("folder.equals=" + DEFAULT_FOLDER, "folder.equals=" + UPDATED_FOLDER);
     }
 
     @Test
@@ -851,11 +728,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where folder in DEFAULT_FOLDER or UPDATED_FOLDER
-        defaultUploadFileShouldBeFound("folder.in=" + DEFAULT_FOLDER + "," + UPDATED_FOLDER);
-
-        // Get all the uploadFileList where folder equals to UPDATED_FOLDER
-        defaultUploadFileShouldNotBeFound("folder.in=" + UPDATED_FOLDER);
+        // Get all the uploadFileList where folder in
+        defaultUploadFileFiltering("folder.in=" + DEFAULT_FOLDER + "," + UPDATED_FOLDER, "folder.in=" + UPDATED_FOLDER);
     }
 
     @Test
@@ -865,10 +739,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where folder is not null
-        defaultUploadFileShouldBeFound("folder.specified=true");
-
-        // Get all the uploadFileList where folder is null
-        defaultUploadFileShouldNotBeFound("folder.specified=false");
+        defaultUploadFileFiltering("folder.specified=true", "folder.specified=false");
     }
 
     @Test
@@ -877,11 +748,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where folder contains DEFAULT_FOLDER
-        defaultUploadFileShouldBeFound("folder.contains=" + DEFAULT_FOLDER);
-
-        // Get all the uploadFileList where folder contains UPDATED_FOLDER
-        defaultUploadFileShouldNotBeFound("folder.contains=" + UPDATED_FOLDER);
+        // Get all the uploadFileList where folder contains
+        defaultUploadFileFiltering("folder.contains=" + DEFAULT_FOLDER, "folder.contains=" + UPDATED_FOLDER);
     }
 
     @Test
@@ -890,11 +758,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where folder does not contain DEFAULT_FOLDER
-        defaultUploadFileShouldNotBeFound("folder.doesNotContain=" + DEFAULT_FOLDER);
-
-        // Get all the uploadFileList where folder does not contain UPDATED_FOLDER
-        defaultUploadFileShouldBeFound("folder.doesNotContain=" + UPDATED_FOLDER);
+        // Get all the uploadFileList where folder does not contain
+        defaultUploadFileFiltering("folder.doesNotContain=" + UPDATED_FOLDER, "folder.doesNotContain=" + DEFAULT_FOLDER);
     }
 
     @Test
@@ -903,11 +768,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where ownerEntityName equals to DEFAULT_OWNER_ENTITY_NAME
-        defaultUploadFileShouldBeFound("ownerEntityName.equals=" + DEFAULT_OWNER_ENTITY_NAME);
-
-        // Get all the uploadFileList where ownerEntityName equals to UPDATED_OWNER_ENTITY_NAME
-        defaultUploadFileShouldNotBeFound("ownerEntityName.equals=" + UPDATED_OWNER_ENTITY_NAME);
+        // Get all the uploadFileList where ownerEntityName equals to
+        defaultUploadFileFiltering(
+            "ownerEntityName.equals=" + DEFAULT_OWNER_ENTITY_NAME,
+            "ownerEntityName.equals=" + UPDATED_OWNER_ENTITY_NAME
+        );
     }
 
     @Test
@@ -916,11 +781,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where ownerEntityName in DEFAULT_OWNER_ENTITY_NAME or UPDATED_OWNER_ENTITY_NAME
-        defaultUploadFileShouldBeFound("ownerEntityName.in=" + DEFAULT_OWNER_ENTITY_NAME + "," + UPDATED_OWNER_ENTITY_NAME);
-
-        // Get all the uploadFileList where ownerEntityName equals to UPDATED_OWNER_ENTITY_NAME
-        defaultUploadFileShouldNotBeFound("ownerEntityName.in=" + UPDATED_OWNER_ENTITY_NAME);
+        // Get all the uploadFileList where ownerEntityName in
+        defaultUploadFileFiltering(
+            "ownerEntityName.in=" + DEFAULT_OWNER_ENTITY_NAME + "," + UPDATED_OWNER_ENTITY_NAME,
+            "ownerEntityName.in=" + UPDATED_OWNER_ENTITY_NAME
+        );
     }
 
     @Test
@@ -930,10 +795,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where ownerEntityName is not null
-        defaultUploadFileShouldBeFound("ownerEntityName.specified=true");
-
-        // Get all the uploadFileList where ownerEntityName is null
-        defaultUploadFileShouldNotBeFound("ownerEntityName.specified=false");
+        defaultUploadFileFiltering("ownerEntityName.specified=true", "ownerEntityName.specified=false");
     }
 
     @Test
@@ -942,11 +804,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where ownerEntityName contains DEFAULT_OWNER_ENTITY_NAME
-        defaultUploadFileShouldBeFound("ownerEntityName.contains=" + DEFAULT_OWNER_ENTITY_NAME);
-
-        // Get all the uploadFileList where ownerEntityName contains UPDATED_OWNER_ENTITY_NAME
-        defaultUploadFileShouldNotBeFound("ownerEntityName.contains=" + UPDATED_OWNER_ENTITY_NAME);
+        // Get all the uploadFileList where ownerEntityName contains
+        defaultUploadFileFiltering(
+            "ownerEntityName.contains=" + DEFAULT_OWNER_ENTITY_NAME,
+            "ownerEntityName.contains=" + UPDATED_OWNER_ENTITY_NAME
+        );
     }
 
     @Test
@@ -955,11 +817,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where ownerEntityName does not contain DEFAULT_OWNER_ENTITY_NAME
-        defaultUploadFileShouldNotBeFound("ownerEntityName.doesNotContain=" + DEFAULT_OWNER_ENTITY_NAME);
-
-        // Get all the uploadFileList where ownerEntityName does not contain UPDATED_OWNER_ENTITY_NAME
-        defaultUploadFileShouldBeFound("ownerEntityName.doesNotContain=" + UPDATED_OWNER_ENTITY_NAME);
+        // Get all the uploadFileList where ownerEntityName does not contain
+        defaultUploadFileFiltering(
+            "ownerEntityName.doesNotContain=" + UPDATED_OWNER_ENTITY_NAME,
+            "ownerEntityName.doesNotContain=" + DEFAULT_OWNER_ENTITY_NAME
+        );
     }
 
     @Test
@@ -968,11 +830,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where ownerEntityId equals to DEFAULT_OWNER_ENTITY_ID
-        defaultUploadFileShouldBeFound("ownerEntityId.equals=" + DEFAULT_OWNER_ENTITY_ID);
-
-        // Get all the uploadFileList where ownerEntityId equals to UPDATED_OWNER_ENTITY_ID
-        defaultUploadFileShouldNotBeFound("ownerEntityId.equals=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the uploadFileList where ownerEntityId equals to
+        defaultUploadFileFiltering("ownerEntityId.equals=" + DEFAULT_OWNER_ENTITY_ID, "ownerEntityId.equals=" + UPDATED_OWNER_ENTITY_ID);
     }
 
     @Test
@@ -981,11 +840,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where ownerEntityId in DEFAULT_OWNER_ENTITY_ID or UPDATED_OWNER_ENTITY_ID
-        defaultUploadFileShouldBeFound("ownerEntityId.in=" + DEFAULT_OWNER_ENTITY_ID + "," + UPDATED_OWNER_ENTITY_ID);
-
-        // Get all the uploadFileList where ownerEntityId equals to UPDATED_OWNER_ENTITY_ID
-        defaultUploadFileShouldNotBeFound("ownerEntityId.in=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the uploadFileList where ownerEntityId in
+        defaultUploadFileFiltering(
+            "ownerEntityId.in=" + DEFAULT_OWNER_ENTITY_ID + "," + UPDATED_OWNER_ENTITY_ID,
+            "ownerEntityId.in=" + UPDATED_OWNER_ENTITY_ID
+        );
     }
 
     @Test
@@ -995,10 +854,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where ownerEntityId is not null
-        defaultUploadFileShouldBeFound("ownerEntityId.specified=true");
-
-        // Get all the uploadFileList where ownerEntityId is null
-        defaultUploadFileShouldNotBeFound("ownerEntityId.specified=false");
+        defaultUploadFileFiltering("ownerEntityId.specified=true", "ownerEntityId.specified=false");
     }
 
     @Test
@@ -1007,11 +863,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where ownerEntityId is greater than or equal to DEFAULT_OWNER_ENTITY_ID
-        defaultUploadFileShouldBeFound("ownerEntityId.greaterThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID);
-
-        // Get all the uploadFileList where ownerEntityId is greater than or equal to UPDATED_OWNER_ENTITY_ID
-        defaultUploadFileShouldNotBeFound("ownerEntityId.greaterThanOrEqual=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the uploadFileList where ownerEntityId is greater than or equal to
+        defaultUploadFileFiltering(
+            "ownerEntityId.greaterThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID,
+            "ownerEntityId.greaterThanOrEqual=" + UPDATED_OWNER_ENTITY_ID
+        );
     }
 
     @Test
@@ -1020,11 +876,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where ownerEntityId is less than or equal to DEFAULT_OWNER_ENTITY_ID
-        defaultUploadFileShouldBeFound("ownerEntityId.lessThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID);
-
-        // Get all the uploadFileList where ownerEntityId is less than or equal to SMALLER_OWNER_ENTITY_ID
-        defaultUploadFileShouldNotBeFound("ownerEntityId.lessThanOrEqual=" + SMALLER_OWNER_ENTITY_ID);
+        // Get all the uploadFileList where ownerEntityId is less than or equal to
+        defaultUploadFileFiltering(
+            "ownerEntityId.lessThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID,
+            "ownerEntityId.lessThanOrEqual=" + SMALLER_OWNER_ENTITY_ID
+        );
     }
 
     @Test
@@ -1033,11 +889,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where ownerEntityId is less than DEFAULT_OWNER_ENTITY_ID
-        defaultUploadFileShouldNotBeFound("ownerEntityId.lessThan=" + DEFAULT_OWNER_ENTITY_ID);
-
-        // Get all the uploadFileList where ownerEntityId is less than UPDATED_OWNER_ENTITY_ID
-        defaultUploadFileShouldBeFound("ownerEntityId.lessThan=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the uploadFileList where ownerEntityId is less than
+        defaultUploadFileFiltering(
+            "ownerEntityId.lessThan=" + UPDATED_OWNER_ENTITY_ID,
+            "ownerEntityId.lessThan=" + DEFAULT_OWNER_ENTITY_ID
+        );
     }
 
     @Test
@@ -1046,11 +902,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where ownerEntityId is greater than DEFAULT_OWNER_ENTITY_ID
-        defaultUploadFileShouldNotBeFound("ownerEntityId.greaterThan=" + DEFAULT_OWNER_ENTITY_ID);
-
-        // Get all the uploadFileList where ownerEntityId is greater than SMALLER_OWNER_ENTITY_ID
-        defaultUploadFileShouldBeFound("ownerEntityId.greaterThan=" + SMALLER_OWNER_ENTITY_ID);
+        // Get all the uploadFileList where ownerEntityId is greater than
+        defaultUploadFileFiltering(
+            "ownerEntityId.greaterThan=" + SMALLER_OWNER_ENTITY_ID,
+            "ownerEntityId.greaterThan=" + DEFAULT_OWNER_ENTITY_ID
+        );
     }
 
     @Test
@@ -1059,11 +915,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where businessTitle equals to DEFAULT_BUSINESS_TITLE
-        defaultUploadFileShouldBeFound("businessTitle.equals=" + DEFAULT_BUSINESS_TITLE);
-
-        // Get all the uploadFileList where businessTitle equals to UPDATED_BUSINESS_TITLE
-        defaultUploadFileShouldNotBeFound("businessTitle.equals=" + UPDATED_BUSINESS_TITLE);
+        // Get all the uploadFileList where businessTitle equals to
+        defaultUploadFileFiltering("businessTitle.equals=" + DEFAULT_BUSINESS_TITLE, "businessTitle.equals=" + UPDATED_BUSINESS_TITLE);
     }
 
     @Test
@@ -1072,11 +925,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where businessTitle in DEFAULT_BUSINESS_TITLE or UPDATED_BUSINESS_TITLE
-        defaultUploadFileShouldBeFound("businessTitle.in=" + DEFAULT_BUSINESS_TITLE + "," + UPDATED_BUSINESS_TITLE);
-
-        // Get all the uploadFileList where businessTitle equals to UPDATED_BUSINESS_TITLE
-        defaultUploadFileShouldNotBeFound("businessTitle.in=" + UPDATED_BUSINESS_TITLE);
+        // Get all the uploadFileList where businessTitle in
+        defaultUploadFileFiltering(
+            "businessTitle.in=" + DEFAULT_BUSINESS_TITLE + "," + UPDATED_BUSINESS_TITLE,
+            "businessTitle.in=" + UPDATED_BUSINESS_TITLE
+        );
     }
 
     @Test
@@ -1086,10 +939,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where businessTitle is not null
-        defaultUploadFileShouldBeFound("businessTitle.specified=true");
-
-        // Get all the uploadFileList where businessTitle is null
-        defaultUploadFileShouldNotBeFound("businessTitle.specified=false");
+        defaultUploadFileFiltering("businessTitle.specified=true", "businessTitle.specified=false");
     }
 
     @Test
@@ -1098,11 +948,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where businessTitle contains DEFAULT_BUSINESS_TITLE
-        defaultUploadFileShouldBeFound("businessTitle.contains=" + DEFAULT_BUSINESS_TITLE);
-
-        // Get all the uploadFileList where businessTitle contains UPDATED_BUSINESS_TITLE
-        defaultUploadFileShouldNotBeFound("businessTitle.contains=" + UPDATED_BUSINESS_TITLE);
+        // Get all the uploadFileList where businessTitle contains
+        defaultUploadFileFiltering("businessTitle.contains=" + DEFAULT_BUSINESS_TITLE, "businessTitle.contains=" + UPDATED_BUSINESS_TITLE);
     }
 
     @Test
@@ -1111,11 +958,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where businessTitle does not contain DEFAULT_BUSINESS_TITLE
-        defaultUploadFileShouldNotBeFound("businessTitle.doesNotContain=" + DEFAULT_BUSINESS_TITLE);
-
-        // Get all the uploadFileList where businessTitle does not contain UPDATED_BUSINESS_TITLE
-        defaultUploadFileShouldBeFound("businessTitle.doesNotContain=" + UPDATED_BUSINESS_TITLE);
+        // Get all the uploadFileList where businessTitle does not contain
+        defaultUploadFileFiltering(
+            "businessTitle.doesNotContain=" + UPDATED_BUSINESS_TITLE,
+            "businessTitle.doesNotContain=" + DEFAULT_BUSINESS_TITLE
+        );
     }
 
     @Test
@@ -1124,11 +971,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where businessDesc equals to DEFAULT_BUSINESS_DESC
-        defaultUploadFileShouldBeFound("businessDesc.equals=" + DEFAULT_BUSINESS_DESC);
-
-        // Get all the uploadFileList where businessDesc equals to UPDATED_BUSINESS_DESC
-        defaultUploadFileShouldNotBeFound("businessDesc.equals=" + UPDATED_BUSINESS_DESC);
+        // Get all the uploadFileList where businessDesc equals to
+        defaultUploadFileFiltering("businessDesc.equals=" + DEFAULT_BUSINESS_DESC, "businessDesc.equals=" + UPDATED_BUSINESS_DESC);
     }
 
     @Test
@@ -1137,11 +981,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where businessDesc in DEFAULT_BUSINESS_DESC or UPDATED_BUSINESS_DESC
-        defaultUploadFileShouldBeFound("businessDesc.in=" + DEFAULT_BUSINESS_DESC + "," + UPDATED_BUSINESS_DESC);
-
-        // Get all the uploadFileList where businessDesc equals to UPDATED_BUSINESS_DESC
-        defaultUploadFileShouldNotBeFound("businessDesc.in=" + UPDATED_BUSINESS_DESC);
+        // Get all the uploadFileList where businessDesc in
+        defaultUploadFileFiltering(
+            "businessDesc.in=" + DEFAULT_BUSINESS_DESC + "," + UPDATED_BUSINESS_DESC,
+            "businessDesc.in=" + UPDATED_BUSINESS_DESC
+        );
     }
 
     @Test
@@ -1151,10 +995,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where businessDesc is not null
-        defaultUploadFileShouldBeFound("businessDesc.specified=true");
-
-        // Get all the uploadFileList where businessDesc is null
-        defaultUploadFileShouldNotBeFound("businessDesc.specified=false");
+        defaultUploadFileFiltering("businessDesc.specified=true", "businessDesc.specified=false");
     }
 
     @Test
@@ -1163,11 +1004,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where businessDesc contains DEFAULT_BUSINESS_DESC
-        defaultUploadFileShouldBeFound("businessDesc.contains=" + DEFAULT_BUSINESS_DESC);
-
-        // Get all the uploadFileList where businessDesc contains UPDATED_BUSINESS_DESC
-        defaultUploadFileShouldNotBeFound("businessDesc.contains=" + UPDATED_BUSINESS_DESC);
+        // Get all the uploadFileList where businessDesc contains
+        defaultUploadFileFiltering("businessDesc.contains=" + DEFAULT_BUSINESS_DESC, "businessDesc.contains=" + UPDATED_BUSINESS_DESC);
     }
 
     @Test
@@ -1176,11 +1014,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where businessDesc does not contain DEFAULT_BUSINESS_DESC
-        defaultUploadFileShouldNotBeFound("businessDesc.doesNotContain=" + DEFAULT_BUSINESS_DESC);
-
-        // Get all the uploadFileList where businessDesc does not contain UPDATED_BUSINESS_DESC
-        defaultUploadFileShouldBeFound("businessDesc.doesNotContain=" + UPDATED_BUSINESS_DESC);
+        // Get all the uploadFileList where businessDesc does not contain
+        defaultUploadFileFiltering(
+            "businessDesc.doesNotContain=" + UPDATED_BUSINESS_DESC,
+            "businessDesc.doesNotContain=" + DEFAULT_BUSINESS_DESC
+        );
     }
 
     @Test
@@ -1189,11 +1027,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where businessStatus equals to DEFAULT_BUSINESS_STATUS
-        defaultUploadFileShouldBeFound("businessStatus.equals=" + DEFAULT_BUSINESS_STATUS);
-
-        // Get all the uploadFileList where businessStatus equals to UPDATED_BUSINESS_STATUS
-        defaultUploadFileShouldNotBeFound("businessStatus.equals=" + UPDATED_BUSINESS_STATUS);
+        // Get all the uploadFileList where businessStatus equals to
+        defaultUploadFileFiltering("businessStatus.equals=" + DEFAULT_BUSINESS_STATUS, "businessStatus.equals=" + UPDATED_BUSINESS_STATUS);
     }
 
     @Test
@@ -1202,11 +1037,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where businessStatus in DEFAULT_BUSINESS_STATUS or UPDATED_BUSINESS_STATUS
-        defaultUploadFileShouldBeFound("businessStatus.in=" + DEFAULT_BUSINESS_STATUS + "," + UPDATED_BUSINESS_STATUS);
-
-        // Get all the uploadFileList where businessStatus equals to UPDATED_BUSINESS_STATUS
-        defaultUploadFileShouldNotBeFound("businessStatus.in=" + UPDATED_BUSINESS_STATUS);
+        // Get all the uploadFileList where businessStatus in
+        defaultUploadFileFiltering(
+            "businessStatus.in=" + DEFAULT_BUSINESS_STATUS + "," + UPDATED_BUSINESS_STATUS,
+            "businessStatus.in=" + UPDATED_BUSINESS_STATUS
+        );
     }
 
     @Test
@@ -1216,10 +1051,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where businessStatus is not null
-        defaultUploadFileShouldBeFound("businessStatus.specified=true");
-
-        // Get all the uploadFileList where businessStatus is null
-        defaultUploadFileShouldNotBeFound("businessStatus.specified=false");
+        defaultUploadFileFiltering("businessStatus.specified=true", "businessStatus.specified=false");
     }
 
     @Test
@@ -1228,11 +1060,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where businessStatus contains DEFAULT_BUSINESS_STATUS
-        defaultUploadFileShouldBeFound("businessStatus.contains=" + DEFAULT_BUSINESS_STATUS);
-
-        // Get all the uploadFileList where businessStatus contains UPDATED_BUSINESS_STATUS
-        defaultUploadFileShouldNotBeFound("businessStatus.contains=" + UPDATED_BUSINESS_STATUS);
+        // Get all the uploadFileList where businessStatus contains
+        defaultUploadFileFiltering(
+            "businessStatus.contains=" + DEFAULT_BUSINESS_STATUS,
+            "businessStatus.contains=" + UPDATED_BUSINESS_STATUS
+        );
     }
 
     @Test
@@ -1241,11 +1073,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where businessStatus does not contain DEFAULT_BUSINESS_STATUS
-        defaultUploadFileShouldNotBeFound("businessStatus.doesNotContain=" + DEFAULT_BUSINESS_STATUS);
-
-        // Get all the uploadFileList where businessStatus does not contain UPDATED_BUSINESS_STATUS
-        defaultUploadFileShouldBeFound("businessStatus.doesNotContain=" + UPDATED_BUSINESS_STATUS);
+        // Get all the uploadFileList where businessStatus does not contain
+        defaultUploadFileFiltering(
+            "businessStatus.doesNotContain=" + UPDATED_BUSINESS_STATUS,
+            "businessStatus.doesNotContain=" + DEFAULT_BUSINESS_STATUS
+        );
     }
 
     @Test
@@ -1254,11 +1086,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where createAt equals to DEFAULT_CREATE_AT
-        defaultUploadFileShouldBeFound("createAt.equals=" + DEFAULT_CREATE_AT);
-
-        // Get all the uploadFileList where createAt equals to UPDATED_CREATE_AT
-        defaultUploadFileShouldNotBeFound("createAt.equals=" + UPDATED_CREATE_AT);
+        // Get all the uploadFileList where createAt equals to
+        defaultUploadFileFiltering("createAt.equals=" + DEFAULT_CREATE_AT, "createAt.equals=" + UPDATED_CREATE_AT);
     }
 
     @Test
@@ -1267,11 +1096,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where createAt in DEFAULT_CREATE_AT or UPDATED_CREATE_AT
-        defaultUploadFileShouldBeFound("createAt.in=" + DEFAULT_CREATE_AT + "," + UPDATED_CREATE_AT);
-
-        // Get all the uploadFileList where createAt equals to UPDATED_CREATE_AT
-        defaultUploadFileShouldNotBeFound("createAt.in=" + UPDATED_CREATE_AT);
+        // Get all the uploadFileList where createAt in
+        defaultUploadFileFiltering("createAt.in=" + DEFAULT_CREATE_AT + "," + UPDATED_CREATE_AT, "createAt.in=" + UPDATED_CREATE_AT);
     }
 
     @Test
@@ -1281,10 +1107,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where createAt is not null
-        defaultUploadFileShouldBeFound("createAt.specified=true");
-
-        // Get all the uploadFileList where createAt is null
-        defaultUploadFileShouldNotBeFound("createAt.specified=false");
+        defaultUploadFileFiltering("createAt.specified=true", "createAt.specified=false");
     }
 
     @Test
@@ -1293,11 +1116,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where createAt is greater than or equal to DEFAULT_CREATE_AT
-        defaultUploadFileShouldBeFound("createAt.greaterThanOrEqual=" + DEFAULT_CREATE_AT);
-
-        // Get all the uploadFileList where createAt is greater than or equal to UPDATED_CREATE_AT
-        defaultUploadFileShouldNotBeFound("createAt.greaterThanOrEqual=" + UPDATED_CREATE_AT);
+        // Get all the uploadFileList where createAt is greater than or equal to
+        defaultUploadFileFiltering("createAt.greaterThanOrEqual=" + DEFAULT_CREATE_AT, "createAt.greaterThanOrEqual=" + UPDATED_CREATE_AT);
     }
 
     @Test
@@ -1306,11 +1126,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where createAt is less than or equal to DEFAULT_CREATE_AT
-        defaultUploadFileShouldBeFound("createAt.lessThanOrEqual=" + DEFAULT_CREATE_AT);
-
-        // Get all the uploadFileList where createAt is less than or equal to SMALLER_CREATE_AT
-        defaultUploadFileShouldNotBeFound("createAt.lessThanOrEqual=" + SMALLER_CREATE_AT);
+        // Get all the uploadFileList where createAt is less than or equal to
+        defaultUploadFileFiltering("createAt.lessThanOrEqual=" + DEFAULT_CREATE_AT, "createAt.lessThanOrEqual=" + SMALLER_CREATE_AT);
     }
 
     @Test
@@ -1319,11 +1136,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where createAt is less than DEFAULT_CREATE_AT
-        defaultUploadFileShouldNotBeFound("createAt.lessThan=" + DEFAULT_CREATE_AT);
-
-        // Get all the uploadFileList where createAt is less than UPDATED_CREATE_AT
-        defaultUploadFileShouldBeFound("createAt.lessThan=" + UPDATED_CREATE_AT);
+        // Get all the uploadFileList where createAt is less than
+        defaultUploadFileFiltering("createAt.lessThan=" + UPDATED_CREATE_AT, "createAt.lessThan=" + DEFAULT_CREATE_AT);
     }
 
     @Test
@@ -1332,11 +1146,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where createAt is greater than DEFAULT_CREATE_AT
-        defaultUploadFileShouldNotBeFound("createAt.greaterThan=" + DEFAULT_CREATE_AT);
-
-        // Get all the uploadFileList where createAt is greater than SMALLER_CREATE_AT
-        defaultUploadFileShouldBeFound("createAt.greaterThan=" + SMALLER_CREATE_AT);
+        // Get all the uploadFileList where createAt is greater than
+        defaultUploadFileFiltering("createAt.greaterThan=" + SMALLER_CREATE_AT, "createAt.greaterThan=" + DEFAULT_CREATE_AT);
     }
 
     @Test
@@ -1345,11 +1156,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where fileSize equals to DEFAULT_FILE_SIZE
-        defaultUploadFileShouldBeFound("fileSize.equals=" + DEFAULT_FILE_SIZE);
-
-        // Get all the uploadFileList where fileSize equals to UPDATED_FILE_SIZE
-        defaultUploadFileShouldNotBeFound("fileSize.equals=" + UPDATED_FILE_SIZE);
+        // Get all the uploadFileList where fileSize equals to
+        defaultUploadFileFiltering("fileSize.equals=" + DEFAULT_FILE_SIZE, "fileSize.equals=" + UPDATED_FILE_SIZE);
     }
 
     @Test
@@ -1358,11 +1166,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where fileSize in DEFAULT_FILE_SIZE or UPDATED_FILE_SIZE
-        defaultUploadFileShouldBeFound("fileSize.in=" + DEFAULT_FILE_SIZE + "," + UPDATED_FILE_SIZE);
-
-        // Get all the uploadFileList where fileSize equals to UPDATED_FILE_SIZE
-        defaultUploadFileShouldNotBeFound("fileSize.in=" + UPDATED_FILE_SIZE);
+        // Get all the uploadFileList where fileSize in
+        defaultUploadFileFiltering("fileSize.in=" + DEFAULT_FILE_SIZE + "," + UPDATED_FILE_SIZE, "fileSize.in=" + UPDATED_FILE_SIZE);
     }
 
     @Test
@@ -1372,10 +1177,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where fileSize is not null
-        defaultUploadFileShouldBeFound("fileSize.specified=true");
-
-        // Get all the uploadFileList where fileSize is null
-        defaultUploadFileShouldNotBeFound("fileSize.specified=false");
+        defaultUploadFileFiltering("fileSize.specified=true", "fileSize.specified=false");
     }
 
     @Test
@@ -1384,11 +1186,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where fileSize is greater than or equal to DEFAULT_FILE_SIZE
-        defaultUploadFileShouldBeFound("fileSize.greaterThanOrEqual=" + DEFAULT_FILE_SIZE);
-
-        // Get all the uploadFileList where fileSize is greater than or equal to UPDATED_FILE_SIZE
-        defaultUploadFileShouldNotBeFound("fileSize.greaterThanOrEqual=" + UPDATED_FILE_SIZE);
+        // Get all the uploadFileList where fileSize is greater than or equal to
+        defaultUploadFileFiltering("fileSize.greaterThanOrEqual=" + DEFAULT_FILE_SIZE, "fileSize.greaterThanOrEqual=" + UPDATED_FILE_SIZE);
     }
 
     @Test
@@ -1397,11 +1196,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where fileSize is less than or equal to DEFAULT_FILE_SIZE
-        defaultUploadFileShouldBeFound("fileSize.lessThanOrEqual=" + DEFAULT_FILE_SIZE);
-
-        // Get all the uploadFileList where fileSize is less than or equal to SMALLER_FILE_SIZE
-        defaultUploadFileShouldNotBeFound("fileSize.lessThanOrEqual=" + SMALLER_FILE_SIZE);
+        // Get all the uploadFileList where fileSize is less than or equal to
+        defaultUploadFileFiltering("fileSize.lessThanOrEqual=" + DEFAULT_FILE_SIZE, "fileSize.lessThanOrEqual=" + SMALLER_FILE_SIZE);
     }
 
     @Test
@@ -1410,11 +1206,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where fileSize is less than DEFAULT_FILE_SIZE
-        defaultUploadFileShouldNotBeFound("fileSize.lessThan=" + DEFAULT_FILE_SIZE);
-
-        // Get all the uploadFileList where fileSize is less than UPDATED_FILE_SIZE
-        defaultUploadFileShouldBeFound("fileSize.lessThan=" + UPDATED_FILE_SIZE);
+        // Get all the uploadFileList where fileSize is less than
+        defaultUploadFileFiltering("fileSize.lessThan=" + UPDATED_FILE_SIZE, "fileSize.lessThan=" + DEFAULT_FILE_SIZE);
     }
 
     @Test
@@ -1423,11 +1216,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where fileSize is greater than DEFAULT_FILE_SIZE
-        defaultUploadFileShouldNotBeFound("fileSize.greaterThan=" + DEFAULT_FILE_SIZE);
-
-        // Get all the uploadFileList where fileSize is greater than SMALLER_FILE_SIZE
-        defaultUploadFileShouldBeFound("fileSize.greaterThan=" + SMALLER_FILE_SIZE);
+        // Get all the uploadFileList where fileSize is greater than
+        defaultUploadFileFiltering("fileSize.greaterThan=" + SMALLER_FILE_SIZE, "fileSize.greaterThan=" + DEFAULT_FILE_SIZE);
     }
 
     @Test
@@ -1436,11 +1226,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where referenceCount equals to DEFAULT_REFERENCE_COUNT
-        defaultUploadFileShouldBeFound("referenceCount.equals=" + DEFAULT_REFERENCE_COUNT);
-
-        // Get all the uploadFileList where referenceCount equals to UPDATED_REFERENCE_COUNT
-        defaultUploadFileShouldNotBeFound("referenceCount.equals=" + UPDATED_REFERENCE_COUNT);
+        // Get all the uploadFileList where referenceCount equals to
+        defaultUploadFileFiltering("referenceCount.equals=" + DEFAULT_REFERENCE_COUNT, "referenceCount.equals=" + UPDATED_REFERENCE_COUNT);
     }
 
     @Test
@@ -1449,11 +1236,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where referenceCount in DEFAULT_REFERENCE_COUNT or UPDATED_REFERENCE_COUNT
-        defaultUploadFileShouldBeFound("referenceCount.in=" + DEFAULT_REFERENCE_COUNT + "," + UPDATED_REFERENCE_COUNT);
-
-        // Get all the uploadFileList where referenceCount equals to UPDATED_REFERENCE_COUNT
-        defaultUploadFileShouldNotBeFound("referenceCount.in=" + UPDATED_REFERENCE_COUNT);
+        // Get all the uploadFileList where referenceCount in
+        defaultUploadFileFiltering(
+            "referenceCount.in=" + DEFAULT_REFERENCE_COUNT + "," + UPDATED_REFERENCE_COUNT,
+            "referenceCount.in=" + UPDATED_REFERENCE_COUNT
+        );
     }
 
     @Test
@@ -1463,10 +1250,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where referenceCount is not null
-        defaultUploadFileShouldBeFound("referenceCount.specified=true");
-
-        // Get all the uploadFileList where referenceCount is null
-        defaultUploadFileShouldNotBeFound("referenceCount.specified=false");
+        defaultUploadFileFiltering("referenceCount.specified=true", "referenceCount.specified=false");
     }
 
     @Test
@@ -1475,11 +1259,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where referenceCount is greater than or equal to DEFAULT_REFERENCE_COUNT
-        defaultUploadFileShouldBeFound("referenceCount.greaterThanOrEqual=" + DEFAULT_REFERENCE_COUNT);
-
-        // Get all the uploadFileList where referenceCount is greater than or equal to UPDATED_REFERENCE_COUNT
-        defaultUploadFileShouldNotBeFound("referenceCount.greaterThanOrEqual=" + UPDATED_REFERENCE_COUNT);
+        // Get all the uploadFileList where referenceCount is greater than or equal to
+        defaultUploadFileFiltering(
+            "referenceCount.greaterThanOrEqual=" + DEFAULT_REFERENCE_COUNT,
+            "referenceCount.greaterThanOrEqual=" + UPDATED_REFERENCE_COUNT
+        );
     }
 
     @Test
@@ -1488,11 +1272,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where referenceCount is less than or equal to DEFAULT_REFERENCE_COUNT
-        defaultUploadFileShouldBeFound("referenceCount.lessThanOrEqual=" + DEFAULT_REFERENCE_COUNT);
-
-        // Get all the uploadFileList where referenceCount is less than or equal to SMALLER_REFERENCE_COUNT
-        defaultUploadFileShouldNotBeFound("referenceCount.lessThanOrEqual=" + SMALLER_REFERENCE_COUNT);
+        // Get all the uploadFileList where referenceCount is less than or equal to
+        defaultUploadFileFiltering(
+            "referenceCount.lessThanOrEqual=" + DEFAULT_REFERENCE_COUNT,
+            "referenceCount.lessThanOrEqual=" + SMALLER_REFERENCE_COUNT
+        );
     }
 
     @Test
@@ -1501,11 +1285,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where referenceCount is less than DEFAULT_REFERENCE_COUNT
-        defaultUploadFileShouldNotBeFound("referenceCount.lessThan=" + DEFAULT_REFERENCE_COUNT);
-
-        // Get all the uploadFileList where referenceCount is less than UPDATED_REFERENCE_COUNT
-        defaultUploadFileShouldBeFound("referenceCount.lessThan=" + UPDATED_REFERENCE_COUNT);
+        // Get all the uploadFileList where referenceCount is less than
+        defaultUploadFileFiltering(
+            "referenceCount.lessThan=" + UPDATED_REFERENCE_COUNT,
+            "referenceCount.lessThan=" + DEFAULT_REFERENCE_COUNT
+        );
     }
 
     @Test
@@ -1514,11 +1298,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where referenceCount is greater than DEFAULT_REFERENCE_COUNT
-        defaultUploadFileShouldNotBeFound("referenceCount.greaterThan=" + DEFAULT_REFERENCE_COUNT);
-
-        // Get all the uploadFileList where referenceCount is greater than SMALLER_REFERENCE_COUNT
-        defaultUploadFileShouldBeFound("referenceCount.greaterThan=" + SMALLER_REFERENCE_COUNT);
+        // Get all the uploadFileList where referenceCount is greater than
+        defaultUploadFileFiltering(
+            "referenceCount.greaterThan=" + SMALLER_REFERENCE_COUNT,
+            "referenceCount.greaterThan=" + DEFAULT_REFERENCE_COUNT
+        );
     }
 
     @Test
@@ -1527,11 +1311,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where createdBy equals to DEFAULT_CREATED_BY
-        defaultUploadFileShouldBeFound("createdBy.equals=" + DEFAULT_CREATED_BY);
-
-        // Get all the uploadFileList where createdBy equals to UPDATED_CREATED_BY
-        defaultUploadFileShouldNotBeFound("createdBy.equals=" + UPDATED_CREATED_BY);
+        // Get all the uploadFileList where createdBy equals to
+        defaultUploadFileFiltering("createdBy.equals=" + DEFAULT_CREATED_BY, "createdBy.equals=" + UPDATED_CREATED_BY);
     }
 
     @Test
@@ -1540,11 +1321,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where createdBy in DEFAULT_CREATED_BY or UPDATED_CREATED_BY
-        defaultUploadFileShouldBeFound("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY);
-
-        // Get all the uploadFileList where createdBy equals to UPDATED_CREATED_BY
-        defaultUploadFileShouldNotBeFound("createdBy.in=" + UPDATED_CREATED_BY);
+        // Get all the uploadFileList where createdBy in
+        defaultUploadFileFiltering("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY, "createdBy.in=" + UPDATED_CREATED_BY);
     }
 
     @Test
@@ -1554,10 +1332,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where createdBy is not null
-        defaultUploadFileShouldBeFound("createdBy.specified=true");
-
-        // Get all the uploadFileList where createdBy is null
-        defaultUploadFileShouldNotBeFound("createdBy.specified=false");
+        defaultUploadFileFiltering("createdBy.specified=true", "createdBy.specified=false");
     }
 
     @Test
@@ -1566,11 +1341,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where createdBy is greater than or equal to DEFAULT_CREATED_BY
-        defaultUploadFileShouldBeFound("createdBy.greaterThanOrEqual=" + DEFAULT_CREATED_BY);
-
-        // Get all the uploadFileList where createdBy is greater than or equal to UPDATED_CREATED_BY
-        defaultUploadFileShouldNotBeFound("createdBy.greaterThanOrEqual=" + UPDATED_CREATED_BY);
+        // Get all the uploadFileList where createdBy is greater than or equal to
+        defaultUploadFileFiltering(
+            "createdBy.greaterThanOrEqual=" + DEFAULT_CREATED_BY,
+            "createdBy.greaterThanOrEqual=" + UPDATED_CREATED_BY
+        );
     }
 
     @Test
@@ -1579,11 +1354,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where createdBy is less than or equal to DEFAULT_CREATED_BY
-        defaultUploadFileShouldBeFound("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY);
-
-        // Get all the uploadFileList where createdBy is less than or equal to SMALLER_CREATED_BY
-        defaultUploadFileShouldNotBeFound("createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
+        // Get all the uploadFileList where createdBy is less than or equal to
+        defaultUploadFileFiltering("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
     }
 
     @Test
@@ -1592,11 +1364,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where createdBy is less than DEFAULT_CREATED_BY
-        defaultUploadFileShouldNotBeFound("createdBy.lessThan=" + DEFAULT_CREATED_BY);
-
-        // Get all the uploadFileList where createdBy is less than UPDATED_CREATED_BY
-        defaultUploadFileShouldBeFound("createdBy.lessThan=" + UPDATED_CREATED_BY);
+        // Get all the uploadFileList where createdBy is less than
+        defaultUploadFileFiltering("createdBy.lessThan=" + UPDATED_CREATED_BY, "createdBy.lessThan=" + DEFAULT_CREATED_BY);
     }
 
     @Test
@@ -1605,11 +1374,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where createdBy is greater than DEFAULT_CREATED_BY
-        defaultUploadFileShouldNotBeFound("createdBy.greaterThan=" + DEFAULT_CREATED_BY);
-
-        // Get all the uploadFileList where createdBy is greater than SMALLER_CREATED_BY
-        defaultUploadFileShouldBeFound("createdBy.greaterThan=" + SMALLER_CREATED_BY);
+        // Get all the uploadFileList where createdBy is greater than
+        defaultUploadFileFiltering("createdBy.greaterThan=" + SMALLER_CREATED_BY, "createdBy.greaterThan=" + DEFAULT_CREATED_BY);
     }
 
     @Test
@@ -1618,11 +1384,8 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where createdDate equals to DEFAULT_CREATED_DATE
-        defaultUploadFileShouldBeFound("createdDate.equals=" + DEFAULT_CREATED_DATE);
-
-        // Get all the uploadFileList where createdDate equals to UPDATED_CREATED_DATE
-        defaultUploadFileShouldNotBeFound("createdDate.equals=" + UPDATED_CREATED_DATE);
+        // Get all the uploadFileList where createdDate equals to
+        defaultUploadFileFiltering("createdDate.equals=" + DEFAULT_CREATED_DATE, "createdDate.equals=" + UPDATED_CREATED_DATE);
     }
 
     @Test
@@ -1631,11 +1394,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where createdDate in DEFAULT_CREATED_DATE or UPDATED_CREATED_DATE
-        defaultUploadFileShouldBeFound("createdDate.in=" + DEFAULT_CREATED_DATE + "," + UPDATED_CREATED_DATE);
-
-        // Get all the uploadFileList where createdDate equals to UPDATED_CREATED_DATE
-        defaultUploadFileShouldNotBeFound("createdDate.in=" + UPDATED_CREATED_DATE);
+        // Get all the uploadFileList where createdDate in
+        defaultUploadFileFiltering(
+            "createdDate.in=" + DEFAULT_CREATED_DATE + "," + UPDATED_CREATED_DATE,
+            "createdDate.in=" + UPDATED_CREATED_DATE
+        );
     }
 
     @Test
@@ -1645,10 +1408,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where createdDate is not null
-        defaultUploadFileShouldBeFound("createdDate.specified=true");
-
-        // Get all the uploadFileList where createdDate is null
-        defaultUploadFileShouldNotBeFound("createdDate.specified=false");
+        defaultUploadFileFiltering("createdDate.specified=true", "createdDate.specified=false");
     }
 
     @Test
@@ -1657,11 +1417,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where lastModifiedBy equals to DEFAULT_LAST_MODIFIED_BY
-        defaultUploadFileShouldBeFound("lastModifiedBy.equals=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the uploadFileList where lastModifiedBy equals to UPDATED_LAST_MODIFIED_BY
-        defaultUploadFileShouldNotBeFound("lastModifiedBy.equals=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the uploadFileList where lastModifiedBy equals to
+        defaultUploadFileFiltering(
+            "lastModifiedBy.equals=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.equals=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1670,11 +1430,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where lastModifiedBy in DEFAULT_LAST_MODIFIED_BY or UPDATED_LAST_MODIFIED_BY
-        defaultUploadFileShouldBeFound("lastModifiedBy.in=" + DEFAULT_LAST_MODIFIED_BY + "," + UPDATED_LAST_MODIFIED_BY);
-
-        // Get all the uploadFileList where lastModifiedBy equals to UPDATED_LAST_MODIFIED_BY
-        defaultUploadFileShouldNotBeFound("lastModifiedBy.in=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the uploadFileList where lastModifiedBy in
+        defaultUploadFileFiltering(
+            "lastModifiedBy.in=" + DEFAULT_LAST_MODIFIED_BY + "," + UPDATED_LAST_MODIFIED_BY,
+            "lastModifiedBy.in=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1684,10 +1444,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where lastModifiedBy is not null
-        defaultUploadFileShouldBeFound("lastModifiedBy.specified=true");
-
-        // Get all the uploadFileList where lastModifiedBy is null
-        defaultUploadFileShouldNotBeFound("lastModifiedBy.specified=false");
+        defaultUploadFileFiltering("lastModifiedBy.specified=true", "lastModifiedBy.specified=false");
     }
 
     @Test
@@ -1696,11 +1453,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where lastModifiedBy is greater than or equal to DEFAULT_LAST_MODIFIED_BY
-        defaultUploadFileShouldBeFound("lastModifiedBy.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the uploadFileList where lastModifiedBy is greater than or equal to UPDATED_LAST_MODIFIED_BY
-        defaultUploadFileShouldNotBeFound("lastModifiedBy.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the uploadFileList where lastModifiedBy is greater than or equal to
+        defaultUploadFileFiltering(
+            "lastModifiedBy.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1709,11 +1466,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where lastModifiedBy is less than or equal to DEFAULT_LAST_MODIFIED_BY
-        defaultUploadFileShouldBeFound("lastModifiedBy.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the uploadFileList where lastModifiedBy is less than or equal to SMALLER_LAST_MODIFIED_BY
-        defaultUploadFileShouldNotBeFound("lastModifiedBy.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_BY);
+        // Get all the uploadFileList where lastModifiedBy is less than or equal to
+        defaultUploadFileFiltering(
+            "lastModifiedBy.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1722,11 +1479,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where lastModifiedBy is less than DEFAULT_LAST_MODIFIED_BY
-        defaultUploadFileShouldNotBeFound("lastModifiedBy.lessThan=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the uploadFileList where lastModifiedBy is less than UPDATED_LAST_MODIFIED_BY
-        defaultUploadFileShouldBeFound("lastModifiedBy.lessThan=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the uploadFileList where lastModifiedBy is less than
+        defaultUploadFileFiltering(
+            "lastModifiedBy.lessThan=" + UPDATED_LAST_MODIFIED_BY,
+            "lastModifiedBy.lessThan=" + DEFAULT_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1735,11 +1492,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where lastModifiedBy is greater than DEFAULT_LAST_MODIFIED_BY
-        defaultUploadFileShouldNotBeFound("lastModifiedBy.greaterThan=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the uploadFileList where lastModifiedBy is greater than SMALLER_LAST_MODIFIED_BY
-        defaultUploadFileShouldBeFound("lastModifiedBy.greaterThan=" + SMALLER_LAST_MODIFIED_BY);
+        // Get all the uploadFileList where lastModifiedBy is greater than
+        defaultUploadFileFiltering(
+            "lastModifiedBy.greaterThan=" + SMALLER_LAST_MODIFIED_BY,
+            "lastModifiedBy.greaterThan=" + DEFAULT_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1748,11 +1505,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where lastModifiedDate equals to DEFAULT_LAST_MODIFIED_DATE
-        defaultUploadFileShouldBeFound("lastModifiedDate.equals=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the uploadFileList where lastModifiedDate equals to UPDATED_LAST_MODIFIED_DATE
-        defaultUploadFileShouldNotBeFound("lastModifiedDate.equals=" + UPDATED_LAST_MODIFIED_DATE);
+        // Get all the uploadFileList where lastModifiedDate equals to
+        defaultUploadFileFiltering(
+            "lastModifiedDate.equals=" + DEFAULT_LAST_MODIFIED_DATE,
+            "lastModifiedDate.equals=" + UPDATED_LAST_MODIFIED_DATE
+        );
     }
 
     @Test
@@ -1761,11 +1518,11 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        // Get all the uploadFileList where lastModifiedDate in DEFAULT_LAST_MODIFIED_DATE or UPDATED_LAST_MODIFIED_DATE
-        defaultUploadFileShouldBeFound("lastModifiedDate.in=" + DEFAULT_LAST_MODIFIED_DATE + "," + UPDATED_LAST_MODIFIED_DATE);
-
-        // Get all the uploadFileList where lastModifiedDate equals to UPDATED_LAST_MODIFIED_DATE
-        defaultUploadFileShouldNotBeFound("lastModifiedDate.in=" + UPDATED_LAST_MODIFIED_DATE);
+        // Get all the uploadFileList where lastModifiedDate in
+        defaultUploadFileFiltering(
+            "lastModifiedDate.in=" + DEFAULT_LAST_MODIFIED_DATE + "," + UPDATED_LAST_MODIFIED_DATE,
+            "lastModifiedDate.in=" + UPDATED_LAST_MODIFIED_DATE
+        );
     }
 
     @Test
@@ -1775,10 +1532,7 @@ public class UploadFileResourceIT {
         uploadFileRepository.save(uploadFile);
 
         // Get all the uploadFileList where lastModifiedDate is not null
-        defaultUploadFileShouldBeFound("lastModifiedDate.specified=true");
-
-        // Get all the uploadFileList where lastModifiedDate is null
-        defaultUploadFileShouldNotBeFound("lastModifiedDate.specified=false");
+        defaultUploadFileFiltering("lastModifiedDate.specified=true", "lastModifiedDate.specified=false");
     }
 
     @Test
@@ -1793,6 +1547,11 @@ public class UploadFileResourceIT {
 
         // Get all the uploadFileList where category equals to (categoryId + 1)
         defaultUploadFileShouldNotBeFound("categoryId.equals=" + (categoryId + 1));
+    }
+
+    private void defaultUploadFileFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultUploadFileShouldBeFound(shouldBeFound);
+        defaultUploadFileShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -1865,7 +1624,7 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        int databaseSizeBeforeUpdate = uploadFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the uploadFile
         UploadFile updatedUploadFile = uploadFileRepository.findById(uploadFile.getId()).orElseThrow();
@@ -1896,40 +1655,19 @@ public class UploadFileResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, uploadFileDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(uploadFileDTO))
+                    .content(om.writeValueAsBytes(uploadFileDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the UploadFile in the database
-        List<UploadFile> uploadFileList = uploadFileRepository.findAll();
-        assertThat(uploadFileList).hasSize(databaseSizeBeforeUpdate);
-        UploadFile testUploadFile = uploadFileList.get(uploadFileList.size() - 1);
-        assertThat(testUploadFile.getUrl()).isEqualTo(UPDATED_URL);
-        assertThat(testUploadFile.getFullName()).isEqualTo(UPDATED_FULL_NAME);
-        assertThat(testUploadFile.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testUploadFile.getThumb()).isEqualTo(UPDATED_THUMB);
-        assertThat(testUploadFile.getExt()).isEqualTo(UPDATED_EXT);
-        assertThat(testUploadFile.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testUploadFile.getPath()).isEqualTo(UPDATED_PATH);
-        assertThat(testUploadFile.getFolder()).isEqualTo(UPDATED_FOLDER);
-        assertThat(testUploadFile.getOwnerEntityName()).isEqualTo(UPDATED_OWNER_ENTITY_NAME);
-        assertThat(testUploadFile.getOwnerEntityId()).isEqualTo(UPDATED_OWNER_ENTITY_ID);
-        assertThat(testUploadFile.getBusinessTitle()).isEqualTo(UPDATED_BUSINESS_TITLE);
-        assertThat(testUploadFile.getBusinessDesc()).isEqualTo(UPDATED_BUSINESS_DESC);
-        assertThat(testUploadFile.getBusinessStatus()).isEqualTo(UPDATED_BUSINESS_STATUS);
-        assertThat(testUploadFile.getCreateAt()).isEqualTo(UPDATED_CREATE_AT);
-        assertThat(testUploadFile.getFileSize()).isEqualTo(UPDATED_FILE_SIZE);
-        assertThat(testUploadFile.getReferenceCount()).isEqualTo(UPDATED_REFERENCE_COUNT);
-        assertThat(testUploadFile.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testUploadFile.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testUploadFile.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testUploadFile.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedUploadFileToMatchAllProperties(updatedUploadFile);
     }
 
     @Test
     @Transactional
     void putNonExistingUploadFile() throws Exception {
-        int databaseSizeBeforeUpdate = uploadFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uploadFile.setId(longCount.incrementAndGet());
 
         // Create the UploadFile
@@ -1940,19 +1678,18 @@ public class UploadFileResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, uploadFileDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(uploadFileDTO))
+                    .content(om.writeValueAsBytes(uploadFileDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the UploadFile in the database
-        List<UploadFile> uploadFileList = uploadFileRepository.findAll();
-        assertThat(uploadFileList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchUploadFile() throws Exception {
-        int databaseSizeBeforeUpdate = uploadFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uploadFile.setId(longCount.incrementAndGet());
 
         // Create the UploadFile
@@ -1963,19 +1700,18 @@ public class UploadFileResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(uploadFileDTO))
+                    .content(om.writeValueAsBytes(uploadFileDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the UploadFile in the database
-        List<UploadFile> uploadFileList = uploadFileRepository.findAll();
-        assertThat(uploadFileList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamUploadFile() throws Exception {
-        int databaseSizeBeforeUpdate = uploadFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uploadFile.setId(longCount.incrementAndGet());
 
         // Create the UploadFile
@@ -1983,12 +1719,11 @@ public class UploadFileResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restUploadFileMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(uploadFileDTO)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(uploadFileDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the UploadFile in the database
-        List<UploadFile> uploadFileList = uploadFileRepository.findAll();
-        assertThat(uploadFileList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1997,7 +1732,7 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        int databaseSizeBeforeUpdate = uploadFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the uploadFile using partial update
         UploadFile partialUpdatedUploadFile = new UploadFile();
@@ -2005,48 +1740,32 @@ public class UploadFileResourceIT {
 
         partialUpdatedUploadFile
             .url(UPDATED_URL)
-            .path(UPDATED_PATH)
-            .folder(UPDATED_FOLDER)
-            .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
+            .fullName(UPDATED_FULL_NAME)
+            .name(UPDATED_NAME)
+            .thumb(UPDATED_THUMB)
             .ownerEntityId(UPDATED_OWNER_ENTITY_ID)
+            .businessTitle(UPDATED_BUSINESS_TITLE)
             .businessDesc(UPDATED_BUSINESS_DESC)
-            .createAt(UPDATED_CREATE_AT)
+            .businessStatus(UPDATED_BUSINESS_STATUS)
             .referenceCount(UPDATED_REFERENCE_COUNT)
-            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
-            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY);
 
         restUploadFileMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedUploadFile.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedUploadFile))
+                    .content(om.writeValueAsBytes(partialUpdatedUploadFile))
             )
             .andExpect(status().isOk());
 
         // Validate the UploadFile in the database
-        List<UploadFile> uploadFileList = uploadFileRepository.findAll();
-        assertThat(uploadFileList).hasSize(databaseSizeBeforeUpdate);
-        UploadFile testUploadFile = uploadFileList.get(uploadFileList.size() - 1);
-        assertThat(testUploadFile.getUrl()).isEqualTo(UPDATED_URL);
-        assertThat(testUploadFile.getFullName()).isEqualTo(DEFAULT_FULL_NAME);
-        assertThat(testUploadFile.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testUploadFile.getThumb()).isEqualTo(DEFAULT_THUMB);
-        assertThat(testUploadFile.getExt()).isEqualTo(DEFAULT_EXT);
-        assertThat(testUploadFile.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testUploadFile.getPath()).isEqualTo(UPDATED_PATH);
-        assertThat(testUploadFile.getFolder()).isEqualTo(UPDATED_FOLDER);
-        assertThat(testUploadFile.getOwnerEntityName()).isEqualTo(UPDATED_OWNER_ENTITY_NAME);
-        assertThat(testUploadFile.getOwnerEntityId()).isEqualTo(UPDATED_OWNER_ENTITY_ID);
-        assertThat(testUploadFile.getBusinessTitle()).isEqualTo(DEFAULT_BUSINESS_TITLE);
-        assertThat(testUploadFile.getBusinessDesc()).isEqualTo(UPDATED_BUSINESS_DESC);
-        assertThat(testUploadFile.getBusinessStatus()).isEqualTo(DEFAULT_BUSINESS_STATUS);
-        assertThat(testUploadFile.getCreateAt()).isEqualTo(UPDATED_CREATE_AT);
-        assertThat(testUploadFile.getFileSize()).isEqualTo(DEFAULT_FILE_SIZE);
-        assertThat(testUploadFile.getReferenceCount()).isEqualTo(UPDATED_REFERENCE_COUNT);
-        assertThat(testUploadFile.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY);
-        assertThat(testUploadFile.getCreatedDate()).isEqualTo(DEFAULT_CREATED_DATE);
-        assertThat(testUploadFile.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testUploadFile.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertUploadFileUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedUploadFile, uploadFile),
+            getPersistedUploadFile(uploadFile)
+        );
     }
 
     @Test
@@ -2055,7 +1774,7 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        int databaseSizeBeforeUpdate = uploadFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the uploadFile using partial update
         UploadFile partialUpdatedUploadFile = new UploadFile();
@@ -2087,40 +1806,20 @@ public class UploadFileResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedUploadFile.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedUploadFile))
+                    .content(om.writeValueAsBytes(partialUpdatedUploadFile))
             )
             .andExpect(status().isOk());
 
         // Validate the UploadFile in the database
-        List<UploadFile> uploadFileList = uploadFileRepository.findAll();
-        assertThat(uploadFileList).hasSize(databaseSizeBeforeUpdate);
-        UploadFile testUploadFile = uploadFileList.get(uploadFileList.size() - 1);
-        assertThat(testUploadFile.getUrl()).isEqualTo(UPDATED_URL);
-        assertThat(testUploadFile.getFullName()).isEqualTo(UPDATED_FULL_NAME);
-        assertThat(testUploadFile.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testUploadFile.getThumb()).isEqualTo(UPDATED_THUMB);
-        assertThat(testUploadFile.getExt()).isEqualTo(UPDATED_EXT);
-        assertThat(testUploadFile.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testUploadFile.getPath()).isEqualTo(UPDATED_PATH);
-        assertThat(testUploadFile.getFolder()).isEqualTo(UPDATED_FOLDER);
-        assertThat(testUploadFile.getOwnerEntityName()).isEqualTo(UPDATED_OWNER_ENTITY_NAME);
-        assertThat(testUploadFile.getOwnerEntityId()).isEqualTo(UPDATED_OWNER_ENTITY_ID);
-        assertThat(testUploadFile.getBusinessTitle()).isEqualTo(UPDATED_BUSINESS_TITLE);
-        assertThat(testUploadFile.getBusinessDesc()).isEqualTo(UPDATED_BUSINESS_DESC);
-        assertThat(testUploadFile.getBusinessStatus()).isEqualTo(UPDATED_BUSINESS_STATUS);
-        assertThat(testUploadFile.getCreateAt()).isEqualTo(UPDATED_CREATE_AT);
-        assertThat(testUploadFile.getFileSize()).isEqualTo(UPDATED_FILE_SIZE);
-        assertThat(testUploadFile.getReferenceCount()).isEqualTo(UPDATED_REFERENCE_COUNT);
-        assertThat(testUploadFile.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testUploadFile.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testUploadFile.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testUploadFile.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertUploadFileUpdatableFieldsEquals(partialUpdatedUploadFile, getPersistedUploadFile(partialUpdatedUploadFile));
     }
 
     @Test
     @Transactional
     void patchNonExistingUploadFile() throws Exception {
-        int databaseSizeBeforeUpdate = uploadFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uploadFile.setId(longCount.incrementAndGet());
 
         // Create the UploadFile
@@ -2131,19 +1830,18 @@ public class UploadFileResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, uploadFileDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(uploadFileDTO))
+                    .content(om.writeValueAsBytes(uploadFileDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the UploadFile in the database
-        List<UploadFile> uploadFileList = uploadFileRepository.findAll();
-        assertThat(uploadFileList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchUploadFile() throws Exception {
-        int databaseSizeBeforeUpdate = uploadFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uploadFile.setId(longCount.incrementAndGet());
 
         // Create the UploadFile
@@ -2154,19 +1852,18 @@ public class UploadFileResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(uploadFileDTO))
+                    .content(om.writeValueAsBytes(uploadFileDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the UploadFile in the database
-        List<UploadFile> uploadFileList = uploadFileRepository.findAll();
-        assertThat(uploadFileList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamUploadFile() throws Exception {
-        int databaseSizeBeforeUpdate = uploadFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uploadFile.setId(longCount.incrementAndGet());
 
         // Create the UploadFile
@@ -2174,14 +1871,11 @@ public class UploadFileResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restUploadFileMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(uploadFileDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(uploadFileDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the UploadFile in the database
-        List<UploadFile> uploadFileList = uploadFileRepository.findAll();
-        assertThat(uploadFileList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -2190,7 +1884,7 @@ public class UploadFileResourceIT {
         // Initialize the database
         uploadFileRepository.save(uploadFile);
 
-        int databaseSizeBeforeDelete = uploadFileRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the uploadFile
         restUploadFileMockMvc
@@ -2198,7 +1892,34 @@ public class UploadFileResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<UploadFile> uploadFileList = uploadFileRepository.findAll();
-        assertThat(uploadFileList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return uploadFileRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected UploadFile getPersistedUploadFile(UploadFile uploadFile) {
+        return uploadFileRepository.findById(uploadFile.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedUploadFileToMatchAllProperties(UploadFile expectedUploadFile) {
+        assertUploadFileAllPropertiesEquals(expectedUploadFile, getPersistedUploadFile(expectedUploadFile));
+    }
+
+    protected void assertPersistedUploadFileToMatchUpdatableProperties(UploadFile expectedUploadFile) {
+        assertUploadFileAllUpdatablePropertiesEquals(expectedUploadFile, getPersistedUploadFile(expectedUploadFile));
     }
 }

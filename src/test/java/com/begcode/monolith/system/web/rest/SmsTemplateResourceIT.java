@@ -1,5 +1,7 @@
 package com.begcode.monolith.system.web.rest;
 
+import static com.begcode.monolith.system.domain.SmsTemplateAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.*;
@@ -17,13 +19,10 @@ import com.begcode.monolith.system.repository.SmsTemplateRepository;
 import com.begcode.monolith.system.service.SmsTemplateService;
 import com.begcode.monolith.system.service.dto.SmsTemplateDTO;
 import com.begcode.monolith.system.service.mapper.SmsTemplateMapper;
-import com.begcode.monolith.web.rest.TestUtil;
-import com.begcode.monolith.web.rest.TestUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -86,8 +85,11 @@ public class SmsTemplateResourceIT {
     private static final String ENTITY_API_URL = "/api/sms-templates";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private SmsTemplateRepository smsTemplateRepository;
@@ -160,31 +162,23 @@ public class SmsTemplateResourceIT {
     @Test
     @Transactional
     void createSmsTemplate() throws Exception {
-        int databaseSizeBeforeCreate = smsTemplateRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the SmsTemplate
         SmsTemplateDTO smsTemplateDTO = smsTemplateMapper.toDto(smsTemplate);
-        restSmsTemplateMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(smsTemplateDTO))
-            )
-            .andExpect(status().isCreated());
+        var returnedSmsTemplateDTO = om.readValue(
+            restSmsTemplateMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(smsTemplateDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            SmsTemplateDTO.class
+        );
 
         // Validate the SmsTemplate in the database
-        List<SmsTemplate> smsTemplateList = smsTemplateRepository.findAll();
-        assertThat(smsTemplateList).hasSize(databaseSizeBeforeCreate + 1);
-        SmsTemplate testSmsTemplate = smsTemplateList.get(smsTemplateList.size() - 1);
-        assertThat(testSmsTemplate.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testSmsTemplate.getCode()).isEqualTo(DEFAULT_CODE);
-        assertThat(testSmsTemplate.getSendType()).isEqualTo(DEFAULT_SEND_TYPE);
-        assertThat(testSmsTemplate.getContent()).isEqualTo(DEFAULT_CONTENT);
-        assertThat(testSmsTemplate.getTestJson()).isEqualTo(DEFAULT_TEST_JSON);
-        assertThat(testSmsTemplate.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testSmsTemplate.getRemark()).isEqualTo(DEFAULT_REMARK);
-        assertThat(testSmsTemplate.getEnabled()).isEqualTo(DEFAULT_ENABLED);
-        assertThat(testSmsTemplate.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY);
-        assertThat(testSmsTemplate.getCreatedDate()).isEqualTo(DEFAULT_CREATED_DATE);
-        assertThat(testSmsTemplate.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
-        assertThat(testSmsTemplate.getLastModifiedDate()).isEqualTo(DEFAULT_LAST_MODIFIED_DATE);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedSmsTemplate = smsTemplateMapper.toEntity(returnedSmsTemplateDTO);
+        assertSmsTemplateUpdatableFieldsEquals(returnedSmsTemplate, getPersistedSmsTemplate(returnedSmsTemplate));
     }
 
     @Test
@@ -194,18 +188,15 @@ public class SmsTemplateResourceIT {
         smsTemplate.setId(1L);
         SmsTemplateDTO smsTemplateDTO = smsTemplateMapper.toDto(smsTemplate);
 
-        int databaseSizeBeforeCreate = smsTemplateRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restSmsTemplateMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(smsTemplateDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(smsTemplateDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the SmsTemplate in the database
-        List<SmsTemplate> smsTemplateList = smsTemplateRepository.findAll();
-        assertThat(smsTemplateList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
@@ -285,14 +276,11 @@ public class SmsTemplateResourceIT {
 
         Long id = smsTemplate.getId();
 
-        defaultSmsTemplateShouldBeFound("id.equals=" + id);
-        defaultSmsTemplateShouldNotBeFound("id.notEquals=" + id);
+        defaultSmsTemplateFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultSmsTemplateShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultSmsTemplateShouldNotBeFound("id.greaterThan=" + id);
+        defaultSmsTemplateFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultSmsTemplateShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultSmsTemplateShouldNotBeFound("id.lessThan=" + id);
+        defaultSmsTemplateFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -301,11 +289,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where name equals to DEFAULT_NAME
-        defaultSmsTemplateShouldBeFound("name.equals=" + DEFAULT_NAME);
-
-        // Get all the smsTemplateList where name equals to UPDATED_NAME
-        defaultSmsTemplateShouldNotBeFound("name.equals=" + UPDATED_NAME);
+        // Get all the smsTemplateList where name equals to
+        defaultSmsTemplateFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
     }
 
     @Test
@@ -314,11 +299,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where name in DEFAULT_NAME or UPDATED_NAME
-        defaultSmsTemplateShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
-
-        // Get all the smsTemplateList where name equals to UPDATED_NAME
-        defaultSmsTemplateShouldNotBeFound("name.in=" + UPDATED_NAME);
+        // Get all the smsTemplateList where name in
+        defaultSmsTemplateFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
     }
 
     @Test
@@ -328,10 +310,7 @@ public class SmsTemplateResourceIT {
         smsTemplateRepository.save(smsTemplate);
 
         // Get all the smsTemplateList where name is not null
-        defaultSmsTemplateShouldBeFound("name.specified=true");
-
-        // Get all the smsTemplateList where name is null
-        defaultSmsTemplateShouldNotBeFound("name.specified=false");
+        defaultSmsTemplateFiltering("name.specified=true", "name.specified=false");
     }
 
     @Test
@@ -340,11 +319,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where name contains DEFAULT_NAME
-        defaultSmsTemplateShouldBeFound("name.contains=" + DEFAULT_NAME);
-
-        // Get all the smsTemplateList where name contains UPDATED_NAME
-        defaultSmsTemplateShouldNotBeFound("name.contains=" + UPDATED_NAME);
+        // Get all the smsTemplateList where name contains
+        defaultSmsTemplateFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
     }
 
     @Test
@@ -353,11 +329,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where name does not contain DEFAULT_NAME
-        defaultSmsTemplateShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
-
-        // Get all the smsTemplateList where name does not contain UPDATED_NAME
-        defaultSmsTemplateShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+        // Get all the smsTemplateList where name does not contain
+        defaultSmsTemplateFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
     }
 
     @Test
@@ -366,11 +339,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where code equals to DEFAULT_CODE
-        defaultSmsTemplateShouldBeFound("code.equals=" + DEFAULT_CODE);
-
-        // Get all the smsTemplateList where code equals to UPDATED_CODE
-        defaultSmsTemplateShouldNotBeFound("code.equals=" + UPDATED_CODE);
+        // Get all the smsTemplateList where code equals to
+        defaultSmsTemplateFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
     }
 
     @Test
@@ -379,11 +349,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where code in DEFAULT_CODE or UPDATED_CODE
-        defaultSmsTemplateShouldBeFound("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE);
-
-        // Get all the smsTemplateList where code equals to UPDATED_CODE
-        defaultSmsTemplateShouldNotBeFound("code.in=" + UPDATED_CODE);
+        // Get all the smsTemplateList where code in
+        defaultSmsTemplateFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
     }
 
     @Test
@@ -393,10 +360,7 @@ public class SmsTemplateResourceIT {
         smsTemplateRepository.save(smsTemplate);
 
         // Get all the smsTemplateList where code is not null
-        defaultSmsTemplateShouldBeFound("code.specified=true");
-
-        // Get all the smsTemplateList where code is null
-        defaultSmsTemplateShouldNotBeFound("code.specified=false");
+        defaultSmsTemplateFiltering("code.specified=true", "code.specified=false");
     }
 
     @Test
@@ -405,11 +369,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where code contains DEFAULT_CODE
-        defaultSmsTemplateShouldBeFound("code.contains=" + DEFAULT_CODE);
-
-        // Get all the smsTemplateList where code contains UPDATED_CODE
-        defaultSmsTemplateShouldNotBeFound("code.contains=" + UPDATED_CODE);
+        // Get all the smsTemplateList where code contains
+        defaultSmsTemplateFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
     }
 
     @Test
@@ -418,11 +379,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where code does not contain DEFAULT_CODE
-        defaultSmsTemplateShouldNotBeFound("code.doesNotContain=" + DEFAULT_CODE);
-
-        // Get all the smsTemplateList where code does not contain UPDATED_CODE
-        defaultSmsTemplateShouldBeFound("code.doesNotContain=" + UPDATED_CODE);
+        // Get all the smsTemplateList where code does not contain
+        defaultSmsTemplateFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
     }
 
     @Test
@@ -431,11 +389,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where sendType equals to DEFAULT_SEND_TYPE
-        defaultSmsTemplateShouldBeFound("sendType.equals=" + DEFAULT_SEND_TYPE);
-
-        // Get all the smsTemplateList where sendType equals to UPDATED_SEND_TYPE
-        defaultSmsTemplateShouldNotBeFound("sendType.equals=" + UPDATED_SEND_TYPE);
+        // Get all the smsTemplateList where sendType equals to
+        defaultSmsTemplateFiltering("sendType.equals=" + DEFAULT_SEND_TYPE, "sendType.equals=" + UPDATED_SEND_TYPE);
     }
 
     @Test
@@ -444,11 +399,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where sendType in DEFAULT_SEND_TYPE or UPDATED_SEND_TYPE
-        defaultSmsTemplateShouldBeFound("sendType.in=" + DEFAULT_SEND_TYPE + "," + UPDATED_SEND_TYPE);
-
-        // Get all the smsTemplateList where sendType equals to UPDATED_SEND_TYPE
-        defaultSmsTemplateShouldNotBeFound("sendType.in=" + UPDATED_SEND_TYPE);
+        // Get all the smsTemplateList where sendType in
+        defaultSmsTemplateFiltering("sendType.in=" + DEFAULT_SEND_TYPE + "," + UPDATED_SEND_TYPE, "sendType.in=" + UPDATED_SEND_TYPE);
     }
 
     @Test
@@ -458,10 +410,7 @@ public class SmsTemplateResourceIT {
         smsTemplateRepository.save(smsTemplate);
 
         // Get all the smsTemplateList where sendType is not null
-        defaultSmsTemplateShouldBeFound("sendType.specified=true");
-
-        // Get all the smsTemplateList where sendType is null
-        defaultSmsTemplateShouldNotBeFound("sendType.specified=false");
+        defaultSmsTemplateFiltering("sendType.specified=true", "sendType.specified=false");
     }
 
     @Test
@@ -470,11 +419,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where content equals to DEFAULT_CONTENT
-        defaultSmsTemplateShouldBeFound("content.equals=" + DEFAULT_CONTENT);
-
-        // Get all the smsTemplateList where content equals to UPDATED_CONTENT
-        defaultSmsTemplateShouldNotBeFound("content.equals=" + UPDATED_CONTENT);
+        // Get all the smsTemplateList where content equals to
+        defaultSmsTemplateFiltering("content.equals=" + DEFAULT_CONTENT, "content.equals=" + UPDATED_CONTENT);
     }
 
     @Test
@@ -483,11 +429,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where content in DEFAULT_CONTENT or UPDATED_CONTENT
-        defaultSmsTemplateShouldBeFound("content.in=" + DEFAULT_CONTENT + "," + UPDATED_CONTENT);
-
-        // Get all the smsTemplateList where content equals to UPDATED_CONTENT
-        defaultSmsTemplateShouldNotBeFound("content.in=" + UPDATED_CONTENT);
+        // Get all the smsTemplateList where content in
+        defaultSmsTemplateFiltering("content.in=" + DEFAULT_CONTENT + "," + UPDATED_CONTENT, "content.in=" + UPDATED_CONTENT);
     }
 
     @Test
@@ -497,10 +440,7 @@ public class SmsTemplateResourceIT {
         smsTemplateRepository.save(smsTemplate);
 
         // Get all the smsTemplateList where content is not null
-        defaultSmsTemplateShouldBeFound("content.specified=true");
-
-        // Get all the smsTemplateList where content is null
-        defaultSmsTemplateShouldNotBeFound("content.specified=false");
+        defaultSmsTemplateFiltering("content.specified=true", "content.specified=false");
     }
 
     @Test
@@ -509,11 +449,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where content contains DEFAULT_CONTENT
-        defaultSmsTemplateShouldBeFound("content.contains=" + DEFAULT_CONTENT);
-
-        // Get all the smsTemplateList where content contains UPDATED_CONTENT
-        defaultSmsTemplateShouldNotBeFound("content.contains=" + UPDATED_CONTENT);
+        // Get all the smsTemplateList where content contains
+        defaultSmsTemplateFiltering("content.contains=" + DEFAULT_CONTENT, "content.contains=" + UPDATED_CONTENT);
     }
 
     @Test
@@ -522,11 +459,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where content does not contain DEFAULT_CONTENT
-        defaultSmsTemplateShouldNotBeFound("content.doesNotContain=" + DEFAULT_CONTENT);
-
-        // Get all the smsTemplateList where content does not contain UPDATED_CONTENT
-        defaultSmsTemplateShouldBeFound("content.doesNotContain=" + UPDATED_CONTENT);
+        // Get all the smsTemplateList where content does not contain
+        defaultSmsTemplateFiltering("content.doesNotContain=" + UPDATED_CONTENT, "content.doesNotContain=" + DEFAULT_CONTENT);
     }
 
     @Test
@@ -535,11 +469,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where testJson equals to DEFAULT_TEST_JSON
-        defaultSmsTemplateShouldBeFound("testJson.equals=" + DEFAULT_TEST_JSON);
-
-        // Get all the smsTemplateList where testJson equals to UPDATED_TEST_JSON
-        defaultSmsTemplateShouldNotBeFound("testJson.equals=" + UPDATED_TEST_JSON);
+        // Get all the smsTemplateList where testJson equals to
+        defaultSmsTemplateFiltering("testJson.equals=" + DEFAULT_TEST_JSON, "testJson.equals=" + UPDATED_TEST_JSON);
     }
 
     @Test
@@ -548,11 +479,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where testJson in DEFAULT_TEST_JSON or UPDATED_TEST_JSON
-        defaultSmsTemplateShouldBeFound("testJson.in=" + DEFAULT_TEST_JSON + "," + UPDATED_TEST_JSON);
-
-        // Get all the smsTemplateList where testJson equals to UPDATED_TEST_JSON
-        defaultSmsTemplateShouldNotBeFound("testJson.in=" + UPDATED_TEST_JSON);
+        // Get all the smsTemplateList where testJson in
+        defaultSmsTemplateFiltering("testJson.in=" + DEFAULT_TEST_JSON + "," + UPDATED_TEST_JSON, "testJson.in=" + UPDATED_TEST_JSON);
     }
 
     @Test
@@ -562,10 +490,7 @@ public class SmsTemplateResourceIT {
         smsTemplateRepository.save(smsTemplate);
 
         // Get all the smsTemplateList where testJson is not null
-        defaultSmsTemplateShouldBeFound("testJson.specified=true");
-
-        // Get all the smsTemplateList where testJson is null
-        defaultSmsTemplateShouldNotBeFound("testJson.specified=false");
+        defaultSmsTemplateFiltering("testJson.specified=true", "testJson.specified=false");
     }
 
     @Test
@@ -574,11 +499,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where testJson contains DEFAULT_TEST_JSON
-        defaultSmsTemplateShouldBeFound("testJson.contains=" + DEFAULT_TEST_JSON);
-
-        // Get all the smsTemplateList where testJson contains UPDATED_TEST_JSON
-        defaultSmsTemplateShouldNotBeFound("testJson.contains=" + UPDATED_TEST_JSON);
+        // Get all the smsTemplateList where testJson contains
+        defaultSmsTemplateFiltering("testJson.contains=" + DEFAULT_TEST_JSON, "testJson.contains=" + UPDATED_TEST_JSON);
     }
 
     @Test
@@ -587,11 +509,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where testJson does not contain DEFAULT_TEST_JSON
-        defaultSmsTemplateShouldNotBeFound("testJson.doesNotContain=" + DEFAULT_TEST_JSON);
-
-        // Get all the smsTemplateList where testJson does not contain UPDATED_TEST_JSON
-        defaultSmsTemplateShouldBeFound("testJson.doesNotContain=" + UPDATED_TEST_JSON);
+        // Get all the smsTemplateList where testJson does not contain
+        defaultSmsTemplateFiltering("testJson.doesNotContain=" + UPDATED_TEST_JSON, "testJson.doesNotContain=" + DEFAULT_TEST_JSON);
     }
 
     @Test
@@ -600,11 +519,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where type equals to DEFAULT_TYPE
-        defaultSmsTemplateShouldBeFound("type.equals=" + DEFAULT_TYPE);
-
-        // Get all the smsTemplateList where type equals to UPDATED_TYPE
-        defaultSmsTemplateShouldNotBeFound("type.equals=" + UPDATED_TYPE);
+        // Get all the smsTemplateList where type equals to
+        defaultSmsTemplateFiltering("type.equals=" + DEFAULT_TYPE, "type.equals=" + UPDATED_TYPE);
     }
 
     @Test
@@ -613,11 +529,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where type in DEFAULT_TYPE or UPDATED_TYPE
-        defaultSmsTemplateShouldBeFound("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE);
-
-        // Get all the smsTemplateList where type equals to UPDATED_TYPE
-        defaultSmsTemplateShouldNotBeFound("type.in=" + UPDATED_TYPE);
+        // Get all the smsTemplateList where type in
+        defaultSmsTemplateFiltering("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE, "type.in=" + UPDATED_TYPE);
     }
 
     @Test
@@ -627,10 +540,7 @@ public class SmsTemplateResourceIT {
         smsTemplateRepository.save(smsTemplate);
 
         // Get all the smsTemplateList where type is not null
-        defaultSmsTemplateShouldBeFound("type.specified=true");
-
-        // Get all the smsTemplateList where type is null
-        defaultSmsTemplateShouldNotBeFound("type.specified=false");
+        defaultSmsTemplateFiltering("type.specified=true", "type.specified=false");
     }
 
     @Test
@@ -639,11 +549,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where remark equals to DEFAULT_REMARK
-        defaultSmsTemplateShouldBeFound("remark.equals=" + DEFAULT_REMARK);
-
-        // Get all the smsTemplateList where remark equals to UPDATED_REMARK
-        defaultSmsTemplateShouldNotBeFound("remark.equals=" + UPDATED_REMARK);
+        // Get all the smsTemplateList where remark equals to
+        defaultSmsTemplateFiltering("remark.equals=" + DEFAULT_REMARK, "remark.equals=" + UPDATED_REMARK);
     }
 
     @Test
@@ -652,11 +559,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where remark in DEFAULT_REMARK or UPDATED_REMARK
-        defaultSmsTemplateShouldBeFound("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK);
-
-        // Get all the smsTemplateList where remark equals to UPDATED_REMARK
-        defaultSmsTemplateShouldNotBeFound("remark.in=" + UPDATED_REMARK);
+        // Get all the smsTemplateList where remark in
+        defaultSmsTemplateFiltering("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK, "remark.in=" + UPDATED_REMARK);
     }
 
     @Test
@@ -666,10 +570,7 @@ public class SmsTemplateResourceIT {
         smsTemplateRepository.save(smsTemplate);
 
         // Get all the smsTemplateList where remark is not null
-        defaultSmsTemplateShouldBeFound("remark.specified=true");
-
-        // Get all the smsTemplateList where remark is null
-        defaultSmsTemplateShouldNotBeFound("remark.specified=false");
+        defaultSmsTemplateFiltering("remark.specified=true", "remark.specified=false");
     }
 
     @Test
@@ -678,11 +579,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where remark contains DEFAULT_REMARK
-        defaultSmsTemplateShouldBeFound("remark.contains=" + DEFAULT_REMARK);
-
-        // Get all the smsTemplateList where remark contains UPDATED_REMARK
-        defaultSmsTemplateShouldNotBeFound("remark.contains=" + UPDATED_REMARK);
+        // Get all the smsTemplateList where remark contains
+        defaultSmsTemplateFiltering("remark.contains=" + DEFAULT_REMARK, "remark.contains=" + UPDATED_REMARK);
     }
 
     @Test
@@ -691,11 +589,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where remark does not contain DEFAULT_REMARK
-        defaultSmsTemplateShouldNotBeFound("remark.doesNotContain=" + DEFAULT_REMARK);
-
-        // Get all the smsTemplateList where remark does not contain UPDATED_REMARK
-        defaultSmsTemplateShouldBeFound("remark.doesNotContain=" + UPDATED_REMARK);
+        // Get all the smsTemplateList where remark does not contain
+        defaultSmsTemplateFiltering("remark.doesNotContain=" + UPDATED_REMARK, "remark.doesNotContain=" + DEFAULT_REMARK);
     }
 
     @Test
@@ -704,11 +599,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where enabled equals to DEFAULT_ENABLED
-        defaultSmsTemplateShouldBeFound("enabled.equals=" + DEFAULT_ENABLED);
-
-        // Get all the smsTemplateList where enabled equals to UPDATED_ENABLED
-        defaultSmsTemplateShouldNotBeFound("enabled.equals=" + UPDATED_ENABLED);
+        // Get all the smsTemplateList where enabled equals to
+        defaultSmsTemplateFiltering("enabled.equals=" + DEFAULT_ENABLED, "enabled.equals=" + UPDATED_ENABLED);
     }
 
     @Test
@@ -717,11 +609,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where enabled in DEFAULT_ENABLED or UPDATED_ENABLED
-        defaultSmsTemplateShouldBeFound("enabled.in=" + DEFAULT_ENABLED + "," + UPDATED_ENABLED);
-
-        // Get all the smsTemplateList where enabled equals to UPDATED_ENABLED
-        defaultSmsTemplateShouldNotBeFound("enabled.in=" + UPDATED_ENABLED);
+        // Get all the smsTemplateList where enabled in
+        defaultSmsTemplateFiltering("enabled.in=" + DEFAULT_ENABLED + "," + UPDATED_ENABLED, "enabled.in=" + UPDATED_ENABLED);
     }
 
     @Test
@@ -731,10 +620,7 @@ public class SmsTemplateResourceIT {
         smsTemplateRepository.save(smsTemplate);
 
         // Get all the smsTemplateList where enabled is not null
-        defaultSmsTemplateShouldBeFound("enabled.specified=true");
-
-        // Get all the smsTemplateList where enabled is null
-        defaultSmsTemplateShouldNotBeFound("enabled.specified=false");
+        defaultSmsTemplateFiltering("enabled.specified=true", "enabled.specified=false");
     }
 
     @Test
@@ -743,11 +629,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where createdBy equals to DEFAULT_CREATED_BY
-        defaultSmsTemplateShouldBeFound("createdBy.equals=" + DEFAULT_CREATED_BY);
-
-        // Get all the smsTemplateList where createdBy equals to UPDATED_CREATED_BY
-        defaultSmsTemplateShouldNotBeFound("createdBy.equals=" + UPDATED_CREATED_BY);
+        // Get all the smsTemplateList where createdBy equals to
+        defaultSmsTemplateFiltering("createdBy.equals=" + DEFAULT_CREATED_BY, "createdBy.equals=" + UPDATED_CREATED_BY);
     }
 
     @Test
@@ -756,11 +639,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where createdBy in DEFAULT_CREATED_BY or UPDATED_CREATED_BY
-        defaultSmsTemplateShouldBeFound("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY);
-
-        // Get all the smsTemplateList where createdBy equals to UPDATED_CREATED_BY
-        defaultSmsTemplateShouldNotBeFound("createdBy.in=" + UPDATED_CREATED_BY);
+        // Get all the smsTemplateList where createdBy in
+        defaultSmsTemplateFiltering("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY, "createdBy.in=" + UPDATED_CREATED_BY);
     }
 
     @Test
@@ -770,10 +650,7 @@ public class SmsTemplateResourceIT {
         smsTemplateRepository.save(smsTemplate);
 
         // Get all the smsTemplateList where createdBy is not null
-        defaultSmsTemplateShouldBeFound("createdBy.specified=true");
-
-        // Get all the smsTemplateList where createdBy is null
-        defaultSmsTemplateShouldNotBeFound("createdBy.specified=false");
+        defaultSmsTemplateFiltering("createdBy.specified=true", "createdBy.specified=false");
     }
 
     @Test
@@ -782,11 +659,11 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where createdBy is greater than or equal to DEFAULT_CREATED_BY
-        defaultSmsTemplateShouldBeFound("createdBy.greaterThanOrEqual=" + DEFAULT_CREATED_BY);
-
-        // Get all the smsTemplateList where createdBy is greater than or equal to UPDATED_CREATED_BY
-        defaultSmsTemplateShouldNotBeFound("createdBy.greaterThanOrEqual=" + UPDATED_CREATED_BY);
+        // Get all the smsTemplateList where createdBy is greater than or equal to
+        defaultSmsTemplateFiltering(
+            "createdBy.greaterThanOrEqual=" + DEFAULT_CREATED_BY,
+            "createdBy.greaterThanOrEqual=" + UPDATED_CREATED_BY
+        );
     }
 
     @Test
@@ -795,11 +672,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where createdBy is less than or equal to DEFAULT_CREATED_BY
-        defaultSmsTemplateShouldBeFound("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY);
-
-        // Get all the smsTemplateList where createdBy is less than or equal to SMALLER_CREATED_BY
-        defaultSmsTemplateShouldNotBeFound("createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
+        // Get all the smsTemplateList where createdBy is less than or equal to
+        defaultSmsTemplateFiltering("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
     }
 
     @Test
@@ -808,11 +682,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where createdBy is less than DEFAULT_CREATED_BY
-        defaultSmsTemplateShouldNotBeFound("createdBy.lessThan=" + DEFAULT_CREATED_BY);
-
-        // Get all the smsTemplateList where createdBy is less than UPDATED_CREATED_BY
-        defaultSmsTemplateShouldBeFound("createdBy.lessThan=" + UPDATED_CREATED_BY);
+        // Get all the smsTemplateList where createdBy is less than
+        defaultSmsTemplateFiltering("createdBy.lessThan=" + UPDATED_CREATED_BY, "createdBy.lessThan=" + DEFAULT_CREATED_BY);
     }
 
     @Test
@@ -821,11 +692,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where createdBy is greater than DEFAULT_CREATED_BY
-        defaultSmsTemplateShouldNotBeFound("createdBy.greaterThan=" + DEFAULT_CREATED_BY);
-
-        // Get all the smsTemplateList where createdBy is greater than SMALLER_CREATED_BY
-        defaultSmsTemplateShouldBeFound("createdBy.greaterThan=" + SMALLER_CREATED_BY);
+        // Get all the smsTemplateList where createdBy is greater than
+        defaultSmsTemplateFiltering("createdBy.greaterThan=" + SMALLER_CREATED_BY, "createdBy.greaterThan=" + DEFAULT_CREATED_BY);
     }
 
     @Test
@@ -834,11 +702,8 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where createdDate equals to DEFAULT_CREATED_DATE
-        defaultSmsTemplateShouldBeFound("createdDate.equals=" + DEFAULT_CREATED_DATE);
-
-        // Get all the smsTemplateList where createdDate equals to UPDATED_CREATED_DATE
-        defaultSmsTemplateShouldNotBeFound("createdDate.equals=" + UPDATED_CREATED_DATE);
+        // Get all the smsTemplateList where createdDate equals to
+        defaultSmsTemplateFiltering("createdDate.equals=" + DEFAULT_CREATED_DATE, "createdDate.equals=" + UPDATED_CREATED_DATE);
     }
 
     @Test
@@ -847,11 +712,11 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where createdDate in DEFAULT_CREATED_DATE or UPDATED_CREATED_DATE
-        defaultSmsTemplateShouldBeFound("createdDate.in=" + DEFAULT_CREATED_DATE + "," + UPDATED_CREATED_DATE);
-
-        // Get all the smsTemplateList where createdDate equals to UPDATED_CREATED_DATE
-        defaultSmsTemplateShouldNotBeFound("createdDate.in=" + UPDATED_CREATED_DATE);
+        // Get all the smsTemplateList where createdDate in
+        defaultSmsTemplateFiltering(
+            "createdDate.in=" + DEFAULT_CREATED_DATE + "," + UPDATED_CREATED_DATE,
+            "createdDate.in=" + UPDATED_CREATED_DATE
+        );
     }
 
     @Test
@@ -861,10 +726,7 @@ public class SmsTemplateResourceIT {
         smsTemplateRepository.save(smsTemplate);
 
         // Get all the smsTemplateList where createdDate is not null
-        defaultSmsTemplateShouldBeFound("createdDate.specified=true");
-
-        // Get all the smsTemplateList where createdDate is null
-        defaultSmsTemplateShouldNotBeFound("createdDate.specified=false");
+        defaultSmsTemplateFiltering("createdDate.specified=true", "createdDate.specified=false");
     }
 
     @Test
@@ -873,11 +735,11 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where lastModifiedBy equals to DEFAULT_LAST_MODIFIED_BY
-        defaultSmsTemplateShouldBeFound("lastModifiedBy.equals=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the smsTemplateList where lastModifiedBy equals to UPDATED_LAST_MODIFIED_BY
-        defaultSmsTemplateShouldNotBeFound("lastModifiedBy.equals=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the smsTemplateList where lastModifiedBy equals to
+        defaultSmsTemplateFiltering(
+            "lastModifiedBy.equals=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.equals=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -886,11 +748,11 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where lastModifiedBy in DEFAULT_LAST_MODIFIED_BY or UPDATED_LAST_MODIFIED_BY
-        defaultSmsTemplateShouldBeFound("lastModifiedBy.in=" + DEFAULT_LAST_MODIFIED_BY + "," + UPDATED_LAST_MODIFIED_BY);
-
-        // Get all the smsTemplateList where lastModifiedBy equals to UPDATED_LAST_MODIFIED_BY
-        defaultSmsTemplateShouldNotBeFound("lastModifiedBy.in=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the smsTemplateList where lastModifiedBy in
+        defaultSmsTemplateFiltering(
+            "lastModifiedBy.in=" + DEFAULT_LAST_MODIFIED_BY + "," + UPDATED_LAST_MODIFIED_BY,
+            "lastModifiedBy.in=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -900,10 +762,7 @@ public class SmsTemplateResourceIT {
         smsTemplateRepository.save(smsTemplate);
 
         // Get all the smsTemplateList where lastModifiedBy is not null
-        defaultSmsTemplateShouldBeFound("lastModifiedBy.specified=true");
-
-        // Get all the smsTemplateList where lastModifiedBy is null
-        defaultSmsTemplateShouldNotBeFound("lastModifiedBy.specified=false");
+        defaultSmsTemplateFiltering("lastModifiedBy.specified=true", "lastModifiedBy.specified=false");
     }
 
     @Test
@@ -912,11 +771,11 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where lastModifiedBy is greater than or equal to DEFAULT_LAST_MODIFIED_BY
-        defaultSmsTemplateShouldBeFound("lastModifiedBy.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the smsTemplateList where lastModifiedBy is greater than or equal to UPDATED_LAST_MODIFIED_BY
-        defaultSmsTemplateShouldNotBeFound("lastModifiedBy.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the smsTemplateList where lastModifiedBy is greater than or equal to
+        defaultSmsTemplateFiltering(
+            "lastModifiedBy.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -925,11 +784,11 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where lastModifiedBy is less than or equal to DEFAULT_LAST_MODIFIED_BY
-        defaultSmsTemplateShouldBeFound("lastModifiedBy.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the smsTemplateList where lastModifiedBy is less than or equal to SMALLER_LAST_MODIFIED_BY
-        defaultSmsTemplateShouldNotBeFound("lastModifiedBy.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_BY);
+        // Get all the smsTemplateList where lastModifiedBy is less than or equal to
+        defaultSmsTemplateFiltering(
+            "lastModifiedBy.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -938,11 +797,11 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where lastModifiedBy is less than DEFAULT_LAST_MODIFIED_BY
-        defaultSmsTemplateShouldNotBeFound("lastModifiedBy.lessThan=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the smsTemplateList where lastModifiedBy is less than UPDATED_LAST_MODIFIED_BY
-        defaultSmsTemplateShouldBeFound("lastModifiedBy.lessThan=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the smsTemplateList where lastModifiedBy is less than
+        defaultSmsTemplateFiltering(
+            "lastModifiedBy.lessThan=" + UPDATED_LAST_MODIFIED_BY,
+            "lastModifiedBy.lessThan=" + DEFAULT_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -951,11 +810,11 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where lastModifiedBy is greater than DEFAULT_LAST_MODIFIED_BY
-        defaultSmsTemplateShouldNotBeFound("lastModifiedBy.greaterThan=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the smsTemplateList where lastModifiedBy is greater than SMALLER_LAST_MODIFIED_BY
-        defaultSmsTemplateShouldBeFound("lastModifiedBy.greaterThan=" + SMALLER_LAST_MODIFIED_BY);
+        // Get all the smsTemplateList where lastModifiedBy is greater than
+        defaultSmsTemplateFiltering(
+            "lastModifiedBy.greaterThan=" + SMALLER_LAST_MODIFIED_BY,
+            "lastModifiedBy.greaterThan=" + DEFAULT_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -964,11 +823,11 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where lastModifiedDate equals to DEFAULT_LAST_MODIFIED_DATE
-        defaultSmsTemplateShouldBeFound("lastModifiedDate.equals=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the smsTemplateList where lastModifiedDate equals to UPDATED_LAST_MODIFIED_DATE
-        defaultSmsTemplateShouldNotBeFound("lastModifiedDate.equals=" + UPDATED_LAST_MODIFIED_DATE);
+        // Get all the smsTemplateList where lastModifiedDate equals to
+        defaultSmsTemplateFiltering(
+            "lastModifiedDate.equals=" + DEFAULT_LAST_MODIFIED_DATE,
+            "lastModifiedDate.equals=" + UPDATED_LAST_MODIFIED_DATE
+        );
     }
 
     @Test
@@ -977,11 +836,11 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        // Get all the smsTemplateList where lastModifiedDate in DEFAULT_LAST_MODIFIED_DATE or UPDATED_LAST_MODIFIED_DATE
-        defaultSmsTemplateShouldBeFound("lastModifiedDate.in=" + DEFAULT_LAST_MODIFIED_DATE + "," + UPDATED_LAST_MODIFIED_DATE);
-
-        // Get all the smsTemplateList where lastModifiedDate equals to UPDATED_LAST_MODIFIED_DATE
-        defaultSmsTemplateShouldNotBeFound("lastModifiedDate.in=" + UPDATED_LAST_MODIFIED_DATE);
+        // Get all the smsTemplateList where lastModifiedDate in
+        defaultSmsTemplateFiltering(
+            "lastModifiedDate.in=" + DEFAULT_LAST_MODIFIED_DATE + "," + UPDATED_LAST_MODIFIED_DATE,
+            "lastModifiedDate.in=" + UPDATED_LAST_MODIFIED_DATE
+        );
     }
 
     @Test
@@ -991,10 +850,7 @@ public class SmsTemplateResourceIT {
         smsTemplateRepository.save(smsTemplate);
 
         // Get all the smsTemplateList where lastModifiedDate is not null
-        defaultSmsTemplateShouldBeFound("lastModifiedDate.specified=true");
-
-        // Get all the smsTemplateList where lastModifiedDate is null
-        defaultSmsTemplateShouldNotBeFound("lastModifiedDate.specified=false");
+        defaultSmsTemplateFiltering("lastModifiedDate.specified=true", "lastModifiedDate.specified=false");
     }
 
     @Test
@@ -1009,6 +865,11 @@ public class SmsTemplateResourceIT {
 
         // Get all the smsTemplateList where supplier equals to (supplierId + 1)
         defaultSmsTemplateShouldNotBeFound("supplierId.equals=" + (supplierId + 1));
+    }
+
+    private void defaultSmsTemplateFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultSmsTemplateShouldBeFound(shouldBeFound);
+        defaultSmsTemplateShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -1073,7 +934,7 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        int databaseSizeBeforeUpdate = smsTemplateRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the smsTemplate
         SmsTemplate updatedSmsTemplate = smsTemplateRepository.findById(smsTemplate.getId()).orElseThrow();
@@ -1096,32 +957,19 @@ public class SmsTemplateResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, smsTemplateDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(smsTemplateDTO))
+                    .content(om.writeValueAsBytes(smsTemplateDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the SmsTemplate in the database
-        List<SmsTemplate> smsTemplateList = smsTemplateRepository.findAll();
-        assertThat(smsTemplateList).hasSize(databaseSizeBeforeUpdate);
-        SmsTemplate testSmsTemplate = smsTemplateList.get(smsTemplateList.size() - 1);
-        assertThat(testSmsTemplate.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testSmsTemplate.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testSmsTemplate.getSendType()).isEqualTo(UPDATED_SEND_TYPE);
-        assertThat(testSmsTemplate.getContent()).isEqualTo(UPDATED_CONTENT);
-        assertThat(testSmsTemplate.getTestJson()).isEqualTo(UPDATED_TEST_JSON);
-        assertThat(testSmsTemplate.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testSmsTemplate.getRemark()).isEqualTo(UPDATED_REMARK);
-        assertThat(testSmsTemplate.getEnabled()).isEqualTo(UPDATED_ENABLED);
-        assertThat(testSmsTemplate.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testSmsTemplate.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testSmsTemplate.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testSmsTemplate.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedSmsTemplateToMatchAllProperties(updatedSmsTemplate);
     }
 
     @Test
     @Transactional
     void putNonExistingSmsTemplate() throws Exception {
-        int databaseSizeBeforeUpdate = smsTemplateRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsTemplate.setId(longCount.incrementAndGet());
 
         // Create the SmsTemplate
@@ -1132,19 +980,18 @@ public class SmsTemplateResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, smsTemplateDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(smsTemplateDTO))
+                    .content(om.writeValueAsBytes(smsTemplateDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SmsTemplate in the database
-        List<SmsTemplate> smsTemplateList = smsTemplateRepository.findAll();
-        assertThat(smsTemplateList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchSmsTemplate() throws Exception {
-        int databaseSizeBeforeUpdate = smsTemplateRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsTemplate.setId(longCount.incrementAndGet());
 
         // Create the SmsTemplate
@@ -1155,19 +1002,18 @@ public class SmsTemplateResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(smsTemplateDTO))
+                    .content(om.writeValueAsBytes(smsTemplateDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SmsTemplate in the database
-        List<SmsTemplate> smsTemplateList = smsTemplateRepository.findAll();
-        assertThat(smsTemplateList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamSmsTemplate() throws Exception {
-        int databaseSizeBeforeUpdate = smsTemplateRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsTemplate.setId(longCount.incrementAndGet());
 
         // Create the SmsTemplate
@@ -1175,12 +1021,11 @@ public class SmsTemplateResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restSmsTemplateMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(smsTemplateDTO)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(smsTemplateDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the SmsTemplate in the database
-        List<SmsTemplate> smsTemplateList = smsTemplateRepository.findAll();
-        assertThat(smsTemplateList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1189,38 +1034,34 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        int databaseSizeBeforeUpdate = smsTemplateRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the smsTemplate using partial update
         SmsTemplate partialUpdatedSmsTemplate = new SmsTemplate();
         partialUpdatedSmsTemplate.setId(smsTemplate.getId());
 
-        partialUpdatedSmsTemplate.name(UPDATED_NAME).sendType(UPDATED_SEND_TYPE).testJson(UPDATED_TEST_JSON).remark(UPDATED_REMARK);
+        partialUpdatedSmsTemplate
+            .name(UPDATED_NAME)
+            .remark(UPDATED_REMARK)
+            .enabled(UPDATED_ENABLED)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restSmsTemplateMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedSmsTemplate.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedSmsTemplate))
+                    .content(om.writeValueAsBytes(partialUpdatedSmsTemplate))
             )
             .andExpect(status().isOk());
 
         // Validate the SmsTemplate in the database
-        List<SmsTemplate> smsTemplateList = smsTemplateRepository.findAll();
-        assertThat(smsTemplateList).hasSize(databaseSizeBeforeUpdate);
-        SmsTemplate testSmsTemplate = smsTemplateList.get(smsTemplateList.size() - 1);
-        assertThat(testSmsTemplate.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testSmsTemplate.getCode()).isEqualTo(DEFAULT_CODE);
-        assertThat(testSmsTemplate.getSendType()).isEqualTo(UPDATED_SEND_TYPE);
-        assertThat(testSmsTemplate.getContent()).isEqualTo(DEFAULT_CONTENT);
-        assertThat(testSmsTemplate.getTestJson()).isEqualTo(UPDATED_TEST_JSON);
-        assertThat(testSmsTemplate.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testSmsTemplate.getRemark()).isEqualTo(UPDATED_REMARK);
-        assertThat(testSmsTemplate.getEnabled()).isEqualTo(DEFAULT_ENABLED);
-        assertThat(testSmsTemplate.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY);
-        assertThat(testSmsTemplate.getCreatedDate()).isEqualTo(DEFAULT_CREATED_DATE);
-        assertThat(testSmsTemplate.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
-        assertThat(testSmsTemplate.getLastModifiedDate()).isEqualTo(DEFAULT_LAST_MODIFIED_DATE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertSmsTemplateUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedSmsTemplate, smsTemplate),
+            getPersistedSmsTemplate(smsTemplate)
+        );
     }
 
     @Test
@@ -1229,7 +1070,7 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        int databaseSizeBeforeUpdate = smsTemplateRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the smsTemplate using partial update
         SmsTemplate partialUpdatedSmsTemplate = new SmsTemplate();
@@ -1253,32 +1094,20 @@ public class SmsTemplateResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedSmsTemplate.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedSmsTemplate))
+                    .content(om.writeValueAsBytes(partialUpdatedSmsTemplate))
             )
             .andExpect(status().isOk());
 
         // Validate the SmsTemplate in the database
-        List<SmsTemplate> smsTemplateList = smsTemplateRepository.findAll();
-        assertThat(smsTemplateList).hasSize(databaseSizeBeforeUpdate);
-        SmsTemplate testSmsTemplate = smsTemplateList.get(smsTemplateList.size() - 1);
-        assertThat(testSmsTemplate.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testSmsTemplate.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testSmsTemplate.getSendType()).isEqualTo(UPDATED_SEND_TYPE);
-        assertThat(testSmsTemplate.getContent()).isEqualTo(UPDATED_CONTENT);
-        assertThat(testSmsTemplate.getTestJson()).isEqualTo(UPDATED_TEST_JSON);
-        assertThat(testSmsTemplate.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testSmsTemplate.getRemark()).isEqualTo(UPDATED_REMARK);
-        assertThat(testSmsTemplate.getEnabled()).isEqualTo(UPDATED_ENABLED);
-        assertThat(testSmsTemplate.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testSmsTemplate.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testSmsTemplate.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testSmsTemplate.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertSmsTemplateUpdatableFieldsEquals(partialUpdatedSmsTemplate, getPersistedSmsTemplate(partialUpdatedSmsTemplate));
     }
 
     @Test
     @Transactional
     void patchNonExistingSmsTemplate() throws Exception {
-        int databaseSizeBeforeUpdate = smsTemplateRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsTemplate.setId(longCount.incrementAndGet());
 
         // Create the SmsTemplate
@@ -1289,19 +1118,18 @@ public class SmsTemplateResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, smsTemplateDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(smsTemplateDTO))
+                    .content(om.writeValueAsBytes(smsTemplateDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SmsTemplate in the database
-        List<SmsTemplate> smsTemplateList = smsTemplateRepository.findAll();
-        assertThat(smsTemplateList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchSmsTemplate() throws Exception {
-        int databaseSizeBeforeUpdate = smsTemplateRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsTemplate.setId(longCount.incrementAndGet());
 
         // Create the SmsTemplate
@@ -1312,19 +1140,18 @@ public class SmsTemplateResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(smsTemplateDTO))
+                    .content(om.writeValueAsBytes(smsTemplateDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SmsTemplate in the database
-        List<SmsTemplate> smsTemplateList = smsTemplateRepository.findAll();
-        assertThat(smsTemplateList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamSmsTemplate() throws Exception {
-        int databaseSizeBeforeUpdate = smsTemplateRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsTemplate.setId(longCount.incrementAndGet());
 
         // Create the SmsTemplate
@@ -1332,14 +1159,11 @@ public class SmsTemplateResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restSmsTemplateMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(smsTemplateDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(smsTemplateDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the SmsTemplate in the database
-        List<SmsTemplate> smsTemplateList = smsTemplateRepository.findAll();
-        assertThat(smsTemplateList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1348,7 +1172,7 @@ public class SmsTemplateResourceIT {
         // Initialize the database
         smsTemplateRepository.save(smsTemplate);
 
-        int databaseSizeBeforeDelete = smsTemplateRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the smsTemplate
         restSmsTemplateMockMvc
@@ -1356,7 +1180,34 @@ public class SmsTemplateResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<SmsTemplate> smsTemplateList = smsTemplateRepository.findAll();
-        assertThat(smsTemplateList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return smsTemplateRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected SmsTemplate getPersistedSmsTemplate(SmsTemplate smsTemplate) {
+        return smsTemplateRepository.findById(smsTemplate.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedSmsTemplateToMatchAllProperties(SmsTemplate expectedSmsTemplate) {
+        assertSmsTemplateAllPropertiesEquals(expectedSmsTemplate, getPersistedSmsTemplate(expectedSmsTemplate));
+    }
+
+    protected void assertPersistedSmsTemplateToMatchUpdatableProperties(SmsTemplate expectedSmsTemplate) {
+        assertSmsTemplateAllUpdatablePropertiesEquals(expectedSmsTemplate, getPersistedSmsTemplate(expectedSmsTemplate));
     }
 }

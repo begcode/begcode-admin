@@ -16,7 +16,6 @@ import com.diboot.core.binding.Binder;
 import com.diboot.core.service.impl.BaseServiceImpl;
 import com.google.common.base.CaseFormat;
 import java.util.*;
-import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -30,11 +29,12 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Service Implementation for managing {@link com.begcode.monolith.settings.domain.SiteConfig}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class SiteConfigBaseService<R extends SiteConfigRepository, E extends SiteConfig>
     extends BaseServiceImpl<SiteConfigRepository, SiteConfig> {
 
     private final Logger log = LoggerFactory.getLogger(SiteConfigBaseService.class);
-    private final List<String> relationNames = Arrays.asList("items");
+    private final List<String> relationNames = List.of("items");
 
     protected final SiteConfigRepository siteConfigRepository;
 
@@ -78,17 +78,16 @@ public class SiteConfigBaseService<R extends SiteConfigRepository, E extends Sit
     @Transactional(rollbackFor = Exception.class)
     public SiteConfigDTO update(SiteConfigDTO siteConfigDTO) {
         log.debug("Request to update SiteConfig : {}", siteConfigDTO);
-
         SiteConfig siteConfig = siteConfigMapper.toEntity(siteConfigDTO);
 
-        this.updateEntityAndRelatedEntities(
+        this.createEntityAndRelatedEntities(
                 siteConfig,
                 siteConfig.getItems(),
                 CommonFieldData::setOwnerEntityId,
                 CommonFieldData::setOwnerEntityName,
                 "SiteConfig"
             );
-        return findOne(siteConfigDTO.getId()).orElseThrow();
+        return findOne(siteConfig.getId()).orElseThrow();
     }
 
     /**
@@ -133,8 +132,7 @@ public class SiteConfigBaseService<R extends SiteConfigRepository, E extends Sit
      */
     public Optional<SiteConfigDTO> findOne(Long id) {
         log.debug("Request to get SiteConfig : {}", id);
-        return Optional
-            .ofNullable(siteConfigRepository.selectById(id))
+        return Optional.ofNullable(siteConfigRepository.selectById(id))
             .map(siteConfig -> {
                 Binder.bindRelations(siteConfig);
                 return siteConfig;
@@ -190,23 +188,25 @@ public class SiteConfigBaseService<R extends SiteConfigRepository, E extends Sit
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             UpdateWrapper<SiteConfig> updateWrapper = new UpdateWrapper<>();
             updateWrapper.in("id", ids);
-            fieldNames.forEach(fieldName ->
-                updateWrapper.set(
-                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
-                    BeanUtil.getFieldValue(changeSiteConfigDTO, fieldName)
-                )
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changeSiteConfigDTO, fieldName)
+                    )
             );
             this.update(updateWrapper);
         } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
             List<SiteConfig> siteConfigList = this.listByIds(ids);
             if (CollectionUtils.isNotEmpty(siteConfigList)) {
                 siteConfigList.forEach(siteConfig -> {
-                    relationshipNames.forEach(relationName ->
-                        BeanUtil.setFieldValue(
-                            siteConfig,
-                            relationName,
-                            BeanUtil.getFieldValue(siteConfigMapper.toEntity(changeSiteConfigDTO), relationName)
-                        )
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                siteConfig,
+                                relationName,
+                                BeanUtil.getFieldValue(siteConfigMapper.toEntity(changeSiteConfigDTO), relationName)
+                            )
                     );
                     this.createOrUpdateAndRelatedRelations(siteConfig, relationshipNames);
                 });
@@ -231,122 +231,119 @@ public class SiteConfigBaseService<R extends SiteConfigRepository, E extends Sit
         SortValueOperateType type
     ) {
         switch (type) {
-            case VALUE:
-                {
-                    if (ObjectUtils.isNotEmpty(changeSortValue)) {
-                        return lambdaUpdate().set(SiteConfig::getSortValue, changeSortValue).eq(SiteConfig::getId, id).update();
-                    } else {
-                        return false;
-                    }
+            case VALUE: {
+                if (ObjectUtils.isNotEmpty(changeSortValue)) {
+                    return lambdaUpdate().set(SiteConfig::getSortValue, changeSortValue).eq(SiteConfig::getId, id).update();
+                } else {
+                    return false;
                 }
-            case STEP:
-                {
-                    if (ObjectUtils.allNotNull(id, beforeId)) {
-                        Set<Long> ids = new HashSet<>();
-                        ids.add(id);
-                        ids.add(beforeId);
-                        Map<Long, Integer> idSortValueMap = listByIds(ids)
-                            .stream()
-                            .filter(siteConfig -> siteConfig.getSortValue() != null)
-                            .collect(Collectors.toMap(SiteConfig::getId, SiteConfig::getSortValue));
-                        return (
-                            lambdaUpdate().set(SiteConfig::getSortValue, idSortValueMap.get(beforeId)).eq(SiteConfig::getId, id).update() &&
-                            lambdaUpdate().set(SiteConfig::getSortValue, idSortValueMap.get(id)).eq(SiteConfig::getId, beforeId).update()
-                        );
-                    } else if (ObjectUtils.allNotNull(id, afterId)) {
-                        Set<Long> ids = new HashSet<>();
-                        ids.add(id);
-                        ids.add(afterId);
-                        Map<Long, Integer> idSortValueMap = listByIds(ids)
-                            .stream()
-                            .filter(siteConfig -> siteConfig.getSortValue() != null)
-                            .collect(Collectors.toMap(SiteConfig::getId, SiteConfig::getSortValue));
-                        return (
-                            lambdaUpdate().set(SiteConfig::getSortValue, idSortValueMap.get(afterId)).eq(SiteConfig::getId, id).update() &&
-                            lambdaUpdate().set(SiteConfig::getSortValue, idSortValueMap.get(id)).eq(SiteConfig::getId, afterId).update()
-                        );
-                    } else {
-                        return false;
-                    }
-                }
-            case DROP:
-                {
+            }
+            case STEP: {
+                if (ObjectUtils.allNotNull(id, beforeId)) {
                     Set<Long> ids = new HashSet<>();
                     ids.add(id);
-                    if (ObjectUtils.isNotEmpty(beforeId)) {
-                        ids.add(beforeId);
-                    }
-                    if (ObjectUtils.isNotEmpty(afterId)) {
-                        ids.add(afterId);
-                    }
+                    ids.add(beforeId);
                     Map<Long, Integer> idSortValueMap = listByIds(ids)
                         .stream()
                         .filter(siteConfig -> siteConfig.getSortValue() != null)
                         .collect(Collectors.toMap(SiteConfig::getId, SiteConfig::getSortValue));
-                    if (ObjectUtils.allNotNull(beforeId, afterId)) {
-                        // 计算中间值
-                        Integer beforeSortValue = idSortValueMap.get(beforeId);
-                        Integer afterSortValue = idSortValueMap.get(afterId);
-                        Integer newSortValue = (beforeSortValue + afterSortValue) / 2;
-                        if (!newSortValue.equals(afterSortValue) && !newSortValue.equals(beforeSortValue)) {
-                            // 正常值，保存到数据库。
-                            return lambdaUpdate().set(SiteConfig::getSortValue, newSortValue).eq(SiteConfig::getId, id).update();
-                        } else {
-                            // 没有排序值插入空间了，重新对相关的所有记录的排序值进行计算。然后再插入相关的值。
-                            // 需要确定相应的记录范围
-                            List<SiteConfig> list = this.list(queryWrapper.orderByAsc("sort_value"));
-                            Integer newBeforeSortValue = 0;
-                            Integer newAfterSortValue = 0;
-                            for (int i = 0; i < list.size(); i++) {
-                                list.get(i).setSortValue(100 * (i + 1));
-                                if (afterId.equals(list.get(i).getId())) {
-                                    newBeforeSortValue = list.get(i).getSortValue();
-                                }
-                                if (beforeId.equals(list.get(i).getId())) {
-                                    newAfterSortValue = list.get(i).getSortValue();
-                                }
-                            }
-                            newSortValue = (newBeforeSortValue + newAfterSortValue) / 2;
-                            updateBatchById(list);
-                            return lambdaUpdate().set(SiteConfig::getSortValue, newSortValue).eq(SiteConfig::getId, id).update();
-                        }
-                    } else if (ObjectUtils.isNotEmpty(beforeId)) {
-                        // 计算比beforeId实体大的排序值
-                        Integer beforeSortValue = idSortValueMap.get(beforeId);
-                        Integer newSortValue = (beforeSortValue + 100) - ((beforeSortValue + 100) % 100);
+                    return (
+                        lambdaUpdate().set(SiteConfig::getSortValue, idSortValueMap.get(beforeId)).eq(SiteConfig::getId, id).update() &&
+                        lambdaUpdate().set(SiteConfig::getSortValue, idSortValueMap.get(id)).eq(SiteConfig::getId, beforeId).update()
+                    );
+                } else if (ObjectUtils.allNotNull(id, afterId)) {
+                    Set<Long> ids = new HashSet<>();
+                    ids.add(id);
+                    ids.add(afterId);
+                    Map<Long, Integer> idSortValueMap = listByIds(ids)
+                        .stream()
+                        .filter(siteConfig -> siteConfig.getSortValue() != null)
+                        .collect(Collectors.toMap(SiteConfig::getId, SiteConfig::getSortValue));
+                    return (
+                        lambdaUpdate().set(SiteConfig::getSortValue, idSortValueMap.get(afterId)).eq(SiteConfig::getId, id).update() &&
+                        lambdaUpdate().set(SiteConfig::getSortValue, idSortValueMap.get(id)).eq(SiteConfig::getId, afterId).update()
+                    );
+                } else {
+                    return false;
+                }
+            }
+            case DROP: {
+                Set<Long> ids = new HashSet<>();
+                ids.add(id);
+                if (ObjectUtils.isNotEmpty(beforeId)) {
+                    ids.add(beforeId);
+                }
+                if (ObjectUtils.isNotEmpty(afterId)) {
+                    ids.add(afterId);
+                }
+                Map<Long, Integer> idSortValueMap = listByIds(ids)
+                    .stream()
+                    .filter(siteConfig -> siteConfig.getSortValue() != null)
+                    .collect(Collectors.toMap(SiteConfig::getId, SiteConfig::getSortValue));
+                if (ObjectUtils.allNotNull(beforeId, afterId)) {
+                    // 计算中间值
+                    Integer beforeSortValue = idSortValueMap.get(beforeId);
+                    Integer afterSortValue = idSortValueMap.get(afterId);
+                    Integer newSortValue = (beforeSortValue + afterSortValue) / 2;
+                    if (!newSortValue.equals(afterSortValue) && !newSortValue.equals(beforeSortValue)) {
                         // 正常值，保存到数据库。
                         return lambdaUpdate().set(SiteConfig::getSortValue, newSortValue).eq(SiteConfig::getId, id).update();
-                    } else if (ObjectUtils.isNotEmpty(afterId)) {
-                        // 计算比afterId实体小的排序值
-                        Integer afterSortValue = idSortValueMap.get(afterId);
-                        Integer newSortValue = (afterSortValue - 100) - ((afterSortValue - 100) % 100);
-                        if (newSortValue <= 0) {
-                            // 没有排序值插入空间了，重新对相关的所有记录的排序值进行计算。然后再插入相关的值。
-                            // 需要确定相应的记录范围
-                            List<SiteConfig> list = this.list(queryWrapper.orderByAsc("sort_value"));
-                            Integer newBeforeSortValue = 0;
-                            Integer newAfterSortValue = 0;
-                            for (int i = 0; i < list.size(); i++) {
-                                list.get(i).setSortValue(100 * (i + 1));
-                                if (afterId.equals(list.get(i).getId())) {
-                                    newBeforeSortValue = list.get(i).getSortValue();
-                                }
-                                if (beforeId.equals(list.get(i).getId())) {
-                                    newAfterSortValue = list.get(i).getSortValue();
-                                }
-                            }
-                            newSortValue = (newBeforeSortValue + newAfterSortValue) / 2;
-                            updateBatchById(list);
-                            return lambdaUpdate().set(SiteConfig::getSortValue, newSortValue).eq(SiteConfig::getId, id).update();
-                        } else {
-                            // 正常值，保存到数据库。
-                            return lambdaUpdate().set(SiteConfig::getSortValue, newSortValue).eq(SiteConfig::getId, id).update();
-                        }
                     } else {
-                        // todo 异常
-                        return false;
+                        // 没有排序值插入空间了，重新对相关的所有记录的排序值进行计算。然后再插入相关的值。
+                        // 需要确定相应的记录范围
+                        List<SiteConfig> list = this.list(queryWrapper.orderByAsc("sort_value"));
+                        Integer newBeforeSortValue = 0;
+                        Integer newAfterSortValue = 0;
+                        for (int i = 0; i < list.size(); i++) {
+                            list.get(i).setSortValue(100 * (i + 1));
+                            if (afterId.equals(list.get(i).getId())) {
+                                newBeforeSortValue = list.get(i).getSortValue();
+                            }
+                            if (beforeId.equals(list.get(i).getId())) {
+                                newAfterSortValue = list.get(i).getSortValue();
+                            }
+                        }
+                        newSortValue = (newBeforeSortValue + newAfterSortValue) / 2;
+                        updateBatchById(list);
+                        return lambdaUpdate().set(SiteConfig::getSortValue, newSortValue).eq(SiteConfig::getId, id).update();
                     }
+                } else if (ObjectUtils.isNotEmpty(beforeId)) {
+                    // 计算比beforeId实体大的排序值
+                    Integer beforeSortValue = idSortValueMap.get(beforeId);
+                    Integer newSortValue = (beforeSortValue + 100) - ((beforeSortValue + 100) % 100);
+                    // 正常值，保存到数据库。
+                    return lambdaUpdate().set(SiteConfig::getSortValue, newSortValue).eq(SiteConfig::getId, id).update();
+                } else if (ObjectUtils.isNotEmpty(afterId)) {
+                    // 计算比afterId实体小的排序值
+                    Integer afterSortValue = idSortValueMap.get(afterId);
+                    Integer newSortValue = (afterSortValue - 100) - ((afterSortValue - 100) % 100);
+                    if (newSortValue <= 0) {
+                        // 没有排序值插入空间了，重新对相关的所有记录的排序值进行计算。然后再插入相关的值。
+                        // 需要确定相应的记录范围
+                        List<SiteConfig> list = this.list(queryWrapper.orderByAsc("sort_value"));
+                        Integer newBeforeSortValue = 0;
+                        Integer newAfterSortValue = 0;
+                        for (int i = 0; i < list.size(); i++) {
+                            list.get(i).setSortValue(100 * (i + 1));
+                            if (afterId.equals(list.get(i).getId())) {
+                                newBeforeSortValue = list.get(i).getSortValue();
+                            }
+                            if (beforeId.equals(list.get(i).getId())) {
+                                newAfterSortValue = list.get(i).getSortValue();
+                            }
+                        }
+                        newSortValue = (newBeforeSortValue + newAfterSortValue) / 2;
+                        updateBatchById(list);
+                        return lambdaUpdate().set(SiteConfig::getSortValue, newSortValue).eq(SiteConfig::getId, id).update();
+                    } else {
+                        // 正常值，保存到数据库。
+                        return lambdaUpdate().set(SiteConfig::getSortValue, newSortValue).eq(SiteConfig::getId, id).update();
+                    }
+                } else {
+                    // todo 异常
+                    return false;
                 }
+            }
             default:
                 return false;
         }

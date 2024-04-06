@@ -1,5 +1,7 @@
 package com.begcode.monolith.system.web.rest;
 
+import static com.begcode.monolith.system.domain.SmsMessageAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static com.begcode.monolith.web.rest.TestUtil.sameInstant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -14,15 +16,13 @@ import com.begcode.monolith.system.domain.SmsMessage;
 import com.begcode.monolith.system.repository.SmsMessageRepository;
 import com.begcode.monolith.system.service.dto.SmsMessageDTO;
 import com.begcode.monolith.system.service.mapper.SmsMessageMapper;
-import com.begcode.monolith.web.rest.TestUtil;
-import com.begcode.monolith.web.rest.TestUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -89,8 +89,11 @@ public class SmsMessageResourceIT {
     private static final String ENTITY_API_URL = "/api/sms-messages";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private SmsMessageRepository smsMessageRepository;
@@ -161,31 +164,23 @@ public class SmsMessageResourceIT {
     @Test
     @Transactional
     void createSmsMessage() throws Exception {
-        int databaseSizeBeforeCreate = smsMessageRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the SmsMessage
         SmsMessageDTO smsMessageDTO = smsMessageMapper.toDto(smsMessage);
-        restSmsMessageMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(smsMessageDTO)))
-            .andExpect(status().isCreated());
+        var returnedSmsMessageDTO = om.readValue(
+            restSmsMessageMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(smsMessageDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            SmsMessageDTO.class
+        );
 
         // Validate the SmsMessage in the database
-        List<SmsMessage> smsMessageList = smsMessageRepository.findAll();
-        assertThat(smsMessageList).hasSize(databaseSizeBeforeCreate + 1);
-        SmsMessage testSmsMessage = smsMessageList.get(smsMessageList.size() - 1);
-        assertThat(testSmsMessage.getTitle()).isEqualTo(DEFAULT_TITLE);
-        assertThat(testSmsMessage.getSendType()).isEqualTo(DEFAULT_SEND_TYPE);
-        assertThat(testSmsMessage.getReceiver()).isEqualTo(DEFAULT_RECEIVER);
-        assertThat(testSmsMessage.getParams()).isEqualTo(DEFAULT_PARAMS);
-        assertThat(testSmsMessage.getContent()).isEqualTo(DEFAULT_CONTENT);
-        assertThat(testSmsMessage.getSendTime()).isEqualTo(DEFAULT_SEND_TIME);
-        assertThat(testSmsMessage.getSendStatus()).isEqualTo(DEFAULT_SEND_STATUS);
-        assertThat(testSmsMessage.getRetryNum()).isEqualTo(DEFAULT_RETRY_NUM);
-        assertThat(testSmsMessage.getFailResult()).isEqualTo(DEFAULT_FAIL_RESULT);
-        assertThat(testSmsMessage.getRemark()).isEqualTo(DEFAULT_REMARK);
-        assertThat(testSmsMessage.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY);
-        assertThat(testSmsMessage.getCreatedDate()).isEqualTo(DEFAULT_CREATED_DATE);
-        assertThat(testSmsMessage.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
-        assertThat(testSmsMessage.getLastModifiedDate()).isEqualTo(DEFAULT_LAST_MODIFIED_DATE);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedSmsMessage = smsMessageMapper.toEntity(returnedSmsMessageDTO);
+        assertSmsMessageUpdatableFieldsEquals(returnedSmsMessage, getPersistedSmsMessage(returnedSmsMessage));
     }
 
     @Test
@@ -195,16 +190,15 @@ public class SmsMessageResourceIT {
         smsMessage.setId(1L);
         SmsMessageDTO smsMessageDTO = smsMessageMapper.toDto(smsMessage);
 
-        int databaseSizeBeforeCreate = smsMessageRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restSmsMessageMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(smsMessageDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(smsMessageDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the SmsMessage in the database
-        List<SmsMessage> smsMessageList = smsMessageRepository.findAll();
-        assertThat(smsMessageList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
@@ -271,14 +265,11 @@ public class SmsMessageResourceIT {
 
         Long id = smsMessage.getId();
 
-        defaultSmsMessageShouldBeFound("id.equals=" + id);
-        defaultSmsMessageShouldNotBeFound("id.notEquals=" + id);
+        defaultSmsMessageFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultSmsMessageShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultSmsMessageShouldNotBeFound("id.greaterThan=" + id);
+        defaultSmsMessageFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultSmsMessageShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultSmsMessageShouldNotBeFound("id.lessThan=" + id);
+        defaultSmsMessageFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -287,11 +278,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where title equals to DEFAULT_TITLE
-        defaultSmsMessageShouldBeFound("title.equals=" + DEFAULT_TITLE);
-
-        // Get all the smsMessageList where title equals to UPDATED_TITLE
-        defaultSmsMessageShouldNotBeFound("title.equals=" + UPDATED_TITLE);
+        // Get all the smsMessageList where title equals to
+        defaultSmsMessageFiltering("title.equals=" + DEFAULT_TITLE, "title.equals=" + UPDATED_TITLE);
     }
 
     @Test
@@ -300,11 +288,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where title in DEFAULT_TITLE or UPDATED_TITLE
-        defaultSmsMessageShouldBeFound("title.in=" + DEFAULT_TITLE + "," + UPDATED_TITLE);
-
-        // Get all the smsMessageList where title equals to UPDATED_TITLE
-        defaultSmsMessageShouldNotBeFound("title.in=" + UPDATED_TITLE);
+        // Get all the smsMessageList where title in
+        defaultSmsMessageFiltering("title.in=" + DEFAULT_TITLE + "," + UPDATED_TITLE, "title.in=" + UPDATED_TITLE);
     }
 
     @Test
@@ -314,10 +299,7 @@ public class SmsMessageResourceIT {
         smsMessageRepository.save(smsMessage);
 
         // Get all the smsMessageList where title is not null
-        defaultSmsMessageShouldBeFound("title.specified=true");
-
-        // Get all the smsMessageList where title is null
-        defaultSmsMessageShouldNotBeFound("title.specified=false");
+        defaultSmsMessageFiltering("title.specified=true", "title.specified=false");
     }
 
     @Test
@@ -326,11 +308,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where title contains DEFAULT_TITLE
-        defaultSmsMessageShouldBeFound("title.contains=" + DEFAULT_TITLE);
-
-        // Get all the smsMessageList where title contains UPDATED_TITLE
-        defaultSmsMessageShouldNotBeFound("title.contains=" + UPDATED_TITLE);
+        // Get all the smsMessageList where title contains
+        defaultSmsMessageFiltering("title.contains=" + DEFAULT_TITLE, "title.contains=" + UPDATED_TITLE);
     }
 
     @Test
@@ -339,11 +318,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where title does not contain DEFAULT_TITLE
-        defaultSmsMessageShouldNotBeFound("title.doesNotContain=" + DEFAULT_TITLE);
-
-        // Get all the smsMessageList where title does not contain UPDATED_TITLE
-        defaultSmsMessageShouldBeFound("title.doesNotContain=" + UPDATED_TITLE);
+        // Get all the smsMessageList where title does not contain
+        defaultSmsMessageFiltering("title.doesNotContain=" + UPDATED_TITLE, "title.doesNotContain=" + DEFAULT_TITLE);
     }
 
     @Test
@@ -352,11 +328,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where sendType equals to DEFAULT_SEND_TYPE
-        defaultSmsMessageShouldBeFound("sendType.equals=" + DEFAULT_SEND_TYPE);
-
-        // Get all the smsMessageList where sendType equals to UPDATED_SEND_TYPE
-        defaultSmsMessageShouldNotBeFound("sendType.equals=" + UPDATED_SEND_TYPE);
+        // Get all the smsMessageList where sendType equals to
+        defaultSmsMessageFiltering("sendType.equals=" + DEFAULT_SEND_TYPE, "sendType.equals=" + UPDATED_SEND_TYPE);
     }
 
     @Test
@@ -365,11 +338,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where sendType in DEFAULT_SEND_TYPE or UPDATED_SEND_TYPE
-        defaultSmsMessageShouldBeFound("sendType.in=" + DEFAULT_SEND_TYPE + "," + UPDATED_SEND_TYPE);
-
-        // Get all the smsMessageList where sendType equals to UPDATED_SEND_TYPE
-        defaultSmsMessageShouldNotBeFound("sendType.in=" + UPDATED_SEND_TYPE);
+        // Get all the smsMessageList where sendType in
+        defaultSmsMessageFiltering("sendType.in=" + DEFAULT_SEND_TYPE + "," + UPDATED_SEND_TYPE, "sendType.in=" + UPDATED_SEND_TYPE);
     }
 
     @Test
@@ -379,10 +349,7 @@ public class SmsMessageResourceIT {
         smsMessageRepository.save(smsMessage);
 
         // Get all the smsMessageList where sendType is not null
-        defaultSmsMessageShouldBeFound("sendType.specified=true");
-
-        // Get all the smsMessageList where sendType is null
-        defaultSmsMessageShouldNotBeFound("sendType.specified=false");
+        defaultSmsMessageFiltering("sendType.specified=true", "sendType.specified=false");
     }
 
     @Test
@@ -391,11 +358,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where receiver equals to DEFAULT_RECEIVER
-        defaultSmsMessageShouldBeFound("receiver.equals=" + DEFAULT_RECEIVER);
-
-        // Get all the smsMessageList where receiver equals to UPDATED_RECEIVER
-        defaultSmsMessageShouldNotBeFound("receiver.equals=" + UPDATED_RECEIVER);
+        // Get all the smsMessageList where receiver equals to
+        defaultSmsMessageFiltering("receiver.equals=" + DEFAULT_RECEIVER, "receiver.equals=" + UPDATED_RECEIVER);
     }
 
     @Test
@@ -404,11 +368,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where receiver in DEFAULT_RECEIVER or UPDATED_RECEIVER
-        defaultSmsMessageShouldBeFound("receiver.in=" + DEFAULT_RECEIVER + "," + UPDATED_RECEIVER);
-
-        // Get all the smsMessageList where receiver equals to UPDATED_RECEIVER
-        defaultSmsMessageShouldNotBeFound("receiver.in=" + UPDATED_RECEIVER);
+        // Get all the smsMessageList where receiver in
+        defaultSmsMessageFiltering("receiver.in=" + DEFAULT_RECEIVER + "," + UPDATED_RECEIVER, "receiver.in=" + UPDATED_RECEIVER);
     }
 
     @Test
@@ -418,10 +379,7 @@ public class SmsMessageResourceIT {
         smsMessageRepository.save(smsMessage);
 
         // Get all the smsMessageList where receiver is not null
-        defaultSmsMessageShouldBeFound("receiver.specified=true");
-
-        // Get all the smsMessageList where receiver is null
-        defaultSmsMessageShouldNotBeFound("receiver.specified=false");
+        defaultSmsMessageFiltering("receiver.specified=true", "receiver.specified=false");
     }
 
     @Test
@@ -430,11 +388,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where receiver contains DEFAULT_RECEIVER
-        defaultSmsMessageShouldBeFound("receiver.contains=" + DEFAULT_RECEIVER);
-
-        // Get all the smsMessageList where receiver contains UPDATED_RECEIVER
-        defaultSmsMessageShouldNotBeFound("receiver.contains=" + UPDATED_RECEIVER);
+        // Get all the smsMessageList where receiver contains
+        defaultSmsMessageFiltering("receiver.contains=" + DEFAULT_RECEIVER, "receiver.contains=" + UPDATED_RECEIVER);
     }
 
     @Test
@@ -443,11 +398,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where receiver does not contain DEFAULT_RECEIVER
-        defaultSmsMessageShouldNotBeFound("receiver.doesNotContain=" + DEFAULT_RECEIVER);
-
-        // Get all the smsMessageList where receiver does not contain UPDATED_RECEIVER
-        defaultSmsMessageShouldBeFound("receiver.doesNotContain=" + UPDATED_RECEIVER);
+        // Get all the smsMessageList where receiver does not contain
+        defaultSmsMessageFiltering("receiver.doesNotContain=" + UPDATED_RECEIVER, "receiver.doesNotContain=" + DEFAULT_RECEIVER);
     }
 
     @Test
@@ -456,11 +408,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where params equals to DEFAULT_PARAMS
-        defaultSmsMessageShouldBeFound("params.equals=" + DEFAULT_PARAMS);
-
-        // Get all the smsMessageList where params equals to UPDATED_PARAMS
-        defaultSmsMessageShouldNotBeFound("params.equals=" + UPDATED_PARAMS);
+        // Get all the smsMessageList where params equals to
+        defaultSmsMessageFiltering("params.equals=" + DEFAULT_PARAMS, "params.equals=" + UPDATED_PARAMS);
     }
 
     @Test
@@ -469,11 +418,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where params in DEFAULT_PARAMS or UPDATED_PARAMS
-        defaultSmsMessageShouldBeFound("params.in=" + DEFAULT_PARAMS + "," + UPDATED_PARAMS);
-
-        // Get all the smsMessageList where params equals to UPDATED_PARAMS
-        defaultSmsMessageShouldNotBeFound("params.in=" + UPDATED_PARAMS);
+        // Get all the smsMessageList where params in
+        defaultSmsMessageFiltering("params.in=" + DEFAULT_PARAMS + "," + UPDATED_PARAMS, "params.in=" + UPDATED_PARAMS);
     }
 
     @Test
@@ -483,10 +429,7 @@ public class SmsMessageResourceIT {
         smsMessageRepository.save(smsMessage);
 
         // Get all the smsMessageList where params is not null
-        defaultSmsMessageShouldBeFound("params.specified=true");
-
-        // Get all the smsMessageList where params is null
-        defaultSmsMessageShouldNotBeFound("params.specified=false");
+        defaultSmsMessageFiltering("params.specified=true", "params.specified=false");
     }
 
     @Test
@@ -495,11 +438,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where params contains DEFAULT_PARAMS
-        defaultSmsMessageShouldBeFound("params.contains=" + DEFAULT_PARAMS);
-
-        // Get all the smsMessageList where params contains UPDATED_PARAMS
-        defaultSmsMessageShouldNotBeFound("params.contains=" + UPDATED_PARAMS);
+        // Get all the smsMessageList where params contains
+        defaultSmsMessageFiltering("params.contains=" + DEFAULT_PARAMS, "params.contains=" + UPDATED_PARAMS);
     }
 
     @Test
@@ -508,11 +448,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where params does not contain DEFAULT_PARAMS
-        defaultSmsMessageShouldNotBeFound("params.doesNotContain=" + DEFAULT_PARAMS);
-
-        // Get all the smsMessageList where params does not contain UPDATED_PARAMS
-        defaultSmsMessageShouldBeFound("params.doesNotContain=" + UPDATED_PARAMS);
+        // Get all the smsMessageList where params does not contain
+        defaultSmsMessageFiltering("params.doesNotContain=" + UPDATED_PARAMS, "params.doesNotContain=" + DEFAULT_PARAMS);
     }
 
     @Test
@@ -521,11 +458,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where sendTime equals to DEFAULT_SEND_TIME
-        defaultSmsMessageShouldBeFound("sendTime.equals=" + DEFAULT_SEND_TIME);
-
-        // Get all the smsMessageList where sendTime equals to UPDATED_SEND_TIME
-        defaultSmsMessageShouldNotBeFound("sendTime.equals=" + UPDATED_SEND_TIME);
+        // Get all the smsMessageList where sendTime equals to
+        defaultSmsMessageFiltering("sendTime.equals=" + DEFAULT_SEND_TIME, "sendTime.equals=" + UPDATED_SEND_TIME);
     }
 
     @Test
@@ -534,11 +468,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where sendTime in DEFAULT_SEND_TIME or UPDATED_SEND_TIME
-        defaultSmsMessageShouldBeFound("sendTime.in=" + DEFAULT_SEND_TIME + "," + UPDATED_SEND_TIME);
-
-        // Get all the smsMessageList where sendTime equals to UPDATED_SEND_TIME
-        defaultSmsMessageShouldNotBeFound("sendTime.in=" + UPDATED_SEND_TIME);
+        // Get all the smsMessageList where sendTime in
+        defaultSmsMessageFiltering("sendTime.in=" + DEFAULT_SEND_TIME + "," + UPDATED_SEND_TIME, "sendTime.in=" + UPDATED_SEND_TIME);
     }
 
     @Test
@@ -548,10 +479,7 @@ public class SmsMessageResourceIT {
         smsMessageRepository.save(smsMessage);
 
         // Get all the smsMessageList where sendTime is not null
-        defaultSmsMessageShouldBeFound("sendTime.specified=true");
-
-        // Get all the smsMessageList where sendTime is null
-        defaultSmsMessageShouldNotBeFound("sendTime.specified=false");
+        defaultSmsMessageFiltering("sendTime.specified=true", "sendTime.specified=false");
     }
 
     @Test
@@ -560,11 +488,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where sendTime is greater than or equal to DEFAULT_SEND_TIME
-        defaultSmsMessageShouldBeFound("sendTime.greaterThanOrEqual=" + DEFAULT_SEND_TIME);
-
-        // Get all the smsMessageList where sendTime is greater than or equal to UPDATED_SEND_TIME
-        defaultSmsMessageShouldNotBeFound("sendTime.greaterThanOrEqual=" + UPDATED_SEND_TIME);
+        // Get all the smsMessageList where sendTime is greater than or equal to
+        defaultSmsMessageFiltering("sendTime.greaterThanOrEqual=" + DEFAULT_SEND_TIME, "sendTime.greaterThanOrEqual=" + UPDATED_SEND_TIME);
     }
 
     @Test
@@ -573,11 +498,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where sendTime is less than or equal to DEFAULT_SEND_TIME
-        defaultSmsMessageShouldBeFound("sendTime.lessThanOrEqual=" + DEFAULT_SEND_TIME);
-
-        // Get all the smsMessageList where sendTime is less than or equal to SMALLER_SEND_TIME
-        defaultSmsMessageShouldNotBeFound("sendTime.lessThanOrEqual=" + SMALLER_SEND_TIME);
+        // Get all the smsMessageList where sendTime is less than or equal to
+        defaultSmsMessageFiltering("sendTime.lessThanOrEqual=" + DEFAULT_SEND_TIME, "sendTime.lessThanOrEqual=" + SMALLER_SEND_TIME);
     }
 
     @Test
@@ -586,11 +508,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where sendTime is less than DEFAULT_SEND_TIME
-        defaultSmsMessageShouldNotBeFound("sendTime.lessThan=" + DEFAULT_SEND_TIME);
-
-        // Get all the smsMessageList where sendTime is less than UPDATED_SEND_TIME
-        defaultSmsMessageShouldBeFound("sendTime.lessThan=" + UPDATED_SEND_TIME);
+        // Get all the smsMessageList where sendTime is less than
+        defaultSmsMessageFiltering("sendTime.lessThan=" + UPDATED_SEND_TIME, "sendTime.lessThan=" + DEFAULT_SEND_TIME);
     }
 
     @Test
@@ -599,11 +518,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where sendTime is greater than DEFAULT_SEND_TIME
-        defaultSmsMessageShouldNotBeFound("sendTime.greaterThan=" + DEFAULT_SEND_TIME);
-
-        // Get all the smsMessageList where sendTime is greater than SMALLER_SEND_TIME
-        defaultSmsMessageShouldBeFound("sendTime.greaterThan=" + SMALLER_SEND_TIME);
+        // Get all the smsMessageList where sendTime is greater than
+        defaultSmsMessageFiltering("sendTime.greaterThan=" + SMALLER_SEND_TIME, "sendTime.greaterThan=" + DEFAULT_SEND_TIME);
     }
 
     @Test
@@ -612,11 +528,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where sendStatus equals to DEFAULT_SEND_STATUS
-        defaultSmsMessageShouldBeFound("sendStatus.equals=" + DEFAULT_SEND_STATUS);
-
-        // Get all the smsMessageList where sendStatus equals to UPDATED_SEND_STATUS
-        defaultSmsMessageShouldNotBeFound("sendStatus.equals=" + UPDATED_SEND_STATUS);
+        // Get all the smsMessageList where sendStatus equals to
+        defaultSmsMessageFiltering("sendStatus.equals=" + DEFAULT_SEND_STATUS, "sendStatus.equals=" + UPDATED_SEND_STATUS);
     }
 
     @Test
@@ -625,11 +538,11 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where sendStatus in DEFAULT_SEND_STATUS or UPDATED_SEND_STATUS
-        defaultSmsMessageShouldBeFound("sendStatus.in=" + DEFAULT_SEND_STATUS + "," + UPDATED_SEND_STATUS);
-
-        // Get all the smsMessageList where sendStatus equals to UPDATED_SEND_STATUS
-        defaultSmsMessageShouldNotBeFound("sendStatus.in=" + UPDATED_SEND_STATUS);
+        // Get all the smsMessageList where sendStatus in
+        defaultSmsMessageFiltering(
+            "sendStatus.in=" + DEFAULT_SEND_STATUS + "," + UPDATED_SEND_STATUS,
+            "sendStatus.in=" + UPDATED_SEND_STATUS
+        );
     }
 
     @Test
@@ -639,10 +552,7 @@ public class SmsMessageResourceIT {
         smsMessageRepository.save(smsMessage);
 
         // Get all the smsMessageList where sendStatus is not null
-        defaultSmsMessageShouldBeFound("sendStatus.specified=true");
-
-        // Get all the smsMessageList where sendStatus is null
-        defaultSmsMessageShouldNotBeFound("sendStatus.specified=false");
+        defaultSmsMessageFiltering("sendStatus.specified=true", "sendStatus.specified=false");
     }
 
     @Test
@@ -651,11 +561,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where retryNum equals to DEFAULT_RETRY_NUM
-        defaultSmsMessageShouldBeFound("retryNum.equals=" + DEFAULT_RETRY_NUM);
-
-        // Get all the smsMessageList where retryNum equals to UPDATED_RETRY_NUM
-        defaultSmsMessageShouldNotBeFound("retryNum.equals=" + UPDATED_RETRY_NUM);
+        // Get all the smsMessageList where retryNum equals to
+        defaultSmsMessageFiltering("retryNum.equals=" + DEFAULT_RETRY_NUM, "retryNum.equals=" + UPDATED_RETRY_NUM);
     }
 
     @Test
@@ -664,11 +571,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where retryNum in DEFAULT_RETRY_NUM or UPDATED_RETRY_NUM
-        defaultSmsMessageShouldBeFound("retryNum.in=" + DEFAULT_RETRY_NUM + "," + UPDATED_RETRY_NUM);
-
-        // Get all the smsMessageList where retryNum equals to UPDATED_RETRY_NUM
-        defaultSmsMessageShouldNotBeFound("retryNum.in=" + UPDATED_RETRY_NUM);
+        // Get all the smsMessageList where retryNum in
+        defaultSmsMessageFiltering("retryNum.in=" + DEFAULT_RETRY_NUM + "," + UPDATED_RETRY_NUM, "retryNum.in=" + UPDATED_RETRY_NUM);
     }
 
     @Test
@@ -678,10 +582,7 @@ public class SmsMessageResourceIT {
         smsMessageRepository.save(smsMessage);
 
         // Get all the smsMessageList where retryNum is not null
-        defaultSmsMessageShouldBeFound("retryNum.specified=true");
-
-        // Get all the smsMessageList where retryNum is null
-        defaultSmsMessageShouldNotBeFound("retryNum.specified=false");
+        defaultSmsMessageFiltering("retryNum.specified=true", "retryNum.specified=false");
     }
 
     @Test
@@ -690,11 +591,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where retryNum is greater than or equal to DEFAULT_RETRY_NUM
-        defaultSmsMessageShouldBeFound("retryNum.greaterThanOrEqual=" + DEFAULT_RETRY_NUM);
-
-        // Get all the smsMessageList where retryNum is greater than or equal to UPDATED_RETRY_NUM
-        defaultSmsMessageShouldNotBeFound("retryNum.greaterThanOrEqual=" + UPDATED_RETRY_NUM);
+        // Get all the smsMessageList where retryNum is greater than or equal to
+        defaultSmsMessageFiltering("retryNum.greaterThanOrEqual=" + DEFAULT_RETRY_NUM, "retryNum.greaterThanOrEqual=" + UPDATED_RETRY_NUM);
     }
 
     @Test
@@ -703,11 +601,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where retryNum is less than or equal to DEFAULT_RETRY_NUM
-        defaultSmsMessageShouldBeFound("retryNum.lessThanOrEqual=" + DEFAULT_RETRY_NUM);
-
-        // Get all the smsMessageList where retryNum is less than or equal to SMALLER_RETRY_NUM
-        defaultSmsMessageShouldNotBeFound("retryNum.lessThanOrEqual=" + SMALLER_RETRY_NUM);
+        // Get all the smsMessageList where retryNum is less than or equal to
+        defaultSmsMessageFiltering("retryNum.lessThanOrEqual=" + DEFAULT_RETRY_NUM, "retryNum.lessThanOrEqual=" + SMALLER_RETRY_NUM);
     }
 
     @Test
@@ -716,11 +611,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where retryNum is less than DEFAULT_RETRY_NUM
-        defaultSmsMessageShouldNotBeFound("retryNum.lessThan=" + DEFAULT_RETRY_NUM);
-
-        // Get all the smsMessageList where retryNum is less than UPDATED_RETRY_NUM
-        defaultSmsMessageShouldBeFound("retryNum.lessThan=" + UPDATED_RETRY_NUM);
+        // Get all the smsMessageList where retryNum is less than
+        defaultSmsMessageFiltering("retryNum.lessThan=" + UPDATED_RETRY_NUM, "retryNum.lessThan=" + DEFAULT_RETRY_NUM);
     }
 
     @Test
@@ -729,11 +621,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where retryNum is greater than DEFAULT_RETRY_NUM
-        defaultSmsMessageShouldNotBeFound("retryNum.greaterThan=" + DEFAULT_RETRY_NUM);
-
-        // Get all the smsMessageList where retryNum is greater than SMALLER_RETRY_NUM
-        defaultSmsMessageShouldBeFound("retryNum.greaterThan=" + SMALLER_RETRY_NUM);
+        // Get all the smsMessageList where retryNum is greater than
+        defaultSmsMessageFiltering("retryNum.greaterThan=" + SMALLER_RETRY_NUM, "retryNum.greaterThan=" + DEFAULT_RETRY_NUM);
     }
 
     @Test
@@ -742,11 +631,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where failResult equals to DEFAULT_FAIL_RESULT
-        defaultSmsMessageShouldBeFound("failResult.equals=" + DEFAULT_FAIL_RESULT);
-
-        // Get all the smsMessageList where failResult equals to UPDATED_FAIL_RESULT
-        defaultSmsMessageShouldNotBeFound("failResult.equals=" + UPDATED_FAIL_RESULT);
+        // Get all the smsMessageList where failResult equals to
+        defaultSmsMessageFiltering("failResult.equals=" + DEFAULT_FAIL_RESULT, "failResult.equals=" + UPDATED_FAIL_RESULT);
     }
 
     @Test
@@ -755,11 +641,11 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where failResult in DEFAULT_FAIL_RESULT or UPDATED_FAIL_RESULT
-        defaultSmsMessageShouldBeFound("failResult.in=" + DEFAULT_FAIL_RESULT + "," + UPDATED_FAIL_RESULT);
-
-        // Get all the smsMessageList where failResult equals to UPDATED_FAIL_RESULT
-        defaultSmsMessageShouldNotBeFound("failResult.in=" + UPDATED_FAIL_RESULT);
+        // Get all the smsMessageList where failResult in
+        defaultSmsMessageFiltering(
+            "failResult.in=" + DEFAULT_FAIL_RESULT + "," + UPDATED_FAIL_RESULT,
+            "failResult.in=" + UPDATED_FAIL_RESULT
+        );
     }
 
     @Test
@@ -769,10 +655,7 @@ public class SmsMessageResourceIT {
         smsMessageRepository.save(smsMessage);
 
         // Get all the smsMessageList where failResult is not null
-        defaultSmsMessageShouldBeFound("failResult.specified=true");
-
-        // Get all the smsMessageList where failResult is null
-        defaultSmsMessageShouldNotBeFound("failResult.specified=false");
+        defaultSmsMessageFiltering("failResult.specified=true", "failResult.specified=false");
     }
 
     @Test
@@ -781,11 +664,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where failResult contains DEFAULT_FAIL_RESULT
-        defaultSmsMessageShouldBeFound("failResult.contains=" + DEFAULT_FAIL_RESULT);
-
-        // Get all the smsMessageList where failResult contains UPDATED_FAIL_RESULT
-        defaultSmsMessageShouldNotBeFound("failResult.contains=" + UPDATED_FAIL_RESULT);
+        // Get all the smsMessageList where failResult contains
+        defaultSmsMessageFiltering("failResult.contains=" + DEFAULT_FAIL_RESULT, "failResult.contains=" + UPDATED_FAIL_RESULT);
     }
 
     @Test
@@ -794,11 +674,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where failResult does not contain DEFAULT_FAIL_RESULT
-        defaultSmsMessageShouldNotBeFound("failResult.doesNotContain=" + DEFAULT_FAIL_RESULT);
-
-        // Get all the smsMessageList where failResult does not contain UPDATED_FAIL_RESULT
-        defaultSmsMessageShouldBeFound("failResult.doesNotContain=" + UPDATED_FAIL_RESULT);
+        // Get all the smsMessageList where failResult does not contain
+        defaultSmsMessageFiltering("failResult.doesNotContain=" + UPDATED_FAIL_RESULT, "failResult.doesNotContain=" + DEFAULT_FAIL_RESULT);
     }
 
     @Test
@@ -807,11 +684,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where remark equals to DEFAULT_REMARK
-        defaultSmsMessageShouldBeFound("remark.equals=" + DEFAULT_REMARK);
-
-        // Get all the smsMessageList where remark equals to UPDATED_REMARK
-        defaultSmsMessageShouldNotBeFound("remark.equals=" + UPDATED_REMARK);
+        // Get all the smsMessageList where remark equals to
+        defaultSmsMessageFiltering("remark.equals=" + DEFAULT_REMARK, "remark.equals=" + UPDATED_REMARK);
     }
 
     @Test
@@ -820,11 +694,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where remark in DEFAULT_REMARK or UPDATED_REMARK
-        defaultSmsMessageShouldBeFound("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK);
-
-        // Get all the smsMessageList where remark equals to UPDATED_REMARK
-        defaultSmsMessageShouldNotBeFound("remark.in=" + UPDATED_REMARK);
+        // Get all the smsMessageList where remark in
+        defaultSmsMessageFiltering("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK, "remark.in=" + UPDATED_REMARK);
     }
 
     @Test
@@ -834,10 +705,7 @@ public class SmsMessageResourceIT {
         smsMessageRepository.save(smsMessage);
 
         // Get all the smsMessageList where remark is not null
-        defaultSmsMessageShouldBeFound("remark.specified=true");
-
-        // Get all the smsMessageList where remark is null
-        defaultSmsMessageShouldNotBeFound("remark.specified=false");
+        defaultSmsMessageFiltering("remark.specified=true", "remark.specified=false");
     }
 
     @Test
@@ -846,11 +714,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where remark contains DEFAULT_REMARK
-        defaultSmsMessageShouldBeFound("remark.contains=" + DEFAULT_REMARK);
-
-        // Get all the smsMessageList where remark contains UPDATED_REMARK
-        defaultSmsMessageShouldNotBeFound("remark.contains=" + UPDATED_REMARK);
+        // Get all the smsMessageList where remark contains
+        defaultSmsMessageFiltering("remark.contains=" + DEFAULT_REMARK, "remark.contains=" + UPDATED_REMARK);
     }
 
     @Test
@@ -859,11 +724,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where remark does not contain DEFAULT_REMARK
-        defaultSmsMessageShouldNotBeFound("remark.doesNotContain=" + DEFAULT_REMARK);
-
-        // Get all the smsMessageList where remark does not contain UPDATED_REMARK
-        defaultSmsMessageShouldBeFound("remark.doesNotContain=" + UPDATED_REMARK);
+        // Get all the smsMessageList where remark does not contain
+        defaultSmsMessageFiltering("remark.doesNotContain=" + UPDATED_REMARK, "remark.doesNotContain=" + DEFAULT_REMARK);
     }
 
     @Test
@@ -872,11 +734,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where createdBy equals to DEFAULT_CREATED_BY
-        defaultSmsMessageShouldBeFound("createdBy.equals=" + DEFAULT_CREATED_BY);
-
-        // Get all the smsMessageList where createdBy equals to UPDATED_CREATED_BY
-        defaultSmsMessageShouldNotBeFound("createdBy.equals=" + UPDATED_CREATED_BY);
+        // Get all the smsMessageList where createdBy equals to
+        defaultSmsMessageFiltering("createdBy.equals=" + DEFAULT_CREATED_BY, "createdBy.equals=" + UPDATED_CREATED_BY);
     }
 
     @Test
@@ -885,11 +744,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where createdBy in DEFAULT_CREATED_BY or UPDATED_CREATED_BY
-        defaultSmsMessageShouldBeFound("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY);
-
-        // Get all the smsMessageList where createdBy equals to UPDATED_CREATED_BY
-        defaultSmsMessageShouldNotBeFound("createdBy.in=" + UPDATED_CREATED_BY);
+        // Get all the smsMessageList where createdBy in
+        defaultSmsMessageFiltering("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY, "createdBy.in=" + UPDATED_CREATED_BY);
     }
 
     @Test
@@ -899,10 +755,7 @@ public class SmsMessageResourceIT {
         smsMessageRepository.save(smsMessage);
 
         // Get all the smsMessageList where createdBy is not null
-        defaultSmsMessageShouldBeFound("createdBy.specified=true");
-
-        // Get all the smsMessageList where createdBy is null
-        defaultSmsMessageShouldNotBeFound("createdBy.specified=false");
+        defaultSmsMessageFiltering("createdBy.specified=true", "createdBy.specified=false");
     }
 
     @Test
@@ -911,11 +764,11 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where createdBy is greater than or equal to DEFAULT_CREATED_BY
-        defaultSmsMessageShouldBeFound("createdBy.greaterThanOrEqual=" + DEFAULT_CREATED_BY);
-
-        // Get all the smsMessageList where createdBy is greater than or equal to UPDATED_CREATED_BY
-        defaultSmsMessageShouldNotBeFound("createdBy.greaterThanOrEqual=" + UPDATED_CREATED_BY);
+        // Get all the smsMessageList where createdBy is greater than or equal to
+        defaultSmsMessageFiltering(
+            "createdBy.greaterThanOrEqual=" + DEFAULT_CREATED_BY,
+            "createdBy.greaterThanOrEqual=" + UPDATED_CREATED_BY
+        );
     }
 
     @Test
@@ -924,11 +777,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where createdBy is less than or equal to DEFAULT_CREATED_BY
-        defaultSmsMessageShouldBeFound("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY);
-
-        // Get all the smsMessageList where createdBy is less than or equal to SMALLER_CREATED_BY
-        defaultSmsMessageShouldNotBeFound("createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
+        // Get all the smsMessageList where createdBy is less than or equal to
+        defaultSmsMessageFiltering("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
     }
 
     @Test
@@ -937,11 +787,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where createdBy is less than DEFAULT_CREATED_BY
-        defaultSmsMessageShouldNotBeFound("createdBy.lessThan=" + DEFAULT_CREATED_BY);
-
-        // Get all the smsMessageList where createdBy is less than UPDATED_CREATED_BY
-        defaultSmsMessageShouldBeFound("createdBy.lessThan=" + UPDATED_CREATED_BY);
+        // Get all the smsMessageList where createdBy is less than
+        defaultSmsMessageFiltering("createdBy.lessThan=" + UPDATED_CREATED_BY, "createdBy.lessThan=" + DEFAULT_CREATED_BY);
     }
 
     @Test
@@ -950,11 +797,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where createdBy is greater than DEFAULT_CREATED_BY
-        defaultSmsMessageShouldNotBeFound("createdBy.greaterThan=" + DEFAULT_CREATED_BY);
-
-        // Get all the smsMessageList where createdBy is greater than SMALLER_CREATED_BY
-        defaultSmsMessageShouldBeFound("createdBy.greaterThan=" + SMALLER_CREATED_BY);
+        // Get all the smsMessageList where createdBy is greater than
+        defaultSmsMessageFiltering("createdBy.greaterThan=" + SMALLER_CREATED_BY, "createdBy.greaterThan=" + DEFAULT_CREATED_BY);
     }
 
     @Test
@@ -963,11 +807,8 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where createdDate equals to DEFAULT_CREATED_DATE
-        defaultSmsMessageShouldBeFound("createdDate.equals=" + DEFAULT_CREATED_DATE);
-
-        // Get all the smsMessageList where createdDate equals to UPDATED_CREATED_DATE
-        defaultSmsMessageShouldNotBeFound("createdDate.equals=" + UPDATED_CREATED_DATE);
+        // Get all the smsMessageList where createdDate equals to
+        defaultSmsMessageFiltering("createdDate.equals=" + DEFAULT_CREATED_DATE, "createdDate.equals=" + UPDATED_CREATED_DATE);
     }
 
     @Test
@@ -976,11 +817,11 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where createdDate in DEFAULT_CREATED_DATE or UPDATED_CREATED_DATE
-        defaultSmsMessageShouldBeFound("createdDate.in=" + DEFAULT_CREATED_DATE + "," + UPDATED_CREATED_DATE);
-
-        // Get all the smsMessageList where createdDate equals to UPDATED_CREATED_DATE
-        defaultSmsMessageShouldNotBeFound("createdDate.in=" + UPDATED_CREATED_DATE);
+        // Get all the smsMessageList where createdDate in
+        defaultSmsMessageFiltering(
+            "createdDate.in=" + DEFAULT_CREATED_DATE + "," + UPDATED_CREATED_DATE,
+            "createdDate.in=" + UPDATED_CREATED_DATE
+        );
     }
 
     @Test
@@ -990,10 +831,7 @@ public class SmsMessageResourceIT {
         smsMessageRepository.save(smsMessage);
 
         // Get all the smsMessageList where createdDate is not null
-        defaultSmsMessageShouldBeFound("createdDate.specified=true");
-
-        // Get all the smsMessageList where createdDate is null
-        defaultSmsMessageShouldNotBeFound("createdDate.specified=false");
+        defaultSmsMessageFiltering("createdDate.specified=true", "createdDate.specified=false");
     }
 
     @Test
@@ -1002,11 +840,11 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where lastModifiedBy equals to DEFAULT_LAST_MODIFIED_BY
-        defaultSmsMessageShouldBeFound("lastModifiedBy.equals=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the smsMessageList where lastModifiedBy equals to UPDATED_LAST_MODIFIED_BY
-        defaultSmsMessageShouldNotBeFound("lastModifiedBy.equals=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the smsMessageList where lastModifiedBy equals to
+        defaultSmsMessageFiltering(
+            "lastModifiedBy.equals=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.equals=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1015,11 +853,11 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where lastModifiedBy in DEFAULT_LAST_MODIFIED_BY or UPDATED_LAST_MODIFIED_BY
-        defaultSmsMessageShouldBeFound("lastModifiedBy.in=" + DEFAULT_LAST_MODIFIED_BY + "," + UPDATED_LAST_MODIFIED_BY);
-
-        // Get all the smsMessageList where lastModifiedBy equals to UPDATED_LAST_MODIFIED_BY
-        defaultSmsMessageShouldNotBeFound("lastModifiedBy.in=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the smsMessageList where lastModifiedBy in
+        defaultSmsMessageFiltering(
+            "lastModifiedBy.in=" + DEFAULT_LAST_MODIFIED_BY + "," + UPDATED_LAST_MODIFIED_BY,
+            "lastModifiedBy.in=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1029,10 +867,7 @@ public class SmsMessageResourceIT {
         smsMessageRepository.save(smsMessage);
 
         // Get all the smsMessageList where lastModifiedBy is not null
-        defaultSmsMessageShouldBeFound("lastModifiedBy.specified=true");
-
-        // Get all the smsMessageList where lastModifiedBy is null
-        defaultSmsMessageShouldNotBeFound("lastModifiedBy.specified=false");
+        defaultSmsMessageFiltering("lastModifiedBy.specified=true", "lastModifiedBy.specified=false");
     }
 
     @Test
@@ -1041,11 +876,11 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where lastModifiedBy is greater than or equal to DEFAULT_LAST_MODIFIED_BY
-        defaultSmsMessageShouldBeFound("lastModifiedBy.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the smsMessageList where lastModifiedBy is greater than or equal to UPDATED_LAST_MODIFIED_BY
-        defaultSmsMessageShouldNotBeFound("lastModifiedBy.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the smsMessageList where lastModifiedBy is greater than or equal to
+        defaultSmsMessageFiltering(
+            "lastModifiedBy.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1054,11 +889,11 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where lastModifiedBy is less than or equal to DEFAULT_LAST_MODIFIED_BY
-        defaultSmsMessageShouldBeFound("lastModifiedBy.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the smsMessageList where lastModifiedBy is less than or equal to SMALLER_LAST_MODIFIED_BY
-        defaultSmsMessageShouldNotBeFound("lastModifiedBy.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_BY);
+        // Get all the smsMessageList where lastModifiedBy is less than or equal to
+        defaultSmsMessageFiltering(
+            "lastModifiedBy.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1067,11 +902,11 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where lastModifiedBy is less than DEFAULT_LAST_MODIFIED_BY
-        defaultSmsMessageShouldNotBeFound("lastModifiedBy.lessThan=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the smsMessageList where lastModifiedBy is less than UPDATED_LAST_MODIFIED_BY
-        defaultSmsMessageShouldBeFound("lastModifiedBy.lessThan=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the smsMessageList where lastModifiedBy is less than
+        defaultSmsMessageFiltering(
+            "lastModifiedBy.lessThan=" + UPDATED_LAST_MODIFIED_BY,
+            "lastModifiedBy.lessThan=" + DEFAULT_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1080,11 +915,11 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where lastModifiedBy is greater than DEFAULT_LAST_MODIFIED_BY
-        defaultSmsMessageShouldNotBeFound("lastModifiedBy.greaterThan=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the smsMessageList where lastModifiedBy is greater than SMALLER_LAST_MODIFIED_BY
-        defaultSmsMessageShouldBeFound("lastModifiedBy.greaterThan=" + SMALLER_LAST_MODIFIED_BY);
+        // Get all the smsMessageList where lastModifiedBy is greater than
+        defaultSmsMessageFiltering(
+            "lastModifiedBy.greaterThan=" + SMALLER_LAST_MODIFIED_BY,
+            "lastModifiedBy.greaterThan=" + DEFAULT_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1093,11 +928,11 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where lastModifiedDate equals to DEFAULT_LAST_MODIFIED_DATE
-        defaultSmsMessageShouldBeFound("lastModifiedDate.equals=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the smsMessageList where lastModifiedDate equals to UPDATED_LAST_MODIFIED_DATE
-        defaultSmsMessageShouldNotBeFound("lastModifiedDate.equals=" + UPDATED_LAST_MODIFIED_DATE);
+        // Get all the smsMessageList where lastModifiedDate equals to
+        defaultSmsMessageFiltering(
+            "lastModifiedDate.equals=" + DEFAULT_LAST_MODIFIED_DATE,
+            "lastModifiedDate.equals=" + UPDATED_LAST_MODIFIED_DATE
+        );
     }
 
     @Test
@@ -1106,11 +941,11 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        // Get all the smsMessageList where lastModifiedDate in DEFAULT_LAST_MODIFIED_DATE or UPDATED_LAST_MODIFIED_DATE
-        defaultSmsMessageShouldBeFound("lastModifiedDate.in=" + DEFAULT_LAST_MODIFIED_DATE + "," + UPDATED_LAST_MODIFIED_DATE);
-
-        // Get all the smsMessageList where lastModifiedDate equals to UPDATED_LAST_MODIFIED_DATE
-        defaultSmsMessageShouldNotBeFound("lastModifiedDate.in=" + UPDATED_LAST_MODIFIED_DATE);
+        // Get all the smsMessageList where lastModifiedDate in
+        defaultSmsMessageFiltering(
+            "lastModifiedDate.in=" + DEFAULT_LAST_MODIFIED_DATE + "," + UPDATED_LAST_MODIFIED_DATE,
+            "lastModifiedDate.in=" + UPDATED_LAST_MODIFIED_DATE
+        );
     }
 
     @Test
@@ -1120,10 +955,12 @@ public class SmsMessageResourceIT {
         smsMessageRepository.save(smsMessage);
 
         // Get all the smsMessageList where lastModifiedDate is not null
-        defaultSmsMessageShouldBeFound("lastModifiedDate.specified=true");
+        defaultSmsMessageFiltering("lastModifiedDate.specified=true", "lastModifiedDate.specified=false");
+    }
 
-        // Get all the smsMessageList where lastModifiedDate is null
-        defaultSmsMessageShouldNotBeFound("lastModifiedDate.specified=false");
+    private void defaultSmsMessageFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultSmsMessageShouldBeFound(shouldBeFound);
+        defaultSmsMessageShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -1190,7 +1027,7 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        int databaseSizeBeforeUpdate = smsMessageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the smsMessage
         SmsMessage updatedSmsMessage = smsMessageRepository.findById(smsMessage.getId()).orElseThrow();
@@ -1215,34 +1052,19 @@ public class SmsMessageResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, smsMessageDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(smsMessageDTO))
+                    .content(om.writeValueAsBytes(smsMessageDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the SmsMessage in the database
-        List<SmsMessage> smsMessageList = smsMessageRepository.findAll();
-        assertThat(smsMessageList).hasSize(databaseSizeBeforeUpdate);
-        SmsMessage testSmsMessage = smsMessageList.get(smsMessageList.size() - 1);
-        assertThat(testSmsMessage.getTitle()).isEqualTo(UPDATED_TITLE);
-        assertThat(testSmsMessage.getSendType()).isEqualTo(UPDATED_SEND_TYPE);
-        assertThat(testSmsMessage.getReceiver()).isEqualTo(UPDATED_RECEIVER);
-        assertThat(testSmsMessage.getParams()).isEqualTo(UPDATED_PARAMS);
-        assertThat(testSmsMessage.getContent()).isEqualTo(UPDATED_CONTENT);
-        assertThat(testSmsMessage.getSendTime()).isEqualTo(UPDATED_SEND_TIME);
-        assertThat(testSmsMessage.getSendStatus()).isEqualTo(UPDATED_SEND_STATUS);
-        assertThat(testSmsMessage.getRetryNum()).isEqualTo(UPDATED_RETRY_NUM);
-        assertThat(testSmsMessage.getFailResult()).isEqualTo(UPDATED_FAIL_RESULT);
-        assertThat(testSmsMessage.getRemark()).isEqualTo(UPDATED_REMARK);
-        assertThat(testSmsMessage.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testSmsMessage.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testSmsMessage.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testSmsMessage.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedSmsMessageToMatchAllProperties(updatedSmsMessage);
     }
 
     @Test
     @Transactional
     void putNonExistingSmsMessage() throws Exception {
-        int databaseSizeBeforeUpdate = smsMessageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsMessage.setId(longCount.incrementAndGet());
 
         // Create the SmsMessage
@@ -1253,19 +1075,18 @@ public class SmsMessageResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, smsMessageDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(smsMessageDTO))
+                    .content(om.writeValueAsBytes(smsMessageDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SmsMessage in the database
-        List<SmsMessage> smsMessageList = smsMessageRepository.findAll();
-        assertThat(smsMessageList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchSmsMessage() throws Exception {
-        int databaseSizeBeforeUpdate = smsMessageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsMessage.setId(longCount.incrementAndGet());
 
         // Create the SmsMessage
@@ -1276,19 +1097,18 @@ public class SmsMessageResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(smsMessageDTO))
+                    .content(om.writeValueAsBytes(smsMessageDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SmsMessage in the database
-        List<SmsMessage> smsMessageList = smsMessageRepository.findAll();
-        assertThat(smsMessageList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamSmsMessage() throws Exception {
-        int databaseSizeBeforeUpdate = smsMessageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsMessage.setId(longCount.incrementAndGet());
 
         // Create the SmsMessage
@@ -1296,12 +1116,11 @@ public class SmsMessageResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restSmsMessageMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(smsMessageDTO)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(smsMessageDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the SmsMessage in the database
-        List<SmsMessage> smsMessageList = smsMessageRepository.findAll();
-        assertThat(smsMessageList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1310,46 +1129,38 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        int databaseSizeBeforeUpdate = smsMessageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the smsMessage using partial update
         SmsMessage partialUpdatedSmsMessage = new SmsMessage();
         partialUpdatedSmsMessage.setId(smsMessage.getId());
 
         partialUpdatedSmsMessage
-            .sendType(UPDATED_SEND_TYPE)
+            .title(UPDATED_TITLE)
             .receiver(UPDATED_RECEIVER)
+            .params(UPDATED_PARAMS)
             .content(UPDATED_CONTENT)
+            .sendStatus(UPDATED_SEND_STATUS)
             .retryNum(UPDATED_RETRY_NUM)
             .failResult(UPDATED_FAIL_RESULT)
-            .remark(UPDATED_REMARK);
+            .remark(UPDATED_REMARK)
+            .createdBy(UPDATED_CREATED_BY);
 
         restSmsMessageMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedSmsMessage.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedSmsMessage))
+                    .content(om.writeValueAsBytes(partialUpdatedSmsMessage))
             )
             .andExpect(status().isOk());
 
         // Validate the SmsMessage in the database
-        List<SmsMessage> smsMessageList = smsMessageRepository.findAll();
-        assertThat(smsMessageList).hasSize(databaseSizeBeforeUpdate);
-        SmsMessage testSmsMessage = smsMessageList.get(smsMessageList.size() - 1);
-        assertThat(testSmsMessage.getTitle()).isEqualTo(DEFAULT_TITLE);
-        assertThat(testSmsMessage.getSendType()).isEqualTo(UPDATED_SEND_TYPE);
-        assertThat(testSmsMessage.getReceiver()).isEqualTo(UPDATED_RECEIVER);
-        assertThat(testSmsMessage.getParams()).isEqualTo(DEFAULT_PARAMS);
-        assertThat(testSmsMessage.getContent()).isEqualTo(UPDATED_CONTENT);
-        assertThat(testSmsMessage.getSendTime()).isEqualTo(DEFAULT_SEND_TIME);
-        assertThat(testSmsMessage.getSendStatus()).isEqualTo(DEFAULT_SEND_STATUS);
-        assertThat(testSmsMessage.getRetryNum()).isEqualTo(UPDATED_RETRY_NUM);
-        assertThat(testSmsMessage.getFailResult()).isEqualTo(UPDATED_FAIL_RESULT);
-        assertThat(testSmsMessage.getRemark()).isEqualTo(UPDATED_REMARK);
-        assertThat(testSmsMessage.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY);
-        assertThat(testSmsMessage.getCreatedDate()).isEqualTo(DEFAULT_CREATED_DATE);
-        assertThat(testSmsMessage.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
-        assertThat(testSmsMessage.getLastModifiedDate()).isEqualTo(DEFAULT_LAST_MODIFIED_DATE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertSmsMessageUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedSmsMessage, smsMessage),
+            getPersistedSmsMessage(smsMessage)
+        );
     }
 
     @Test
@@ -1358,7 +1169,7 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        int databaseSizeBeforeUpdate = smsMessageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the smsMessage using partial update
         SmsMessage partialUpdatedSmsMessage = new SmsMessage();
@@ -1384,34 +1195,20 @@ public class SmsMessageResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedSmsMessage.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedSmsMessage))
+                    .content(om.writeValueAsBytes(partialUpdatedSmsMessage))
             )
             .andExpect(status().isOk());
 
         // Validate the SmsMessage in the database
-        List<SmsMessage> smsMessageList = smsMessageRepository.findAll();
-        assertThat(smsMessageList).hasSize(databaseSizeBeforeUpdate);
-        SmsMessage testSmsMessage = smsMessageList.get(smsMessageList.size() - 1);
-        assertThat(testSmsMessage.getTitle()).isEqualTo(UPDATED_TITLE);
-        assertThat(testSmsMessage.getSendType()).isEqualTo(UPDATED_SEND_TYPE);
-        assertThat(testSmsMessage.getReceiver()).isEqualTo(UPDATED_RECEIVER);
-        assertThat(testSmsMessage.getParams()).isEqualTo(UPDATED_PARAMS);
-        assertThat(testSmsMessage.getContent()).isEqualTo(UPDATED_CONTENT);
-        assertThat(testSmsMessage.getSendTime()).isEqualTo(UPDATED_SEND_TIME);
-        assertThat(testSmsMessage.getSendStatus()).isEqualTo(UPDATED_SEND_STATUS);
-        assertThat(testSmsMessage.getRetryNum()).isEqualTo(UPDATED_RETRY_NUM);
-        assertThat(testSmsMessage.getFailResult()).isEqualTo(UPDATED_FAIL_RESULT);
-        assertThat(testSmsMessage.getRemark()).isEqualTo(UPDATED_REMARK);
-        assertThat(testSmsMessage.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testSmsMessage.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testSmsMessage.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testSmsMessage.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertSmsMessageUpdatableFieldsEquals(partialUpdatedSmsMessage, getPersistedSmsMessage(partialUpdatedSmsMessage));
     }
 
     @Test
     @Transactional
     void patchNonExistingSmsMessage() throws Exception {
-        int databaseSizeBeforeUpdate = smsMessageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsMessage.setId(longCount.incrementAndGet());
 
         // Create the SmsMessage
@@ -1422,19 +1219,18 @@ public class SmsMessageResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, smsMessageDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(smsMessageDTO))
+                    .content(om.writeValueAsBytes(smsMessageDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SmsMessage in the database
-        List<SmsMessage> smsMessageList = smsMessageRepository.findAll();
-        assertThat(smsMessageList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchSmsMessage() throws Exception {
-        int databaseSizeBeforeUpdate = smsMessageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsMessage.setId(longCount.incrementAndGet());
 
         // Create the SmsMessage
@@ -1445,19 +1241,18 @@ public class SmsMessageResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(smsMessageDTO))
+                    .content(om.writeValueAsBytes(smsMessageDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SmsMessage in the database
-        List<SmsMessage> smsMessageList = smsMessageRepository.findAll();
-        assertThat(smsMessageList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamSmsMessage() throws Exception {
-        int databaseSizeBeforeUpdate = smsMessageRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsMessage.setId(longCount.incrementAndGet());
 
         // Create the SmsMessage
@@ -1465,14 +1260,11 @@ public class SmsMessageResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restSmsMessageMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(smsMessageDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(smsMessageDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the SmsMessage in the database
-        List<SmsMessage> smsMessageList = smsMessageRepository.findAll();
-        assertThat(smsMessageList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1481,7 +1273,7 @@ public class SmsMessageResourceIT {
         // Initialize the database
         smsMessageRepository.save(smsMessage);
 
-        int databaseSizeBeforeDelete = smsMessageRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the smsMessage
         restSmsMessageMockMvc
@@ -1489,7 +1281,34 @@ public class SmsMessageResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<SmsMessage> smsMessageList = smsMessageRepository.findAll();
-        assertThat(smsMessageList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return smsMessageRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected SmsMessage getPersistedSmsMessage(SmsMessage smsMessage) {
+        return smsMessageRepository.findById(smsMessage.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedSmsMessageToMatchAllProperties(SmsMessage expectedSmsMessage) {
+        assertSmsMessageAllPropertiesEquals(expectedSmsMessage, getPersistedSmsMessage(expectedSmsMessage));
+    }
+
+    protected void assertPersistedSmsMessageToMatchUpdatableProperties(SmsMessage expectedSmsMessage) {
+        assertSmsMessageAllUpdatablePropertiesEquals(expectedSmsMessage, getPersistedSmsMessage(expectedSmsMessage));
     }
 }

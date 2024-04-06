@@ -16,7 +16,6 @@ import com.diboot.core.binding.Binder;
 import com.diboot.core.service.impl.BaseServiceImpl;
 import com.google.common.base.CaseFormat;
 import java.util.*;
-import java.util.Arrays;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,17 +33,18 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 /**
  * Service Implementation for managing {@link com.begcode.monolith.domain.ApiPermission}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class ApiPermissionBaseService<R extends ApiPermissionRepository, E extends ApiPermission>
     extends BaseServiceImpl<ApiPermissionRepository, ApiPermission> {
 
     private final Logger log = LoggerFactory.getLogger(ApiPermissionBaseService.class);
 
-    private final List<String> relationCacheNames = Arrays.asList(
+    private final List<String> relationCacheNames = List.of(
         com.begcode.monolith.domain.ApiPermission.class.getName() + ".parent",
         com.begcode.monolith.domain.ApiPermission.class.getName() + ".children",
         com.begcode.monolith.domain.Authority.class.getName() + ".apiPermissions"
     );
-    private final List<String> relationNames = Arrays.asList("children", "parent", "authorities");
+    private final List<String> relationNames = List.of("children", "parent", "authorities");
 
     protected final ApiPermissionRepository apiPermissionRepository;
 
@@ -91,11 +91,11 @@ public class ApiPermissionBaseService<R extends ApiPermissionRepository, E exten
     @Transactional(rollbackFor = Exception.class)
     public ApiPermissionDTO update(ApiPermissionDTO apiPermissionDTO) {
         log.debug("Request to update ApiPermission : {}", apiPermissionDTO);
-
         ApiPermission apiPermission = apiPermissionMapper.toEntity(apiPermissionDTO);
+        clearChildrenCache();
 
-        apiPermissionRepository.updateById(apiPermission);
-        return findOne(apiPermissionDTO.getId()).orElseThrow();
+        this.saveOrUpdate(apiPermission);
+        return findOne(apiPermission.getId()).orElseThrow();
     }
 
     /**
@@ -140,8 +140,7 @@ public class ApiPermissionBaseService<R extends ApiPermissionRepository, E exten
      */
     public Optional<ApiPermissionDTO> findOne(Long id) {
         log.debug("Request to get ApiPermission : {}", id);
-        return Optional
-            .ofNullable(apiPermissionRepository.selectById(id))
+        return Optional.ofNullable(apiPermissionRepository.selectById(id))
             .map(apiPermission -> {
                 Binder.bindRelations(apiPermission);
                 return apiPermission;
@@ -299,23 +298,25 @@ public class ApiPermissionBaseService<R extends ApiPermissionRepository, E exten
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             UpdateWrapper<ApiPermission> updateWrapper = new UpdateWrapper<>();
             updateWrapper.in("id", ids);
-            fieldNames.forEach(fieldName ->
-                updateWrapper.set(
-                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
-                    BeanUtil.getFieldValue(changeApiPermissionDTO, fieldName)
-                )
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changeApiPermissionDTO, fieldName)
+                    )
             );
             this.update(updateWrapper);
         } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
             List<ApiPermission> apiPermissionList = this.listByIds(ids);
             if (CollectionUtils.isNotEmpty(apiPermissionList)) {
                 apiPermissionList.forEach(apiPermission -> {
-                    relationshipNames.forEach(relationName ->
-                        BeanUtil.setFieldValue(
-                            apiPermission,
-                            relationName,
-                            BeanUtil.getFieldValue(apiPermissionMapper.toEntity(changeApiPermissionDTO), relationName)
-                        )
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                apiPermission,
+                                relationName,
+                                BeanUtil.getFieldValue(apiPermissionMapper.toEntity(changeApiPermissionDTO), relationName)
+                            )
                     );
                     this.createOrUpdateAndRelatedRelations(apiPermission, relationshipNames);
                 });

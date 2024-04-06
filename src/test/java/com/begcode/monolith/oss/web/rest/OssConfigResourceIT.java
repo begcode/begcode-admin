@@ -1,5 +1,7 @@
 package com.begcode.monolith.oss.web.rest;
 
+import static com.begcode.monolith.oss.domain.OssConfigAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -12,10 +14,8 @@ import com.begcode.monolith.oss.domain.OssConfig;
 import com.begcode.monolith.oss.repository.OssConfigRepository;
 import com.begcode.monolith.oss.service.dto.OssConfigDTO;
 import com.begcode.monolith.oss.service.mapper.OssConfigMapper;
-import com.begcode.monolith.web.rest.TestUtil;
-import com.begcode.monolith.web.rest.TestUtil;
-import java.util.List;
-import java.util.Random;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,8 +51,11 @@ public class OssConfigResourceIT {
     private static final String ENTITY_API_URL = "/api/oss-configs";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private OssConfigRepository ossConfigRepository;
@@ -105,22 +108,23 @@ public class OssConfigResourceIT {
     @Test
     @Transactional
     void createOssConfig() throws Exception {
-        int databaseSizeBeforeCreate = ossConfigRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the OssConfig
         OssConfigDTO ossConfigDTO = ossConfigMapper.toDto(ossConfig);
-        restOssConfigMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(ossConfigDTO)))
-            .andExpect(status().isCreated());
+        var returnedOssConfigDTO = om.readValue(
+            restOssConfigMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ossConfigDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            OssConfigDTO.class
+        );
 
         // Validate the OssConfig in the database
-        List<OssConfig> ossConfigList = ossConfigRepository.findAll();
-        assertThat(ossConfigList).hasSize(databaseSizeBeforeCreate + 1);
-        OssConfig testOssConfig = ossConfigList.get(ossConfigList.size() - 1);
-        assertThat(testOssConfig.getProvider()).isEqualTo(DEFAULT_PROVIDER);
-        assertThat(testOssConfig.getPlatform()).isEqualTo(DEFAULT_PLATFORM);
-        assertThat(testOssConfig.getEnabled()).isEqualTo(DEFAULT_ENABLED);
-        assertThat(testOssConfig.getRemark()).isEqualTo(DEFAULT_REMARK);
-        assertThat(testOssConfig.getConfigData()).isEqualTo(DEFAULT_CONFIG_DATA);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedOssConfig = ossConfigMapper.toEntity(returnedOssConfigDTO);
+        assertOssConfigUpdatableFieldsEquals(returnedOssConfig, getPersistedOssConfig(returnedOssConfig));
     }
 
     @Test
@@ -130,22 +134,21 @@ public class OssConfigResourceIT {
         ossConfig.setId(1L);
         OssConfigDTO ossConfigDTO = ossConfigMapper.toDto(ossConfig);
 
-        int databaseSizeBeforeCreate = ossConfigRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restOssConfigMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(ossConfigDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ossConfigDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the OssConfig in the database
-        List<OssConfig> ossConfigList = ossConfigRepository.findAll();
-        assertThat(ossConfigList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
     @Transactional
     void checkProviderIsRequired() throws Exception {
-        int databaseSizeBeforeTest = ossConfigRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         ossConfig.setProvider(null);
 
@@ -153,17 +156,16 @@ public class OssConfigResourceIT {
         OssConfigDTO ossConfigDTO = ossConfigMapper.toDto(ossConfig);
 
         restOssConfigMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(ossConfigDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ossConfigDTO)))
             .andExpect(status().isBadRequest());
 
-        List<OssConfig> ossConfigList = ossConfigRepository.findAll();
-        assertThat(ossConfigList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void checkPlatformIsRequired() throws Exception {
-        int databaseSizeBeforeTest = ossConfigRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         ossConfig.setPlatform(null);
 
@@ -171,11 +173,10 @@ public class OssConfigResourceIT {
         OssConfigDTO ossConfigDTO = ossConfigMapper.toDto(ossConfig);
 
         restOssConfigMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(ossConfigDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ossConfigDTO)))
             .andExpect(status().isBadRequest());
 
-        List<OssConfig> ossConfigList = ossConfigRepository.findAll();
-        assertThat(ossConfigList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
@@ -224,14 +225,11 @@ public class OssConfigResourceIT {
 
         Long id = ossConfig.getId();
 
-        defaultOssConfigShouldBeFound("id.equals=" + id);
-        defaultOssConfigShouldNotBeFound("id.notEquals=" + id);
+        defaultOssConfigFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultOssConfigShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultOssConfigShouldNotBeFound("id.greaterThan=" + id);
+        defaultOssConfigFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultOssConfigShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultOssConfigShouldNotBeFound("id.lessThan=" + id);
+        defaultOssConfigFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -240,11 +238,8 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        // Get all the ossConfigList where provider equals to DEFAULT_PROVIDER
-        defaultOssConfigShouldBeFound("provider.equals=" + DEFAULT_PROVIDER);
-
-        // Get all the ossConfigList where provider equals to UPDATED_PROVIDER
-        defaultOssConfigShouldNotBeFound("provider.equals=" + UPDATED_PROVIDER);
+        // Get all the ossConfigList where provider equals to
+        defaultOssConfigFiltering("provider.equals=" + DEFAULT_PROVIDER, "provider.equals=" + UPDATED_PROVIDER);
     }
 
     @Test
@@ -253,11 +248,8 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        // Get all the ossConfigList where provider in DEFAULT_PROVIDER or UPDATED_PROVIDER
-        defaultOssConfigShouldBeFound("provider.in=" + DEFAULT_PROVIDER + "," + UPDATED_PROVIDER);
-
-        // Get all the ossConfigList where provider equals to UPDATED_PROVIDER
-        defaultOssConfigShouldNotBeFound("provider.in=" + UPDATED_PROVIDER);
+        // Get all the ossConfigList where provider in
+        defaultOssConfigFiltering("provider.in=" + DEFAULT_PROVIDER + "," + UPDATED_PROVIDER, "provider.in=" + UPDATED_PROVIDER);
     }
 
     @Test
@@ -267,10 +259,7 @@ public class OssConfigResourceIT {
         ossConfigRepository.save(ossConfig);
 
         // Get all the ossConfigList where provider is not null
-        defaultOssConfigShouldBeFound("provider.specified=true");
-
-        // Get all the ossConfigList where provider is null
-        defaultOssConfigShouldNotBeFound("provider.specified=false");
+        defaultOssConfigFiltering("provider.specified=true", "provider.specified=false");
     }
 
     @Test
@@ -279,11 +268,8 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        // Get all the ossConfigList where platform equals to DEFAULT_PLATFORM
-        defaultOssConfigShouldBeFound("platform.equals=" + DEFAULT_PLATFORM);
-
-        // Get all the ossConfigList where platform equals to UPDATED_PLATFORM
-        defaultOssConfigShouldNotBeFound("platform.equals=" + UPDATED_PLATFORM);
+        // Get all the ossConfigList where platform equals to
+        defaultOssConfigFiltering("platform.equals=" + DEFAULT_PLATFORM, "platform.equals=" + UPDATED_PLATFORM);
     }
 
     @Test
@@ -292,11 +278,8 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        // Get all the ossConfigList where platform in DEFAULT_PLATFORM or UPDATED_PLATFORM
-        defaultOssConfigShouldBeFound("platform.in=" + DEFAULT_PLATFORM + "," + UPDATED_PLATFORM);
-
-        // Get all the ossConfigList where platform equals to UPDATED_PLATFORM
-        defaultOssConfigShouldNotBeFound("platform.in=" + UPDATED_PLATFORM);
+        // Get all the ossConfigList where platform in
+        defaultOssConfigFiltering("platform.in=" + DEFAULT_PLATFORM + "," + UPDATED_PLATFORM, "platform.in=" + UPDATED_PLATFORM);
     }
 
     @Test
@@ -306,10 +289,7 @@ public class OssConfigResourceIT {
         ossConfigRepository.save(ossConfig);
 
         // Get all the ossConfigList where platform is not null
-        defaultOssConfigShouldBeFound("platform.specified=true");
-
-        // Get all the ossConfigList where platform is null
-        defaultOssConfigShouldNotBeFound("platform.specified=false");
+        defaultOssConfigFiltering("platform.specified=true", "platform.specified=false");
     }
 
     @Test
@@ -318,11 +298,8 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        // Get all the ossConfigList where platform contains DEFAULT_PLATFORM
-        defaultOssConfigShouldBeFound("platform.contains=" + DEFAULT_PLATFORM);
-
-        // Get all the ossConfigList where platform contains UPDATED_PLATFORM
-        defaultOssConfigShouldNotBeFound("platform.contains=" + UPDATED_PLATFORM);
+        // Get all the ossConfigList where platform contains
+        defaultOssConfigFiltering("platform.contains=" + DEFAULT_PLATFORM, "platform.contains=" + UPDATED_PLATFORM);
     }
 
     @Test
@@ -331,11 +308,8 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        // Get all the ossConfigList where platform does not contain DEFAULT_PLATFORM
-        defaultOssConfigShouldNotBeFound("platform.doesNotContain=" + DEFAULT_PLATFORM);
-
-        // Get all the ossConfigList where platform does not contain UPDATED_PLATFORM
-        defaultOssConfigShouldBeFound("platform.doesNotContain=" + UPDATED_PLATFORM);
+        // Get all the ossConfigList where platform does not contain
+        defaultOssConfigFiltering("platform.doesNotContain=" + UPDATED_PLATFORM, "platform.doesNotContain=" + DEFAULT_PLATFORM);
     }
 
     @Test
@@ -344,11 +318,8 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        // Get all the ossConfigList where enabled equals to DEFAULT_ENABLED
-        defaultOssConfigShouldBeFound("enabled.equals=" + DEFAULT_ENABLED);
-
-        // Get all the ossConfigList where enabled equals to UPDATED_ENABLED
-        defaultOssConfigShouldNotBeFound("enabled.equals=" + UPDATED_ENABLED);
+        // Get all the ossConfigList where enabled equals to
+        defaultOssConfigFiltering("enabled.equals=" + DEFAULT_ENABLED, "enabled.equals=" + UPDATED_ENABLED);
     }
 
     @Test
@@ -357,11 +328,8 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        // Get all the ossConfigList where enabled in DEFAULT_ENABLED or UPDATED_ENABLED
-        defaultOssConfigShouldBeFound("enabled.in=" + DEFAULT_ENABLED + "," + UPDATED_ENABLED);
-
-        // Get all the ossConfigList where enabled equals to UPDATED_ENABLED
-        defaultOssConfigShouldNotBeFound("enabled.in=" + UPDATED_ENABLED);
+        // Get all the ossConfigList where enabled in
+        defaultOssConfigFiltering("enabled.in=" + DEFAULT_ENABLED + "," + UPDATED_ENABLED, "enabled.in=" + UPDATED_ENABLED);
     }
 
     @Test
@@ -371,10 +339,7 @@ public class OssConfigResourceIT {
         ossConfigRepository.save(ossConfig);
 
         // Get all the ossConfigList where enabled is not null
-        defaultOssConfigShouldBeFound("enabled.specified=true");
-
-        // Get all the ossConfigList where enabled is null
-        defaultOssConfigShouldNotBeFound("enabled.specified=false");
+        defaultOssConfigFiltering("enabled.specified=true", "enabled.specified=false");
     }
 
     @Test
@@ -383,11 +348,8 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        // Get all the ossConfigList where remark equals to DEFAULT_REMARK
-        defaultOssConfigShouldBeFound("remark.equals=" + DEFAULT_REMARK);
-
-        // Get all the ossConfigList where remark equals to UPDATED_REMARK
-        defaultOssConfigShouldNotBeFound("remark.equals=" + UPDATED_REMARK);
+        // Get all the ossConfigList where remark equals to
+        defaultOssConfigFiltering("remark.equals=" + DEFAULT_REMARK, "remark.equals=" + UPDATED_REMARK);
     }
 
     @Test
@@ -396,11 +358,8 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        // Get all the ossConfigList where remark in DEFAULT_REMARK or UPDATED_REMARK
-        defaultOssConfigShouldBeFound("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK);
-
-        // Get all the ossConfigList where remark equals to UPDATED_REMARK
-        defaultOssConfigShouldNotBeFound("remark.in=" + UPDATED_REMARK);
+        // Get all the ossConfigList where remark in
+        defaultOssConfigFiltering("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK, "remark.in=" + UPDATED_REMARK);
     }
 
     @Test
@@ -410,10 +369,7 @@ public class OssConfigResourceIT {
         ossConfigRepository.save(ossConfig);
 
         // Get all the ossConfigList where remark is not null
-        defaultOssConfigShouldBeFound("remark.specified=true");
-
-        // Get all the ossConfigList where remark is null
-        defaultOssConfigShouldNotBeFound("remark.specified=false");
+        defaultOssConfigFiltering("remark.specified=true", "remark.specified=false");
     }
 
     @Test
@@ -422,11 +378,8 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        // Get all the ossConfigList where remark contains DEFAULT_REMARK
-        defaultOssConfigShouldBeFound("remark.contains=" + DEFAULT_REMARK);
-
-        // Get all the ossConfigList where remark contains UPDATED_REMARK
-        defaultOssConfigShouldNotBeFound("remark.contains=" + UPDATED_REMARK);
+        // Get all the ossConfigList where remark contains
+        defaultOssConfigFiltering("remark.contains=" + DEFAULT_REMARK, "remark.contains=" + UPDATED_REMARK);
     }
 
     @Test
@@ -435,11 +388,8 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        // Get all the ossConfigList where remark does not contain DEFAULT_REMARK
-        defaultOssConfigShouldNotBeFound("remark.doesNotContain=" + DEFAULT_REMARK);
-
-        // Get all the ossConfigList where remark does not contain UPDATED_REMARK
-        defaultOssConfigShouldBeFound("remark.doesNotContain=" + UPDATED_REMARK);
+        // Get all the ossConfigList where remark does not contain
+        defaultOssConfigFiltering("remark.doesNotContain=" + UPDATED_REMARK, "remark.doesNotContain=" + DEFAULT_REMARK);
     }
 
     @Test
@@ -448,11 +398,8 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        // Get all the ossConfigList where configData equals to DEFAULT_CONFIG_DATA
-        defaultOssConfigShouldBeFound("configData.equals=" + DEFAULT_CONFIG_DATA);
-
-        // Get all the ossConfigList where configData equals to UPDATED_CONFIG_DATA
-        defaultOssConfigShouldNotBeFound("configData.equals=" + UPDATED_CONFIG_DATA);
+        // Get all the ossConfigList where configData equals to
+        defaultOssConfigFiltering("configData.equals=" + DEFAULT_CONFIG_DATA, "configData.equals=" + UPDATED_CONFIG_DATA);
     }
 
     @Test
@@ -461,11 +408,11 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        // Get all the ossConfigList where configData in DEFAULT_CONFIG_DATA or UPDATED_CONFIG_DATA
-        defaultOssConfigShouldBeFound("configData.in=" + DEFAULT_CONFIG_DATA + "," + UPDATED_CONFIG_DATA);
-
-        // Get all the ossConfigList where configData equals to UPDATED_CONFIG_DATA
-        defaultOssConfigShouldNotBeFound("configData.in=" + UPDATED_CONFIG_DATA);
+        // Get all the ossConfigList where configData in
+        defaultOssConfigFiltering(
+            "configData.in=" + DEFAULT_CONFIG_DATA + "," + UPDATED_CONFIG_DATA,
+            "configData.in=" + UPDATED_CONFIG_DATA
+        );
     }
 
     @Test
@@ -475,10 +422,7 @@ public class OssConfigResourceIT {
         ossConfigRepository.save(ossConfig);
 
         // Get all the ossConfigList where configData is not null
-        defaultOssConfigShouldBeFound("configData.specified=true");
-
-        // Get all the ossConfigList where configData is null
-        defaultOssConfigShouldNotBeFound("configData.specified=false");
+        defaultOssConfigFiltering("configData.specified=true", "configData.specified=false");
     }
 
     @Test
@@ -487,11 +431,8 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        // Get all the ossConfigList where configData contains DEFAULT_CONFIG_DATA
-        defaultOssConfigShouldBeFound("configData.contains=" + DEFAULT_CONFIG_DATA);
-
-        // Get all the ossConfigList where configData contains UPDATED_CONFIG_DATA
-        defaultOssConfigShouldNotBeFound("configData.contains=" + UPDATED_CONFIG_DATA);
+        // Get all the ossConfigList where configData contains
+        defaultOssConfigFiltering("configData.contains=" + DEFAULT_CONFIG_DATA, "configData.contains=" + UPDATED_CONFIG_DATA);
     }
 
     @Test
@@ -500,11 +441,13 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        // Get all the ossConfigList where configData does not contain DEFAULT_CONFIG_DATA
-        defaultOssConfigShouldNotBeFound("configData.doesNotContain=" + DEFAULT_CONFIG_DATA);
+        // Get all the ossConfigList where configData does not contain
+        defaultOssConfigFiltering("configData.doesNotContain=" + UPDATED_CONFIG_DATA, "configData.doesNotContain=" + DEFAULT_CONFIG_DATA);
+    }
 
-        // Get all the ossConfigList where configData does not contain UPDATED_CONFIG_DATA
-        defaultOssConfigShouldBeFound("configData.doesNotContain=" + UPDATED_CONFIG_DATA);
+    private void defaultOssConfigFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultOssConfigShouldBeFound(shouldBeFound);
+        defaultOssConfigShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -562,7 +505,7 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        int databaseSizeBeforeUpdate = ossConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the ossConfig
         OssConfig updatedOssConfig = ossConfigRepository.findById(ossConfig.getId()).orElseThrow();
@@ -578,25 +521,19 @@ public class OssConfigResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, ossConfigDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(ossConfigDTO))
+                    .content(om.writeValueAsBytes(ossConfigDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the OssConfig in the database
-        List<OssConfig> ossConfigList = ossConfigRepository.findAll();
-        assertThat(ossConfigList).hasSize(databaseSizeBeforeUpdate);
-        OssConfig testOssConfig = ossConfigList.get(ossConfigList.size() - 1);
-        assertThat(testOssConfig.getProvider()).isEqualTo(UPDATED_PROVIDER);
-        assertThat(testOssConfig.getPlatform()).isEqualTo(UPDATED_PLATFORM);
-        assertThat(testOssConfig.getEnabled()).isEqualTo(UPDATED_ENABLED);
-        assertThat(testOssConfig.getRemark()).isEqualTo(UPDATED_REMARK);
-        assertThat(testOssConfig.getConfigData()).isEqualTo(UPDATED_CONFIG_DATA);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedOssConfigToMatchAllProperties(updatedOssConfig);
     }
 
     @Test
     @Transactional
     void putNonExistingOssConfig() throws Exception {
-        int databaseSizeBeforeUpdate = ossConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         ossConfig.setId(longCount.incrementAndGet());
 
         // Create the OssConfig
@@ -607,19 +544,18 @@ public class OssConfigResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, ossConfigDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(ossConfigDTO))
+                    .content(om.writeValueAsBytes(ossConfigDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the OssConfig in the database
-        List<OssConfig> ossConfigList = ossConfigRepository.findAll();
-        assertThat(ossConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchOssConfig() throws Exception {
-        int databaseSizeBeforeUpdate = ossConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         ossConfig.setId(longCount.incrementAndGet());
 
         // Create the OssConfig
@@ -630,19 +566,18 @@ public class OssConfigResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(ossConfigDTO))
+                    .content(om.writeValueAsBytes(ossConfigDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the OssConfig in the database
-        List<OssConfig> ossConfigList = ossConfigRepository.findAll();
-        assertThat(ossConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamOssConfig() throws Exception {
-        int databaseSizeBeforeUpdate = ossConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         ossConfig.setId(longCount.incrementAndGet());
 
         // Create the OssConfig
@@ -650,12 +585,11 @@ public class OssConfigResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOssConfigMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(ossConfigDTO)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(ossConfigDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the OssConfig in the database
-        List<OssConfig> ossConfigList = ossConfigRepository.findAll();
-        assertThat(ossConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -664,31 +598,29 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        int databaseSizeBeforeUpdate = ossConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the ossConfig using partial update
         OssConfig partialUpdatedOssConfig = new OssConfig();
         partialUpdatedOssConfig.setId(ossConfig.getId());
 
-        partialUpdatedOssConfig.platform(UPDATED_PLATFORM).remark(UPDATED_REMARK).configData(UPDATED_CONFIG_DATA);
+        partialUpdatedOssConfig.enabled(UPDATED_ENABLED);
 
         restOssConfigMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedOssConfig.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedOssConfig))
+                    .content(om.writeValueAsBytes(partialUpdatedOssConfig))
             )
             .andExpect(status().isOk());
 
         // Validate the OssConfig in the database
-        List<OssConfig> ossConfigList = ossConfigRepository.findAll();
-        assertThat(ossConfigList).hasSize(databaseSizeBeforeUpdate);
-        OssConfig testOssConfig = ossConfigList.get(ossConfigList.size() - 1);
-        assertThat(testOssConfig.getProvider()).isEqualTo(DEFAULT_PROVIDER);
-        assertThat(testOssConfig.getPlatform()).isEqualTo(UPDATED_PLATFORM);
-        assertThat(testOssConfig.getEnabled()).isEqualTo(DEFAULT_ENABLED);
-        assertThat(testOssConfig.getRemark()).isEqualTo(UPDATED_REMARK);
-        assertThat(testOssConfig.getConfigData()).isEqualTo(UPDATED_CONFIG_DATA);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertOssConfigUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedOssConfig, ossConfig),
+            getPersistedOssConfig(ossConfig)
+        );
     }
 
     @Test
@@ -697,7 +629,7 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        int databaseSizeBeforeUpdate = ossConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the ossConfig using partial update
         OssConfig partialUpdatedOssConfig = new OssConfig();
@@ -714,25 +646,20 @@ public class OssConfigResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedOssConfig.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedOssConfig))
+                    .content(om.writeValueAsBytes(partialUpdatedOssConfig))
             )
             .andExpect(status().isOk());
 
         // Validate the OssConfig in the database
-        List<OssConfig> ossConfigList = ossConfigRepository.findAll();
-        assertThat(ossConfigList).hasSize(databaseSizeBeforeUpdate);
-        OssConfig testOssConfig = ossConfigList.get(ossConfigList.size() - 1);
-        assertThat(testOssConfig.getProvider()).isEqualTo(UPDATED_PROVIDER);
-        assertThat(testOssConfig.getPlatform()).isEqualTo(UPDATED_PLATFORM);
-        assertThat(testOssConfig.getEnabled()).isEqualTo(UPDATED_ENABLED);
-        assertThat(testOssConfig.getRemark()).isEqualTo(UPDATED_REMARK);
-        assertThat(testOssConfig.getConfigData()).isEqualTo(UPDATED_CONFIG_DATA);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertOssConfigUpdatableFieldsEquals(partialUpdatedOssConfig, getPersistedOssConfig(partialUpdatedOssConfig));
     }
 
     @Test
     @Transactional
     void patchNonExistingOssConfig() throws Exception {
-        int databaseSizeBeforeUpdate = ossConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         ossConfig.setId(longCount.incrementAndGet());
 
         // Create the OssConfig
@@ -743,19 +670,18 @@ public class OssConfigResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, ossConfigDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(ossConfigDTO))
+                    .content(om.writeValueAsBytes(ossConfigDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the OssConfig in the database
-        List<OssConfig> ossConfigList = ossConfigRepository.findAll();
-        assertThat(ossConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchOssConfig() throws Exception {
-        int databaseSizeBeforeUpdate = ossConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         ossConfig.setId(longCount.incrementAndGet());
 
         // Create the OssConfig
@@ -766,19 +692,18 @@ public class OssConfigResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(ossConfigDTO))
+                    .content(om.writeValueAsBytes(ossConfigDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the OssConfig in the database
-        List<OssConfig> ossConfigList = ossConfigRepository.findAll();
-        assertThat(ossConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamOssConfig() throws Exception {
-        int databaseSizeBeforeUpdate = ossConfigRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         ossConfig.setId(longCount.incrementAndGet());
 
         // Create the OssConfig
@@ -786,14 +711,11 @@ public class OssConfigResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOssConfigMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(ossConfigDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(ossConfigDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the OssConfig in the database
-        List<OssConfig> ossConfigList = ossConfigRepository.findAll();
-        assertThat(ossConfigList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -802,7 +724,7 @@ public class OssConfigResourceIT {
         // Initialize the database
         ossConfigRepository.save(ossConfig);
 
-        int databaseSizeBeforeDelete = ossConfigRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the ossConfig
         restOssConfigMockMvc
@@ -810,7 +732,34 @@ public class OssConfigResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<OssConfig> ossConfigList = ossConfigRepository.findAll();
-        assertThat(ossConfigList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return ossConfigRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected OssConfig getPersistedOssConfig(OssConfig ossConfig) {
+        return ossConfigRepository.findById(ossConfig.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedOssConfigToMatchAllProperties(OssConfig expectedOssConfig) {
+        assertOssConfigAllPropertiesEquals(expectedOssConfig, getPersistedOssConfig(expectedOssConfig));
+    }
+
+    protected void assertPersistedOssConfigToMatchUpdatableProperties(OssConfig expectedOssConfig) {
+        assertOssConfigAllUpdatablePropertiesEquals(expectedOssConfig, getPersistedOssConfig(expectedOssConfig));
     }
 }

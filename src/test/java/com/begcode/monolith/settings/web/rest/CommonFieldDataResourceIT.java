@@ -1,5 +1,7 @@
 package com.begcode.monolith.settings.web.rest;
 
+import static com.begcode.monolith.settings.domain.CommonFieldDataAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -12,10 +14,8 @@ import com.begcode.monolith.settings.domain.CommonFieldData;
 import com.begcode.monolith.settings.repository.CommonFieldDataRepository;
 import com.begcode.monolith.settings.service.dto.CommonFieldDataDTO;
 import com.begcode.monolith.settings.service.mapper.CommonFieldDataMapper;
-import com.begcode.monolith.web.rest.TestUtil;
-import com.begcode.monolith.web.rest.TestUtil;
-import java.util.List;
-import java.util.Random;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,8 +65,11 @@ public class CommonFieldDataResourceIT {
     private static final String ENTITY_API_URL = "/api/common-field-data";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private CommonFieldDataRepository commonFieldDataRepository;
@@ -127,28 +130,23 @@ public class CommonFieldDataResourceIT {
     @Test
     @Transactional
     void createCommonFieldData() throws Exception {
-        int databaseSizeBeforeCreate = commonFieldDataRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the CommonFieldData
         CommonFieldDataDTO commonFieldDataDTO = commonFieldDataMapper.toDto(commonFieldData);
-        restCommonFieldDataMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(commonFieldDataDTO))
-            )
-            .andExpect(status().isCreated());
+        var returnedCommonFieldDataDTO = om.readValue(
+            restCommonFieldDataMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(commonFieldDataDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            CommonFieldDataDTO.class
+        );
 
         // Validate the CommonFieldData in the database
-        List<CommonFieldData> commonFieldDataList = commonFieldDataRepository.findAll();
-        assertThat(commonFieldDataList).hasSize(databaseSizeBeforeCreate + 1);
-        CommonFieldData testCommonFieldData = commonFieldDataList.get(commonFieldDataList.size() - 1);
-        assertThat(testCommonFieldData.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testCommonFieldData.getValue()).isEqualTo(DEFAULT_VALUE);
-        assertThat(testCommonFieldData.getLabel()).isEqualTo(DEFAULT_LABEL);
-        assertThat(testCommonFieldData.getValueType()).isEqualTo(DEFAULT_VALUE_TYPE);
-        assertThat(testCommonFieldData.getRemark()).isEqualTo(DEFAULT_REMARK);
-        assertThat(testCommonFieldData.getSortValue()).isEqualTo(DEFAULT_SORT_VALUE);
-        assertThat(testCommonFieldData.getDisabled()).isEqualTo(DEFAULT_DISABLED);
-        assertThat(testCommonFieldData.getOwnerEntityName()).isEqualTo(DEFAULT_OWNER_ENTITY_NAME);
-        assertThat(testCommonFieldData.getOwnerEntityId()).isEqualTo(DEFAULT_OWNER_ENTITY_ID);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedCommonFieldData = commonFieldDataMapper.toEntity(returnedCommonFieldDataDTO);
+        assertCommonFieldDataUpdatableFieldsEquals(returnedCommonFieldData, getPersistedCommonFieldData(returnedCommonFieldData));
     }
 
     @Test
@@ -158,18 +156,15 @@ public class CommonFieldDataResourceIT {
         commonFieldData.setId(1L);
         CommonFieldDataDTO commonFieldDataDTO = commonFieldDataMapper.toDto(commonFieldData);
 
-        int databaseSizeBeforeCreate = commonFieldDataRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restCommonFieldDataMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(commonFieldDataDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(commonFieldDataDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the CommonFieldData in the database
-        List<CommonFieldData> commonFieldDataList = commonFieldDataRepository.findAll();
-        assertThat(commonFieldDataList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
@@ -226,14 +221,11 @@ public class CommonFieldDataResourceIT {
 
         Long id = commonFieldData.getId();
 
-        defaultCommonFieldDataShouldBeFound("id.equals=" + id);
-        defaultCommonFieldDataShouldNotBeFound("id.notEquals=" + id);
+        defaultCommonFieldDataFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultCommonFieldDataShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultCommonFieldDataShouldNotBeFound("id.greaterThan=" + id);
+        defaultCommonFieldDataFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultCommonFieldDataShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultCommonFieldDataShouldNotBeFound("id.lessThan=" + id);
+        defaultCommonFieldDataFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -242,11 +234,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where name equals to DEFAULT_NAME
-        defaultCommonFieldDataShouldBeFound("name.equals=" + DEFAULT_NAME);
-
-        // Get all the commonFieldDataList where name equals to UPDATED_NAME
-        defaultCommonFieldDataShouldNotBeFound("name.equals=" + UPDATED_NAME);
+        // Get all the commonFieldDataList where name equals to
+        defaultCommonFieldDataFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
     }
 
     @Test
@@ -255,11 +244,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where name in DEFAULT_NAME or UPDATED_NAME
-        defaultCommonFieldDataShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
-
-        // Get all the commonFieldDataList where name equals to UPDATED_NAME
-        defaultCommonFieldDataShouldNotBeFound("name.in=" + UPDATED_NAME);
+        // Get all the commonFieldDataList where name in
+        defaultCommonFieldDataFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
     }
 
     @Test
@@ -269,10 +255,7 @@ public class CommonFieldDataResourceIT {
         commonFieldDataRepository.save(commonFieldData);
 
         // Get all the commonFieldDataList where name is not null
-        defaultCommonFieldDataShouldBeFound("name.specified=true");
-
-        // Get all the commonFieldDataList where name is null
-        defaultCommonFieldDataShouldNotBeFound("name.specified=false");
+        defaultCommonFieldDataFiltering("name.specified=true", "name.specified=false");
     }
 
     @Test
@@ -281,11 +264,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where name contains DEFAULT_NAME
-        defaultCommonFieldDataShouldBeFound("name.contains=" + DEFAULT_NAME);
-
-        // Get all the commonFieldDataList where name contains UPDATED_NAME
-        defaultCommonFieldDataShouldNotBeFound("name.contains=" + UPDATED_NAME);
+        // Get all the commonFieldDataList where name contains
+        defaultCommonFieldDataFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
     }
 
     @Test
@@ -294,11 +274,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where name does not contain DEFAULT_NAME
-        defaultCommonFieldDataShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
-
-        // Get all the commonFieldDataList where name does not contain UPDATED_NAME
-        defaultCommonFieldDataShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+        // Get all the commonFieldDataList where name does not contain
+        defaultCommonFieldDataFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
     }
 
     @Test
@@ -307,11 +284,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where value equals to DEFAULT_VALUE
-        defaultCommonFieldDataShouldBeFound("value.equals=" + DEFAULT_VALUE);
-
-        // Get all the commonFieldDataList where value equals to UPDATED_VALUE
-        defaultCommonFieldDataShouldNotBeFound("value.equals=" + UPDATED_VALUE);
+        // Get all the commonFieldDataList where value equals to
+        defaultCommonFieldDataFiltering("value.equals=" + DEFAULT_VALUE, "value.equals=" + UPDATED_VALUE);
     }
 
     @Test
@@ -320,11 +294,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where value in DEFAULT_VALUE or UPDATED_VALUE
-        defaultCommonFieldDataShouldBeFound("value.in=" + DEFAULT_VALUE + "," + UPDATED_VALUE);
-
-        // Get all the commonFieldDataList where value equals to UPDATED_VALUE
-        defaultCommonFieldDataShouldNotBeFound("value.in=" + UPDATED_VALUE);
+        // Get all the commonFieldDataList where value in
+        defaultCommonFieldDataFiltering("value.in=" + DEFAULT_VALUE + "," + UPDATED_VALUE, "value.in=" + UPDATED_VALUE);
     }
 
     @Test
@@ -334,10 +305,7 @@ public class CommonFieldDataResourceIT {
         commonFieldDataRepository.save(commonFieldData);
 
         // Get all the commonFieldDataList where value is not null
-        defaultCommonFieldDataShouldBeFound("value.specified=true");
-
-        // Get all the commonFieldDataList where value is null
-        defaultCommonFieldDataShouldNotBeFound("value.specified=false");
+        defaultCommonFieldDataFiltering("value.specified=true", "value.specified=false");
     }
 
     @Test
@@ -346,11 +314,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where value contains DEFAULT_VALUE
-        defaultCommonFieldDataShouldBeFound("value.contains=" + DEFAULT_VALUE);
-
-        // Get all the commonFieldDataList where value contains UPDATED_VALUE
-        defaultCommonFieldDataShouldNotBeFound("value.contains=" + UPDATED_VALUE);
+        // Get all the commonFieldDataList where value contains
+        defaultCommonFieldDataFiltering("value.contains=" + DEFAULT_VALUE, "value.contains=" + UPDATED_VALUE);
     }
 
     @Test
@@ -359,11 +324,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where value does not contain DEFAULT_VALUE
-        defaultCommonFieldDataShouldNotBeFound("value.doesNotContain=" + DEFAULT_VALUE);
-
-        // Get all the commonFieldDataList where value does not contain UPDATED_VALUE
-        defaultCommonFieldDataShouldBeFound("value.doesNotContain=" + UPDATED_VALUE);
+        // Get all the commonFieldDataList where value does not contain
+        defaultCommonFieldDataFiltering("value.doesNotContain=" + UPDATED_VALUE, "value.doesNotContain=" + DEFAULT_VALUE);
     }
 
     @Test
@@ -372,11 +334,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where label equals to DEFAULT_LABEL
-        defaultCommonFieldDataShouldBeFound("label.equals=" + DEFAULT_LABEL);
-
-        // Get all the commonFieldDataList where label equals to UPDATED_LABEL
-        defaultCommonFieldDataShouldNotBeFound("label.equals=" + UPDATED_LABEL);
+        // Get all the commonFieldDataList where label equals to
+        defaultCommonFieldDataFiltering("label.equals=" + DEFAULT_LABEL, "label.equals=" + UPDATED_LABEL);
     }
 
     @Test
@@ -385,11 +344,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where label in DEFAULT_LABEL or UPDATED_LABEL
-        defaultCommonFieldDataShouldBeFound("label.in=" + DEFAULT_LABEL + "," + UPDATED_LABEL);
-
-        // Get all the commonFieldDataList where label equals to UPDATED_LABEL
-        defaultCommonFieldDataShouldNotBeFound("label.in=" + UPDATED_LABEL);
+        // Get all the commonFieldDataList where label in
+        defaultCommonFieldDataFiltering("label.in=" + DEFAULT_LABEL + "," + UPDATED_LABEL, "label.in=" + UPDATED_LABEL);
     }
 
     @Test
@@ -399,10 +355,7 @@ public class CommonFieldDataResourceIT {
         commonFieldDataRepository.save(commonFieldData);
 
         // Get all the commonFieldDataList where label is not null
-        defaultCommonFieldDataShouldBeFound("label.specified=true");
-
-        // Get all the commonFieldDataList where label is null
-        defaultCommonFieldDataShouldNotBeFound("label.specified=false");
+        defaultCommonFieldDataFiltering("label.specified=true", "label.specified=false");
     }
 
     @Test
@@ -411,11 +364,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where label contains DEFAULT_LABEL
-        defaultCommonFieldDataShouldBeFound("label.contains=" + DEFAULT_LABEL);
-
-        // Get all the commonFieldDataList where label contains UPDATED_LABEL
-        defaultCommonFieldDataShouldNotBeFound("label.contains=" + UPDATED_LABEL);
+        // Get all the commonFieldDataList where label contains
+        defaultCommonFieldDataFiltering("label.contains=" + DEFAULT_LABEL, "label.contains=" + UPDATED_LABEL);
     }
 
     @Test
@@ -424,11 +374,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where label does not contain DEFAULT_LABEL
-        defaultCommonFieldDataShouldNotBeFound("label.doesNotContain=" + DEFAULT_LABEL);
-
-        // Get all the commonFieldDataList where label does not contain UPDATED_LABEL
-        defaultCommonFieldDataShouldBeFound("label.doesNotContain=" + UPDATED_LABEL);
+        // Get all the commonFieldDataList where label does not contain
+        defaultCommonFieldDataFiltering("label.doesNotContain=" + UPDATED_LABEL, "label.doesNotContain=" + DEFAULT_LABEL);
     }
 
     @Test
@@ -437,11 +384,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where valueType equals to DEFAULT_VALUE_TYPE
-        defaultCommonFieldDataShouldBeFound("valueType.equals=" + DEFAULT_VALUE_TYPE);
-
-        // Get all the commonFieldDataList where valueType equals to UPDATED_VALUE_TYPE
-        defaultCommonFieldDataShouldNotBeFound("valueType.equals=" + UPDATED_VALUE_TYPE);
+        // Get all the commonFieldDataList where valueType equals to
+        defaultCommonFieldDataFiltering("valueType.equals=" + DEFAULT_VALUE_TYPE, "valueType.equals=" + UPDATED_VALUE_TYPE);
     }
 
     @Test
@@ -450,11 +394,11 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where valueType in DEFAULT_VALUE_TYPE or UPDATED_VALUE_TYPE
-        defaultCommonFieldDataShouldBeFound("valueType.in=" + DEFAULT_VALUE_TYPE + "," + UPDATED_VALUE_TYPE);
-
-        // Get all the commonFieldDataList where valueType equals to UPDATED_VALUE_TYPE
-        defaultCommonFieldDataShouldNotBeFound("valueType.in=" + UPDATED_VALUE_TYPE);
+        // Get all the commonFieldDataList where valueType in
+        defaultCommonFieldDataFiltering(
+            "valueType.in=" + DEFAULT_VALUE_TYPE + "," + UPDATED_VALUE_TYPE,
+            "valueType.in=" + UPDATED_VALUE_TYPE
+        );
     }
 
     @Test
@@ -464,10 +408,7 @@ public class CommonFieldDataResourceIT {
         commonFieldDataRepository.save(commonFieldData);
 
         // Get all the commonFieldDataList where valueType is not null
-        defaultCommonFieldDataShouldBeFound("valueType.specified=true");
-
-        // Get all the commonFieldDataList where valueType is null
-        defaultCommonFieldDataShouldNotBeFound("valueType.specified=false");
+        defaultCommonFieldDataFiltering("valueType.specified=true", "valueType.specified=false");
     }
 
     @Test
@@ -476,11 +417,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where remark equals to DEFAULT_REMARK
-        defaultCommonFieldDataShouldBeFound("remark.equals=" + DEFAULT_REMARK);
-
-        // Get all the commonFieldDataList where remark equals to UPDATED_REMARK
-        defaultCommonFieldDataShouldNotBeFound("remark.equals=" + UPDATED_REMARK);
+        // Get all the commonFieldDataList where remark equals to
+        defaultCommonFieldDataFiltering("remark.equals=" + DEFAULT_REMARK, "remark.equals=" + UPDATED_REMARK);
     }
 
     @Test
@@ -489,11 +427,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where remark in DEFAULT_REMARK or UPDATED_REMARK
-        defaultCommonFieldDataShouldBeFound("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK);
-
-        // Get all the commonFieldDataList where remark equals to UPDATED_REMARK
-        defaultCommonFieldDataShouldNotBeFound("remark.in=" + UPDATED_REMARK);
+        // Get all the commonFieldDataList where remark in
+        defaultCommonFieldDataFiltering("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK, "remark.in=" + UPDATED_REMARK);
     }
 
     @Test
@@ -503,10 +438,7 @@ public class CommonFieldDataResourceIT {
         commonFieldDataRepository.save(commonFieldData);
 
         // Get all the commonFieldDataList where remark is not null
-        defaultCommonFieldDataShouldBeFound("remark.specified=true");
-
-        // Get all the commonFieldDataList where remark is null
-        defaultCommonFieldDataShouldNotBeFound("remark.specified=false");
+        defaultCommonFieldDataFiltering("remark.specified=true", "remark.specified=false");
     }
 
     @Test
@@ -515,11 +447,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where remark contains DEFAULT_REMARK
-        defaultCommonFieldDataShouldBeFound("remark.contains=" + DEFAULT_REMARK);
-
-        // Get all the commonFieldDataList where remark contains UPDATED_REMARK
-        defaultCommonFieldDataShouldNotBeFound("remark.contains=" + UPDATED_REMARK);
+        // Get all the commonFieldDataList where remark contains
+        defaultCommonFieldDataFiltering("remark.contains=" + DEFAULT_REMARK, "remark.contains=" + UPDATED_REMARK);
     }
 
     @Test
@@ -528,11 +457,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where remark does not contain DEFAULT_REMARK
-        defaultCommonFieldDataShouldNotBeFound("remark.doesNotContain=" + DEFAULT_REMARK);
-
-        // Get all the commonFieldDataList where remark does not contain UPDATED_REMARK
-        defaultCommonFieldDataShouldBeFound("remark.doesNotContain=" + UPDATED_REMARK);
+        // Get all the commonFieldDataList where remark does not contain
+        defaultCommonFieldDataFiltering("remark.doesNotContain=" + UPDATED_REMARK, "remark.doesNotContain=" + DEFAULT_REMARK);
     }
 
     @Test
@@ -541,11 +467,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where sortValue equals to DEFAULT_SORT_VALUE
-        defaultCommonFieldDataShouldBeFound("sortValue.equals=" + DEFAULT_SORT_VALUE);
-
-        // Get all the commonFieldDataList where sortValue equals to UPDATED_SORT_VALUE
-        defaultCommonFieldDataShouldNotBeFound("sortValue.equals=" + UPDATED_SORT_VALUE);
+        // Get all the commonFieldDataList where sortValue equals to
+        defaultCommonFieldDataFiltering("sortValue.equals=" + DEFAULT_SORT_VALUE, "sortValue.equals=" + UPDATED_SORT_VALUE);
     }
 
     @Test
@@ -554,11 +477,11 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where sortValue in DEFAULT_SORT_VALUE or UPDATED_SORT_VALUE
-        defaultCommonFieldDataShouldBeFound("sortValue.in=" + DEFAULT_SORT_VALUE + "," + UPDATED_SORT_VALUE);
-
-        // Get all the commonFieldDataList where sortValue equals to UPDATED_SORT_VALUE
-        defaultCommonFieldDataShouldNotBeFound("sortValue.in=" + UPDATED_SORT_VALUE);
+        // Get all the commonFieldDataList where sortValue in
+        defaultCommonFieldDataFiltering(
+            "sortValue.in=" + DEFAULT_SORT_VALUE + "," + UPDATED_SORT_VALUE,
+            "sortValue.in=" + UPDATED_SORT_VALUE
+        );
     }
 
     @Test
@@ -568,10 +491,7 @@ public class CommonFieldDataResourceIT {
         commonFieldDataRepository.save(commonFieldData);
 
         // Get all the commonFieldDataList where sortValue is not null
-        defaultCommonFieldDataShouldBeFound("sortValue.specified=true");
-
-        // Get all the commonFieldDataList where sortValue is null
-        defaultCommonFieldDataShouldNotBeFound("sortValue.specified=false");
+        defaultCommonFieldDataFiltering("sortValue.specified=true", "sortValue.specified=false");
     }
 
     @Test
@@ -580,11 +500,11 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where sortValue is greater than or equal to DEFAULT_SORT_VALUE
-        defaultCommonFieldDataShouldBeFound("sortValue.greaterThanOrEqual=" + DEFAULT_SORT_VALUE);
-
-        // Get all the commonFieldDataList where sortValue is greater than or equal to UPDATED_SORT_VALUE
-        defaultCommonFieldDataShouldNotBeFound("sortValue.greaterThanOrEqual=" + UPDATED_SORT_VALUE);
+        // Get all the commonFieldDataList where sortValue is greater than or equal to
+        defaultCommonFieldDataFiltering(
+            "sortValue.greaterThanOrEqual=" + DEFAULT_SORT_VALUE,
+            "sortValue.greaterThanOrEqual=" + UPDATED_SORT_VALUE
+        );
     }
 
     @Test
@@ -593,11 +513,11 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where sortValue is less than or equal to DEFAULT_SORT_VALUE
-        defaultCommonFieldDataShouldBeFound("sortValue.lessThanOrEqual=" + DEFAULT_SORT_VALUE);
-
-        // Get all the commonFieldDataList where sortValue is less than or equal to SMALLER_SORT_VALUE
-        defaultCommonFieldDataShouldNotBeFound("sortValue.lessThanOrEqual=" + SMALLER_SORT_VALUE);
+        // Get all the commonFieldDataList where sortValue is less than or equal to
+        defaultCommonFieldDataFiltering(
+            "sortValue.lessThanOrEqual=" + DEFAULT_SORT_VALUE,
+            "sortValue.lessThanOrEqual=" + SMALLER_SORT_VALUE
+        );
     }
 
     @Test
@@ -606,11 +526,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where sortValue is less than DEFAULT_SORT_VALUE
-        defaultCommonFieldDataShouldNotBeFound("sortValue.lessThan=" + DEFAULT_SORT_VALUE);
-
-        // Get all the commonFieldDataList where sortValue is less than UPDATED_SORT_VALUE
-        defaultCommonFieldDataShouldBeFound("sortValue.lessThan=" + UPDATED_SORT_VALUE);
+        // Get all the commonFieldDataList where sortValue is less than
+        defaultCommonFieldDataFiltering("sortValue.lessThan=" + UPDATED_SORT_VALUE, "sortValue.lessThan=" + DEFAULT_SORT_VALUE);
     }
 
     @Test
@@ -619,11 +536,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where sortValue is greater than DEFAULT_SORT_VALUE
-        defaultCommonFieldDataShouldNotBeFound("sortValue.greaterThan=" + DEFAULT_SORT_VALUE);
-
-        // Get all the commonFieldDataList where sortValue is greater than SMALLER_SORT_VALUE
-        defaultCommonFieldDataShouldBeFound("sortValue.greaterThan=" + SMALLER_SORT_VALUE);
+        // Get all the commonFieldDataList where sortValue is greater than
+        defaultCommonFieldDataFiltering("sortValue.greaterThan=" + SMALLER_SORT_VALUE, "sortValue.greaterThan=" + DEFAULT_SORT_VALUE);
     }
 
     @Test
@@ -632,11 +546,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where disabled equals to DEFAULT_DISABLED
-        defaultCommonFieldDataShouldBeFound("disabled.equals=" + DEFAULT_DISABLED);
-
-        // Get all the commonFieldDataList where disabled equals to UPDATED_DISABLED
-        defaultCommonFieldDataShouldNotBeFound("disabled.equals=" + UPDATED_DISABLED);
+        // Get all the commonFieldDataList where disabled equals to
+        defaultCommonFieldDataFiltering("disabled.equals=" + DEFAULT_DISABLED, "disabled.equals=" + UPDATED_DISABLED);
     }
 
     @Test
@@ -645,11 +556,8 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where disabled in DEFAULT_DISABLED or UPDATED_DISABLED
-        defaultCommonFieldDataShouldBeFound("disabled.in=" + DEFAULT_DISABLED + "," + UPDATED_DISABLED);
-
-        // Get all the commonFieldDataList where disabled equals to UPDATED_DISABLED
-        defaultCommonFieldDataShouldNotBeFound("disabled.in=" + UPDATED_DISABLED);
+        // Get all the commonFieldDataList where disabled in
+        defaultCommonFieldDataFiltering("disabled.in=" + DEFAULT_DISABLED + "," + UPDATED_DISABLED, "disabled.in=" + UPDATED_DISABLED);
     }
 
     @Test
@@ -659,10 +567,7 @@ public class CommonFieldDataResourceIT {
         commonFieldDataRepository.save(commonFieldData);
 
         // Get all the commonFieldDataList where disabled is not null
-        defaultCommonFieldDataShouldBeFound("disabled.specified=true");
-
-        // Get all the commonFieldDataList where disabled is null
-        defaultCommonFieldDataShouldNotBeFound("disabled.specified=false");
+        defaultCommonFieldDataFiltering("disabled.specified=true", "disabled.specified=false");
     }
 
     @Test
@@ -671,11 +576,11 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where ownerEntityName equals to DEFAULT_OWNER_ENTITY_NAME
-        defaultCommonFieldDataShouldBeFound("ownerEntityName.equals=" + DEFAULT_OWNER_ENTITY_NAME);
-
-        // Get all the commonFieldDataList where ownerEntityName equals to UPDATED_OWNER_ENTITY_NAME
-        defaultCommonFieldDataShouldNotBeFound("ownerEntityName.equals=" + UPDATED_OWNER_ENTITY_NAME);
+        // Get all the commonFieldDataList where ownerEntityName equals to
+        defaultCommonFieldDataFiltering(
+            "ownerEntityName.equals=" + DEFAULT_OWNER_ENTITY_NAME,
+            "ownerEntityName.equals=" + UPDATED_OWNER_ENTITY_NAME
+        );
     }
 
     @Test
@@ -684,11 +589,11 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where ownerEntityName in DEFAULT_OWNER_ENTITY_NAME or UPDATED_OWNER_ENTITY_NAME
-        defaultCommonFieldDataShouldBeFound("ownerEntityName.in=" + DEFAULT_OWNER_ENTITY_NAME + "," + UPDATED_OWNER_ENTITY_NAME);
-
-        // Get all the commonFieldDataList where ownerEntityName equals to UPDATED_OWNER_ENTITY_NAME
-        defaultCommonFieldDataShouldNotBeFound("ownerEntityName.in=" + UPDATED_OWNER_ENTITY_NAME);
+        // Get all the commonFieldDataList where ownerEntityName in
+        defaultCommonFieldDataFiltering(
+            "ownerEntityName.in=" + DEFAULT_OWNER_ENTITY_NAME + "," + UPDATED_OWNER_ENTITY_NAME,
+            "ownerEntityName.in=" + UPDATED_OWNER_ENTITY_NAME
+        );
     }
 
     @Test
@@ -698,10 +603,7 @@ public class CommonFieldDataResourceIT {
         commonFieldDataRepository.save(commonFieldData);
 
         // Get all the commonFieldDataList where ownerEntityName is not null
-        defaultCommonFieldDataShouldBeFound("ownerEntityName.specified=true");
-
-        // Get all the commonFieldDataList where ownerEntityName is null
-        defaultCommonFieldDataShouldNotBeFound("ownerEntityName.specified=false");
+        defaultCommonFieldDataFiltering("ownerEntityName.specified=true", "ownerEntityName.specified=false");
     }
 
     @Test
@@ -710,11 +612,11 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where ownerEntityName contains DEFAULT_OWNER_ENTITY_NAME
-        defaultCommonFieldDataShouldBeFound("ownerEntityName.contains=" + DEFAULT_OWNER_ENTITY_NAME);
-
-        // Get all the commonFieldDataList where ownerEntityName contains UPDATED_OWNER_ENTITY_NAME
-        defaultCommonFieldDataShouldNotBeFound("ownerEntityName.contains=" + UPDATED_OWNER_ENTITY_NAME);
+        // Get all the commonFieldDataList where ownerEntityName contains
+        defaultCommonFieldDataFiltering(
+            "ownerEntityName.contains=" + DEFAULT_OWNER_ENTITY_NAME,
+            "ownerEntityName.contains=" + UPDATED_OWNER_ENTITY_NAME
+        );
     }
 
     @Test
@@ -723,11 +625,11 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where ownerEntityName does not contain DEFAULT_OWNER_ENTITY_NAME
-        defaultCommonFieldDataShouldNotBeFound("ownerEntityName.doesNotContain=" + DEFAULT_OWNER_ENTITY_NAME);
-
-        // Get all the commonFieldDataList where ownerEntityName does not contain UPDATED_OWNER_ENTITY_NAME
-        defaultCommonFieldDataShouldBeFound("ownerEntityName.doesNotContain=" + UPDATED_OWNER_ENTITY_NAME);
+        // Get all the commonFieldDataList where ownerEntityName does not contain
+        defaultCommonFieldDataFiltering(
+            "ownerEntityName.doesNotContain=" + UPDATED_OWNER_ENTITY_NAME,
+            "ownerEntityName.doesNotContain=" + DEFAULT_OWNER_ENTITY_NAME
+        );
     }
 
     @Test
@@ -736,11 +638,11 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where ownerEntityId equals to DEFAULT_OWNER_ENTITY_ID
-        defaultCommonFieldDataShouldBeFound("ownerEntityId.equals=" + DEFAULT_OWNER_ENTITY_ID);
-
-        // Get all the commonFieldDataList where ownerEntityId equals to UPDATED_OWNER_ENTITY_ID
-        defaultCommonFieldDataShouldNotBeFound("ownerEntityId.equals=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the commonFieldDataList where ownerEntityId equals to
+        defaultCommonFieldDataFiltering(
+            "ownerEntityId.equals=" + DEFAULT_OWNER_ENTITY_ID,
+            "ownerEntityId.equals=" + UPDATED_OWNER_ENTITY_ID
+        );
     }
 
     @Test
@@ -749,11 +651,11 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where ownerEntityId in DEFAULT_OWNER_ENTITY_ID or UPDATED_OWNER_ENTITY_ID
-        defaultCommonFieldDataShouldBeFound("ownerEntityId.in=" + DEFAULT_OWNER_ENTITY_ID + "," + UPDATED_OWNER_ENTITY_ID);
-
-        // Get all the commonFieldDataList where ownerEntityId equals to UPDATED_OWNER_ENTITY_ID
-        defaultCommonFieldDataShouldNotBeFound("ownerEntityId.in=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the commonFieldDataList where ownerEntityId in
+        defaultCommonFieldDataFiltering(
+            "ownerEntityId.in=" + DEFAULT_OWNER_ENTITY_ID + "," + UPDATED_OWNER_ENTITY_ID,
+            "ownerEntityId.in=" + UPDATED_OWNER_ENTITY_ID
+        );
     }
 
     @Test
@@ -763,10 +665,7 @@ public class CommonFieldDataResourceIT {
         commonFieldDataRepository.save(commonFieldData);
 
         // Get all the commonFieldDataList where ownerEntityId is not null
-        defaultCommonFieldDataShouldBeFound("ownerEntityId.specified=true");
-
-        // Get all the commonFieldDataList where ownerEntityId is null
-        defaultCommonFieldDataShouldNotBeFound("ownerEntityId.specified=false");
+        defaultCommonFieldDataFiltering("ownerEntityId.specified=true", "ownerEntityId.specified=false");
     }
 
     @Test
@@ -775,11 +674,11 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where ownerEntityId is greater than or equal to DEFAULT_OWNER_ENTITY_ID
-        defaultCommonFieldDataShouldBeFound("ownerEntityId.greaterThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID);
-
-        // Get all the commonFieldDataList where ownerEntityId is greater than or equal to UPDATED_OWNER_ENTITY_ID
-        defaultCommonFieldDataShouldNotBeFound("ownerEntityId.greaterThanOrEqual=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the commonFieldDataList where ownerEntityId is greater than or equal to
+        defaultCommonFieldDataFiltering(
+            "ownerEntityId.greaterThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID,
+            "ownerEntityId.greaterThanOrEqual=" + UPDATED_OWNER_ENTITY_ID
+        );
     }
 
     @Test
@@ -788,11 +687,11 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where ownerEntityId is less than or equal to DEFAULT_OWNER_ENTITY_ID
-        defaultCommonFieldDataShouldBeFound("ownerEntityId.lessThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID);
-
-        // Get all the commonFieldDataList where ownerEntityId is less than or equal to SMALLER_OWNER_ENTITY_ID
-        defaultCommonFieldDataShouldNotBeFound("ownerEntityId.lessThanOrEqual=" + SMALLER_OWNER_ENTITY_ID);
+        // Get all the commonFieldDataList where ownerEntityId is less than or equal to
+        defaultCommonFieldDataFiltering(
+            "ownerEntityId.lessThanOrEqual=" + DEFAULT_OWNER_ENTITY_ID,
+            "ownerEntityId.lessThanOrEqual=" + SMALLER_OWNER_ENTITY_ID
+        );
     }
 
     @Test
@@ -801,11 +700,11 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where ownerEntityId is less than DEFAULT_OWNER_ENTITY_ID
-        defaultCommonFieldDataShouldNotBeFound("ownerEntityId.lessThan=" + DEFAULT_OWNER_ENTITY_ID);
-
-        // Get all the commonFieldDataList where ownerEntityId is less than UPDATED_OWNER_ENTITY_ID
-        defaultCommonFieldDataShouldBeFound("ownerEntityId.lessThan=" + UPDATED_OWNER_ENTITY_ID);
+        // Get all the commonFieldDataList where ownerEntityId is less than
+        defaultCommonFieldDataFiltering(
+            "ownerEntityId.lessThan=" + UPDATED_OWNER_ENTITY_ID,
+            "ownerEntityId.lessThan=" + DEFAULT_OWNER_ENTITY_ID
+        );
     }
 
     @Test
@@ -814,11 +713,16 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        // Get all the commonFieldDataList where ownerEntityId is greater than DEFAULT_OWNER_ENTITY_ID
-        defaultCommonFieldDataShouldNotBeFound("ownerEntityId.greaterThan=" + DEFAULT_OWNER_ENTITY_ID);
+        // Get all the commonFieldDataList where ownerEntityId is greater than
+        defaultCommonFieldDataFiltering(
+            "ownerEntityId.greaterThan=" + SMALLER_OWNER_ENTITY_ID,
+            "ownerEntityId.greaterThan=" + DEFAULT_OWNER_ENTITY_ID
+        );
+    }
 
-        // Get all the commonFieldDataList where ownerEntityId is greater than SMALLER_OWNER_ENTITY_ID
-        defaultCommonFieldDataShouldBeFound("ownerEntityId.greaterThan=" + SMALLER_OWNER_ENTITY_ID);
+    private void defaultCommonFieldDataFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultCommonFieldDataShouldBeFound(shouldBeFound);
+        defaultCommonFieldDataShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -880,7 +784,7 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        int databaseSizeBeforeUpdate = commonFieldDataRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the commonFieldData
         CommonFieldData updatedCommonFieldData = commonFieldDataRepository.findById(commonFieldData.getId()).orElseThrow();
@@ -900,29 +804,19 @@ public class CommonFieldDataResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, commonFieldDataDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(commonFieldDataDTO))
+                    .content(om.writeValueAsBytes(commonFieldDataDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the CommonFieldData in the database
-        List<CommonFieldData> commonFieldDataList = commonFieldDataRepository.findAll();
-        assertThat(commonFieldDataList).hasSize(databaseSizeBeforeUpdate);
-        CommonFieldData testCommonFieldData = commonFieldDataList.get(commonFieldDataList.size() - 1);
-        assertThat(testCommonFieldData.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testCommonFieldData.getValue()).isEqualTo(UPDATED_VALUE);
-        assertThat(testCommonFieldData.getLabel()).isEqualTo(UPDATED_LABEL);
-        assertThat(testCommonFieldData.getValueType()).isEqualTo(UPDATED_VALUE_TYPE);
-        assertThat(testCommonFieldData.getRemark()).isEqualTo(UPDATED_REMARK);
-        assertThat(testCommonFieldData.getSortValue()).isEqualTo(UPDATED_SORT_VALUE);
-        assertThat(testCommonFieldData.getDisabled()).isEqualTo(UPDATED_DISABLED);
-        assertThat(testCommonFieldData.getOwnerEntityName()).isEqualTo(UPDATED_OWNER_ENTITY_NAME);
-        assertThat(testCommonFieldData.getOwnerEntityId()).isEqualTo(UPDATED_OWNER_ENTITY_ID);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedCommonFieldDataToMatchAllProperties(updatedCommonFieldData);
     }
 
     @Test
     @Transactional
     void putNonExistingCommonFieldData() throws Exception {
-        int databaseSizeBeforeUpdate = commonFieldDataRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         commonFieldData.setId(longCount.incrementAndGet());
 
         // Create the CommonFieldData
@@ -933,19 +827,18 @@ public class CommonFieldDataResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, commonFieldDataDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(commonFieldDataDTO))
+                    .content(om.writeValueAsBytes(commonFieldDataDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the CommonFieldData in the database
-        List<CommonFieldData> commonFieldDataList = commonFieldDataRepository.findAll();
-        assertThat(commonFieldDataList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchCommonFieldData() throws Exception {
-        int databaseSizeBeforeUpdate = commonFieldDataRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         commonFieldData.setId(longCount.incrementAndGet());
 
         // Create the CommonFieldData
@@ -956,19 +849,18 @@ public class CommonFieldDataResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(commonFieldDataDTO))
+                    .content(om.writeValueAsBytes(commonFieldDataDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the CommonFieldData in the database
-        List<CommonFieldData> commonFieldDataList = commonFieldDataRepository.findAll();
-        assertThat(commonFieldDataList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamCommonFieldData() throws Exception {
-        int databaseSizeBeforeUpdate = commonFieldDataRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         commonFieldData.setId(longCount.incrementAndGet());
 
         // Create the CommonFieldData
@@ -976,14 +868,11 @@ public class CommonFieldDataResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restCommonFieldDataMockMvc
-            .perform(
-                put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(commonFieldDataDTO))
-            )
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(commonFieldDataDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the CommonFieldData in the database
-        List<CommonFieldData> commonFieldDataList = commonFieldDataRepository.findAll();
-        assertThat(commonFieldDataList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -992,35 +881,36 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        int databaseSizeBeforeUpdate = commonFieldDataRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the commonFieldData using partial update
         CommonFieldData partialUpdatedCommonFieldData = new CommonFieldData();
         partialUpdatedCommonFieldData.setId(commonFieldData.getId());
 
-        partialUpdatedCommonFieldData.remark(UPDATED_REMARK).disabled(UPDATED_DISABLED).ownerEntityName(UPDATED_OWNER_ENTITY_NAME);
+        partialUpdatedCommonFieldData
+            .name(UPDATED_NAME)
+            .value(UPDATED_VALUE)
+            .valueType(UPDATED_VALUE_TYPE)
+            .sortValue(UPDATED_SORT_VALUE)
+            .disabled(UPDATED_DISABLED)
+            .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
+            .ownerEntityId(UPDATED_OWNER_ENTITY_ID);
 
         restCommonFieldDataMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedCommonFieldData.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedCommonFieldData))
+                    .content(om.writeValueAsBytes(partialUpdatedCommonFieldData))
             )
             .andExpect(status().isOk());
 
         // Validate the CommonFieldData in the database
-        List<CommonFieldData> commonFieldDataList = commonFieldDataRepository.findAll();
-        assertThat(commonFieldDataList).hasSize(databaseSizeBeforeUpdate);
-        CommonFieldData testCommonFieldData = commonFieldDataList.get(commonFieldDataList.size() - 1);
-        assertThat(testCommonFieldData.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testCommonFieldData.getValue()).isEqualTo(DEFAULT_VALUE);
-        assertThat(testCommonFieldData.getLabel()).isEqualTo(DEFAULT_LABEL);
-        assertThat(testCommonFieldData.getValueType()).isEqualTo(DEFAULT_VALUE_TYPE);
-        assertThat(testCommonFieldData.getRemark()).isEqualTo(UPDATED_REMARK);
-        assertThat(testCommonFieldData.getSortValue()).isEqualTo(DEFAULT_SORT_VALUE);
-        assertThat(testCommonFieldData.getDisabled()).isEqualTo(UPDATED_DISABLED);
-        assertThat(testCommonFieldData.getOwnerEntityName()).isEqualTo(UPDATED_OWNER_ENTITY_NAME);
-        assertThat(testCommonFieldData.getOwnerEntityId()).isEqualTo(DEFAULT_OWNER_ENTITY_ID);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertCommonFieldDataUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedCommonFieldData, commonFieldData),
+            getPersistedCommonFieldData(commonFieldData)
+        );
     }
 
     @Test
@@ -1029,7 +919,7 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        int databaseSizeBeforeUpdate = commonFieldDataRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the commonFieldData using partial update
         CommonFieldData partialUpdatedCommonFieldData = new CommonFieldData();
@@ -1050,29 +940,23 @@ public class CommonFieldDataResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedCommonFieldData.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedCommonFieldData))
+                    .content(om.writeValueAsBytes(partialUpdatedCommonFieldData))
             )
             .andExpect(status().isOk());
 
         // Validate the CommonFieldData in the database
-        List<CommonFieldData> commonFieldDataList = commonFieldDataRepository.findAll();
-        assertThat(commonFieldDataList).hasSize(databaseSizeBeforeUpdate);
-        CommonFieldData testCommonFieldData = commonFieldDataList.get(commonFieldDataList.size() - 1);
-        assertThat(testCommonFieldData.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testCommonFieldData.getValue()).isEqualTo(UPDATED_VALUE);
-        assertThat(testCommonFieldData.getLabel()).isEqualTo(UPDATED_LABEL);
-        assertThat(testCommonFieldData.getValueType()).isEqualTo(UPDATED_VALUE_TYPE);
-        assertThat(testCommonFieldData.getRemark()).isEqualTo(UPDATED_REMARK);
-        assertThat(testCommonFieldData.getSortValue()).isEqualTo(UPDATED_SORT_VALUE);
-        assertThat(testCommonFieldData.getDisabled()).isEqualTo(UPDATED_DISABLED);
-        assertThat(testCommonFieldData.getOwnerEntityName()).isEqualTo(UPDATED_OWNER_ENTITY_NAME);
-        assertThat(testCommonFieldData.getOwnerEntityId()).isEqualTo(UPDATED_OWNER_ENTITY_ID);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertCommonFieldDataUpdatableFieldsEquals(
+            partialUpdatedCommonFieldData,
+            getPersistedCommonFieldData(partialUpdatedCommonFieldData)
+        );
     }
 
     @Test
     @Transactional
     void patchNonExistingCommonFieldData() throws Exception {
-        int databaseSizeBeforeUpdate = commonFieldDataRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         commonFieldData.setId(longCount.incrementAndGet());
 
         // Create the CommonFieldData
@@ -1083,19 +967,18 @@ public class CommonFieldDataResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, commonFieldDataDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(commonFieldDataDTO))
+                    .content(om.writeValueAsBytes(commonFieldDataDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the CommonFieldData in the database
-        List<CommonFieldData> commonFieldDataList = commonFieldDataRepository.findAll();
-        assertThat(commonFieldDataList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchCommonFieldData() throws Exception {
-        int databaseSizeBeforeUpdate = commonFieldDataRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         commonFieldData.setId(longCount.incrementAndGet());
 
         // Create the CommonFieldData
@@ -1106,19 +989,18 @@ public class CommonFieldDataResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(commonFieldDataDTO))
+                    .content(om.writeValueAsBytes(commonFieldDataDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the CommonFieldData in the database
-        List<CommonFieldData> commonFieldDataList = commonFieldDataRepository.findAll();
-        assertThat(commonFieldDataList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamCommonFieldData() throws Exception {
-        int databaseSizeBeforeUpdate = commonFieldDataRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         commonFieldData.setId(longCount.incrementAndGet());
 
         // Create the CommonFieldData
@@ -1126,16 +1008,11 @@ public class CommonFieldDataResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restCommonFieldDataMockMvc
-            .perform(
-                patch(ENTITY_API_URL)
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(commonFieldDataDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(commonFieldDataDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the CommonFieldData in the database
-        List<CommonFieldData> commonFieldDataList = commonFieldDataRepository.findAll();
-        assertThat(commonFieldDataList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1144,7 +1021,7 @@ public class CommonFieldDataResourceIT {
         // Initialize the database
         commonFieldDataRepository.save(commonFieldData);
 
-        int databaseSizeBeforeDelete = commonFieldDataRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the commonFieldData
         restCommonFieldDataMockMvc
@@ -1152,7 +1029,34 @@ public class CommonFieldDataResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<CommonFieldData> commonFieldDataList = commonFieldDataRepository.findAll();
-        assertThat(commonFieldDataList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return commonFieldDataRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected CommonFieldData getPersistedCommonFieldData(CommonFieldData commonFieldData) {
+        return commonFieldDataRepository.findById(commonFieldData.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedCommonFieldDataToMatchAllProperties(CommonFieldData expectedCommonFieldData) {
+        assertCommonFieldDataAllPropertiesEquals(expectedCommonFieldData, getPersistedCommonFieldData(expectedCommonFieldData));
+    }
+
+    protected void assertPersistedCommonFieldDataToMatchUpdatableProperties(CommonFieldData expectedCommonFieldData) {
+        assertCommonFieldDataAllUpdatablePropertiesEquals(expectedCommonFieldData, getPersistedCommonFieldData(expectedCommonFieldData));
     }
 }

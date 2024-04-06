@@ -14,7 +14,6 @@ import com.diboot.core.binding.Binder;
 import com.diboot.core.service.impl.BaseServiceImpl;
 import com.google.common.base.CaseFormat;
 import java.util.*;
-import java.util.Arrays;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,12 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Service Implementation for managing {@link com.begcode.monolith.settings.domain.SysFillRule}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class SysFillRuleBaseService<R extends SysFillRuleRepository, E extends SysFillRule>
     extends BaseServiceImpl<SysFillRuleRepository, SysFillRule>
     implements IFillRuleHandler {
 
     private final Logger log = LoggerFactory.getLogger(SysFillRuleBaseService.class);
-    private final List<String> relationNames = Arrays.asList("ruleItems");
+    private final List<String> relationNames = List.of("ruleItems");
 
     protected final SysFillRuleRepository sysFillRuleRepository;
 
@@ -73,11 +73,10 @@ public class SysFillRuleBaseService<R extends SysFillRuleRepository, E extends S
     @Transactional(rollbackFor = Exception.class)
     public SysFillRuleDTO update(SysFillRuleDTO sysFillRuleDTO) {
         log.debug("Request to update SysFillRule : {}", sysFillRuleDTO);
-
         SysFillRule sysFillRule = sysFillRuleMapper.toEntity(sysFillRuleDTO);
 
-        this.updateEntityAndRelatedEntities(sysFillRule, sysFillRule.getRuleItems(), FillRuleItem::setFillRuleId);
-        return findOne(sysFillRuleDTO.getId()).orElseThrow();
+        this.createEntityAndRelatedEntities(sysFillRule, sysFillRule.getRuleItems(), FillRuleItem::setFillRuleId);
+        return findOne(sysFillRule.getId()).orElseThrow();
     }
 
     /**
@@ -122,8 +121,7 @@ public class SysFillRuleBaseService<R extends SysFillRuleRepository, E extends S
      */
     public Optional<SysFillRuleDTO> findOne(Long id) {
         log.debug("Request to get SysFillRule : {}", id);
-        return Optional
-            .ofNullable(sysFillRuleRepository.selectById(id))
+        return Optional.ofNullable(sysFillRuleRepository.selectById(id))
             .map(sysFillRule -> {
                 Binder.bindRelations(sysFillRule);
                 return sysFillRule;
@@ -158,23 +156,25 @@ public class SysFillRuleBaseService<R extends SysFillRuleRepository, E extends S
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             UpdateWrapper<SysFillRule> updateWrapper = new UpdateWrapper<>();
             updateWrapper.in("id", ids);
-            fieldNames.forEach(fieldName ->
-                updateWrapper.set(
-                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
-                    BeanUtil.getFieldValue(changeSysFillRuleDTO, fieldName)
-                )
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changeSysFillRuleDTO, fieldName)
+                    )
             );
             this.update(updateWrapper);
         } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
             List<SysFillRule> sysFillRuleList = this.listByIds(ids);
             if (CollectionUtils.isNotEmpty(sysFillRuleList)) {
                 sysFillRuleList.forEach(sysFillRule -> {
-                    relationshipNames.forEach(relationName ->
-                        BeanUtil.setFieldValue(
-                            sysFillRule,
-                            relationName,
-                            BeanUtil.getFieldValue(sysFillRuleMapper.toEntity(changeSysFillRuleDTO), relationName)
-                        )
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                sysFillRule,
+                                relationName,
+                                BeanUtil.getFieldValue(sysFillRuleMapper.toEntity(changeSysFillRuleDTO), relationName)
+                            )
                     );
                     this.createOrUpdateAndRelatedRelations(sysFillRule, relationshipNames);
                 });

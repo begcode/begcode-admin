@@ -1,5 +1,7 @@
 package com.begcode.monolith.system.web.rest;
 
+import static com.begcode.monolith.system.domain.AnnouncementRecordAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static com.begcode.monolith.web.rest.TestUtil.sameInstant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -12,15 +14,13 @@ import com.begcode.monolith.system.domain.AnnouncementRecord;
 import com.begcode.monolith.system.repository.AnnouncementRecordRepository;
 import com.begcode.monolith.system.service.dto.AnnouncementRecordDTO;
 import com.begcode.monolith.system.service.mapper.AnnouncementRecordMapper;
-import com.begcode.monolith.web.rest.TestUtil;
-import com.begcode.monolith.web.rest.TestUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,8 +70,11 @@ public class AnnouncementRecordResourceIT {
     private static final String ENTITY_API_URL = "/api/announcement-records";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private AnnouncementRecordRepository announcementRecordRepository;
@@ -130,29 +133,26 @@ public class AnnouncementRecordResourceIT {
     @Test
     @Transactional
     void createAnnouncementRecord() throws Exception {
-        int databaseSizeBeforeCreate = announcementRecordRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the AnnouncementRecord
         AnnouncementRecordDTO announcementRecordDTO = announcementRecordMapper.toDto(announcementRecord);
-        restAnnouncementRecordMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(announcementRecordDTO))
-            )
-            .andExpect(status().isCreated());
+        var returnedAnnouncementRecordDTO = om.readValue(
+            restAnnouncementRecordMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(announcementRecordDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            AnnouncementRecordDTO.class
+        );
 
         // Validate the AnnouncementRecord in the database
-        List<AnnouncementRecord> announcementRecordList = announcementRecordRepository.findAll();
-        assertThat(announcementRecordList).hasSize(databaseSizeBeforeCreate + 1);
-        AnnouncementRecord testAnnouncementRecord = announcementRecordList.get(announcementRecordList.size() - 1);
-        assertThat(testAnnouncementRecord.getAnntId()).isEqualTo(DEFAULT_ANNT_ID);
-        assertThat(testAnnouncementRecord.getUserId()).isEqualTo(DEFAULT_USER_ID);
-        assertThat(testAnnouncementRecord.getHasRead()).isEqualTo(DEFAULT_HAS_READ);
-        assertThat(testAnnouncementRecord.getReadTime()).isEqualTo(DEFAULT_READ_TIME);
-        assertThat(testAnnouncementRecord.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY);
-        assertThat(testAnnouncementRecord.getCreatedDate()).isEqualTo(DEFAULT_CREATED_DATE);
-        assertThat(testAnnouncementRecord.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
-        assertThat(testAnnouncementRecord.getLastModifiedDate()).isEqualTo(DEFAULT_LAST_MODIFIED_DATE);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedAnnouncementRecord = announcementRecordMapper.toEntity(returnedAnnouncementRecordDTO);
+        assertAnnouncementRecordUpdatableFieldsEquals(
+            returnedAnnouncementRecord,
+            getPersistedAnnouncementRecord(returnedAnnouncementRecord)
+        );
     }
 
     @Test
@@ -162,20 +162,15 @@ public class AnnouncementRecordResourceIT {
         announcementRecord.setId(1L);
         AnnouncementRecordDTO announcementRecordDTO = announcementRecordMapper.toDto(announcementRecord);
 
-        int databaseSizeBeforeCreate = announcementRecordRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restAnnouncementRecordMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(announcementRecordDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(announcementRecordDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the AnnouncementRecord in the database
-        List<AnnouncementRecord> announcementRecordList = announcementRecordRepository.findAll();
-        assertThat(announcementRecordList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
@@ -230,14 +225,11 @@ public class AnnouncementRecordResourceIT {
 
         Long id = announcementRecord.getId();
 
-        defaultAnnouncementRecordShouldBeFound("id.equals=" + id);
-        defaultAnnouncementRecordShouldNotBeFound("id.notEquals=" + id);
+        defaultAnnouncementRecordFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultAnnouncementRecordShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultAnnouncementRecordShouldNotBeFound("id.greaterThan=" + id);
+        defaultAnnouncementRecordFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultAnnouncementRecordShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultAnnouncementRecordShouldNotBeFound("id.lessThan=" + id);
+        defaultAnnouncementRecordFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -246,11 +238,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where anntId equals to DEFAULT_ANNT_ID
-        defaultAnnouncementRecordShouldBeFound("anntId.equals=" + DEFAULT_ANNT_ID);
-
-        // Get all the announcementRecordList where anntId equals to UPDATED_ANNT_ID
-        defaultAnnouncementRecordShouldNotBeFound("anntId.equals=" + UPDATED_ANNT_ID);
+        // Get all the announcementRecordList where anntId equals to
+        defaultAnnouncementRecordFiltering("anntId.equals=" + DEFAULT_ANNT_ID, "anntId.equals=" + UPDATED_ANNT_ID);
     }
 
     @Test
@@ -259,11 +248,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where anntId in DEFAULT_ANNT_ID or UPDATED_ANNT_ID
-        defaultAnnouncementRecordShouldBeFound("anntId.in=" + DEFAULT_ANNT_ID + "," + UPDATED_ANNT_ID);
-
-        // Get all the announcementRecordList where anntId equals to UPDATED_ANNT_ID
-        defaultAnnouncementRecordShouldNotBeFound("anntId.in=" + UPDATED_ANNT_ID);
+        // Get all the announcementRecordList where anntId in
+        defaultAnnouncementRecordFiltering("anntId.in=" + DEFAULT_ANNT_ID + "," + UPDATED_ANNT_ID, "anntId.in=" + UPDATED_ANNT_ID);
     }
 
     @Test
@@ -273,10 +259,7 @@ public class AnnouncementRecordResourceIT {
         announcementRecordRepository.save(announcementRecord);
 
         // Get all the announcementRecordList where anntId is not null
-        defaultAnnouncementRecordShouldBeFound("anntId.specified=true");
-
-        // Get all the announcementRecordList where anntId is null
-        defaultAnnouncementRecordShouldNotBeFound("anntId.specified=false");
+        defaultAnnouncementRecordFiltering("anntId.specified=true", "anntId.specified=false");
     }
 
     @Test
@@ -285,11 +268,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where anntId is greater than or equal to DEFAULT_ANNT_ID
-        defaultAnnouncementRecordShouldBeFound("anntId.greaterThanOrEqual=" + DEFAULT_ANNT_ID);
-
-        // Get all the announcementRecordList where anntId is greater than or equal to UPDATED_ANNT_ID
-        defaultAnnouncementRecordShouldNotBeFound("anntId.greaterThanOrEqual=" + UPDATED_ANNT_ID);
+        // Get all the announcementRecordList where anntId is greater than or equal to
+        defaultAnnouncementRecordFiltering("anntId.greaterThanOrEqual=" + DEFAULT_ANNT_ID, "anntId.greaterThanOrEqual=" + UPDATED_ANNT_ID);
     }
 
     @Test
@@ -298,11 +278,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where anntId is less than or equal to DEFAULT_ANNT_ID
-        defaultAnnouncementRecordShouldBeFound("anntId.lessThanOrEqual=" + DEFAULT_ANNT_ID);
-
-        // Get all the announcementRecordList where anntId is less than or equal to SMALLER_ANNT_ID
-        defaultAnnouncementRecordShouldNotBeFound("anntId.lessThanOrEqual=" + SMALLER_ANNT_ID);
+        // Get all the announcementRecordList where anntId is less than or equal to
+        defaultAnnouncementRecordFiltering("anntId.lessThanOrEqual=" + DEFAULT_ANNT_ID, "anntId.lessThanOrEqual=" + SMALLER_ANNT_ID);
     }
 
     @Test
@@ -311,11 +288,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where anntId is less than DEFAULT_ANNT_ID
-        defaultAnnouncementRecordShouldNotBeFound("anntId.lessThan=" + DEFAULT_ANNT_ID);
-
-        // Get all the announcementRecordList where anntId is less than UPDATED_ANNT_ID
-        defaultAnnouncementRecordShouldBeFound("anntId.lessThan=" + UPDATED_ANNT_ID);
+        // Get all the announcementRecordList where anntId is less than
+        defaultAnnouncementRecordFiltering("anntId.lessThan=" + UPDATED_ANNT_ID, "anntId.lessThan=" + DEFAULT_ANNT_ID);
     }
 
     @Test
@@ -324,11 +298,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where anntId is greater than DEFAULT_ANNT_ID
-        defaultAnnouncementRecordShouldNotBeFound("anntId.greaterThan=" + DEFAULT_ANNT_ID);
-
-        // Get all the announcementRecordList where anntId is greater than SMALLER_ANNT_ID
-        defaultAnnouncementRecordShouldBeFound("anntId.greaterThan=" + SMALLER_ANNT_ID);
+        // Get all the announcementRecordList where anntId is greater than
+        defaultAnnouncementRecordFiltering("anntId.greaterThan=" + SMALLER_ANNT_ID, "anntId.greaterThan=" + DEFAULT_ANNT_ID);
     }
 
     @Test
@@ -337,11 +308,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where userId equals to DEFAULT_USER_ID
-        defaultAnnouncementRecordShouldBeFound("userId.equals=" + DEFAULT_USER_ID);
-
-        // Get all the announcementRecordList where userId equals to UPDATED_USER_ID
-        defaultAnnouncementRecordShouldNotBeFound("userId.equals=" + UPDATED_USER_ID);
+        // Get all the announcementRecordList where userId equals to
+        defaultAnnouncementRecordFiltering("userId.equals=" + DEFAULT_USER_ID, "userId.equals=" + UPDATED_USER_ID);
     }
 
     @Test
@@ -350,11 +318,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where userId in DEFAULT_USER_ID or UPDATED_USER_ID
-        defaultAnnouncementRecordShouldBeFound("userId.in=" + DEFAULT_USER_ID + "," + UPDATED_USER_ID);
-
-        // Get all the announcementRecordList where userId equals to UPDATED_USER_ID
-        defaultAnnouncementRecordShouldNotBeFound("userId.in=" + UPDATED_USER_ID);
+        // Get all the announcementRecordList where userId in
+        defaultAnnouncementRecordFiltering("userId.in=" + DEFAULT_USER_ID + "," + UPDATED_USER_ID, "userId.in=" + UPDATED_USER_ID);
     }
 
     @Test
@@ -364,10 +329,7 @@ public class AnnouncementRecordResourceIT {
         announcementRecordRepository.save(announcementRecord);
 
         // Get all the announcementRecordList where userId is not null
-        defaultAnnouncementRecordShouldBeFound("userId.specified=true");
-
-        // Get all the announcementRecordList where userId is null
-        defaultAnnouncementRecordShouldNotBeFound("userId.specified=false");
+        defaultAnnouncementRecordFiltering("userId.specified=true", "userId.specified=false");
     }
 
     @Test
@@ -376,11 +338,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where userId is greater than or equal to DEFAULT_USER_ID
-        defaultAnnouncementRecordShouldBeFound("userId.greaterThanOrEqual=" + DEFAULT_USER_ID);
-
-        // Get all the announcementRecordList where userId is greater than or equal to UPDATED_USER_ID
-        defaultAnnouncementRecordShouldNotBeFound("userId.greaterThanOrEqual=" + UPDATED_USER_ID);
+        // Get all the announcementRecordList where userId is greater than or equal to
+        defaultAnnouncementRecordFiltering("userId.greaterThanOrEqual=" + DEFAULT_USER_ID, "userId.greaterThanOrEqual=" + UPDATED_USER_ID);
     }
 
     @Test
@@ -389,11 +348,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where userId is less than or equal to DEFAULT_USER_ID
-        defaultAnnouncementRecordShouldBeFound("userId.lessThanOrEqual=" + DEFAULT_USER_ID);
-
-        // Get all the announcementRecordList where userId is less than or equal to SMALLER_USER_ID
-        defaultAnnouncementRecordShouldNotBeFound("userId.lessThanOrEqual=" + SMALLER_USER_ID);
+        // Get all the announcementRecordList where userId is less than or equal to
+        defaultAnnouncementRecordFiltering("userId.lessThanOrEqual=" + DEFAULT_USER_ID, "userId.lessThanOrEqual=" + SMALLER_USER_ID);
     }
 
     @Test
@@ -402,11 +358,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where userId is less than DEFAULT_USER_ID
-        defaultAnnouncementRecordShouldNotBeFound("userId.lessThan=" + DEFAULT_USER_ID);
-
-        // Get all the announcementRecordList where userId is less than UPDATED_USER_ID
-        defaultAnnouncementRecordShouldBeFound("userId.lessThan=" + UPDATED_USER_ID);
+        // Get all the announcementRecordList where userId is less than
+        defaultAnnouncementRecordFiltering("userId.lessThan=" + UPDATED_USER_ID, "userId.lessThan=" + DEFAULT_USER_ID);
     }
 
     @Test
@@ -415,11 +368,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where userId is greater than DEFAULT_USER_ID
-        defaultAnnouncementRecordShouldNotBeFound("userId.greaterThan=" + DEFAULT_USER_ID);
-
-        // Get all the announcementRecordList where userId is greater than SMALLER_USER_ID
-        defaultAnnouncementRecordShouldBeFound("userId.greaterThan=" + SMALLER_USER_ID);
+        // Get all the announcementRecordList where userId is greater than
+        defaultAnnouncementRecordFiltering("userId.greaterThan=" + SMALLER_USER_ID, "userId.greaterThan=" + DEFAULT_USER_ID);
     }
 
     @Test
@@ -428,11 +378,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where hasRead equals to DEFAULT_HAS_READ
-        defaultAnnouncementRecordShouldBeFound("hasRead.equals=" + DEFAULT_HAS_READ);
-
-        // Get all the announcementRecordList where hasRead equals to UPDATED_HAS_READ
-        defaultAnnouncementRecordShouldNotBeFound("hasRead.equals=" + UPDATED_HAS_READ);
+        // Get all the announcementRecordList where hasRead equals to
+        defaultAnnouncementRecordFiltering("hasRead.equals=" + DEFAULT_HAS_READ, "hasRead.equals=" + UPDATED_HAS_READ);
     }
 
     @Test
@@ -441,11 +388,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where hasRead in DEFAULT_HAS_READ or UPDATED_HAS_READ
-        defaultAnnouncementRecordShouldBeFound("hasRead.in=" + DEFAULT_HAS_READ + "," + UPDATED_HAS_READ);
-
-        // Get all the announcementRecordList where hasRead equals to UPDATED_HAS_READ
-        defaultAnnouncementRecordShouldNotBeFound("hasRead.in=" + UPDATED_HAS_READ);
+        // Get all the announcementRecordList where hasRead in
+        defaultAnnouncementRecordFiltering("hasRead.in=" + DEFAULT_HAS_READ + "," + UPDATED_HAS_READ, "hasRead.in=" + UPDATED_HAS_READ);
     }
 
     @Test
@@ -455,10 +399,7 @@ public class AnnouncementRecordResourceIT {
         announcementRecordRepository.save(announcementRecord);
 
         // Get all the announcementRecordList where hasRead is not null
-        defaultAnnouncementRecordShouldBeFound("hasRead.specified=true");
-
-        // Get all the announcementRecordList where hasRead is null
-        defaultAnnouncementRecordShouldNotBeFound("hasRead.specified=false");
+        defaultAnnouncementRecordFiltering("hasRead.specified=true", "hasRead.specified=false");
     }
 
     @Test
@@ -467,11 +408,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where readTime equals to DEFAULT_READ_TIME
-        defaultAnnouncementRecordShouldBeFound("readTime.equals=" + DEFAULT_READ_TIME);
-
-        // Get all the announcementRecordList where readTime equals to UPDATED_READ_TIME
-        defaultAnnouncementRecordShouldNotBeFound("readTime.equals=" + UPDATED_READ_TIME);
+        // Get all the announcementRecordList where readTime equals to
+        defaultAnnouncementRecordFiltering("readTime.equals=" + DEFAULT_READ_TIME, "readTime.equals=" + UPDATED_READ_TIME);
     }
 
     @Test
@@ -480,11 +418,11 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where readTime in DEFAULT_READ_TIME or UPDATED_READ_TIME
-        defaultAnnouncementRecordShouldBeFound("readTime.in=" + DEFAULT_READ_TIME + "," + UPDATED_READ_TIME);
-
-        // Get all the announcementRecordList where readTime equals to UPDATED_READ_TIME
-        defaultAnnouncementRecordShouldNotBeFound("readTime.in=" + UPDATED_READ_TIME);
+        // Get all the announcementRecordList where readTime in
+        defaultAnnouncementRecordFiltering(
+            "readTime.in=" + DEFAULT_READ_TIME + "," + UPDATED_READ_TIME,
+            "readTime.in=" + UPDATED_READ_TIME
+        );
     }
 
     @Test
@@ -494,10 +432,7 @@ public class AnnouncementRecordResourceIT {
         announcementRecordRepository.save(announcementRecord);
 
         // Get all the announcementRecordList where readTime is not null
-        defaultAnnouncementRecordShouldBeFound("readTime.specified=true");
-
-        // Get all the announcementRecordList where readTime is null
-        defaultAnnouncementRecordShouldNotBeFound("readTime.specified=false");
+        defaultAnnouncementRecordFiltering("readTime.specified=true", "readTime.specified=false");
     }
 
     @Test
@@ -506,11 +441,11 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where readTime is greater than or equal to DEFAULT_READ_TIME
-        defaultAnnouncementRecordShouldBeFound("readTime.greaterThanOrEqual=" + DEFAULT_READ_TIME);
-
-        // Get all the announcementRecordList where readTime is greater than or equal to UPDATED_READ_TIME
-        defaultAnnouncementRecordShouldNotBeFound("readTime.greaterThanOrEqual=" + UPDATED_READ_TIME);
+        // Get all the announcementRecordList where readTime is greater than or equal to
+        defaultAnnouncementRecordFiltering(
+            "readTime.greaterThanOrEqual=" + DEFAULT_READ_TIME,
+            "readTime.greaterThanOrEqual=" + UPDATED_READ_TIME
+        );
     }
 
     @Test
@@ -519,11 +454,11 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where readTime is less than or equal to DEFAULT_READ_TIME
-        defaultAnnouncementRecordShouldBeFound("readTime.lessThanOrEqual=" + DEFAULT_READ_TIME);
-
-        // Get all the announcementRecordList where readTime is less than or equal to SMALLER_READ_TIME
-        defaultAnnouncementRecordShouldNotBeFound("readTime.lessThanOrEqual=" + SMALLER_READ_TIME);
+        // Get all the announcementRecordList where readTime is less than or equal to
+        defaultAnnouncementRecordFiltering(
+            "readTime.lessThanOrEqual=" + DEFAULT_READ_TIME,
+            "readTime.lessThanOrEqual=" + SMALLER_READ_TIME
+        );
     }
 
     @Test
@@ -532,11 +467,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where readTime is less than DEFAULT_READ_TIME
-        defaultAnnouncementRecordShouldNotBeFound("readTime.lessThan=" + DEFAULT_READ_TIME);
-
-        // Get all the announcementRecordList where readTime is less than UPDATED_READ_TIME
-        defaultAnnouncementRecordShouldBeFound("readTime.lessThan=" + UPDATED_READ_TIME);
+        // Get all the announcementRecordList where readTime is less than
+        defaultAnnouncementRecordFiltering("readTime.lessThan=" + UPDATED_READ_TIME, "readTime.lessThan=" + DEFAULT_READ_TIME);
     }
 
     @Test
@@ -545,11 +477,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where readTime is greater than DEFAULT_READ_TIME
-        defaultAnnouncementRecordShouldNotBeFound("readTime.greaterThan=" + DEFAULT_READ_TIME);
-
-        // Get all the announcementRecordList where readTime is greater than SMALLER_READ_TIME
-        defaultAnnouncementRecordShouldBeFound("readTime.greaterThan=" + SMALLER_READ_TIME);
+        // Get all the announcementRecordList where readTime is greater than
+        defaultAnnouncementRecordFiltering("readTime.greaterThan=" + SMALLER_READ_TIME, "readTime.greaterThan=" + DEFAULT_READ_TIME);
     }
 
     @Test
@@ -558,11 +487,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where createdBy equals to DEFAULT_CREATED_BY
-        defaultAnnouncementRecordShouldBeFound("createdBy.equals=" + DEFAULT_CREATED_BY);
-
-        // Get all the announcementRecordList where createdBy equals to UPDATED_CREATED_BY
-        defaultAnnouncementRecordShouldNotBeFound("createdBy.equals=" + UPDATED_CREATED_BY);
+        // Get all the announcementRecordList where createdBy equals to
+        defaultAnnouncementRecordFiltering("createdBy.equals=" + DEFAULT_CREATED_BY, "createdBy.equals=" + UPDATED_CREATED_BY);
     }
 
     @Test
@@ -571,11 +497,11 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where createdBy in DEFAULT_CREATED_BY or UPDATED_CREATED_BY
-        defaultAnnouncementRecordShouldBeFound("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY);
-
-        // Get all the announcementRecordList where createdBy equals to UPDATED_CREATED_BY
-        defaultAnnouncementRecordShouldNotBeFound("createdBy.in=" + UPDATED_CREATED_BY);
+        // Get all the announcementRecordList where createdBy in
+        defaultAnnouncementRecordFiltering(
+            "createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY,
+            "createdBy.in=" + UPDATED_CREATED_BY
+        );
     }
 
     @Test
@@ -585,10 +511,7 @@ public class AnnouncementRecordResourceIT {
         announcementRecordRepository.save(announcementRecord);
 
         // Get all the announcementRecordList where createdBy is not null
-        defaultAnnouncementRecordShouldBeFound("createdBy.specified=true");
-
-        // Get all the announcementRecordList where createdBy is null
-        defaultAnnouncementRecordShouldNotBeFound("createdBy.specified=false");
+        defaultAnnouncementRecordFiltering("createdBy.specified=true", "createdBy.specified=false");
     }
 
     @Test
@@ -597,11 +520,11 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where createdBy is greater than or equal to DEFAULT_CREATED_BY
-        defaultAnnouncementRecordShouldBeFound("createdBy.greaterThanOrEqual=" + DEFAULT_CREATED_BY);
-
-        // Get all the announcementRecordList where createdBy is greater than or equal to UPDATED_CREATED_BY
-        defaultAnnouncementRecordShouldNotBeFound("createdBy.greaterThanOrEqual=" + UPDATED_CREATED_BY);
+        // Get all the announcementRecordList where createdBy is greater than or equal to
+        defaultAnnouncementRecordFiltering(
+            "createdBy.greaterThanOrEqual=" + DEFAULT_CREATED_BY,
+            "createdBy.greaterThanOrEqual=" + UPDATED_CREATED_BY
+        );
     }
 
     @Test
@@ -610,11 +533,11 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where createdBy is less than or equal to DEFAULT_CREATED_BY
-        defaultAnnouncementRecordShouldBeFound("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY);
-
-        // Get all the announcementRecordList where createdBy is less than or equal to SMALLER_CREATED_BY
-        defaultAnnouncementRecordShouldNotBeFound("createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
+        // Get all the announcementRecordList where createdBy is less than or equal to
+        defaultAnnouncementRecordFiltering(
+            "createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY,
+            "createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY
+        );
     }
 
     @Test
@@ -623,11 +546,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where createdBy is less than DEFAULT_CREATED_BY
-        defaultAnnouncementRecordShouldNotBeFound("createdBy.lessThan=" + DEFAULT_CREATED_BY);
-
-        // Get all the announcementRecordList where createdBy is less than UPDATED_CREATED_BY
-        defaultAnnouncementRecordShouldBeFound("createdBy.lessThan=" + UPDATED_CREATED_BY);
+        // Get all the announcementRecordList where createdBy is less than
+        defaultAnnouncementRecordFiltering("createdBy.lessThan=" + UPDATED_CREATED_BY, "createdBy.lessThan=" + DEFAULT_CREATED_BY);
     }
 
     @Test
@@ -636,11 +556,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where createdBy is greater than DEFAULT_CREATED_BY
-        defaultAnnouncementRecordShouldNotBeFound("createdBy.greaterThan=" + DEFAULT_CREATED_BY);
-
-        // Get all the announcementRecordList where createdBy is greater than SMALLER_CREATED_BY
-        defaultAnnouncementRecordShouldBeFound("createdBy.greaterThan=" + SMALLER_CREATED_BY);
+        // Get all the announcementRecordList where createdBy is greater than
+        defaultAnnouncementRecordFiltering("createdBy.greaterThan=" + SMALLER_CREATED_BY, "createdBy.greaterThan=" + DEFAULT_CREATED_BY);
     }
 
     @Test
@@ -649,11 +566,8 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where createdDate equals to DEFAULT_CREATED_DATE
-        defaultAnnouncementRecordShouldBeFound("createdDate.equals=" + DEFAULT_CREATED_DATE);
-
-        // Get all the announcementRecordList where createdDate equals to UPDATED_CREATED_DATE
-        defaultAnnouncementRecordShouldNotBeFound("createdDate.equals=" + UPDATED_CREATED_DATE);
+        // Get all the announcementRecordList where createdDate equals to
+        defaultAnnouncementRecordFiltering("createdDate.equals=" + DEFAULT_CREATED_DATE, "createdDate.equals=" + UPDATED_CREATED_DATE);
     }
 
     @Test
@@ -662,11 +576,11 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where createdDate in DEFAULT_CREATED_DATE or UPDATED_CREATED_DATE
-        defaultAnnouncementRecordShouldBeFound("createdDate.in=" + DEFAULT_CREATED_DATE + "," + UPDATED_CREATED_DATE);
-
-        // Get all the announcementRecordList where createdDate equals to UPDATED_CREATED_DATE
-        defaultAnnouncementRecordShouldNotBeFound("createdDate.in=" + UPDATED_CREATED_DATE);
+        // Get all the announcementRecordList where createdDate in
+        defaultAnnouncementRecordFiltering(
+            "createdDate.in=" + DEFAULT_CREATED_DATE + "," + UPDATED_CREATED_DATE,
+            "createdDate.in=" + UPDATED_CREATED_DATE
+        );
     }
 
     @Test
@@ -676,10 +590,7 @@ public class AnnouncementRecordResourceIT {
         announcementRecordRepository.save(announcementRecord);
 
         // Get all the announcementRecordList where createdDate is not null
-        defaultAnnouncementRecordShouldBeFound("createdDate.specified=true");
-
-        // Get all the announcementRecordList where createdDate is null
-        defaultAnnouncementRecordShouldNotBeFound("createdDate.specified=false");
+        defaultAnnouncementRecordFiltering("createdDate.specified=true", "createdDate.specified=false");
     }
 
     @Test
@@ -688,11 +599,11 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where lastModifiedBy equals to DEFAULT_LAST_MODIFIED_BY
-        defaultAnnouncementRecordShouldBeFound("lastModifiedBy.equals=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the announcementRecordList where lastModifiedBy equals to UPDATED_LAST_MODIFIED_BY
-        defaultAnnouncementRecordShouldNotBeFound("lastModifiedBy.equals=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the announcementRecordList where lastModifiedBy equals to
+        defaultAnnouncementRecordFiltering(
+            "lastModifiedBy.equals=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.equals=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -701,11 +612,11 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where lastModifiedBy in DEFAULT_LAST_MODIFIED_BY or UPDATED_LAST_MODIFIED_BY
-        defaultAnnouncementRecordShouldBeFound("lastModifiedBy.in=" + DEFAULT_LAST_MODIFIED_BY + "," + UPDATED_LAST_MODIFIED_BY);
-
-        // Get all the announcementRecordList where lastModifiedBy equals to UPDATED_LAST_MODIFIED_BY
-        defaultAnnouncementRecordShouldNotBeFound("lastModifiedBy.in=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the announcementRecordList where lastModifiedBy in
+        defaultAnnouncementRecordFiltering(
+            "lastModifiedBy.in=" + DEFAULT_LAST_MODIFIED_BY + "," + UPDATED_LAST_MODIFIED_BY,
+            "lastModifiedBy.in=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -715,10 +626,7 @@ public class AnnouncementRecordResourceIT {
         announcementRecordRepository.save(announcementRecord);
 
         // Get all the announcementRecordList where lastModifiedBy is not null
-        defaultAnnouncementRecordShouldBeFound("lastModifiedBy.specified=true");
-
-        // Get all the announcementRecordList where lastModifiedBy is null
-        defaultAnnouncementRecordShouldNotBeFound("lastModifiedBy.specified=false");
+        defaultAnnouncementRecordFiltering("lastModifiedBy.specified=true", "lastModifiedBy.specified=false");
     }
 
     @Test
@@ -727,11 +635,11 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where lastModifiedBy is greater than or equal to DEFAULT_LAST_MODIFIED_BY
-        defaultAnnouncementRecordShouldBeFound("lastModifiedBy.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the announcementRecordList where lastModifiedBy is greater than or equal to UPDATED_LAST_MODIFIED_BY
-        defaultAnnouncementRecordShouldNotBeFound("lastModifiedBy.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the announcementRecordList where lastModifiedBy is greater than or equal to
+        defaultAnnouncementRecordFiltering(
+            "lastModifiedBy.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -740,11 +648,11 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where lastModifiedBy is less than or equal to DEFAULT_LAST_MODIFIED_BY
-        defaultAnnouncementRecordShouldBeFound("lastModifiedBy.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the announcementRecordList where lastModifiedBy is less than or equal to SMALLER_LAST_MODIFIED_BY
-        defaultAnnouncementRecordShouldNotBeFound("lastModifiedBy.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_BY);
+        // Get all the announcementRecordList where lastModifiedBy is less than or equal to
+        defaultAnnouncementRecordFiltering(
+            "lastModifiedBy.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -753,11 +661,11 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where lastModifiedBy is less than DEFAULT_LAST_MODIFIED_BY
-        defaultAnnouncementRecordShouldNotBeFound("lastModifiedBy.lessThan=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the announcementRecordList where lastModifiedBy is less than UPDATED_LAST_MODIFIED_BY
-        defaultAnnouncementRecordShouldBeFound("lastModifiedBy.lessThan=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the announcementRecordList where lastModifiedBy is less than
+        defaultAnnouncementRecordFiltering(
+            "lastModifiedBy.lessThan=" + UPDATED_LAST_MODIFIED_BY,
+            "lastModifiedBy.lessThan=" + DEFAULT_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -766,11 +674,11 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where lastModifiedBy is greater than DEFAULT_LAST_MODIFIED_BY
-        defaultAnnouncementRecordShouldNotBeFound("lastModifiedBy.greaterThan=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the announcementRecordList where lastModifiedBy is greater than SMALLER_LAST_MODIFIED_BY
-        defaultAnnouncementRecordShouldBeFound("lastModifiedBy.greaterThan=" + SMALLER_LAST_MODIFIED_BY);
+        // Get all the announcementRecordList where lastModifiedBy is greater than
+        defaultAnnouncementRecordFiltering(
+            "lastModifiedBy.greaterThan=" + SMALLER_LAST_MODIFIED_BY,
+            "lastModifiedBy.greaterThan=" + DEFAULT_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -779,11 +687,11 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where lastModifiedDate equals to DEFAULT_LAST_MODIFIED_DATE
-        defaultAnnouncementRecordShouldBeFound("lastModifiedDate.equals=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the announcementRecordList where lastModifiedDate equals to UPDATED_LAST_MODIFIED_DATE
-        defaultAnnouncementRecordShouldNotBeFound("lastModifiedDate.equals=" + UPDATED_LAST_MODIFIED_DATE);
+        // Get all the announcementRecordList where lastModifiedDate equals to
+        defaultAnnouncementRecordFiltering(
+            "lastModifiedDate.equals=" + DEFAULT_LAST_MODIFIED_DATE,
+            "lastModifiedDate.equals=" + UPDATED_LAST_MODIFIED_DATE
+        );
     }
 
     @Test
@@ -792,11 +700,11 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        // Get all the announcementRecordList where lastModifiedDate in DEFAULT_LAST_MODIFIED_DATE or UPDATED_LAST_MODIFIED_DATE
-        defaultAnnouncementRecordShouldBeFound("lastModifiedDate.in=" + DEFAULT_LAST_MODIFIED_DATE + "," + UPDATED_LAST_MODIFIED_DATE);
-
-        // Get all the announcementRecordList where lastModifiedDate equals to UPDATED_LAST_MODIFIED_DATE
-        defaultAnnouncementRecordShouldNotBeFound("lastModifiedDate.in=" + UPDATED_LAST_MODIFIED_DATE);
+        // Get all the announcementRecordList where lastModifiedDate in
+        defaultAnnouncementRecordFiltering(
+            "lastModifiedDate.in=" + DEFAULT_LAST_MODIFIED_DATE + "," + UPDATED_LAST_MODIFIED_DATE,
+            "lastModifiedDate.in=" + UPDATED_LAST_MODIFIED_DATE
+        );
     }
 
     @Test
@@ -806,10 +714,12 @@ public class AnnouncementRecordResourceIT {
         announcementRecordRepository.save(announcementRecord);
 
         // Get all the announcementRecordList where lastModifiedDate is not null
-        defaultAnnouncementRecordShouldBeFound("lastModifiedDate.specified=true");
+        defaultAnnouncementRecordFiltering("lastModifiedDate.specified=true", "lastModifiedDate.specified=false");
+    }
 
-        // Get all the announcementRecordList where lastModifiedDate is null
-        defaultAnnouncementRecordShouldNotBeFound("lastModifiedDate.specified=false");
+    private void defaultAnnouncementRecordFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultAnnouncementRecordShouldBeFound(shouldBeFound);
+        defaultAnnouncementRecordShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -870,7 +780,7 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        int databaseSizeBeforeUpdate = announcementRecordRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the announcementRecord
         AnnouncementRecord updatedAnnouncementRecord = announcementRecordRepository.findById(announcementRecord.getId()).orElseThrow();
@@ -889,28 +799,19 @@ public class AnnouncementRecordResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, announcementRecordDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(announcementRecordDTO))
+                    .content(om.writeValueAsBytes(announcementRecordDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the AnnouncementRecord in the database
-        List<AnnouncementRecord> announcementRecordList = announcementRecordRepository.findAll();
-        assertThat(announcementRecordList).hasSize(databaseSizeBeforeUpdate);
-        AnnouncementRecord testAnnouncementRecord = announcementRecordList.get(announcementRecordList.size() - 1);
-        assertThat(testAnnouncementRecord.getAnntId()).isEqualTo(UPDATED_ANNT_ID);
-        assertThat(testAnnouncementRecord.getUserId()).isEqualTo(UPDATED_USER_ID);
-        assertThat(testAnnouncementRecord.getHasRead()).isEqualTo(UPDATED_HAS_READ);
-        assertThat(testAnnouncementRecord.getReadTime()).isEqualTo(UPDATED_READ_TIME);
-        assertThat(testAnnouncementRecord.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testAnnouncementRecord.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testAnnouncementRecord.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testAnnouncementRecord.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedAnnouncementRecordToMatchAllProperties(updatedAnnouncementRecord);
     }
 
     @Test
     @Transactional
     void putNonExistingAnnouncementRecord() throws Exception {
-        int databaseSizeBeforeUpdate = announcementRecordRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         announcementRecord.setId(longCount.incrementAndGet());
 
         // Create the AnnouncementRecord
@@ -921,19 +822,18 @@ public class AnnouncementRecordResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, announcementRecordDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(announcementRecordDTO))
+                    .content(om.writeValueAsBytes(announcementRecordDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the AnnouncementRecord in the database
-        List<AnnouncementRecord> announcementRecordList = announcementRecordRepository.findAll();
-        assertThat(announcementRecordList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchAnnouncementRecord() throws Exception {
-        int databaseSizeBeforeUpdate = announcementRecordRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         announcementRecord.setId(longCount.incrementAndGet());
 
         // Create the AnnouncementRecord
@@ -944,19 +844,18 @@ public class AnnouncementRecordResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(announcementRecordDTO))
+                    .content(om.writeValueAsBytes(announcementRecordDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the AnnouncementRecord in the database
-        List<AnnouncementRecord> announcementRecordList = announcementRecordRepository.findAll();
-        assertThat(announcementRecordList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamAnnouncementRecord() throws Exception {
-        int databaseSizeBeforeUpdate = announcementRecordRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         announcementRecord.setId(longCount.incrementAndGet());
 
         // Create the AnnouncementRecord
@@ -964,16 +863,11 @@ public class AnnouncementRecordResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restAnnouncementRecordMockMvc
-            .perform(
-                put(ENTITY_API_URL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(announcementRecordDTO))
-            )
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(announcementRecordDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the AnnouncementRecord in the database
-        List<AnnouncementRecord> announcementRecordList = announcementRecordRepository.findAll();
-        assertThat(announcementRecordList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -982,38 +876,29 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        int databaseSizeBeforeUpdate = announcementRecordRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the announcementRecord using partial update
         AnnouncementRecord partialUpdatedAnnouncementRecord = new AnnouncementRecord();
         partialUpdatedAnnouncementRecord.setId(announcementRecord.getId());
 
-        partialUpdatedAnnouncementRecord
-            .hasRead(UPDATED_HAS_READ)
-            .createdBy(UPDATED_CREATED_BY)
-            .createdDate(UPDATED_CREATED_DATE)
-            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
+        partialUpdatedAnnouncementRecord.userId(UPDATED_USER_ID).createdBy(UPDATED_CREATED_BY).lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restAnnouncementRecordMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedAnnouncementRecord.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedAnnouncementRecord))
+                    .content(om.writeValueAsBytes(partialUpdatedAnnouncementRecord))
             )
             .andExpect(status().isOk());
 
         // Validate the AnnouncementRecord in the database
-        List<AnnouncementRecord> announcementRecordList = announcementRecordRepository.findAll();
-        assertThat(announcementRecordList).hasSize(databaseSizeBeforeUpdate);
-        AnnouncementRecord testAnnouncementRecord = announcementRecordList.get(announcementRecordList.size() - 1);
-        assertThat(testAnnouncementRecord.getAnntId()).isEqualTo(DEFAULT_ANNT_ID);
-        assertThat(testAnnouncementRecord.getUserId()).isEqualTo(DEFAULT_USER_ID);
-        assertThat(testAnnouncementRecord.getHasRead()).isEqualTo(UPDATED_HAS_READ);
-        assertThat(testAnnouncementRecord.getReadTime()).isEqualTo(DEFAULT_READ_TIME);
-        assertThat(testAnnouncementRecord.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testAnnouncementRecord.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testAnnouncementRecord.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
-        assertThat(testAnnouncementRecord.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertAnnouncementRecordUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedAnnouncementRecord, announcementRecord),
+            getPersistedAnnouncementRecord(announcementRecord)
+        );
     }
 
     @Test
@@ -1022,7 +907,7 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        int databaseSizeBeforeUpdate = announcementRecordRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the announcementRecord using partial update
         AnnouncementRecord partialUpdatedAnnouncementRecord = new AnnouncementRecord();
@@ -1042,28 +927,23 @@ public class AnnouncementRecordResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedAnnouncementRecord.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedAnnouncementRecord))
+                    .content(om.writeValueAsBytes(partialUpdatedAnnouncementRecord))
             )
             .andExpect(status().isOk());
 
         // Validate the AnnouncementRecord in the database
-        List<AnnouncementRecord> announcementRecordList = announcementRecordRepository.findAll();
-        assertThat(announcementRecordList).hasSize(databaseSizeBeforeUpdate);
-        AnnouncementRecord testAnnouncementRecord = announcementRecordList.get(announcementRecordList.size() - 1);
-        assertThat(testAnnouncementRecord.getAnntId()).isEqualTo(UPDATED_ANNT_ID);
-        assertThat(testAnnouncementRecord.getUserId()).isEqualTo(UPDATED_USER_ID);
-        assertThat(testAnnouncementRecord.getHasRead()).isEqualTo(UPDATED_HAS_READ);
-        assertThat(testAnnouncementRecord.getReadTime()).isEqualTo(UPDATED_READ_TIME);
-        assertThat(testAnnouncementRecord.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testAnnouncementRecord.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testAnnouncementRecord.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testAnnouncementRecord.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertAnnouncementRecordUpdatableFieldsEquals(
+            partialUpdatedAnnouncementRecord,
+            getPersistedAnnouncementRecord(partialUpdatedAnnouncementRecord)
+        );
     }
 
     @Test
     @Transactional
     void patchNonExistingAnnouncementRecord() throws Exception {
-        int databaseSizeBeforeUpdate = announcementRecordRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         announcementRecord.setId(longCount.incrementAndGet());
 
         // Create the AnnouncementRecord
@@ -1074,19 +954,18 @@ public class AnnouncementRecordResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, announcementRecordDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(announcementRecordDTO))
+                    .content(om.writeValueAsBytes(announcementRecordDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the AnnouncementRecord in the database
-        List<AnnouncementRecord> announcementRecordList = announcementRecordRepository.findAll();
-        assertThat(announcementRecordList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchAnnouncementRecord() throws Exception {
-        int databaseSizeBeforeUpdate = announcementRecordRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         announcementRecord.setId(longCount.incrementAndGet());
 
         // Create the AnnouncementRecord
@@ -1097,19 +976,18 @@ public class AnnouncementRecordResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(announcementRecordDTO))
+                    .content(om.writeValueAsBytes(announcementRecordDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the AnnouncementRecord in the database
-        List<AnnouncementRecord> announcementRecordList = announcementRecordRepository.findAll();
-        assertThat(announcementRecordList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamAnnouncementRecord() throws Exception {
-        int databaseSizeBeforeUpdate = announcementRecordRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         announcementRecord.setId(longCount.incrementAndGet());
 
         // Create the AnnouncementRecord
@@ -1117,16 +995,11 @@ public class AnnouncementRecordResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restAnnouncementRecordMockMvc
-            .perform(
-                patch(ENTITY_API_URL)
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(announcementRecordDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(announcementRecordDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the AnnouncementRecord in the database
-        List<AnnouncementRecord> announcementRecordList = announcementRecordRepository.findAll();
-        assertThat(announcementRecordList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1135,7 +1008,7 @@ public class AnnouncementRecordResourceIT {
         // Initialize the database
         announcementRecordRepository.save(announcementRecord);
 
-        int databaseSizeBeforeDelete = announcementRecordRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the announcementRecord
         restAnnouncementRecordMockMvc
@@ -1143,7 +1016,37 @@ public class AnnouncementRecordResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<AnnouncementRecord> announcementRecordList = announcementRecordRepository.findAll();
-        assertThat(announcementRecordList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return announcementRecordRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected AnnouncementRecord getPersistedAnnouncementRecord(AnnouncementRecord announcementRecord) {
+        return announcementRecordRepository.findById(announcementRecord.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedAnnouncementRecordToMatchAllProperties(AnnouncementRecord expectedAnnouncementRecord) {
+        assertAnnouncementRecordAllPropertiesEquals(expectedAnnouncementRecord, getPersistedAnnouncementRecord(expectedAnnouncementRecord));
+    }
+
+    protected void assertPersistedAnnouncementRecordToMatchUpdatableProperties(AnnouncementRecord expectedAnnouncementRecord) {
+        assertAnnouncementRecordAllUpdatablePropertiesEquals(
+            expectedAnnouncementRecord,
+            getPersistedAnnouncementRecord(expectedAnnouncementRecord)
+        );
     }
 }

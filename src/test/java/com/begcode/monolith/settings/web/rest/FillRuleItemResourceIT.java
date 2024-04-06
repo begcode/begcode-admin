@@ -1,5 +1,7 @@
 package com.begcode.monolith.settings.web.rest;
 
+import static com.begcode.monolith.settings.domain.FillRuleItemAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.*;
@@ -16,11 +18,8 @@ import com.begcode.monolith.settings.repository.FillRuleItemRepository;
 import com.begcode.monolith.settings.service.FillRuleItemService;
 import com.begcode.monolith.settings.service.dto.FillRuleItemDTO;
 import com.begcode.monolith.settings.service.mapper.FillRuleItemMapper;
-import com.begcode.monolith.web.rest.TestUtil;
-import com.begcode.monolith.web.rest.TestUtil;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,8 +69,11 @@ public class FillRuleItemResourceIT {
     private static final String ENTITY_API_URL = "/api/fill-rule-items";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private FillRuleItemRepository fillRuleItemRepository;
@@ -134,26 +136,23 @@ public class FillRuleItemResourceIT {
     @Test
     @Transactional
     void createFillRuleItem() throws Exception {
-        int databaseSizeBeforeCreate = fillRuleItemRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the FillRuleItem
         FillRuleItemDTO fillRuleItemDTO = fillRuleItemMapper.toDto(fillRuleItem);
-        restFillRuleItemMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(fillRuleItemDTO))
-            )
-            .andExpect(status().isCreated());
+        var returnedFillRuleItemDTO = om.readValue(
+            restFillRuleItemMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(fillRuleItemDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            FillRuleItemDTO.class
+        );
 
         // Validate the FillRuleItem in the database
-        List<FillRuleItem> fillRuleItemList = fillRuleItemRepository.findAll();
-        assertThat(fillRuleItemList).hasSize(databaseSizeBeforeCreate + 1);
-        FillRuleItem testFillRuleItem = fillRuleItemList.get(fillRuleItemList.size() - 1);
-        assertThat(testFillRuleItem.getSortValue()).isEqualTo(DEFAULT_SORT_VALUE);
-        assertThat(testFillRuleItem.getFieldParamType()).isEqualTo(DEFAULT_FIELD_PARAM_TYPE);
-        assertThat(testFillRuleItem.getFieldParamValue()).isEqualTo(DEFAULT_FIELD_PARAM_VALUE);
-        assertThat(testFillRuleItem.getDatePattern()).isEqualTo(DEFAULT_DATE_PATTERN);
-        assertThat(testFillRuleItem.getSeqLength()).isEqualTo(DEFAULT_SEQ_LENGTH);
-        assertThat(testFillRuleItem.getSeqIncrement()).isEqualTo(DEFAULT_SEQ_INCREMENT);
-        assertThat(testFillRuleItem.getSeqStartValue()).isEqualTo(DEFAULT_SEQ_START_VALUE);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedFillRuleItem = fillRuleItemMapper.toEntity(returnedFillRuleItemDTO);
+        assertFillRuleItemUpdatableFieldsEquals(returnedFillRuleItem, getPersistedFillRuleItem(returnedFillRuleItem));
     }
 
     @Test
@@ -163,18 +162,15 @@ public class FillRuleItemResourceIT {
         fillRuleItem.setId(1L);
         FillRuleItemDTO fillRuleItemDTO = fillRuleItemMapper.toDto(fillRuleItem);
 
-        int databaseSizeBeforeCreate = fillRuleItemRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restFillRuleItemMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(fillRuleItemDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(fillRuleItemDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the FillRuleItem in the database
-        List<FillRuleItem> fillRuleItemList = fillRuleItemRepository.findAll();
-        assertThat(fillRuleItemList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
@@ -244,14 +240,11 @@ public class FillRuleItemResourceIT {
 
         Long id = fillRuleItem.getId();
 
-        defaultFillRuleItemShouldBeFound("id.equals=" + id);
-        defaultFillRuleItemShouldNotBeFound("id.notEquals=" + id);
+        defaultFillRuleItemFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultFillRuleItemShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultFillRuleItemShouldNotBeFound("id.greaterThan=" + id);
+        defaultFillRuleItemFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultFillRuleItemShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultFillRuleItemShouldNotBeFound("id.lessThan=" + id);
+        defaultFillRuleItemFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -260,11 +253,8 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where sortValue equals to DEFAULT_SORT_VALUE
-        defaultFillRuleItemShouldBeFound("sortValue.equals=" + DEFAULT_SORT_VALUE);
-
-        // Get all the fillRuleItemList where sortValue equals to UPDATED_SORT_VALUE
-        defaultFillRuleItemShouldNotBeFound("sortValue.equals=" + UPDATED_SORT_VALUE);
+        // Get all the fillRuleItemList where sortValue equals to
+        defaultFillRuleItemFiltering("sortValue.equals=" + DEFAULT_SORT_VALUE, "sortValue.equals=" + UPDATED_SORT_VALUE);
     }
 
     @Test
@@ -273,11 +263,8 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where sortValue in DEFAULT_SORT_VALUE or UPDATED_SORT_VALUE
-        defaultFillRuleItemShouldBeFound("sortValue.in=" + DEFAULT_SORT_VALUE + "," + UPDATED_SORT_VALUE);
-
-        // Get all the fillRuleItemList where sortValue equals to UPDATED_SORT_VALUE
-        defaultFillRuleItemShouldNotBeFound("sortValue.in=" + UPDATED_SORT_VALUE);
+        // Get all the fillRuleItemList where sortValue in
+        defaultFillRuleItemFiltering("sortValue.in=" + DEFAULT_SORT_VALUE + "," + UPDATED_SORT_VALUE, "sortValue.in=" + UPDATED_SORT_VALUE);
     }
 
     @Test
@@ -287,10 +274,7 @@ public class FillRuleItemResourceIT {
         fillRuleItemRepository.save(fillRuleItem);
 
         // Get all the fillRuleItemList where sortValue is not null
-        defaultFillRuleItemShouldBeFound("sortValue.specified=true");
-
-        // Get all the fillRuleItemList where sortValue is null
-        defaultFillRuleItemShouldNotBeFound("sortValue.specified=false");
+        defaultFillRuleItemFiltering("sortValue.specified=true", "sortValue.specified=false");
     }
 
     @Test
@@ -299,11 +283,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where sortValue is greater than or equal to DEFAULT_SORT_VALUE
-        defaultFillRuleItemShouldBeFound("sortValue.greaterThanOrEqual=" + DEFAULT_SORT_VALUE);
-
-        // Get all the fillRuleItemList where sortValue is greater than or equal to UPDATED_SORT_VALUE
-        defaultFillRuleItemShouldNotBeFound("sortValue.greaterThanOrEqual=" + UPDATED_SORT_VALUE);
+        // Get all the fillRuleItemList where sortValue is greater than or equal to
+        defaultFillRuleItemFiltering(
+            "sortValue.greaterThanOrEqual=" + DEFAULT_SORT_VALUE,
+            "sortValue.greaterThanOrEqual=" + UPDATED_SORT_VALUE
+        );
     }
 
     @Test
@@ -312,11 +296,8 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where sortValue is less than or equal to DEFAULT_SORT_VALUE
-        defaultFillRuleItemShouldBeFound("sortValue.lessThanOrEqual=" + DEFAULT_SORT_VALUE);
-
-        // Get all the fillRuleItemList where sortValue is less than or equal to SMALLER_SORT_VALUE
-        defaultFillRuleItemShouldNotBeFound("sortValue.lessThanOrEqual=" + SMALLER_SORT_VALUE);
+        // Get all the fillRuleItemList where sortValue is less than or equal to
+        defaultFillRuleItemFiltering("sortValue.lessThanOrEqual=" + DEFAULT_SORT_VALUE, "sortValue.lessThanOrEqual=" + SMALLER_SORT_VALUE);
     }
 
     @Test
@@ -325,11 +306,8 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where sortValue is less than DEFAULT_SORT_VALUE
-        defaultFillRuleItemShouldNotBeFound("sortValue.lessThan=" + DEFAULT_SORT_VALUE);
-
-        // Get all the fillRuleItemList where sortValue is less than UPDATED_SORT_VALUE
-        defaultFillRuleItemShouldBeFound("sortValue.lessThan=" + UPDATED_SORT_VALUE);
+        // Get all the fillRuleItemList where sortValue is less than
+        defaultFillRuleItemFiltering("sortValue.lessThan=" + UPDATED_SORT_VALUE, "sortValue.lessThan=" + DEFAULT_SORT_VALUE);
     }
 
     @Test
@@ -338,11 +316,8 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where sortValue is greater than DEFAULT_SORT_VALUE
-        defaultFillRuleItemShouldNotBeFound("sortValue.greaterThan=" + DEFAULT_SORT_VALUE);
-
-        // Get all the fillRuleItemList where sortValue is greater than SMALLER_SORT_VALUE
-        defaultFillRuleItemShouldBeFound("sortValue.greaterThan=" + SMALLER_SORT_VALUE);
+        // Get all the fillRuleItemList where sortValue is greater than
+        defaultFillRuleItemFiltering("sortValue.greaterThan=" + SMALLER_SORT_VALUE, "sortValue.greaterThan=" + DEFAULT_SORT_VALUE);
     }
 
     @Test
@@ -351,11 +326,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where fieldParamType equals to DEFAULT_FIELD_PARAM_TYPE
-        defaultFillRuleItemShouldBeFound("fieldParamType.equals=" + DEFAULT_FIELD_PARAM_TYPE);
-
-        // Get all the fillRuleItemList where fieldParamType equals to UPDATED_FIELD_PARAM_TYPE
-        defaultFillRuleItemShouldNotBeFound("fieldParamType.equals=" + UPDATED_FIELD_PARAM_TYPE);
+        // Get all the fillRuleItemList where fieldParamType equals to
+        defaultFillRuleItemFiltering(
+            "fieldParamType.equals=" + DEFAULT_FIELD_PARAM_TYPE,
+            "fieldParamType.equals=" + UPDATED_FIELD_PARAM_TYPE
+        );
     }
 
     @Test
@@ -364,11 +339,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where fieldParamType in DEFAULT_FIELD_PARAM_TYPE or UPDATED_FIELD_PARAM_TYPE
-        defaultFillRuleItemShouldBeFound("fieldParamType.in=" + DEFAULT_FIELD_PARAM_TYPE + "," + UPDATED_FIELD_PARAM_TYPE);
-
-        // Get all the fillRuleItemList where fieldParamType equals to UPDATED_FIELD_PARAM_TYPE
-        defaultFillRuleItemShouldNotBeFound("fieldParamType.in=" + UPDATED_FIELD_PARAM_TYPE);
+        // Get all the fillRuleItemList where fieldParamType in
+        defaultFillRuleItemFiltering(
+            "fieldParamType.in=" + DEFAULT_FIELD_PARAM_TYPE + "," + UPDATED_FIELD_PARAM_TYPE,
+            "fieldParamType.in=" + UPDATED_FIELD_PARAM_TYPE
+        );
     }
 
     @Test
@@ -378,10 +353,7 @@ public class FillRuleItemResourceIT {
         fillRuleItemRepository.save(fillRuleItem);
 
         // Get all the fillRuleItemList where fieldParamType is not null
-        defaultFillRuleItemShouldBeFound("fieldParamType.specified=true");
-
-        // Get all the fillRuleItemList where fieldParamType is null
-        defaultFillRuleItemShouldNotBeFound("fieldParamType.specified=false");
+        defaultFillRuleItemFiltering("fieldParamType.specified=true", "fieldParamType.specified=false");
     }
 
     @Test
@@ -390,11 +362,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where fieldParamValue equals to DEFAULT_FIELD_PARAM_VALUE
-        defaultFillRuleItemShouldBeFound("fieldParamValue.equals=" + DEFAULT_FIELD_PARAM_VALUE);
-
-        // Get all the fillRuleItemList where fieldParamValue equals to UPDATED_FIELD_PARAM_VALUE
-        defaultFillRuleItemShouldNotBeFound("fieldParamValue.equals=" + UPDATED_FIELD_PARAM_VALUE);
+        // Get all the fillRuleItemList where fieldParamValue equals to
+        defaultFillRuleItemFiltering(
+            "fieldParamValue.equals=" + DEFAULT_FIELD_PARAM_VALUE,
+            "fieldParamValue.equals=" + UPDATED_FIELD_PARAM_VALUE
+        );
     }
 
     @Test
@@ -403,11 +375,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where fieldParamValue in DEFAULT_FIELD_PARAM_VALUE or UPDATED_FIELD_PARAM_VALUE
-        defaultFillRuleItemShouldBeFound("fieldParamValue.in=" + DEFAULT_FIELD_PARAM_VALUE + "," + UPDATED_FIELD_PARAM_VALUE);
-
-        // Get all the fillRuleItemList where fieldParamValue equals to UPDATED_FIELD_PARAM_VALUE
-        defaultFillRuleItemShouldNotBeFound("fieldParamValue.in=" + UPDATED_FIELD_PARAM_VALUE);
+        // Get all the fillRuleItemList where fieldParamValue in
+        defaultFillRuleItemFiltering(
+            "fieldParamValue.in=" + DEFAULT_FIELD_PARAM_VALUE + "," + UPDATED_FIELD_PARAM_VALUE,
+            "fieldParamValue.in=" + UPDATED_FIELD_PARAM_VALUE
+        );
     }
 
     @Test
@@ -417,10 +389,7 @@ public class FillRuleItemResourceIT {
         fillRuleItemRepository.save(fillRuleItem);
 
         // Get all the fillRuleItemList where fieldParamValue is not null
-        defaultFillRuleItemShouldBeFound("fieldParamValue.specified=true");
-
-        // Get all the fillRuleItemList where fieldParamValue is null
-        defaultFillRuleItemShouldNotBeFound("fieldParamValue.specified=false");
+        defaultFillRuleItemFiltering("fieldParamValue.specified=true", "fieldParamValue.specified=false");
     }
 
     @Test
@@ -429,11 +398,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where fieldParamValue contains DEFAULT_FIELD_PARAM_VALUE
-        defaultFillRuleItemShouldBeFound("fieldParamValue.contains=" + DEFAULT_FIELD_PARAM_VALUE);
-
-        // Get all the fillRuleItemList where fieldParamValue contains UPDATED_FIELD_PARAM_VALUE
-        defaultFillRuleItemShouldNotBeFound("fieldParamValue.contains=" + UPDATED_FIELD_PARAM_VALUE);
+        // Get all the fillRuleItemList where fieldParamValue contains
+        defaultFillRuleItemFiltering(
+            "fieldParamValue.contains=" + DEFAULT_FIELD_PARAM_VALUE,
+            "fieldParamValue.contains=" + UPDATED_FIELD_PARAM_VALUE
+        );
     }
 
     @Test
@@ -442,11 +411,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where fieldParamValue does not contain DEFAULT_FIELD_PARAM_VALUE
-        defaultFillRuleItemShouldNotBeFound("fieldParamValue.doesNotContain=" + DEFAULT_FIELD_PARAM_VALUE);
-
-        // Get all the fillRuleItemList where fieldParamValue does not contain UPDATED_FIELD_PARAM_VALUE
-        defaultFillRuleItemShouldBeFound("fieldParamValue.doesNotContain=" + UPDATED_FIELD_PARAM_VALUE);
+        // Get all the fillRuleItemList where fieldParamValue does not contain
+        defaultFillRuleItemFiltering(
+            "fieldParamValue.doesNotContain=" + UPDATED_FIELD_PARAM_VALUE,
+            "fieldParamValue.doesNotContain=" + DEFAULT_FIELD_PARAM_VALUE
+        );
     }
 
     @Test
@@ -455,11 +424,8 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where datePattern equals to DEFAULT_DATE_PATTERN
-        defaultFillRuleItemShouldBeFound("datePattern.equals=" + DEFAULT_DATE_PATTERN);
-
-        // Get all the fillRuleItemList where datePattern equals to UPDATED_DATE_PATTERN
-        defaultFillRuleItemShouldNotBeFound("datePattern.equals=" + UPDATED_DATE_PATTERN);
+        // Get all the fillRuleItemList where datePattern equals to
+        defaultFillRuleItemFiltering("datePattern.equals=" + DEFAULT_DATE_PATTERN, "datePattern.equals=" + UPDATED_DATE_PATTERN);
     }
 
     @Test
@@ -468,11 +434,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where datePattern in DEFAULT_DATE_PATTERN or UPDATED_DATE_PATTERN
-        defaultFillRuleItemShouldBeFound("datePattern.in=" + DEFAULT_DATE_PATTERN + "," + UPDATED_DATE_PATTERN);
-
-        // Get all the fillRuleItemList where datePattern equals to UPDATED_DATE_PATTERN
-        defaultFillRuleItemShouldNotBeFound("datePattern.in=" + UPDATED_DATE_PATTERN);
+        // Get all the fillRuleItemList where datePattern in
+        defaultFillRuleItemFiltering(
+            "datePattern.in=" + DEFAULT_DATE_PATTERN + "," + UPDATED_DATE_PATTERN,
+            "datePattern.in=" + UPDATED_DATE_PATTERN
+        );
     }
 
     @Test
@@ -482,10 +448,7 @@ public class FillRuleItemResourceIT {
         fillRuleItemRepository.save(fillRuleItem);
 
         // Get all the fillRuleItemList where datePattern is not null
-        defaultFillRuleItemShouldBeFound("datePattern.specified=true");
-
-        // Get all the fillRuleItemList where datePattern is null
-        defaultFillRuleItemShouldNotBeFound("datePattern.specified=false");
+        defaultFillRuleItemFiltering("datePattern.specified=true", "datePattern.specified=false");
     }
 
     @Test
@@ -494,11 +457,8 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where datePattern contains DEFAULT_DATE_PATTERN
-        defaultFillRuleItemShouldBeFound("datePattern.contains=" + DEFAULT_DATE_PATTERN);
-
-        // Get all the fillRuleItemList where datePattern contains UPDATED_DATE_PATTERN
-        defaultFillRuleItemShouldNotBeFound("datePattern.contains=" + UPDATED_DATE_PATTERN);
+        // Get all the fillRuleItemList where datePattern contains
+        defaultFillRuleItemFiltering("datePattern.contains=" + DEFAULT_DATE_PATTERN, "datePattern.contains=" + UPDATED_DATE_PATTERN);
     }
 
     @Test
@@ -507,11 +467,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where datePattern does not contain DEFAULT_DATE_PATTERN
-        defaultFillRuleItemShouldNotBeFound("datePattern.doesNotContain=" + DEFAULT_DATE_PATTERN);
-
-        // Get all the fillRuleItemList where datePattern does not contain UPDATED_DATE_PATTERN
-        defaultFillRuleItemShouldBeFound("datePattern.doesNotContain=" + UPDATED_DATE_PATTERN);
+        // Get all the fillRuleItemList where datePattern does not contain
+        defaultFillRuleItemFiltering(
+            "datePattern.doesNotContain=" + UPDATED_DATE_PATTERN,
+            "datePattern.doesNotContain=" + DEFAULT_DATE_PATTERN
+        );
     }
 
     @Test
@@ -520,11 +480,8 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqLength equals to DEFAULT_SEQ_LENGTH
-        defaultFillRuleItemShouldBeFound("seqLength.equals=" + DEFAULT_SEQ_LENGTH);
-
-        // Get all the fillRuleItemList where seqLength equals to UPDATED_SEQ_LENGTH
-        defaultFillRuleItemShouldNotBeFound("seqLength.equals=" + UPDATED_SEQ_LENGTH);
+        // Get all the fillRuleItemList where seqLength equals to
+        defaultFillRuleItemFiltering("seqLength.equals=" + DEFAULT_SEQ_LENGTH, "seqLength.equals=" + UPDATED_SEQ_LENGTH);
     }
 
     @Test
@@ -533,11 +490,8 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqLength in DEFAULT_SEQ_LENGTH or UPDATED_SEQ_LENGTH
-        defaultFillRuleItemShouldBeFound("seqLength.in=" + DEFAULT_SEQ_LENGTH + "," + UPDATED_SEQ_LENGTH);
-
-        // Get all the fillRuleItemList where seqLength equals to UPDATED_SEQ_LENGTH
-        defaultFillRuleItemShouldNotBeFound("seqLength.in=" + UPDATED_SEQ_LENGTH);
+        // Get all the fillRuleItemList where seqLength in
+        defaultFillRuleItemFiltering("seqLength.in=" + DEFAULT_SEQ_LENGTH + "," + UPDATED_SEQ_LENGTH, "seqLength.in=" + UPDATED_SEQ_LENGTH);
     }
 
     @Test
@@ -547,10 +501,7 @@ public class FillRuleItemResourceIT {
         fillRuleItemRepository.save(fillRuleItem);
 
         // Get all the fillRuleItemList where seqLength is not null
-        defaultFillRuleItemShouldBeFound("seqLength.specified=true");
-
-        // Get all the fillRuleItemList where seqLength is null
-        defaultFillRuleItemShouldNotBeFound("seqLength.specified=false");
+        defaultFillRuleItemFiltering("seqLength.specified=true", "seqLength.specified=false");
     }
 
     @Test
@@ -559,11 +510,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqLength is greater than or equal to DEFAULT_SEQ_LENGTH
-        defaultFillRuleItemShouldBeFound("seqLength.greaterThanOrEqual=" + DEFAULT_SEQ_LENGTH);
-
-        // Get all the fillRuleItemList where seqLength is greater than or equal to UPDATED_SEQ_LENGTH
-        defaultFillRuleItemShouldNotBeFound("seqLength.greaterThanOrEqual=" + UPDATED_SEQ_LENGTH);
+        // Get all the fillRuleItemList where seqLength is greater than or equal to
+        defaultFillRuleItemFiltering(
+            "seqLength.greaterThanOrEqual=" + DEFAULT_SEQ_LENGTH,
+            "seqLength.greaterThanOrEqual=" + UPDATED_SEQ_LENGTH
+        );
     }
 
     @Test
@@ -572,11 +523,8 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqLength is less than or equal to DEFAULT_SEQ_LENGTH
-        defaultFillRuleItemShouldBeFound("seqLength.lessThanOrEqual=" + DEFAULT_SEQ_LENGTH);
-
-        // Get all the fillRuleItemList where seqLength is less than or equal to SMALLER_SEQ_LENGTH
-        defaultFillRuleItemShouldNotBeFound("seqLength.lessThanOrEqual=" + SMALLER_SEQ_LENGTH);
+        // Get all the fillRuleItemList where seqLength is less than or equal to
+        defaultFillRuleItemFiltering("seqLength.lessThanOrEqual=" + DEFAULT_SEQ_LENGTH, "seqLength.lessThanOrEqual=" + SMALLER_SEQ_LENGTH);
     }
 
     @Test
@@ -585,11 +533,8 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqLength is less than DEFAULT_SEQ_LENGTH
-        defaultFillRuleItemShouldNotBeFound("seqLength.lessThan=" + DEFAULT_SEQ_LENGTH);
-
-        // Get all the fillRuleItemList where seqLength is less than UPDATED_SEQ_LENGTH
-        defaultFillRuleItemShouldBeFound("seqLength.lessThan=" + UPDATED_SEQ_LENGTH);
+        // Get all the fillRuleItemList where seqLength is less than
+        defaultFillRuleItemFiltering("seqLength.lessThan=" + UPDATED_SEQ_LENGTH, "seqLength.lessThan=" + DEFAULT_SEQ_LENGTH);
     }
 
     @Test
@@ -598,11 +543,8 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqLength is greater than DEFAULT_SEQ_LENGTH
-        defaultFillRuleItemShouldNotBeFound("seqLength.greaterThan=" + DEFAULT_SEQ_LENGTH);
-
-        // Get all the fillRuleItemList where seqLength is greater than SMALLER_SEQ_LENGTH
-        defaultFillRuleItemShouldBeFound("seqLength.greaterThan=" + SMALLER_SEQ_LENGTH);
+        // Get all the fillRuleItemList where seqLength is greater than
+        defaultFillRuleItemFiltering("seqLength.greaterThan=" + SMALLER_SEQ_LENGTH, "seqLength.greaterThan=" + DEFAULT_SEQ_LENGTH);
     }
 
     @Test
@@ -611,11 +553,8 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqIncrement equals to DEFAULT_SEQ_INCREMENT
-        defaultFillRuleItemShouldBeFound("seqIncrement.equals=" + DEFAULT_SEQ_INCREMENT);
-
-        // Get all the fillRuleItemList where seqIncrement equals to UPDATED_SEQ_INCREMENT
-        defaultFillRuleItemShouldNotBeFound("seqIncrement.equals=" + UPDATED_SEQ_INCREMENT);
+        // Get all the fillRuleItemList where seqIncrement equals to
+        defaultFillRuleItemFiltering("seqIncrement.equals=" + DEFAULT_SEQ_INCREMENT, "seqIncrement.equals=" + UPDATED_SEQ_INCREMENT);
     }
 
     @Test
@@ -624,11 +563,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqIncrement in DEFAULT_SEQ_INCREMENT or UPDATED_SEQ_INCREMENT
-        defaultFillRuleItemShouldBeFound("seqIncrement.in=" + DEFAULT_SEQ_INCREMENT + "," + UPDATED_SEQ_INCREMENT);
-
-        // Get all the fillRuleItemList where seqIncrement equals to UPDATED_SEQ_INCREMENT
-        defaultFillRuleItemShouldNotBeFound("seqIncrement.in=" + UPDATED_SEQ_INCREMENT);
+        // Get all the fillRuleItemList where seqIncrement in
+        defaultFillRuleItemFiltering(
+            "seqIncrement.in=" + DEFAULT_SEQ_INCREMENT + "," + UPDATED_SEQ_INCREMENT,
+            "seqIncrement.in=" + UPDATED_SEQ_INCREMENT
+        );
     }
 
     @Test
@@ -638,10 +577,7 @@ public class FillRuleItemResourceIT {
         fillRuleItemRepository.save(fillRuleItem);
 
         // Get all the fillRuleItemList where seqIncrement is not null
-        defaultFillRuleItemShouldBeFound("seqIncrement.specified=true");
-
-        // Get all the fillRuleItemList where seqIncrement is null
-        defaultFillRuleItemShouldNotBeFound("seqIncrement.specified=false");
+        defaultFillRuleItemFiltering("seqIncrement.specified=true", "seqIncrement.specified=false");
     }
 
     @Test
@@ -650,11 +586,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqIncrement is greater than or equal to DEFAULT_SEQ_INCREMENT
-        defaultFillRuleItemShouldBeFound("seqIncrement.greaterThanOrEqual=" + DEFAULT_SEQ_INCREMENT);
-
-        // Get all the fillRuleItemList where seqIncrement is greater than or equal to UPDATED_SEQ_INCREMENT
-        defaultFillRuleItemShouldNotBeFound("seqIncrement.greaterThanOrEqual=" + UPDATED_SEQ_INCREMENT);
+        // Get all the fillRuleItemList where seqIncrement is greater than or equal to
+        defaultFillRuleItemFiltering(
+            "seqIncrement.greaterThanOrEqual=" + DEFAULT_SEQ_INCREMENT,
+            "seqIncrement.greaterThanOrEqual=" + UPDATED_SEQ_INCREMENT
+        );
     }
 
     @Test
@@ -663,11 +599,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqIncrement is less than or equal to DEFAULT_SEQ_INCREMENT
-        defaultFillRuleItemShouldBeFound("seqIncrement.lessThanOrEqual=" + DEFAULT_SEQ_INCREMENT);
-
-        // Get all the fillRuleItemList where seqIncrement is less than or equal to SMALLER_SEQ_INCREMENT
-        defaultFillRuleItemShouldNotBeFound("seqIncrement.lessThanOrEqual=" + SMALLER_SEQ_INCREMENT);
+        // Get all the fillRuleItemList where seqIncrement is less than or equal to
+        defaultFillRuleItemFiltering(
+            "seqIncrement.lessThanOrEqual=" + DEFAULT_SEQ_INCREMENT,
+            "seqIncrement.lessThanOrEqual=" + SMALLER_SEQ_INCREMENT
+        );
     }
 
     @Test
@@ -676,11 +612,8 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqIncrement is less than DEFAULT_SEQ_INCREMENT
-        defaultFillRuleItemShouldNotBeFound("seqIncrement.lessThan=" + DEFAULT_SEQ_INCREMENT);
-
-        // Get all the fillRuleItemList where seqIncrement is less than UPDATED_SEQ_INCREMENT
-        defaultFillRuleItemShouldBeFound("seqIncrement.lessThan=" + UPDATED_SEQ_INCREMENT);
+        // Get all the fillRuleItemList where seqIncrement is less than
+        defaultFillRuleItemFiltering("seqIncrement.lessThan=" + UPDATED_SEQ_INCREMENT, "seqIncrement.lessThan=" + DEFAULT_SEQ_INCREMENT);
     }
 
     @Test
@@ -689,11 +622,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqIncrement is greater than DEFAULT_SEQ_INCREMENT
-        defaultFillRuleItemShouldNotBeFound("seqIncrement.greaterThan=" + DEFAULT_SEQ_INCREMENT);
-
-        // Get all the fillRuleItemList where seqIncrement is greater than SMALLER_SEQ_INCREMENT
-        defaultFillRuleItemShouldBeFound("seqIncrement.greaterThan=" + SMALLER_SEQ_INCREMENT);
+        // Get all the fillRuleItemList where seqIncrement is greater than
+        defaultFillRuleItemFiltering(
+            "seqIncrement.greaterThan=" + SMALLER_SEQ_INCREMENT,
+            "seqIncrement.greaterThan=" + DEFAULT_SEQ_INCREMENT
+        );
     }
 
     @Test
@@ -702,11 +635,8 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqStartValue equals to DEFAULT_SEQ_START_VALUE
-        defaultFillRuleItemShouldBeFound("seqStartValue.equals=" + DEFAULT_SEQ_START_VALUE);
-
-        // Get all the fillRuleItemList where seqStartValue equals to UPDATED_SEQ_START_VALUE
-        defaultFillRuleItemShouldNotBeFound("seqStartValue.equals=" + UPDATED_SEQ_START_VALUE);
+        // Get all the fillRuleItemList where seqStartValue equals to
+        defaultFillRuleItemFiltering("seqStartValue.equals=" + DEFAULT_SEQ_START_VALUE, "seqStartValue.equals=" + UPDATED_SEQ_START_VALUE);
     }
 
     @Test
@@ -715,11 +645,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqStartValue in DEFAULT_SEQ_START_VALUE or UPDATED_SEQ_START_VALUE
-        defaultFillRuleItemShouldBeFound("seqStartValue.in=" + DEFAULT_SEQ_START_VALUE + "," + UPDATED_SEQ_START_VALUE);
-
-        // Get all the fillRuleItemList where seqStartValue equals to UPDATED_SEQ_START_VALUE
-        defaultFillRuleItemShouldNotBeFound("seqStartValue.in=" + UPDATED_SEQ_START_VALUE);
+        // Get all the fillRuleItemList where seqStartValue in
+        defaultFillRuleItemFiltering(
+            "seqStartValue.in=" + DEFAULT_SEQ_START_VALUE + "," + UPDATED_SEQ_START_VALUE,
+            "seqStartValue.in=" + UPDATED_SEQ_START_VALUE
+        );
     }
 
     @Test
@@ -729,10 +659,7 @@ public class FillRuleItemResourceIT {
         fillRuleItemRepository.save(fillRuleItem);
 
         // Get all the fillRuleItemList where seqStartValue is not null
-        defaultFillRuleItemShouldBeFound("seqStartValue.specified=true");
-
-        // Get all the fillRuleItemList where seqStartValue is null
-        defaultFillRuleItemShouldNotBeFound("seqStartValue.specified=false");
+        defaultFillRuleItemFiltering("seqStartValue.specified=true", "seqStartValue.specified=false");
     }
 
     @Test
@@ -741,11 +668,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqStartValue is greater than or equal to DEFAULT_SEQ_START_VALUE
-        defaultFillRuleItemShouldBeFound("seqStartValue.greaterThanOrEqual=" + DEFAULT_SEQ_START_VALUE);
-
-        // Get all the fillRuleItemList where seqStartValue is greater than or equal to UPDATED_SEQ_START_VALUE
-        defaultFillRuleItemShouldNotBeFound("seqStartValue.greaterThanOrEqual=" + UPDATED_SEQ_START_VALUE);
+        // Get all the fillRuleItemList where seqStartValue is greater than or equal to
+        defaultFillRuleItemFiltering(
+            "seqStartValue.greaterThanOrEqual=" + DEFAULT_SEQ_START_VALUE,
+            "seqStartValue.greaterThanOrEqual=" + UPDATED_SEQ_START_VALUE
+        );
     }
 
     @Test
@@ -754,11 +681,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqStartValue is less than or equal to DEFAULT_SEQ_START_VALUE
-        defaultFillRuleItemShouldBeFound("seqStartValue.lessThanOrEqual=" + DEFAULT_SEQ_START_VALUE);
-
-        // Get all the fillRuleItemList where seqStartValue is less than or equal to SMALLER_SEQ_START_VALUE
-        defaultFillRuleItemShouldNotBeFound("seqStartValue.lessThanOrEqual=" + SMALLER_SEQ_START_VALUE);
+        // Get all the fillRuleItemList where seqStartValue is less than or equal to
+        defaultFillRuleItemFiltering(
+            "seqStartValue.lessThanOrEqual=" + DEFAULT_SEQ_START_VALUE,
+            "seqStartValue.lessThanOrEqual=" + SMALLER_SEQ_START_VALUE
+        );
     }
 
     @Test
@@ -767,11 +694,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqStartValue is less than DEFAULT_SEQ_START_VALUE
-        defaultFillRuleItemShouldNotBeFound("seqStartValue.lessThan=" + DEFAULT_SEQ_START_VALUE);
-
-        // Get all the fillRuleItemList where seqStartValue is less than UPDATED_SEQ_START_VALUE
-        defaultFillRuleItemShouldBeFound("seqStartValue.lessThan=" + UPDATED_SEQ_START_VALUE);
+        // Get all the fillRuleItemList where seqStartValue is less than
+        defaultFillRuleItemFiltering(
+            "seqStartValue.lessThan=" + UPDATED_SEQ_START_VALUE,
+            "seqStartValue.lessThan=" + DEFAULT_SEQ_START_VALUE
+        );
     }
 
     @Test
@@ -780,11 +707,11 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        // Get all the fillRuleItemList where seqStartValue is greater than DEFAULT_SEQ_START_VALUE
-        defaultFillRuleItemShouldNotBeFound("seqStartValue.greaterThan=" + DEFAULT_SEQ_START_VALUE);
-
-        // Get all the fillRuleItemList where seqStartValue is greater than SMALLER_SEQ_START_VALUE
-        defaultFillRuleItemShouldBeFound("seqStartValue.greaterThan=" + SMALLER_SEQ_START_VALUE);
+        // Get all the fillRuleItemList where seqStartValue is greater than
+        defaultFillRuleItemFiltering(
+            "seqStartValue.greaterThan=" + SMALLER_SEQ_START_VALUE,
+            "seqStartValue.greaterThan=" + DEFAULT_SEQ_START_VALUE
+        );
     }
 
     @Test
@@ -799,6 +726,11 @@ public class FillRuleItemResourceIT {
 
         // Get all the fillRuleItemList where fillRule equals to (fillRuleId + 1)
         defaultFillRuleItemShouldNotBeFound("fillRuleId.equals=" + (fillRuleId + 1));
+    }
+
+    private void defaultFillRuleItemFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultFillRuleItemShouldBeFound(shouldBeFound);
+        defaultFillRuleItemShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -858,7 +790,7 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        int databaseSizeBeforeUpdate = fillRuleItemRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the fillRuleItem
         FillRuleItem updatedFillRuleItem = fillRuleItemRepository.findById(fillRuleItem.getId()).orElseThrow();
@@ -876,27 +808,19 @@ public class FillRuleItemResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, fillRuleItemDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(fillRuleItemDTO))
+                    .content(om.writeValueAsBytes(fillRuleItemDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the FillRuleItem in the database
-        List<FillRuleItem> fillRuleItemList = fillRuleItemRepository.findAll();
-        assertThat(fillRuleItemList).hasSize(databaseSizeBeforeUpdate);
-        FillRuleItem testFillRuleItem = fillRuleItemList.get(fillRuleItemList.size() - 1);
-        assertThat(testFillRuleItem.getSortValue()).isEqualTo(UPDATED_SORT_VALUE);
-        assertThat(testFillRuleItem.getFieldParamType()).isEqualTo(UPDATED_FIELD_PARAM_TYPE);
-        assertThat(testFillRuleItem.getFieldParamValue()).isEqualTo(UPDATED_FIELD_PARAM_VALUE);
-        assertThat(testFillRuleItem.getDatePattern()).isEqualTo(UPDATED_DATE_PATTERN);
-        assertThat(testFillRuleItem.getSeqLength()).isEqualTo(UPDATED_SEQ_LENGTH);
-        assertThat(testFillRuleItem.getSeqIncrement()).isEqualTo(UPDATED_SEQ_INCREMENT);
-        assertThat(testFillRuleItem.getSeqStartValue()).isEqualTo(UPDATED_SEQ_START_VALUE);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedFillRuleItemToMatchAllProperties(updatedFillRuleItem);
     }
 
     @Test
     @Transactional
     void putNonExistingFillRuleItem() throws Exception {
-        int databaseSizeBeforeUpdate = fillRuleItemRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         fillRuleItem.setId(longCount.incrementAndGet());
 
         // Create the FillRuleItem
@@ -907,19 +831,18 @@ public class FillRuleItemResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, fillRuleItemDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(fillRuleItemDTO))
+                    .content(om.writeValueAsBytes(fillRuleItemDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the FillRuleItem in the database
-        List<FillRuleItem> fillRuleItemList = fillRuleItemRepository.findAll();
-        assertThat(fillRuleItemList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchFillRuleItem() throws Exception {
-        int databaseSizeBeforeUpdate = fillRuleItemRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         fillRuleItem.setId(longCount.incrementAndGet());
 
         // Create the FillRuleItem
@@ -930,19 +853,18 @@ public class FillRuleItemResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(fillRuleItemDTO))
+                    .content(om.writeValueAsBytes(fillRuleItemDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the FillRuleItem in the database
-        List<FillRuleItem> fillRuleItemList = fillRuleItemRepository.findAll();
-        assertThat(fillRuleItemList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamFillRuleItem() throws Exception {
-        int databaseSizeBeforeUpdate = fillRuleItemRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         fillRuleItem.setId(longCount.incrementAndGet());
 
         // Create the FillRuleItem
@@ -950,14 +872,11 @@ public class FillRuleItemResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restFillRuleItemMockMvc
-            .perform(
-                put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(fillRuleItemDTO))
-            )
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(fillRuleItemDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the FillRuleItem in the database
-        List<FillRuleItem> fillRuleItemList = fillRuleItemRepository.findAll();
-        assertThat(fillRuleItemList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -966,15 +885,15 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        int databaseSizeBeforeUpdate = fillRuleItemRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the fillRuleItem using partial update
         FillRuleItem partialUpdatedFillRuleItem = new FillRuleItem();
         partialUpdatedFillRuleItem.setId(fillRuleItem.getId());
 
         partialUpdatedFillRuleItem
-            .fieldParamType(UPDATED_FIELD_PARAM_TYPE)
             .fieldParamValue(UPDATED_FIELD_PARAM_VALUE)
+            .datePattern(UPDATED_DATE_PATTERN)
             .seqLength(UPDATED_SEQ_LENGTH)
             .seqStartValue(UPDATED_SEQ_START_VALUE);
 
@@ -982,21 +901,17 @@ public class FillRuleItemResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedFillRuleItem.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedFillRuleItem))
+                    .content(om.writeValueAsBytes(partialUpdatedFillRuleItem))
             )
             .andExpect(status().isOk());
 
         // Validate the FillRuleItem in the database
-        List<FillRuleItem> fillRuleItemList = fillRuleItemRepository.findAll();
-        assertThat(fillRuleItemList).hasSize(databaseSizeBeforeUpdate);
-        FillRuleItem testFillRuleItem = fillRuleItemList.get(fillRuleItemList.size() - 1);
-        assertThat(testFillRuleItem.getSortValue()).isEqualTo(DEFAULT_SORT_VALUE);
-        assertThat(testFillRuleItem.getFieldParamType()).isEqualTo(UPDATED_FIELD_PARAM_TYPE);
-        assertThat(testFillRuleItem.getFieldParamValue()).isEqualTo(UPDATED_FIELD_PARAM_VALUE);
-        assertThat(testFillRuleItem.getDatePattern()).isEqualTo(DEFAULT_DATE_PATTERN);
-        assertThat(testFillRuleItem.getSeqLength()).isEqualTo(UPDATED_SEQ_LENGTH);
-        assertThat(testFillRuleItem.getSeqIncrement()).isEqualTo(DEFAULT_SEQ_INCREMENT);
-        assertThat(testFillRuleItem.getSeqStartValue()).isEqualTo(UPDATED_SEQ_START_VALUE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertFillRuleItemUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedFillRuleItem, fillRuleItem),
+            getPersistedFillRuleItem(fillRuleItem)
+        );
     }
 
     @Test
@@ -1005,7 +920,7 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        int databaseSizeBeforeUpdate = fillRuleItemRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the fillRuleItem using partial update
         FillRuleItem partialUpdatedFillRuleItem = new FillRuleItem();
@@ -1024,27 +939,20 @@ public class FillRuleItemResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedFillRuleItem.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedFillRuleItem))
+                    .content(om.writeValueAsBytes(partialUpdatedFillRuleItem))
             )
             .andExpect(status().isOk());
 
         // Validate the FillRuleItem in the database
-        List<FillRuleItem> fillRuleItemList = fillRuleItemRepository.findAll();
-        assertThat(fillRuleItemList).hasSize(databaseSizeBeforeUpdate);
-        FillRuleItem testFillRuleItem = fillRuleItemList.get(fillRuleItemList.size() - 1);
-        assertThat(testFillRuleItem.getSortValue()).isEqualTo(UPDATED_SORT_VALUE);
-        assertThat(testFillRuleItem.getFieldParamType()).isEqualTo(UPDATED_FIELD_PARAM_TYPE);
-        assertThat(testFillRuleItem.getFieldParamValue()).isEqualTo(UPDATED_FIELD_PARAM_VALUE);
-        assertThat(testFillRuleItem.getDatePattern()).isEqualTo(UPDATED_DATE_PATTERN);
-        assertThat(testFillRuleItem.getSeqLength()).isEqualTo(UPDATED_SEQ_LENGTH);
-        assertThat(testFillRuleItem.getSeqIncrement()).isEqualTo(UPDATED_SEQ_INCREMENT);
-        assertThat(testFillRuleItem.getSeqStartValue()).isEqualTo(UPDATED_SEQ_START_VALUE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertFillRuleItemUpdatableFieldsEquals(partialUpdatedFillRuleItem, getPersistedFillRuleItem(partialUpdatedFillRuleItem));
     }
 
     @Test
     @Transactional
     void patchNonExistingFillRuleItem() throws Exception {
-        int databaseSizeBeforeUpdate = fillRuleItemRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         fillRuleItem.setId(longCount.incrementAndGet());
 
         // Create the FillRuleItem
@@ -1055,19 +963,18 @@ public class FillRuleItemResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, fillRuleItemDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(fillRuleItemDTO))
+                    .content(om.writeValueAsBytes(fillRuleItemDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the FillRuleItem in the database
-        List<FillRuleItem> fillRuleItemList = fillRuleItemRepository.findAll();
-        assertThat(fillRuleItemList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchFillRuleItem() throws Exception {
-        int databaseSizeBeforeUpdate = fillRuleItemRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         fillRuleItem.setId(longCount.incrementAndGet());
 
         // Create the FillRuleItem
@@ -1078,19 +985,18 @@ public class FillRuleItemResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(fillRuleItemDTO))
+                    .content(om.writeValueAsBytes(fillRuleItemDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the FillRuleItem in the database
-        List<FillRuleItem> fillRuleItemList = fillRuleItemRepository.findAll();
-        assertThat(fillRuleItemList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamFillRuleItem() throws Exception {
-        int databaseSizeBeforeUpdate = fillRuleItemRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         fillRuleItem.setId(longCount.incrementAndGet());
 
         // Create the FillRuleItem
@@ -1098,16 +1004,11 @@ public class FillRuleItemResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restFillRuleItemMockMvc
-            .perform(
-                patch(ENTITY_API_URL)
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(fillRuleItemDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(fillRuleItemDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the FillRuleItem in the database
-        List<FillRuleItem> fillRuleItemList = fillRuleItemRepository.findAll();
-        assertThat(fillRuleItemList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1116,7 +1017,7 @@ public class FillRuleItemResourceIT {
         // Initialize the database
         fillRuleItemRepository.save(fillRuleItem);
 
-        int databaseSizeBeforeDelete = fillRuleItemRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the fillRuleItem
         restFillRuleItemMockMvc
@@ -1124,7 +1025,34 @@ public class FillRuleItemResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<FillRuleItem> fillRuleItemList = fillRuleItemRepository.findAll();
-        assertThat(fillRuleItemList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return fillRuleItemRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected FillRuleItem getPersistedFillRuleItem(FillRuleItem fillRuleItem) {
+        return fillRuleItemRepository.findById(fillRuleItem.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedFillRuleItemToMatchAllProperties(FillRuleItem expectedFillRuleItem) {
+        assertFillRuleItemAllPropertiesEquals(expectedFillRuleItem, getPersistedFillRuleItem(expectedFillRuleItem));
+    }
+
+    protected void assertPersistedFillRuleItemToMatchUpdatableProperties(FillRuleItem expectedFillRuleItem) {
+        assertFillRuleItemAllUpdatablePropertiesEquals(expectedFillRuleItem, getPersistedFillRuleItem(expectedFillRuleItem));
     }
 }

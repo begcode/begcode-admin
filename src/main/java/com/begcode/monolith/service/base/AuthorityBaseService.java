@@ -16,7 +16,6 @@ import com.diboot.core.binding.Binder;
 import com.diboot.core.service.impl.BaseServiceImpl;
 import com.google.common.base.CaseFormat;
 import java.util.*;
-import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -31,12 +30,13 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Service Implementation for managing {@link com.begcode.monolith.domain.Authority}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class AuthorityBaseService<R extends AuthorityRepository, E extends Authority>
     extends BaseServiceImpl<AuthorityRepository, Authority> {
 
     private final Logger log = LoggerFactory.getLogger(AuthorityBaseService.class);
 
-    private final List<String> relationCacheNames = Arrays.asList(
+    private final List<String> relationCacheNames = List.of(
         com.begcode.monolith.domain.Authority.class.getName() + ".parent",
         com.begcode.monolith.domain.ViewPermission.class.getName() + ".authorities",
         com.begcode.monolith.domain.ApiPermission.class.getName() + ".authorities",
@@ -44,14 +44,7 @@ public class AuthorityBaseService<R extends AuthorityRepository, E extends Autho
         com.begcode.monolith.domain.User.class.getName() + ".authorities",
         com.begcode.monolith.domain.Department.class.getName() + ".authorities"
     );
-    private final List<String> relationNames = Arrays.asList(
-        "children",
-        "viewPermissions",
-        "apiPermissions",
-        "parent",
-        "users",
-        "department"
-    );
+    private final List<String> relationNames = List.of("children", "viewPermissions", "apiPermissions", "parent", "users", "department");
 
     protected final AuthorityRepository authorityRepository;
 
@@ -90,11 +83,11 @@ public class AuthorityBaseService<R extends AuthorityRepository, E extends Autho
     @Transactional(rollbackFor = Exception.class)
     public AuthorityDTO update(AuthorityDTO authorityDTO) {
         log.debug("Request to update Authority : {}", authorityDTO);
-
         Authority authority = authorityMapper.toEntity(authorityDTO);
+        clearChildrenCache();
 
-        this.createOrUpdateN2NRelations(authority, Arrays.asList("viewPermissions", "apiPermissions"));
-        return findOne(authorityDTO.getId()).orElseThrow();
+        this.createOrUpdateAndRelatedRelations(authority, Arrays.asList("viewPermissions", "apiPermissions"));
+        return findOne(authority.getId()).orElseThrow();
     }
 
     /**
@@ -139,8 +132,7 @@ public class AuthorityBaseService<R extends AuthorityRepository, E extends Autho
      */
     public Optional<AuthorityDTO> findOne(Long id) {
         log.debug("Request to get Authority : {}", id);
-        return Optional
-            .ofNullable(authorityRepository.selectById(id))
+        return Optional.ofNullable(authorityRepository.selectById(id))
             .map(authority -> {
                 Binder.bindRelations(authority);
                 return authority;
@@ -190,23 +182,25 @@ public class AuthorityBaseService<R extends AuthorityRepository, E extends Autho
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             UpdateWrapper<Authority> updateWrapper = new UpdateWrapper<>();
             updateWrapper.in("id", ids);
-            fieldNames.forEach(fieldName ->
-                updateWrapper.set(
-                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
-                    BeanUtil.getFieldValue(changeAuthorityDTO, fieldName)
-                )
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changeAuthorityDTO, fieldName)
+                    )
             );
             this.update(updateWrapper);
         } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
             List<Authority> authorityList = this.listByIds(ids);
             if (CollectionUtils.isNotEmpty(authorityList)) {
                 authorityList.forEach(authority -> {
-                    relationshipNames.forEach(relationName ->
-                        BeanUtil.setFieldValue(
-                            authority,
-                            relationName,
-                            BeanUtil.getFieldValue(authorityMapper.toEntity(changeAuthorityDTO), relationName)
-                        )
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                authority,
+                                relationName,
+                                BeanUtil.getFieldValue(authorityMapper.toEntity(changeAuthorityDTO), relationName)
+                            )
                     );
                     this.createOrUpdateAndRelatedRelations(authority, relationshipNames);
                 });
@@ -268,122 +262,119 @@ public class AuthorityBaseService<R extends AuthorityRepository, E extends Autho
         SortValueOperateType type
     ) {
         switch (type) {
-            case VALUE:
-                {
-                    if (ObjectUtils.isNotEmpty(changeSortValue)) {
-                        return lambdaUpdate().set(Authority::getOrder, changeSortValue).eq(Authority::getId, id).update();
-                    } else {
-                        return false;
-                    }
+            case VALUE: {
+                if (ObjectUtils.isNotEmpty(changeSortValue)) {
+                    return lambdaUpdate().set(Authority::getOrder, changeSortValue).eq(Authority::getId, id).update();
+                } else {
+                    return false;
                 }
-            case STEP:
-                {
-                    if (ObjectUtils.allNotNull(id, beforeId)) {
-                        Set<Long> ids = new HashSet<>();
-                        ids.add(id);
-                        ids.add(beforeId);
-                        Map<Long, Integer> idSortValueMap = listByIds(ids)
-                            .stream()
-                            .filter(authority -> authority.getOrder() != null)
-                            .collect(Collectors.toMap(Authority::getId, Authority::getOrder));
-                        return (
-                            lambdaUpdate().set(Authority::getOrder, idSortValueMap.get(beforeId)).eq(Authority::getId, id).update() &&
-                            lambdaUpdate().set(Authority::getOrder, idSortValueMap.get(id)).eq(Authority::getId, beforeId).update()
-                        );
-                    } else if (ObjectUtils.allNotNull(id, afterId)) {
-                        Set<Long> ids = new HashSet<>();
-                        ids.add(id);
-                        ids.add(afterId);
-                        Map<Long, Integer> idSortValueMap = listByIds(ids)
-                            .stream()
-                            .filter(authority -> authority.getOrder() != null)
-                            .collect(Collectors.toMap(Authority::getId, Authority::getOrder));
-                        return (
-                            lambdaUpdate().set(Authority::getOrder, idSortValueMap.get(afterId)).eq(Authority::getId, id).update() &&
-                            lambdaUpdate().set(Authority::getOrder, idSortValueMap.get(id)).eq(Authority::getId, afterId).update()
-                        );
-                    } else {
-                        return false;
-                    }
-                }
-            case DROP:
-                {
+            }
+            case STEP: {
+                if (ObjectUtils.allNotNull(id, beforeId)) {
                     Set<Long> ids = new HashSet<>();
                     ids.add(id);
-                    if (ObjectUtils.isNotEmpty(beforeId)) {
-                        ids.add(beforeId);
-                    }
-                    if (ObjectUtils.isNotEmpty(afterId)) {
-                        ids.add(afterId);
-                    }
+                    ids.add(beforeId);
                     Map<Long, Integer> idSortValueMap = listByIds(ids)
                         .stream()
                         .filter(authority -> authority.getOrder() != null)
                         .collect(Collectors.toMap(Authority::getId, Authority::getOrder));
-                    if (ObjectUtils.allNotNull(beforeId, afterId)) {
-                        // 计算中间值
-                        Integer beforeSortValue = idSortValueMap.get(beforeId);
-                        Integer afterSortValue = idSortValueMap.get(afterId);
-                        Integer newSortValue = (beforeSortValue + afterSortValue) / 2;
-                        if (!newSortValue.equals(afterSortValue) && !newSortValue.equals(beforeSortValue)) {
-                            // 正常值，保存到数据库。
-                            return lambdaUpdate().set(Authority::getOrder, newSortValue).eq(Authority::getId, id).update();
-                        } else {
-                            // 没有排序值插入空间了，重新对相关的所有记录的排序值进行计算。然后再插入相关的值。
-                            // 需要确定相应的记录范围
-                            List<Authority> list = this.list(queryWrapper.orderByAsc("order"));
-                            Integer newBeforeSortValue = 0;
-                            Integer newAfterSortValue = 0;
-                            for (int i = 0; i < list.size(); i++) {
-                                list.get(i).setOrder(100 * (i + 1));
-                                if (afterId.equals(list.get(i).getId())) {
-                                    newBeforeSortValue = list.get(i).getOrder();
-                                }
-                                if (beforeId.equals(list.get(i).getId())) {
-                                    newAfterSortValue = list.get(i).getOrder();
-                                }
-                            }
-                            newSortValue = (newBeforeSortValue + newAfterSortValue) / 2;
-                            updateBatchById(list);
-                            return lambdaUpdate().set(Authority::getOrder, newSortValue).eq(Authority::getId, id).update();
-                        }
-                    } else if (ObjectUtils.isNotEmpty(beforeId)) {
-                        // 计算比beforeId实体大的排序值
-                        Integer beforeSortValue = idSortValueMap.get(beforeId);
-                        Integer newSortValue = (beforeSortValue + 100) - ((beforeSortValue + 100) % 100);
+                    return (
+                        lambdaUpdate().set(Authority::getOrder, idSortValueMap.get(beforeId)).eq(Authority::getId, id).update() &&
+                        lambdaUpdate().set(Authority::getOrder, idSortValueMap.get(id)).eq(Authority::getId, beforeId).update()
+                    );
+                } else if (ObjectUtils.allNotNull(id, afterId)) {
+                    Set<Long> ids = new HashSet<>();
+                    ids.add(id);
+                    ids.add(afterId);
+                    Map<Long, Integer> idSortValueMap = listByIds(ids)
+                        .stream()
+                        .filter(authority -> authority.getOrder() != null)
+                        .collect(Collectors.toMap(Authority::getId, Authority::getOrder));
+                    return (
+                        lambdaUpdate().set(Authority::getOrder, idSortValueMap.get(afterId)).eq(Authority::getId, id).update() &&
+                        lambdaUpdate().set(Authority::getOrder, idSortValueMap.get(id)).eq(Authority::getId, afterId).update()
+                    );
+                } else {
+                    return false;
+                }
+            }
+            case DROP: {
+                Set<Long> ids = new HashSet<>();
+                ids.add(id);
+                if (ObjectUtils.isNotEmpty(beforeId)) {
+                    ids.add(beforeId);
+                }
+                if (ObjectUtils.isNotEmpty(afterId)) {
+                    ids.add(afterId);
+                }
+                Map<Long, Integer> idSortValueMap = listByIds(ids)
+                    .stream()
+                    .filter(authority -> authority.getOrder() != null)
+                    .collect(Collectors.toMap(Authority::getId, Authority::getOrder));
+                if (ObjectUtils.allNotNull(beforeId, afterId)) {
+                    // 计算中间值
+                    Integer beforeSortValue = idSortValueMap.get(beforeId);
+                    Integer afterSortValue = idSortValueMap.get(afterId);
+                    Integer newSortValue = (beforeSortValue + afterSortValue) / 2;
+                    if (!newSortValue.equals(afterSortValue) && !newSortValue.equals(beforeSortValue)) {
                         // 正常值，保存到数据库。
                         return lambdaUpdate().set(Authority::getOrder, newSortValue).eq(Authority::getId, id).update();
-                    } else if (ObjectUtils.isNotEmpty(afterId)) {
-                        // 计算比afterId实体小的排序值
-                        Integer afterSortValue = idSortValueMap.get(afterId);
-                        Integer newSortValue = (afterSortValue - 100) - ((afterSortValue - 100) % 100);
-                        if (newSortValue <= 0) {
-                            // 没有排序值插入空间了，重新对相关的所有记录的排序值进行计算。然后再插入相关的值。
-                            // 需要确定相应的记录范围
-                            List<Authority> list = this.list(queryWrapper.orderByAsc("order"));
-                            Integer newBeforeSortValue = 0;
-                            Integer newAfterSortValue = 0;
-                            for (int i = 0; i < list.size(); i++) {
-                                list.get(i).setOrder(100 * (i + 1));
-                                if (afterId.equals(list.get(i).getId())) {
-                                    newBeforeSortValue = list.get(i).getOrder();
-                                }
-                                if (beforeId.equals(list.get(i).getId())) {
-                                    newAfterSortValue = list.get(i).getOrder();
-                                }
-                            }
-                            newSortValue = (newBeforeSortValue + newAfterSortValue) / 2;
-                            updateBatchById(list);
-                            return lambdaUpdate().set(Authority::getOrder, newSortValue).eq(Authority::getId, id).update();
-                        } else {
-                            // 正常值，保存到数据库。
-                            return lambdaUpdate().set(Authority::getOrder, newSortValue).eq(Authority::getId, id).update();
-                        }
                     } else {
-                        // todo 异常
-                        return false;
+                        // 没有排序值插入空间了，重新对相关的所有记录的排序值进行计算。然后再插入相关的值。
+                        // 需要确定相应的记录范围
+                        List<Authority> list = this.list(queryWrapper.orderByAsc("order"));
+                        Integer newBeforeSortValue = 0;
+                        Integer newAfterSortValue = 0;
+                        for (int i = 0; i < list.size(); i++) {
+                            list.get(i).setOrder(100 * (i + 1));
+                            if (afterId.equals(list.get(i).getId())) {
+                                newBeforeSortValue = list.get(i).getOrder();
+                            }
+                            if (beforeId.equals(list.get(i).getId())) {
+                                newAfterSortValue = list.get(i).getOrder();
+                            }
+                        }
+                        newSortValue = (newBeforeSortValue + newAfterSortValue) / 2;
+                        updateBatchById(list);
+                        return lambdaUpdate().set(Authority::getOrder, newSortValue).eq(Authority::getId, id).update();
                     }
+                } else if (ObjectUtils.isNotEmpty(beforeId)) {
+                    // 计算比beforeId实体大的排序值
+                    Integer beforeSortValue = idSortValueMap.get(beforeId);
+                    Integer newSortValue = (beforeSortValue + 100) - ((beforeSortValue + 100) % 100);
+                    // 正常值，保存到数据库。
+                    return lambdaUpdate().set(Authority::getOrder, newSortValue).eq(Authority::getId, id).update();
+                } else if (ObjectUtils.isNotEmpty(afterId)) {
+                    // 计算比afterId实体小的排序值
+                    Integer afterSortValue = idSortValueMap.get(afterId);
+                    Integer newSortValue = (afterSortValue - 100) - ((afterSortValue - 100) % 100);
+                    if (newSortValue <= 0) {
+                        // 没有排序值插入空间了，重新对相关的所有记录的排序值进行计算。然后再插入相关的值。
+                        // 需要确定相应的记录范围
+                        List<Authority> list = this.list(queryWrapper.orderByAsc("order"));
+                        Integer newBeforeSortValue = 0;
+                        Integer newAfterSortValue = 0;
+                        for (int i = 0; i < list.size(); i++) {
+                            list.get(i).setOrder(100 * (i + 1));
+                            if (afterId.equals(list.get(i).getId())) {
+                                newBeforeSortValue = list.get(i).getOrder();
+                            }
+                            if (beforeId.equals(list.get(i).getId())) {
+                                newAfterSortValue = list.get(i).getOrder();
+                            }
+                        }
+                        newSortValue = (newBeforeSortValue + newAfterSortValue) / 2;
+                        updateBatchById(list);
+                        return lambdaUpdate().set(Authority::getOrder, newSortValue).eq(Authority::getId, id).update();
+                    } else {
+                        // 正常值，保存到数据库。
+                        return lambdaUpdate().set(Authority::getOrder, newSortValue).eq(Authority::getId, id).update();
+                    }
+                } else {
+                    // todo 异常
+                    return false;
                 }
+            }
             default:
                 return false;
         }

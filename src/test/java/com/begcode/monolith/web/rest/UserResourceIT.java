@@ -14,6 +14,7 @@ import com.begcode.monolith.security.AuthoritiesConstants;
 import com.begcode.monolith.service.AuthorityService;
 import com.begcode.monolith.service.dto.AdminUserDTO;
 import com.begcode.monolith.service.mapper.UserMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Consumer;
@@ -59,6 +60,9 @@ public class UserResourceIT {
 
     private static final String DEFAULT_LANGKEY = "en";
     private static final String UPDATED_LANGKEY = "fr";
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private UserRepository userRepository;
@@ -135,7 +139,7 @@ public class UserResourceIT {
         user.setAuthorities(authorityService.findFirstByCode(AuthoritiesConstants.USER).map(Collections::singletonList).orElse(null));
 
         restUserMockMvc
-            .perform(post("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(user)))
+            .perform(post("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(user)))
             .andExpect(status().isCreated());
 
         // Validate the User in the database
@@ -169,7 +173,7 @@ public class UserResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restUserMockMvc
-            .perform(post("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(user)))
+            .perform(post("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(user)))
             .andExpect(status().isBadRequest());
 
         // Validate the User in the database
@@ -195,7 +199,7 @@ public class UserResourceIT {
 
         // Create the User
         restUserMockMvc
-            .perform(post("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(user)))
+            .perform(post("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(user)))
             .andExpect(status().isBadRequest());
 
         // Validate the User in the database
@@ -221,7 +225,7 @@ public class UserResourceIT {
 
         // Create the User
         restUserMockMvc
-            .perform(post("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(user)))
+            .perform(post("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(user)))
             .andExpect(status().isBadRequest());
 
         // Validate the User in the database
@@ -302,7 +306,7 @@ public class UserResourceIT {
         user.setAuthorities(authorityService.findFirstByCode(AuthoritiesConstants.USER).map(Collections::singletonList).orElse(null));
 
         restUserMockMvc
-            .perform(put("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(user)))
+            .perform(put("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(user)))
             .andExpect(status().isOk());
 
         // Validate the User in the database
@@ -343,7 +347,7 @@ public class UserResourceIT {
         user.setAuthorities(authorityService.findFirstByCode(AuthoritiesConstants.USER).map(Collections::singletonList).orElse(null));
 
         restUserMockMvc
-            .perform(put("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(user)))
+            .perform(put("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(user)))
             .andExpect(status().isOk());
 
         // Validate the User in the database
@@ -395,7 +399,7 @@ public class UserResourceIT {
         user.setAuthorities(authorityService.findFirstByCode(AuthoritiesConstants.USER).map(Collections::singletonList).orElse(null));
 
         restUserMockMvc
-            .perform(put("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(user)))
+            .perform(put("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(user)))
             .andExpect(status().isBadRequest());
     }
 
@@ -435,7 +439,7 @@ public class UserResourceIT {
         user.setAuthorities(authorityService.findFirstByCode(AuthoritiesConstants.USER).map(Collections::singletonList).orElse(null));
 
         restUserMockMvc
-            .perform(put("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(user)))
+            .perform(put("/api/admin/users").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(user)))
             .andExpect(status().isBadRequest());
     }
 
@@ -531,26 +535,6 @@ public class UserResourceIT {
         assertThat(userDTO.getLastModifiedDate()).isEqualTo(user.getLastModifiedDate());
         assertThat(userDTO.getAuthorities()).containsExactly(authorityService.findFirstByCode(AuthoritiesConstants.USER).orElse(null));
         assertThat(userDTO.toString()).isNotNull();
-    }
-
-    @Test
-    void testAuthorityEquals() {
-        Authority authorityA = new Authority();
-        assertThat(authorityA).isNotEqualTo(null).isNotEqualTo(new Object());
-        assertThat(authorityA.hashCode()).isZero();
-        assertThat(authorityA.toString()).isNotNull();
-
-        Authority authorityB = new Authority();
-        assertThat(authorityA).isEqualTo(authorityB);
-
-        authorityB.setName(AuthoritiesConstants.ADMIN);
-        assertThat(authorityA).isNotEqualTo(authorityB);
-
-        authorityA.setName(AuthoritiesConstants.USER);
-        assertThat(authorityA).isNotEqualTo(authorityB);
-
-        authorityB.setName(AuthoritiesConstants.USER);
-        assertThat(authorityA).isEqualTo(authorityB).hasSameHashCodeAs(authorityB);
     }
 
     private void assertPersistedUsers(Consumer<List<User>> userAssertion) {

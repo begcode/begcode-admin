@@ -1,5 +1,7 @@
 package com.begcode.monolith.web.rest;
 
+import static com.begcode.monolith.domain.UReportFileAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static com.begcode.monolith.web.rest.TestUtil.sameInstant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -12,12 +14,12 @@ import com.begcode.monolith.domain.UReportFile;
 import com.begcode.monolith.repository.UReportFileRepository;
 import com.begcode.monolith.service.dto.UReportFileDTO;
 import com.begcode.monolith.service.mapper.UReportFileMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,8 +54,11 @@ public class UReportFileResourceIT {
     private static final String ENTITY_API_URL = "/api/u-report-files";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private UReportFileRepository uReportFileRepository;
@@ -104,23 +109,23 @@ public class UReportFileResourceIT {
     @Test
     @Transactional
     void createUReportFile() throws Exception {
-        int databaseSizeBeforeCreate = uReportFileRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the UReportFile
         UReportFileDTO uReportFileDTO = uReportFileMapper.toDto(uReportFile);
-        restUReportFileMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(uReportFileDTO))
-            )
-            .andExpect(status().isCreated());
+        var returnedUReportFileDTO = om.readValue(
+            restUReportFileMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(uReportFileDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            UReportFileDTO.class
+        );
 
         // Validate the UReportFile in the database
-        List<UReportFile> uReportFileList = uReportFileRepository.findAll();
-        assertThat(uReportFileList).hasSize(databaseSizeBeforeCreate + 1);
-        UReportFile testUReportFile = uReportFileList.get(uReportFileList.size() - 1);
-        assertThat(testUReportFile.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testUReportFile.getContent()).isEqualTo(DEFAULT_CONTENT);
-        assertThat(testUReportFile.getCreateAt()).isEqualTo(DEFAULT_CREATE_AT);
-        assertThat(testUReportFile.getUpdateAt()).isEqualTo(DEFAULT_UPDATE_AT);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedUReportFile = uReportFileMapper.toEntity(returnedUReportFileDTO);
+        assertUReportFileUpdatableFieldsEquals(returnedUReportFile, getPersistedUReportFile(returnedUReportFile));
     }
 
     @Test
@@ -130,24 +135,21 @@ public class UReportFileResourceIT {
         uReportFile.setId(1L);
         UReportFileDTO uReportFileDTO = uReportFileMapper.toDto(uReportFile);
 
-        int databaseSizeBeforeCreate = uReportFileRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restUReportFileMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(uReportFileDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(uReportFileDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the UReportFile in the database
-        List<UReportFile> uReportFileList = uReportFileRepository.findAll();
-        assertThat(uReportFileList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
     @Transactional
     void checkNameIsRequired() throws Exception {
-        int databaseSizeBeforeTest = uReportFileRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         uReportFile.setName(null);
 
@@ -155,13 +157,10 @@ public class UReportFileResourceIT {
         UReportFileDTO uReportFileDTO = uReportFileMapper.toDto(uReportFile);
 
         restUReportFileMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(uReportFileDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(uReportFileDTO)))
             .andExpect(status().isBadRequest());
 
-        List<UReportFile> uReportFileList = uReportFileRepository.findAll();
-        assertThat(uReportFileList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
@@ -208,14 +207,11 @@ public class UReportFileResourceIT {
 
         Long id = uReportFile.getId();
 
-        defaultUReportFileShouldBeFound("id.equals=" + id);
-        defaultUReportFileShouldNotBeFound("id.notEquals=" + id);
+        defaultUReportFileFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultUReportFileShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultUReportFileShouldNotBeFound("id.greaterThan=" + id);
+        defaultUReportFileFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultUReportFileShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultUReportFileShouldNotBeFound("id.lessThan=" + id);
+        defaultUReportFileFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -224,11 +220,8 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        // Get all the uReportFileList where name equals to DEFAULT_NAME
-        defaultUReportFileShouldBeFound("name.equals=" + DEFAULT_NAME);
-
-        // Get all the uReportFileList where name equals to UPDATED_NAME
-        defaultUReportFileShouldNotBeFound("name.equals=" + UPDATED_NAME);
+        // Get all the uReportFileList where name equals to
+        defaultUReportFileFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
     }
 
     @Test
@@ -237,11 +230,8 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        // Get all the uReportFileList where name in DEFAULT_NAME or UPDATED_NAME
-        defaultUReportFileShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
-
-        // Get all the uReportFileList where name equals to UPDATED_NAME
-        defaultUReportFileShouldNotBeFound("name.in=" + UPDATED_NAME);
+        // Get all the uReportFileList where name in
+        defaultUReportFileFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
     }
 
     @Test
@@ -251,10 +241,7 @@ public class UReportFileResourceIT {
         uReportFileRepository.save(uReportFile);
 
         // Get all the uReportFileList where name is not null
-        defaultUReportFileShouldBeFound("name.specified=true");
-
-        // Get all the uReportFileList where name is null
-        defaultUReportFileShouldNotBeFound("name.specified=false");
+        defaultUReportFileFiltering("name.specified=true", "name.specified=false");
     }
 
     @Test
@@ -263,11 +250,8 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        // Get all the uReportFileList where name contains DEFAULT_NAME
-        defaultUReportFileShouldBeFound("name.contains=" + DEFAULT_NAME);
-
-        // Get all the uReportFileList where name contains UPDATED_NAME
-        defaultUReportFileShouldNotBeFound("name.contains=" + UPDATED_NAME);
+        // Get all the uReportFileList where name contains
+        defaultUReportFileFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
     }
 
     @Test
@@ -276,11 +260,8 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        // Get all the uReportFileList where name does not contain DEFAULT_NAME
-        defaultUReportFileShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
-
-        // Get all the uReportFileList where name does not contain UPDATED_NAME
-        defaultUReportFileShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+        // Get all the uReportFileList where name does not contain
+        defaultUReportFileFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
     }
 
     @Test
@@ -289,11 +270,8 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        // Get all the uReportFileList where createAt equals to DEFAULT_CREATE_AT
-        defaultUReportFileShouldBeFound("createAt.equals=" + DEFAULT_CREATE_AT);
-
-        // Get all the uReportFileList where createAt equals to UPDATED_CREATE_AT
-        defaultUReportFileShouldNotBeFound("createAt.equals=" + UPDATED_CREATE_AT);
+        // Get all the uReportFileList where createAt equals to
+        defaultUReportFileFiltering("createAt.equals=" + DEFAULT_CREATE_AT, "createAt.equals=" + UPDATED_CREATE_AT);
     }
 
     @Test
@@ -302,11 +280,8 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        // Get all the uReportFileList where createAt in DEFAULT_CREATE_AT or UPDATED_CREATE_AT
-        defaultUReportFileShouldBeFound("createAt.in=" + DEFAULT_CREATE_AT + "," + UPDATED_CREATE_AT);
-
-        // Get all the uReportFileList where createAt equals to UPDATED_CREATE_AT
-        defaultUReportFileShouldNotBeFound("createAt.in=" + UPDATED_CREATE_AT);
+        // Get all the uReportFileList where createAt in
+        defaultUReportFileFiltering("createAt.in=" + DEFAULT_CREATE_AT + "," + UPDATED_CREATE_AT, "createAt.in=" + UPDATED_CREATE_AT);
     }
 
     @Test
@@ -316,10 +291,7 @@ public class UReportFileResourceIT {
         uReportFileRepository.save(uReportFile);
 
         // Get all the uReportFileList where createAt is not null
-        defaultUReportFileShouldBeFound("createAt.specified=true");
-
-        // Get all the uReportFileList where createAt is null
-        defaultUReportFileShouldNotBeFound("createAt.specified=false");
+        defaultUReportFileFiltering("createAt.specified=true", "createAt.specified=false");
     }
 
     @Test
@@ -328,11 +300,8 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        // Get all the uReportFileList where createAt is greater than or equal to DEFAULT_CREATE_AT
-        defaultUReportFileShouldBeFound("createAt.greaterThanOrEqual=" + DEFAULT_CREATE_AT);
-
-        // Get all the uReportFileList where createAt is greater than or equal to UPDATED_CREATE_AT
-        defaultUReportFileShouldNotBeFound("createAt.greaterThanOrEqual=" + UPDATED_CREATE_AT);
+        // Get all the uReportFileList where createAt is greater than or equal to
+        defaultUReportFileFiltering("createAt.greaterThanOrEqual=" + DEFAULT_CREATE_AT, "createAt.greaterThanOrEqual=" + UPDATED_CREATE_AT);
     }
 
     @Test
@@ -341,11 +310,8 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        // Get all the uReportFileList where createAt is less than or equal to DEFAULT_CREATE_AT
-        defaultUReportFileShouldBeFound("createAt.lessThanOrEqual=" + DEFAULT_CREATE_AT);
-
-        // Get all the uReportFileList where createAt is less than or equal to SMALLER_CREATE_AT
-        defaultUReportFileShouldNotBeFound("createAt.lessThanOrEqual=" + SMALLER_CREATE_AT);
+        // Get all the uReportFileList where createAt is less than or equal to
+        defaultUReportFileFiltering("createAt.lessThanOrEqual=" + DEFAULT_CREATE_AT, "createAt.lessThanOrEqual=" + SMALLER_CREATE_AT);
     }
 
     @Test
@@ -354,11 +320,8 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        // Get all the uReportFileList where createAt is less than DEFAULT_CREATE_AT
-        defaultUReportFileShouldNotBeFound("createAt.lessThan=" + DEFAULT_CREATE_AT);
-
-        // Get all the uReportFileList where createAt is less than UPDATED_CREATE_AT
-        defaultUReportFileShouldBeFound("createAt.lessThan=" + UPDATED_CREATE_AT);
+        // Get all the uReportFileList where createAt is less than
+        defaultUReportFileFiltering("createAt.lessThan=" + UPDATED_CREATE_AT, "createAt.lessThan=" + DEFAULT_CREATE_AT);
     }
 
     @Test
@@ -367,11 +330,8 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        // Get all the uReportFileList where createAt is greater than DEFAULT_CREATE_AT
-        defaultUReportFileShouldNotBeFound("createAt.greaterThan=" + DEFAULT_CREATE_AT);
-
-        // Get all the uReportFileList where createAt is greater than SMALLER_CREATE_AT
-        defaultUReportFileShouldBeFound("createAt.greaterThan=" + SMALLER_CREATE_AT);
+        // Get all the uReportFileList where createAt is greater than
+        defaultUReportFileFiltering("createAt.greaterThan=" + SMALLER_CREATE_AT, "createAt.greaterThan=" + DEFAULT_CREATE_AT);
     }
 
     @Test
@@ -380,11 +340,8 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        // Get all the uReportFileList where updateAt equals to DEFAULT_UPDATE_AT
-        defaultUReportFileShouldBeFound("updateAt.equals=" + DEFAULT_UPDATE_AT);
-
-        // Get all the uReportFileList where updateAt equals to UPDATED_UPDATE_AT
-        defaultUReportFileShouldNotBeFound("updateAt.equals=" + UPDATED_UPDATE_AT);
+        // Get all the uReportFileList where updateAt equals to
+        defaultUReportFileFiltering("updateAt.equals=" + DEFAULT_UPDATE_AT, "updateAt.equals=" + UPDATED_UPDATE_AT);
     }
 
     @Test
@@ -393,11 +350,8 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        // Get all the uReportFileList where updateAt in DEFAULT_UPDATE_AT or UPDATED_UPDATE_AT
-        defaultUReportFileShouldBeFound("updateAt.in=" + DEFAULT_UPDATE_AT + "," + UPDATED_UPDATE_AT);
-
-        // Get all the uReportFileList where updateAt equals to UPDATED_UPDATE_AT
-        defaultUReportFileShouldNotBeFound("updateAt.in=" + UPDATED_UPDATE_AT);
+        // Get all the uReportFileList where updateAt in
+        defaultUReportFileFiltering("updateAt.in=" + DEFAULT_UPDATE_AT + "," + UPDATED_UPDATE_AT, "updateAt.in=" + UPDATED_UPDATE_AT);
     }
 
     @Test
@@ -407,10 +361,7 @@ public class UReportFileResourceIT {
         uReportFileRepository.save(uReportFile);
 
         // Get all the uReportFileList where updateAt is not null
-        defaultUReportFileShouldBeFound("updateAt.specified=true");
-
-        // Get all the uReportFileList where updateAt is null
-        defaultUReportFileShouldNotBeFound("updateAt.specified=false");
+        defaultUReportFileFiltering("updateAt.specified=true", "updateAt.specified=false");
     }
 
     @Test
@@ -419,11 +370,8 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        // Get all the uReportFileList where updateAt is greater than or equal to DEFAULT_UPDATE_AT
-        defaultUReportFileShouldBeFound("updateAt.greaterThanOrEqual=" + DEFAULT_UPDATE_AT);
-
-        // Get all the uReportFileList where updateAt is greater than or equal to UPDATED_UPDATE_AT
-        defaultUReportFileShouldNotBeFound("updateAt.greaterThanOrEqual=" + UPDATED_UPDATE_AT);
+        // Get all the uReportFileList where updateAt is greater than or equal to
+        defaultUReportFileFiltering("updateAt.greaterThanOrEqual=" + DEFAULT_UPDATE_AT, "updateAt.greaterThanOrEqual=" + UPDATED_UPDATE_AT);
     }
 
     @Test
@@ -432,11 +380,8 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        // Get all the uReportFileList where updateAt is less than or equal to DEFAULT_UPDATE_AT
-        defaultUReportFileShouldBeFound("updateAt.lessThanOrEqual=" + DEFAULT_UPDATE_AT);
-
-        // Get all the uReportFileList where updateAt is less than or equal to SMALLER_UPDATE_AT
-        defaultUReportFileShouldNotBeFound("updateAt.lessThanOrEqual=" + SMALLER_UPDATE_AT);
+        // Get all the uReportFileList where updateAt is less than or equal to
+        defaultUReportFileFiltering("updateAt.lessThanOrEqual=" + DEFAULT_UPDATE_AT, "updateAt.lessThanOrEqual=" + SMALLER_UPDATE_AT);
     }
 
     @Test
@@ -445,11 +390,8 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        // Get all the uReportFileList where updateAt is less than DEFAULT_UPDATE_AT
-        defaultUReportFileShouldNotBeFound("updateAt.lessThan=" + DEFAULT_UPDATE_AT);
-
-        // Get all the uReportFileList where updateAt is less than UPDATED_UPDATE_AT
-        defaultUReportFileShouldBeFound("updateAt.lessThan=" + UPDATED_UPDATE_AT);
+        // Get all the uReportFileList where updateAt is less than
+        defaultUReportFileFiltering("updateAt.lessThan=" + UPDATED_UPDATE_AT, "updateAt.lessThan=" + DEFAULT_UPDATE_AT);
     }
 
     @Test
@@ -458,11 +400,13 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        // Get all the uReportFileList where updateAt is greater than DEFAULT_UPDATE_AT
-        defaultUReportFileShouldNotBeFound("updateAt.greaterThan=" + DEFAULT_UPDATE_AT);
+        // Get all the uReportFileList where updateAt is greater than
+        defaultUReportFileFiltering("updateAt.greaterThan=" + SMALLER_UPDATE_AT, "updateAt.greaterThan=" + DEFAULT_UPDATE_AT);
+    }
 
-        // Get all the uReportFileList where updateAt is greater than SMALLER_UPDATE_AT
-        defaultUReportFileShouldBeFound("updateAt.greaterThan=" + SMALLER_UPDATE_AT);
+    private void defaultUReportFileFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultUReportFileShouldBeFound(shouldBeFound);
+        defaultUReportFileShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -519,7 +463,7 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        int databaseSizeBeforeUpdate = uReportFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the uReportFile
         UReportFile updatedUReportFile = uReportFileRepository.findById(uReportFile.getId()).orElseThrow();
@@ -530,24 +474,19 @@ public class UReportFileResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, uReportFileDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(uReportFileDTO))
+                    .content(om.writeValueAsBytes(uReportFileDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the UReportFile in the database
-        List<UReportFile> uReportFileList = uReportFileRepository.findAll();
-        assertThat(uReportFileList).hasSize(databaseSizeBeforeUpdate);
-        UReportFile testUReportFile = uReportFileList.get(uReportFileList.size() - 1);
-        assertThat(testUReportFile.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testUReportFile.getContent()).isEqualTo(UPDATED_CONTENT);
-        assertThat(testUReportFile.getCreateAt()).isEqualTo(UPDATED_CREATE_AT);
-        assertThat(testUReportFile.getUpdateAt()).isEqualTo(UPDATED_UPDATE_AT);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedUReportFileToMatchAllProperties(updatedUReportFile);
     }
 
     @Test
     @Transactional
     void putNonExistingUReportFile() throws Exception {
-        int databaseSizeBeforeUpdate = uReportFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uReportFile.setId(longCount.incrementAndGet());
 
         // Create the UReportFile
@@ -558,19 +497,18 @@ public class UReportFileResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, uReportFileDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(uReportFileDTO))
+                    .content(om.writeValueAsBytes(uReportFileDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the UReportFile in the database
-        List<UReportFile> uReportFileList = uReportFileRepository.findAll();
-        assertThat(uReportFileList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchUReportFile() throws Exception {
-        int databaseSizeBeforeUpdate = uReportFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uReportFile.setId(longCount.incrementAndGet());
 
         // Create the UReportFile
@@ -581,19 +519,18 @@ public class UReportFileResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(uReportFileDTO))
+                    .content(om.writeValueAsBytes(uReportFileDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the UReportFile in the database
-        List<UReportFile> uReportFileList = uReportFileRepository.findAll();
-        assertThat(uReportFileList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamUReportFile() throws Exception {
-        int databaseSizeBeforeUpdate = uReportFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uReportFile.setId(longCount.incrementAndGet());
 
         // Create the UReportFile
@@ -601,12 +538,11 @@ public class UReportFileResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restUReportFileMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(uReportFileDTO)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(uReportFileDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the UReportFile in the database
-        List<UReportFile> uReportFileList = uReportFileRepository.findAll();
-        assertThat(uReportFileList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -615,30 +551,29 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        int databaseSizeBeforeUpdate = uReportFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the uReportFile using partial update
         UReportFile partialUpdatedUReportFile = new UReportFile();
         partialUpdatedUReportFile.setId(uReportFile.getId());
 
-        partialUpdatedUReportFile.createAt(UPDATED_CREATE_AT).updateAt(UPDATED_UPDATE_AT);
+        partialUpdatedUReportFile.name(UPDATED_NAME).createAt(UPDATED_CREATE_AT);
 
         restUReportFileMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedUReportFile.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedUReportFile))
+                    .content(om.writeValueAsBytes(partialUpdatedUReportFile))
             )
             .andExpect(status().isOk());
 
         // Validate the UReportFile in the database
-        List<UReportFile> uReportFileList = uReportFileRepository.findAll();
-        assertThat(uReportFileList).hasSize(databaseSizeBeforeUpdate);
-        UReportFile testUReportFile = uReportFileList.get(uReportFileList.size() - 1);
-        assertThat(testUReportFile.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testUReportFile.getContent()).isEqualTo(DEFAULT_CONTENT);
-        assertThat(testUReportFile.getCreateAt()).isEqualTo(UPDATED_CREATE_AT);
-        assertThat(testUReportFile.getUpdateAt()).isEqualTo(UPDATED_UPDATE_AT);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertUReportFileUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedUReportFile, uReportFile),
+            getPersistedUReportFile(uReportFile)
+        );
     }
 
     @Test
@@ -647,7 +582,7 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        int databaseSizeBeforeUpdate = uReportFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the uReportFile using partial update
         UReportFile partialUpdatedUReportFile = new UReportFile();
@@ -659,24 +594,20 @@ public class UReportFileResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedUReportFile.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedUReportFile))
+                    .content(om.writeValueAsBytes(partialUpdatedUReportFile))
             )
             .andExpect(status().isOk());
 
         // Validate the UReportFile in the database
-        List<UReportFile> uReportFileList = uReportFileRepository.findAll();
-        assertThat(uReportFileList).hasSize(databaseSizeBeforeUpdate);
-        UReportFile testUReportFile = uReportFileList.get(uReportFileList.size() - 1);
-        assertThat(testUReportFile.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testUReportFile.getContent()).isEqualTo(UPDATED_CONTENT);
-        assertThat(testUReportFile.getCreateAt()).isEqualTo(UPDATED_CREATE_AT);
-        assertThat(testUReportFile.getUpdateAt()).isEqualTo(UPDATED_UPDATE_AT);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertUReportFileUpdatableFieldsEquals(partialUpdatedUReportFile, getPersistedUReportFile(partialUpdatedUReportFile));
     }
 
     @Test
     @Transactional
     void patchNonExistingUReportFile() throws Exception {
-        int databaseSizeBeforeUpdate = uReportFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uReportFile.setId(longCount.incrementAndGet());
 
         // Create the UReportFile
@@ -687,19 +618,18 @@ public class UReportFileResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, uReportFileDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(uReportFileDTO))
+                    .content(om.writeValueAsBytes(uReportFileDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the UReportFile in the database
-        List<UReportFile> uReportFileList = uReportFileRepository.findAll();
-        assertThat(uReportFileList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchUReportFile() throws Exception {
-        int databaseSizeBeforeUpdate = uReportFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uReportFile.setId(longCount.incrementAndGet());
 
         // Create the UReportFile
@@ -710,19 +640,18 @@ public class UReportFileResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(uReportFileDTO))
+                    .content(om.writeValueAsBytes(uReportFileDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the UReportFile in the database
-        List<UReportFile> uReportFileList = uReportFileRepository.findAll();
-        assertThat(uReportFileList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamUReportFile() throws Exception {
-        int databaseSizeBeforeUpdate = uReportFileRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         uReportFile.setId(longCount.incrementAndGet());
 
         // Create the UReportFile
@@ -730,14 +659,11 @@ public class UReportFileResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restUReportFileMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(uReportFileDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(uReportFileDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the UReportFile in the database
-        List<UReportFile> uReportFileList = uReportFileRepository.findAll();
-        assertThat(uReportFileList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -746,7 +672,7 @@ public class UReportFileResourceIT {
         // Initialize the database
         uReportFileRepository.save(uReportFile);
 
-        int databaseSizeBeforeDelete = uReportFileRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the uReportFile
         restUReportFileMockMvc
@@ -754,7 +680,34 @@ public class UReportFileResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<UReportFile> uReportFileList = uReportFileRepository.findAll();
-        assertThat(uReportFileList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return uReportFileRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected UReportFile getPersistedUReportFile(UReportFile uReportFile) {
+        return uReportFileRepository.findById(uReportFile.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedUReportFileToMatchAllProperties(UReportFile expectedUReportFile) {
+        assertUReportFileAllPropertiesEquals(expectedUReportFile, getPersistedUReportFile(expectedUReportFile));
+    }
+
+    protected void assertPersistedUReportFileToMatchUpdatableProperties(UReportFile expectedUReportFile) {
+        assertUReportFileAllUpdatablePropertiesEquals(expectedUReportFile, getPersistedUReportFile(expectedUReportFile));
     }
 }

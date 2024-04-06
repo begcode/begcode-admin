@@ -1,5 +1,7 @@
 package com.begcode.monolith.settings.web.rest;
 
+import static com.begcode.monolith.settings.domain.RegionCodeAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.*;
@@ -17,11 +19,8 @@ import com.begcode.monolith.settings.repository.RegionCodeRepository;
 import com.begcode.monolith.settings.service.RegionCodeService;
 import com.begcode.monolith.settings.service.dto.RegionCodeDTO;
 import com.begcode.monolith.settings.service.mapper.RegionCodeMapper;
-import com.begcode.monolith.web.rest.TestUtil;
-import com.begcode.monolith.web.rest.TestUtil;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -75,8 +74,11 @@ public class RegionCodeResourceIT {
     private static final String ENTITY_API_URL = "/api/region-codes";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private RegionCodeRepository regionCodeRepository;
@@ -143,26 +145,23 @@ public class RegionCodeResourceIT {
     @Test
     @Transactional
     void createRegionCode() throws Exception {
-        int databaseSizeBeforeCreate = regionCodeRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the RegionCode
         RegionCodeDTO regionCodeDTO = regionCodeMapper.toDto(regionCode);
-        restRegionCodeMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(regionCodeDTO)))
-            .andExpect(status().isCreated());
+        var returnedRegionCodeDTO = om.readValue(
+            restRegionCodeMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(regionCodeDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            RegionCodeDTO.class
+        );
 
         // Validate the RegionCode in the database
-        List<RegionCode> regionCodeList = regionCodeRepository.findAll();
-        assertThat(regionCodeList).hasSize(databaseSizeBeforeCreate + 1);
-        RegionCode testRegionCode = regionCodeList.get(regionCodeList.size() - 1);
-        assertThat(testRegionCode.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testRegionCode.getAreaCode()).isEqualTo(DEFAULT_AREA_CODE);
-        assertThat(testRegionCode.getCityCode()).isEqualTo(DEFAULT_CITY_CODE);
-        assertThat(testRegionCode.getMergerName()).isEqualTo(DEFAULT_MERGER_NAME);
-        assertThat(testRegionCode.getShortName()).isEqualTo(DEFAULT_SHORT_NAME);
-        assertThat(testRegionCode.getZipCode()).isEqualTo(DEFAULT_ZIP_CODE);
-        assertThat(testRegionCode.getLevel()).isEqualTo(DEFAULT_LEVEL);
-        assertThat(testRegionCode.getLng()).isEqualTo(DEFAULT_LNG);
-        assertThat(testRegionCode.getLat()).isEqualTo(DEFAULT_LAT);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedRegionCode = regionCodeMapper.toEntity(returnedRegionCodeDTO);
+        assertRegionCodeUpdatableFieldsEquals(returnedRegionCode, getPersistedRegionCode(returnedRegionCode));
     }
 
     @Test
@@ -172,16 +171,15 @@ public class RegionCodeResourceIT {
         regionCode.setId(1L);
         RegionCodeDTO regionCodeDTO = regionCodeMapper.toDto(regionCode);
 
-        int databaseSizeBeforeCreate = regionCodeRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restRegionCodeMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(regionCodeDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(regionCodeDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the RegionCode in the database
-        List<RegionCode> regionCodeList = regionCodeRepository.findAll();
-        assertThat(regionCodeList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
@@ -255,14 +253,11 @@ public class RegionCodeResourceIT {
 
         Long id = regionCode.getId();
 
-        defaultRegionCodeShouldBeFound("id.equals=" + id);
-        defaultRegionCodeShouldNotBeFound("id.notEquals=" + id);
+        defaultRegionCodeFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultRegionCodeShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultRegionCodeShouldNotBeFound("id.greaterThan=" + id);
+        defaultRegionCodeFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultRegionCodeShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultRegionCodeShouldNotBeFound("id.lessThan=" + id);
+        defaultRegionCodeFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -271,11 +266,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where name equals to DEFAULT_NAME
-        defaultRegionCodeShouldBeFound("name.equals=" + DEFAULT_NAME);
-
-        // Get all the regionCodeList where name equals to UPDATED_NAME
-        defaultRegionCodeShouldNotBeFound("name.equals=" + UPDATED_NAME);
+        // Get all the regionCodeList where name equals to
+        defaultRegionCodeFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
     }
 
     @Test
@@ -284,11 +276,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where name in DEFAULT_NAME or UPDATED_NAME
-        defaultRegionCodeShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
-
-        // Get all the regionCodeList where name equals to UPDATED_NAME
-        defaultRegionCodeShouldNotBeFound("name.in=" + UPDATED_NAME);
+        // Get all the regionCodeList where name in
+        defaultRegionCodeFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
     }
 
     @Test
@@ -298,10 +287,7 @@ public class RegionCodeResourceIT {
         regionCodeRepository.save(regionCode);
 
         // Get all the regionCodeList where name is not null
-        defaultRegionCodeShouldBeFound("name.specified=true");
-
-        // Get all the regionCodeList where name is null
-        defaultRegionCodeShouldNotBeFound("name.specified=false");
+        defaultRegionCodeFiltering("name.specified=true", "name.specified=false");
     }
 
     @Test
@@ -310,11 +296,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where name contains DEFAULT_NAME
-        defaultRegionCodeShouldBeFound("name.contains=" + DEFAULT_NAME);
-
-        // Get all the regionCodeList where name contains UPDATED_NAME
-        defaultRegionCodeShouldNotBeFound("name.contains=" + UPDATED_NAME);
+        // Get all the regionCodeList where name contains
+        defaultRegionCodeFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
     }
 
     @Test
@@ -323,11 +306,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where name does not contain DEFAULT_NAME
-        defaultRegionCodeShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
-
-        // Get all the regionCodeList where name does not contain UPDATED_NAME
-        defaultRegionCodeShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+        // Get all the regionCodeList where name does not contain
+        defaultRegionCodeFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
     }
 
     @Test
@@ -336,11 +316,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where areaCode equals to DEFAULT_AREA_CODE
-        defaultRegionCodeShouldBeFound("areaCode.equals=" + DEFAULT_AREA_CODE);
-
-        // Get all the regionCodeList where areaCode equals to UPDATED_AREA_CODE
-        defaultRegionCodeShouldNotBeFound("areaCode.equals=" + UPDATED_AREA_CODE);
+        // Get all the regionCodeList where areaCode equals to
+        defaultRegionCodeFiltering("areaCode.equals=" + DEFAULT_AREA_CODE, "areaCode.equals=" + UPDATED_AREA_CODE);
     }
 
     @Test
@@ -349,11 +326,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where areaCode in DEFAULT_AREA_CODE or UPDATED_AREA_CODE
-        defaultRegionCodeShouldBeFound("areaCode.in=" + DEFAULT_AREA_CODE + "," + UPDATED_AREA_CODE);
-
-        // Get all the regionCodeList where areaCode equals to UPDATED_AREA_CODE
-        defaultRegionCodeShouldNotBeFound("areaCode.in=" + UPDATED_AREA_CODE);
+        // Get all the regionCodeList where areaCode in
+        defaultRegionCodeFiltering("areaCode.in=" + DEFAULT_AREA_CODE + "," + UPDATED_AREA_CODE, "areaCode.in=" + UPDATED_AREA_CODE);
     }
 
     @Test
@@ -363,10 +337,7 @@ public class RegionCodeResourceIT {
         regionCodeRepository.save(regionCode);
 
         // Get all the regionCodeList where areaCode is not null
-        defaultRegionCodeShouldBeFound("areaCode.specified=true");
-
-        // Get all the regionCodeList where areaCode is null
-        defaultRegionCodeShouldNotBeFound("areaCode.specified=false");
+        defaultRegionCodeFiltering("areaCode.specified=true", "areaCode.specified=false");
     }
 
     @Test
@@ -375,11 +346,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where areaCode contains DEFAULT_AREA_CODE
-        defaultRegionCodeShouldBeFound("areaCode.contains=" + DEFAULT_AREA_CODE);
-
-        // Get all the regionCodeList where areaCode contains UPDATED_AREA_CODE
-        defaultRegionCodeShouldNotBeFound("areaCode.contains=" + UPDATED_AREA_CODE);
+        // Get all the regionCodeList where areaCode contains
+        defaultRegionCodeFiltering("areaCode.contains=" + DEFAULT_AREA_CODE, "areaCode.contains=" + UPDATED_AREA_CODE);
     }
 
     @Test
@@ -388,11 +356,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where areaCode does not contain DEFAULT_AREA_CODE
-        defaultRegionCodeShouldNotBeFound("areaCode.doesNotContain=" + DEFAULT_AREA_CODE);
-
-        // Get all the regionCodeList where areaCode does not contain UPDATED_AREA_CODE
-        defaultRegionCodeShouldBeFound("areaCode.doesNotContain=" + UPDATED_AREA_CODE);
+        // Get all the regionCodeList where areaCode does not contain
+        defaultRegionCodeFiltering("areaCode.doesNotContain=" + UPDATED_AREA_CODE, "areaCode.doesNotContain=" + DEFAULT_AREA_CODE);
     }
 
     @Test
@@ -401,11 +366,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where cityCode equals to DEFAULT_CITY_CODE
-        defaultRegionCodeShouldBeFound("cityCode.equals=" + DEFAULT_CITY_CODE);
-
-        // Get all the regionCodeList where cityCode equals to UPDATED_CITY_CODE
-        defaultRegionCodeShouldNotBeFound("cityCode.equals=" + UPDATED_CITY_CODE);
+        // Get all the regionCodeList where cityCode equals to
+        defaultRegionCodeFiltering("cityCode.equals=" + DEFAULT_CITY_CODE, "cityCode.equals=" + UPDATED_CITY_CODE);
     }
 
     @Test
@@ -414,11 +376,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where cityCode in DEFAULT_CITY_CODE or UPDATED_CITY_CODE
-        defaultRegionCodeShouldBeFound("cityCode.in=" + DEFAULT_CITY_CODE + "," + UPDATED_CITY_CODE);
-
-        // Get all the regionCodeList where cityCode equals to UPDATED_CITY_CODE
-        defaultRegionCodeShouldNotBeFound("cityCode.in=" + UPDATED_CITY_CODE);
+        // Get all the regionCodeList where cityCode in
+        defaultRegionCodeFiltering("cityCode.in=" + DEFAULT_CITY_CODE + "," + UPDATED_CITY_CODE, "cityCode.in=" + UPDATED_CITY_CODE);
     }
 
     @Test
@@ -428,10 +387,7 @@ public class RegionCodeResourceIT {
         regionCodeRepository.save(regionCode);
 
         // Get all the regionCodeList where cityCode is not null
-        defaultRegionCodeShouldBeFound("cityCode.specified=true");
-
-        // Get all the regionCodeList where cityCode is null
-        defaultRegionCodeShouldNotBeFound("cityCode.specified=false");
+        defaultRegionCodeFiltering("cityCode.specified=true", "cityCode.specified=false");
     }
 
     @Test
@@ -440,11 +396,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where cityCode contains DEFAULT_CITY_CODE
-        defaultRegionCodeShouldBeFound("cityCode.contains=" + DEFAULT_CITY_CODE);
-
-        // Get all the regionCodeList where cityCode contains UPDATED_CITY_CODE
-        defaultRegionCodeShouldNotBeFound("cityCode.contains=" + UPDATED_CITY_CODE);
+        // Get all the regionCodeList where cityCode contains
+        defaultRegionCodeFiltering("cityCode.contains=" + DEFAULT_CITY_CODE, "cityCode.contains=" + UPDATED_CITY_CODE);
     }
 
     @Test
@@ -453,11 +406,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where cityCode does not contain DEFAULT_CITY_CODE
-        defaultRegionCodeShouldNotBeFound("cityCode.doesNotContain=" + DEFAULT_CITY_CODE);
-
-        // Get all the regionCodeList where cityCode does not contain UPDATED_CITY_CODE
-        defaultRegionCodeShouldBeFound("cityCode.doesNotContain=" + UPDATED_CITY_CODE);
+        // Get all the regionCodeList where cityCode does not contain
+        defaultRegionCodeFiltering("cityCode.doesNotContain=" + UPDATED_CITY_CODE, "cityCode.doesNotContain=" + DEFAULT_CITY_CODE);
     }
 
     @Test
@@ -466,11 +416,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where mergerName equals to DEFAULT_MERGER_NAME
-        defaultRegionCodeShouldBeFound("mergerName.equals=" + DEFAULT_MERGER_NAME);
-
-        // Get all the regionCodeList where mergerName equals to UPDATED_MERGER_NAME
-        defaultRegionCodeShouldNotBeFound("mergerName.equals=" + UPDATED_MERGER_NAME);
+        // Get all the regionCodeList where mergerName equals to
+        defaultRegionCodeFiltering("mergerName.equals=" + DEFAULT_MERGER_NAME, "mergerName.equals=" + UPDATED_MERGER_NAME);
     }
 
     @Test
@@ -479,11 +426,11 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where mergerName in DEFAULT_MERGER_NAME or UPDATED_MERGER_NAME
-        defaultRegionCodeShouldBeFound("mergerName.in=" + DEFAULT_MERGER_NAME + "," + UPDATED_MERGER_NAME);
-
-        // Get all the regionCodeList where mergerName equals to UPDATED_MERGER_NAME
-        defaultRegionCodeShouldNotBeFound("mergerName.in=" + UPDATED_MERGER_NAME);
+        // Get all the regionCodeList where mergerName in
+        defaultRegionCodeFiltering(
+            "mergerName.in=" + DEFAULT_MERGER_NAME + "," + UPDATED_MERGER_NAME,
+            "mergerName.in=" + UPDATED_MERGER_NAME
+        );
     }
 
     @Test
@@ -493,10 +440,7 @@ public class RegionCodeResourceIT {
         regionCodeRepository.save(regionCode);
 
         // Get all the regionCodeList where mergerName is not null
-        defaultRegionCodeShouldBeFound("mergerName.specified=true");
-
-        // Get all the regionCodeList where mergerName is null
-        defaultRegionCodeShouldNotBeFound("mergerName.specified=false");
+        defaultRegionCodeFiltering("mergerName.specified=true", "mergerName.specified=false");
     }
 
     @Test
@@ -505,11 +449,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where mergerName contains DEFAULT_MERGER_NAME
-        defaultRegionCodeShouldBeFound("mergerName.contains=" + DEFAULT_MERGER_NAME);
-
-        // Get all the regionCodeList where mergerName contains UPDATED_MERGER_NAME
-        defaultRegionCodeShouldNotBeFound("mergerName.contains=" + UPDATED_MERGER_NAME);
+        // Get all the regionCodeList where mergerName contains
+        defaultRegionCodeFiltering("mergerName.contains=" + DEFAULT_MERGER_NAME, "mergerName.contains=" + UPDATED_MERGER_NAME);
     }
 
     @Test
@@ -518,11 +459,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where mergerName does not contain DEFAULT_MERGER_NAME
-        defaultRegionCodeShouldNotBeFound("mergerName.doesNotContain=" + DEFAULT_MERGER_NAME);
-
-        // Get all the regionCodeList where mergerName does not contain UPDATED_MERGER_NAME
-        defaultRegionCodeShouldBeFound("mergerName.doesNotContain=" + UPDATED_MERGER_NAME);
+        // Get all the regionCodeList where mergerName does not contain
+        defaultRegionCodeFiltering("mergerName.doesNotContain=" + UPDATED_MERGER_NAME, "mergerName.doesNotContain=" + DEFAULT_MERGER_NAME);
     }
 
     @Test
@@ -531,11 +469,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where shortName equals to DEFAULT_SHORT_NAME
-        defaultRegionCodeShouldBeFound("shortName.equals=" + DEFAULT_SHORT_NAME);
-
-        // Get all the regionCodeList where shortName equals to UPDATED_SHORT_NAME
-        defaultRegionCodeShouldNotBeFound("shortName.equals=" + UPDATED_SHORT_NAME);
+        // Get all the regionCodeList where shortName equals to
+        defaultRegionCodeFiltering("shortName.equals=" + DEFAULT_SHORT_NAME, "shortName.equals=" + UPDATED_SHORT_NAME);
     }
 
     @Test
@@ -544,11 +479,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where shortName in DEFAULT_SHORT_NAME or UPDATED_SHORT_NAME
-        defaultRegionCodeShouldBeFound("shortName.in=" + DEFAULT_SHORT_NAME + "," + UPDATED_SHORT_NAME);
-
-        // Get all the regionCodeList where shortName equals to UPDATED_SHORT_NAME
-        defaultRegionCodeShouldNotBeFound("shortName.in=" + UPDATED_SHORT_NAME);
+        // Get all the regionCodeList where shortName in
+        defaultRegionCodeFiltering("shortName.in=" + DEFAULT_SHORT_NAME + "," + UPDATED_SHORT_NAME, "shortName.in=" + UPDATED_SHORT_NAME);
     }
 
     @Test
@@ -558,10 +490,7 @@ public class RegionCodeResourceIT {
         regionCodeRepository.save(regionCode);
 
         // Get all the regionCodeList where shortName is not null
-        defaultRegionCodeShouldBeFound("shortName.specified=true");
-
-        // Get all the regionCodeList where shortName is null
-        defaultRegionCodeShouldNotBeFound("shortName.specified=false");
+        defaultRegionCodeFiltering("shortName.specified=true", "shortName.specified=false");
     }
 
     @Test
@@ -570,11 +499,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where shortName contains DEFAULT_SHORT_NAME
-        defaultRegionCodeShouldBeFound("shortName.contains=" + DEFAULT_SHORT_NAME);
-
-        // Get all the regionCodeList where shortName contains UPDATED_SHORT_NAME
-        defaultRegionCodeShouldNotBeFound("shortName.contains=" + UPDATED_SHORT_NAME);
+        // Get all the regionCodeList where shortName contains
+        defaultRegionCodeFiltering("shortName.contains=" + DEFAULT_SHORT_NAME, "shortName.contains=" + UPDATED_SHORT_NAME);
     }
 
     @Test
@@ -583,11 +509,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where shortName does not contain DEFAULT_SHORT_NAME
-        defaultRegionCodeShouldNotBeFound("shortName.doesNotContain=" + DEFAULT_SHORT_NAME);
-
-        // Get all the regionCodeList where shortName does not contain UPDATED_SHORT_NAME
-        defaultRegionCodeShouldBeFound("shortName.doesNotContain=" + UPDATED_SHORT_NAME);
+        // Get all the regionCodeList where shortName does not contain
+        defaultRegionCodeFiltering("shortName.doesNotContain=" + UPDATED_SHORT_NAME, "shortName.doesNotContain=" + DEFAULT_SHORT_NAME);
     }
 
     @Test
@@ -596,11 +519,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where zipCode equals to DEFAULT_ZIP_CODE
-        defaultRegionCodeShouldBeFound("zipCode.equals=" + DEFAULT_ZIP_CODE);
-
-        // Get all the regionCodeList where zipCode equals to UPDATED_ZIP_CODE
-        defaultRegionCodeShouldNotBeFound("zipCode.equals=" + UPDATED_ZIP_CODE);
+        // Get all the regionCodeList where zipCode equals to
+        defaultRegionCodeFiltering("zipCode.equals=" + DEFAULT_ZIP_CODE, "zipCode.equals=" + UPDATED_ZIP_CODE);
     }
 
     @Test
@@ -609,11 +529,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where zipCode in DEFAULT_ZIP_CODE or UPDATED_ZIP_CODE
-        defaultRegionCodeShouldBeFound("zipCode.in=" + DEFAULT_ZIP_CODE + "," + UPDATED_ZIP_CODE);
-
-        // Get all the regionCodeList where zipCode equals to UPDATED_ZIP_CODE
-        defaultRegionCodeShouldNotBeFound("zipCode.in=" + UPDATED_ZIP_CODE);
+        // Get all the regionCodeList where zipCode in
+        defaultRegionCodeFiltering("zipCode.in=" + DEFAULT_ZIP_CODE + "," + UPDATED_ZIP_CODE, "zipCode.in=" + UPDATED_ZIP_CODE);
     }
 
     @Test
@@ -623,10 +540,7 @@ public class RegionCodeResourceIT {
         regionCodeRepository.save(regionCode);
 
         // Get all the regionCodeList where zipCode is not null
-        defaultRegionCodeShouldBeFound("zipCode.specified=true");
-
-        // Get all the regionCodeList where zipCode is null
-        defaultRegionCodeShouldNotBeFound("zipCode.specified=false");
+        defaultRegionCodeFiltering("zipCode.specified=true", "zipCode.specified=false");
     }
 
     @Test
@@ -635,11 +549,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where zipCode contains DEFAULT_ZIP_CODE
-        defaultRegionCodeShouldBeFound("zipCode.contains=" + DEFAULT_ZIP_CODE);
-
-        // Get all the regionCodeList where zipCode contains UPDATED_ZIP_CODE
-        defaultRegionCodeShouldNotBeFound("zipCode.contains=" + UPDATED_ZIP_CODE);
+        // Get all the regionCodeList where zipCode contains
+        defaultRegionCodeFiltering("zipCode.contains=" + DEFAULT_ZIP_CODE, "zipCode.contains=" + UPDATED_ZIP_CODE);
     }
 
     @Test
@@ -648,11 +559,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where zipCode does not contain DEFAULT_ZIP_CODE
-        defaultRegionCodeShouldNotBeFound("zipCode.doesNotContain=" + DEFAULT_ZIP_CODE);
-
-        // Get all the regionCodeList where zipCode does not contain UPDATED_ZIP_CODE
-        defaultRegionCodeShouldBeFound("zipCode.doesNotContain=" + UPDATED_ZIP_CODE);
+        // Get all the regionCodeList where zipCode does not contain
+        defaultRegionCodeFiltering("zipCode.doesNotContain=" + UPDATED_ZIP_CODE, "zipCode.doesNotContain=" + DEFAULT_ZIP_CODE);
     }
 
     @Test
@@ -661,11 +569,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where level equals to DEFAULT_LEVEL
-        defaultRegionCodeShouldBeFound("level.equals=" + DEFAULT_LEVEL);
-
-        // Get all the regionCodeList where level equals to UPDATED_LEVEL
-        defaultRegionCodeShouldNotBeFound("level.equals=" + UPDATED_LEVEL);
+        // Get all the regionCodeList where level equals to
+        defaultRegionCodeFiltering("level.equals=" + DEFAULT_LEVEL, "level.equals=" + UPDATED_LEVEL);
     }
 
     @Test
@@ -674,11 +579,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where level in DEFAULT_LEVEL or UPDATED_LEVEL
-        defaultRegionCodeShouldBeFound("level.in=" + DEFAULT_LEVEL + "," + UPDATED_LEVEL);
-
-        // Get all the regionCodeList where level equals to UPDATED_LEVEL
-        defaultRegionCodeShouldNotBeFound("level.in=" + UPDATED_LEVEL);
+        // Get all the regionCodeList where level in
+        defaultRegionCodeFiltering("level.in=" + DEFAULT_LEVEL + "," + UPDATED_LEVEL, "level.in=" + UPDATED_LEVEL);
     }
 
     @Test
@@ -688,10 +590,7 @@ public class RegionCodeResourceIT {
         regionCodeRepository.save(regionCode);
 
         // Get all the regionCodeList where level is not null
-        defaultRegionCodeShouldBeFound("level.specified=true");
-
-        // Get all the regionCodeList where level is null
-        defaultRegionCodeShouldNotBeFound("level.specified=false");
+        defaultRegionCodeFiltering("level.specified=true", "level.specified=false");
     }
 
     @Test
@@ -700,11 +599,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where lng equals to DEFAULT_LNG
-        defaultRegionCodeShouldBeFound("lng.equals=" + DEFAULT_LNG);
-
-        // Get all the regionCodeList where lng equals to UPDATED_LNG
-        defaultRegionCodeShouldNotBeFound("lng.equals=" + UPDATED_LNG);
+        // Get all the regionCodeList where lng equals to
+        defaultRegionCodeFiltering("lng.equals=" + DEFAULT_LNG, "lng.equals=" + UPDATED_LNG);
     }
 
     @Test
@@ -713,11 +609,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where lng in DEFAULT_LNG or UPDATED_LNG
-        defaultRegionCodeShouldBeFound("lng.in=" + DEFAULT_LNG + "," + UPDATED_LNG);
-
-        // Get all the regionCodeList where lng equals to UPDATED_LNG
-        defaultRegionCodeShouldNotBeFound("lng.in=" + UPDATED_LNG);
+        // Get all the regionCodeList where lng in
+        defaultRegionCodeFiltering("lng.in=" + DEFAULT_LNG + "," + UPDATED_LNG, "lng.in=" + UPDATED_LNG);
     }
 
     @Test
@@ -727,10 +620,7 @@ public class RegionCodeResourceIT {
         regionCodeRepository.save(regionCode);
 
         // Get all the regionCodeList where lng is not null
-        defaultRegionCodeShouldBeFound("lng.specified=true");
-
-        // Get all the regionCodeList where lng is null
-        defaultRegionCodeShouldNotBeFound("lng.specified=false");
+        defaultRegionCodeFiltering("lng.specified=true", "lng.specified=false");
     }
 
     @Test
@@ -739,11 +629,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where lng is greater than or equal to DEFAULT_LNG
-        defaultRegionCodeShouldBeFound("lng.greaterThanOrEqual=" + DEFAULT_LNG);
-
-        // Get all the regionCodeList where lng is greater than or equal to UPDATED_LNG
-        defaultRegionCodeShouldNotBeFound("lng.greaterThanOrEqual=" + UPDATED_LNG);
+        // Get all the regionCodeList where lng is greater than or equal to
+        defaultRegionCodeFiltering("lng.greaterThanOrEqual=" + DEFAULT_LNG, "lng.greaterThanOrEqual=" + UPDATED_LNG);
     }
 
     @Test
@@ -752,11 +639,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where lng is less than or equal to DEFAULT_LNG
-        defaultRegionCodeShouldBeFound("lng.lessThanOrEqual=" + DEFAULT_LNG);
-
-        // Get all the regionCodeList where lng is less than or equal to SMALLER_LNG
-        defaultRegionCodeShouldNotBeFound("lng.lessThanOrEqual=" + SMALLER_LNG);
+        // Get all the regionCodeList where lng is less than or equal to
+        defaultRegionCodeFiltering("lng.lessThanOrEqual=" + DEFAULT_LNG, "lng.lessThanOrEqual=" + SMALLER_LNG);
     }
 
     @Test
@@ -765,11 +649,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where lng is less than DEFAULT_LNG
-        defaultRegionCodeShouldNotBeFound("lng.lessThan=" + DEFAULT_LNG);
-
-        // Get all the regionCodeList where lng is less than UPDATED_LNG
-        defaultRegionCodeShouldBeFound("lng.lessThan=" + UPDATED_LNG);
+        // Get all the regionCodeList where lng is less than
+        defaultRegionCodeFiltering("lng.lessThan=" + UPDATED_LNG, "lng.lessThan=" + DEFAULT_LNG);
     }
 
     @Test
@@ -778,11 +659,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where lng is greater than DEFAULT_LNG
-        defaultRegionCodeShouldNotBeFound("lng.greaterThan=" + DEFAULT_LNG);
-
-        // Get all the regionCodeList where lng is greater than SMALLER_LNG
-        defaultRegionCodeShouldBeFound("lng.greaterThan=" + SMALLER_LNG);
+        // Get all the regionCodeList where lng is greater than
+        defaultRegionCodeFiltering("lng.greaterThan=" + SMALLER_LNG, "lng.greaterThan=" + DEFAULT_LNG);
     }
 
     @Test
@@ -791,11 +669,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where lat equals to DEFAULT_LAT
-        defaultRegionCodeShouldBeFound("lat.equals=" + DEFAULT_LAT);
-
-        // Get all the regionCodeList where lat equals to UPDATED_LAT
-        defaultRegionCodeShouldNotBeFound("lat.equals=" + UPDATED_LAT);
+        // Get all the regionCodeList where lat equals to
+        defaultRegionCodeFiltering("lat.equals=" + DEFAULT_LAT, "lat.equals=" + UPDATED_LAT);
     }
 
     @Test
@@ -804,11 +679,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where lat in DEFAULT_LAT or UPDATED_LAT
-        defaultRegionCodeShouldBeFound("lat.in=" + DEFAULT_LAT + "," + UPDATED_LAT);
-
-        // Get all the regionCodeList where lat equals to UPDATED_LAT
-        defaultRegionCodeShouldNotBeFound("lat.in=" + UPDATED_LAT);
+        // Get all the regionCodeList where lat in
+        defaultRegionCodeFiltering("lat.in=" + DEFAULT_LAT + "," + UPDATED_LAT, "lat.in=" + UPDATED_LAT);
     }
 
     @Test
@@ -818,10 +690,7 @@ public class RegionCodeResourceIT {
         regionCodeRepository.save(regionCode);
 
         // Get all the regionCodeList where lat is not null
-        defaultRegionCodeShouldBeFound("lat.specified=true");
-
-        // Get all the regionCodeList where lat is null
-        defaultRegionCodeShouldNotBeFound("lat.specified=false");
+        defaultRegionCodeFiltering("lat.specified=true", "lat.specified=false");
     }
 
     @Test
@@ -830,11 +699,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where lat is greater than or equal to DEFAULT_LAT
-        defaultRegionCodeShouldBeFound("lat.greaterThanOrEqual=" + DEFAULT_LAT);
-
-        // Get all the regionCodeList where lat is greater than or equal to UPDATED_LAT
-        defaultRegionCodeShouldNotBeFound("lat.greaterThanOrEqual=" + UPDATED_LAT);
+        // Get all the regionCodeList where lat is greater than or equal to
+        defaultRegionCodeFiltering("lat.greaterThanOrEqual=" + DEFAULT_LAT, "lat.greaterThanOrEqual=" + UPDATED_LAT);
     }
 
     @Test
@@ -843,11 +709,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where lat is less than or equal to DEFAULT_LAT
-        defaultRegionCodeShouldBeFound("lat.lessThanOrEqual=" + DEFAULT_LAT);
-
-        // Get all the regionCodeList where lat is less than or equal to SMALLER_LAT
-        defaultRegionCodeShouldNotBeFound("lat.lessThanOrEqual=" + SMALLER_LAT);
+        // Get all the regionCodeList where lat is less than or equal to
+        defaultRegionCodeFiltering("lat.lessThanOrEqual=" + DEFAULT_LAT, "lat.lessThanOrEqual=" + SMALLER_LAT);
     }
 
     @Test
@@ -856,11 +719,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where lat is less than DEFAULT_LAT
-        defaultRegionCodeShouldNotBeFound("lat.lessThan=" + DEFAULT_LAT);
-
-        // Get all the regionCodeList where lat is less than UPDATED_LAT
-        defaultRegionCodeShouldBeFound("lat.lessThan=" + UPDATED_LAT);
+        // Get all the regionCodeList where lat is less than
+        defaultRegionCodeFiltering("lat.lessThan=" + UPDATED_LAT, "lat.lessThan=" + DEFAULT_LAT);
     }
 
     @Test
@@ -869,11 +729,8 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        // Get all the regionCodeList where lat is greater than DEFAULT_LAT
-        defaultRegionCodeShouldNotBeFound("lat.greaterThan=" + DEFAULT_LAT);
-
-        // Get all the regionCodeList where lat is greater than SMALLER_LAT
-        defaultRegionCodeShouldBeFound("lat.greaterThan=" + SMALLER_LAT);
+        // Get all the regionCodeList where lat is greater than
+        defaultRegionCodeFiltering("lat.greaterThan=" + SMALLER_LAT, "lat.greaterThan=" + DEFAULT_LAT);
     }
 
     @Test
@@ -888,6 +745,11 @@ public class RegionCodeResourceIT {
 
         // Get all the regionCodeList where parent equals to (parentId + 1)
         defaultRegionCodeShouldNotBeFound("parentId.equals=" + (parentId + 1));
+    }
+
+    private void defaultRegionCodeFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultRegionCodeShouldBeFound(shouldBeFound);
+        defaultRegionCodeShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -949,7 +811,7 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        int databaseSizeBeforeUpdate = regionCodeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the regionCode
         RegionCode updatedRegionCode = regionCodeRepository.findById(regionCode.getId()).orElseThrow();
@@ -969,29 +831,19 @@ public class RegionCodeResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, regionCodeDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(regionCodeDTO))
+                    .content(om.writeValueAsBytes(regionCodeDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the RegionCode in the database
-        List<RegionCode> regionCodeList = regionCodeRepository.findAll();
-        assertThat(regionCodeList).hasSize(databaseSizeBeforeUpdate);
-        RegionCode testRegionCode = regionCodeList.get(regionCodeList.size() - 1);
-        assertThat(testRegionCode.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testRegionCode.getAreaCode()).isEqualTo(UPDATED_AREA_CODE);
-        assertThat(testRegionCode.getCityCode()).isEqualTo(UPDATED_CITY_CODE);
-        assertThat(testRegionCode.getMergerName()).isEqualTo(UPDATED_MERGER_NAME);
-        assertThat(testRegionCode.getShortName()).isEqualTo(UPDATED_SHORT_NAME);
-        assertThat(testRegionCode.getZipCode()).isEqualTo(UPDATED_ZIP_CODE);
-        assertThat(testRegionCode.getLevel()).isEqualTo(UPDATED_LEVEL);
-        assertThat(testRegionCode.getLng()).isEqualTo(UPDATED_LNG);
-        assertThat(testRegionCode.getLat()).isEqualTo(UPDATED_LAT);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedRegionCodeToMatchAllProperties(updatedRegionCode);
     }
 
     @Test
     @Transactional
     void putNonExistingRegionCode() throws Exception {
-        int databaseSizeBeforeUpdate = regionCodeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         regionCode.setId(longCount.incrementAndGet());
 
         // Create the RegionCode
@@ -1002,19 +854,18 @@ public class RegionCodeResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, regionCodeDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(regionCodeDTO))
+                    .content(om.writeValueAsBytes(regionCodeDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the RegionCode in the database
-        List<RegionCode> regionCodeList = regionCodeRepository.findAll();
-        assertThat(regionCodeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchRegionCode() throws Exception {
-        int databaseSizeBeforeUpdate = regionCodeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         regionCode.setId(longCount.incrementAndGet());
 
         // Create the RegionCode
@@ -1025,19 +876,18 @@ public class RegionCodeResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(regionCodeDTO))
+                    .content(om.writeValueAsBytes(regionCodeDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the RegionCode in the database
-        List<RegionCode> regionCodeList = regionCodeRepository.findAll();
-        assertThat(regionCodeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamRegionCode() throws Exception {
-        int databaseSizeBeforeUpdate = regionCodeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         regionCode.setId(longCount.incrementAndGet());
 
         // Create the RegionCode
@@ -1045,12 +895,11 @@ public class RegionCodeResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restRegionCodeMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(regionCodeDTO)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(regionCodeDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the RegionCode in the database
-        List<RegionCode> regionCodeList = regionCodeRepository.findAll();
-        assertThat(regionCodeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1059,35 +908,35 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        int databaseSizeBeforeUpdate = regionCodeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the regionCode using partial update
         RegionCode partialUpdatedRegionCode = new RegionCode();
         partialUpdatedRegionCode.setId(regionCode.getId());
 
-        partialUpdatedRegionCode.name(UPDATED_NAME).areaCode(UPDATED_AREA_CODE).shortName(UPDATED_SHORT_NAME).zipCode(UPDATED_ZIP_CODE);
+        partialUpdatedRegionCode
+            .areaCode(UPDATED_AREA_CODE)
+            .cityCode(UPDATED_CITY_CODE)
+            .shortName(UPDATED_SHORT_NAME)
+            .level(UPDATED_LEVEL)
+            .lng(UPDATED_LNG)
+            .lat(UPDATED_LAT);
 
         restRegionCodeMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedRegionCode.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedRegionCode))
+                    .content(om.writeValueAsBytes(partialUpdatedRegionCode))
             )
             .andExpect(status().isOk());
 
         // Validate the RegionCode in the database
-        List<RegionCode> regionCodeList = regionCodeRepository.findAll();
-        assertThat(regionCodeList).hasSize(databaseSizeBeforeUpdate);
-        RegionCode testRegionCode = regionCodeList.get(regionCodeList.size() - 1);
-        assertThat(testRegionCode.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testRegionCode.getAreaCode()).isEqualTo(UPDATED_AREA_CODE);
-        assertThat(testRegionCode.getCityCode()).isEqualTo(DEFAULT_CITY_CODE);
-        assertThat(testRegionCode.getMergerName()).isEqualTo(DEFAULT_MERGER_NAME);
-        assertThat(testRegionCode.getShortName()).isEqualTo(UPDATED_SHORT_NAME);
-        assertThat(testRegionCode.getZipCode()).isEqualTo(UPDATED_ZIP_CODE);
-        assertThat(testRegionCode.getLevel()).isEqualTo(DEFAULT_LEVEL);
-        assertThat(testRegionCode.getLng()).isEqualTo(DEFAULT_LNG);
-        assertThat(testRegionCode.getLat()).isEqualTo(DEFAULT_LAT);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertRegionCodeUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedRegionCode, regionCode),
+            getPersistedRegionCode(regionCode)
+        );
     }
 
     @Test
@@ -1096,7 +945,7 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        int databaseSizeBeforeUpdate = regionCodeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the regionCode using partial update
         RegionCode partialUpdatedRegionCode = new RegionCode();
@@ -1117,29 +966,20 @@ public class RegionCodeResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedRegionCode.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedRegionCode))
+                    .content(om.writeValueAsBytes(partialUpdatedRegionCode))
             )
             .andExpect(status().isOk());
 
         // Validate the RegionCode in the database
-        List<RegionCode> regionCodeList = regionCodeRepository.findAll();
-        assertThat(regionCodeList).hasSize(databaseSizeBeforeUpdate);
-        RegionCode testRegionCode = regionCodeList.get(regionCodeList.size() - 1);
-        assertThat(testRegionCode.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testRegionCode.getAreaCode()).isEqualTo(UPDATED_AREA_CODE);
-        assertThat(testRegionCode.getCityCode()).isEqualTo(UPDATED_CITY_CODE);
-        assertThat(testRegionCode.getMergerName()).isEqualTo(UPDATED_MERGER_NAME);
-        assertThat(testRegionCode.getShortName()).isEqualTo(UPDATED_SHORT_NAME);
-        assertThat(testRegionCode.getZipCode()).isEqualTo(UPDATED_ZIP_CODE);
-        assertThat(testRegionCode.getLevel()).isEqualTo(UPDATED_LEVEL);
-        assertThat(testRegionCode.getLng()).isEqualTo(UPDATED_LNG);
-        assertThat(testRegionCode.getLat()).isEqualTo(UPDATED_LAT);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertRegionCodeUpdatableFieldsEquals(partialUpdatedRegionCode, getPersistedRegionCode(partialUpdatedRegionCode));
     }
 
     @Test
     @Transactional
     void patchNonExistingRegionCode() throws Exception {
-        int databaseSizeBeforeUpdate = regionCodeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         regionCode.setId(longCount.incrementAndGet());
 
         // Create the RegionCode
@@ -1150,19 +990,18 @@ public class RegionCodeResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, regionCodeDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(regionCodeDTO))
+                    .content(om.writeValueAsBytes(regionCodeDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the RegionCode in the database
-        List<RegionCode> regionCodeList = regionCodeRepository.findAll();
-        assertThat(regionCodeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchRegionCode() throws Exception {
-        int databaseSizeBeforeUpdate = regionCodeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         regionCode.setId(longCount.incrementAndGet());
 
         // Create the RegionCode
@@ -1173,19 +1012,18 @@ public class RegionCodeResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(regionCodeDTO))
+                    .content(om.writeValueAsBytes(regionCodeDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the RegionCode in the database
-        List<RegionCode> regionCodeList = regionCodeRepository.findAll();
-        assertThat(regionCodeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamRegionCode() throws Exception {
-        int databaseSizeBeforeUpdate = regionCodeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         regionCode.setId(longCount.incrementAndGet());
 
         // Create the RegionCode
@@ -1193,14 +1031,11 @@ public class RegionCodeResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restRegionCodeMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(regionCodeDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(regionCodeDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the RegionCode in the database
-        List<RegionCode> regionCodeList = regionCodeRepository.findAll();
-        assertThat(regionCodeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1209,7 +1044,7 @@ public class RegionCodeResourceIT {
         // Initialize the database
         regionCodeRepository.save(regionCode);
 
-        int databaseSizeBeforeDelete = regionCodeRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the regionCode
         restRegionCodeMockMvc
@@ -1217,7 +1052,34 @@ public class RegionCodeResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<RegionCode> regionCodeList = regionCodeRepository.findAll();
-        assertThat(regionCodeList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return regionCodeRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected RegionCode getPersistedRegionCode(RegionCode regionCode) {
+        return regionCodeRepository.findById(regionCode.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedRegionCodeToMatchAllProperties(RegionCode expectedRegionCode) {
+        assertRegionCodeAllPropertiesEquals(expectedRegionCode, getPersistedRegionCode(expectedRegionCode));
+    }
+
+    protected void assertPersistedRegionCodeToMatchUpdatableProperties(RegionCode expectedRegionCode) {
+        assertRegionCodeAllUpdatablePropertiesEquals(expectedRegionCode, getPersistedRegionCode(expectedRegionCode));
     }
 }

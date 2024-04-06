@@ -1,5 +1,7 @@
 package com.begcode.monolith.log.web.rest;
 
+import static com.begcode.monolith.log.domain.SysLogAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -13,12 +15,10 @@ import com.begcode.monolith.log.domain.SysLog;
 import com.begcode.monolith.log.repository.SysLogRepository;
 import com.begcode.monolith.log.service.dto.SysLogDTO;
 import com.begcode.monolith.log.service.mapper.SysLogMapper;
-import com.begcode.monolith.web.rest.TestUtil;
-import com.begcode.monolith.web.rest.TestUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,8 +87,11 @@ public class SysLogResourceIT {
     private static final String ENTITY_API_URL = "/api/sys-logs";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private SysLogRepository sysLogRepository;
@@ -161,32 +164,23 @@ public class SysLogResourceIT {
     @Test
     @Transactional
     void createSysLog() throws Exception {
-        int databaseSizeBeforeCreate = sysLogRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the SysLog
         SysLogDTO sysLogDTO = sysLogMapper.toDto(sysLog);
-        restSysLogMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(sysLogDTO)))
-            .andExpect(status().isCreated());
+        var returnedSysLogDTO = om.readValue(
+            restSysLogMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(sysLogDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            SysLogDTO.class
+        );
 
         // Validate the SysLog in the database
-        List<SysLog> sysLogList = sysLogRepository.findAll();
-        assertThat(sysLogList).hasSize(databaseSizeBeforeCreate + 1);
-        SysLog testSysLog = sysLogList.get(sysLogList.size() - 1);
-        assertThat(testSysLog.getLogType()).isEqualTo(DEFAULT_LOG_TYPE);
-        assertThat(testSysLog.getLogContent()).isEqualTo(DEFAULT_LOG_CONTENT);
-        assertThat(testSysLog.getOperateType()).isEqualTo(DEFAULT_OPERATE_TYPE);
-        assertThat(testSysLog.getUserid()).isEqualTo(DEFAULT_USERID);
-        assertThat(testSysLog.getUsername()).isEqualTo(DEFAULT_USERNAME);
-        assertThat(testSysLog.getIp()).isEqualTo(DEFAULT_IP);
-        assertThat(testSysLog.getMethod()).isEqualTo(DEFAULT_METHOD);
-        assertThat(testSysLog.getRequestUrl()).isEqualTo(DEFAULT_REQUEST_URL);
-        assertThat(testSysLog.getRequestParam()).isEqualTo(DEFAULT_REQUEST_PARAM);
-        assertThat(testSysLog.getRequestType()).isEqualTo(DEFAULT_REQUEST_TYPE);
-        assertThat(testSysLog.getCostTime()).isEqualTo(DEFAULT_COST_TIME);
-        assertThat(testSysLog.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY);
-        assertThat(testSysLog.getCreatedDate()).isEqualTo(DEFAULT_CREATED_DATE);
-        assertThat(testSysLog.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
-        assertThat(testSysLog.getLastModifiedDate()).isEqualTo(DEFAULT_LAST_MODIFIED_DATE);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedSysLog = sysLogMapper.toEntity(returnedSysLogDTO);
+        assertSysLogUpdatableFieldsEquals(returnedSysLog, getPersistedSysLog(returnedSysLog));
     }
 
     @Test
@@ -196,16 +190,15 @@ public class SysLogResourceIT {
         sysLog.setId(1L);
         SysLogDTO sysLogDTO = sysLogMapper.toDto(sysLog);
 
-        int databaseSizeBeforeCreate = sysLogRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restSysLogMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(sysLogDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(sysLogDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the SysLog in the database
-        List<SysLog> sysLogList = sysLogRepository.findAll();
-        assertThat(sysLogList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
@@ -274,14 +267,11 @@ public class SysLogResourceIT {
 
         Long id = sysLog.getId();
 
-        defaultSysLogShouldBeFound("id.equals=" + id);
-        defaultSysLogShouldNotBeFound("id.notEquals=" + id);
+        defaultSysLogFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultSysLogShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultSysLogShouldNotBeFound("id.greaterThan=" + id);
+        defaultSysLogFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultSysLogShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultSysLogShouldNotBeFound("id.lessThan=" + id);
+        defaultSysLogFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -290,11 +280,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where logType equals to DEFAULT_LOG_TYPE
-        defaultSysLogShouldBeFound("logType.equals=" + DEFAULT_LOG_TYPE);
-
-        // Get all the sysLogList where logType equals to UPDATED_LOG_TYPE
-        defaultSysLogShouldNotBeFound("logType.equals=" + UPDATED_LOG_TYPE);
+        // Get all the sysLogList where logType equals to
+        defaultSysLogFiltering("logType.equals=" + DEFAULT_LOG_TYPE, "logType.equals=" + UPDATED_LOG_TYPE);
     }
 
     @Test
@@ -303,11 +290,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where logType in DEFAULT_LOG_TYPE or UPDATED_LOG_TYPE
-        defaultSysLogShouldBeFound("logType.in=" + DEFAULT_LOG_TYPE + "," + UPDATED_LOG_TYPE);
-
-        // Get all the sysLogList where logType equals to UPDATED_LOG_TYPE
-        defaultSysLogShouldNotBeFound("logType.in=" + UPDATED_LOG_TYPE);
+        // Get all the sysLogList where logType in
+        defaultSysLogFiltering("logType.in=" + DEFAULT_LOG_TYPE + "," + UPDATED_LOG_TYPE, "logType.in=" + UPDATED_LOG_TYPE);
     }
 
     @Test
@@ -317,10 +301,7 @@ public class SysLogResourceIT {
         sysLogRepository.save(sysLog);
 
         // Get all the sysLogList where logType is not null
-        defaultSysLogShouldBeFound("logType.specified=true");
-
-        // Get all the sysLogList where logType is null
-        defaultSysLogShouldNotBeFound("logType.specified=false");
+        defaultSysLogFiltering("logType.specified=true", "logType.specified=false");
     }
 
     @Test
@@ -329,11 +310,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where logContent equals to DEFAULT_LOG_CONTENT
-        defaultSysLogShouldBeFound("logContent.equals=" + DEFAULT_LOG_CONTENT);
-
-        // Get all the sysLogList where logContent equals to UPDATED_LOG_CONTENT
-        defaultSysLogShouldNotBeFound("logContent.equals=" + UPDATED_LOG_CONTENT);
+        // Get all the sysLogList where logContent equals to
+        defaultSysLogFiltering("logContent.equals=" + DEFAULT_LOG_CONTENT, "logContent.equals=" + UPDATED_LOG_CONTENT);
     }
 
     @Test
@@ -342,11 +320,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where logContent in DEFAULT_LOG_CONTENT or UPDATED_LOG_CONTENT
-        defaultSysLogShouldBeFound("logContent.in=" + DEFAULT_LOG_CONTENT + "," + UPDATED_LOG_CONTENT);
-
-        // Get all the sysLogList where logContent equals to UPDATED_LOG_CONTENT
-        defaultSysLogShouldNotBeFound("logContent.in=" + UPDATED_LOG_CONTENT);
+        // Get all the sysLogList where logContent in
+        defaultSysLogFiltering("logContent.in=" + DEFAULT_LOG_CONTENT + "," + UPDATED_LOG_CONTENT, "logContent.in=" + UPDATED_LOG_CONTENT);
     }
 
     @Test
@@ -356,10 +331,7 @@ public class SysLogResourceIT {
         sysLogRepository.save(sysLog);
 
         // Get all the sysLogList where logContent is not null
-        defaultSysLogShouldBeFound("logContent.specified=true");
-
-        // Get all the sysLogList where logContent is null
-        defaultSysLogShouldNotBeFound("logContent.specified=false");
+        defaultSysLogFiltering("logContent.specified=true", "logContent.specified=false");
     }
 
     @Test
@@ -368,11 +340,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where logContent contains DEFAULT_LOG_CONTENT
-        defaultSysLogShouldBeFound("logContent.contains=" + DEFAULT_LOG_CONTENT);
-
-        // Get all the sysLogList where logContent contains UPDATED_LOG_CONTENT
-        defaultSysLogShouldNotBeFound("logContent.contains=" + UPDATED_LOG_CONTENT);
+        // Get all the sysLogList where logContent contains
+        defaultSysLogFiltering("logContent.contains=" + DEFAULT_LOG_CONTENT, "logContent.contains=" + UPDATED_LOG_CONTENT);
     }
 
     @Test
@@ -381,11 +350,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where logContent does not contain DEFAULT_LOG_CONTENT
-        defaultSysLogShouldNotBeFound("logContent.doesNotContain=" + DEFAULT_LOG_CONTENT);
-
-        // Get all the sysLogList where logContent does not contain UPDATED_LOG_CONTENT
-        defaultSysLogShouldBeFound("logContent.doesNotContain=" + UPDATED_LOG_CONTENT);
+        // Get all the sysLogList where logContent does not contain
+        defaultSysLogFiltering("logContent.doesNotContain=" + UPDATED_LOG_CONTENT, "logContent.doesNotContain=" + DEFAULT_LOG_CONTENT);
     }
 
     @Test
@@ -394,11 +360,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where operateType equals to DEFAULT_OPERATE_TYPE
-        defaultSysLogShouldBeFound("operateType.equals=" + DEFAULT_OPERATE_TYPE);
-
-        // Get all the sysLogList where operateType equals to UPDATED_OPERATE_TYPE
-        defaultSysLogShouldNotBeFound("operateType.equals=" + UPDATED_OPERATE_TYPE);
+        // Get all the sysLogList where operateType equals to
+        defaultSysLogFiltering("operateType.equals=" + DEFAULT_OPERATE_TYPE, "operateType.equals=" + UPDATED_OPERATE_TYPE);
     }
 
     @Test
@@ -407,11 +370,11 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where operateType in DEFAULT_OPERATE_TYPE or UPDATED_OPERATE_TYPE
-        defaultSysLogShouldBeFound("operateType.in=" + DEFAULT_OPERATE_TYPE + "," + UPDATED_OPERATE_TYPE);
-
-        // Get all the sysLogList where operateType equals to UPDATED_OPERATE_TYPE
-        defaultSysLogShouldNotBeFound("operateType.in=" + UPDATED_OPERATE_TYPE);
+        // Get all the sysLogList where operateType in
+        defaultSysLogFiltering(
+            "operateType.in=" + DEFAULT_OPERATE_TYPE + "," + UPDATED_OPERATE_TYPE,
+            "operateType.in=" + UPDATED_OPERATE_TYPE
+        );
     }
 
     @Test
@@ -421,10 +384,7 @@ public class SysLogResourceIT {
         sysLogRepository.save(sysLog);
 
         // Get all the sysLogList where operateType is not null
-        defaultSysLogShouldBeFound("operateType.specified=true");
-
-        // Get all the sysLogList where operateType is null
-        defaultSysLogShouldNotBeFound("operateType.specified=false");
+        defaultSysLogFiltering("operateType.specified=true", "operateType.specified=false");
     }
 
     @Test
@@ -433,11 +393,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where userid equals to DEFAULT_USERID
-        defaultSysLogShouldBeFound("userid.equals=" + DEFAULT_USERID);
-
-        // Get all the sysLogList where userid equals to UPDATED_USERID
-        defaultSysLogShouldNotBeFound("userid.equals=" + UPDATED_USERID);
+        // Get all the sysLogList where userid equals to
+        defaultSysLogFiltering("userid.equals=" + DEFAULT_USERID, "userid.equals=" + UPDATED_USERID);
     }
 
     @Test
@@ -446,11 +403,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where userid in DEFAULT_USERID or UPDATED_USERID
-        defaultSysLogShouldBeFound("userid.in=" + DEFAULT_USERID + "," + UPDATED_USERID);
-
-        // Get all the sysLogList where userid equals to UPDATED_USERID
-        defaultSysLogShouldNotBeFound("userid.in=" + UPDATED_USERID);
+        // Get all the sysLogList where userid in
+        defaultSysLogFiltering("userid.in=" + DEFAULT_USERID + "," + UPDATED_USERID, "userid.in=" + UPDATED_USERID);
     }
 
     @Test
@@ -460,10 +414,7 @@ public class SysLogResourceIT {
         sysLogRepository.save(sysLog);
 
         // Get all the sysLogList where userid is not null
-        defaultSysLogShouldBeFound("userid.specified=true");
-
-        // Get all the sysLogList where userid is null
-        defaultSysLogShouldNotBeFound("userid.specified=false");
+        defaultSysLogFiltering("userid.specified=true", "userid.specified=false");
     }
 
     @Test
@@ -472,11 +423,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where userid contains DEFAULT_USERID
-        defaultSysLogShouldBeFound("userid.contains=" + DEFAULT_USERID);
-
-        // Get all the sysLogList where userid contains UPDATED_USERID
-        defaultSysLogShouldNotBeFound("userid.contains=" + UPDATED_USERID);
+        // Get all the sysLogList where userid contains
+        defaultSysLogFiltering("userid.contains=" + DEFAULT_USERID, "userid.contains=" + UPDATED_USERID);
     }
 
     @Test
@@ -485,11 +433,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where userid does not contain DEFAULT_USERID
-        defaultSysLogShouldNotBeFound("userid.doesNotContain=" + DEFAULT_USERID);
-
-        // Get all the sysLogList where userid does not contain UPDATED_USERID
-        defaultSysLogShouldBeFound("userid.doesNotContain=" + UPDATED_USERID);
+        // Get all the sysLogList where userid does not contain
+        defaultSysLogFiltering("userid.doesNotContain=" + UPDATED_USERID, "userid.doesNotContain=" + DEFAULT_USERID);
     }
 
     @Test
@@ -498,11 +443,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where username equals to DEFAULT_USERNAME
-        defaultSysLogShouldBeFound("username.equals=" + DEFAULT_USERNAME);
-
-        // Get all the sysLogList where username equals to UPDATED_USERNAME
-        defaultSysLogShouldNotBeFound("username.equals=" + UPDATED_USERNAME);
+        // Get all the sysLogList where username equals to
+        defaultSysLogFiltering("username.equals=" + DEFAULT_USERNAME, "username.equals=" + UPDATED_USERNAME);
     }
 
     @Test
@@ -511,11 +453,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where username in DEFAULT_USERNAME or UPDATED_USERNAME
-        defaultSysLogShouldBeFound("username.in=" + DEFAULT_USERNAME + "," + UPDATED_USERNAME);
-
-        // Get all the sysLogList where username equals to UPDATED_USERNAME
-        defaultSysLogShouldNotBeFound("username.in=" + UPDATED_USERNAME);
+        // Get all the sysLogList where username in
+        defaultSysLogFiltering("username.in=" + DEFAULT_USERNAME + "," + UPDATED_USERNAME, "username.in=" + UPDATED_USERNAME);
     }
 
     @Test
@@ -525,10 +464,7 @@ public class SysLogResourceIT {
         sysLogRepository.save(sysLog);
 
         // Get all the sysLogList where username is not null
-        defaultSysLogShouldBeFound("username.specified=true");
-
-        // Get all the sysLogList where username is null
-        defaultSysLogShouldNotBeFound("username.specified=false");
+        defaultSysLogFiltering("username.specified=true", "username.specified=false");
     }
 
     @Test
@@ -537,11 +473,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where username contains DEFAULT_USERNAME
-        defaultSysLogShouldBeFound("username.contains=" + DEFAULT_USERNAME);
-
-        // Get all the sysLogList where username contains UPDATED_USERNAME
-        defaultSysLogShouldNotBeFound("username.contains=" + UPDATED_USERNAME);
+        // Get all the sysLogList where username contains
+        defaultSysLogFiltering("username.contains=" + DEFAULT_USERNAME, "username.contains=" + UPDATED_USERNAME);
     }
 
     @Test
@@ -550,11 +483,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where username does not contain DEFAULT_USERNAME
-        defaultSysLogShouldNotBeFound("username.doesNotContain=" + DEFAULT_USERNAME);
-
-        // Get all the sysLogList where username does not contain UPDATED_USERNAME
-        defaultSysLogShouldBeFound("username.doesNotContain=" + UPDATED_USERNAME);
+        // Get all the sysLogList where username does not contain
+        defaultSysLogFiltering("username.doesNotContain=" + UPDATED_USERNAME, "username.doesNotContain=" + DEFAULT_USERNAME);
     }
 
     @Test
@@ -563,11 +493,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where ip equals to DEFAULT_IP
-        defaultSysLogShouldBeFound("ip.equals=" + DEFAULT_IP);
-
-        // Get all the sysLogList where ip equals to UPDATED_IP
-        defaultSysLogShouldNotBeFound("ip.equals=" + UPDATED_IP);
+        // Get all the sysLogList where ip equals to
+        defaultSysLogFiltering("ip.equals=" + DEFAULT_IP, "ip.equals=" + UPDATED_IP);
     }
 
     @Test
@@ -576,11 +503,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where ip in DEFAULT_IP or UPDATED_IP
-        defaultSysLogShouldBeFound("ip.in=" + DEFAULT_IP + "," + UPDATED_IP);
-
-        // Get all the sysLogList where ip equals to UPDATED_IP
-        defaultSysLogShouldNotBeFound("ip.in=" + UPDATED_IP);
+        // Get all the sysLogList where ip in
+        defaultSysLogFiltering("ip.in=" + DEFAULT_IP + "," + UPDATED_IP, "ip.in=" + UPDATED_IP);
     }
 
     @Test
@@ -590,10 +514,7 @@ public class SysLogResourceIT {
         sysLogRepository.save(sysLog);
 
         // Get all the sysLogList where ip is not null
-        defaultSysLogShouldBeFound("ip.specified=true");
-
-        // Get all the sysLogList where ip is null
-        defaultSysLogShouldNotBeFound("ip.specified=false");
+        defaultSysLogFiltering("ip.specified=true", "ip.specified=false");
     }
 
     @Test
@@ -602,11 +523,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where ip contains DEFAULT_IP
-        defaultSysLogShouldBeFound("ip.contains=" + DEFAULT_IP);
-
-        // Get all the sysLogList where ip contains UPDATED_IP
-        defaultSysLogShouldNotBeFound("ip.contains=" + UPDATED_IP);
+        // Get all the sysLogList where ip contains
+        defaultSysLogFiltering("ip.contains=" + DEFAULT_IP, "ip.contains=" + UPDATED_IP);
     }
 
     @Test
@@ -615,11 +533,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where ip does not contain DEFAULT_IP
-        defaultSysLogShouldNotBeFound("ip.doesNotContain=" + DEFAULT_IP);
-
-        // Get all the sysLogList where ip does not contain UPDATED_IP
-        defaultSysLogShouldBeFound("ip.doesNotContain=" + UPDATED_IP);
+        // Get all the sysLogList where ip does not contain
+        defaultSysLogFiltering("ip.doesNotContain=" + UPDATED_IP, "ip.doesNotContain=" + DEFAULT_IP);
     }
 
     @Test
@@ -628,11 +543,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where method equals to DEFAULT_METHOD
-        defaultSysLogShouldBeFound("method.equals=" + DEFAULT_METHOD);
-
-        // Get all the sysLogList where method equals to UPDATED_METHOD
-        defaultSysLogShouldNotBeFound("method.equals=" + UPDATED_METHOD);
+        // Get all the sysLogList where method equals to
+        defaultSysLogFiltering("method.equals=" + DEFAULT_METHOD, "method.equals=" + UPDATED_METHOD);
     }
 
     @Test
@@ -641,11 +553,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where method in DEFAULT_METHOD or UPDATED_METHOD
-        defaultSysLogShouldBeFound("method.in=" + DEFAULT_METHOD + "," + UPDATED_METHOD);
-
-        // Get all the sysLogList where method equals to UPDATED_METHOD
-        defaultSysLogShouldNotBeFound("method.in=" + UPDATED_METHOD);
+        // Get all the sysLogList where method in
+        defaultSysLogFiltering("method.in=" + DEFAULT_METHOD + "," + UPDATED_METHOD, "method.in=" + UPDATED_METHOD);
     }
 
     @Test
@@ -655,10 +564,7 @@ public class SysLogResourceIT {
         sysLogRepository.save(sysLog);
 
         // Get all the sysLogList where method is not null
-        defaultSysLogShouldBeFound("method.specified=true");
-
-        // Get all the sysLogList where method is null
-        defaultSysLogShouldNotBeFound("method.specified=false");
+        defaultSysLogFiltering("method.specified=true", "method.specified=false");
     }
 
     @Test
@@ -667,11 +573,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where method contains DEFAULT_METHOD
-        defaultSysLogShouldBeFound("method.contains=" + DEFAULT_METHOD);
-
-        // Get all the sysLogList where method contains UPDATED_METHOD
-        defaultSysLogShouldNotBeFound("method.contains=" + UPDATED_METHOD);
+        // Get all the sysLogList where method contains
+        defaultSysLogFiltering("method.contains=" + DEFAULT_METHOD, "method.contains=" + UPDATED_METHOD);
     }
 
     @Test
@@ -680,11 +583,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where method does not contain DEFAULT_METHOD
-        defaultSysLogShouldNotBeFound("method.doesNotContain=" + DEFAULT_METHOD);
-
-        // Get all the sysLogList where method does not contain UPDATED_METHOD
-        defaultSysLogShouldBeFound("method.doesNotContain=" + UPDATED_METHOD);
+        // Get all the sysLogList where method does not contain
+        defaultSysLogFiltering("method.doesNotContain=" + UPDATED_METHOD, "method.doesNotContain=" + DEFAULT_METHOD);
     }
 
     @Test
@@ -693,11 +593,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where requestUrl equals to DEFAULT_REQUEST_URL
-        defaultSysLogShouldBeFound("requestUrl.equals=" + DEFAULT_REQUEST_URL);
-
-        // Get all the sysLogList where requestUrl equals to UPDATED_REQUEST_URL
-        defaultSysLogShouldNotBeFound("requestUrl.equals=" + UPDATED_REQUEST_URL);
+        // Get all the sysLogList where requestUrl equals to
+        defaultSysLogFiltering("requestUrl.equals=" + DEFAULT_REQUEST_URL, "requestUrl.equals=" + UPDATED_REQUEST_URL);
     }
 
     @Test
@@ -706,11 +603,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where requestUrl in DEFAULT_REQUEST_URL or UPDATED_REQUEST_URL
-        defaultSysLogShouldBeFound("requestUrl.in=" + DEFAULT_REQUEST_URL + "," + UPDATED_REQUEST_URL);
-
-        // Get all the sysLogList where requestUrl equals to UPDATED_REQUEST_URL
-        defaultSysLogShouldNotBeFound("requestUrl.in=" + UPDATED_REQUEST_URL);
+        // Get all the sysLogList where requestUrl in
+        defaultSysLogFiltering("requestUrl.in=" + DEFAULT_REQUEST_URL + "," + UPDATED_REQUEST_URL, "requestUrl.in=" + UPDATED_REQUEST_URL);
     }
 
     @Test
@@ -720,10 +614,7 @@ public class SysLogResourceIT {
         sysLogRepository.save(sysLog);
 
         // Get all the sysLogList where requestUrl is not null
-        defaultSysLogShouldBeFound("requestUrl.specified=true");
-
-        // Get all the sysLogList where requestUrl is null
-        defaultSysLogShouldNotBeFound("requestUrl.specified=false");
+        defaultSysLogFiltering("requestUrl.specified=true", "requestUrl.specified=false");
     }
 
     @Test
@@ -732,11 +623,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where requestUrl contains DEFAULT_REQUEST_URL
-        defaultSysLogShouldBeFound("requestUrl.contains=" + DEFAULT_REQUEST_URL);
-
-        // Get all the sysLogList where requestUrl contains UPDATED_REQUEST_URL
-        defaultSysLogShouldNotBeFound("requestUrl.contains=" + UPDATED_REQUEST_URL);
+        // Get all the sysLogList where requestUrl contains
+        defaultSysLogFiltering("requestUrl.contains=" + DEFAULT_REQUEST_URL, "requestUrl.contains=" + UPDATED_REQUEST_URL);
     }
 
     @Test
@@ -745,11 +633,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where requestUrl does not contain DEFAULT_REQUEST_URL
-        defaultSysLogShouldNotBeFound("requestUrl.doesNotContain=" + DEFAULT_REQUEST_URL);
-
-        // Get all the sysLogList where requestUrl does not contain UPDATED_REQUEST_URL
-        defaultSysLogShouldBeFound("requestUrl.doesNotContain=" + UPDATED_REQUEST_URL);
+        // Get all the sysLogList where requestUrl does not contain
+        defaultSysLogFiltering("requestUrl.doesNotContain=" + UPDATED_REQUEST_URL, "requestUrl.doesNotContain=" + DEFAULT_REQUEST_URL);
     }
 
     @Test
@@ -758,11 +643,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where requestType equals to DEFAULT_REQUEST_TYPE
-        defaultSysLogShouldBeFound("requestType.equals=" + DEFAULT_REQUEST_TYPE);
-
-        // Get all the sysLogList where requestType equals to UPDATED_REQUEST_TYPE
-        defaultSysLogShouldNotBeFound("requestType.equals=" + UPDATED_REQUEST_TYPE);
+        // Get all the sysLogList where requestType equals to
+        defaultSysLogFiltering("requestType.equals=" + DEFAULT_REQUEST_TYPE, "requestType.equals=" + UPDATED_REQUEST_TYPE);
     }
 
     @Test
@@ -771,11 +653,11 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where requestType in DEFAULT_REQUEST_TYPE or UPDATED_REQUEST_TYPE
-        defaultSysLogShouldBeFound("requestType.in=" + DEFAULT_REQUEST_TYPE + "," + UPDATED_REQUEST_TYPE);
-
-        // Get all the sysLogList where requestType equals to UPDATED_REQUEST_TYPE
-        defaultSysLogShouldNotBeFound("requestType.in=" + UPDATED_REQUEST_TYPE);
+        // Get all the sysLogList where requestType in
+        defaultSysLogFiltering(
+            "requestType.in=" + DEFAULT_REQUEST_TYPE + "," + UPDATED_REQUEST_TYPE,
+            "requestType.in=" + UPDATED_REQUEST_TYPE
+        );
     }
 
     @Test
@@ -785,10 +667,7 @@ public class SysLogResourceIT {
         sysLogRepository.save(sysLog);
 
         // Get all the sysLogList where requestType is not null
-        defaultSysLogShouldBeFound("requestType.specified=true");
-
-        // Get all the sysLogList where requestType is null
-        defaultSysLogShouldNotBeFound("requestType.specified=false");
+        defaultSysLogFiltering("requestType.specified=true", "requestType.specified=false");
     }
 
     @Test
@@ -797,11 +676,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where requestType contains DEFAULT_REQUEST_TYPE
-        defaultSysLogShouldBeFound("requestType.contains=" + DEFAULT_REQUEST_TYPE);
-
-        // Get all the sysLogList where requestType contains UPDATED_REQUEST_TYPE
-        defaultSysLogShouldNotBeFound("requestType.contains=" + UPDATED_REQUEST_TYPE);
+        // Get all the sysLogList where requestType contains
+        defaultSysLogFiltering("requestType.contains=" + DEFAULT_REQUEST_TYPE, "requestType.contains=" + UPDATED_REQUEST_TYPE);
     }
 
     @Test
@@ -810,11 +686,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where requestType does not contain DEFAULT_REQUEST_TYPE
-        defaultSysLogShouldNotBeFound("requestType.doesNotContain=" + DEFAULT_REQUEST_TYPE);
-
-        // Get all the sysLogList where requestType does not contain UPDATED_REQUEST_TYPE
-        defaultSysLogShouldBeFound("requestType.doesNotContain=" + UPDATED_REQUEST_TYPE);
+        // Get all the sysLogList where requestType does not contain
+        defaultSysLogFiltering("requestType.doesNotContain=" + UPDATED_REQUEST_TYPE, "requestType.doesNotContain=" + DEFAULT_REQUEST_TYPE);
     }
 
     @Test
@@ -823,11 +696,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where costTime equals to DEFAULT_COST_TIME
-        defaultSysLogShouldBeFound("costTime.equals=" + DEFAULT_COST_TIME);
-
-        // Get all the sysLogList where costTime equals to UPDATED_COST_TIME
-        defaultSysLogShouldNotBeFound("costTime.equals=" + UPDATED_COST_TIME);
+        // Get all the sysLogList where costTime equals to
+        defaultSysLogFiltering("costTime.equals=" + DEFAULT_COST_TIME, "costTime.equals=" + UPDATED_COST_TIME);
     }
 
     @Test
@@ -836,11 +706,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where costTime in DEFAULT_COST_TIME or UPDATED_COST_TIME
-        defaultSysLogShouldBeFound("costTime.in=" + DEFAULT_COST_TIME + "," + UPDATED_COST_TIME);
-
-        // Get all the sysLogList where costTime equals to UPDATED_COST_TIME
-        defaultSysLogShouldNotBeFound("costTime.in=" + UPDATED_COST_TIME);
+        // Get all the sysLogList where costTime in
+        defaultSysLogFiltering("costTime.in=" + DEFAULT_COST_TIME + "," + UPDATED_COST_TIME, "costTime.in=" + UPDATED_COST_TIME);
     }
 
     @Test
@@ -850,10 +717,7 @@ public class SysLogResourceIT {
         sysLogRepository.save(sysLog);
 
         // Get all the sysLogList where costTime is not null
-        defaultSysLogShouldBeFound("costTime.specified=true");
-
-        // Get all the sysLogList where costTime is null
-        defaultSysLogShouldNotBeFound("costTime.specified=false");
+        defaultSysLogFiltering("costTime.specified=true", "costTime.specified=false");
     }
 
     @Test
@@ -862,11 +726,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where costTime is greater than or equal to DEFAULT_COST_TIME
-        defaultSysLogShouldBeFound("costTime.greaterThanOrEqual=" + DEFAULT_COST_TIME);
-
-        // Get all the sysLogList where costTime is greater than or equal to UPDATED_COST_TIME
-        defaultSysLogShouldNotBeFound("costTime.greaterThanOrEqual=" + UPDATED_COST_TIME);
+        // Get all the sysLogList where costTime is greater than or equal to
+        defaultSysLogFiltering("costTime.greaterThanOrEqual=" + DEFAULT_COST_TIME, "costTime.greaterThanOrEqual=" + UPDATED_COST_TIME);
     }
 
     @Test
@@ -875,11 +736,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where costTime is less than or equal to DEFAULT_COST_TIME
-        defaultSysLogShouldBeFound("costTime.lessThanOrEqual=" + DEFAULT_COST_TIME);
-
-        // Get all the sysLogList where costTime is less than or equal to SMALLER_COST_TIME
-        defaultSysLogShouldNotBeFound("costTime.lessThanOrEqual=" + SMALLER_COST_TIME);
+        // Get all the sysLogList where costTime is less than or equal to
+        defaultSysLogFiltering("costTime.lessThanOrEqual=" + DEFAULT_COST_TIME, "costTime.lessThanOrEqual=" + SMALLER_COST_TIME);
     }
 
     @Test
@@ -888,11 +746,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where costTime is less than DEFAULT_COST_TIME
-        defaultSysLogShouldNotBeFound("costTime.lessThan=" + DEFAULT_COST_TIME);
-
-        // Get all the sysLogList where costTime is less than UPDATED_COST_TIME
-        defaultSysLogShouldBeFound("costTime.lessThan=" + UPDATED_COST_TIME);
+        // Get all the sysLogList where costTime is less than
+        defaultSysLogFiltering("costTime.lessThan=" + UPDATED_COST_TIME, "costTime.lessThan=" + DEFAULT_COST_TIME);
     }
 
     @Test
@@ -901,11 +756,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where costTime is greater than DEFAULT_COST_TIME
-        defaultSysLogShouldNotBeFound("costTime.greaterThan=" + DEFAULT_COST_TIME);
-
-        // Get all the sysLogList where costTime is greater than SMALLER_COST_TIME
-        defaultSysLogShouldBeFound("costTime.greaterThan=" + SMALLER_COST_TIME);
+        // Get all the sysLogList where costTime is greater than
+        defaultSysLogFiltering("costTime.greaterThan=" + SMALLER_COST_TIME, "costTime.greaterThan=" + DEFAULT_COST_TIME);
     }
 
     @Test
@@ -914,11 +766,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where createdBy equals to DEFAULT_CREATED_BY
-        defaultSysLogShouldBeFound("createdBy.equals=" + DEFAULT_CREATED_BY);
-
-        // Get all the sysLogList where createdBy equals to UPDATED_CREATED_BY
-        defaultSysLogShouldNotBeFound("createdBy.equals=" + UPDATED_CREATED_BY);
+        // Get all the sysLogList where createdBy equals to
+        defaultSysLogFiltering("createdBy.equals=" + DEFAULT_CREATED_BY, "createdBy.equals=" + UPDATED_CREATED_BY);
     }
 
     @Test
@@ -927,11 +776,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where createdBy in DEFAULT_CREATED_BY or UPDATED_CREATED_BY
-        defaultSysLogShouldBeFound("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY);
-
-        // Get all the sysLogList where createdBy equals to UPDATED_CREATED_BY
-        defaultSysLogShouldNotBeFound("createdBy.in=" + UPDATED_CREATED_BY);
+        // Get all the sysLogList where createdBy in
+        defaultSysLogFiltering("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY, "createdBy.in=" + UPDATED_CREATED_BY);
     }
 
     @Test
@@ -941,10 +787,7 @@ public class SysLogResourceIT {
         sysLogRepository.save(sysLog);
 
         // Get all the sysLogList where createdBy is not null
-        defaultSysLogShouldBeFound("createdBy.specified=true");
-
-        // Get all the sysLogList where createdBy is null
-        defaultSysLogShouldNotBeFound("createdBy.specified=false");
+        defaultSysLogFiltering("createdBy.specified=true", "createdBy.specified=false");
     }
 
     @Test
@@ -953,11 +796,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where createdBy is greater than or equal to DEFAULT_CREATED_BY
-        defaultSysLogShouldBeFound("createdBy.greaterThanOrEqual=" + DEFAULT_CREATED_BY);
-
-        // Get all the sysLogList where createdBy is greater than or equal to UPDATED_CREATED_BY
-        defaultSysLogShouldNotBeFound("createdBy.greaterThanOrEqual=" + UPDATED_CREATED_BY);
+        // Get all the sysLogList where createdBy is greater than or equal to
+        defaultSysLogFiltering("createdBy.greaterThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.greaterThanOrEqual=" + UPDATED_CREATED_BY);
     }
 
     @Test
@@ -966,11 +806,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where createdBy is less than or equal to DEFAULT_CREATED_BY
-        defaultSysLogShouldBeFound("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY);
-
-        // Get all the sysLogList where createdBy is less than or equal to SMALLER_CREATED_BY
-        defaultSysLogShouldNotBeFound("createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
+        // Get all the sysLogList where createdBy is less than or equal to
+        defaultSysLogFiltering("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
     }
 
     @Test
@@ -979,11 +816,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where createdBy is less than DEFAULT_CREATED_BY
-        defaultSysLogShouldNotBeFound("createdBy.lessThan=" + DEFAULT_CREATED_BY);
-
-        // Get all the sysLogList where createdBy is less than UPDATED_CREATED_BY
-        defaultSysLogShouldBeFound("createdBy.lessThan=" + UPDATED_CREATED_BY);
+        // Get all the sysLogList where createdBy is less than
+        defaultSysLogFiltering("createdBy.lessThan=" + UPDATED_CREATED_BY, "createdBy.lessThan=" + DEFAULT_CREATED_BY);
     }
 
     @Test
@@ -992,11 +826,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where createdBy is greater than DEFAULT_CREATED_BY
-        defaultSysLogShouldNotBeFound("createdBy.greaterThan=" + DEFAULT_CREATED_BY);
-
-        // Get all the sysLogList where createdBy is greater than SMALLER_CREATED_BY
-        defaultSysLogShouldBeFound("createdBy.greaterThan=" + SMALLER_CREATED_BY);
+        // Get all the sysLogList where createdBy is greater than
+        defaultSysLogFiltering("createdBy.greaterThan=" + SMALLER_CREATED_BY, "createdBy.greaterThan=" + DEFAULT_CREATED_BY);
     }
 
     @Test
@@ -1005,11 +836,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where createdDate equals to DEFAULT_CREATED_DATE
-        defaultSysLogShouldBeFound("createdDate.equals=" + DEFAULT_CREATED_DATE);
-
-        // Get all the sysLogList where createdDate equals to UPDATED_CREATED_DATE
-        defaultSysLogShouldNotBeFound("createdDate.equals=" + UPDATED_CREATED_DATE);
+        // Get all the sysLogList where createdDate equals to
+        defaultSysLogFiltering("createdDate.equals=" + DEFAULT_CREATED_DATE, "createdDate.equals=" + UPDATED_CREATED_DATE);
     }
 
     @Test
@@ -1018,11 +846,11 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where createdDate in DEFAULT_CREATED_DATE or UPDATED_CREATED_DATE
-        defaultSysLogShouldBeFound("createdDate.in=" + DEFAULT_CREATED_DATE + "," + UPDATED_CREATED_DATE);
-
-        // Get all the sysLogList where createdDate equals to UPDATED_CREATED_DATE
-        defaultSysLogShouldNotBeFound("createdDate.in=" + UPDATED_CREATED_DATE);
+        // Get all the sysLogList where createdDate in
+        defaultSysLogFiltering(
+            "createdDate.in=" + DEFAULT_CREATED_DATE + "," + UPDATED_CREATED_DATE,
+            "createdDate.in=" + UPDATED_CREATED_DATE
+        );
     }
 
     @Test
@@ -1032,10 +860,7 @@ public class SysLogResourceIT {
         sysLogRepository.save(sysLog);
 
         // Get all the sysLogList where createdDate is not null
-        defaultSysLogShouldBeFound("createdDate.specified=true");
-
-        // Get all the sysLogList where createdDate is null
-        defaultSysLogShouldNotBeFound("createdDate.specified=false");
+        defaultSysLogFiltering("createdDate.specified=true", "createdDate.specified=false");
     }
 
     @Test
@@ -1044,11 +869,8 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where lastModifiedBy equals to DEFAULT_LAST_MODIFIED_BY
-        defaultSysLogShouldBeFound("lastModifiedBy.equals=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the sysLogList where lastModifiedBy equals to UPDATED_LAST_MODIFIED_BY
-        defaultSysLogShouldNotBeFound("lastModifiedBy.equals=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the sysLogList where lastModifiedBy equals to
+        defaultSysLogFiltering("lastModifiedBy.equals=" + DEFAULT_LAST_MODIFIED_BY, "lastModifiedBy.equals=" + UPDATED_LAST_MODIFIED_BY);
     }
 
     @Test
@@ -1057,11 +879,11 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where lastModifiedBy in DEFAULT_LAST_MODIFIED_BY or UPDATED_LAST_MODIFIED_BY
-        defaultSysLogShouldBeFound("lastModifiedBy.in=" + DEFAULT_LAST_MODIFIED_BY + "," + UPDATED_LAST_MODIFIED_BY);
-
-        // Get all the sysLogList where lastModifiedBy equals to UPDATED_LAST_MODIFIED_BY
-        defaultSysLogShouldNotBeFound("lastModifiedBy.in=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the sysLogList where lastModifiedBy in
+        defaultSysLogFiltering(
+            "lastModifiedBy.in=" + DEFAULT_LAST_MODIFIED_BY + "," + UPDATED_LAST_MODIFIED_BY,
+            "lastModifiedBy.in=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1071,10 +893,7 @@ public class SysLogResourceIT {
         sysLogRepository.save(sysLog);
 
         // Get all the sysLogList where lastModifiedBy is not null
-        defaultSysLogShouldBeFound("lastModifiedBy.specified=true");
-
-        // Get all the sysLogList where lastModifiedBy is null
-        defaultSysLogShouldNotBeFound("lastModifiedBy.specified=false");
+        defaultSysLogFiltering("lastModifiedBy.specified=true", "lastModifiedBy.specified=false");
     }
 
     @Test
@@ -1083,11 +902,11 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where lastModifiedBy is greater than or equal to DEFAULT_LAST_MODIFIED_BY
-        defaultSysLogShouldBeFound("lastModifiedBy.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the sysLogList where lastModifiedBy is greater than or equal to UPDATED_LAST_MODIFIED_BY
-        defaultSysLogShouldNotBeFound("lastModifiedBy.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the sysLogList where lastModifiedBy is greater than or equal to
+        defaultSysLogFiltering(
+            "lastModifiedBy.greaterThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.greaterThanOrEqual=" + UPDATED_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1096,11 +915,11 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where lastModifiedBy is less than or equal to DEFAULT_LAST_MODIFIED_BY
-        defaultSysLogShouldBeFound("lastModifiedBy.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the sysLogList where lastModifiedBy is less than or equal to SMALLER_LAST_MODIFIED_BY
-        defaultSysLogShouldNotBeFound("lastModifiedBy.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_BY);
+        // Get all the sysLogList where lastModifiedBy is less than or equal to
+        defaultSysLogFiltering(
+            "lastModifiedBy.lessThanOrEqual=" + DEFAULT_LAST_MODIFIED_BY,
+            "lastModifiedBy.lessThanOrEqual=" + SMALLER_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1109,11 +928,11 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where lastModifiedBy is less than DEFAULT_LAST_MODIFIED_BY
-        defaultSysLogShouldNotBeFound("lastModifiedBy.lessThan=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the sysLogList where lastModifiedBy is less than UPDATED_LAST_MODIFIED_BY
-        defaultSysLogShouldBeFound("lastModifiedBy.lessThan=" + UPDATED_LAST_MODIFIED_BY);
+        // Get all the sysLogList where lastModifiedBy is less than
+        defaultSysLogFiltering(
+            "lastModifiedBy.lessThan=" + UPDATED_LAST_MODIFIED_BY,
+            "lastModifiedBy.lessThan=" + DEFAULT_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1122,11 +941,11 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where lastModifiedBy is greater than DEFAULT_LAST_MODIFIED_BY
-        defaultSysLogShouldNotBeFound("lastModifiedBy.greaterThan=" + DEFAULT_LAST_MODIFIED_BY);
-
-        // Get all the sysLogList where lastModifiedBy is greater than SMALLER_LAST_MODIFIED_BY
-        defaultSysLogShouldBeFound("lastModifiedBy.greaterThan=" + SMALLER_LAST_MODIFIED_BY);
+        // Get all the sysLogList where lastModifiedBy is greater than
+        defaultSysLogFiltering(
+            "lastModifiedBy.greaterThan=" + SMALLER_LAST_MODIFIED_BY,
+            "lastModifiedBy.greaterThan=" + DEFAULT_LAST_MODIFIED_BY
+        );
     }
 
     @Test
@@ -1135,11 +954,11 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where lastModifiedDate equals to DEFAULT_LAST_MODIFIED_DATE
-        defaultSysLogShouldBeFound("lastModifiedDate.equals=" + DEFAULT_LAST_MODIFIED_DATE);
-
-        // Get all the sysLogList where lastModifiedDate equals to UPDATED_LAST_MODIFIED_DATE
-        defaultSysLogShouldNotBeFound("lastModifiedDate.equals=" + UPDATED_LAST_MODIFIED_DATE);
+        // Get all the sysLogList where lastModifiedDate equals to
+        defaultSysLogFiltering(
+            "lastModifiedDate.equals=" + DEFAULT_LAST_MODIFIED_DATE,
+            "lastModifiedDate.equals=" + UPDATED_LAST_MODIFIED_DATE
+        );
     }
 
     @Test
@@ -1148,11 +967,11 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        // Get all the sysLogList where lastModifiedDate in DEFAULT_LAST_MODIFIED_DATE or UPDATED_LAST_MODIFIED_DATE
-        defaultSysLogShouldBeFound("lastModifiedDate.in=" + DEFAULT_LAST_MODIFIED_DATE + "," + UPDATED_LAST_MODIFIED_DATE);
-
-        // Get all the sysLogList where lastModifiedDate equals to UPDATED_LAST_MODIFIED_DATE
-        defaultSysLogShouldNotBeFound("lastModifiedDate.in=" + UPDATED_LAST_MODIFIED_DATE);
+        // Get all the sysLogList where lastModifiedDate in
+        defaultSysLogFiltering(
+            "lastModifiedDate.in=" + DEFAULT_LAST_MODIFIED_DATE + "," + UPDATED_LAST_MODIFIED_DATE,
+            "lastModifiedDate.in=" + UPDATED_LAST_MODIFIED_DATE
+        );
     }
 
     @Test
@@ -1162,10 +981,12 @@ public class SysLogResourceIT {
         sysLogRepository.save(sysLog);
 
         // Get all the sysLogList where lastModifiedDate is not null
-        defaultSysLogShouldBeFound("lastModifiedDate.specified=true");
+        defaultSysLogFiltering("lastModifiedDate.specified=true", "lastModifiedDate.specified=false");
+    }
 
-        // Get all the sysLogList where lastModifiedDate is null
-        defaultSysLogShouldNotBeFound("lastModifiedDate.specified=false");
+    private void defaultSysLogFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultSysLogShouldBeFound(shouldBeFound);
+        defaultSysLogShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -1233,7 +1054,7 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        int databaseSizeBeforeUpdate = sysLogRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the sysLog
         SysLog updatedSysLog = sysLogRepository.findById(sysLog.getId()).orElseThrow();
@@ -1257,37 +1078,19 @@ public class SysLogResourceIT {
 
         restSysLogMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, sysLogDTO.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(sysLogDTO))
+                put(ENTITY_API_URL_ID, sysLogDTO.getId()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(sysLogDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the SysLog in the database
-        List<SysLog> sysLogList = sysLogRepository.findAll();
-        assertThat(sysLogList).hasSize(databaseSizeBeforeUpdate);
-        SysLog testSysLog = sysLogList.get(sysLogList.size() - 1);
-        assertThat(testSysLog.getLogType()).isEqualTo(UPDATED_LOG_TYPE);
-        assertThat(testSysLog.getLogContent()).isEqualTo(UPDATED_LOG_CONTENT);
-        assertThat(testSysLog.getOperateType()).isEqualTo(UPDATED_OPERATE_TYPE);
-        assertThat(testSysLog.getUserid()).isEqualTo(UPDATED_USERID);
-        assertThat(testSysLog.getUsername()).isEqualTo(UPDATED_USERNAME);
-        assertThat(testSysLog.getIp()).isEqualTo(UPDATED_IP);
-        assertThat(testSysLog.getMethod()).isEqualTo(UPDATED_METHOD);
-        assertThat(testSysLog.getRequestUrl()).isEqualTo(UPDATED_REQUEST_URL);
-        assertThat(testSysLog.getRequestParam()).isEqualTo(UPDATED_REQUEST_PARAM);
-        assertThat(testSysLog.getRequestType()).isEqualTo(UPDATED_REQUEST_TYPE);
-        assertThat(testSysLog.getCostTime()).isEqualTo(UPDATED_COST_TIME);
-        assertThat(testSysLog.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testSysLog.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testSysLog.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testSysLog.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedSysLogToMatchAllProperties(updatedSysLog);
     }
 
     @Test
     @Transactional
     void putNonExistingSysLog() throws Exception {
-        int databaseSizeBeforeUpdate = sysLogRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         sysLog.setId(longCount.incrementAndGet());
 
         // Create the SysLog
@@ -1296,21 +1099,18 @@ public class SysLogResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restSysLogMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, sysLogDTO.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(sysLogDTO))
+                put(ENTITY_API_URL_ID, sysLogDTO.getId()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(sysLogDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SysLog in the database
-        List<SysLog> sysLogList = sysLogRepository.findAll();
-        assertThat(sysLogList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchSysLog() throws Exception {
-        int databaseSizeBeforeUpdate = sysLogRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         sysLog.setId(longCount.incrementAndGet());
 
         // Create the SysLog
@@ -1321,19 +1121,18 @@ public class SysLogResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(sysLogDTO))
+                    .content(om.writeValueAsBytes(sysLogDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SysLog in the database
-        List<SysLog> sysLogList = sysLogRepository.findAll();
-        assertThat(sysLogList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamSysLog() throws Exception {
-        int databaseSizeBeforeUpdate = sysLogRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         sysLog.setId(longCount.incrementAndGet());
 
         // Create the SysLog
@@ -1341,12 +1140,11 @@ public class SysLogResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restSysLogMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(sysLogDTO)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(sysLogDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the SysLog in the database
-        List<SysLog> sysLogList = sysLogRepository.findAll();
-        assertThat(sysLogList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1355,45 +1153,39 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        int databaseSizeBeforeUpdate = sysLogRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the sysLog using partial update
         SysLog partialUpdatedSysLog = new SysLog();
         partialUpdatedSysLog.setId(sysLog.getId());
 
         partialUpdatedSysLog
+            .logType(UPDATED_LOG_TYPE)
+            .logContent(UPDATED_LOG_CONTENT)
             .operateType(UPDATED_OPERATE_TYPE)
-            .ip(UPDATED_IP)
+            .userid(UPDATED_USERID)
+            .username(UPDATED_USERNAME)
+            .method(UPDATED_METHOD)
+            .requestUrl(UPDATED_REQUEST_URL)
             .requestParam(UPDATED_REQUEST_PARAM)
-            .createdDate(UPDATED_CREATED_DATE);
+            .requestType(UPDATED_REQUEST_TYPE)
+            .createdBy(UPDATED_CREATED_BY)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restSysLogMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedSysLog.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedSysLog))
+                    .content(om.writeValueAsBytes(partialUpdatedSysLog))
             )
             .andExpect(status().isOk());
 
         // Validate the SysLog in the database
-        List<SysLog> sysLogList = sysLogRepository.findAll();
-        assertThat(sysLogList).hasSize(databaseSizeBeforeUpdate);
-        SysLog testSysLog = sysLogList.get(sysLogList.size() - 1);
-        assertThat(testSysLog.getLogType()).isEqualTo(DEFAULT_LOG_TYPE);
-        assertThat(testSysLog.getLogContent()).isEqualTo(DEFAULT_LOG_CONTENT);
-        assertThat(testSysLog.getOperateType()).isEqualTo(UPDATED_OPERATE_TYPE);
-        assertThat(testSysLog.getUserid()).isEqualTo(DEFAULT_USERID);
-        assertThat(testSysLog.getUsername()).isEqualTo(DEFAULT_USERNAME);
-        assertThat(testSysLog.getIp()).isEqualTo(UPDATED_IP);
-        assertThat(testSysLog.getMethod()).isEqualTo(DEFAULT_METHOD);
-        assertThat(testSysLog.getRequestUrl()).isEqualTo(DEFAULT_REQUEST_URL);
-        assertThat(testSysLog.getRequestParam()).isEqualTo(UPDATED_REQUEST_PARAM);
-        assertThat(testSysLog.getRequestType()).isEqualTo(DEFAULT_REQUEST_TYPE);
-        assertThat(testSysLog.getCostTime()).isEqualTo(DEFAULT_COST_TIME);
-        assertThat(testSysLog.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY);
-        assertThat(testSysLog.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testSysLog.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
-        assertThat(testSysLog.getLastModifiedDate()).isEqualTo(DEFAULT_LAST_MODIFIED_DATE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertSysLogUpdatableFieldsEquals(createUpdateProxyForBean(partialUpdatedSysLog, sysLog), getPersistedSysLog(sysLog));
     }
 
     @Test
@@ -1402,7 +1194,7 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        int databaseSizeBeforeUpdate = sysLogRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the sysLog using partial update
         SysLog partialUpdatedSysLog = new SysLog();
@@ -1429,35 +1221,20 @@ public class SysLogResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedSysLog.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedSysLog))
+                    .content(om.writeValueAsBytes(partialUpdatedSysLog))
             )
             .andExpect(status().isOk());
 
         // Validate the SysLog in the database
-        List<SysLog> sysLogList = sysLogRepository.findAll();
-        assertThat(sysLogList).hasSize(databaseSizeBeforeUpdate);
-        SysLog testSysLog = sysLogList.get(sysLogList.size() - 1);
-        assertThat(testSysLog.getLogType()).isEqualTo(UPDATED_LOG_TYPE);
-        assertThat(testSysLog.getLogContent()).isEqualTo(UPDATED_LOG_CONTENT);
-        assertThat(testSysLog.getOperateType()).isEqualTo(UPDATED_OPERATE_TYPE);
-        assertThat(testSysLog.getUserid()).isEqualTo(UPDATED_USERID);
-        assertThat(testSysLog.getUsername()).isEqualTo(UPDATED_USERNAME);
-        assertThat(testSysLog.getIp()).isEqualTo(UPDATED_IP);
-        assertThat(testSysLog.getMethod()).isEqualTo(UPDATED_METHOD);
-        assertThat(testSysLog.getRequestUrl()).isEqualTo(UPDATED_REQUEST_URL);
-        assertThat(testSysLog.getRequestParam()).isEqualTo(UPDATED_REQUEST_PARAM);
-        assertThat(testSysLog.getRequestType()).isEqualTo(UPDATED_REQUEST_TYPE);
-        assertThat(testSysLog.getCostTime()).isEqualTo(UPDATED_COST_TIME);
-        assertThat(testSysLog.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testSysLog.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
-        assertThat(testSysLog.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
-        assertThat(testSysLog.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertSysLogUpdatableFieldsEquals(partialUpdatedSysLog, getPersistedSysLog(partialUpdatedSysLog));
     }
 
     @Test
     @Transactional
     void patchNonExistingSysLog() throws Exception {
-        int databaseSizeBeforeUpdate = sysLogRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         sysLog.setId(longCount.incrementAndGet());
 
         // Create the SysLog
@@ -1468,19 +1245,18 @@ public class SysLogResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, sysLogDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(sysLogDTO))
+                    .content(om.writeValueAsBytes(sysLogDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SysLog in the database
-        List<SysLog> sysLogList = sysLogRepository.findAll();
-        assertThat(sysLogList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchSysLog() throws Exception {
-        int databaseSizeBeforeUpdate = sysLogRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         sysLog.setId(longCount.incrementAndGet());
 
         // Create the SysLog
@@ -1491,19 +1267,18 @@ public class SysLogResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(sysLogDTO))
+                    .content(om.writeValueAsBytes(sysLogDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SysLog in the database
-        List<SysLog> sysLogList = sysLogRepository.findAll();
-        assertThat(sysLogList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamSysLog() throws Exception {
-        int databaseSizeBeforeUpdate = sysLogRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         sysLog.setId(longCount.incrementAndGet());
 
         // Create the SysLog
@@ -1511,14 +1286,11 @@ public class SysLogResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restSysLogMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(sysLogDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(sysLogDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the SysLog in the database
-        List<SysLog> sysLogList = sysLogRepository.findAll();
-        assertThat(sysLogList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1527,7 +1299,7 @@ public class SysLogResourceIT {
         // Initialize the database
         sysLogRepository.save(sysLog);
 
-        int databaseSizeBeforeDelete = sysLogRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the sysLog
         restSysLogMockMvc
@@ -1535,7 +1307,34 @@ public class SysLogResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<SysLog> sysLogList = sysLogRepository.findAll();
-        assertThat(sysLogList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return sysLogRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected SysLog getPersistedSysLog(SysLog sysLog) {
+        return sysLogRepository.findById(sysLog.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedSysLogToMatchAllProperties(SysLog expectedSysLog) {
+        assertSysLogAllPropertiesEquals(expectedSysLog, getPersistedSysLog(expectedSysLog));
+    }
+
+    protected void assertPersistedSysLogToMatchUpdatableProperties(SysLog expectedSysLog) {
+        assertSysLogAllUpdatablePropertiesEquals(expectedSysLog, getPersistedSysLog(expectedSysLog));
     }
 }

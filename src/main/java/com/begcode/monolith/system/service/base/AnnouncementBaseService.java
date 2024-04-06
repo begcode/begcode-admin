@@ -31,11 +31,12 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Service Implementation for managing {@link com.begcode.monolith.system.domain.Announcement}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class AnnouncementBaseService<R extends AnnouncementRepository, E extends Announcement>
     extends BaseServiceImpl<AnnouncementRepository, Announcement> {
 
     private final Logger log = LoggerFactory.getLogger(AnnouncementBaseService.class);
-    private final List<String> relationNames = Arrays.asList();
+    private final List<String> relationNames = List.of();
 
     protected final UserQueryService userQueryService;
 
@@ -85,11 +86,10 @@ public class AnnouncementBaseService<R extends AnnouncementRepository, E extends
     @Transactional(rollbackFor = Exception.class)
     public AnnouncementDTO update(AnnouncementDTO announcementDTO) {
         log.debug("Request to update Announcement : {}", announcementDTO);
-
         Announcement announcement = announcementMapper.toEntity(announcementDTO);
 
-        announcementRepository.updateById(announcement);
-        return findOne(announcementDTO.getId()).orElseThrow();
+        this.saveOrUpdate(announcement);
+        return findOne(announcement.getId()).orElseThrow();
     }
 
     /**
@@ -134,8 +134,7 @@ public class AnnouncementBaseService<R extends AnnouncementRepository, E extends
      */
     public Optional<AnnouncementDTO> findOne(Long id) {
         log.debug("Request to get Announcement : {}", id);
-        return Optional
-            .ofNullable(announcementRepository.selectById(id))
+        return Optional.ofNullable(announcementRepository.selectById(id))
             .map(announcement -> {
                 Binder.bindRelations(announcement);
                 return announcement;
@@ -165,9 +164,9 @@ public class AnnouncementBaseService<R extends AnnouncementRepository, E extends
             Long[] userIds = {};
             UserCriteria criteria = new UserCriteria();
             List<Long> receiverIds = new ArrayList<>();
-            Optional
-                .ofNullable(announcement.getReceiverIds())
-                .ifPresent(receiverIdData -> receiverIds.addAll(Arrays.stream((receiverIdData.split(","))).map(Long::valueOf).toList()));
+            Optional.ofNullable(announcement.getReceiverIds()).ifPresent(
+                receiverIdData -> receiverIds.addAll(Arrays.stream((receiverIdData.split(","))).map(Long::valueOf).toList())
+            );
             switch (announcement.getReceiverType()) {
                 case ALL:
                     userIds = userIds;
@@ -211,23 +210,25 @@ public class AnnouncementBaseService<R extends AnnouncementRepository, E extends
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             UpdateWrapper<Announcement> updateWrapper = new UpdateWrapper<>();
             updateWrapper.in("id", ids);
-            fieldNames.forEach(fieldName ->
-                updateWrapper.set(
-                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
-                    BeanUtil.getFieldValue(changeAnnouncementDTO, fieldName)
-                )
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changeAnnouncementDTO, fieldName)
+                    )
             );
             this.update(updateWrapper);
         } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
             List<Announcement> announcementList = this.listByIds(ids);
             if (CollectionUtils.isNotEmpty(announcementList)) {
                 announcementList.forEach(announcement -> {
-                    relationshipNames.forEach(relationName ->
-                        BeanUtil.setFieldValue(
-                            announcement,
-                            relationName,
-                            BeanUtil.getFieldValue(announcementMapper.toEntity(changeAnnouncementDTO), relationName)
-                        )
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                announcement,
+                                relationName,
+                                BeanUtil.getFieldValue(announcementMapper.toEntity(changeAnnouncementDTO), relationName)
+                            )
                     );
                     this.createOrUpdateAndRelatedRelations(announcement, relationshipNames);
                 });

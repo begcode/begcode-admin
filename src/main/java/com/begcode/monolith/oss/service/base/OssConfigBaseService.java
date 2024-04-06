@@ -33,11 +33,12 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Service Implementation for managing {@link com.begcode.monolith.oss.domain.OssConfig}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class OssConfigBaseService<R extends OssConfigRepository, E extends OssConfig>
     extends BaseServiceImpl<OssConfigRepository, OssConfig> {
 
     private final Logger log = LoggerFactory.getLogger(OssConfigBaseService.class);
-    private final List<String> relationNames = Arrays.asList();
+    private final List<String> relationNames = List.of();
 
     protected final FileStorageService fileStorageService;
 
@@ -84,12 +85,11 @@ public class OssConfigBaseService<R extends OssConfigRepository, E extends OssCo
     @Transactional(rollbackFor = Exception.class)
     public OssConfigDTO update(OssConfigDTO ossConfigDTO) {
         log.debug("Request to update OssConfig : {}", ossConfigDTO);
-
         OssConfig ossConfig = ossConfigMapper.toEntity(ossConfigDTO);
 
-        ossConfigRepository.updateById(ossConfig);
+        this.saveOrUpdate(ossConfig);
         this.initPlatforms();
-        return findOne(ossConfigDTO.getId()).orElseThrow();
+        return findOne(ossConfig.getId()).orElseThrow();
     }
 
     /**
@@ -134,8 +134,7 @@ public class OssConfigBaseService<R extends OssConfigRepository, E extends OssCo
      */
     public Optional<OssConfigDTO> findOne(Long id) {
         log.debug("Request to get OssConfig : {}", id);
-        return Optional
-            .ofNullable(ossConfigRepository.selectById(id))
+        return Optional.ofNullable(ossConfigRepository.selectById(id))
             .map(ossConfig -> {
                 Binder.bindRelations(ossConfig);
                 return ossConfig;
@@ -241,23 +240,25 @@ public class OssConfigBaseService<R extends OssConfigRepository, E extends OssCo
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             UpdateWrapper<OssConfig> updateWrapper = new UpdateWrapper<>();
             updateWrapper.in("id", ids);
-            fieldNames.forEach(fieldName ->
-                updateWrapper.set(
-                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
-                    BeanUtil.getFieldValue(changeOssConfigDTO, fieldName)
-                )
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changeOssConfigDTO, fieldName)
+                    )
             );
             this.update(updateWrapper);
         } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
             List<OssConfig> ossConfigList = this.listByIds(ids);
             if (CollectionUtils.isNotEmpty(ossConfigList)) {
                 ossConfigList.forEach(ossConfig -> {
-                    relationshipNames.forEach(relationName ->
-                        BeanUtil.setFieldValue(
-                            ossConfig,
-                            relationName,
-                            BeanUtil.getFieldValue(ossConfigMapper.toEntity(changeOssConfigDTO), relationName)
-                        )
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                ossConfig,
+                                relationName,
+                                BeanUtil.getFieldValue(ossConfigMapper.toEntity(changeOssConfigDTO), relationName)
+                            )
                     );
                     this.createOrUpdateAndRelatedRelations(ossConfig, relationshipNames);
                 });

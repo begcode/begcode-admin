@@ -77,12 +77,10 @@ public class AnnouncementRecordQueryService implements QueryService<Announcement
     public IPage<AnnouncementRecordDTO> findByCriteria(AnnouncementRecordCriteria criteria, Page<AnnouncementRecord> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<AnnouncementRecord> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, AnnouncementRecord.class, page)
-            .convert(announcementRecord -> {
-                Binder.bindRelations(announcementRecord, new String[] {});
-                return announcementRecordMapper.toDto(announcementRecord);
-            });
+        return Binder.joinQueryPage(queryWrapper, AnnouncementRecord.class, page).convert(announcementRecord -> {
+            Binder.bindRelations(announcementRecord, new String[] {});
+            return announcementRecordMapper.toDto(announcementRecord);
+        });
     }
 
     /**

@@ -23,11 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Service Implementation for managing {@link com.begcode.monolith.system.domain.SmsMessage}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class SmsMessageBaseService<R extends SmsMessageRepository, E extends SmsMessage>
     extends BaseServiceImpl<SmsMessageRepository, SmsMessage> {
 
     private final Logger log = LoggerFactory.getLogger(SmsMessageBaseService.class);
-    private final List<String> relationNames = Arrays.asList();
+    private final List<String> relationNames = List.of();
 
     protected final SmsMessageRepository smsMessageRepository;
 
@@ -65,11 +66,10 @@ public class SmsMessageBaseService<R extends SmsMessageRepository, E extends Sms
     @Transactional(rollbackFor = Exception.class)
     public SmsMessageDTO update(SmsMessageDTO smsMessageDTO) {
         log.debug("Request to update SmsMessage : {}", smsMessageDTO);
-
         SmsMessage smsMessage = smsMessageMapper.toEntity(smsMessageDTO);
 
-        smsMessageRepository.updateById(smsMessage);
-        return findOne(smsMessageDTO.getId()).orElseThrow();
+        this.saveOrUpdate(smsMessage);
+        return findOne(smsMessage.getId()).orElseThrow();
     }
 
     /**
@@ -114,8 +114,7 @@ public class SmsMessageBaseService<R extends SmsMessageRepository, E extends Sms
      */
     public Optional<SmsMessageDTO> findOne(Long id) {
         log.debug("Request to get SmsMessage : {}", id);
-        return Optional
-            .ofNullable(smsMessageRepository.selectById(id))
+        return Optional.ofNullable(smsMessageRepository.selectById(id))
             .map(smsMessage -> {
                 Binder.bindRelations(smsMessage);
                 return smsMessage;
@@ -145,23 +144,25 @@ public class SmsMessageBaseService<R extends SmsMessageRepository, E extends Sms
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             UpdateWrapper<SmsMessage> updateWrapper = new UpdateWrapper<>();
             updateWrapper.in("id", ids);
-            fieldNames.forEach(fieldName ->
-                updateWrapper.set(
-                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
-                    BeanUtil.getFieldValue(changeSmsMessageDTO, fieldName)
-                )
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changeSmsMessageDTO, fieldName)
+                    )
             );
             this.update(updateWrapper);
         } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
             List<SmsMessage> smsMessageList = this.listByIds(ids);
             if (CollectionUtils.isNotEmpty(smsMessageList)) {
                 smsMessageList.forEach(smsMessage -> {
-                    relationshipNames.forEach(relationName ->
-                        BeanUtil.setFieldValue(
-                            smsMessage,
-                            relationName,
-                            BeanUtil.getFieldValue(smsMessageMapper.toEntity(changeSmsMessageDTO), relationName)
-                        )
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                smsMessage,
+                                relationName,
+                                BeanUtil.getFieldValue(smsMessageMapper.toEntity(changeSmsMessageDTO), relationName)
+                            )
                     );
                     this.createOrUpdateAndRelatedRelations(smsMessage, relationshipNames);
                 });

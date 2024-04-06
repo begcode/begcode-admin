@@ -1,5 +1,7 @@
 package com.begcode.monolith.web.rest;
 
+import static com.begcode.monolith.domain.DepartmentAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.*;
@@ -17,11 +19,10 @@ import com.begcode.monolith.repository.DepartmentRepository;
 import com.begcode.monolith.service.DepartmentService;
 import com.begcode.monolith.service.dto.DepartmentDTO;
 import com.begcode.monolith.service.mapper.DepartmentMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,8 +72,11 @@ public class DepartmentResourceIT {
     private static final String ENTITY_API_URL = "/api/departments";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private DepartmentRepository departmentRepository;
@@ -137,25 +141,23 @@ public class DepartmentResourceIT {
     @Test
     @Transactional
     void createDepartment() throws Exception {
-        int databaseSizeBeforeCreate = departmentRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the Department
         DepartmentDTO departmentDTO = departmentMapper.toDto(department);
-        restDepartmentMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(departmentDTO)))
-            .andExpect(status().isCreated());
+        var returnedDepartmentDTO = om.readValue(
+            restDepartmentMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(departmentDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            DepartmentDTO.class
+        );
 
         // Validate the Department in the database
-        List<Department> departmentList = departmentRepository.findAll();
-        assertThat(departmentList).hasSize(databaseSizeBeforeCreate + 1);
-        Department testDepartment = departmentList.get(departmentList.size() - 1);
-        assertThat(testDepartment.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testDepartment.getCode()).isEqualTo(DEFAULT_CODE);
-        assertThat(testDepartment.getAddress()).isEqualTo(DEFAULT_ADDRESS);
-        assertThat(testDepartment.getPhoneNum()).isEqualTo(DEFAULT_PHONE_NUM);
-        assertThat(testDepartment.getLogo()).isEqualTo(DEFAULT_LOGO);
-        assertThat(testDepartment.getContact()).isEqualTo(DEFAULT_CONTACT);
-        assertThat(testDepartment.getCreateUserId()).isEqualTo(DEFAULT_CREATE_USER_ID);
-        assertThat(testDepartment.getCreateTime()).isEqualTo(DEFAULT_CREATE_TIME);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedDepartment = departmentMapper.toEntity(returnedDepartmentDTO);
+        assertDepartmentUpdatableFieldsEquals(returnedDepartment, getPersistedDepartment(returnedDepartment));
     }
 
     @Test
@@ -165,16 +167,15 @@ public class DepartmentResourceIT {
         department.setId(1L);
         DepartmentDTO departmentDTO = departmentMapper.toDto(department);
 
-        int databaseSizeBeforeCreate = departmentRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restDepartmentMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(departmentDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(departmentDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Department in the database
-        List<Department> departmentList = departmentRepository.findAll();
-        assertThat(departmentList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
@@ -246,14 +247,11 @@ public class DepartmentResourceIT {
 
         Long id = department.getId();
 
-        defaultDepartmentShouldBeFound("id.equals=" + id);
-        defaultDepartmentShouldNotBeFound("id.notEquals=" + id);
+        defaultDepartmentFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultDepartmentShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultDepartmentShouldNotBeFound("id.greaterThan=" + id);
+        defaultDepartmentFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultDepartmentShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultDepartmentShouldNotBeFound("id.lessThan=" + id);
+        defaultDepartmentFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -262,11 +260,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where name equals to DEFAULT_NAME
-        defaultDepartmentShouldBeFound("name.equals=" + DEFAULT_NAME);
-
-        // Get all the departmentList where name equals to UPDATED_NAME
-        defaultDepartmentShouldNotBeFound("name.equals=" + UPDATED_NAME);
+        // Get all the departmentList where name equals to
+        defaultDepartmentFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
     }
 
     @Test
@@ -275,11 +270,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where name in DEFAULT_NAME or UPDATED_NAME
-        defaultDepartmentShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
-
-        // Get all the departmentList where name equals to UPDATED_NAME
-        defaultDepartmentShouldNotBeFound("name.in=" + UPDATED_NAME);
+        // Get all the departmentList where name in
+        defaultDepartmentFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
     }
 
     @Test
@@ -289,10 +281,7 @@ public class DepartmentResourceIT {
         departmentRepository.save(department);
 
         // Get all the departmentList where name is not null
-        defaultDepartmentShouldBeFound("name.specified=true");
-
-        // Get all the departmentList where name is null
-        defaultDepartmentShouldNotBeFound("name.specified=false");
+        defaultDepartmentFiltering("name.specified=true", "name.specified=false");
     }
 
     @Test
@@ -301,11 +290,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where name contains DEFAULT_NAME
-        defaultDepartmentShouldBeFound("name.contains=" + DEFAULT_NAME);
-
-        // Get all the departmentList where name contains UPDATED_NAME
-        defaultDepartmentShouldNotBeFound("name.contains=" + UPDATED_NAME);
+        // Get all the departmentList where name contains
+        defaultDepartmentFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
     }
 
     @Test
@@ -314,11 +300,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where name does not contain DEFAULT_NAME
-        defaultDepartmentShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
-
-        // Get all the departmentList where name does not contain UPDATED_NAME
-        defaultDepartmentShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+        // Get all the departmentList where name does not contain
+        defaultDepartmentFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
     }
 
     @Test
@@ -327,11 +310,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where code equals to DEFAULT_CODE
-        defaultDepartmentShouldBeFound("code.equals=" + DEFAULT_CODE);
-
-        // Get all the departmentList where code equals to UPDATED_CODE
-        defaultDepartmentShouldNotBeFound("code.equals=" + UPDATED_CODE);
+        // Get all the departmentList where code equals to
+        defaultDepartmentFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
     }
 
     @Test
@@ -340,11 +320,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where code in DEFAULT_CODE or UPDATED_CODE
-        defaultDepartmentShouldBeFound("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE);
-
-        // Get all the departmentList where code equals to UPDATED_CODE
-        defaultDepartmentShouldNotBeFound("code.in=" + UPDATED_CODE);
+        // Get all the departmentList where code in
+        defaultDepartmentFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
     }
 
     @Test
@@ -354,10 +331,7 @@ public class DepartmentResourceIT {
         departmentRepository.save(department);
 
         // Get all the departmentList where code is not null
-        defaultDepartmentShouldBeFound("code.specified=true");
-
-        // Get all the departmentList where code is null
-        defaultDepartmentShouldNotBeFound("code.specified=false");
+        defaultDepartmentFiltering("code.specified=true", "code.specified=false");
     }
 
     @Test
@@ -366,11 +340,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where code contains DEFAULT_CODE
-        defaultDepartmentShouldBeFound("code.contains=" + DEFAULT_CODE);
-
-        // Get all the departmentList where code contains UPDATED_CODE
-        defaultDepartmentShouldNotBeFound("code.contains=" + UPDATED_CODE);
+        // Get all the departmentList where code contains
+        defaultDepartmentFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
     }
 
     @Test
@@ -379,11 +350,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where code does not contain DEFAULT_CODE
-        defaultDepartmentShouldNotBeFound("code.doesNotContain=" + DEFAULT_CODE);
-
-        // Get all the departmentList where code does not contain UPDATED_CODE
-        defaultDepartmentShouldBeFound("code.doesNotContain=" + UPDATED_CODE);
+        // Get all the departmentList where code does not contain
+        defaultDepartmentFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
     }
 
     @Test
@@ -392,11 +360,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where address equals to DEFAULT_ADDRESS
-        defaultDepartmentShouldBeFound("address.equals=" + DEFAULT_ADDRESS);
-
-        // Get all the departmentList where address equals to UPDATED_ADDRESS
-        defaultDepartmentShouldNotBeFound("address.equals=" + UPDATED_ADDRESS);
+        // Get all the departmentList where address equals to
+        defaultDepartmentFiltering("address.equals=" + DEFAULT_ADDRESS, "address.equals=" + UPDATED_ADDRESS);
     }
 
     @Test
@@ -405,11 +370,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where address in DEFAULT_ADDRESS or UPDATED_ADDRESS
-        defaultDepartmentShouldBeFound("address.in=" + DEFAULT_ADDRESS + "," + UPDATED_ADDRESS);
-
-        // Get all the departmentList where address equals to UPDATED_ADDRESS
-        defaultDepartmentShouldNotBeFound("address.in=" + UPDATED_ADDRESS);
+        // Get all the departmentList where address in
+        defaultDepartmentFiltering("address.in=" + DEFAULT_ADDRESS + "," + UPDATED_ADDRESS, "address.in=" + UPDATED_ADDRESS);
     }
 
     @Test
@@ -419,10 +381,7 @@ public class DepartmentResourceIT {
         departmentRepository.save(department);
 
         // Get all the departmentList where address is not null
-        defaultDepartmentShouldBeFound("address.specified=true");
-
-        // Get all the departmentList where address is null
-        defaultDepartmentShouldNotBeFound("address.specified=false");
+        defaultDepartmentFiltering("address.specified=true", "address.specified=false");
     }
 
     @Test
@@ -431,11 +390,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where address contains DEFAULT_ADDRESS
-        defaultDepartmentShouldBeFound("address.contains=" + DEFAULT_ADDRESS);
-
-        // Get all the departmentList where address contains UPDATED_ADDRESS
-        defaultDepartmentShouldNotBeFound("address.contains=" + UPDATED_ADDRESS);
+        // Get all the departmentList where address contains
+        defaultDepartmentFiltering("address.contains=" + DEFAULT_ADDRESS, "address.contains=" + UPDATED_ADDRESS);
     }
 
     @Test
@@ -444,11 +400,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where address does not contain DEFAULT_ADDRESS
-        defaultDepartmentShouldNotBeFound("address.doesNotContain=" + DEFAULT_ADDRESS);
-
-        // Get all the departmentList where address does not contain UPDATED_ADDRESS
-        defaultDepartmentShouldBeFound("address.doesNotContain=" + UPDATED_ADDRESS);
+        // Get all the departmentList where address does not contain
+        defaultDepartmentFiltering("address.doesNotContain=" + UPDATED_ADDRESS, "address.doesNotContain=" + DEFAULT_ADDRESS);
     }
 
     @Test
@@ -457,11 +410,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where phoneNum equals to DEFAULT_PHONE_NUM
-        defaultDepartmentShouldBeFound("phoneNum.equals=" + DEFAULT_PHONE_NUM);
-
-        // Get all the departmentList where phoneNum equals to UPDATED_PHONE_NUM
-        defaultDepartmentShouldNotBeFound("phoneNum.equals=" + UPDATED_PHONE_NUM);
+        // Get all the departmentList where phoneNum equals to
+        defaultDepartmentFiltering("phoneNum.equals=" + DEFAULT_PHONE_NUM, "phoneNum.equals=" + UPDATED_PHONE_NUM);
     }
 
     @Test
@@ -470,11 +420,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where phoneNum in DEFAULT_PHONE_NUM or UPDATED_PHONE_NUM
-        defaultDepartmentShouldBeFound("phoneNum.in=" + DEFAULT_PHONE_NUM + "," + UPDATED_PHONE_NUM);
-
-        // Get all the departmentList where phoneNum equals to UPDATED_PHONE_NUM
-        defaultDepartmentShouldNotBeFound("phoneNum.in=" + UPDATED_PHONE_NUM);
+        // Get all the departmentList where phoneNum in
+        defaultDepartmentFiltering("phoneNum.in=" + DEFAULT_PHONE_NUM + "," + UPDATED_PHONE_NUM, "phoneNum.in=" + UPDATED_PHONE_NUM);
     }
 
     @Test
@@ -484,10 +431,7 @@ public class DepartmentResourceIT {
         departmentRepository.save(department);
 
         // Get all the departmentList where phoneNum is not null
-        defaultDepartmentShouldBeFound("phoneNum.specified=true");
-
-        // Get all the departmentList where phoneNum is null
-        defaultDepartmentShouldNotBeFound("phoneNum.specified=false");
+        defaultDepartmentFiltering("phoneNum.specified=true", "phoneNum.specified=false");
     }
 
     @Test
@@ -496,11 +440,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where phoneNum contains DEFAULT_PHONE_NUM
-        defaultDepartmentShouldBeFound("phoneNum.contains=" + DEFAULT_PHONE_NUM);
-
-        // Get all the departmentList where phoneNum contains UPDATED_PHONE_NUM
-        defaultDepartmentShouldNotBeFound("phoneNum.contains=" + UPDATED_PHONE_NUM);
+        // Get all the departmentList where phoneNum contains
+        defaultDepartmentFiltering("phoneNum.contains=" + DEFAULT_PHONE_NUM, "phoneNum.contains=" + UPDATED_PHONE_NUM);
     }
 
     @Test
@@ -509,11 +450,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where phoneNum does not contain DEFAULT_PHONE_NUM
-        defaultDepartmentShouldNotBeFound("phoneNum.doesNotContain=" + DEFAULT_PHONE_NUM);
-
-        // Get all the departmentList where phoneNum does not contain UPDATED_PHONE_NUM
-        defaultDepartmentShouldBeFound("phoneNum.doesNotContain=" + UPDATED_PHONE_NUM);
+        // Get all the departmentList where phoneNum does not contain
+        defaultDepartmentFiltering("phoneNum.doesNotContain=" + UPDATED_PHONE_NUM, "phoneNum.doesNotContain=" + DEFAULT_PHONE_NUM);
     }
 
     @Test
@@ -522,11 +460,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where logo equals to DEFAULT_LOGO
-        defaultDepartmentShouldBeFound("logo.equals=" + DEFAULT_LOGO);
-
-        // Get all the departmentList where logo equals to UPDATED_LOGO
-        defaultDepartmentShouldNotBeFound("logo.equals=" + UPDATED_LOGO);
+        // Get all the departmentList where logo equals to
+        defaultDepartmentFiltering("logo.equals=" + DEFAULT_LOGO, "logo.equals=" + UPDATED_LOGO);
     }
 
     @Test
@@ -535,11 +470,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where logo in DEFAULT_LOGO or UPDATED_LOGO
-        defaultDepartmentShouldBeFound("logo.in=" + DEFAULT_LOGO + "," + UPDATED_LOGO);
-
-        // Get all the departmentList where logo equals to UPDATED_LOGO
-        defaultDepartmentShouldNotBeFound("logo.in=" + UPDATED_LOGO);
+        // Get all the departmentList where logo in
+        defaultDepartmentFiltering("logo.in=" + DEFAULT_LOGO + "," + UPDATED_LOGO, "logo.in=" + UPDATED_LOGO);
     }
 
     @Test
@@ -549,10 +481,7 @@ public class DepartmentResourceIT {
         departmentRepository.save(department);
 
         // Get all the departmentList where logo is not null
-        defaultDepartmentShouldBeFound("logo.specified=true");
-
-        // Get all the departmentList where logo is null
-        defaultDepartmentShouldNotBeFound("logo.specified=false");
+        defaultDepartmentFiltering("logo.specified=true", "logo.specified=false");
     }
 
     @Test
@@ -561,11 +490,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where logo contains DEFAULT_LOGO
-        defaultDepartmentShouldBeFound("logo.contains=" + DEFAULT_LOGO);
-
-        // Get all the departmentList where logo contains UPDATED_LOGO
-        defaultDepartmentShouldNotBeFound("logo.contains=" + UPDATED_LOGO);
+        // Get all the departmentList where logo contains
+        defaultDepartmentFiltering("logo.contains=" + DEFAULT_LOGO, "logo.contains=" + UPDATED_LOGO);
     }
 
     @Test
@@ -574,11 +500,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where logo does not contain DEFAULT_LOGO
-        defaultDepartmentShouldNotBeFound("logo.doesNotContain=" + DEFAULT_LOGO);
-
-        // Get all the departmentList where logo does not contain UPDATED_LOGO
-        defaultDepartmentShouldBeFound("logo.doesNotContain=" + UPDATED_LOGO);
+        // Get all the departmentList where logo does not contain
+        defaultDepartmentFiltering("logo.doesNotContain=" + UPDATED_LOGO, "logo.doesNotContain=" + DEFAULT_LOGO);
     }
 
     @Test
@@ -587,11 +510,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where contact equals to DEFAULT_CONTACT
-        defaultDepartmentShouldBeFound("contact.equals=" + DEFAULT_CONTACT);
-
-        // Get all the departmentList where contact equals to UPDATED_CONTACT
-        defaultDepartmentShouldNotBeFound("contact.equals=" + UPDATED_CONTACT);
+        // Get all the departmentList where contact equals to
+        defaultDepartmentFiltering("contact.equals=" + DEFAULT_CONTACT, "contact.equals=" + UPDATED_CONTACT);
     }
 
     @Test
@@ -600,11 +520,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where contact in DEFAULT_CONTACT or UPDATED_CONTACT
-        defaultDepartmentShouldBeFound("contact.in=" + DEFAULT_CONTACT + "," + UPDATED_CONTACT);
-
-        // Get all the departmentList where contact equals to UPDATED_CONTACT
-        defaultDepartmentShouldNotBeFound("contact.in=" + UPDATED_CONTACT);
+        // Get all the departmentList where contact in
+        defaultDepartmentFiltering("contact.in=" + DEFAULT_CONTACT + "," + UPDATED_CONTACT, "contact.in=" + UPDATED_CONTACT);
     }
 
     @Test
@@ -614,10 +531,7 @@ public class DepartmentResourceIT {
         departmentRepository.save(department);
 
         // Get all the departmentList where contact is not null
-        defaultDepartmentShouldBeFound("contact.specified=true");
-
-        // Get all the departmentList where contact is null
-        defaultDepartmentShouldNotBeFound("contact.specified=false");
+        defaultDepartmentFiltering("contact.specified=true", "contact.specified=false");
     }
 
     @Test
@@ -626,11 +540,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where contact contains DEFAULT_CONTACT
-        defaultDepartmentShouldBeFound("contact.contains=" + DEFAULT_CONTACT);
-
-        // Get all the departmentList where contact contains UPDATED_CONTACT
-        defaultDepartmentShouldNotBeFound("contact.contains=" + UPDATED_CONTACT);
+        // Get all the departmentList where contact contains
+        defaultDepartmentFiltering("contact.contains=" + DEFAULT_CONTACT, "contact.contains=" + UPDATED_CONTACT);
     }
 
     @Test
@@ -639,11 +550,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where contact does not contain DEFAULT_CONTACT
-        defaultDepartmentShouldNotBeFound("contact.doesNotContain=" + DEFAULT_CONTACT);
-
-        // Get all the departmentList where contact does not contain UPDATED_CONTACT
-        defaultDepartmentShouldBeFound("contact.doesNotContain=" + UPDATED_CONTACT);
+        // Get all the departmentList where contact does not contain
+        defaultDepartmentFiltering("contact.doesNotContain=" + UPDATED_CONTACT, "contact.doesNotContain=" + DEFAULT_CONTACT);
     }
 
     @Test
@@ -652,11 +560,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where createUserId equals to DEFAULT_CREATE_USER_ID
-        defaultDepartmentShouldBeFound("createUserId.equals=" + DEFAULT_CREATE_USER_ID);
-
-        // Get all the departmentList where createUserId equals to UPDATED_CREATE_USER_ID
-        defaultDepartmentShouldNotBeFound("createUserId.equals=" + UPDATED_CREATE_USER_ID);
+        // Get all the departmentList where createUserId equals to
+        defaultDepartmentFiltering("createUserId.equals=" + DEFAULT_CREATE_USER_ID, "createUserId.equals=" + UPDATED_CREATE_USER_ID);
     }
 
     @Test
@@ -665,11 +570,11 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where createUserId in DEFAULT_CREATE_USER_ID or UPDATED_CREATE_USER_ID
-        defaultDepartmentShouldBeFound("createUserId.in=" + DEFAULT_CREATE_USER_ID + "," + UPDATED_CREATE_USER_ID);
-
-        // Get all the departmentList where createUserId equals to UPDATED_CREATE_USER_ID
-        defaultDepartmentShouldNotBeFound("createUserId.in=" + UPDATED_CREATE_USER_ID);
+        // Get all the departmentList where createUserId in
+        defaultDepartmentFiltering(
+            "createUserId.in=" + DEFAULT_CREATE_USER_ID + "," + UPDATED_CREATE_USER_ID,
+            "createUserId.in=" + UPDATED_CREATE_USER_ID
+        );
     }
 
     @Test
@@ -679,10 +584,7 @@ public class DepartmentResourceIT {
         departmentRepository.save(department);
 
         // Get all the departmentList where createUserId is not null
-        defaultDepartmentShouldBeFound("createUserId.specified=true");
-
-        // Get all the departmentList where createUserId is null
-        defaultDepartmentShouldNotBeFound("createUserId.specified=false");
+        defaultDepartmentFiltering("createUserId.specified=true", "createUserId.specified=false");
     }
 
     @Test
@@ -691,11 +593,11 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where createUserId is greater than or equal to DEFAULT_CREATE_USER_ID
-        defaultDepartmentShouldBeFound("createUserId.greaterThanOrEqual=" + DEFAULT_CREATE_USER_ID);
-
-        // Get all the departmentList where createUserId is greater than or equal to UPDATED_CREATE_USER_ID
-        defaultDepartmentShouldNotBeFound("createUserId.greaterThanOrEqual=" + UPDATED_CREATE_USER_ID);
+        // Get all the departmentList where createUserId is greater than or equal to
+        defaultDepartmentFiltering(
+            "createUserId.greaterThanOrEqual=" + DEFAULT_CREATE_USER_ID,
+            "createUserId.greaterThanOrEqual=" + UPDATED_CREATE_USER_ID
+        );
     }
 
     @Test
@@ -704,11 +606,11 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where createUserId is less than or equal to DEFAULT_CREATE_USER_ID
-        defaultDepartmentShouldBeFound("createUserId.lessThanOrEqual=" + DEFAULT_CREATE_USER_ID);
-
-        // Get all the departmentList where createUserId is less than or equal to SMALLER_CREATE_USER_ID
-        defaultDepartmentShouldNotBeFound("createUserId.lessThanOrEqual=" + SMALLER_CREATE_USER_ID);
+        // Get all the departmentList where createUserId is less than or equal to
+        defaultDepartmentFiltering(
+            "createUserId.lessThanOrEqual=" + DEFAULT_CREATE_USER_ID,
+            "createUserId.lessThanOrEqual=" + SMALLER_CREATE_USER_ID
+        );
     }
 
     @Test
@@ -717,11 +619,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where createUserId is less than DEFAULT_CREATE_USER_ID
-        defaultDepartmentShouldNotBeFound("createUserId.lessThan=" + DEFAULT_CREATE_USER_ID);
-
-        // Get all the departmentList where createUserId is less than UPDATED_CREATE_USER_ID
-        defaultDepartmentShouldBeFound("createUserId.lessThan=" + UPDATED_CREATE_USER_ID);
+        // Get all the departmentList where createUserId is less than
+        defaultDepartmentFiltering("createUserId.lessThan=" + UPDATED_CREATE_USER_ID, "createUserId.lessThan=" + DEFAULT_CREATE_USER_ID);
     }
 
     @Test
@@ -730,11 +629,11 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where createUserId is greater than DEFAULT_CREATE_USER_ID
-        defaultDepartmentShouldNotBeFound("createUserId.greaterThan=" + DEFAULT_CREATE_USER_ID);
-
-        // Get all the departmentList where createUserId is greater than SMALLER_CREATE_USER_ID
-        defaultDepartmentShouldBeFound("createUserId.greaterThan=" + SMALLER_CREATE_USER_ID);
+        // Get all the departmentList where createUserId is greater than
+        defaultDepartmentFiltering(
+            "createUserId.greaterThan=" + SMALLER_CREATE_USER_ID,
+            "createUserId.greaterThan=" + DEFAULT_CREATE_USER_ID
+        );
     }
 
     @Test
@@ -743,11 +642,8 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where createTime equals to DEFAULT_CREATE_TIME
-        defaultDepartmentShouldBeFound("createTime.equals=" + DEFAULT_CREATE_TIME);
-
-        // Get all the departmentList where createTime equals to UPDATED_CREATE_TIME
-        defaultDepartmentShouldNotBeFound("createTime.equals=" + UPDATED_CREATE_TIME);
+        // Get all the departmentList where createTime equals to
+        defaultDepartmentFiltering("createTime.equals=" + DEFAULT_CREATE_TIME, "createTime.equals=" + UPDATED_CREATE_TIME);
     }
 
     @Test
@@ -756,11 +652,11 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        // Get all the departmentList where createTime in DEFAULT_CREATE_TIME or UPDATED_CREATE_TIME
-        defaultDepartmentShouldBeFound("createTime.in=" + DEFAULT_CREATE_TIME + "," + UPDATED_CREATE_TIME);
-
-        // Get all the departmentList where createTime equals to UPDATED_CREATE_TIME
-        defaultDepartmentShouldNotBeFound("createTime.in=" + UPDATED_CREATE_TIME);
+        // Get all the departmentList where createTime in
+        defaultDepartmentFiltering(
+            "createTime.in=" + DEFAULT_CREATE_TIME + "," + UPDATED_CREATE_TIME,
+            "createTime.in=" + UPDATED_CREATE_TIME
+        );
     }
 
     @Test
@@ -770,10 +666,7 @@ public class DepartmentResourceIT {
         departmentRepository.save(department);
 
         // Get all the departmentList where createTime is not null
-        defaultDepartmentShouldBeFound("createTime.specified=true");
-
-        // Get all the departmentList where createTime is null
-        defaultDepartmentShouldNotBeFound("createTime.specified=false");
+        defaultDepartmentFiltering("createTime.specified=true", "createTime.specified=false");
     }
 
     @Test
@@ -802,6 +695,11 @@ public class DepartmentResourceIT {
 
         // Get all the departmentList where parent equals to (parentId + 1)
         defaultDepartmentShouldNotBeFound("parentId.equals=" + (parentId + 1));
+    }
+
+    private void defaultDepartmentFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultDepartmentShouldBeFound(shouldBeFound);
+        defaultDepartmentShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -862,7 +760,7 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        int databaseSizeBeforeUpdate = departmentRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the department
         Department updatedDepartment = departmentRepository.findById(department.getId()).orElseThrow();
@@ -881,28 +779,19 @@ public class DepartmentResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, departmentDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(departmentDTO))
+                    .content(om.writeValueAsBytes(departmentDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the Department in the database
-        List<Department> departmentList = departmentRepository.findAll();
-        assertThat(departmentList).hasSize(databaseSizeBeforeUpdate);
-        Department testDepartment = departmentList.get(departmentList.size() - 1);
-        assertThat(testDepartment.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testDepartment.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testDepartment.getAddress()).isEqualTo(UPDATED_ADDRESS);
-        assertThat(testDepartment.getPhoneNum()).isEqualTo(UPDATED_PHONE_NUM);
-        assertThat(testDepartment.getLogo()).isEqualTo(UPDATED_LOGO);
-        assertThat(testDepartment.getContact()).isEqualTo(UPDATED_CONTACT);
-        assertThat(testDepartment.getCreateUserId()).isEqualTo(UPDATED_CREATE_USER_ID);
-        assertThat(testDepartment.getCreateTime()).isEqualTo(UPDATED_CREATE_TIME);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedDepartmentToMatchAllProperties(updatedDepartment);
     }
 
     @Test
     @Transactional
     void putNonExistingDepartment() throws Exception {
-        int databaseSizeBeforeUpdate = departmentRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         department.setId(longCount.incrementAndGet());
 
         // Create the Department
@@ -913,19 +802,18 @@ public class DepartmentResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, departmentDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(departmentDTO))
+                    .content(om.writeValueAsBytes(departmentDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Department in the database
-        List<Department> departmentList = departmentRepository.findAll();
-        assertThat(departmentList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchDepartment() throws Exception {
-        int databaseSizeBeforeUpdate = departmentRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         department.setId(longCount.incrementAndGet());
 
         // Create the Department
@@ -936,19 +824,18 @@ public class DepartmentResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(departmentDTO))
+                    .content(om.writeValueAsBytes(departmentDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Department in the database
-        List<Department> departmentList = departmentRepository.findAll();
-        assertThat(departmentList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamDepartment() throws Exception {
-        int databaseSizeBeforeUpdate = departmentRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         department.setId(longCount.incrementAndGet());
 
         // Create the Department
@@ -956,12 +843,11 @@ public class DepartmentResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restDepartmentMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(departmentDTO)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(departmentDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Department in the database
-        List<Department> departmentList = departmentRepository.findAll();
-        assertThat(departmentList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -970,34 +856,34 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        int databaseSizeBeforeUpdate = departmentRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the department using partial update
         Department partialUpdatedDepartment = new Department();
         partialUpdatedDepartment.setId(department.getId());
 
-        partialUpdatedDepartment.code(UPDATED_CODE).createTime(UPDATED_CREATE_TIME);
+        partialUpdatedDepartment
+            .address(UPDATED_ADDRESS)
+            .phoneNum(UPDATED_PHONE_NUM)
+            .logo(UPDATED_LOGO)
+            .contact(UPDATED_CONTACT)
+            .createTime(UPDATED_CREATE_TIME);
 
         restDepartmentMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedDepartment.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedDepartment))
+                    .content(om.writeValueAsBytes(partialUpdatedDepartment))
             )
             .andExpect(status().isOk());
 
         // Validate the Department in the database
-        List<Department> departmentList = departmentRepository.findAll();
-        assertThat(departmentList).hasSize(databaseSizeBeforeUpdate);
-        Department testDepartment = departmentList.get(departmentList.size() - 1);
-        assertThat(testDepartment.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testDepartment.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testDepartment.getAddress()).isEqualTo(DEFAULT_ADDRESS);
-        assertThat(testDepartment.getPhoneNum()).isEqualTo(DEFAULT_PHONE_NUM);
-        assertThat(testDepartment.getLogo()).isEqualTo(DEFAULT_LOGO);
-        assertThat(testDepartment.getContact()).isEqualTo(DEFAULT_CONTACT);
-        assertThat(testDepartment.getCreateUserId()).isEqualTo(DEFAULT_CREATE_USER_ID);
-        assertThat(testDepartment.getCreateTime()).isEqualTo(UPDATED_CREATE_TIME);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertDepartmentUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedDepartment, department),
+            getPersistedDepartment(department)
+        );
     }
 
     @Test
@@ -1006,7 +892,7 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        int databaseSizeBeforeUpdate = departmentRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the department using partial update
         Department partialUpdatedDepartment = new Department();
@@ -1026,28 +912,20 @@ public class DepartmentResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedDepartment.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedDepartment))
+                    .content(om.writeValueAsBytes(partialUpdatedDepartment))
             )
             .andExpect(status().isOk());
 
         // Validate the Department in the database
-        List<Department> departmentList = departmentRepository.findAll();
-        assertThat(departmentList).hasSize(databaseSizeBeforeUpdate);
-        Department testDepartment = departmentList.get(departmentList.size() - 1);
-        assertThat(testDepartment.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testDepartment.getCode()).isEqualTo(UPDATED_CODE);
-        assertThat(testDepartment.getAddress()).isEqualTo(UPDATED_ADDRESS);
-        assertThat(testDepartment.getPhoneNum()).isEqualTo(UPDATED_PHONE_NUM);
-        assertThat(testDepartment.getLogo()).isEqualTo(UPDATED_LOGO);
-        assertThat(testDepartment.getContact()).isEqualTo(UPDATED_CONTACT);
-        assertThat(testDepartment.getCreateUserId()).isEqualTo(UPDATED_CREATE_USER_ID);
-        assertThat(testDepartment.getCreateTime()).isEqualTo(UPDATED_CREATE_TIME);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertDepartmentUpdatableFieldsEquals(partialUpdatedDepartment, getPersistedDepartment(partialUpdatedDepartment));
     }
 
     @Test
     @Transactional
     void patchNonExistingDepartment() throws Exception {
-        int databaseSizeBeforeUpdate = departmentRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         department.setId(longCount.incrementAndGet());
 
         // Create the Department
@@ -1058,19 +936,18 @@ public class DepartmentResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, departmentDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(departmentDTO))
+                    .content(om.writeValueAsBytes(departmentDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Department in the database
-        List<Department> departmentList = departmentRepository.findAll();
-        assertThat(departmentList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchDepartment() throws Exception {
-        int databaseSizeBeforeUpdate = departmentRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         department.setId(longCount.incrementAndGet());
 
         // Create the Department
@@ -1081,19 +958,18 @@ public class DepartmentResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(departmentDTO))
+                    .content(om.writeValueAsBytes(departmentDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Department in the database
-        List<Department> departmentList = departmentRepository.findAll();
-        assertThat(departmentList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamDepartment() throws Exception {
-        int databaseSizeBeforeUpdate = departmentRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         department.setId(longCount.incrementAndGet());
 
         // Create the Department
@@ -1101,14 +977,11 @@ public class DepartmentResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restDepartmentMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(departmentDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(departmentDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Department in the database
-        List<Department> departmentList = departmentRepository.findAll();
-        assertThat(departmentList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -1117,7 +990,7 @@ public class DepartmentResourceIT {
         // Initialize the database
         departmentRepository.save(department);
 
-        int databaseSizeBeforeDelete = departmentRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the department
         restDepartmentMockMvc
@@ -1125,7 +998,34 @@ public class DepartmentResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<Department> departmentList = departmentRepository.findAll();
-        assertThat(departmentList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return departmentRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected Department getPersistedDepartment(Department department) {
+        return departmentRepository.findById(department.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedDepartmentToMatchAllProperties(Department expectedDepartment) {
+        assertDepartmentAllPropertiesEquals(expectedDepartment, getPersistedDepartment(expectedDepartment));
+    }
+
+    protected void assertPersistedDepartmentToMatchUpdatableProperties(Department expectedDepartment) {
+        assertDepartmentAllUpdatablePropertiesEquals(expectedDepartment, getPersistedDepartment(expectedDepartment));
     }
 }

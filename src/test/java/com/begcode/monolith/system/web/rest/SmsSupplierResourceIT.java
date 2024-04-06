@@ -1,5 +1,7 @@
 package com.begcode.monolith.system.web.rest;
 
+import static com.begcode.monolith.system.domain.SmsSupplierAsserts.*;
+import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -12,10 +14,8 @@ import com.begcode.monolith.system.domain.SmsSupplier;
 import com.begcode.monolith.system.repository.SmsSupplierRepository;
 import com.begcode.monolith.system.service.dto.SmsSupplierDTO;
 import com.begcode.monolith.system.service.mapper.SmsSupplierMapper;
-import com.begcode.monolith.web.rest.TestUtil;
-import com.begcode.monolith.web.rest.TestUtil;
-import java.util.List;
-import java.util.Random;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,8 +51,11 @@ public class SmsSupplierResourceIT {
     private static final String ENTITY_API_URL = "/api/sms-suppliers";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private SmsSupplierRepository smsSupplierRepository;
@@ -105,24 +108,23 @@ public class SmsSupplierResourceIT {
     @Test
     @Transactional
     void createSmsSupplier() throws Exception {
-        int databaseSizeBeforeCreate = smsSupplierRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the SmsSupplier
         SmsSupplierDTO smsSupplierDTO = smsSupplierMapper.toDto(smsSupplier);
-        restSmsSupplierMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(smsSupplierDTO))
-            )
-            .andExpect(status().isCreated());
+        var returnedSmsSupplierDTO = om.readValue(
+            restSmsSupplierMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(smsSupplierDTO)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            SmsSupplierDTO.class
+        );
 
         // Validate the SmsSupplier in the database
-        List<SmsSupplier> smsSupplierList = smsSupplierRepository.findAll();
-        assertThat(smsSupplierList).hasSize(databaseSizeBeforeCreate + 1);
-        SmsSupplier testSmsSupplier = smsSupplierList.get(smsSupplierList.size() - 1);
-        assertThat(testSmsSupplier.getProvider()).isEqualTo(DEFAULT_PROVIDER);
-        assertThat(testSmsSupplier.getConfigData()).isEqualTo(DEFAULT_CONFIG_DATA);
-        assertThat(testSmsSupplier.getSignName()).isEqualTo(DEFAULT_SIGN_NAME);
-        assertThat(testSmsSupplier.getRemark()).isEqualTo(DEFAULT_REMARK);
-        assertThat(testSmsSupplier.getEnabled()).isEqualTo(DEFAULT_ENABLED);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedSmsSupplier = smsSupplierMapper.toEntity(returnedSmsSupplierDTO);
+        assertSmsSupplierUpdatableFieldsEquals(returnedSmsSupplier, getPersistedSmsSupplier(returnedSmsSupplier));
     }
 
     @Test
@@ -132,18 +134,15 @@ public class SmsSupplierResourceIT {
         smsSupplier.setId(1L);
         SmsSupplierDTO smsSupplierDTO = smsSupplierMapper.toDto(smsSupplier);
 
-        int databaseSizeBeforeCreate = smsSupplierRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restSmsSupplierMockMvc
-            .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(smsSupplierDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(smsSupplierDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the SmsSupplier in the database
-        List<SmsSupplier> smsSupplierList = smsSupplierRepository.findAll();
-        assertThat(smsSupplierList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
@@ -192,14 +191,11 @@ public class SmsSupplierResourceIT {
 
         Long id = smsSupplier.getId();
 
-        defaultSmsSupplierShouldBeFound("id.equals=" + id);
-        defaultSmsSupplierShouldNotBeFound("id.notEquals=" + id);
+        defaultSmsSupplierFiltering("id.equals=" + id, "id.notEquals=" + id);
 
-        defaultSmsSupplierShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultSmsSupplierShouldNotBeFound("id.greaterThan=" + id);
+        defaultSmsSupplierFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
-        defaultSmsSupplierShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultSmsSupplierShouldNotBeFound("id.lessThan=" + id);
+        defaultSmsSupplierFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -208,11 +204,8 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        // Get all the smsSupplierList where provider equals to DEFAULT_PROVIDER
-        defaultSmsSupplierShouldBeFound("provider.equals=" + DEFAULT_PROVIDER);
-
-        // Get all the smsSupplierList where provider equals to UPDATED_PROVIDER
-        defaultSmsSupplierShouldNotBeFound("provider.equals=" + UPDATED_PROVIDER);
+        // Get all the smsSupplierList where provider equals to
+        defaultSmsSupplierFiltering("provider.equals=" + DEFAULT_PROVIDER, "provider.equals=" + UPDATED_PROVIDER);
     }
 
     @Test
@@ -221,11 +214,8 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        // Get all the smsSupplierList where provider in DEFAULT_PROVIDER or UPDATED_PROVIDER
-        defaultSmsSupplierShouldBeFound("provider.in=" + DEFAULT_PROVIDER + "," + UPDATED_PROVIDER);
-
-        // Get all the smsSupplierList where provider equals to UPDATED_PROVIDER
-        defaultSmsSupplierShouldNotBeFound("provider.in=" + UPDATED_PROVIDER);
+        // Get all the smsSupplierList where provider in
+        defaultSmsSupplierFiltering("provider.in=" + DEFAULT_PROVIDER + "," + UPDATED_PROVIDER, "provider.in=" + UPDATED_PROVIDER);
     }
 
     @Test
@@ -235,10 +225,7 @@ public class SmsSupplierResourceIT {
         smsSupplierRepository.save(smsSupplier);
 
         // Get all the smsSupplierList where provider is not null
-        defaultSmsSupplierShouldBeFound("provider.specified=true");
-
-        // Get all the smsSupplierList where provider is null
-        defaultSmsSupplierShouldNotBeFound("provider.specified=false");
+        defaultSmsSupplierFiltering("provider.specified=true", "provider.specified=false");
     }
 
     @Test
@@ -247,11 +234,8 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        // Get all the smsSupplierList where configData equals to DEFAULT_CONFIG_DATA
-        defaultSmsSupplierShouldBeFound("configData.equals=" + DEFAULT_CONFIG_DATA);
-
-        // Get all the smsSupplierList where configData equals to UPDATED_CONFIG_DATA
-        defaultSmsSupplierShouldNotBeFound("configData.equals=" + UPDATED_CONFIG_DATA);
+        // Get all the smsSupplierList where configData equals to
+        defaultSmsSupplierFiltering("configData.equals=" + DEFAULT_CONFIG_DATA, "configData.equals=" + UPDATED_CONFIG_DATA);
     }
 
     @Test
@@ -260,11 +244,11 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        // Get all the smsSupplierList where configData in DEFAULT_CONFIG_DATA or UPDATED_CONFIG_DATA
-        defaultSmsSupplierShouldBeFound("configData.in=" + DEFAULT_CONFIG_DATA + "," + UPDATED_CONFIG_DATA);
-
-        // Get all the smsSupplierList where configData equals to UPDATED_CONFIG_DATA
-        defaultSmsSupplierShouldNotBeFound("configData.in=" + UPDATED_CONFIG_DATA);
+        // Get all the smsSupplierList where configData in
+        defaultSmsSupplierFiltering(
+            "configData.in=" + DEFAULT_CONFIG_DATA + "," + UPDATED_CONFIG_DATA,
+            "configData.in=" + UPDATED_CONFIG_DATA
+        );
     }
 
     @Test
@@ -274,10 +258,7 @@ public class SmsSupplierResourceIT {
         smsSupplierRepository.save(smsSupplier);
 
         // Get all the smsSupplierList where configData is not null
-        defaultSmsSupplierShouldBeFound("configData.specified=true");
-
-        // Get all the smsSupplierList where configData is null
-        defaultSmsSupplierShouldNotBeFound("configData.specified=false");
+        defaultSmsSupplierFiltering("configData.specified=true", "configData.specified=false");
     }
 
     @Test
@@ -286,11 +267,8 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        // Get all the smsSupplierList where configData contains DEFAULT_CONFIG_DATA
-        defaultSmsSupplierShouldBeFound("configData.contains=" + DEFAULT_CONFIG_DATA);
-
-        // Get all the smsSupplierList where configData contains UPDATED_CONFIG_DATA
-        defaultSmsSupplierShouldNotBeFound("configData.contains=" + UPDATED_CONFIG_DATA);
+        // Get all the smsSupplierList where configData contains
+        defaultSmsSupplierFiltering("configData.contains=" + DEFAULT_CONFIG_DATA, "configData.contains=" + UPDATED_CONFIG_DATA);
     }
 
     @Test
@@ -299,11 +277,8 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        // Get all the smsSupplierList where configData does not contain DEFAULT_CONFIG_DATA
-        defaultSmsSupplierShouldNotBeFound("configData.doesNotContain=" + DEFAULT_CONFIG_DATA);
-
-        // Get all the smsSupplierList where configData does not contain UPDATED_CONFIG_DATA
-        defaultSmsSupplierShouldBeFound("configData.doesNotContain=" + UPDATED_CONFIG_DATA);
+        // Get all the smsSupplierList where configData does not contain
+        defaultSmsSupplierFiltering("configData.doesNotContain=" + UPDATED_CONFIG_DATA, "configData.doesNotContain=" + DEFAULT_CONFIG_DATA);
     }
 
     @Test
@@ -312,11 +287,8 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        // Get all the smsSupplierList where signName equals to DEFAULT_SIGN_NAME
-        defaultSmsSupplierShouldBeFound("signName.equals=" + DEFAULT_SIGN_NAME);
-
-        // Get all the smsSupplierList where signName equals to UPDATED_SIGN_NAME
-        defaultSmsSupplierShouldNotBeFound("signName.equals=" + UPDATED_SIGN_NAME);
+        // Get all the smsSupplierList where signName equals to
+        defaultSmsSupplierFiltering("signName.equals=" + DEFAULT_SIGN_NAME, "signName.equals=" + UPDATED_SIGN_NAME);
     }
 
     @Test
@@ -325,11 +297,8 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        // Get all the smsSupplierList where signName in DEFAULT_SIGN_NAME or UPDATED_SIGN_NAME
-        defaultSmsSupplierShouldBeFound("signName.in=" + DEFAULT_SIGN_NAME + "," + UPDATED_SIGN_NAME);
-
-        // Get all the smsSupplierList where signName equals to UPDATED_SIGN_NAME
-        defaultSmsSupplierShouldNotBeFound("signName.in=" + UPDATED_SIGN_NAME);
+        // Get all the smsSupplierList where signName in
+        defaultSmsSupplierFiltering("signName.in=" + DEFAULT_SIGN_NAME + "," + UPDATED_SIGN_NAME, "signName.in=" + UPDATED_SIGN_NAME);
     }
 
     @Test
@@ -339,10 +308,7 @@ public class SmsSupplierResourceIT {
         smsSupplierRepository.save(smsSupplier);
 
         // Get all the smsSupplierList where signName is not null
-        defaultSmsSupplierShouldBeFound("signName.specified=true");
-
-        // Get all the smsSupplierList where signName is null
-        defaultSmsSupplierShouldNotBeFound("signName.specified=false");
+        defaultSmsSupplierFiltering("signName.specified=true", "signName.specified=false");
     }
 
     @Test
@@ -351,11 +317,8 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        // Get all the smsSupplierList where signName contains DEFAULT_SIGN_NAME
-        defaultSmsSupplierShouldBeFound("signName.contains=" + DEFAULT_SIGN_NAME);
-
-        // Get all the smsSupplierList where signName contains UPDATED_SIGN_NAME
-        defaultSmsSupplierShouldNotBeFound("signName.contains=" + UPDATED_SIGN_NAME);
+        // Get all the smsSupplierList where signName contains
+        defaultSmsSupplierFiltering("signName.contains=" + DEFAULT_SIGN_NAME, "signName.contains=" + UPDATED_SIGN_NAME);
     }
 
     @Test
@@ -364,11 +327,8 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        // Get all the smsSupplierList where signName does not contain DEFAULT_SIGN_NAME
-        defaultSmsSupplierShouldNotBeFound("signName.doesNotContain=" + DEFAULT_SIGN_NAME);
-
-        // Get all the smsSupplierList where signName does not contain UPDATED_SIGN_NAME
-        defaultSmsSupplierShouldBeFound("signName.doesNotContain=" + UPDATED_SIGN_NAME);
+        // Get all the smsSupplierList where signName does not contain
+        defaultSmsSupplierFiltering("signName.doesNotContain=" + UPDATED_SIGN_NAME, "signName.doesNotContain=" + DEFAULT_SIGN_NAME);
     }
 
     @Test
@@ -377,11 +337,8 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        // Get all the smsSupplierList where remark equals to DEFAULT_REMARK
-        defaultSmsSupplierShouldBeFound("remark.equals=" + DEFAULT_REMARK);
-
-        // Get all the smsSupplierList where remark equals to UPDATED_REMARK
-        defaultSmsSupplierShouldNotBeFound("remark.equals=" + UPDATED_REMARK);
+        // Get all the smsSupplierList where remark equals to
+        defaultSmsSupplierFiltering("remark.equals=" + DEFAULT_REMARK, "remark.equals=" + UPDATED_REMARK);
     }
 
     @Test
@@ -390,11 +347,8 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        // Get all the smsSupplierList where remark in DEFAULT_REMARK or UPDATED_REMARK
-        defaultSmsSupplierShouldBeFound("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK);
-
-        // Get all the smsSupplierList where remark equals to UPDATED_REMARK
-        defaultSmsSupplierShouldNotBeFound("remark.in=" + UPDATED_REMARK);
+        // Get all the smsSupplierList where remark in
+        defaultSmsSupplierFiltering("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK, "remark.in=" + UPDATED_REMARK);
     }
 
     @Test
@@ -404,10 +358,7 @@ public class SmsSupplierResourceIT {
         smsSupplierRepository.save(smsSupplier);
 
         // Get all the smsSupplierList where remark is not null
-        defaultSmsSupplierShouldBeFound("remark.specified=true");
-
-        // Get all the smsSupplierList where remark is null
-        defaultSmsSupplierShouldNotBeFound("remark.specified=false");
+        defaultSmsSupplierFiltering("remark.specified=true", "remark.specified=false");
     }
 
     @Test
@@ -416,11 +367,8 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        // Get all the smsSupplierList where remark contains DEFAULT_REMARK
-        defaultSmsSupplierShouldBeFound("remark.contains=" + DEFAULT_REMARK);
-
-        // Get all the smsSupplierList where remark contains UPDATED_REMARK
-        defaultSmsSupplierShouldNotBeFound("remark.contains=" + UPDATED_REMARK);
+        // Get all the smsSupplierList where remark contains
+        defaultSmsSupplierFiltering("remark.contains=" + DEFAULT_REMARK, "remark.contains=" + UPDATED_REMARK);
     }
 
     @Test
@@ -429,11 +377,8 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        // Get all the smsSupplierList where remark does not contain DEFAULT_REMARK
-        defaultSmsSupplierShouldNotBeFound("remark.doesNotContain=" + DEFAULT_REMARK);
-
-        // Get all the smsSupplierList where remark does not contain UPDATED_REMARK
-        defaultSmsSupplierShouldBeFound("remark.doesNotContain=" + UPDATED_REMARK);
+        // Get all the smsSupplierList where remark does not contain
+        defaultSmsSupplierFiltering("remark.doesNotContain=" + UPDATED_REMARK, "remark.doesNotContain=" + DEFAULT_REMARK);
     }
 
     @Test
@@ -442,11 +387,8 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        // Get all the smsSupplierList where enabled equals to DEFAULT_ENABLED
-        defaultSmsSupplierShouldBeFound("enabled.equals=" + DEFAULT_ENABLED);
-
-        // Get all the smsSupplierList where enabled equals to UPDATED_ENABLED
-        defaultSmsSupplierShouldNotBeFound("enabled.equals=" + UPDATED_ENABLED);
+        // Get all the smsSupplierList where enabled equals to
+        defaultSmsSupplierFiltering("enabled.equals=" + DEFAULT_ENABLED, "enabled.equals=" + UPDATED_ENABLED);
     }
 
     @Test
@@ -455,11 +397,8 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        // Get all the smsSupplierList where enabled in DEFAULT_ENABLED or UPDATED_ENABLED
-        defaultSmsSupplierShouldBeFound("enabled.in=" + DEFAULT_ENABLED + "," + UPDATED_ENABLED);
-
-        // Get all the smsSupplierList where enabled equals to UPDATED_ENABLED
-        defaultSmsSupplierShouldNotBeFound("enabled.in=" + UPDATED_ENABLED);
+        // Get all the smsSupplierList where enabled in
+        defaultSmsSupplierFiltering("enabled.in=" + DEFAULT_ENABLED + "," + UPDATED_ENABLED, "enabled.in=" + UPDATED_ENABLED);
     }
 
     @Test
@@ -469,10 +408,12 @@ public class SmsSupplierResourceIT {
         smsSupplierRepository.save(smsSupplier);
 
         // Get all the smsSupplierList where enabled is not null
-        defaultSmsSupplierShouldBeFound("enabled.specified=true");
+        defaultSmsSupplierFiltering("enabled.specified=true", "enabled.specified=false");
+    }
 
-        // Get all the smsSupplierList where enabled is null
-        defaultSmsSupplierShouldNotBeFound("enabled.specified=false");
+    private void defaultSmsSupplierFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
+        defaultSmsSupplierShouldBeFound(shouldBeFound);
+        defaultSmsSupplierShouldNotBeFound(shouldNotBeFound);
     }
 
     /**
@@ -530,7 +471,7 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        int databaseSizeBeforeUpdate = smsSupplierRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the smsSupplier
         SmsSupplier updatedSmsSupplier = smsSupplierRepository.findById(smsSupplier.getId()).orElseThrow();
@@ -546,25 +487,19 @@ public class SmsSupplierResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, smsSupplierDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(smsSupplierDTO))
+                    .content(om.writeValueAsBytes(smsSupplierDTO))
             )
             .andExpect(status().isOk());
 
         // Validate the SmsSupplier in the database
-        List<SmsSupplier> smsSupplierList = smsSupplierRepository.findAll();
-        assertThat(smsSupplierList).hasSize(databaseSizeBeforeUpdate);
-        SmsSupplier testSmsSupplier = smsSupplierList.get(smsSupplierList.size() - 1);
-        assertThat(testSmsSupplier.getProvider()).isEqualTo(UPDATED_PROVIDER);
-        assertThat(testSmsSupplier.getConfigData()).isEqualTo(UPDATED_CONFIG_DATA);
-        assertThat(testSmsSupplier.getSignName()).isEqualTo(UPDATED_SIGN_NAME);
-        assertThat(testSmsSupplier.getRemark()).isEqualTo(UPDATED_REMARK);
-        assertThat(testSmsSupplier.getEnabled()).isEqualTo(UPDATED_ENABLED);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedSmsSupplierToMatchAllProperties(updatedSmsSupplier);
     }
 
     @Test
     @Transactional
     void putNonExistingSmsSupplier() throws Exception {
-        int databaseSizeBeforeUpdate = smsSupplierRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsSupplier.setId(longCount.incrementAndGet());
 
         // Create the SmsSupplier
@@ -575,19 +510,18 @@ public class SmsSupplierResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, smsSupplierDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(smsSupplierDTO))
+                    .content(om.writeValueAsBytes(smsSupplierDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SmsSupplier in the database
-        List<SmsSupplier> smsSupplierList = smsSupplierRepository.findAll();
-        assertThat(smsSupplierList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchSmsSupplier() throws Exception {
-        int databaseSizeBeforeUpdate = smsSupplierRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsSupplier.setId(longCount.incrementAndGet());
 
         // Create the SmsSupplier
@@ -598,19 +532,18 @@ public class SmsSupplierResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(smsSupplierDTO))
+                    .content(om.writeValueAsBytes(smsSupplierDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SmsSupplier in the database
-        List<SmsSupplier> smsSupplierList = smsSupplierRepository.findAll();
-        assertThat(smsSupplierList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamSmsSupplier() throws Exception {
-        int databaseSizeBeforeUpdate = smsSupplierRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsSupplier.setId(longCount.incrementAndGet());
 
         // Create the SmsSupplier
@@ -618,12 +551,11 @@ public class SmsSupplierResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restSmsSupplierMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(smsSupplierDTO)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(smsSupplierDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the SmsSupplier in the database
-        List<SmsSupplier> smsSupplierList = smsSupplierRepository.findAll();
-        assertThat(smsSupplierList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -632,31 +564,33 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        int databaseSizeBeforeUpdate = smsSupplierRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the smsSupplier using partial update
         SmsSupplier partialUpdatedSmsSupplier = new SmsSupplier();
         partialUpdatedSmsSupplier.setId(smsSupplier.getId());
 
-        partialUpdatedSmsSupplier.configData(UPDATED_CONFIG_DATA).remark(UPDATED_REMARK);
+        partialUpdatedSmsSupplier
+            .provider(UPDATED_PROVIDER)
+            .configData(UPDATED_CONFIG_DATA)
+            .signName(UPDATED_SIGN_NAME)
+            .remark(UPDATED_REMARK);
 
         restSmsSupplierMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedSmsSupplier.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedSmsSupplier))
+                    .content(om.writeValueAsBytes(partialUpdatedSmsSupplier))
             )
             .andExpect(status().isOk());
 
         // Validate the SmsSupplier in the database
-        List<SmsSupplier> smsSupplierList = smsSupplierRepository.findAll();
-        assertThat(smsSupplierList).hasSize(databaseSizeBeforeUpdate);
-        SmsSupplier testSmsSupplier = smsSupplierList.get(smsSupplierList.size() - 1);
-        assertThat(testSmsSupplier.getProvider()).isEqualTo(DEFAULT_PROVIDER);
-        assertThat(testSmsSupplier.getConfigData()).isEqualTo(UPDATED_CONFIG_DATA);
-        assertThat(testSmsSupplier.getSignName()).isEqualTo(DEFAULT_SIGN_NAME);
-        assertThat(testSmsSupplier.getRemark()).isEqualTo(UPDATED_REMARK);
-        assertThat(testSmsSupplier.getEnabled()).isEqualTo(DEFAULT_ENABLED);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertSmsSupplierUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedSmsSupplier, smsSupplier),
+            getPersistedSmsSupplier(smsSupplier)
+        );
     }
 
     @Test
@@ -665,7 +599,7 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        int databaseSizeBeforeUpdate = smsSupplierRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the smsSupplier using partial update
         SmsSupplier partialUpdatedSmsSupplier = new SmsSupplier();
@@ -682,25 +616,20 @@ public class SmsSupplierResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedSmsSupplier.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedSmsSupplier))
+                    .content(om.writeValueAsBytes(partialUpdatedSmsSupplier))
             )
             .andExpect(status().isOk());
 
         // Validate the SmsSupplier in the database
-        List<SmsSupplier> smsSupplierList = smsSupplierRepository.findAll();
-        assertThat(smsSupplierList).hasSize(databaseSizeBeforeUpdate);
-        SmsSupplier testSmsSupplier = smsSupplierList.get(smsSupplierList.size() - 1);
-        assertThat(testSmsSupplier.getProvider()).isEqualTo(UPDATED_PROVIDER);
-        assertThat(testSmsSupplier.getConfigData()).isEqualTo(UPDATED_CONFIG_DATA);
-        assertThat(testSmsSupplier.getSignName()).isEqualTo(UPDATED_SIGN_NAME);
-        assertThat(testSmsSupplier.getRemark()).isEqualTo(UPDATED_REMARK);
-        assertThat(testSmsSupplier.getEnabled()).isEqualTo(UPDATED_ENABLED);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertSmsSupplierUpdatableFieldsEquals(partialUpdatedSmsSupplier, getPersistedSmsSupplier(partialUpdatedSmsSupplier));
     }
 
     @Test
     @Transactional
     void patchNonExistingSmsSupplier() throws Exception {
-        int databaseSizeBeforeUpdate = smsSupplierRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsSupplier.setId(longCount.incrementAndGet());
 
         // Create the SmsSupplier
@@ -711,19 +640,18 @@ public class SmsSupplierResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, smsSupplierDTO.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(smsSupplierDTO))
+                    .content(om.writeValueAsBytes(smsSupplierDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SmsSupplier in the database
-        List<SmsSupplier> smsSupplierList = smsSupplierRepository.findAll();
-        assertThat(smsSupplierList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchSmsSupplier() throws Exception {
-        int databaseSizeBeforeUpdate = smsSupplierRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsSupplier.setId(longCount.incrementAndGet());
 
         // Create the SmsSupplier
@@ -734,19 +662,18 @@ public class SmsSupplierResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(smsSupplierDTO))
+                    .content(om.writeValueAsBytes(smsSupplierDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the SmsSupplier in the database
-        List<SmsSupplier> smsSupplierList = smsSupplierRepository.findAll();
-        assertThat(smsSupplierList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamSmsSupplier() throws Exception {
-        int databaseSizeBeforeUpdate = smsSupplierRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
         smsSupplier.setId(longCount.incrementAndGet());
 
         // Create the SmsSupplier
@@ -754,14 +681,11 @@ public class SmsSupplierResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restSmsSupplierMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(smsSupplierDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(smsSupplierDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the SmsSupplier in the database
-        List<SmsSupplier> smsSupplierList = smsSupplierRepository.findAll();
-        assertThat(smsSupplierList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -770,7 +694,7 @@ public class SmsSupplierResourceIT {
         // Initialize the database
         smsSupplierRepository.save(smsSupplier);
 
-        int databaseSizeBeforeDelete = smsSupplierRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the smsSupplier
         restSmsSupplierMockMvc
@@ -778,7 +702,34 @@ public class SmsSupplierResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<SmsSupplier> smsSupplierList = smsSupplierRepository.findAll();
-        assertThat(smsSupplierList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return smsSupplierRepository.selectCount(null);
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected SmsSupplier getPersistedSmsSupplier(SmsSupplier smsSupplier) {
+        return smsSupplierRepository.findById(smsSupplier.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedSmsSupplierToMatchAllProperties(SmsSupplier expectedSmsSupplier) {
+        assertSmsSupplierAllPropertiesEquals(expectedSmsSupplier, getPersistedSmsSupplier(expectedSmsSupplier));
+    }
+
+    protected void assertPersistedSmsSupplierToMatchUpdatableProperties(SmsSupplier expectedSmsSupplier) {
+        assertSmsSupplierAllUpdatablePropertiesEquals(expectedSmsSupplier, getPersistedSmsSupplier(expectedSmsSupplier));
     }
 }

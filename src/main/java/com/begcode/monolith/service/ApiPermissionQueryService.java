@@ -76,12 +76,10 @@ public class ApiPermissionQueryService implements QueryService<ApiPermission> {
     public IPage<ApiPermissionDTO> findByCriteria(ApiPermissionCriteria criteria, Page<ApiPermission> page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         final QueryWrapper<ApiPermission> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, ApiPermission.class, page)
-            .convert(apiPermission -> {
-                Binder.bindRelations(apiPermission, new String[] { "children" });
-                return apiPermissionMapper.toDto(apiPermission);
-            });
+        return Binder.joinQueryPage(queryWrapper, ApiPermission.class, page).convert(apiPermission -> {
+            Binder.bindRelations(apiPermission, new String[] { "children" });
+            return apiPermissionMapper.toDto(apiPermission);
+        });
     }
 
     /**
@@ -105,12 +103,10 @@ public class ApiPermissionQueryService implements QueryService<ApiPermission> {
         log.debug("find by criteria : {}, page: {}", criteria, page);
         criteria.parentId().setSpecified(false);
         final QueryWrapper<ApiPermission> queryWrapper = createQueryWrapper(criteria);
-        return Binder
-            .joinQueryPage(queryWrapper, ApiPermission.class, page)
-            .convert(apiPermission -> {
-                Binder.bindRelations(apiPermission, new String[] { "parent" });
-                return apiPermissionMapper.toDto(apiPermission);
-            });
+        return Binder.joinQueryPage(queryWrapper, ApiPermission.class, page).convert(apiPermission -> {
+            Binder.bindRelations(apiPermission, new String[] { "parent" });
+            return apiPermissionMapper.toDto(apiPermission);
+        });
     }
 
     /**
