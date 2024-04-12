@@ -9,7 +9,6 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.begcode.monolith.taskjob.domain.*; // for static metamodels
 import com.begcode.monolith.taskjob.domain.TaskJobConfig;
 import com.begcode.monolith.taskjob.repository.TaskJobConfigRepository;
 import com.begcode.monolith.taskjob.service.criteria.TaskJobConfigCriteria;

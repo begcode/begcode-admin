@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.core.conditions.query.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.begcode.monolith.domain.enumeration.LogType;
-import com.begcode.monolith.log.domain.*; // for static metamodels
 import com.begcode.monolith.log.domain.SysLog;
 import com.begcode.monolith.log.repository.SysLogRepository;
 import com.begcode.monolith.log.service.criteria.SysLogCriteria;

@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.core.conditions.query.*;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.begcode.monolith.domain.*; // for static metamodels
 import com.begcode.monolith.domain.Authority;
 import com.begcode.monolith.repository.AuthorityRepository;
 import com.begcode.monolith.service.criteria.AuthorityCriteria;

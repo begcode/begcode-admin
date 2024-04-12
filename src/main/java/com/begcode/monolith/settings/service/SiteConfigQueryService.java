@@ -9,7 +9,6 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.begcode.monolith.settings.domain.*; // for static metamodels
 import com.begcode.monolith.settings.domain.SiteConfig;
 import com.begcode.monolith.settings.repository.SiteConfigRepository;
 import com.begcode.monolith.settings.service.criteria.SiteConfigCriteria;

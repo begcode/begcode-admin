@@ -100,12 +100,12 @@ entity Authority (jhi_authority) {
 /**
  * 用户
  */
-@skipComponent(domain-mapper-repository-controllerTest-serviceClass-restController)
+@skipComponent(domain-mapper-controllerTest-serviceClass-restController)
 @skipFakeData
 @importData
 @importDataFile(jhi_user-rel_jhi_user__authorities)
 @builtInUser
-@addCustomMethod(queryService)
+@addCustomMethod(queryService-repository)
 @moduleName(system)
 @adminUserDto(AdminUserDTO)
 @extendAbstractAuditingEntity

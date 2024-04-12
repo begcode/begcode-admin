@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.conditions.update.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.begcode.monolith.domain.ResourceCategory;
+import com.begcode.monolith.domain.UploadFile;
+import com.begcode.monolith.domain.UploadImage;
 import com.begcode.monolith.repository.ResourceCategoryRepository;
 import com.begcode.monolith.service.dto.ResourceCategoryDTO;
 import com.begcode.monolith.service.mapper.ResourceCategoryMapper;

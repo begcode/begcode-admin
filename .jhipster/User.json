@@ -1,6 +1,6 @@
 {
   "annotations": {
-    "addCustomMethod": "queryService",
+    "addCustomMethod": "queryService-repository",
     "adminUserDto": "AdminUserDTO",
     "builtInUser": true,
     "changelogDate": "20240101061506",
@@ -11,7 +11,7 @@
     "moduleName": "system",
     "publicDto": "id-login-firstName-lastName-email-mobile-birthday-langKey-imageUrl-activated",
     "publicDtoFile": true,
-    "skipComponent": "domain-mapper-repository-controllerTest-serviceClass-restController",
+    "skipComponent": "domain-mapper-controllerTest-serviceClass-restController",
     "skipFakeData": true,
     "skipWebsite": true
   },
