@@ -168,7 +168,7 @@
     "vite-plugin-mkcert": "1.17.4",
     "vite-plugin-mock": "3.0.1",
     "vite-plugin-purge-icons": "0.10.0",
-    "vite-plugin-pwa": "0.19.4",
+    "vite-plugin-pwa": "0.19.8",
     "vite-plugin-static-copy": "0.17.1",
     "vite-plugin-svg-icons": "2.0.1",
     "vue-eslint-parser": "9.4.2",

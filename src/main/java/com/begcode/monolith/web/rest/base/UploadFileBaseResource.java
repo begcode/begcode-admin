@@ -331,8 +331,8 @@ public class UploadFileBaseResource {
     @PostMapping("")
     public ResponseEntity<UploadFileDTO> createUploadFile(
         @RequestPart(required = false) UploadFileDTO uploadFileDTO,
-        @RequestPart("file") MultipartFile file,
-        @RequestPart("files") MultipartFile[] files
+        @RequestPart(name = "file", required = false) MultipartFile file,
+        @RequestPart(name = "files", required = false) MultipartFile[] files
     ) throws Exception {
         log.debug("REST request to save UploadFile : {}, {}", file.getOriginalFilename(), files);
         if (file.isEmpty() && ArrayUtils.isEmpty(files)) {

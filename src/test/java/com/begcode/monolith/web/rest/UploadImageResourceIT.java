@@ -1800,16 +1800,14 @@ public class UploadImageResourceIT {
         partialUpdatedUploadImage
             .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
-            .type(UPDATED_TYPE)
-            .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
+            .path(UPDATED_PATH)
+            .folder(UPDATED_FOLDER)
+            .businessDesc(UPDATED_BUSINESS_DESC)
             .businessStatus(UPDATED_BUSINESS_STATUS)
-            .createAt(UPDATED_CREATE_AT)
             .fileSize(UPDATED_FILE_SIZE)
             .mediumUrl(UPDATED_MEDIUM_URL)
-            .referenceCount(UPDATED_REFERENCE_COUNT)
-            .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
-            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY);
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restUploadImageMockMvc
             .perform(

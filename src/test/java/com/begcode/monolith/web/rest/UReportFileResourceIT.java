@@ -557,7 +557,7 @@ public class UReportFileResourceIT {
         UReportFile partialUpdatedUReportFile = new UReportFile();
         partialUpdatedUReportFile.setId(uReportFile.getId());
 
-        partialUpdatedUReportFile.name(UPDATED_NAME).createAt(UPDATED_CREATE_AT);
+        partialUpdatedUReportFile.content(UPDATED_CONTENT).createAt(UPDATED_CREATE_AT);
 
         restUReportFileMockMvc
             .perform(

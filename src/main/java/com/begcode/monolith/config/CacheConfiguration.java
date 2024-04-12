@@ -101,6 +101,22 @@ public class CacheConfiguration {
         }
     }
 
+    public void createCache(javax.cache.CacheManager cm, String cacheName, long expirySeconds) {
+        javax.cache.Cache<Object, Object> cache = cm.getCache(cacheName);
+        if (cache != null) {
+            cache.clear();
+        } else {
+            cm.createCache(
+                cacheName,
+                Eh107Configuration.fromEhcacheCacheConfiguration(
+                    CacheConfigurationBuilder.newCacheConfigurationBuilder(Object.class, Object.class, ResourcePoolsBuilder.heap(100))
+                        .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofSeconds(expirySeconds)))
+                        .build()
+                )
+            );
+        }
+    }
+
     @Autowired(required = false)
     public void setGitProperties(GitProperties gitProperties) {
         this.gitProperties = gitProperties;

@@ -18,7 +18,6 @@ import java.io.File;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.UUID;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -149,10 +148,8 @@ public class UploadFileBaseService<R extends UploadFileRepository, E extends Upl
         log.debug("Request to save UploadFile : {}", uploadFileDTO);
         if (!uploadFileDTO.getFile().isEmpty()) {
             final String extName = FilenameUtils.getExtension(uploadFileDTO.getFile().getOriginalFilename());
-            final String randomNameNew = UUID.randomUUID().toString().replaceAll("\\-", "");
             final String yearAndMonth = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM"));
             final String savePathNew = yearAndMonth + File.separator;
-            final String saveFileName = savePathNew + randomNameNew + "." + extName;
             final long fileSize = uploadFileDTO.getFile().getSize();
             FileInfo upload = fileStorageService.of(uploadFileDTO.getFile()).setPath(savePathNew).upload();
             uploadFileDTO.setCreateAt(ZonedDateTime.now());
@@ -160,6 +157,7 @@ public class UploadFileBaseService<R extends UploadFileRepository, E extends Upl
             uploadFileDTO.setFullName(uploadFileDTO.getFile().getOriginalFilename());
             uploadFileDTO.setName(uploadFileDTO.getFile().getName());
             uploadFileDTO.setFolder(savePathNew);
+            uploadFileDTO.setPath(upload.getBasePath() + upload.getPath() + upload.getFilename());
             uploadFileDTO.setUrl(upload.getUrl());
             uploadFileDTO.setFileSize(fileSize);
         } else {

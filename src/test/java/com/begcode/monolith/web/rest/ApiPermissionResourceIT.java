@@ -818,7 +818,7 @@ public class ApiPermissionResourceIT {
         ApiPermission partialUpdatedApiPermission = new ApiPermission();
         partialUpdatedApiPermission.setId(apiPermission.getId());
 
-        partialUpdatedApiPermission.code(UPDATED_CODE).type(UPDATED_TYPE).method(UPDATED_METHOD);
+        partialUpdatedApiPermission.name(UPDATED_NAME).code(UPDATED_CODE).description(UPDATED_DESCRIPTION).type(UPDATED_TYPE);
 
         restApiPermissionMockMvc
             .perform(

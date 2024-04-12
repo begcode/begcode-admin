@@ -549,7 +549,7 @@ public class BusinessTypeResourceIT {
         BusinessType partialUpdatedBusinessType = new BusinessType();
         partialUpdatedBusinessType.setId(businessType.getId());
 
-        partialUpdatedBusinessType.name(UPDATED_NAME).description(UPDATED_DESCRIPTION);
+        partialUpdatedBusinessType.name(UPDATED_NAME).code(UPDATED_CODE).description(UPDATED_DESCRIPTION).icon(UPDATED_ICON);
 
         restBusinessTypeMockMvc
             .perform(

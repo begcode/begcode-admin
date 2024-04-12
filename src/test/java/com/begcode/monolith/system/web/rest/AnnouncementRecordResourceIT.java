@@ -882,7 +882,12 @@ public class AnnouncementRecordResourceIT {
         AnnouncementRecord partialUpdatedAnnouncementRecord = new AnnouncementRecord();
         partialUpdatedAnnouncementRecord.setId(announcementRecord.getId());
 
-        partialUpdatedAnnouncementRecord.userId(UPDATED_USER_ID).createdBy(UPDATED_CREATED_BY).lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
+        partialUpdatedAnnouncementRecord
+            .anntId(UPDATED_ANNT_ID)
+            .hasRead(UPDATED_HAS_READ)
+            .readTime(UPDATED_READ_TIME)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY);
 
         restAnnouncementRecordMockMvc
             .perform(

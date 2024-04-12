@@ -1162,16 +1162,10 @@ public class SysLogResourceIT {
         partialUpdatedSysLog
             .logType(UPDATED_LOG_TYPE)
             .logContent(UPDATED_LOG_CONTENT)
-            .operateType(UPDATED_OPERATE_TYPE)
-            .userid(UPDATED_USERID)
             .username(UPDATED_USERNAME)
+            .ip(UPDATED_IP)
             .method(UPDATED_METHOD)
-            .requestUrl(UPDATED_REQUEST_URL)
             .requestParam(UPDATED_REQUEST_PARAM)
-            .requestType(UPDATED_REQUEST_TYPE)
-            .createdBy(UPDATED_CREATED_BY)
-            .createdDate(UPDATED_CREATED_DATE)
-            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
             .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restSysLogMockMvc

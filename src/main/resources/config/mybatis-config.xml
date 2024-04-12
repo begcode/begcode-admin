@@ -16,6 +16,5 @@
         <typeHandler handler="org.apache.ibatis.type.YearMonthTypeHandler" />
         <typeHandler handler="org.apache.ibatis.type.JapaneseDateTypeHandler" />
         <typeHandler handler="com.begcode.monolith.util.mybatis.handler.ZonedDateTimeTypeHandler" />
-
     </typeHandlers>
 </configuration>

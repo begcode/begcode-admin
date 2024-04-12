@@ -754,11 +754,7 @@ public class FormConfigResourceIT {
         FormConfig partialUpdatedFormConfig = new FormConfig();
         partialUpdatedFormConfig.setId(formConfig.getId());
 
-        partialUpdatedFormConfig
-            .formKey(UPDATED_FORM_KEY)
-            .formName(UPDATED_FORM_NAME)
-            .formJson(UPDATED_FORM_JSON)
-            .createdBy(UPDATED_CREATED_BY);
+        partialUpdatedFormConfig.createdBy(UPDATED_CREATED_BY).lastModifiedBy(UPDATED_LAST_MODIFIED_BY);
 
         restFormConfigMockMvc
             .perform(

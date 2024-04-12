@@ -153,7 +153,9 @@ public class UploadImageBaseService<R extends UploadImageRepository, E extends U
             uploadImageDTO.setName(uploadImageDTO.getImage().getName());
             uploadImageDTO.setFolder(yearAndMonth + File.separator);
             uploadImageDTO.setFileSize(uploadImageDTO.getImage().getSize());
-            FileInfo upload = fileStorageService.of(uploadImageDTO.getImage()).setPlatform("local").upload();
+            final String savePathNew = yearAndMonth + File.separator;
+            FileInfo upload = fileStorageService.of(uploadImageDTO.getImage()).setPath(savePathNew).upload();
+            uploadImageDTO.setPath(upload.getBasePath() + upload.getPath() + upload.getFilename());
             uploadImageDTO.setUrl(upload.getUrl());
             uploadImageDTO.setExt(upload.getExt());
         } else {

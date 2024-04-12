@@ -906,7 +906,12 @@ public class SiteConfigResourceIT {
         SiteConfig partialUpdatedSiteConfig = new SiteConfig();
         partialUpdatedSiteConfig.setId(siteConfig.getId());
 
-        partialUpdatedSiteConfig.categoryKey(UPDATED_CATEGORY_KEY).createdBy(UPDATED_CREATED_BY);
+        partialUpdatedSiteConfig
+            .categoryName(UPDATED_CATEGORY_NAME)
+            .sortValue(UPDATED_SORT_VALUE)
+            .builtIn(UPDATED_BUILT_IN)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY);
 
         restSiteConfigMockMvc
             .perform(

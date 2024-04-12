@@ -947,12 +947,11 @@ public class TaskJobConfigResourceIT {
         partialUpdatedTaskJobConfig.setId(taskJobConfig.getId());
 
         partialUpdatedTaskJobConfig
-            .name(UPDATED_NAME)
-            .jobClassName(UPDATED_JOB_CLASS_NAME)
-            .parameter(UPDATED_PARAMETER)
             .description(UPDATED_DESCRIPTION)
-            .jobStatus(UPDATED_JOB_STATUS)
-            .createdDate(UPDATED_CREATED_DATE);
+            .createdBy(UPDATED_CREATED_BY)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restTaskJobConfigMockMvc
             .perform(

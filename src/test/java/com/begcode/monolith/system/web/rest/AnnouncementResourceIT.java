@@ -1521,18 +1521,19 @@ public class AnnouncementResourceIT {
         partialUpdatedAnnouncement.setId(announcement.getId());
 
         partialUpdatedAnnouncement
-            .title(UPDATED_TITLE)
             .summary(UPDATED_SUMMARY)
-            .endTime(UPDATED_END_TIME)
+            .content(UPDATED_CONTENT)
+            .startTime(UPDATED_START_TIME)
             .senderId(UPDATED_SENDER_ID)
             .priority(UPDATED_PRIORITY)
             .category(UPDATED_CATEGORY)
-            .sendStatus(UPDATED_SEND_STATUS)
+            .receiverType(UPDATED_RECEIVER_TYPE)
+            .sendTime(UPDATED_SEND_TIME)
             .cancelTime(UPDATED_CANCEL_TIME)
-            .businessType(UPDATED_BUSINESS_TYPE)
-            .businessId(UPDATED_BUSINESS_ID)
+            .openPage(UPDATED_OPEN_PAGE)
             .receiverIds(UPDATED_RECEIVER_IDS)
-            .createdBy(UPDATED_CREATED_BY);
+            .createdBy(UPDATED_CREATED_BY)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY);
 
         restAnnouncementMockMvc
             .perform(

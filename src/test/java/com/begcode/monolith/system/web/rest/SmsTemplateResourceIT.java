@@ -1042,10 +1042,10 @@ public class SmsTemplateResourceIT {
 
         partialUpdatedSmsTemplate
             .name(UPDATED_NAME)
-            .remark(UPDATED_REMARK)
-            .enabled(UPDATED_ENABLED)
-            .createdDate(UPDATED_CREATED_DATE)
-            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
+            .sendType(UPDATED_SEND_TYPE)
+            .content(UPDATED_CONTENT)
+            .testJson(UPDATED_TEST_JSON)
+            .type(UPDATED_TYPE);
 
         restSmsTemplateMockMvc
             .perform(

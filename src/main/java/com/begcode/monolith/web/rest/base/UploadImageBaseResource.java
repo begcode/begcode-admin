@@ -331,8 +331,8 @@ public class UploadImageBaseResource {
     @PostMapping("")
     public ResponseEntity<UploadImageDTO> createUploadImage(
         @RequestPart(required = false) UploadImageDTO uploadImageDTO,
-        @RequestPart("image") MultipartFile image,
-        @RequestPart("images") MultipartFile[] images
+        @RequestPart(name = "image", required = false) MultipartFile image,
+        @RequestPart(name = "images", required = false) MultipartFile[] images
     ) throws URISyntaxException {
         log.debug("REST request to save UploadImage : {}", image.getOriginalFilename());
         if (image.isEmpty() && ArrayUtils.isEmpty(images)) {

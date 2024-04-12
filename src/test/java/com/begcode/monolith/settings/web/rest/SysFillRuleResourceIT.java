@@ -1107,11 +1107,9 @@ public class SysFillRuleResourceIT {
 
         partialUpdatedSysFillRule
             .code(UPDATED_CODE)
-            .enabled(UPDATED_ENABLED)
             .resetFrequency(UPDATED_RESET_FREQUENCY)
             .fillValue(UPDATED_FILL_VALUE)
             .resetStartTime(UPDATED_RESET_START_TIME)
-            .resetEndTime(UPDATED_RESET_END_TIME)
             .resetTime(UPDATED_RESET_TIME);
 
         restSysFillRuleMockMvc

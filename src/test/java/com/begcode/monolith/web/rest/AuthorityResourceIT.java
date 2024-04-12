@@ -708,7 +708,7 @@ public class AuthorityResourceIT {
         Authority partialUpdatedAuthority = new Authority();
         partialUpdatedAuthority.setId(authority.getId());
 
-        partialUpdatedAuthority.info(UPDATED_INFO).order(UPDATED_ORDER);
+        partialUpdatedAuthority.code(UPDATED_CODE).order(UPDATED_ORDER);
 
         restAuthorityMockMvc
             .perform(
