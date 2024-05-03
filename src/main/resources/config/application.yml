@@ -95,7 +95,7 @@ spring:
     # The commented value for `active` can be replaced with valid Spring profiles to load.
     # Otherwise, it will be filled in by maven when building the JAR file
     # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
-    active: #spring.profiles.active#
+    active: '@spring.profiles.active@'
     group:
       dev:
         - dev
@@ -194,42 +194,10 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 application:
-  pay:
-    wxPay:
-      appId: xxxxxxx #微信公众号或者小程序等的appid
-      mchId: xxxx #微信支付商户号
-      mchKey: xxxxx #微信支付商户密钥
-      subAppId: #服务商模式下的子商户公众账号ID
-      subMchId: #服务商模式下的子商户号
-      keyPath: classpath:config/cert/apiclient_cert.p12 # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
-oauth:
-  qq:
-    client-id: 1015*****
-    client-secret: 1f7d08df55766**************
-    redirect-uri: http://oauth.xkcoding.com/demo/oauth/qq/callback
-  github:
-    client-id: 2d25a70**************
-    client-secret: 5a2919b5fe911567343**************
-    redirect-uri: http://oauth.xkcoding.com/demo/oauth/github/callback
-  wechat:
-    client-id: wxdcb31**************
-    client-secret: b4e9dc6841ef7d**************
-    redirect-uri: http://oauth.xkcoding.com/demo/oauth/wechat/callback
-  google:
-    client-id: 716518501517-6dbdkapivhia806vqcjjh9nttj3**************
-    client-secret: 9IBornd7w1A**************
-    redirect-uri: http://oauth.xkcoding.com/demo/oauth/google/callback
-  microsoft:
-    client-id: 7bdce818-2c8e-4b**************
-    client-secret: Iu0zZ43RQydo_FkD**************
-    redirect-uri: https://oauth.xkcoding.com/demo/oauth/microsoft/callback
-  mi:
-    client-id: 2882303**************
-    client-secret: nFeTt89Yn**************
-    redirect-uri: http://oauth.xkcoding.com/demo/oauth/mi/callback
 mybatis-plus:
   config-location: classpath:/config/mybatis-config.xml
   global-config:
     db-config:
       insert-strategy: ignored
       update-strategy: ignored
+# jhipster-needle-add-config-yml
