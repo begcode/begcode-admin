@@ -1741,14 +1741,15 @@ public class UploadFileResourceIT {
         partialUpdatedUploadFile
             .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
+            .name(UPDATED_NAME)
+            .thumb(UPDATED_THUMB)
             .ownerEntityId(UPDATED_OWNER_ENTITY_ID)
             .businessTitle(UPDATED_BUSINESS_TITLE)
+            .businessDesc(UPDATED_BUSINESS_DESC)
             .businessStatus(UPDATED_BUSINESS_STATUS)
-            .createAt(UPDATED_CREATE_AT)
-            .createdBy(UPDATED_CREATED_BY)
+            .referenceCount(UPDATED_REFERENCE_COUNT)
             .createdDate(UPDATED_CREATED_DATE)
-            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
-            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY);
 
         restUploadFileMockMvc
             .perform(

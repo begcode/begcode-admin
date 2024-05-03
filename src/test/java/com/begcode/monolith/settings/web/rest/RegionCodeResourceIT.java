@@ -914,7 +914,13 @@ public class RegionCodeResourceIT {
         RegionCode partialUpdatedRegionCode = new RegionCode();
         partialUpdatedRegionCode.setId(regionCode.getId());
 
-        partialUpdatedRegionCode.areaCode(UPDATED_AREA_CODE).shortName(UPDATED_SHORT_NAME).lng(UPDATED_LNG).lat(UPDATED_LAT);
+        partialUpdatedRegionCode
+            .areaCode(UPDATED_AREA_CODE)
+            .cityCode(UPDATED_CITY_CODE)
+            .shortName(UPDATED_SHORT_NAME)
+            .level(UPDATED_LEVEL)
+            .lng(UPDATED_LNG)
+            .lat(UPDATED_LAT);
 
         restRegionCodeMockMvc
             .perform(

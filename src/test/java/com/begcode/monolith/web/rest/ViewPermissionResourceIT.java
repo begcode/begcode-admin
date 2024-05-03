@@ -1472,11 +1472,15 @@ public class ViewPermissionResourceIT {
         partialUpdatedViewPermission.setId(viewPermission.getId());
 
         partialUpdatedViewPermission
-            .text(UPDATED_TEXT)
+            .i18n(UPDATED_I_18_N)
             .group(UPDATED_GROUP)
+            .externalLink(UPDATED_EXTERNAL_LINK)
             .disabled(UPDATED_DISABLED)
             .hideInBreadcrumb(UPDATED_HIDE_IN_BREADCRUMB)
-            .shortcutRoot(UPDATED_SHORTCUT_ROOT);
+            .shortcutRoot(UPDATED_SHORTCUT_ROOT)
+            .code(UPDATED_CODE)
+            .description(UPDATED_DESCRIPTION)
+            .order(UPDATED_ORDER);
 
         restViewPermissionMockMvc
             .perform(

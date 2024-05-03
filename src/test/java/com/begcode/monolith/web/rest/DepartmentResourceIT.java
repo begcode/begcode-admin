@@ -862,7 +862,12 @@ public class DepartmentResourceIT {
         Department partialUpdatedDepartment = new Department();
         partialUpdatedDepartment.setId(department.getId());
 
-        partialUpdatedDepartment.contact(UPDATED_CONTACT).createTime(UPDATED_CREATE_TIME);
+        partialUpdatedDepartment
+            .address(UPDATED_ADDRESS)
+            .phoneNum(UPDATED_PHONE_NUM)
+            .logo(UPDATED_LOGO)
+            .contact(UPDATED_CONTACT)
+            .createTime(UPDATED_CREATE_TIME);
 
         restDepartmentMockMvc
             .perform(
