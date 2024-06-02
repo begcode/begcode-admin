@@ -8,19 +8,19 @@ export const commonFieldDataRoutes: AppRouteRecordRaw = {
   meta: {
     title: '通用字段数据',
   },
-  redirect: '',
+  redirect: '/settings/common-field-data/list',
   children: [
     {
       path: 'list',
       name: 'systemCommonFieldDataList',
       component: () => import('@/views/settings/common-field-data/common-field-data-list.vue'),
-      meta: { title: '通用字段数据列表' },
+      meta: { title: '通用字段数据列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'systemCommonFieldDataNew',
       component: () => import('@/views/settings/common-field-data/common-field-data-edit.vue'),
-      meta: { title: '新建通用字段数据' },
+      meta: { title: '新建通用字段数据', hideMenu: true },
     },
     {
       path: ':entityId/edit',

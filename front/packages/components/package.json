@@ -16,7 +16,8 @@
   ],
   "scripts": {
     "build": "vite build",
-    "build:analyze": "cross-env NODE_OPTIONS=--max-old-space-size=8192 REPORT=true vite build"
+    "build:analyze": "cross-env NODE_OPTIONS=--max-old-space-size=8192 REPORT=true vite build",
+    "postinstall": "vite build"
   },
   "dependencies": {
     "vue-draggable-next": "2.2.1"

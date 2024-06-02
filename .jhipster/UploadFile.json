@@ -1,4 +1,5 @@
 {
+  "aigcs": [],
   "annotations": {
     "addCustomMethod": "service-rest-dto-listComponent-clientService-editComponent",
     "changelogDate": "20240101062306",

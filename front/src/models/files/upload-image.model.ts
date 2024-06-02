@@ -23,6 +23,7 @@ export interface IUploadImage {
   createdDate?: Date | null; //创建时间
   lastModifiedBy?: number | null; //修改者Id
   lastModifiedDate?: Date | null; //修改时间
+  categoryId?: number | null;
   category?: IResourceCategory | null; //所属分类
 }
 
@@ -50,6 +51,7 @@ export class UploadImage implements IUploadImage {
     public createdDate?: Date | null,
     public lastModifiedBy?: number | null,
     public lastModifiedDate?: Date | null,
+    public categoryId?: number | null,
     public category?: IResourceCategory | null,
   ) {}
 }

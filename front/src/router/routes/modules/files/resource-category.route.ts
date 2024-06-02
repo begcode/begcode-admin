@@ -8,19 +8,19 @@ export const resourceCategoryRoutes: AppRouteRecordRaw = {
   meta: {
     title: '资源分类',
   },
-  redirect: '',
+  redirect: '/files/resource-category/list',
   children: [
     {
       path: 'list',
       name: 'ossResourceCategoryList',
       component: () => import('@/views/files/resource-category/resource-category-list.vue'),
-      meta: { title: '资源分类列表' },
+      meta: { title: '资源分类列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'ossResourceCategoryNew',
       component: () => import('@/views/files/resource-category/resource-category-edit.vue'),
-      meta: { title: '新建资源分类' },
+      meta: { title: '新建资源分类', hideMenu: true },
     },
     {
       path: ':entityId/edit',

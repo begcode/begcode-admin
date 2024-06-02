@@ -8,19 +8,19 @@ export const smsMessageRoutes: AppRouteRecordRaw = {
   meta: {
     title: '短信消息',
   },
-  redirect: '',
+  redirect: '/system/sms-message/list',
   children: [
     {
       path: 'list',
       name: 'systemSmsMessageList',
       component: () => import('@/views/system/sms-message/sms-message-list.vue'),
-      meta: { title: '短信消息列表' },
+      meta: { title: '短信消息列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'systemSmsMessageNew',
       component: () => import('@/views/system/sms-message/sms-message-edit.vue'),
-      meta: { title: '新建短信消息' },
+      meta: { title: '新建短信消息', hideMenu: true },
     },
     {
       path: ':entityId/edit',

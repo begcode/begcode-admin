@@ -8,19 +8,19 @@ export const regionCodeRoutes: AppRouteRecordRaw = {
   meta: {
     title: '行政区划码',
   },
-  redirect: '',
+  redirect: '/settings/region-code/list',
   children: [
     {
       path: 'list',
       name: 'systemRegionCodeList',
       component: () => import('@/views/settings/region-code/region-code-list.vue'),
-      meta: { title: '行政区划码列表' },
+      meta: { title: '行政区划码列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'systemRegionCodeNew',
       component: () => import('@/views/settings/region-code/region-code-edit.vue'),
-      meta: { title: '新建行政区划码' },
+      meta: { title: '新建行政区划码', hideMenu: true },
     },
     {
       path: ':entityId/edit',

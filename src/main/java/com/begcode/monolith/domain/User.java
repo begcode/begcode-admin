@@ -13,12 +13,16 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * A user.
  */
 @TableName(value = "jhi_user")
+@Setter
+@Getter
 public class User extends AbstractAuditingEntity<Long, User> implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -115,12 +119,9 @@ public class User extends AbstractAuditingEntity<Long, User> implements Serializ
     @BindEntity(entity = Position.class, condition = "this.position_id=id")
     private Position position;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    // Lowercase the login before saving it in database
+    public void setLogin(String login) {
+        this.login = StringUtils.lowerCase(login, Locale.ENGLISH);
     }
 
     public User id(Long id) {
@@ -128,26 +129,9 @@ public class User extends AbstractAuditingEntity<Long, User> implements Serializ
         return this;
     }
 
-    public String getLogin() {
-        return login;
-    }
-
-    // Lowercase the login before saving it in database
-    public void setLogin(String login) {
-        this.login = StringUtils.lowerCase(login, Locale.ENGLISH);
-    }
-
     public User login(String login) {
         this.setLogin(login);
         return this;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public User password(String password) {
@@ -155,25 +139,9 @@ public class User extends AbstractAuditingEntity<Long, User> implements Serializ
         return this;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     public User firstName(String firstName) {
         this.setFirstName(firstName);
         return this;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
     }
 
     public User lastName(String lastName) {
@@ -181,25 +149,9 @@ public class User extends AbstractAuditingEntity<Long, User> implements Serializ
         return this;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public User email(String email) {
         this.setEmail(email);
         return this;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
     }
 
     public User mobile(String mobile) {
@@ -207,25 +159,9 @@ public class User extends AbstractAuditingEntity<Long, User> implements Serializ
         return this;
     }
 
-    public ZonedDateTime getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(ZonedDateTime birthday) {
-        this.birthday = birthday;
-    }
-
     public User birthday(ZonedDateTime birthday) {
         this.setBirthday(birthday);
         return this;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
     }
 
     public User imageUrl(String imageUrl) {
@@ -233,25 +169,9 @@ public class User extends AbstractAuditingEntity<Long, User> implements Serializ
         return this;
     }
 
-    public boolean isActivated() {
-        return activated;
-    }
-
-    public void setActivated(boolean activated) {
-        this.activated = activated;
-    }
-
     public User activated(boolean activated) {
         this.setActivated(activated);
         return this;
-    }
-
-    public String getActivationKey() {
-        return activationKey;
-    }
-
-    public void setActivationKey(String activationKey) {
-        this.activationKey = activationKey;
     }
 
     public User activationKey(String activationKey) {
@@ -259,25 +179,9 @@ public class User extends AbstractAuditingEntity<Long, User> implements Serializ
         return this;
     }
 
-    public String getResetKey() {
-        return resetKey;
-    }
-
-    public void setResetKey(String resetKey) {
-        this.resetKey = resetKey;
-    }
-
     public User resetKey(String resetKey) {
         this.setResetKey(resetKey);
         return this;
-    }
-
-    public Instant getResetDate() {
-        return resetDate;
-    }
-
-    public void setResetDate(Instant resetDate) {
-        this.resetDate = resetDate;
     }
 
     public User resetDate(Instant resetDate) {
@@ -285,25 +189,9 @@ public class User extends AbstractAuditingEntity<Long, User> implements Serializ
         return this;
     }
 
-    public String getLangKey() {
-        return langKey;
-    }
-
-    public void setLangKey(String langKey) {
-        this.langKey = langKey;
-    }
-
     public User langKey(String langKey) {
         this.setLangKey(langKey);
         return this;
-    }
-
-    public List<Authority> getAuthorities() {
-        return authorities;
-    }
-
-    public void setAuthorities(List<Authority> authorities) {
-        this.authorities = authorities;
     }
 
     public User authorities(List<Authority> authorities) {
@@ -311,25 +199,9 @@ public class User extends AbstractAuditingEntity<Long, User> implements Serializ
         return this;
     }
 
-    public Long getDepartmentId() {
-        return departmentId;
-    }
-
-    public void setDepartmentId(Long departmentId) {
-        this.departmentId = departmentId;
-    }
-
     public User departmentId(Long departmentId) {
         this.setDepartmentId(departmentId);
         return this;
-    }
-
-    public Long getPositionId() {
-        return positionId;
-    }
-
-    public void setPositionId(Long positionId) {
-        this.positionId = positionId;
     }
 
     public User positionId(Long positionId) {
@@ -337,25 +209,9 @@ public class User extends AbstractAuditingEntity<Long, User> implements Serializ
         return this;
     }
 
-    public String getDepartmentName() {
-        return departmentName;
-    }
-
-    public void setDepartmentName(String departmentName) {
-        this.departmentName = departmentName;
-    }
-
     public User departmentName(String departmentName) {
         this.setDepartmentName(departmentName);
         return this;
-    }
-
-    public void setPositionName(String positionName) {
-        this.positionName = positionName;
-    }
-
-    public String getPositionName() {
-        return positionName;
     }
 
     public User positionName(String positionName) {
@@ -363,25 +219,9 @@ public class User extends AbstractAuditingEntity<Long, User> implements Serializ
         return this;
     }
 
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
-
     public User department(Department department) {
         this.setDepartment(department);
         return this;
-    }
-
-    public Position getPosition() {
-        return position;
-    }
-
-    public void setPosition(Position position) {
-        this.position = position;
     }
 
     public User position(Position position) {

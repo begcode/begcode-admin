@@ -8,19 +8,19 @@ export const uploadFileRoutes: AppRouteRecordRaw = {
   meta: {
     title: '上传文件',
   },
-  redirect: '',
+  redirect: '/files/upload-file/list',
   children: [
     {
       path: 'list',
       name: 'ossUploadFileList',
       component: () => import('@/views/files/upload-file/upload-file-list.vue'),
-      meta: { title: '上传文件列表' },
+      meta: { title: '上传文件列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'ossUploadFileNew',
       component: () => import('@/views/files/upload-file/upload-file-edit.vue'),
-      meta: { title: '新建上传文件' },
+      meta: { title: '新建上传文件', hideMenu: true },
     },
     {
       path: ':entityId/edit',

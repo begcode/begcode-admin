@@ -8,19 +8,19 @@ export const sysLogRoutes: AppRouteRecordRaw = {
   meta: {
     title: '系统日志',
   },
-  redirect: '',
+  redirect: '/log/sys-log/list',
   children: [
     {
       path: 'list',
       name: 'logSysLogList',
       component: () => import('@/views/log/sys-log/sys-log-list.vue'),
-      meta: { title: '系统日志列表' },
+      meta: { title: '系统日志列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'logSysLogNew',
       component: () => import('@/views/log/sys-log/sys-log-edit.vue'),
-      meta: { title: '新建系统日志' },
+      meta: { title: '新建系统日志', hideMenu: true },
     },
     {
       path: ':entityId/edit',

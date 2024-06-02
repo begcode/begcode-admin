@@ -8,19 +8,19 @@ export const businessTypeRoutes: AppRouteRecordRaw = {
   meta: {
     title: '业务类型',
   },
-  redirect: '',
+  redirect: '/settings/business-type/list',
   children: [
     {
       path: 'list',
       name: 'systemBusinessTypeList',
       component: () => import('@/views/settings/business-type/business-type-list.vue'),
-      meta: { title: '业务类型列表' },
+      meta: { title: '业务类型列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'systemBusinessTypeNew',
       component: () => import('@/views/settings/business-type/business-type-edit.vue'),
-      meta: { title: '新建业务类型' },
+      meta: { title: '新建业务类型', hideMenu: true },
     },
     {
       path: ':entityId/edit',

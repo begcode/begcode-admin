@@ -16,6 +16,7 @@ export interface ISmsTemplate {
   createdDate?: Date | null; //创建时间
   lastModifiedBy?: number | null; //修改者Id
   lastModifiedDate?: Date | null; //修改时间
+  supplierId?: number | null;
   supplier?: ISmsSupplier | null; //短信服务商
 }
 
@@ -34,6 +35,7 @@ export class SmsTemplate implements ISmsTemplate {
     public createdDate?: Date | null,
     public lastModifiedBy?: number | null,
     public lastModifiedDate?: Date | null,
+    public supplierId?: number | null,
     public supplier?: ISmsSupplier | null,
   ) {
     this.enabled = this.enabled ?? false;

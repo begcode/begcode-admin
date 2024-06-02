@@ -8,19 +8,19 @@ export const apiPermissionRoutes: AppRouteRecordRaw = {
   meta: {
     title: 'API权限',
   },
-  redirect: '',
+  redirect: '/system/api-permission/list',
   children: [
     {
       path: 'list',
       name: 'systemApiPermissionList',
       component: () => import('@/views/system/api-permission/api-permission-list.vue'),
-      meta: { title: 'API权限列表' },
+      meta: { title: 'API权限列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'systemApiPermissionNew',
       component: () => import('@/views/system/api-permission/api-permission-edit.vue'),
-      meta: { title: '新建API权限' },
+      meta: { title: '新建API权限', hideMenu: true },
     },
     {
       path: ':entityId/edit',

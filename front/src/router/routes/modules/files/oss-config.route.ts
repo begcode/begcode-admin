@@ -8,19 +8,19 @@ export const ossConfigRoutes: AppRouteRecordRaw = {
   meta: {
     title: '对象存储配置',
   },
-  redirect: '',
+  redirect: '/files/oss-config/list',
   children: [
     {
       path: 'list',
       name: 'ossOssConfigList',
       component: () => import('@/views/files/oss-config/oss-config-list.vue'),
-      meta: { title: '对象存储配置列表' },
+      meta: { title: '对象存储配置列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'ossOssConfigNew',
       component: () => import('@/views/files/oss-config/oss-config-edit.vue'),
-      meta: { title: '新建对象存储配置' },
+      meta: { title: '新建对象存储配置', hideMenu: true },
     },
     {
       path: ':entityId/edit',

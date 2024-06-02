@@ -24,6 +24,7 @@
     "types": ["vite/client"],
     "removeComments": true,
     "paths": {
+      "mock/*": ["mock/*"],
       "@/*": ["src/*"],
       "#/*": ["src/types/*"]
     }

@@ -64,6 +64,8 @@ export default defineConfig({
     rollupOptions: {
       external: ['vue', 'vue-i18n', 'ant-design-vue'],
       output: {
+        chunkFileNames: '[name].js', // 引入文件名的名称
+        entryFileNames: '[name].[format].js', // 包的入口文件名称
         banner: chunk => {
           if (chunk.name === 'index') {
             return 'import "./index.css"';

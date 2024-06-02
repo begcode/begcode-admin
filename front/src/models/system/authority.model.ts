@@ -12,6 +12,7 @@ export interface IAuthority {
   display?: boolean | null; //展示
   viewPermissions?: IViewPermission[] | null; //菜单列表
   apiPermissions?: IApiPermission[] | null; //Api权限列表
+  parentId?: number | null;
   parent?: IAuthority | null; //上级
   users?: IUser[] | null; //用户列表
   departments?: IDepartment[] | null; //Department
@@ -29,6 +30,7 @@ export class Authority implements IAuthority {
     public display?: boolean | null,
     public viewPermissions?: IViewPermission[] | null,
     public apiPermissions?: IApiPermission[] | null,
+    public parentId?: number | null,
     public parent?: IAuthority | null,
     public users?: IUser[] | null,
     public departments?: IDepartment[] | null,

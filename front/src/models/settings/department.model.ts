@@ -11,6 +11,7 @@ export interface IDepartment {
   createUserId?: number | null; //创建用户 Id
   createTime?: Date | null; //创建时间
   authorities?: IAuthority[] | null; //角色列表
+  parentId?: number | null;
   parent?: IDepartment | null; //上级
   expand?: boolean;
   nzAddLevel?: number;
@@ -28,6 +29,7 @@ export class Department implements IDepartment {
     public createUserId?: number | null,
     public createTime?: Date | null,
     public authorities?: IAuthority[] | null,
+    public parentId?: number | null,
     public parent?: IDepartment | null,
     public expand?: boolean,
     public nzAddLevel?: number,

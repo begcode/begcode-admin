@@ -44,7 +44,6 @@
       <UserDropDown :theme="getHeaderTheme" />
 
       <SettingDrawer v-if="getShowSetting" :class="`${prefixCls}-action__item`" />
-      <Aide></Aide>
     </div>
   </Layout.Header>
   <LoginSelect ref="loginSelectRef" @success="loginSelectOk"></LoginSelect>
@@ -65,8 +64,7 @@ import { useLocale } from '@/i18n/useLocale';
 import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
 import { useGlobSetting } from '@/hooks/setting';
 import { propTypes } from '@begcode/components';
-import { useI18n } from '/@/hooks/web/useI18n';
-import Aide from '@/views/dashboard/ai/components/aide/index.vue';
+import { useI18n } from '@/hooks/web/useI18n';
 
 import LayoutMenu from '../menu/index.vue';
 import LayoutTrigger from '../trigger/index.vue';

@@ -8,19 +8,19 @@ export const announcementRoutes: AppRouteRecordRaw = {
   meta: {
     title: '系统通告',
   },
-  redirect: '',
+  redirect: '/system/announcement/list',
   children: [
     {
       path: 'list',
       name: 'systemAnnouncementList',
       component: () => import('@/views/system/announcement/announcement-list.vue'),
-      meta: { title: '系统通告列表' },
+      meta: { title: '系统通告列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'systemAnnouncementNew',
       component: () => import('@/views/system/announcement/announcement-edit.vue'),
-      meta: { title: '新建系统通告' },
+      meta: { title: '新建系统通告', hideMenu: true },
     },
     {
       path: ':entityId/edit',

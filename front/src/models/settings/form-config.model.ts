@@ -9,6 +9,7 @@ export interface IFormConfig {
   createdDate?: Date | null; //创建时间
   lastModifiedBy?: number | null; //修改者Id
   lastModifiedDate?: Date | null; //修改时间
+  businessTypeId?: number | null;
   businessType?: IBusinessType | null; //业务类别
 }
 
@@ -22,6 +23,7 @@ export class FormConfig implements IFormConfig {
     public createdDate?: Date | null,
     public lastModifiedBy?: number | null,
     public lastModifiedDate?: Date | null,
+    public businessTypeId?: number | null,
     public businessType?: IBusinessType | null,
   ) {}
 }

@@ -12,6 +12,7 @@ export interface IApiPermission {
   method?: string | null; //请求类型
   url?: string | null; //url 地址
   status?: keyof typeof ApiPermissionState | null; //状态
+  parentId?: number | null;
   parent?: IApiPermission | null; //上级
   authorities?: IAuthority[] | null; //角色列表
   expand?: boolean;
@@ -29,6 +30,7 @@ export class ApiPermission implements IApiPermission {
     public method?: string | null,
     public url?: string | null,
     public status?: keyof typeof ApiPermissionState | null,
+    public parentId?: number | null,
     public parent?: IApiPermission | null,
     public authorities?: IAuthority[] | null,
     public expand?: boolean,

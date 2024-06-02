@@ -8,19 +8,19 @@ export const userRoutes: AppRouteRecordRaw = {
   meta: {
     title: '用户',
   },
-  redirect: '',
+  redirect: '/system/user/list',
   children: [
     {
       path: 'list',
       name: 'systemUserList',
       component: () => import('@/views/system/user/user-list.vue'),
-      meta: { title: '用户列表' },
+      meta: { title: '用户列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'systemUserNew',
       component: () => import('@/views/system/user/user-edit.vue'),
-      meta: { title: '新建用户' },
+      meta: { title: '新建用户', hideMenu: true },
     },
     {
       path: ':entityId/edit',

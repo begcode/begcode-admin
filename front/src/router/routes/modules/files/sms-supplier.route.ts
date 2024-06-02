@@ -8,19 +8,19 @@ export const smsSupplierRoutes: AppRouteRecordRaw = {
   meta: {
     title: '短信服务商配置',
   },
-  redirect: '',
+  redirect: '/files/sms-supplier/list',
   children: [
     {
       path: 'list',
       name: 'systemSmsSupplierList',
       component: () => import('@/views/files/sms-supplier/sms-supplier-list.vue'),
-      meta: { title: '短信服务商配置列表' },
+      meta: { title: '短信服务商配置列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'systemSmsSupplierNew',
       component: () => import('@/views/files/sms-supplier/sms-supplier-edit.vue'),
-      meta: { title: '新建短信服务商配置' },
+      meta: { title: '新建短信服务商配置', hideMenu: true },
     },
     {
       path: ':entityId/edit',

@@ -8,19 +8,19 @@ export const positionRoutes: AppRouteRecordRaw = {
   meta: {
     title: '岗位',
   },
-  redirect: '',
+  redirect: '/settings/position/list',
   children: [
     {
       path: 'list',
       name: 'systemPositionList',
       component: () => import('@/views/settings/position/position-list.vue'),
-      meta: { title: '岗位列表' },
+      meta: { title: '岗位列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'systemPositionNew',
       component: () => import('@/views/settings/position/position-edit.vue'),
-      meta: { title: '新建岗位' },
+      meta: { title: '新建岗位', hideMenu: true },
     },
     {
       path: ':entityId/edit',

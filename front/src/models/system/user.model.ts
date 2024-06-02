@@ -21,7 +21,9 @@ export interface IUser {
   createdDate?: Date | null; //创建时间
   lastModifiedBy?: number | null; //修改者Id
   lastModifiedDate?: Date | null; //修改时间
+  departmentId?: number | null;
   department?: IDepartment | null; //部门
+  positionId?: number | null;
   position?: IPosition | null; //岗位
   authorities?: IAuthority[] | null; //角色列表
 }
@@ -46,7 +48,9 @@ export class User implements IUser {
     public createdDate?: Date | null,
     public lastModifiedBy?: number | null,
     public lastModifiedDate?: Date | null,
+    public departmentId?: number | null,
     public department?: IDepartment | null,
+    public positionId?: number | null,
     public position?: IPosition | null,
     public authorities?: IAuthority[] | null,
   ) {

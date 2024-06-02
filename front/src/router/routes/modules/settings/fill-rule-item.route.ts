@@ -8,19 +8,19 @@ export const fillRuleItemRoutes: AppRouteRecordRaw = {
   meta: {
     title: '填充规则条目',
   },
-  redirect: '',
+  redirect: '/settings/fill-rule-item/list',
   children: [
     {
       path: 'list',
       name: 'systemFillRuleItemList',
       component: () => import('@/views/settings/fill-rule-item/fill-rule-item-list.vue'),
-      meta: { title: '填充规则条目列表' },
+      meta: { title: '填充规则条目列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'systemFillRuleItemNew',
       component: () => import('@/views/settings/fill-rule-item/fill-rule-item-edit.vue'),
-      meta: { title: '新建填充规则条目' },
+      meta: { title: '新建填充规则条目', hideMenu: true },
     },
     {
       path: ':entityId/edit',

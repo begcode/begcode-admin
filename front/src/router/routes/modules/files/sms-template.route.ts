@@ -8,19 +8,19 @@ export const smsTemplateRoutes: AppRouteRecordRaw = {
   meta: {
     title: '消息模板',
   },
-  redirect: '',
+  redirect: '/files/sms-template/list',
   children: [
     {
       path: 'list',
       name: 'systemSmsTemplateList',
       component: () => import('@/views/files/sms-template/sms-template-list.vue'),
-      meta: { title: '消息模板列表' },
+      meta: { title: '消息模板列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'systemSmsTemplateNew',
       component: () => import('@/views/files/sms-template/sms-template-edit.vue'),
-      meta: { title: '新建消息模板' },
+      meta: { title: '新建消息模板', hideMenu: true },
     },
     {
       path: ':entityId/edit',

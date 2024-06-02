@@ -8,19 +8,19 @@ export const uReportFileRoutes: AppRouteRecordRaw = {
   meta: {
     title: '报表存储',
   },
-  redirect: '',
+  redirect: '/report/u-report-file/list',
   children: [
     {
       path: 'list',
       name: 'reportUReportFileList',
       component: () => import('@/views/report/u-report-file/u-report-file-list.vue'),
-      meta: { title: '报表存储列表' },
+      meta: { title: '报表存储列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'reportUReportFileNew',
       component: () => import('@/views/report/u-report-file/u-report-file-edit.vue'),
-      meta: { title: '新建报表存储' },
+      meta: { title: '新建报表存储', hideMenu: true },
     },
     {
       path: ':entityId/edit',

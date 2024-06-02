@@ -3,6 +3,7 @@ export interface IResourceCategory {
   title?: string | null; //标题
   code?: string | null; //代码
   orderNumber?: number | null; //排序
+  parentId?: number | null;
   parent?: IResourceCategory | null; //上级
   expand?: boolean;
   nzAddLevel?: number;
@@ -14,6 +15,7 @@ export class ResourceCategory implements IResourceCategory {
     public title?: string | null,
     public code?: string | null,
     public orderNumber?: number | null,
+    public parentId?: number | null,
     public parent?: IResourceCategory | null,
     public expand?: boolean,
     public nzAddLevel?: number,

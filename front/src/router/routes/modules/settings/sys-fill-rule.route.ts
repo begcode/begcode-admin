@@ -8,19 +8,19 @@ export const sysFillRuleRoutes: AppRouteRecordRaw = {
   meta: {
     title: '填充规则',
   },
-  redirect: '',
+  redirect: '/settings/sys-fill-rule/list',
   children: [
     {
       path: 'list',
       name: 'systemSysFillRuleList',
       component: () => import('@/views/settings/sys-fill-rule/sys-fill-rule-list.vue'),
-      meta: { title: '填充规则列表' },
+      meta: { title: '填充规则列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'systemSysFillRuleNew',
       component: () => import('@/views/settings/sys-fill-rule/sys-fill-rule-edit.vue'),
-      meta: { title: '新建填充规则' },
+      meta: { title: '新建填充规则', hideMenu: true },
     },
     {
       path: ':entityId/edit',

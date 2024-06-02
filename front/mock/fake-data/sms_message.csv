@@ -1,0 +1,11 @@
+id;title;send_type;receiver;params;content;send_time;send_status;retry_num;fail_result;remark;created_by;created_date;last_modified_by;last_modified_date
+1;midden;EMAIL;finally someone meh;捡 lest;../fake-data/blob/hipster.txt;2024-01-01T01:38:46;SUCCESS;15661;仿佛 捉 百般;whose pfft 攥;21376;2023-12-31T07:18:00;24195;2023-12-31T20:43:52
+2;捏 amidst opposite;EMAIL;aw 就;athwart but aw;../fake-data/blob/hipster.txt;2023-12-31T22:29:01;SUCCESS;3526;搀 aw round;including at;4379;2023-12-31T09:14:09;17100;2023-12-31T18:40:47
+3;phooey technology without;EMAIL;抛 pace below;共;../fake-data/blob/hipster.txt;2023-12-31T23:16:43;SUCCESS;19649;苦 supreme circa;拎 boo yippee;23902;2023-12-31T23:58:24;3115;2023-12-31T18:15:01
+4;搜;WECHAT;一共 托 ugh;till 倒 aha;../fake-data/blob/hipster.txt;2023-12-31T12:07:03;WAITING;17272;当然 how;following pish;24220;2024-01-01T00:52:03;6236;2023-12-31T20:33:52
+5;长 pish when;SMS;好 鲁莽 仅;猛然 苦 毅然;../fake-data/blob/hipster.txt;2023-12-31T07:44:45;FAILURE;29087;拍;yowza 喝;28477;2023-12-31T12:27:28;29192;2024-01-01T03:40:58
+6;radar 偏偏;WECHAT;save;可 drat 掘;../fake-data/blob/hipster.txt;2023-12-31T22:16:46;FAILURE;26709;开 攥;坚固 tabernacle 不;16309;2023-12-31T08:11:53;28920;2023-12-31T13:47:08
+7;吞 apud 必定;WECHAT;than unless;plus 大;../fake-data/blob/hipster.txt;2024-01-01T00:56:27;SUCCESS;772;antler 弹 modulo;gee camp 抄;3514;2023-12-31T17:41:31;30489;2023-12-31T08:59:44
+8;平常 but;SMS;gunpowder;摊 长 全;../fake-data/blob/hipster.txt;2023-12-31T18:08:13;WAITING;23270;through;掐 ack;32491;2024-01-01T03:01:55;30493;2023-12-31T16:45:44
+9;boohoo 按;WECHAT;绿油油 却 仍然;uh-huh parchment ah;../fake-data/blob/hipster.txt;2023-12-31T19:28:18;FAILURE;326;now blackbird 爬;yum suppression;23494;2024-01-01T04:16:12;9300;2024-01-01T01:34:55
+10;hmph amid;WECHAT;even 短;eek;../fake-data/blob/hipster.txt;2024-01-01T03:52:55;WAITING;30588;多么 pita;骨碌碌;25781;2023-12-31T10:32:35;20356;2023-12-31T16:33:08

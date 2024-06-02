@@ -167,6 +167,7 @@ entity AnnouncementRecord {
   hasRead Boolean /** 是否已读 */
   readTime ZonedDateTime /** 阅读时间 */
 }
+
 /**
  * 定时任务
  */

@@ -8,19 +8,19 @@ export const authorityRoutes: AppRouteRecordRaw = {
   meta: {
     title: '角色',
   },
-  redirect: '',
+  redirect: '/system/authority/list',
   children: [
     {
       path: 'list',
       name: 'systemAuthorityList',
       component: () => import('@/views/system/authority/authority-list.vue'),
-      meta: { title: '角色列表' },
+      meta: { title: '角色列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'systemAuthorityNew',
       component: () => import('@/views/system/authority/authority-edit.vue'),
-      meta: { title: '新建角色' },
+      meta: { title: '新建角色', hideMenu: true },
     },
     {
       path: ':entityId/edit',

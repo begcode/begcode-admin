@@ -8,19 +8,19 @@ export const siteConfigRoutes: AppRouteRecordRaw = {
   meta: {
     title: '网站配置',
   },
-  redirect: '',
+  redirect: '/settings/site-config/list',
   children: [
     {
       path: 'list',
       name: 'systemSiteConfigList',
       component: () => import('@/views/settings/site-config/site-config-list.vue'),
-      meta: { title: '网站配置列表' },
+      meta: { title: '网站配置列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'systemSiteConfigNew',
       component: () => import('@/views/settings/site-config/site-config-edit.vue'),
-      meta: { title: '新建网站配置' },
+      meta: { title: '新建网站配置', hideMenu: true },
     },
     {
       path: ':entityId/edit',

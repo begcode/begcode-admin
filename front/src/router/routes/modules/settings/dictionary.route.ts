@@ -8,19 +8,19 @@ export const dictionaryRoutes: AppRouteRecordRaw = {
   meta: {
     title: '数据字典',
   },
-  redirect: '',
+  redirect: '/settings/dictionary/list',
   children: [
     {
       path: 'list',
       name: 'systemDictionaryList',
       component: () => import('@/views/settings/dictionary/dictionary-list.vue'),
-      meta: { title: '数据字典列表' },
+      meta: { title: '数据字典列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'systemDictionaryNew',
       component: () => import('@/views/settings/dictionary/dictionary-edit.vue'),
-      meta: { title: '新建数据字典' },
+      meta: { title: '新建数据字典', hideMenu: true },
     },
     {
       path: ':entityId/edit',

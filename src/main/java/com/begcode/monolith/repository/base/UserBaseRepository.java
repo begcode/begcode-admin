@@ -48,10 +48,6 @@ public interface UserBaseRepository<E extends User> extends BaseCrudMapper<User>
     @Select("delete from jhi_user user where user.position = #{positionId}")
     void deleteAllByPositionId(@Param("positionId") Long positionId);
 
-    //    default Optional<User> findById(Long id) {
-    //        return Optional.ofNullable(this.selectById(id));
-    //    }
-
     default Optional<User> findOneByActivationKey(String activationKey) {
         return Optional.ofNullable(this.selectOne(new LambdaQueryWrapper<User>().eq(User::getActivationKey, activationKey)));
     }

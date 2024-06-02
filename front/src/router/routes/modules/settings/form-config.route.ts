@@ -8,19 +8,19 @@ export const formConfigRoutes: AppRouteRecordRaw = {
   meta: {
     title: '表单配置',
   },
-  redirect: '',
+  redirect: '/settings/form-config/list',
   children: [
     {
       path: 'list',
       name: 'systemFormConfigList',
       component: () => import('@/views/settings/form-config/form-config-list.vue'),
-      meta: { title: '表单配置列表' },
+      meta: { title: '表单配置列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'systemFormConfigNew',
       component: () => import('@/views/settings/form-config/form-config-edit.vue'),
-      meta: { title: '新建表单配置' },
+      meta: { title: '新建表单配置', hideMenu: true },
     },
     {
       path: ':entityId/edit',

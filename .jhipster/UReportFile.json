@@ -1,4 +1,5 @@
 {
+  "aigcs": [],
   "annotations": {
     "addCustomMethod": "repository-service-listComponent",
     "changelogDate": "20240101063206",

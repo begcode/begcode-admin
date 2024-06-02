@@ -10,6 +10,7 @@ export interface IFillRuleItem {
   seqLength?: number | null; //序列长度
   seqIncrement?: number | null; //序列增量
   seqStartValue?: number | null; //序列起始值
+  fillRuleId?: number | null;
   fillRule?: ISysFillRule | null; //填充规则
 }
 
@@ -23,6 +24,7 @@ export class FillRuleItem implements IFillRuleItem {
     public seqLength?: number | null,
     public seqIncrement?: number | null,
     public seqStartValue?: number | null,
+    public fillRuleId?: number | null,
     public fillRule?: ISysFillRule | null,
   ) {}
 }

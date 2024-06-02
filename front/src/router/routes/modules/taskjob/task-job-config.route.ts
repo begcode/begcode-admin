@@ -8,19 +8,19 @@ export const taskJobConfigRoutes: AppRouteRecordRaw = {
   meta: {
     title: '定时任务',
   },
-  redirect: '',
+  redirect: '/taskjob/task-job-config/list',
   children: [
     {
       path: 'list',
       name: 'taskjobTaskJobConfigList',
       component: () => import('@/views/taskjob/task-job-config/task-job-config-list.vue'),
-      meta: { title: '定时任务列表' },
+      meta: { title: '定时任务列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'taskjobTaskJobConfigNew',
       component: () => import('@/views/taskjob/task-job-config/task-job-config-edit.vue'),
-      meta: { title: '新建定时任务' },
+      meta: { title: '新建定时任务', hideMenu: true },
     },
     {
       path: ':entityId/edit',

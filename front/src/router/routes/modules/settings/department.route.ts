@@ -8,19 +8,19 @@ export const departmentRoutes: AppRouteRecordRaw = {
   meta: {
     title: '部门',
   },
-  redirect: '',
+  redirect: '/settings/department/list',
   children: [
     {
       path: 'list',
       name: 'systemDepartmentList',
       component: () => import('@/views/settings/department/department-list.vue'),
-      meta: { title: '部门列表' },
+      meta: { title: '部门列表', hideMenu: true },
     },
     {
       path: 'new',
       name: 'systemDepartmentNew',
       component: () => import('@/views/settings/department/department-edit.vue'),
-      meta: { title: '新建部门' },
+      meta: { title: '新建部门', hideMenu: true },
     },
     {
       path: ':entityId/edit',
