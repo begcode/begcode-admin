@@ -1,6 +1,7 @@
 import type { AppRouteModule } from '@/router/types';
 
 import { LAYOUT } from '@/router/constant';
+import { cacheManageRoutes } from '@/router/routes/modules/system/cache-manage.route';
 import { viewPermissionRoutes } from '@/router/routes/modules/system/view-permission.route';
 import { authorityRoutes } from '@/router/routes/modules/system/authority.route';
 import { userRoutes } from '@/router/routes/modules/system/user.route';
@@ -20,6 +21,7 @@ const system: AppRouteModule = {
     title: '系统设置',
   },
   children: [
+    cacheManageRoutes,
     viewPermissionRoutes,
     authorityRoutes,
     userRoutes,

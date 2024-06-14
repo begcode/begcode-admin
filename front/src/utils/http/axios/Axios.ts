@@ -2,12 +2,14 @@ import type { AxiosRequestConfig, AxiosInstance, AxiosResponse, AxiosError, Inte
 import axios from 'axios';
 import qs from 'qs';
 import { cloneDeep, isFunction } from 'lodash-es';
-import { AxiosCanceler } from './axiosCancel';
+import MockAdapter from 'axios-mock-adapter';
+import { setupMockServer } from 'mock/api/index';
 import type { CreateAxiosOptions } from './axiosTransform';
-import type { RequestOptions, Result, UploadFileParams, UploadFileCallBack } from '#/axios';
+import { AxiosCanceler } from './axiosCancel';
 import { ContentTypeEnum, RequestEnum } from '@/enums/httpEnum';
 import { useGlobSetting } from '@/hooks/setting';
 import { useMessage } from '@/hooks/web/useMessage';
+import type { RequestOptions, Result, UploadFileParams, UploadFileCallBack } from '#/axios';
 
 const { createMessage } = useMessage();
 export * from './axiosTransform';
@@ -17,11 +19,15 @@ export * from './axiosTransform';
  */
 export class VAxios {
   private axiosInstance: AxiosInstance;
+  private mockInstance: MockAdapter | null = null;
   private readonly options: CreateAxiosOptions;
 
   constructor(options: CreateAxiosOptions) {
     this.options = options;
     this.axiosInstance = axios.create(options);
+    this.mockInstance = new MockAdapter(this.axiosInstance);
+    const glob = useGlobSetting();
+    glob.useMock && setupMockServer(this.mockInstance);
     this.setupInterceptors();
   }
 
@@ -39,6 +45,10 @@ export class VAxios {
 
   getAxios(): AxiosInstance {
     return this.axiosInstance;
+  }
+
+  getMock(): MockAdapter | null {
+    return this.mockInstance;
   }
 
   /**

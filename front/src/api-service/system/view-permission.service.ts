@@ -17,12 +17,12 @@ export default {
 
   retrieve(paginationQuery?: any): Promise<PageRecord<IViewPermission>> {
     const options = buildPaginationQueryOpts(paginationQuery);
-    return defHttp.get({ url: apiUrl + `?${qs.stringify(options, { arrayFormat: 'repeat' })}` });
+    return defHttp.get({ url: apiUrl, params: qs.stringify(options, { arrayFormat: 'repeat' }) });
   },
 
   stats(queryParams?: any): Promise<any> {
     const options = buildPaginationQueryOpts(queryParams);
-    return defHttp.get({ url: `${apiUrl}/stats?${qs.stringify(options, { arrayFormat: 'repeat' })}` });
+    return defHttp.get({ url: `${apiUrl}/stats`, params: qs.stringify(options, { arrayFormat: 'repeat' }) });
   },
 
   exist(queryParams?: any): Promise<Boolean> {
@@ -32,7 +32,7 @@ export default {
     const options = buildPaginationQueryOpts(queryParams);
     return new Promise((resolve, reject) => {
       defHttp
-        .get({ url: `${apiUrl}/stats?${qs.stringify(options, { arrayFormat: 'repeat' })}` })
+        .get({ url: `${apiUrl}/stats?`, params: qs.stringify(options, { arrayFormat: 'repeat' }) })
         .then(res => {
           resolve(res && res[0] && res[0]['id_count'] > 0);
         })
@@ -64,7 +64,7 @@ export default {
 
   tree(paginationQuery?: any): Promise<PageRecord<IViewPermission[]>> {
     const options = buildPaginationQueryOpts(paginationQuery);
-    return defHttp.get({ url: `${apiUrl}/tree` + `?${qs.stringify(options, { arrayFormat: 'repeat' })}` });
+    return defHttp.get({ url: `${apiUrl}/tree`, params: qs.stringify(options, { arrayFormat: 'repeat' }) });
   },
 
   treeByParentId(parentId: number): Promise<IViewPermission[]> {
@@ -85,7 +85,7 @@ export default {
 
   updateRelations(otherEntityIds: String[], relationshipName: String, relatedIds: number[], operateType: String): Promise<Boolean> {
     const queryParams = qs.stringify({ otherEntityIds, relatedIds, relationshipName }, { arrayFormat: 'repeat' });
-    return defHttp.put({ url: `${apiUrl}/relations/${operateType}?${queryParams}` });
+    return defHttp.put({ url: `${apiUrl}/relations/${operateType}`, params: queryParams });
   },
   // prettier-ignore
   treeByLogin(): Promise<any> {

@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { resultPageSuccess, resultSuccess } from 'mock/_util';
+import { resultPageSuccess } from 'mock/_util';
+import qs from 'qs';
 import Papa from 'papaparse';
 import { camelCase } from 'lodash-es';
 
@@ -24,87 +25,65 @@ Papa.parse(csv.toString(), {
 const baseApiUrl = '/api/sys-fill-rules';
 
 const getById = id => {
-  return allData.find(item => (item.id = id));
+  return allData.find(item => item.id === id);
 };
 
 const getIdFromUrl = url => {
   const regExp = new RegExp(`${baseApiUrl}/`.replace('/', '\\/') + '(?<id>\\d+)');
-  let match = regExp.exec(url);
+  const match = regExp.exec(url);
   if (match) {
-    let { id } = match.groups as any;
+    const { id } = match.groups as any;
     return id;
   }
 };
 
-export default [
-  {
-    url: `${baseApiUrl}`,
-    timeout: 1000,
-    method: 'get',
-    response: ({ query }) => {
-      const { page = 0, size = 15 } = query;
-      return resultPageSuccess(page, size, allData);
-    },
-  },
-  {
-    url: `${baseApiUrl}/:id`,
-    timeout: 1000,
-    method: 'get',
-    response: ({ url }) => {
-      console.log('url:', url);
-      const id = getIdFromUrl(url);
-      if (id) {
-        const entity = getById(id);
-        if (entity) {
-          return entity;
-        }
+export function setOssConfigMock(mock) {
+  mock.onGet(`${baseApiUrl}`).reply(config => {
+    const { params = '' } = config;
+    const { page = '0', size = '15' } = qs.parse(params);
+    return [200, resultPageSuccess(Number(page), Number(size), allData)];
+  });
+  mock.onGet(new RegExp(`${baseApiUrl}/\\d+`)).reply(config => {
+    const { url } = config;
+    const id = getIdFromUrl(url);
+    if (id) {
+      const entity = getById(id);
+      if (entity) {
+        return [200, entity];
       }
-      return resultSuccess({});
-    },
-  },
-  {
-    url: `${baseApiUrl}`,
-    timeout: 1000,
-    method: 'post',
-    response: ({ body }) => {
-      console.log('body', body);
-      return resultSuccess({});
-    },
-  },
-  {
-    url: `${baseApiUrl}/:id`,
-    timeout: 1000,
-    method: 'put',
-    response: ({ body, params, url }) => {
-      const id = getIdFromUrl(url);
-      if (id) {
-        console.log('id:', id);
-        const entity = getById(id);
-        if (entity) {
-          console.log('entity:', entity);
-          return resultSuccess(entity);
-        }
+    }
+    return [404, {}];
+  });
+  mock.onPost(baseApiUrl).reply(config => {
+    const { data } = config;
+    console.log('data', data);
+    return [201, data];
+  });
+  mock.onPut(new RegExp(`${baseApiUrl}/\\d+`)).reply(config => {
+    const { url, params, data } = config;
+    const id = getIdFromUrl(url);
+    if (id) {
+      console.log('id:', id);
+      const entity = getById(id);
+      if (entity) {
+        console.log('entity:', entity);
+        return [200, entity];
       }
-      console.log('body', body);
-      console.log('params', params);
-      return resultSuccess({});
-    },
-  },
-  {
-    url: `${baseApiUrl}/:id`,
-    timeout: 1000,
-    method: 'delete',
-    response: ({ params, url }) => {
-      console.log('params', params);
-      const id = getIdFromUrl(url);
-      if (id) {
-        const findIndex = allData.findIndex(item => (item.id = id));
-        if (findIndex > -1) {
-          allData.splice(findIndex, 1);
-        }
-        return {};
+    }
+    console.log('data', data);
+    console.log('params', params);
+    return [200, {}];
+  });
+  mock.onDelete(new RegExp(`${baseApiUrl}/\\d+`)).reply(config => {
+    const { params, url } = config;
+    const id = getIdFromUrl(url);
+    if (id) {
+      const findIndex = allData.findIndex(item => item.id === id);
+      if (findIndex > -1) {
+        allData.splice(findIndex, 1);
       }
-      return resultSuccess({});
-    },
-  },
-];
+      return [204, {}];
+    }
+    return [404, {}];
+  });
+}
