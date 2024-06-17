@@ -224,7 +224,6 @@ import { transVxeSorts } from '@/utils/jhipster/sorts';
 import { Button, Icon, useModalInner, BasicModal, useDrawerInner, BasicDrawer, SearchForm } from '@begcode/components';
 import { useGo } from '@/hooks/web/usePage';
 import ServerProvider from '@/api-service/index';
-import { useRootSetting } from '@/hooks/setting/useRootSetting';
 import AuthorityEdit from '../authority-edit.vue';
 import AuthorityDetail from '../authority-detail.vue';
 import AuthorityList from '../authority-list.vue';
@@ -553,7 +552,6 @@ const drawerComponentRef = ref<any>(null);
 const ctx = getCurrentInstance()?.proxy;
 const go = useGo();
 const apiService = ctx?.$apiService as typeof ServerProvider;
-const { getPageSetting } = useRootSetting();
 const relationshipApis: any = {
   children: apiService.system.authorityService.tree,
   viewPermissions: apiService.system.viewPermissionService.tree,
@@ -600,17 +598,17 @@ let rowOperations = [
   {
     disabled: false,
     name: 'save',
-    type: getPageSetting.value.buttonType || 'link',
+    type: 'link',
   },
   {
     title: '下级',
     name: 'addChildren',
     containerType: 'modal',
-    type: getPageSetting.value.buttonType || 'link',
+    type: 'link',
   },
   {
     name: 'delete',
-    type: getPageSetting.value.buttonType || 'link',
+    type: 'link',
   },
   {
     name: 'cancelRelate',
@@ -621,7 +619,7 @@ let rowOperations = [
     title: '详情',
     name: 'detail',
     containerType: 'drawer',
-    type: getPageSetting.value.buttonType || 'link',
+    type: 'link',
   },
 ];
 if (props.gridCustomConfig?.rowOperations && isArray(props.gridCustomConfig.rowOperations)) {

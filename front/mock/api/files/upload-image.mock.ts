@@ -1,28 +1,18 @@
-import fs from 'fs';
-import path from 'path';
 import { resultPageSuccess } from 'mock/_util';
 import qs from 'qs';
-import Papa from 'papaparse';
-import { camelCase } from 'lodash-es';
+import { getMockData } from 'mock/allMockData';
 
 const allData: any[] = [];
-const dataPath = path.resolve(__dirname, '../../data/upload_image.csv');
-const fakePath = path.resolve(__dirname, '../../fake-data/upload_image.csv');
-let filePath = fakePath;
-if (fs.existsSync(dataPath)) {
-  filePath = dataPath;
-}
-const csv = fs.readFileSync(filePath);
-Papa.parse(csv.toString(), {
-  header: true,
-  transformHeader: header => camelCase(header),
-  skipEmptyLines: true,
-  complete: function (results: any) {
-    allData.push(...(results.data as any[]));
-  },
-});
+let feteched = false;
 
 const baseApiUrl = '/api/upload-images';
+
+const fetchData = () => {
+  if (!feteched) {
+    allData.push(...getMockData('upload_image'));
+    feteched = true;
+  }
+};
 
 const getById = id => {
   return allData.find(item => item.id === id);
@@ -37,13 +27,15 @@ const getIdFromUrl = url => {
   }
 };
 
-export function setOssConfigMock(mock) {
+export function setUploadImageMock(mock) {
   mock.onGet(`${baseApiUrl}`).reply(config => {
+    fetchData();
     const { params = '' } = config;
     const { page = '0', size = '15' } = qs.parse(params);
     return [200, resultPageSuccess(Number(page), Number(size), allData)];
   });
   mock.onGet(new RegExp(`${baseApiUrl}/\\d+`)).reply(config => {
+    fetchData();
     const { url } = config;
     const id = getIdFromUrl(url);
     if (id) {
@@ -55,11 +47,13 @@ export function setOssConfigMock(mock) {
     return [404, {}];
   });
   mock.onPost(baseApiUrl).reply(config => {
+    fetchData();
     const { data } = config;
     console.log('data', data);
     return [201, data];
   });
   mock.onPut(new RegExp(`${baseApiUrl}/\\d+`)).reply(config => {
+    fetchData();
     const { url, params, data } = config;
     const id = getIdFromUrl(url);
     if (id) {
@@ -75,7 +69,9 @@ export function setOssConfigMock(mock) {
     return [200, {}];
   });
   mock.onDelete(new RegExp(`${baseApiUrl}/\\d+`)).reply(config => {
+    fetchData();
     const { params, url } = config;
+    console.log('params', params);
     const id = getIdFromUrl(url);
     if (id) {
       const findIndex = allData.findIndex(item => item.id === id);

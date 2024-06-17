@@ -7,7 +7,7 @@ import { defineComponent } from 'vue';
 import { ITaskJobConfig } from '@/models/taskjob/task-job-config.model';
 
 import ServerProvider from '@/api-service/index';
-import { PageWrapper, Icon, getButtonConfig, Description, DescList } from '@begcode/components';
+import { PageWrapper, Icon, getButtonConfig, Descriptions, DescList } from '@begcode/components';
 
 export default defineComponent({
   // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
@@ -134,11 +134,11 @@ export default defineComponent({
             if (pageConfig?.canExpand) {
               return (
                 <CollapsePanel>
-                  <Description {...componentRef.props} />
+                  <Descriptions {...componentRef.props} />
                 </CollapsePanel>
               );
             } else {
-              return <Description {...componentRef.props} />;
+              return <Descriptions {...componentRef.props} />;
             }
           } else {
             const component = resolveComponent(componentRef.name);

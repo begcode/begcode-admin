@@ -5,7 +5,6 @@ import purgeIcons from 'vite-plugin-purge-icons';
 import UnoCSS from 'unocss/vite';
 import VitePluginCertificate from 'vite-plugin-mkcert';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
-import { configMockPlugin } from './mock';
 import { configCompressPlugin } from './compress';
 import { configVisualizerConfig } from './visualizer';
 import { configThemePlugin } from './theme';
@@ -44,15 +43,20 @@ export function createVitePlugins(viteEnv: ViteEnv, isBuild: boolean) {
             src: 'dev/swagger-ui/index.html',
             dest: 'swagger-ui',
           },
+          {
+            src: 'mock/data/*.csv',
+            dest: 'mock/data',
+          },
+          {
+            src: 'mock/fake-data/*.csv',
+            dest: 'mock/fake-data',
+          },
         ],
       }),
     );
 
   // vite-plugin-svg-icons
   vitePlugins.push(configSvgIconsPlugin(isBuild));
-
-  // vite-plugin-mock
-  VITE_USE_MOCK && vitePlugins.push(configMockPlugin(isBuild));
 
   // vite-plugin-purge-icons
   vitePlugins.push(purgeIcons());

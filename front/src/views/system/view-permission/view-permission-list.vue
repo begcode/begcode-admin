@@ -104,7 +104,7 @@
                         </template>
                         <Button>
                           {{ button.name }}
-                          <DownOutlined />
+                          <Icon icon="ant-design:down-outlined" />
                         </Button>
                       </Dropdown>
                     </template>
@@ -113,84 +113,7 @@
               </Row>
             </template>
             <template #recordAction="{ row, column }">
-              <template v-if="tableRowOperations.length">
-                <Space :size="4">
-                  <template
-                    v-for="operation in tableRowOperations.filter(
-                      rowOperation => !rowOperation.disabled && !(rowOperation.hide && rowOperation.hide(row)),
-                    )"
-                  >
-                    <template v-if="operation.name === 'save'">
-                      <Button
-                        v-if="xGrid.isEditByRow(row) && xGrid.props.editConfig.mode === 'row'"
-                        :type="operation.type || 'link'"
-                        :key="operation.name"
-                        :title="getButtonTitle(operation.title || '保存', row)"
-                        @click="rowClick('save', row)"
-                        status="primary"
-                      >
-                        <Icon icon="ant-design:save-outlined" #icon v-if="operation.type !== 'link'" />
-                        <span v-else>{{ getButtonTitle(operation.title || '保存', row) }}</span>
-                      </Button>
-                      <Button
-                        v-else
-                        :type="operation.type || 'link'"
-                        :key="operation.name"
-                        :title="getButtonTitle(operation.title || '编辑', row)"
-                        shape="circle"
-                        @click="rowClick('edit', row)"
-                      >
-                        <Icon icon="ant-design:edit-outlined" #icon v-if="operation.type !== 'link'" />
-                        <span v-else>{{ getButtonTitle(operation.title || '编辑', row) }}</span>
-                      </Button>
-                    </template>
-                    <template v-else-if="operation.name === 'delete' && !operation.disabled">
-                      <Button
-                        :type="operation.type || 'link'"
-                        :key="operation.name"
-                        :title="getButtonTitle(operation.title || '删除', row)"
-                        @click="rowClick('delete', row)"
-                        shape="circle"
-                      >
-                        <Icon :icon="operation.icon || 'ant-design:delete-outlined'" #icon v-if="operation.type !== 'link'" />
-                        <span v-else>{{ getButtonTitle(operation.title || '删除', row) }}</span>
-                      </Button>
-                    </template>
-                    <template v-else>
-                      <Button
-                        v-if="!operation.disabled"
-                        :type="operation.type || 'link'"
-                        :key="operation.name"
-                        :title="getButtonTitle(operation.title || '操作', row)"
-                        @click="rowClick(operation.name, row)"
-                        shape="circle"
-                      >
-                        <Icon :icon="operation.icon || 'ant-design:info-circle-outlined'" v-if="operation.type !== 'link'" #icon />
-                        <span v-else>{{ getButtonTitle(operation.title || '操作', row) }}</span>
-                      </Button>
-                    </template>
-                  </template>
-                  <Dropdown v-if="tableRowMoreOperations && tableRowMoreOperations.length">
-                    <template #overlay>
-                      <Menu @click="rowMoreClick($event, row)">
-                        <MenuItem
-                          :key="operation.name"
-                          v-for="operation in tableRowMoreOperations.filter(
-                            operationItem => !operationItem.disabled && !(operationItem.hide && operationItem.hide(row)),
-                          )"
-                        >
-                          <Icon :icon="operation.icon" v-if="operation.icon" />
-                          <span v-if="operation.type === 'link'">{{ getButtonTitle(operation.title || '操作', row) }}</span>
-                        </MenuItem>
-                      </Menu>
-                    </template>
-                    <a class="ant-dropdown-link" @click.prevent>
-                      &nbsp;
-                      <DownOutlined />
-                    </a>
-                  </Dropdown>
-                </Space>
-              </template>
+              <ButtonGroup :row="row" :buttons="rowOperations" @click="rowClick" />
             </template>
           </Grid>
         </Col>
@@ -220,15 +143,13 @@
 <script lang="ts" setup>
 import { reactive, ref, getCurrentInstance, h, onMounted, toRaw, shallowRef } from 'vue';
 import { Alert, message, Modal, Space, Card, Divider, Row, Col, Tree, Input, Dropdown, Menu, MenuItem } from 'ant-design-vue';
-import { DownOutlined } from '@ant-design/icons-vue';
 import { VxeGridInstance, VxeGridListeners, VxeGridProps, Grid } from 'vxe-table';
 import { mergeWith, isArray, isObject, isString, debounce } from 'lodash-es';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { transVxeSorts } from '@/utils/jhipster/sorts';
-import { Button, Icon, useModalInner, BasicModal, useDrawerInner, BasicDrawer, SearchForm } from '@begcode/components';
+import { Button, Icon, useModalInner, BasicModal, useDrawerInner, BasicDrawer, SearchForm, ButtonGroup } from '@begcode/components';
 import { useGo } from '@/hooks/web/usePage';
 import ServerProvider from '@/api-service/index';
-import { useRootSetting } from '@/hooks/setting/useRootSetting';
 import ViewPermissionEdit from './view-permission-edit.vue';
 import ViewPermissionDetail from './view-permission-detail.vue';
 
@@ -288,7 +209,6 @@ const drawerComponentRef = ref<any>(null);
 const ctx = getCurrentInstance()?.proxy;
 const go = useGo();
 const apiService = ctx?.$apiService as typeof ServerProvider;
-const { getPageSetting } = useRootSetting();
 const apis = {
   viewPermissionService: apiService.system.viewPermissionService,
   find: apiService.system.viewPermissionService.tree,
@@ -334,25 +254,36 @@ const searchFormConfig = reactive(
 const batchOperations = [];
 let rowOperations = [
   {
-    disabled: false,
+    hide: row => !xGrid.value.isEditByRow(row) || !xGrid.value.props.editConfig.mode === 'row',
+    title: '保存',
     name: 'save',
-    type: getPageSetting.value.buttonType || 'link',
+    type: 'link',
+  },
+  {
+    title: '编辑',
+    hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig.mode === 'row',
+    name: 'edit',
+    type: 'link',
   },
   {
     title: '下级',
     name: 'addChildren',
+    hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig.mode === 'row',
     containerType: 'modal',
-    type: getPageSetting.value.buttonType || 'link',
+    type: 'link',
   },
   {
+    title: '删除',
+    hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig.mode === 'row',
     name: 'delete',
-    type: getPageSetting.value.buttonType || 'link',
+    type: 'link',
   },
   {
     title: '详情',
+    hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig.mode === 'row',
     name: 'detail',
     containerType: 'drawer',
-    type: getPageSetting.value.buttonType || 'link',
+    type: 'link',
   },
 ];
 if (props.gridCustomConfig?.rowOperations && isArray(props.gridCustomConfig.rowOperations)) {
@@ -363,20 +294,6 @@ if (props.gridCustomConfig?.rowOperations && isArray(props.gridCustomConfig.rowO
       props.gridCustomConfig.rowOperations.some(rowItem => (isObject(rowItem) ? item.name === rowItem['name'] : item.name === rowItem)),
     );
   }
-}
-const tableRowOperations = reactive<any[]>([]);
-const tableRowMoreOperations = reactive<any[]>([]);
-const saveOperation = rowOperations.find(operation => operation.name === 'save');
-if (rowOperations.length > 4 || (saveOperation && rowOperations.length > 3)) {
-  if (saveOperation) {
-    tableRowOperations.push(...rowOperations?.slice(0, 3));
-    tableRowMoreOperations.push(...rowOperations.slice(3));
-  } else {
-    tableRowOperations.push(...rowOperations?.slice(0, 4));
-    tableRowMoreOperations.push(...rowOperations.slice(4));
-  }
-} else {
-  tableRowOperations.push(...rowOperations);
 }
 const selectedRows = reactive<any>([]);
 const searchFormRef = ref<any>(null);
@@ -495,17 +412,53 @@ mergeWith(gridOptions, props.gridOptions, (objValue: any, srcValue: any, key: an
     }
   }
 });
+const toolbarClick = ({ code }) => {
+  const $grid = xGrid.value;
+  switch (code) {
+    case 'batchDelete': {
+      const records = $grid.getCheckboxRecords(true);
+      if (records?.length > 0) {
+        const ids = records.map(record => record.id);
+        Modal.confirm({
+          title: `操作提示`,
+          content: `是否删除ID为【${ids.join(',')}】的${records.length}项数据？`,
+          onOk() {
+            apis.deleteByIds(ids).then(() => {
+              formSearch();
+            });
+          },
+        });
+      }
+      break;
+    }
+    case 'new':
+      if (props.editIn === 'modal') {
+        modalConfig.componentName = shallowRef(ViewPermissionEdit);
+        modalConfig.entityId = '';
+        setModalProps({ open: true, title: '新建' });
+      } else if (props.editIn === 'drawer') {
+        drawerConfig.componentName = shallowRef(ViewPermissionEdit);
+        drawerConfig.entityId = '';
+        setDrawerProps({ open: true, title: '新建' });
+      } else {
+        if (pageConfig.baseRouteName) {
+          go({ name: `${pageConfig.baseRouteName}New` });
+        } else {
+          console.log('未定义方法');
+        }
+      }
+      break;
+  }
+};
+
+const checkboxChange = () => {
+  const $grid = xGrid.value;
+  selectedRows.length = 0;
+  selectedRows.push(...$grid.getCheckboxRecords());
+};
 const gridEvents = reactive<VxeGridListeners>({
-  checkboxAll: () => {
-    const $grid = xGrid.value;
-    selectedRows.length = 0;
-    selectedRows.push(...$grid.getCheckboxRecords());
-  },
-  checkboxChange: () => {
-    const $grid = xGrid.value;
-    selectedRows.length = 0;
-    selectedRows.push(...$grid.getCheckboxRecords());
-  },
+  checkboxAll: checkboxChange,
+  checkboxChange: checkboxChange,
   pageChange({ currentPage, pageSize }) {
     if (gridOptions.pagerConfig) {
       gridOptions.pagerConfig.currentPage = currentPage;
@@ -518,55 +471,9 @@ const gridEvents = reactive<VxeGridListeners>({
     selectedRows.push($grid.getRadioRecord());
   },
   // 表格左上角按钮事件
-  toolbarButtonClick({ code }) {
-    const $grid = xGrid.value;
-    switch (code) {
-      case 'batchDelete': {
-        const records = $grid.getCheckboxRecords(true);
-        if (records?.length > 0) {
-          const ids = records.map(record => record.id);
-          Modal.confirm({
-            title: `操作提示`,
-            content: `是否删除ID为【${ids.join(',')}】的${records.length}项数据？`,
-            onOk() {
-              apis.deleteByIds(ids).then(() => {
-                formSearch();
-              });
-            },
-          });
-        }
-        break;
-      }
-      case 'mySave': {
-        break;
-      }
-      case 'myExport': {
-        break;
-      }
-    }
-  },
+  toolbarButtonClick: toolbarClick,
   // 表格右上角自定义按钮事件
-  toolbarToolClick({ code }) {
-    switch (code) {
-      case 'new':
-        if (props.editIn === 'modal') {
-          modalConfig.componentName = shallowRef(ViewPermissionEdit);
-          modalConfig.entityId = '';
-          setModalProps({ open: true, title: '新建' });
-        } else if (props.editIn === 'drawer') {
-          drawerConfig.componentName = shallowRef(ViewPermissionEdit);
-          drawerConfig.entityId = '';
-          setDrawerProps({ open: true, title: '新建' });
-        } else {
-          if (pageConfig.baseRouteName) {
-            go({ name: `${pageConfig.baseRouteName}New` });
-          } else {
-            console.log('未定义方法');
-          }
-        }
-        break;
-    }
-  },
+  toolbarToolClick: toolbarClick,
   editClosed({ row, column }) {
     const field = column.property;
     const cellValue = row[field];
@@ -660,18 +567,9 @@ const switchFilterTree = () => {
   filterTreeConfig.filterTreeSpan = filterTreeConfig.filterTreeSpan > 0 ? 0 : 6;
 };
 
-const rowMoreClick = (e, row) => {
-  const { key } = e;
-  const operation = tableRowMoreOperations.find(operation => operation.name === key);
-  rowClickHandler(key, operation, row);
-};
-
-const rowClick = (name, row) => {
-  const operation = tableRowOperations.find(operation => operation.name === name);
-  rowClickHandler(name, operation, row);
-};
-
-const rowClickHandler = (name, operation, row) => {
+const rowClick = ({ name, data }) => {
+  const row = data;
+  const operation = rowOperations.find(operation => operation.name === name);
   switch (name) {
     case 'save':
       break;
@@ -823,12 +721,7 @@ const rowClickHandler = (name, operation, row) => {
       }
   }
 };
-const getButtonTitle = (title: any, row: any) => {
-  if (typeof title === 'function') {
-    return title(row);
-  }
-  return title;
-};
+
 const getSelectRows = () => {
   return toRaw(selectedRows);
 };

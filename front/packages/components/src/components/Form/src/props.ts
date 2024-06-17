@@ -78,7 +78,7 @@ export const basicProps = {
     },
   },
   rulesMessageJoinLabel: propTypes.bool.def(true),
-  // 【jeecg】超过3列自动折叠
+  // 超过3列自动折叠
   autoAdvancedCol: propTypes.number.def(3),
   // 超过3行自动折叠
   autoAdvancedLine: propTypes.number.def(3),

@@ -1,26 +1,16 @@
-import fs from 'fs';
-import path from 'path';
-import Papa from 'papaparse';
-import { camelCase } from 'lodash-es';
+import { getMockData } from 'mock/allMockData';
 
 const baseApiUrl = '/api/';
 
 const allData: any[] = [];
-const dataPath = path.resolve(__dirname, '../data/jhi_user.csv');
-const fakePath = path.resolve(__dirname, '../fake-data/jhi_user.csv');
-let filePath = fakePath;
-if (fs.existsSync(dataPath)) {
-  filePath = dataPath;
-}
-const csv = fs.readFileSync(filePath);
-Papa.parse(csv.toString(), {
-  header: true,
-  transformHeader: header => camelCase(header),
-  skipEmptyLines: true,
-  complete: function (results: any) {
-    allData.push(...(results.data as any[]));
-  },
-});
+let feteched = false;
+
+const fetchData = () => {
+  if (!feteched) {
+    allData.push(...getMockData('jhi_user'));
+    feteched = true;
+  }
+};
 
 export function setAuthMock(mock) {
   mock?.onPost(`${baseApiUrl}authenticate/withoutCaptcha`).reply(config => {
@@ -43,6 +33,7 @@ export function setAuthMock(mock) {
   });
   mock?.onGet('/api/account').reply(config => {
     console.log('account.config:::', config);
+    fetchData();
     const user = allData.find(user => user.login === 'admin') || {};
     console.log('user.mock:::', user);
     return [200, user];

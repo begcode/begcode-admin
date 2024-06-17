@@ -94,7 +94,7 @@ class Area {
     }
   }
 }
-const jeecgAreaData = new Area();
+const areaData = new Area();
 
 // 根据code找文本
 const getAreaTextByCode = function (code) {
@@ -103,7 +103,7 @@ const getAreaTextByCode = function (code) {
     index = code.split(',').length;
     code = code.substring(code.lastIndexOf(',') + 1);
   }
-  return jeecgAreaData.getText(code, index);
+  return areaData.getText(code, index);
 };
 
 export { getAreaTextByCode };

@@ -158,6 +158,7 @@ export interface GlobConfig {
   urlPrefix?: string;
   // Project abbreviation
   shortName: string;
+  useMock: boolean;
 }
 export interface GlobEnvConfig {
   // Site title

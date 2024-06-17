@@ -3,7 +3,7 @@ import axios from 'axios';
 import qs from 'qs';
 import { cloneDeep, isFunction } from 'lodash-es';
 import MockAdapter from 'axios-mock-adapter';
-import { setupMockServer } from 'mock/api/index';
+import { setupMockServer } from 'mock/api';
 import type { CreateAxiosOptions } from './axiosTransform';
 import { AxiosCanceler } from './axiosCancel';
 import { ContentTypeEnum, RequestEnum } from '@/enums/httpEnum';
@@ -25,9 +25,11 @@ export class VAxios {
   constructor(options: CreateAxiosOptions) {
     this.options = options;
     this.axiosInstance = axios.create(options);
-    this.mockInstance = new MockAdapter(this.axiosInstance);
     const glob = useGlobSetting();
-    glob.useMock && setupMockServer(this.mockInstance);
+    if (glob.useMock) {
+      this.mockInstance = new MockAdapter(this.axiosInstance);
+      setupMockServer(this.mockInstance);
+    }
     this.setupInterceptors();
   }
 

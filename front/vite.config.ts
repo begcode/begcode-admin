@@ -57,6 +57,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         },
       ],
     },
+    assetsInclude: ['**/*.csv'],
     server: {
       https: false,
       // Listening on all local IPs

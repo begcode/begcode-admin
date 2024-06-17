@@ -38,7 +38,7 @@ const props = {
 };
 
 export default defineComponent({
-  name: 'Description',
+  name: 'BDescriptions',
   props,
   emits: ['register'],
   setup(props, { slots, emit }) {

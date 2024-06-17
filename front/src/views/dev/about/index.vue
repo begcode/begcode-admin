@@ -8,16 +8,16 @@
         </span>
       </div>
     </template>
-    <Description @register="infoRegister" class="enter-y" />
-    <Description @register="register" class="my-4 enter-y" />
-    <Description @register="registerDev" class="enter-y" />
-    <Description @register="backendRegister" class="enter-y" />
+    <Descriptions @register="infoRegister" class="enter-y" />
+    <Descriptions @register="register" class="my-4 enter-y" />
+    <Descriptions @register="registerDev" class="enter-y" />
+    <Descriptions @register="backendRegister" class="enter-y" />
   </PageWrapper>
 </template>
 <script lang="ts" setup>
 import { h } from 'vue';
 import { Tag } from 'ant-design-vue';
-import { PageWrapper, Description, DescItem, useDescription } from '@begcode/components';
+import { PageWrapper, Descriptions, DescItem, useDescription } from '@begcode/components';
 import { GITHUB_URL, SITE_URL, DOC_URL } from '@/settings/siteSetting';
 
 const { pkg, lastBuildTime } = __APP_INFO__;

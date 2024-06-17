@@ -123,7 +123,14 @@ const transform: AxiosTransform = {
         config.params = Object.assign(params || {}, joinTimestamp(joinTime, false));
       } else {
         // 兼容restful风格
-        config.url = config.url + params + `${joinTimestamp(joinTime, true)}`;
+        let timestampstr = joinTimestamp(joinTime, true);
+        if (params) {
+          timestampstr = timestampstr.replace('?', '&');
+          config.url = config.url + '?' + params + `${timestampstr}`;
+        } else {
+          config.url = config.url + timestampstr;
+        }
+
         config.params = undefined;
       }
     } else {

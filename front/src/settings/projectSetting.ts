@@ -11,6 +11,7 @@ import {
   SessionTimeoutProcessingEnum,
   TabsThemeEnum,
 } from '@/enums/appEnum';
+import { useGlobSetting } from '@/hooks/setting';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
@@ -37,7 +38,7 @@ const setting: ProjectConfig = {
   // ROUTE_MAPPING: 前端模式（菜单由路由生成，默认）
   // ROLE：前端模式（菜单路由分开）
   // BACK：后台模式
-  permissionMode: PermissionModeEnum.BACK,
+  permissionMode: useGlobSetting().useMock ? PermissionModeEnum.ROUTE_MAPPING : PermissionModeEnum.BACK,
 
   // Permission-related cache is stored in sessionStorage or localStorage
   // 权限缓存存放位置。默认存放于localStorage
