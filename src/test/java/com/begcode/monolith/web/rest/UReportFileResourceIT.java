@@ -40,9 +40,6 @@ public class UReportFileResourceIT {
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
-    private static final String DEFAULT_CONTENT = "AAAAAAAAAA";
-    private static final String UPDATED_CONTENT = "BBBBBBBBBB";
-
     private static final ZonedDateTime DEFAULT_CREATE_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
     private static final ZonedDateTime UPDATED_CREATE_AT = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
     private static final ZonedDateTime SMALLER_CREATE_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
@@ -78,11 +75,7 @@ public class UReportFileResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static UReportFile createEntity() {
-        UReportFile uReportFile = new UReportFile()
-            .name(DEFAULT_NAME)
-            .content(DEFAULT_CONTENT)
-            .createAt(DEFAULT_CREATE_AT)
-            .updateAt(DEFAULT_UPDATE_AT);
+        UReportFile uReportFile = new UReportFile().name(DEFAULT_NAME).createAt(DEFAULT_CREATE_AT).updateAt(DEFAULT_UPDATE_AT);
         return uReportFile;
     }
 
@@ -93,11 +86,7 @@ public class UReportFileResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static UReportFile createUpdatedEntity() {
-        UReportFile uReportFile = new UReportFile()
-            .name(UPDATED_NAME)
-            .content(UPDATED_CONTENT)
-            .createAt(UPDATED_CREATE_AT)
-            .updateAt(UPDATED_UPDATE_AT);
+        UReportFile uReportFile = new UReportFile().name(UPDATED_NAME).createAt(UPDATED_CREATE_AT).updateAt(UPDATED_UPDATE_AT);
         return uReportFile;
     }
 
@@ -176,7 +165,6 @@ public class UReportFileResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(uReportFile.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT.toString())))
             .andExpect(jsonPath("$.[*].createAt").value(hasItem(sameInstant(DEFAULT_CREATE_AT))))
             .andExpect(jsonPath("$.[*].updateAt").value(hasItem(sameInstant(DEFAULT_UPDATE_AT))));
     }
@@ -194,7 +182,6 @@ public class UReportFileResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(uReportFile.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
-            .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT.toString()))
             .andExpect(jsonPath("$.createAt").value(sameInstant(DEFAULT_CREATE_AT)))
             .andExpect(jsonPath("$.updateAt").value(sameInstant(DEFAULT_UPDATE_AT)));
     }
@@ -419,7 +406,6 @@ public class UReportFileResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(uReportFile.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT.toString())))
             .andExpect(jsonPath("$.[*].createAt").value(hasItem(sameInstant(DEFAULT_CREATE_AT))))
             .andExpect(jsonPath("$.[*].updateAt").value(hasItem(sameInstant(DEFAULT_UPDATE_AT))));
 
@@ -467,7 +453,7 @@ public class UReportFileResourceIT {
 
         // Update the uReportFile
         UReportFile updatedUReportFile = uReportFileRepository.findById(uReportFile.getId()).orElseThrow();
-        updatedUReportFile.name(UPDATED_NAME).content(UPDATED_CONTENT).createAt(UPDATED_CREATE_AT).updateAt(UPDATED_UPDATE_AT);
+        updatedUReportFile.name(UPDATED_NAME).createAt(UPDATED_CREATE_AT).updateAt(UPDATED_UPDATE_AT);
         UReportFileDTO uReportFileDTO = uReportFileMapper.toDto(updatedUReportFile);
 
         restUReportFileMockMvc
@@ -557,7 +543,7 @@ public class UReportFileResourceIT {
         UReportFile partialUpdatedUReportFile = new UReportFile();
         partialUpdatedUReportFile.setId(uReportFile.getId());
 
-        partialUpdatedUReportFile.name(UPDATED_NAME).createAt(UPDATED_CREATE_AT);
+        partialUpdatedUReportFile.name(UPDATED_NAME).updateAt(UPDATED_UPDATE_AT);
 
         restUReportFileMockMvc
             .perform(
@@ -588,7 +574,7 @@ public class UReportFileResourceIT {
         UReportFile partialUpdatedUReportFile = new UReportFile();
         partialUpdatedUReportFile.setId(uReportFile.getId());
 
-        partialUpdatedUReportFile.name(UPDATED_NAME).content(UPDATED_CONTENT).createAt(UPDATED_CREATE_AT).updateAt(UPDATED_UPDATE_AT);
+        partialUpdatedUReportFile.name(UPDATED_NAME).createAt(UPDATED_CREATE_AT).updateAt(UPDATED_UPDATE_AT);
 
         restUReportFileMockMvc
             .perform(

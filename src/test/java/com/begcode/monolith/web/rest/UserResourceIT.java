@@ -296,7 +296,7 @@ public class UserResourceIT {
         user.setFirstName(UPDATED_FIRSTNAME);
         user.setLastName(UPDATED_LASTNAME);
         user.setEmail(UPDATED_EMAIL);
-        user.setActivated(updatedUser.isActivated());
+        user.setActivated(updatedUser.getActivated());
         user.setImageUrl(UPDATED_IMAGEURL);
         user.setLangKey(UPDATED_LANGKEY);
         user.setCreatedBy(updatedUser.getCreatedBy());
@@ -337,7 +337,7 @@ public class UserResourceIT {
         user.setFirstName(UPDATED_FIRSTNAME);
         user.setLastName(UPDATED_LASTNAME);
         user.setEmail(UPDATED_EMAIL);
-        user.setActivated(updatedUser.isActivated());
+        user.setActivated(updatedUser.getActivated());
         user.setImageUrl(UPDATED_IMAGEURL);
         user.setLangKey(UPDATED_LANGKEY);
         user.setCreatedBy(updatedUser.getCreatedBy());
@@ -389,7 +389,7 @@ public class UserResourceIT {
         user.setFirstName(updatedUser.getFirstName());
         user.setLastName(updatedUser.getLastName());
         user.setEmail("jhipster@localhost"); // this email should already be used by anotherUser
-        user.setActivated(updatedUser.isActivated());
+        user.setActivated(updatedUser.getActivated());
         user.setImageUrl(updatedUser.getImageUrl());
         user.setLangKey(updatedUser.getLangKey());
         user.setCreatedBy(updatedUser.getCreatedBy());
@@ -429,7 +429,7 @@ public class UserResourceIT {
         user.setFirstName(updatedUser.getFirstName());
         user.setLastName(updatedUser.getLastName());
         user.setEmail(updatedUser.getEmail());
-        user.setActivated(updatedUser.isActivated());
+        user.setActivated(updatedUser.getActivated());
         user.setImageUrl(updatedUser.getImageUrl());
         user.setLangKey(updatedUser.getLangKey());
         user.setCreatedBy(updatedUser.getCreatedBy());
@@ -496,7 +496,7 @@ public class UserResourceIT {
         assertThat(user.getFirstName()).isEqualTo(DEFAULT_FIRSTNAME);
         assertThat(user.getLastName()).isEqualTo(DEFAULT_LASTNAME);
         assertThat(user.getEmail()).isEqualTo(DEFAULT_EMAIL);
-        assertThat(user.isActivated()).isTrue();
+        assertThat(user.getActivated()).isTrue();
         assertThat(user.getImageUrl()).isEqualTo(DEFAULT_IMAGEURL);
         assertThat(user.getLangKey()).isEqualTo(DEFAULT_LANGKEY);
         assertThat(user.getCreatedBy()).isNull();
@@ -526,7 +526,7 @@ public class UserResourceIT {
         assertThat(userDTO.getFirstName()).isEqualTo(DEFAULT_FIRSTNAME);
         assertThat(userDTO.getLastName()).isEqualTo(DEFAULT_LASTNAME);
         assertThat(userDTO.getEmail()).isEqualTo(DEFAULT_EMAIL);
-        assertThat(userDTO.isActivated()).isTrue();
+        assertThat(userDTO.getActivated()).isTrue();
         assertThat(userDTO.getImageUrl()).isEqualTo(DEFAULT_IMAGEURL);
         assertThat(userDTO.getLangKey()).isEqualTo(DEFAULT_LANGKEY);
         assertThat(userDTO.getCreatedBy()).isEqualTo(DEFAULT_LOGIN_ID);

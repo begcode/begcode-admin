@@ -63,7 +63,7 @@ public class User extends AbstractAuditingEntity<Long, User> implements Serializ
 
     @NotNull
     @TableField(value = "activated")
-    private boolean activated = false;
+    private Boolean activated = false;
 
     @Size(min = 2, max = 10)
     @TableField(value = "lang_key")

@@ -1,9 +1,7 @@
 package com.begcode.monolith.config;
 
 import com.begcode.monolith.security.MyUserDetails;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

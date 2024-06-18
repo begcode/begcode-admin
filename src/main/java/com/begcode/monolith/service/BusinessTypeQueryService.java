@@ -25,9 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tech.jhipster.service.aggregate.*;
-import tech.jhipster.service.filter.Filter;
-import tech.jhipster.service.filter.RangeFilter;
-import tech.jhipster.service.filter.StringFilter;
+import tech.jhipster.service.filter.*;
 import tech.jhipster.service.mybatis.CriteriaUtil;
 import tech.jhipster.service.mybatis.QueryService;
 

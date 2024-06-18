@@ -96,7 +96,7 @@ public class UserService extends BaseServiceImpl<UserRepository, User> {
     public Optional<User> requestPasswordReset(String mail) {
         return userRepository
             .findOneByEmailIgnoreCase(mail)
-            .filter(User::isActivated)
+            .filter(User::getActivated)
             .map(user -> {
                 user.setResetKey(RandomUtil.generateResetKey());
                 user.setResetDate(Instant.now());
@@ -109,7 +109,7 @@ public class UserService extends BaseServiceImpl<UserRepository, User> {
     public Optional<User> requestPasswordResetByMobile(String mobile) {
         return userRepository
             .findByMobile(mobile)
-            .filter(User::isActivated)
+            .filter(User::getActivated)
             .map(user -> {
                 user.setResetKey(RandomUtil.generateResetKey());
                 user.setResetDate(Instant.now());
@@ -163,7 +163,7 @@ public class UserService extends BaseServiceImpl<UserRepository, User> {
     }
 
     private boolean removeNonActivatedUser(User existingUser) {
-        if (existingUser.isActivated()) {
+        if (existingUser.getActivated()) {
             return false;
         }
         userRepository.deleteById(existingUser);
@@ -229,7 +229,7 @@ public class UserService extends BaseServiceImpl<UserRepository, User> {
                     user.setEmail(userDTO.getEmail().toLowerCase());
                 }
                 user.setImageUrl(userDTO.getImageUrl());
-                user.setActivated(userDTO.isActivated());
+                user.setActivated(userDTO.getActivated());
                 user.setLangKey(userDTO.getLangKey());
                 List<Authority> managedAuthorities = user.getAuthorities();
                 managedAuthorities.clear();

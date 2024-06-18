@@ -61,7 +61,7 @@ public class UserAsserts {
                         .usingComparator(zonedDataTimeSameInstant)
                         .isEqualTo(actual.getBirthday())
             )
-            .satisfies(e -> assertThat(e.isActivated()).as("check activated").isEqualTo(actual.isActivated()))
+            .satisfies(e -> assertThat(e.getActivated()).as("check activated").isEqualTo(actual.getActivated()))
             .satisfies(e -> assertThat(e.getLangKey()).as("check langKey").isEqualTo(actual.getLangKey()))
             .satisfies(e -> assertThat(e.getImageUrl()).as("check imageUrl").isEqualTo(actual.getImageUrl()))
             .satisfies(e -> assertThat(e.getActivationKey()).as("check activationKey").isEqualTo(actual.getActivationKey()))

@@ -36,7 +36,7 @@ public class AdminUserDTO implements Serializable {
     @Size(max = 256)
     private String imageUrl;
 
-    private boolean activated = false;
+    private Boolean activated = false;
 
     @Size(min = 2, max = 10)
     private String langKey;
@@ -111,7 +111,7 @@ public class AdminUserDTO implements Serializable {
         this.imageUrl = imageUrl;
     }
 
-    public boolean isActivated() {
+    public Boolean getActivated() {
         return activated;
     }
 

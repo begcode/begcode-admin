@@ -366,7 +366,7 @@ class AccountResourceIT {
         restAccountMockMvc.perform(get("/api/activate?key={activationKey}", activationKey)).andExpect(status().isOk());
 
         user = userRepository.findOneByLogin(user.getLogin()).orElse(null);
-        assertThat(user.isActivated()).isTrue();
+        assertThat(user.getActivated()).isTrue();
     }
 
     @Test
@@ -408,7 +408,7 @@ class AccountResourceIT {
         assertThat(updatedUser.getPassword()).isEqualTo(user.getPassword());
         assertThat(updatedUser.getImageUrl()).isEqualTo(userDTO.getImageUrl());
 
-        assertThat(updatedUser.isActivated()).isTrue();
+        assertThat(updatedUser.getActivated()).isTrue();
         assertThat(updatedUser.getAuthorities()).isEmpty();
     }
 

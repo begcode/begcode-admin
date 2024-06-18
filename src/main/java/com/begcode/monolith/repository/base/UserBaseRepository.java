@@ -55,7 +55,7 @@ public interface UserBaseRepository<E extends User> extends BaseCrudMapper<User>
     default List<User> findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(Instant dateTime) {
         return this.selectList(
                 new LambdaQueryWrapper<User>()
-                    .eq(User::isActivated, false)
+                    .eq(User::getActivated, false)
                     .isNotNull(User::getActivationKey)
                     .le(User::getCreatedDate, dateTime)
             );
@@ -96,7 +96,7 @@ public interface UserBaseRepository<E extends User> extends BaseCrudMapper<User>
     }
 
     default IPage<User> findAllByIdNotNullAndActivatedIsTrue(IPage<User> pageable) {
-        return this.selectPage(pageable, new LambdaQueryWrapper<User>().isNotNull(User::getId).eq(User::isActivated, true));
+        return this.selectPage(pageable, new LambdaQueryWrapper<User>().isNotNull(User::getId).eq(User::getActivated, true));
     }
     // jhipster-needle-repository-add-method - JHipster will add getters and setters here, do not remove
 
