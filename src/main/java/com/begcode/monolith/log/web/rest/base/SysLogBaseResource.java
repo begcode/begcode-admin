@@ -48,7 +48,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class SysLogBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(SysLogBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(SysLogBaseResource.class);
 
     protected static final String ENTITY_NAME = "logSysLog";
 

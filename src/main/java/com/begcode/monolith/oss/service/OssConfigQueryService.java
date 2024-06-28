@@ -38,7 +38,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class OssConfigQueryService implements QueryService<OssConfig> {
 
-    private final Logger log = LoggerFactory.getLogger(OssConfigQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(OssConfigQueryService.class);
 
     protected final OssConfigRepository ossConfigRepository;
 

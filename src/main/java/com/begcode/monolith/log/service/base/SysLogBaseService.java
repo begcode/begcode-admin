@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SuppressWarnings("UnusedReturnValue")
 public class SysLogBaseService<R extends SysLogRepository, E extends SysLog> extends BaseServiceImpl<SysLogRepository, SysLog> {
 
-    private final Logger log = LoggerFactory.getLogger(SysLogBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(SysLogBaseService.class);
     private final List<String> relationNames = List.of();
 
     protected final SysLogRepository sysLogRepository;

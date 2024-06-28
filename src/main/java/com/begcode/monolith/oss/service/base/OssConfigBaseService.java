@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OssConfigBaseService<R extends OssConfigRepository, E extends OssConfig>
     extends BaseServiceImpl<OssConfigRepository, OssConfig> {
 
-    private final Logger log = LoggerFactory.getLogger(OssConfigBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(OssConfigBaseService.class);
     private final List<String> relationNames = List.of();
 
     protected final FileStorageService fileStorageService;

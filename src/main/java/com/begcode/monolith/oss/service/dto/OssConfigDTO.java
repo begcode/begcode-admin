@@ -26,7 +26,7 @@ public class OssConfigDTO implements Serializable {
      * 提供商
      */
     @NotNull
-    @Schema(description = "提供商", required = true)
+    @Schema(description = "提供商", requiredMode = Schema.RequiredMode.REQUIRED)
     private OssProvider provider;
 
     /**
@@ -34,7 +34,7 @@ public class OssConfigDTO implements Serializable {
      */
     @NotNull
     @Size(max = 40)
-    @Schema(description = "平台", required = true)
+    @Schema(description = "平台", requiredMode = Schema.RequiredMode.REQUIRED)
     private String platform;
 
     /**

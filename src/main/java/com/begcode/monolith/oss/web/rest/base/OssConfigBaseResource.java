@@ -50,7 +50,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class OssConfigBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(OssConfigBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(OssConfigBaseResource.class);
 
     protected static final String ENTITY_NAME = "filesOssConfig";
 

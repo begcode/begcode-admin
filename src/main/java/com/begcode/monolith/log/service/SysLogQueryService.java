@@ -43,7 +43,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class SysLogQueryService implements QueryService<SysLog> {
 
-    private final Logger log = LoggerFactory.getLogger(SysLogQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(SysLogQueryService.class);
 
     protected final SysLogRepository sysLogRepository;
 
