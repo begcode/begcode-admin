@@ -36,7 +36,7 @@ import tech.jhipster.security.RandomUtil;
 @Service
 public class UserService extends BaseServiceImpl<UserRepository, User> {
 
-    private final Logger log = LoggerFactory.getLogger(UserService.class);
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final List<String> relationNames = Arrays.asList("department", "authorities", "position");
 

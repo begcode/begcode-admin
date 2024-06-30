@@ -33,7 +33,7 @@ public class AnnouncementDTO extends AbstractAuditingEntity<Long, AnnouncementDT
      * 标题
      */
     @NotNull
-    @Schema(description = "标题", required = true)
+    @Schema(description = "标题", requiredMode = Schema.RequiredMode.REQUIRED)
     private String title;
 
     /**
@@ -85,7 +85,7 @@ public class AnnouncementDTO extends AbstractAuditingEntity<Long, AnnouncementDT
      * （USER:指定用户，ALL:全体用户）
      */
     @NotNull
-    @Schema(description = "通告对象类型\n（USER:指定用户，ALL:全体用户）", required = true)
+    @Schema(description = "通告对象类型\n（USER:指定用户，ALL:全体用户）", requiredMode = Schema.RequiredMode.REQUIRED)
     private ReceiverType receiverType;
 
     /**

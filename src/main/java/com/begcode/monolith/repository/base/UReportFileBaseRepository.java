@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.begcode.monolith.domain.UReportFile;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.ibatis.annotations.*;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -22,6 +23,15 @@ public interface UReportFileBaseRepository<E extends UReportFile> extends BaseCr
 
     default Optional<UReportFile> findById(Long id) {
         return Optional.ofNullable(this.selectById(id));
+    }
+
+    default UReportFile saveAndGet(UReportFile uReportFile) {
+        if (Objects.nonNull(uReportFile.getId())) {
+            this.updateById(uReportFile);
+        } else {
+            this.insert(uReportFile);
+        }
+        return this.selectById(uReportFile.getId());
     }
 
     default Boolean existsByName(String name) {

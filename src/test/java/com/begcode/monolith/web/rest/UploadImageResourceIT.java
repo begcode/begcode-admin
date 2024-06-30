@@ -26,6 +26,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -141,6 +142,8 @@ public class UploadImageResourceIT {
 
     private UploadImage uploadImage;
 
+    private UploadImage insertedUploadImage;
+
     /**
      * Create an entity for this test.
      *
@@ -210,6 +213,14 @@ public class UploadImageResourceIT {
         uploadImage = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedUploadImage != null) {
+            uploadImageRepository.deleteById(insertedUploadImage.getId());
+            insertedUploadImage = null;
+        }
+    }
+
     @Test
     @Transactional
     void createUploadImage() throws Exception {
@@ -230,6 +241,8 @@ public class UploadImageResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedUploadImage = uploadImageMapper.toEntity(returnedUploadImageDTO);
         assertUploadImageUpdatableFieldsEquals(returnedUploadImage, getPersistedUploadImage(returnedUploadImage));
+
+        insertedUploadImage = returnedUploadImage;
     }
 
     @Test
@@ -271,7 +284,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImages() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList
         restUploadImageMockMvc
@@ -323,7 +336,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getUploadImage() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get the uploadImage
         restUploadImageMockMvc
@@ -358,7 +371,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getUploadImagesByIdFiltering() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         Long id = uploadImage.getId();
 
@@ -373,7 +386,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByUrlIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where url equals to
         defaultUploadImageFiltering("url.equals=" + DEFAULT_URL, "url.equals=" + UPDATED_URL);
@@ -383,7 +396,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByUrlIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where url in
         defaultUploadImageFiltering("url.in=" + DEFAULT_URL + "," + UPDATED_URL, "url.in=" + UPDATED_URL);
@@ -393,7 +406,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByUrlIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where url is not null
         defaultUploadImageFiltering("url.specified=true", "url.specified=false");
@@ -403,7 +416,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByUrlContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where url contains
         defaultUploadImageFiltering("url.contains=" + DEFAULT_URL, "url.contains=" + UPDATED_URL);
@@ -413,7 +426,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByUrlNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where url does not contain
         defaultUploadImageFiltering("url.doesNotContain=" + UPDATED_URL, "url.doesNotContain=" + DEFAULT_URL);
@@ -423,7 +436,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByFullNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where fullName equals to
         defaultUploadImageFiltering("fullName.equals=" + DEFAULT_FULL_NAME, "fullName.equals=" + UPDATED_FULL_NAME);
@@ -433,7 +446,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByFullNameIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where fullName in
         defaultUploadImageFiltering("fullName.in=" + DEFAULT_FULL_NAME + "," + UPDATED_FULL_NAME, "fullName.in=" + UPDATED_FULL_NAME);
@@ -443,7 +456,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByFullNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where fullName is not null
         defaultUploadImageFiltering("fullName.specified=true", "fullName.specified=false");
@@ -453,7 +466,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByFullNameContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where fullName contains
         defaultUploadImageFiltering("fullName.contains=" + DEFAULT_FULL_NAME, "fullName.contains=" + UPDATED_FULL_NAME);
@@ -463,7 +476,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByFullNameNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where fullName does not contain
         defaultUploadImageFiltering("fullName.doesNotContain=" + UPDATED_FULL_NAME, "fullName.doesNotContain=" + DEFAULT_FULL_NAME);
@@ -473,7 +486,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where name equals to
         defaultUploadImageFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
@@ -483,7 +496,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByNameIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where name in
         defaultUploadImageFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
@@ -493,7 +506,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where name is not null
         defaultUploadImageFiltering("name.specified=true", "name.specified=false");
@@ -503,7 +516,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByNameContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where name contains
         defaultUploadImageFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
@@ -513,7 +526,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByNameNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where name does not contain
         defaultUploadImageFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
@@ -523,7 +536,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByExtIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where ext equals to
         defaultUploadImageFiltering("ext.equals=" + DEFAULT_EXT, "ext.equals=" + UPDATED_EXT);
@@ -533,7 +546,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByExtIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where ext in
         defaultUploadImageFiltering("ext.in=" + DEFAULT_EXT + "," + UPDATED_EXT, "ext.in=" + UPDATED_EXT);
@@ -543,7 +556,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByExtIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where ext is not null
         defaultUploadImageFiltering("ext.specified=true", "ext.specified=false");
@@ -553,7 +566,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByExtContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where ext contains
         defaultUploadImageFiltering("ext.contains=" + DEFAULT_EXT, "ext.contains=" + UPDATED_EXT);
@@ -563,7 +576,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByExtNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where ext does not contain
         defaultUploadImageFiltering("ext.doesNotContain=" + UPDATED_EXT, "ext.doesNotContain=" + DEFAULT_EXT);
@@ -573,7 +586,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByTypeIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where type equals to
         defaultUploadImageFiltering("type.equals=" + DEFAULT_TYPE, "type.equals=" + UPDATED_TYPE);
@@ -583,7 +596,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByTypeIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where type in
         defaultUploadImageFiltering("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE, "type.in=" + UPDATED_TYPE);
@@ -593,7 +606,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByTypeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where type is not null
         defaultUploadImageFiltering("type.specified=true", "type.specified=false");
@@ -603,7 +616,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByTypeContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where type contains
         defaultUploadImageFiltering("type.contains=" + DEFAULT_TYPE, "type.contains=" + UPDATED_TYPE);
@@ -613,7 +626,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByTypeNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where type does not contain
         defaultUploadImageFiltering("type.doesNotContain=" + UPDATED_TYPE, "type.doesNotContain=" + DEFAULT_TYPE);
@@ -623,7 +636,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByPathIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where path equals to
         defaultUploadImageFiltering("path.equals=" + DEFAULT_PATH, "path.equals=" + UPDATED_PATH);
@@ -633,7 +646,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByPathIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where path in
         defaultUploadImageFiltering("path.in=" + DEFAULT_PATH + "," + UPDATED_PATH, "path.in=" + UPDATED_PATH);
@@ -643,7 +656,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByPathIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where path is not null
         defaultUploadImageFiltering("path.specified=true", "path.specified=false");
@@ -653,7 +666,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByPathContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where path contains
         defaultUploadImageFiltering("path.contains=" + DEFAULT_PATH, "path.contains=" + UPDATED_PATH);
@@ -663,7 +676,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByPathNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where path does not contain
         defaultUploadImageFiltering("path.doesNotContain=" + UPDATED_PATH, "path.doesNotContain=" + DEFAULT_PATH);
@@ -673,7 +686,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByFolderIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where folder equals to
         defaultUploadImageFiltering("folder.equals=" + DEFAULT_FOLDER, "folder.equals=" + UPDATED_FOLDER);
@@ -683,7 +696,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByFolderIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where folder in
         defaultUploadImageFiltering("folder.in=" + DEFAULT_FOLDER + "," + UPDATED_FOLDER, "folder.in=" + UPDATED_FOLDER);
@@ -693,7 +706,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByFolderIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where folder is not null
         defaultUploadImageFiltering("folder.specified=true", "folder.specified=false");
@@ -703,7 +716,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByFolderContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where folder contains
         defaultUploadImageFiltering("folder.contains=" + DEFAULT_FOLDER, "folder.contains=" + UPDATED_FOLDER);
@@ -713,7 +726,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByFolderNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where folder does not contain
         defaultUploadImageFiltering("folder.doesNotContain=" + UPDATED_FOLDER, "folder.doesNotContain=" + DEFAULT_FOLDER);
@@ -723,7 +736,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByOwnerEntityNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where ownerEntityName equals to
         defaultUploadImageFiltering(
@@ -736,7 +749,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByOwnerEntityNameIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where ownerEntityName in
         defaultUploadImageFiltering(
@@ -749,7 +762,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByOwnerEntityNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where ownerEntityName is not null
         defaultUploadImageFiltering("ownerEntityName.specified=true", "ownerEntityName.specified=false");
@@ -759,7 +772,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByOwnerEntityNameContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where ownerEntityName contains
         defaultUploadImageFiltering(
@@ -772,7 +785,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByOwnerEntityNameNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where ownerEntityName does not contain
         defaultUploadImageFiltering(
@@ -785,7 +798,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByOwnerEntityIdIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where ownerEntityId equals to
         defaultUploadImageFiltering("ownerEntityId.equals=" + DEFAULT_OWNER_ENTITY_ID, "ownerEntityId.equals=" + UPDATED_OWNER_ENTITY_ID);
@@ -795,7 +808,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByOwnerEntityIdIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where ownerEntityId in
         defaultUploadImageFiltering(
@@ -808,7 +821,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByOwnerEntityIdIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where ownerEntityId is not null
         defaultUploadImageFiltering("ownerEntityId.specified=true", "ownerEntityId.specified=false");
@@ -818,7 +831,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByOwnerEntityIdIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where ownerEntityId is greater than or equal to
         defaultUploadImageFiltering(
@@ -831,7 +844,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByOwnerEntityIdIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where ownerEntityId is less than or equal to
         defaultUploadImageFiltering(
@@ -844,7 +857,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByOwnerEntityIdIsLessThanSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where ownerEntityId is less than
         defaultUploadImageFiltering(
@@ -857,7 +870,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByOwnerEntityIdIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where ownerEntityId is greater than
         defaultUploadImageFiltering(
@@ -870,7 +883,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByBusinessTitleIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where businessTitle equals to
         defaultUploadImageFiltering("businessTitle.equals=" + DEFAULT_BUSINESS_TITLE, "businessTitle.equals=" + UPDATED_BUSINESS_TITLE);
@@ -880,7 +893,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByBusinessTitleIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where businessTitle in
         defaultUploadImageFiltering(
@@ -893,7 +906,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByBusinessTitleIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where businessTitle is not null
         defaultUploadImageFiltering("businessTitle.specified=true", "businessTitle.specified=false");
@@ -903,7 +916,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByBusinessTitleContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where businessTitle contains
         defaultUploadImageFiltering("businessTitle.contains=" + DEFAULT_BUSINESS_TITLE, "businessTitle.contains=" + UPDATED_BUSINESS_TITLE);
@@ -913,7 +926,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByBusinessTitleNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where businessTitle does not contain
         defaultUploadImageFiltering(
@@ -926,7 +939,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByBusinessDescIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where businessDesc equals to
         defaultUploadImageFiltering("businessDesc.equals=" + DEFAULT_BUSINESS_DESC, "businessDesc.equals=" + UPDATED_BUSINESS_DESC);
@@ -936,7 +949,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByBusinessDescIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where businessDesc in
         defaultUploadImageFiltering(
@@ -949,7 +962,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByBusinessDescIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where businessDesc is not null
         defaultUploadImageFiltering("businessDesc.specified=true", "businessDesc.specified=false");
@@ -959,7 +972,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByBusinessDescContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where businessDesc contains
         defaultUploadImageFiltering("businessDesc.contains=" + DEFAULT_BUSINESS_DESC, "businessDesc.contains=" + UPDATED_BUSINESS_DESC);
@@ -969,7 +982,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByBusinessDescNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where businessDesc does not contain
         defaultUploadImageFiltering(
@@ -982,7 +995,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByBusinessStatusIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where businessStatus equals to
         defaultUploadImageFiltering("businessStatus.equals=" + DEFAULT_BUSINESS_STATUS, "businessStatus.equals=" + UPDATED_BUSINESS_STATUS);
@@ -992,7 +1005,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByBusinessStatusIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where businessStatus in
         defaultUploadImageFiltering(
@@ -1005,7 +1018,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByBusinessStatusIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where businessStatus is not null
         defaultUploadImageFiltering("businessStatus.specified=true", "businessStatus.specified=false");
@@ -1015,7 +1028,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByBusinessStatusContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where businessStatus contains
         defaultUploadImageFiltering(
@@ -1028,7 +1041,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByBusinessStatusNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where businessStatus does not contain
         defaultUploadImageFiltering(
@@ -1041,7 +1054,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByCreateAtIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where createAt equals to
         defaultUploadImageFiltering("createAt.equals=" + DEFAULT_CREATE_AT, "createAt.equals=" + UPDATED_CREATE_AT);
@@ -1051,7 +1064,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByCreateAtIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where createAt in
         defaultUploadImageFiltering("createAt.in=" + DEFAULT_CREATE_AT + "," + UPDATED_CREATE_AT, "createAt.in=" + UPDATED_CREATE_AT);
@@ -1061,7 +1074,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByCreateAtIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where createAt is not null
         defaultUploadImageFiltering("createAt.specified=true", "createAt.specified=false");
@@ -1071,7 +1084,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByCreateAtIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where createAt is greater than or equal to
         defaultUploadImageFiltering("createAt.greaterThanOrEqual=" + DEFAULT_CREATE_AT, "createAt.greaterThanOrEqual=" + UPDATED_CREATE_AT);
@@ -1081,7 +1094,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByCreateAtIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where createAt is less than or equal to
         defaultUploadImageFiltering("createAt.lessThanOrEqual=" + DEFAULT_CREATE_AT, "createAt.lessThanOrEqual=" + SMALLER_CREATE_AT);
@@ -1091,7 +1104,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByCreateAtIsLessThanSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where createAt is less than
         defaultUploadImageFiltering("createAt.lessThan=" + UPDATED_CREATE_AT, "createAt.lessThan=" + DEFAULT_CREATE_AT);
@@ -1101,7 +1114,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByCreateAtIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where createAt is greater than
         defaultUploadImageFiltering("createAt.greaterThan=" + SMALLER_CREATE_AT, "createAt.greaterThan=" + DEFAULT_CREATE_AT);
@@ -1111,7 +1124,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByFileSizeIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where fileSize equals to
         defaultUploadImageFiltering("fileSize.equals=" + DEFAULT_FILE_SIZE, "fileSize.equals=" + UPDATED_FILE_SIZE);
@@ -1121,7 +1134,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByFileSizeIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where fileSize in
         defaultUploadImageFiltering("fileSize.in=" + DEFAULT_FILE_SIZE + "," + UPDATED_FILE_SIZE, "fileSize.in=" + UPDATED_FILE_SIZE);
@@ -1131,7 +1144,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByFileSizeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where fileSize is not null
         defaultUploadImageFiltering("fileSize.specified=true", "fileSize.specified=false");
@@ -1141,7 +1154,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByFileSizeIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where fileSize is greater than or equal to
         defaultUploadImageFiltering("fileSize.greaterThanOrEqual=" + DEFAULT_FILE_SIZE, "fileSize.greaterThanOrEqual=" + UPDATED_FILE_SIZE);
@@ -1151,7 +1164,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByFileSizeIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where fileSize is less than or equal to
         defaultUploadImageFiltering("fileSize.lessThanOrEqual=" + DEFAULT_FILE_SIZE, "fileSize.lessThanOrEqual=" + SMALLER_FILE_SIZE);
@@ -1161,7 +1174,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByFileSizeIsLessThanSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where fileSize is less than
         defaultUploadImageFiltering("fileSize.lessThan=" + UPDATED_FILE_SIZE, "fileSize.lessThan=" + DEFAULT_FILE_SIZE);
@@ -1171,7 +1184,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByFileSizeIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where fileSize is greater than
         defaultUploadImageFiltering("fileSize.greaterThan=" + SMALLER_FILE_SIZE, "fileSize.greaterThan=" + DEFAULT_FILE_SIZE);
@@ -1181,7 +1194,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesBySmartUrlIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where smartUrl equals to
         defaultUploadImageFiltering("smartUrl.equals=" + DEFAULT_SMART_URL, "smartUrl.equals=" + UPDATED_SMART_URL);
@@ -1191,7 +1204,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesBySmartUrlIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where smartUrl in
         defaultUploadImageFiltering("smartUrl.in=" + DEFAULT_SMART_URL + "," + UPDATED_SMART_URL, "smartUrl.in=" + UPDATED_SMART_URL);
@@ -1201,7 +1214,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesBySmartUrlIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where smartUrl is not null
         defaultUploadImageFiltering("smartUrl.specified=true", "smartUrl.specified=false");
@@ -1211,7 +1224,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesBySmartUrlContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where smartUrl contains
         defaultUploadImageFiltering("smartUrl.contains=" + DEFAULT_SMART_URL, "smartUrl.contains=" + UPDATED_SMART_URL);
@@ -1221,7 +1234,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesBySmartUrlNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where smartUrl does not contain
         defaultUploadImageFiltering("smartUrl.doesNotContain=" + UPDATED_SMART_URL, "smartUrl.doesNotContain=" + DEFAULT_SMART_URL);
@@ -1231,7 +1244,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByMediumUrlIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where mediumUrl equals to
         defaultUploadImageFiltering("mediumUrl.equals=" + DEFAULT_MEDIUM_URL, "mediumUrl.equals=" + UPDATED_MEDIUM_URL);
@@ -1241,7 +1254,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByMediumUrlIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where mediumUrl in
         defaultUploadImageFiltering("mediumUrl.in=" + DEFAULT_MEDIUM_URL + "," + UPDATED_MEDIUM_URL, "mediumUrl.in=" + UPDATED_MEDIUM_URL);
@@ -1251,7 +1264,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByMediumUrlIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where mediumUrl is not null
         defaultUploadImageFiltering("mediumUrl.specified=true", "mediumUrl.specified=false");
@@ -1261,7 +1274,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByMediumUrlContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where mediumUrl contains
         defaultUploadImageFiltering("mediumUrl.contains=" + DEFAULT_MEDIUM_URL, "mediumUrl.contains=" + UPDATED_MEDIUM_URL);
@@ -1271,7 +1284,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByMediumUrlNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where mediumUrl does not contain
         defaultUploadImageFiltering("mediumUrl.doesNotContain=" + UPDATED_MEDIUM_URL, "mediumUrl.doesNotContain=" + DEFAULT_MEDIUM_URL);
@@ -1281,7 +1294,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByReferenceCountIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where referenceCount equals to
         defaultUploadImageFiltering("referenceCount.equals=" + DEFAULT_REFERENCE_COUNT, "referenceCount.equals=" + UPDATED_REFERENCE_COUNT);
@@ -1291,7 +1304,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByReferenceCountIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where referenceCount in
         defaultUploadImageFiltering(
@@ -1304,7 +1317,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByReferenceCountIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where referenceCount is not null
         defaultUploadImageFiltering("referenceCount.specified=true", "referenceCount.specified=false");
@@ -1314,7 +1327,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByReferenceCountIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where referenceCount is greater than or equal to
         defaultUploadImageFiltering(
@@ -1327,7 +1340,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByReferenceCountIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where referenceCount is less than or equal to
         defaultUploadImageFiltering(
@@ -1340,7 +1353,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByReferenceCountIsLessThanSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where referenceCount is less than
         defaultUploadImageFiltering(
@@ -1353,7 +1366,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByReferenceCountIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where referenceCount is greater than
         defaultUploadImageFiltering(
@@ -1366,7 +1379,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByCreatedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where createdBy equals to
         defaultUploadImageFiltering("createdBy.equals=" + DEFAULT_CREATED_BY, "createdBy.equals=" + UPDATED_CREATED_BY);
@@ -1376,7 +1389,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByCreatedByIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where createdBy in
         defaultUploadImageFiltering("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY, "createdBy.in=" + UPDATED_CREATED_BY);
@@ -1386,7 +1399,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByCreatedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where createdBy is not null
         defaultUploadImageFiltering("createdBy.specified=true", "createdBy.specified=false");
@@ -1396,7 +1409,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByCreatedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where createdBy is greater than or equal to
         defaultUploadImageFiltering(
@@ -1409,7 +1422,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByCreatedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where createdBy is less than or equal to
         defaultUploadImageFiltering("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
@@ -1419,7 +1432,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByCreatedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where createdBy is less than
         defaultUploadImageFiltering("createdBy.lessThan=" + UPDATED_CREATED_BY, "createdBy.lessThan=" + DEFAULT_CREATED_BY);
@@ -1429,7 +1442,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByCreatedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where createdBy is greater than
         defaultUploadImageFiltering("createdBy.greaterThan=" + SMALLER_CREATED_BY, "createdBy.greaterThan=" + DEFAULT_CREATED_BY);
@@ -1439,7 +1452,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByCreatedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where createdDate equals to
         defaultUploadImageFiltering("createdDate.equals=" + DEFAULT_CREATED_DATE, "createdDate.equals=" + UPDATED_CREATED_DATE);
@@ -1449,7 +1462,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByCreatedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where createdDate in
         defaultUploadImageFiltering(
@@ -1462,7 +1475,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByCreatedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where createdDate is not null
         defaultUploadImageFiltering("createdDate.specified=true", "createdDate.specified=false");
@@ -1472,7 +1485,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByLastModifiedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where lastModifiedBy equals to
         defaultUploadImageFiltering(
@@ -1485,7 +1498,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByLastModifiedByIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where lastModifiedBy in
         defaultUploadImageFiltering(
@@ -1498,7 +1511,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByLastModifiedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where lastModifiedBy is not null
         defaultUploadImageFiltering("lastModifiedBy.specified=true", "lastModifiedBy.specified=false");
@@ -1508,7 +1521,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByLastModifiedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where lastModifiedBy is greater than or equal to
         defaultUploadImageFiltering(
@@ -1521,7 +1534,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByLastModifiedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where lastModifiedBy is less than or equal to
         defaultUploadImageFiltering(
@@ -1534,7 +1547,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByLastModifiedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where lastModifiedBy is less than
         defaultUploadImageFiltering(
@@ -1547,7 +1560,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByLastModifiedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where lastModifiedBy is greater than
         defaultUploadImageFiltering(
@@ -1560,7 +1573,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByLastModifiedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where lastModifiedDate equals to
         defaultUploadImageFiltering(
@@ -1573,7 +1586,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByLastModifiedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where lastModifiedDate in
         defaultUploadImageFiltering(
@@ -1586,7 +1599,7 @@ public class UploadImageResourceIT {
     @Transactional
     void getAllUploadImagesByLastModifiedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         // Get all the uploadImageList where lastModifiedDate is not null
         defaultUploadImageFiltering("lastModifiedDate.specified=true", "lastModifiedDate.specified=false");
@@ -1680,7 +1693,7 @@ public class UploadImageResourceIT {
     @Transactional
     void putExistingUploadImage() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1789,7 +1802,7 @@ public class UploadImageResourceIT {
     @Transactional
     void partialUpdateUploadImageWithPatch() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1798,18 +1811,12 @@ public class UploadImageResourceIT {
         partialUpdatedUploadImage.setId(uploadImage.getId());
 
         partialUpdatedUploadImage
-            .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
-            .type(UPDATED_TYPE)
+            .path(UPDATED_PATH)
             .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
-            .businessStatus(UPDATED_BUSINESS_STATUS)
+            .businessTitle(UPDATED_BUSINESS_TITLE)
             .createAt(UPDATED_CREATE_AT)
-            .fileSize(UPDATED_FILE_SIZE)
-            .mediumUrl(UPDATED_MEDIUM_URL)
-            .referenceCount(UPDATED_REFERENCE_COUNT)
-            .createdBy(UPDATED_CREATED_BY)
-            .createdDate(UPDATED_CREATED_DATE)
-            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY);
+            .referenceCount(UPDATED_REFERENCE_COUNT);
 
         restUploadImageMockMvc
             .perform(
@@ -1832,7 +1839,7 @@ public class UploadImageResourceIT {
     @Transactional
     void fullUpdateUploadImageWithPatch() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1943,7 +1950,7 @@ public class UploadImageResourceIT {
     @Transactional
     void deleteUploadImage() throws Exception {
         // Initialize the database
-        uploadImageRepository.save(uploadImage);
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

@@ -48,7 +48,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class TaskJobConfigBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(TaskJobConfigBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(TaskJobConfigBaseResource.class);
 
     protected static final String ENTITY_NAME = "taskjobTaskJobConfig";
 

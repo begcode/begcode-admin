@@ -38,7 +38,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class DictionaryQueryService implements QueryService<Dictionary> {
 
-    private final Logger log = LoggerFactory.getLogger(DictionaryQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(DictionaryQueryService.class);
 
     protected final DictionaryRepository dictionaryRepository;
 

@@ -16,7 +16,7 @@
       placement="right"
       :overlayClassName="`${prefixCls}-menu-popover`"
       v-else
-      :open="getIsOpend"
+      :open="getIsOpened"
       @on-open-change="handleVisibleChange"
       :overlayStyle="getOverlayStyle"
       :overlayInnerStyle="{ padding: 0 }"
@@ -38,7 +38,7 @@
       <!-- eslint-disable-next-line -->
       <template #content v-show="state.opened">
         <div v-bind="getEvents(true)">
-          <ul :class="[prefixCls, `${prefixCls}-${getTheme}`, `${prefixCls}-popup`]">
+          <ul :class="[prefixCls, `${prefixCls}-${getTheme}`, `${prefixCls}-popup`, `${isThemeBright && 'bright'}`]">
             <slot></slot>
           </ul>
         </div>
@@ -68,6 +68,10 @@ const props = defineProps({
   },
   disabled: propTypes.bool,
   collapsedShowTitle: propTypes.bool,
+  isThemeBright: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const DELAY = 200;
@@ -122,11 +126,11 @@ const getTheme = computed(() => rootProps.theme);
 
 const getOverlayStyle = computed((): CSSProperties => {
   return {
-    minWidth: '200px',
+    minWidth: '150px',
   };
 });
 
-const getIsOpend = computed(() => {
+const getIsOpened = computed(() => {
   const name = props.name;
   if (unref(getCollapse)) {
     return parentGetOpenNames().includes(name);
@@ -163,7 +167,7 @@ function handleClick() {
   if (unref(getAccordion)) {
     const { uidList } = getParentList();
     rootMenuEmitter.emit('on-update-opened', {
-      opend: false,
+      opened: false,
       parent: instance?.parent,
       uidList: uidList,
     });
@@ -237,9 +241,9 @@ onBeforeMount(() => {
       return;
     }
     if (isObject(data) && rootProps.accordion) {
-      const { opend, parent, uidList } = data as Recordable<any>;
+      const { opened, parent, uidList } = data as Recordable<any>;
       if (parent === instance?.parent) {
-        state.opened = opend;
+        state.opened = opened;
       } else if (!uidList || !uidList.includes(instance?.uid)) {
         state.opened = false;
       }

@@ -38,13 +38,14 @@
 </template>
 
 <script lang="ts" setup>
-import { defineComponent, ref, unref, watchEffect, computed } from 'vue';
+import { ref, unref, watchEffect, computed } from 'vue';
 import { Upload, Switch } from 'ant-design-vue';
 import { BasicModal, useModalInner, Button } from '@begcode/components';
 import { useAttrs } from '@/hooks/vben/useAttrs';
 import { defHttp } from '@/utils/http/axios';
 import { useGlobSetting } from '@/hooks/setting';
 import { useMessage } from '@/hooks/web/useMessage';
+import { isObject } from 'lodash-es';
 
 defineOptions({
   name: 'ImportModal',
@@ -127,6 +128,9 @@ function handleImport() {
   }
   if (unref(foreignKeys) && unref(foreignKeys).length > 0) {
     formData.append('foreignKeys', unref(foreignKeys));
+  }
+  if (isObject(foreignKeys.value)) {
+    formData.append('foreignKeys', JSON.stringify(foreignKeys.value));
   }
   if (!!online) {
     formData.append('validateStatus', unref(validateStatus));

@@ -113,6 +113,41 @@ function init() {
     // 设置外观主题
     theme: getTheme(getDarkMode.value) as any,
     lang: unref(getCurrentLang),
+    toolbar: [
+      'emoji',
+      'headings',
+      'bold',
+      'italic',
+      'strike',
+      'link',
+      '|',
+      'list',
+      'ordered-list',
+      'check',
+      'outdent',
+      'indent',
+      '|',
+      'quote',
+      'line',
+      'code',
+      'inline-code',
+      'insert-before',
+      'insert-after',
+      '|',
+      'upload',
+      // 'record',
+      'table',
+      '|',
+      'undo',
+      'redo',
+      '|',
+      'fullscreen',
+      'edit-mode',
+      {
+        name: 'more',
+        toolbar: ['both', 'code-theme', 'content-theme', 'export', 'outline', 'preview', 'devtools', 'info', 'help'],
+      },
+    ],
     mode: 'sv',
     fullscreen: {
       index: 520,
@@ -184,3 +219,8 @@ onMountedOrActivated(init);
 onBeforeUnmount(destroy);
 onDeactivated(destroy);
 </script>
+<style lang="less" scoped>
+:deep(.vditor-menu--disabled) {
+  pointer-events: none;
+}
+</style>

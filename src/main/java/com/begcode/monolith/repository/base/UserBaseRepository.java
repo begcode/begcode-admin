@@ -8,6 +8,7 @@ import com.diboot.core.mapper.BaseCrudMapper;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.ibatis.annotations.*;
 import org.springframework.cache.annotation.Cacheable;
@@ -47,6 +48,15 @@ public interface UserBaseRepository<E extends User> extends BaseCrudMapper<User>
 
     @Select("delete from jhi_user user where user.position = #{positionId}")
     void deleteAllByPositionId(@Param("positionId") Long positionId);
+
+    default User saveAndGet(User user) {
+        if (Objects.nonNull(user.getId())) {
+            this.updateById(user);
+        } else {
+            this.insert(user);
+        }
+        return this.selectById(user.getId());
+    }
 
     default Optional<User> findOneByActivationKey(String activationKey) {
         return Optional.ofNullable(this.selectOne(new LambdaQueryWrapper<User>().eq(User::getActivationKey, activationKey)));

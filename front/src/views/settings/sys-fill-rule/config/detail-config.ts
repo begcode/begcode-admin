@@ -43,7 +43,7 @@ const fields: DescItem[] = [
     field: 'resetFrequency',
     format: (value, _data) => {
       const { getEnumDict } = useI18n();
-      return getEnumDict('ResetFrequency').find(item => item.value === value) || value;
+      return (getEnumDict('ResetFrequency').find(item => item.value === value) || { value: value, label: value }).label;
     },
   },
   {
@@ -99,7 +99,6 @@ const ruleItemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'LONG' },
-      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '排序值',
@@ -108,7 +107,6 @@ const ruleItemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'INTEGER' },
-      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '字段参数类型',
@@ -147,7 +145,6 @@ const ruleItemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'INTEGER' },
-      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '序列增量',
@@ -156,7 +153,6 @@ const ruleItemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'INTEGER' },
-      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '序列起始值',
@@ -165,16 +161,15 @@ const ruleItemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'INTEGER' },
-      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '操作',
-      field: 'operation',
+      field: 'recordOperation',
       fixed: 'right',
       headerAlign: 'center',
       align: 'right',
       showOverflow: false,
-      width: 170,
+      width: 120,
       slots: { default: 'recordAction' },
     },
   ];

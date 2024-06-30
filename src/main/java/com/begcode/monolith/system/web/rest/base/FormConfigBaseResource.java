@@ -50,7 +50,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class FormConfigBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(FormConfigBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(FormConfigBaseResource.class);
 
     protected static final String ENTITY_NAME = "settingsFormConfig";
 

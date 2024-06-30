@@ -26,7 +26,7 @@ const fields = (): FormSchema[] => {
       field: 'logType',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择日志类型', options: getEnumDict('LogType'), style: 'width: 100%' };
+        return { placeholder: '请选择日志类型', options: getEnumDict('LogType'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },
@@ -42,7 +42,7 @@ const fields = (): FormSchema[] => {
       field: 'operateType',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择操作类型', options: getEnumDict('OperateType'), style: 'width: 100%' };
+        return { placeholder: '请选择操作类型', options: getEnumDict('OperateType'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },

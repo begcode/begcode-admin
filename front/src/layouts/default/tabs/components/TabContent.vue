@@ -1,13 +1,16 @@
 <template>
-  <Dropdown :dropMenuList="getDropMenuList" :trigger="getTrigger" placement="bottomRight" @menu-event="handleMenuEvent">
+  <Dropdown
+    :dropMenuList="getDropMenuList"
+    :trigger="getTrigger"
+    placement="bottomRight"
+    @menu-event="handleMenuEvent"
+    :overlayClassName="prefixCls"
+  >
     <div :class="`${prefixCls}__info`" @contextmenu="handleContext" v-if="getIsTabs">
-      <span v-if="showPrefixIcon" :class="`${prefixCls}__prefix-icon`" @click="handleContext">
-        <Icon :icon="prefixIconType" />
-      </span>
       <span class="ml-1">{{ getTitle }}</span>
     </div>
     <span :class="`${prefixCls}__extra-quick`" v-else @click="handleContext">
-      <Icon icon="ion:chevron-down" />
+      <Icon icon="ion:chevron-down" :size="18" />
     </span>
   </Dropdown>
 </template>
@@ -75,3 +78,18 @@ const { getTabsTheme } = useMultipleTabSetting();
 // 是否显示图标
 const showPrefixIcon = computed(() => unref(getTabsTheme) === TabsThemeEnum.SMOOTH);
 </script>
+<style lang="less">
+@prefix-cls: ~'@{namespace}-multiple-tabs-content';
+.@{prefix-cls} {
+  .ant-dropdown-menu-item {
+    .ant-dropdown-menu-title-content {
+      .anticon {
+        font-size: 14px !important;
+      }
+      span:not(.anticon) {
+        margin-left: 6px;
+      }
+    }
+  }
+}
+</style>

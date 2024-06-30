@@ -1,5 +1,12 @@
 <template>
-  <BasicModal :footer="null" :title="t('layout.header.lockScreen')" v-bind="$attrs" :class="prefixCls" @register="register">
+  <BasicModal
+    :footer="null"
+    :title="t('layout.header.lockScreen')"
+    v-bind="$attrs"
+    :class="prefixCls"
+    @register="register"
+    :canFullscreen="false"
+  >
     <div :class="`${prefixCls}__entry`">
       <div :class="`${prefixCls}__header`">
         <img :src="avatar" :class="`${prefixCls}__header-img`" />
@@ -40,7 +47,9 @@ const getRealName = computed(() => userStore.getUserInfo?.realName);
 const [register, { closeModal }] = useModalInner();
 
 const [registerForm, { validate, resetFields }] = useForm({
-  labelWidth: 100,
+  labelWidth: 74,
+  labelAlign: 'left',
+  wrapperCol: {},
   showActionButtonGroup: false,
   schemas: [
     {
@@ -50,7 +59,9 @@ const [registerForm, { validate, resetFields }] = useForm({
         span: 24,
       },
       component: 'InputPassword',
-      required: true,
+      componentProps: {
+        autocomplete: 'new-password',
+      },
     },
   ],
 });

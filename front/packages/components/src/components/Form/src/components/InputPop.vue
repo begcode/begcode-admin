@@ -7,7 +7,7 @@
     :placement="position"
   >
     <template #title>
-      <span>{{ title }}</span>
+      <span :class="title ? 'title' : 'emptyTitle'">{{ title }}</span>
       <span style="float: right" title="关闭">
         <Icon icon="ant-design:close-outlined" @click="visible = false" />
       </span>
@@ -100,6 +100,9 @@ function emitValue(value) {
 </script>
 
 <style>
+.vben-j-input-popup-input-popover .ant-popover-title:has(.emptyTitle) {
+  border-bottom: none;
+}
 .vben-j-input-popup-input .app-iconify {
   cursor: pointer;
   color: #666666;

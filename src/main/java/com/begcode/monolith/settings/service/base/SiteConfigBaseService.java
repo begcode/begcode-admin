@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SiteConfigBaseService<R extends SiteConfigRepository, E extends SiteConfig>
     extends BaseServiceImpl<SiteConfigRepository, SiteConfig> {
 
-    private final Logger log = LoggerFactory.getLogger(SiteConfigBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(SiteConfigBaseService.class);
     private final List<String> relationNames = List.of("items");
 
     protected final SiteConfigRepository siteConfigRepository;

@@ -54,7 +54,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class ViewPermissionBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(ViewPermissionBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(ViewPermissionBaseResource.class);
 
     protected static final String ENTITY_NAME = "systemViewPermission";
 

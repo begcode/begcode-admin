@@ -245,11 +245,6 @@ export const usePermissionStore = defineStore({
         case PermissionModeEnum.BACK:
           // @ts-ignore
           const { createMessage, createWarningModal } = useMessage();
-          // 菜单加载提示
-          createMessage.loading({
-            content: t('sys.app.menuLoading'),
-            duration: 1,
-          });
 
           // !Simulate to obtain permission codes from the background,
           // 模拟从后台获取权限码，

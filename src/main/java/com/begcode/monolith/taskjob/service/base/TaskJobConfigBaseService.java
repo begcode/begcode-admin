@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TaskJobConfigBaseService<R extends TaskJobConfigRepository, E extends TaskJobConfig>
     extends BaseServiceImpl<TaskJobConfigRepository, TaskJobConfig> {
 
-    private final Logger log = LoggerFactory.getLogger(TaskJobConfigBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(TaskJobConfigBaseService.class);
     private final List<String> relationNames = List.of();
 
     protected final Scheduler scheduler;

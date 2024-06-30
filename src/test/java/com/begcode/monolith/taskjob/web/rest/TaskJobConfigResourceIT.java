@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +88,8 @@ public class TaskJobConfigResourceIT {
 
     private TaskJobConfig taskJobConfig;
 
+    private TaskJobConfig insertedTaskJobConfig;
+
     /**
      * Create an entity for this test.
      *
@@ -134,6 +137,14 @@ public class TaskJobConfigResourceIT {
         taskJobConfig = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedTaskJobConfig != null) {
+            taskJobConfigRepository.deleteById(insertedTaskJobConfig.getId());
+            insertedTaskJobConfig = null;
+        }
+    }
+
     @Test
     @Transactional
     void createTaskJobConfig() throws Exception {
@@ -154,6 +165,8 @@ public class TaskJobConfigResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedTaskJobConfig = taskJobConfigMapper.toEntity(returnedTaskJobConfigDTO);
         assertTaskJobConfigUpdatableFieldsEquals(returnedTaskJobConfig, getPersistedTaskJobConfig(returnedTaskJobConfig));
+
+        insertedTaskJobConfig = returnedTaskJobConfig;
     }
 
     @Test
@@ -178,7 +191,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigs() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList
         restTaskJobConfigMockMvc
@@ -202,7 +215,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getTaskJobConfig() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get the taskJobConfig
         restTaskJobConfigMockMvc
@@ -226,7 +239,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getTaskJobConfigsByIdFiltering() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         Long id = taskJobConfig.getId();
 
@@ -241,7 +254,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where name equals to
         defaultTaskJobConfigFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
@@ -251,7 +264,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByNameIsInShouldWork() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where name in
         defaultTaskJobConfigFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
@@ -261,7 +274,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where name is not null
         defaultTaskJobConfigFiltering("name.specified=true", "name.specified=false");
@@ -271,7 +284,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByNameContainsSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where name contains
         defaultTaskJobConfigFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
@@ -281,7 +294,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByNameNotContainsSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where name does not contain
         defaultTaskJobConfigFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
@@ -291,7 +304,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByJobClassNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where jobClassName equals to
         defaultTaskJobConfigFiltering("jobClassName.equals=" + DEFAULT_JOB_CLASS_NAME, "jobClassName.equals=" + UPDATED_JOB_CLASS_NAME);
@@ -301,7 +314,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByJobClassNameIsInShouldWork() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where jobClassName in
         defaultTaskJobConfigFiltering(
@@ -314,7 +327,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByJobClassNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where jobClassName is not null
         defaultTaskJobConfigFiltering("jobClassName.specified=true", "jobClassName.specified=false");
@@ -324,7 +337,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByJobClassNameContainsSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where jobClassName contains
         defaultTaskJobConfigFiltering("jobClassName.contains=" + DEFAULT_JOB_CLASS_NAME, "jobClassName.contains=" + UPDATED_JOB_CLASS_NAME);
@@ -334,7 +347,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByJobClassNameNotContainsSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where jobClassName does not contain
         defaultTaskJobConfigFiltering(
@@ -347,7 +360,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByCronExpressionIsEqualToSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where cronExpression equals to
         defaultTaskJobConfigFiltering(
@@ -360,7 +373,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByCronExpressionIsInShouldWork() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where cronExpression in
         defaultTaskJobConfigFiltering(
@@ -373,7 +386,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByCronExpressionIsNullOrNotNull() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where cronExpression is not null
         defaultTaskJobConfigFiltering("cronExpression.specified=true", "cronExpression.specified=false");
@@ -383,7 +396,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByCronExpressionContainsSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where cronExpression contains
         defaultTaskJobConfigFiltering(
@@ -396,7 +409,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByCronExpressionNotContainsSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where cronExpression does not contain
         defaultTaskJobConfigFiltering(
@@ -409,7 +422,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByParameterIsEqualToSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where parameter equals to
         defaultTaskJobConfigFiltering("parameter.equals=" + DEFAULT_PARAMETER, "parameter.equals=" + UPDATED_PARAMETER);
@@ -419,7 +432,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByParameterIsInShouldWork() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where parameter in
         defaultTaskJobConfigFiltering("parameter.in=" + DEFAULT_PARAMETER + "," + UPDATED_PARAMETER, "parameter.in=" + UPDATED_PARAMETER);
@@ -429,7 +442,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByParameterIsNullOrNotNull() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where parameter is not null
         defaultTaskJobConfigFiltering("parameter.specified=true", "parameter.specified=false");
@@ -439,7 +452,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByParameterContainsSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where parameter contains
         defaultTaskJobConfigFiltering("parameter.contains=" + DEFAULT_PARAMETER, "parameter.contains=" + UPDATED_PARAMETER);
@@ -449,7 +462,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByParameterNotContainsSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where parameter does not contain
         defaultTaskJobConfigFiltering("parameter.doesNotContain=" + UPDATED_PARAMETER, "parameter.doesNotContain=" + DEFAULT_PARAMETER);
@@ -459,7 +472,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByDescriptionIsEqualToSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where description equals to
         defaultTaskJobConfigFiltering("description.equals=" + DEFAULT_DESCRIPTION, "description.equals=" + UPDATED_DESCRIPTION);
@@ -469,7 +482,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByDescriptionIsInShouldWork() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where description in
         defaultTaskJobConfigFiltering(
@@ -482,7 +495,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByDescriptionIsNullOrNotNull() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where description is not null
         defaultTaskJobConfigFiltering("description.specified=true", "description.specified=false");
@@ -492,7 +505,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByDescriptionContainsSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where description contains
         defaultTaskJobConfigFiltering("description.contains=" + DEFAULT_DESCRIPTION, "description.contains=" + UPDATED_DESCRIPTION);
@@ -502,7 +515,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByDescriptionNotContainsSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where description does not contain
         defaultTaskJobConfigFiltering(
@@ -515,7 +528,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByJobStatusIsEqualToSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where jobStatus equals to
         defaultTaskJobConfigFiltering("jobStatus.equals=" + DEFAULT_JOB_STATUS, "jobStatus.equals=" + UPDATED_JOB_STATUS);
@@ -525,7 +538,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByJobStatusIsInShouldWork() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where jobStatus in
         defaultTaskJobConfigFiltering(
@@ -538,7 +551,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByJobStatusIsNullOrNotNull() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where jobStatus is not null
         defaultTaskJobConfigFiltering("jobStatus.specified=true", "jobStatus.specified=false");
@@ -548,7 +561,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByCreatedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where createdBy equals to
         defaultTaskJobConfigFiltering("createdBy.equals=" + DEFAULT_CREATED_BY, "createdBy.equals=" + UPDATED_CREATED_BY);
@@ -558,7 +571,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByCreatedByIsInShouldWork() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where createdBy in
         defaultTaskJobConfigFiltering(
@@ -571,7 +584,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByCreatedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where createdBy is not null
         defaultTaskJobConfigFiltering("createdBy.specified=true", "createdBy.specified=false");
@@ -581,7 +594,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByCreatedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where createdBy is greater than or equal to
         defaultTaskJobConfigFiltering(
@@ -594,7 +607,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByCreatedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where createdBy is less than or equal to
         defaultTaskJobConfigFiltering("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
@@ -604,7 +617,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByCreatedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where createdBy is less than
         defaultTaskJobConfigFiltering("createdBy.lessThan=" + UPDATED_CREATED_BY, "createdBy.lessThan=" + DEFAULT_CREATED_BY);
@@ -614,7 +627,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByCreatedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where createdBy is greater than
         defaultTaskJobConfigFiltering("createdBy.greaterThan=" + SMALLER_CREATED_BY, "createdBy.greaterThan=" + DEFAULT_CREATED_BY);
@@ -624,7 +637,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByCreatedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where createdDate equals to
         defaultTaskJobConfigFiltering("createdDate.equals=" + DEFAULT_CREATED_DATE, "createdDate.equals=" + UPDATED_CREATED_DATE);
@@ -634,7 +647,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByCreatedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where createdDate in
         defaultTaskJobConfigFiltering(
@@ -647,7 +660,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByCreatedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where createdDate is not null
         defaultTaskJobConfigFiltering("createdDate.specified=true", "createdDate.specified=false");
@@ -657,7 +670,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByLastModifiedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where lastModifiedBy equals to
         defaultTaskJobConfigFiltering(
@@ -670,7 +683,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByLastModifiedByIsInShouldWork() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where lastModifiedBy in
         defaultTaskJobConfigFiltering(
@@ -683,7 +696,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByLastModifiedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where lastModifiedBy is not null
         defaultTaskJobConfigFiltering("lastModifiedBy.specified=true", "lastModifiedBy.specified=false");
@@ -693,7 +706,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByLastModifiedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where lastModifiedBy is greater than or equal to
         defaultTaskJobConfigFiltering(
@@ -706,7 +719,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByLastModifiedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where lastModifiedBy is less than or equal to
         defaultTaskJobConfigFiltering(
@@ -719,7 +732,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByLastModifiedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where lastModifiedBy is less than
         defaultTaskJobConfigFiltering(
@@ -732,7 +745,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByLastModifiedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where lastModifiedBy is greater than
         defaultTaskJobConfigFiltering(
@@ -745,7 +758,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByLastModifiedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where lastModifiedDate equals to
         defaultTaskJobConfigFiltering(
@@ -758,7 +771,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByLastModifiedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where lastModifiedDate in
         defaultTaskJobConfigFiltering(
@@ -771,7 +784,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void getAllTaskJobConfigsByLastModifiedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         // Get all the taskJobConfigList where lastModifiedDate is not null
         defaultTaskJobConfigFiltering("lastModifiedDate.specified=true", "lastModifiedDate.specified=false");
@@ -840,7 +853,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void putExistingTaskJobConfig() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -938,7 +951,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void partialUpdateTaskJobConfigWithPatch() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -949,10 +962,8 @@ public class TaskJobConfigResourceIT {
         partialUpdatedTaskJobConfig
             .name(UPDATED_NAME)
             .jobClassName(UPDATED_JOB_CLASS_NAME)
-            .parameter(UPDATED_PARAMETER)
-            .description(UPDATED_DESCRIPTION)
             .jobStatus(UPDATED_JOB_STATUS)
-            .createdDate(UPDATED_CREATED_DATE);
+            .createdBy(UPDATED_CREATED_BY);
 
         restTaskJobConfigMockMvc
             .perform(
@@ -975,7 +986,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void fullUpdateTaskJobConfigWithPatch() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1075,7 +1086,7 @@ public class TaskJobConfigResourceIT {
     @Transactional
     void deleteTaskJobConfig() throws Exception {
         // Initialize the database
-        taskJobConfigRepository.save(taskJobConfig);
+        insertedTaskJobConfig = taskJobConfigRepository.saveAndGet(taskJobConfig);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

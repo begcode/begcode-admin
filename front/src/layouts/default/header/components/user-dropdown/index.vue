@@ -15,7 +15,12 @@
         <Menu.Divider v-if="getShowDoc" />
         <MenuItem v-if="getShowApi" key="api" :text="t('layout.header.dropdownChangeApi')" icon="ant-design:swap-outlined" />
         <MenuItem key="account" :text="t('layout.header.dropdownItemSwitchAccount')" icon="ant-design:setting-outlined" />
-        <MenuItem key="password" :text="t('layout.header.dropdownItemSwitchPassword')" icon="ant-design:edit-outlined" />
+        <MenuItem
+          key="password"
+          :text="t('layout.header.dropdownItemSwitchPassword')"
+          icon="ant-design:edit-outlined"
+          data-cy="changePasswordMenu"
+        />
         <!--        <MenuItem key="depart" :text="t('layout.header.dropdownItemSwitchDepart')" icon="ant-design:cluster-outlined" />-->
         <MenuItem v-if="getUseLockPage" key="lock" :text="t('layout.header.tooltipLock')" icon="ion:lock-closed-outline" />
         <MenuItem key="logout" :text="t('layout.header.dropdownItemLoginOut')" icon="ion:power-outline" />
@@ -40,9 +45,7 @@ import { useMessage } from '@/hooks/web/useMessage';
 import { useGo } from '@/hooks/web/usePage';
 
 import headerImg from '@/assets/images/header.jpg';
-import { propTypes, openWindow, useDesign, useModal } from '@begcode/components';
-
-import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
+import { propTypes, openWindow, useDesign, useModal, createAsyncComponent } from '@begcode/components';
 
 import { getFileAccessHttpUrl, getRefPromise } from '@begcode/components';
 

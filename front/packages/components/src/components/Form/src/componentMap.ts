@@ -32,24 +32,21 @@ import SelectFile from './components/SelectFile.vue';
 import ApiTransfer from './components/ApiTransfer.vue';
 import ColorPicker from './components/ColorPicker.vue';
 import RangeDate from './components/RangeDate.vue';
-import AreaLinkage from './components/AreaLinkage.vue';
 import AreaSelect from './components/AreaSelect.vue';
 import RangeNumber from './components/RangeNumber.vue';
 import InputPop from './components/InputPop.vue';
 import AddInput from './components/AddInput.vue';
 import RangeTime from './components/RangeTime.vue';
 import EditorPop from './components/EditorPop.vue';
-import { EasyCron } from '@/components/EasyCron';
 import { Tinymce as Editor } from '@/components/Tinymce';
-import { CodeEditor } from '@/components/CodeEditor';
 import { SelectModal } from '@/components/SelectModal';
-// import DictSelectTag from '@/views/settings/dictionary/DictSelectTag.vue';
 import { Time } from '@/components/Time';
 import { BasicTitle } from '@/components/Basic';
 import { CountdownInput } from '@/components/CountDown';
 import { IconPicker } from '@/components/Icon';
 import { StrengthMeter } from '@/components/StrengthMeter';
 import { BasicUpload, ImageUpload } from '@/components/Upload';
+import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
 
 const componentMap = new Map<ComponentType | string, Component>();
 
@@ -97,18 +94,31 @@ componentMap.set('BasicTitle', BasicTitle);
 componentMap.set('ImageUpload', ImageUpload);
 componentMap.set('ColorPicker', ColorPicker);
 componentMap.set('RangeDate', RangeDate);
-componentMap.set('AreaLinkage', AreaLinkage);
 componentMap.set('AreaSelect', AreaSelect);
 componentMap.set('RangeNumber', RangeNumber);
 componentMap.set('InputPop', InputPop);
 componentMap.set('AddInput', AddInput);
 componentMap.set('RangeTime', RangeTime);
-componentMap.set('EasyCron', EasyCron);
 componentMap.set('Editor', Editor);
-componentMap.set('CodeEditor', CodeEditor);
-// componentMap.set('DictSelectTag', DictSelectTag);
 componentMap.set('EditorPop', EditorPop);
 componentMap.set('SelectModal', SelectModal);
+
+componentMap.set(
+  'AreaLinkage',
+  createAsyncComponent(() => import('./components/AreaLinkage.vue')),
+);
+componentMap.set(
+  'MarkdownEditor',
+  createAsyncComponent(() => import('./components/MarkdownEditor.vue')),
+);
+componentMap.set(
+  'CodeEditor',
+  createAsyncComponent(() => import('@/components/CodeEditor/src/CodeEditor.vue')),
+);
+componentMap.set(
+  'EasyCron',
+  createAsyncComponent(() => import('@/components/EasyCron/EasyCronInput.vue')),
+);
 
 export function add<T extends string, R extends Component>(compName: ComponentType | T, component: R) {
   componentMap.set(compName, component);

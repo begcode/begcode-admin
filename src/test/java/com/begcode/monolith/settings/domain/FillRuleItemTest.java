@@ -25,7 +25,7 @@ class FillRuleItemTest {
     }
 
     @Test
-    void fillRuleTest() throws Exception {
+    void fillRuleTest() {
         FillRuleItem fillRuleItem = getFillRuleItemRandomSampleGenerator();
         SysFillRule sysFillRuleBack = getSysFillRuleRandomSampleGenerator();
 

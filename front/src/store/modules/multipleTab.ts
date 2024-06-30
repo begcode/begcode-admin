@@ -20,6 +20,7 @@ export interface MultipleTabState {
   tabList: RouteLocationNormalized[];
   lastDragEndIndex: number;
   redirectPageParam: null | redirectPageParamType;
+  shortcutButtons: Record<string, any[]>;
 }
 
 interface redirectPageParamType {
@@ -30,9 +31,9 @@ interface redirectPageParamType {
   params?: RouteParamsRaw;
 }
 
-function handleGotoPage(router: Router) {
+function handleGotoPage(router: Router, path?) {
   const go = useGo(router);
-  go(unref(router.currentRoute).fullPath, true);
+  go(path || unref(router.currentRoute).path, true);
 }
 
 const getToTarget = (tabItem: RouteLocationNormalized) => {
@@ -42,6 +43,20 @@ const getToTarget = (tabItem: RouteLocationNormalized) => {
     path,
     query: query || {},
   };
+};
+
+const closeTabContainCurrentRoute = (router, pathList) => {
+  const { currentRoute } = router;
+  const getCurrentTab = () => {
+    const route = unref(currentRoute);
+    const tabStore = useMultipleTabStore();
+    return tabStore.getTabList.find(item => item.path === route.path)!;
+  };
+  const currentTab = getCurrentTab();
+  if (currentTab) {
+    return pathList.includes(currentTab.path);
+  }
+  return false;
 };
 
 const cacheTab = projectSetting.multiTabsSetting.cache;
@@ -57,6 +72,7 @@ export const useMultipleTabStore = defineStore({
     lastDragEndIndex: 0,
     // 重定向时存储的路由参数
     redirectPageParam: null,
+    shortcutButtons: {},
   }),
   getters: {
     getTabList(state): RouteLocationNormalized[] {
@@ -67,6 +83,9 @@ export const useMultipleTabStore = defineStore({
     },
     getLastDragEndIndex(state): number {
       return state.lastDragEndIndex;
+    },
+    getShortcutButtons(state): any[] {
+      return Object.values(state.shortcutButtons).flatMap((item: any) => item);
     },
   },
   actions: {
@@ -265,6 +284,7 @@ export const useMultipleTabStore = defineStore({
     // Close the tab on the right and jump
     async closeLeftTabs(route: RouteLocationNormalized, router: Router) {
       const index = this.tabList.findIndex(item => item.path === route.path);
+      let isCloseCurrentTab = false;
 
       if (index > 0) {
         const leftTabs = this.tabList.slice(0, index);
@@ -275,15 +295,21 @@ export const useMultipleTabStore = defineStore({
             pathList.push(item.fullPath);
           }
         }
+        isCloseCurrentTab = closeTabContainCurrentRoute(router, pathList);
         this.bulkCloseTabs(pathList);
       }
       this.updateCacheTab();
-      handleGotoPage(router);
+      if (isCloseCurrentTab) {
+        handleGotoPage(router, route.path);
+      } else {
+        handleGotoPage(router);
+      }
     },
 
     // Close the tab on the left and jump
     async closeRightTabs(route: RouteLocationNormalized, router: Router) {
       const index = this.tabList.findIndex(item => item.fullPath === route.fullPath);
+      let isCloseCurrentTab = false;
 
       if (index >= 0 && index < this.tabList.length - 1) {
         const rightTabs = this.tabList.slice(index + 1, this.tabList.length);
@@ -295,10 +321,15 @@ export const useMultipleTabStore = defineStore({
             pathList.push(item.fullPath);
           }
         }
+        isCloseCurrentTab = closeTabContainCurrentRoute(router, pathList);
         this.bulkCloseTabs(pathList);
       }
       this.updateCacheTab();
-      handleGotoPage(router);
+      if (isCloseCurrentTab) {
+        handleGotoPage(router, route.path);
+      } else {
+        handleGotoPage(router);
+      }
     },
 
     async closeAllTab(router: Router) {
@@ -312,6 +343,7 @@ export const useMultipleTabStore = defineStore({
      */
     async closeOtherTabs(route: RouteLocationNormalized, router: Router) {
       const closePathList = this.tabList.map(item => item.fullPath);
+      let isCloseCurrentTab = false;
 
       const pathList: string[] = [];
 
@@ -327,10 +359,15 @@ export const useMultipleTabStore = defineStore({
           }
         }
       }
+      isCloseCurrentTab = closeTabContainCurrentRoute(router, pathList);
       this.bulkCloseTabs(pathList);
       this.updateCacheTab();
       Persistent.setLocal(MULTIPLE_TABS_KEY, this.tabList, true);
-      handleGotoPage(router);
+      if (isCloseCurrentTab) {
+        handleGotoPage(router, route.path);
+      } else {
+        handleGotoPage(router);
+      }
     },
 
     /**
@@ -363,6 +400,23 @@ export const useMultipleTabStore = defineStore({
     },
     setRedirectPageParam(data) {
       this.redirectPageParam = data;
+    },
+    setShortcutButtons(componentName, shortcutButtons) {
+      if (shortcutButtons && shortcutButtons.length > 0) {
+        this.shortcutButtons = { [componentName]: shortcutButtons };
+      } else {
+        delete this.shortcutButtons[componentName];
+      }
+    },
+    addShortcutButtons(componentName, shortcutButtons: any[]) {
+      const shortcutButtonsExist = this.shortcutButtons[componentName] || [];
+      const addButtons = shortcutButtons.filter(button => {
+        return !shortcutButtonsExist.find((item: any) => item.name === button.name);
+      });
+      this.shortcutButtons = { [componentName]: shortcutButtonsExist.concat(addButtons) };
+    },
+    clearShortcutButtons(componentName) {
+      delete this.shortcutButtons[componentName];
     },
   },
 });

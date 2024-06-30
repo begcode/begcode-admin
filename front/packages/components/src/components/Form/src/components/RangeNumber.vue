@@ -1,13 +1,19 @@
 <template>
   <InputGroup>
-    <Input :value="beginValue" style="width: calc(50% - 15px)" placeholder="最小值" @change="handleChangeBegin" />
+    <Input v-bind="attrs" :value="beginValue" style="width: calc(50% - 15px)" placeholder="最小值" @change="handleChangeBegin" />
     <Input style="width: 30px; border-left: 0; pointer-events: none; background-color: #fff" placeholder="~" disabled />
-    <Input :value="endValue" style="width: calc(50% - 15px); border-left: 0" placeholder="最大值" @change="handleChangeEnd" />
+    <Input
+      v-bind="attrs"
+      :value="endValue"
+      style="width: calc(50% - 15px); border-left: 0"
+      placeholder="最大值"
+      @change="handleChangeEnd"
+    />
   </InputGroup>
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, PropType } from 'vue';
+import { ref, watch, PropType, useAttrs } from 'vue';
 import { Form, InputGroup, Input } from 'ant-design-vue';
 
 defineOptions({
@@ -20,11 +26,12 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['change', 'update:value']);
+const emit = defineEmits(['change', 'update:value', 'blur']);
 
 const beginValue = ref('');
 const endValue = ref('');
 const formItemContext = Form.useInjectFormItemContext();
+const attrs = useAttrs();
 
 function handleChangeBegin(e) {
   beginValue.value = e.target.value;
@@ -61,3 +68,18 @@ watch(
   { immediate: true },
 );
 </script>
+<style lang="less" scoped>
+.ant-input-group {
+  display: flex;
+  .ant-input-number {
+    &:first-child {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    &:last-child {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+}
+</style>

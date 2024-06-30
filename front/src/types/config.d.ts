@@ -25,6 +25,7 @@ export interface MenuSetting {
   mode: MenuModeEnum;
   type: MenuTypeEnum;
   theme: ThemeEnum;
+  isThemeBright: boolean;
   topMenuAlign: 'start' | 'center' | 'end';
   trigger: TriggerEnum;
   accordion: boolean;
@@ -159,6 +160,7 @@ export interface GlobConfig {
   // Project abbreviation
   shortName: string;
   useMock: boolean;
+  shortTitle: string;
 }
 export interface GlobEnvConfig {
   // Site title

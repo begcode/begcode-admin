@@ -6,9 +6,9 @@ id;name;code;description;icon
 5;微信配置;weixin;微信相关配置;anticon-wechat
 6;内容管理;cms;文章等内容管理;anticon-file-text
 7;热点银行;wifibank;热点银行相关;anticon-wifi
-8;流程管理;workflow;工作流管理;gateway-outlined
+8;流程管理;workflow;工作流管理;ant-design:gateway-outlined
 9;模型管理;modelConfig;模型管理;container-filled
-10;数据可视;report;数据可视;bar-chart-outline
+10;数据可视;report;数据可视;ion:bar-chart-outline
 11;未分类;;未分类;anticon-file-text
 12;日志管理;log;日志管理;profile-outlined
 13;oss;oss;oss;ant-design:project-outline

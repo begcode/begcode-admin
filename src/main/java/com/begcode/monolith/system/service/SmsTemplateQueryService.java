@@ -38,7 +38,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class SmsTemplateQueryService implements QueryService<SmsTemplate> {
 
-    private final Logger log = LoggerFactory.getLogger(SmsTemplateQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(SmsTemplateQueryService.class);
 
     protected final SmsTemplateRepository smsTemplateRepository;
 

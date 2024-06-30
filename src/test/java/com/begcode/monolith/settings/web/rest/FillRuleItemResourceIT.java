@@ -21,6 +21,7 @@ import com.begcode.monolith.settings.service.mapper.FillRuleItemMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -92,6 +93,8 @@ public class FillRuleItemResourceIT {
 
     private FillRuleItem fillRuleItem;
 
+    private FillRuleItem insertedFillRuleItem;
+
     /**
      * Create an entity for this test.
      *
@@ -133,6 +136,14 @@ public class FillRuleItemResourceIT {
         fillRuleItem = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedFillRuleItem != null) {
+            fillRuleItemRepository.deleteById(insertedFillRuleItem.getId());
+            insertedFillRuleItem = null;
+        }
+    }
+
     @Test
     @Transactional
     void createFillRuleItem() throws Exception {
@@ -153,6 +164,8 @@ public class FillRuleItemResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedFillRuleItem = fillRuleItemMapper.toEntity(returnedFillRuleItemDTO);
         assertFillRuleItemUpdatableFieldsEquals(returnedFillRuleItem, getPersistedFillRuleItem(returnedFillRuleItem));
+
+        insertedFillRuleItem = returnedFillRuleItem;
     }
 
     @Test
@@ -177,7 +190,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItems() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList
         restFillRuleItemMockMvc
@@ -215,7 +228,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getFillRuleItem() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get the fillRuleItem
         restFillRuleItemMockMvc
@@ -236,7 +249,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getFillRuleItemsByIdFiltering() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         Long id = fillRuleItem.getId();
 
@@ -251,7 +264,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySortValueIsEqualToSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where sortValue equals to
         defaultFillRuleItemFiltering("sortValue.equals=" + DEFAULT_SORT_VALUE, "sortValue.equals=" + UPDATED_SORT_VALUE);
@@ -261,7 +274,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySortValueIsInShouldWork() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where sortValue in
         defaultFillRuleItemFiltering("sortValue.in=" + DEFAULT_SORT_VALUE + "," + UPDATED_SORT_VALUE, "sortValue.in=" + UPDATED_SORT_VALUE);
@@ -271,7 +284,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySortValueIsNullOrNotNull() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where sortValue is not null
         defaultFillRuleItemFiltering("sortValue.specified=true", "sortValue.specified=false");
@@ -281,7 +294,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySortValueIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where sortValue is greater than or equal to
         defaultFillRuleItemFiltering(
@@ -294,7 +307,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySortValueIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where sortValue is less than or equal to
         defaultFillRuleItemFiltering("sortValue.lessThanOrEqual=" + DEFAULT_SORT_VALUE, "sortValue.lessThanOrEqual=" + SMALLER_SORT_VALUE);
@@ -304,7 +317,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySortValueIsLessThanSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where sortValue is less than
         defaultFillRuleItemFiltering("sortValue.lessThan=" + UPDATED_SORT_VALUE, "sortValue.lessThan=" + DEFAULT_SORT_VALUE);
@@ -314,7 +327,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySortValueIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where sortValue is greater than
         defaultFillRuleItemFiltering("sortValue.greaterThan=" + SMALLER_SORT_VALUE, "sortValue.greaterThan=" + DEFAULT_SORT_VALUE);
@@ -324,7 +337,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsByFieldParamTypeIsEqualToSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where fieldParamType equals to
         defaultFillRuleItemFiltering(
@@ -337,7 +350,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsByFieldParamTypeIsInShouldWork() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where fieldParamType in
         defaultFillRuleItemFiltering(
@@ -350,7 +363,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsByFieldParamTypeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where fieldParamType is not null
         defaultFillRuleItemFiltering("fieldParamType.specified=true", "fieldParamType.specified=false");
@@ -360,7 +373,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsByFieldParamValueIsEqualToSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where fieldParamValue equals to
         defaultFillRuleItemFiltering(
@@ -373,7 +386,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsByFieldParamValueIsInShouldWork() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where fieldParamValue in
         defaultFillRuleItemFiltering(
@@ -386,7 +399,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsByFieldParamValueIsNullOrNotNull() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where fieldParamValue is not null
         defaultFillRuleItemFiltering("fieldParamValue.specified=true", "fieldParamValue.specified=false");
@@ -396,7 +409,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsByFieldParamValueContainsSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where fieldParamValue contains
         defaultFillRuleItemFiltering(
@@ -409,7 +422,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsByFieldParamValueNotContainsSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where fieldParamValue does not contain
         defaultFillRuleItemFiltering(
@@ -422,7 +435,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsByDatePatternIsEqualToSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where datePattern equals to
         defaultFillRuleItemFiltering("datePattern.equals=" + DEFAULT_DATE_PATTERN, "datePattern.equals=" + UPDATED_DATE_PATTERN);
@@ -432,7 +445,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsByDatePatternIsInShouldWork() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where datePattern in
         defaultFillRuleItemFiltering(
@@ -445,7 +458,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsByDatePatternIsNullOrNotNull() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where datePattern is not null
         defaultFillRuleItemFiltering("datePattern.specified=true", "datePattern.specified=false");
@@ -455,7 +468,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsByDatePatternContainsSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where datePattern contains
         defaultFillRuleItemFiltering("datePattern.contains=" + DEFAULT_DATE_PATTERN, "datePattern.contains=" + UPDATED_DATE_PATTERN);
@@ -465,7 +478,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsByDatePatternNotContainsSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where datePattern does not contain
         defaultFillRuleItemFiltering(
@@ -478,7 +491,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqLengthIsEqualToSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqLength equals to
         defaultFillRuleItemFiltering("seqLength.equals=" + DEFAULT_SEQ_LENGTH, "seqLength.equals=" + UPDATED_SEQ_LENGTH);
@@ -488,7 +501,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqLengthIsInShouldWork() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqLength in
         defaultFillRuleItemFiltering("seqLength.in=" + DEFAULT_SEQ_LENGTH + "," + UPDATED_SEQ_LENGTH, "seqLength.in=" + UPDATED_SEQ_LENGTH);
@@ -498,7 +511,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqLengthIsNullOrNotNull() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqLength is not null
         defaultFillRuleItemFiltering("seqLength.specified=true", "seqLength.specified=false");
@@ -508,7 +521,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqLengthIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqLength is greater than or equal to
         defaultFillRuleItemFiltering(
@@ -521,7 +534,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqLengthIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqLength is less than or equal to
         defaultFillRuleItemFiltering("seqLength.lessThanOrEqual=" + DEFAULT_SEQ_LENGTH, "seqLength.lessThanOrEqual=" + SMALLER_SEQ_LENGTH);
@@ -531,7 +544,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqLengthIsLessThanSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqLength is less than
         defaultFillRuleItemFiltering("seqLength.lessThan=" + UPDATED_SEQ_LENGTH, "seqLength.lessThan=" + DEFAULT_SEQ_LENGTH);
@@ -541,7 +554,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqLengthIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqLength is greater than
         defaultFillRuleItemFiltering("seqLength.greaterThan=" + SMALLER_SEQ_LENGTH, "seqLength.greaterThan=" + DEFAULT_SEQ_LENGTH);
@@ -551,7 +564,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqIncrementIsEqualToSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqIncrement equals to
         defaultFillRuleItemFiltering("seqIncrement.equals=" + DEFAULT_SEQ_INCREMENT, "seqIncrement.equals=" + UPDATED_SEQ_INCREMENT);
@@ -561,7 +574,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqIncrementIsInShouldWork() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqIncrement in
         defaultFillRuleItemFiltering(
@@ -574,7 +587,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqIncrementIsNullOrNotNull() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqIncrement is not null
         defaultFillRuleItemFiltering("seqIncrement.specified=true", "seqIncrement.specified=false");
@@ -584,7 +597,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqIncrementIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqIncrement is greater than or equal to
         defaultFillRuleItemFiltering(
@@ -597,7 +610,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqIncrementIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqIncrement is less than or equal to
         defaultFillRuleItemFiltering(
@@ -610,7 +623,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqIncrementIsLessThanSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqIncrement is less than
         defaultFillRuleItemFiltering("seqIncrement.lessThan=" + UPDATED_SEQ_INCREMENT, "seqIncrement.lessThan=" + DEFAULT_SEQ_INCREMENT);
@@ -620,7 +633,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqIncrementIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqIncrement is greater than
         defaultFillRuleItemFiltering(
@@ -633,7 +646,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqStartValueIsEqualToSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqStartValue equals to
         defaultFillRuleItemFiltering("seqStartValue.equals=" + DEFAULT_SEQ_START_VALUE, "seqStartValue.equals=" + UPDATED_SEQ_START_VALUE);
@@ -643,7 +656,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqStartValueIsInShouldWork() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqStartValue in
         defaultFillRuleItemFiltering(
@@ -656,7 +669,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqStartValueIsNullOrNotNull() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqStartValue is not null
         defaultFillRuleItemFiltering("seqStartValue.specified=true", "seqStartValue.specified=false");
@@ -666,7 +679,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqStartValueIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqStartValue is greater than or equal to
         defaultFillRuleItemFiltering(
@@ -679,7 +692,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqStartValueIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqStartValue is less than or equal to
         defaultFillRuleItemFiltering(
@@ -692,7 +705,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqStartValueIsLessThanSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqStartValue is less than
         defaultFillRuleItemFiltering(
@@ -705,7 +718,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void getAllFillRuleItemsBySeqStartValueIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         // Get all the fillRuleItemList where seqStartValue is greater than
         defaultFillRuleItemFiltering(
@@ -788,7 +801,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void putExistingFillRuleItem() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -883,7 +896,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void partialUpdateFillRuleItemWithPatch() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -892,6 +905,8 @@ public class FillRuleItemResourceIT {
         partialUpdatedFillRuleItem.setId(fillRuleItem.getId());
 
         partialUpdatedFillRuleItem
+            .sortValue(UPDATED_SORT_VALUE)
+            .fieldParamType(UPDATED_FIELD_PARAM_TYPE)
             .fieldParamValue(UPDATED_FIELD_PARAM_VALUE)
             .datePattern(UPDATED_DATE_PATTERN)
             .seqLength(UPDATED_SEQ_LENGTH)
@@ -918,7 +933,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void fullUpdateFillRuleItemWithPatch() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1015,7 +1030,7 @@ public class FillRuleItemResourceIT {
     @Transactional
     void deleteFillRuleItem() throws Exception {
         // Initialize the database
-        fillRuleItemRepository.save(fillRuleItem);
+        insertedFillRuleItem = fillRuleItemRepository.saveAndGet(fillRuleItem);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

@@ -29,7 +29,7 @@ class AuthorityTest {
     }
 
     @Test
-    void childrenTest() throws Exception {
+    void childrenTest() {
         Authority authority = getAuthorityRandomSampleGenerator();
         Authority authorityBack = getAuthorityRandomSampleGenerator();
 
@@ -51,7 +51,7 @@ class AuthorityTest {
     }
 
     @Test
-    void viewPermissionsTest() throws Exception {
+    void viewPermissionsTest() {
         Authority authority = getAuthorityRandomSampleGenerator();
         ViewPermission viewPermissionBack = getViewPermissionRandomSampleGenerator();
 
@@ -69,7 +69,7 @@ class AuthorityTest {
     }
 
     @Test
-    void apiPermissionsTest() throws Exception {
+    void apiPermissionsTest() {
         Authority authority = getAuthorityRandomSampleGenerator();
         ApiPermission apiPermissionBack = getApiPermissionRandomSampleGenerator();
 
@@ -87,7 +87,7 @@ class AuthorityTest {
     }
 
     @Test
-    void parentTest() throws Exception {
+    void parentTest() {
         Authority authority = getAuthorityRandomSampleGenerator();
         Authority authorityBack = getAuthorityRandomSampleGenerator();
 
@@ -99,7 +99,7 @@ class AuthorityTest {
     }
 
     @Test
-    void usersTest() throws Exception {
+    void usersTest() {
         Authority authority = getAuthorityRandomSampleGenerator();
         User userBack = getUserRandomSampleGenerator();
 
@@ -121,7 +121,7 @@ class AuthorityTest {
     }
 
     @Test
-    void departmentTest() throws Exception {
+    void departmentTest() {
         Authority authority = getAuthorityRandomSampleGenerator();
         Department departmentBack = getDepartmentRandomSampleGenerator();
 

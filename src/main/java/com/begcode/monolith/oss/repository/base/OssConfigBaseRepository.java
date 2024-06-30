@@ -3,6 +3,7 @@ package com.begcode.monolith.oss.repository.base;
 import com.begcode.monolith.oss.domain.OssConfig;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.ibatis.annotations.*;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -21,6 +22,15 @@ public interface OssConfigBaseRepository<E extends OssConfig> extends BaseCrudMa
 
     default Optional<OssConfig> findById(Long id) {
         return Optional.ofNullable(this.selectById(id));
+    }
+
+    default OssConfig saveAndGet(OssConfig ossConfig) {
+        if (Objects.nonNull(ossConfig.getId())) {
+            this.updateById(ossConfig);
+        } else {
+            this.insert(ossConfig);
+        }
+        return this.selectById(ossConfig.getId());
     }
     // jhipster-needle-repository-add-method - JHipster will add getters and setters here, do not remove
 

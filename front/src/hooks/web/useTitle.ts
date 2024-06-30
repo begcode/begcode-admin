@@ -1,12 +1,12 @@
-import type { Menu } from '@/router/types';
 import { ref, watch, unref } from 'vue';
-import { useI18n } from '@/hooks/web/useI18n';
 import { useTitle as usePageTitle } from '@vueuse/core';
-import { useGlobSetting } from '@/hooks/setting';
 import { useRouter } from 'vue-router';
+import type { Menu } from '@/router/types';
+import { useI18n } from '@/hooks/web/useI18n';
+import { useGlobSetting } from '@/hooks/setting';
 import { useLocaleStore } from '@/store/modules/locale';
 import { REDIRECT_NAME } from '@/router/constant';
-import { getMenus } from '/@/router/menus';
+import { getMenus } from '@/router/menus';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 

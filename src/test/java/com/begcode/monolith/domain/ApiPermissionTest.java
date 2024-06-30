@@ -26,7 +26,7 @@ class ApiPermissionTest {
     }
 
     @Test
-    void childrenTest() throws Exception {
+    void childrenTest() {
         ApiPermission apiPermission = getApiPermissionRandomSampleGenerator();
         ApiPermission apiPermissionBack = getApiPermissionRandomSampleGenerator();
 
@@ -48,7 +48,7 @@ class ApiPermissionTest {
     }
 
     @Test
-    void parentTest() throws Exception {
+    void parentTest() {
         ApiPermission apiPermission = getApiPermissionRandomSampleGenerator();
         ApiPermission apiPermissionBack = getApiPermissionRandomSampleGenerator();
 
@@ -60,7 +60,7 @@ class ApiPermissionTest {
     }
 
     @Test
-    void authoritiesTest() throws Exception {
+    void authoritiesTest() {
         ApiPermission apiPermission = getApiPermissionRandomSampleGenerator();
         Authority authorityBack = getAuthorityRandomSampleGenerator();
 

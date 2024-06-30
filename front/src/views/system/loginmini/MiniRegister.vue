@@ -93,12 +93,14 @@
       </div>
     </div>
   </div>
+  <!-- 图片验证码弹窗 -->
+  <CaptchaModal @register="captchaRegisterModal" @ok="getLoginCode" />
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive, unref, toRaw } from 'vue';
 import { Form, FormItem, Input, Checkbox } from 'ant-design-vue';
-import { Icon } from '@begcode/components';
+import { Icon, useModal, CaptchaModal } from '@begcode/components';
 import { getSmsCaptcha, register } from '@/api-service/sys/user';
 import { SmsEnum } from '@/views/account/login/useLogin';
 import { useMessage } from '@/hooks/web/useMessage';
@@ -106,6 +108,7 @@ import jeecgAdTextImg from '@/assets/loginmini/icon/jeecg_ad_text.png';
 import eyeKImg from '@/assets/loginmini/icon/icon-eye-k.png';
 import eyeGImg from '@/assets/loginmini/icon/icon-eye-g.png';
 import { useI18n } from '@/hooks/web/useI18n';
+import { ExceptionEnum } from '@/enums/exceptionEnum';
 
 defineOptions({
   name: 'MiniRegister',
@@ -134,6 +137,7 @@ const timer = ref<any>(null);
 const pwdIndex = ref<string>('close');
 //确认密码眼睛打开关闭
 const confirmPwdIndex = ref<string>('close');
+const [captchaRegisterModal, { openModal: openCaptchaModal }] = useModal();
 
 /**
  * 返回
@@ -151,7 +155,11 @@ async function getLoginCode() {
     createMessage.warn(t('sys.login.mobilePlaceholder'));
     return;
   }
-  const result = await getSmsCaptcha({ mobile: formData.mobile, smsmode: SmsEnum.REGISTER });
+  const result = await getSmsCaptcha({ mobile: formData.mobile, smsmode: SmsEnum.REGISTER }).catch(res => {
+    if (res.code === ExceptionEnum.PHONE_SMS_FAIL_CODE) {
+      openCaptchaModal(true, {});
+    }
+  });
   if (result) {
     const TIME_COUNT = 60;
     if (!unref(timer)) {

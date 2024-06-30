@@ -6,7 +6,7 @@ export type MenuEmitterEvents = {
   'on-update-opened':
     | (string | number)[]
     | {
-        opend: boolean;
+        opened: boolean;
         parent?: ComponentInternalInstance | null;
         uidList: number[];
       };

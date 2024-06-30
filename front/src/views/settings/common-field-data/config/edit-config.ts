@@ -50,7 +50,7 @@ const fields = (): FormSchema[] => {
       field: 'valueType',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择字段类型', options: getEnumDict('CommonFieldType'), style: 'width: 100%' };
+        return { placeholder: '请选择字段类型', options: getEnumDict('CommonFieldType'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },

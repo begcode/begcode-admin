@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FormConfigBaseService<R extends FormConfigRepository, E extends FormConfig>
     extends BaseServiceImpl<FormConfigRepository, FormConfig> {
 
-    private final Logger log = LoggerFactory.getLogger(FormConfigBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(FormConfigBaseService.class);
     private final List<String> relationNames = List.of("businessType");
 
     protected final FormConfigRepository formConfigRepository;

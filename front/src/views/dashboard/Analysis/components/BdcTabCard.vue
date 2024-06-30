@@ -16,7 +16,12 @@
         <TabPane loading="true" tab="受理监管" key="1">
           <Row>
             <Col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
-              <Bar :chartData="barData" :option="{ title: { text: '受理量统计', textStyle: { fontWeight: 'lighter' } } }" height="40vh" />
+              <Bar
+                :chartData="barData"
+                :option="{ title: { text: '受理量统计', textStyle: { fontWeight: 'lighter' } } }"
+                height="40vh"
+                :seriesColor="seriesColor"
+              />
             </Col>
             <Col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
               <QuickNav :loading="loading" class="enter-y" :bordered="false" :body-style="{ padding: 0 }" />
@@ -30,6 +35,7 @@
                 :chartData="barMultiData"
                 :option="{ title: { text: '平台与部门交互量统计', textStyle: { fontWeight: 'lighter' } } }"
                 height="40vh"
+                :seriesColor="interactiveColor"
               />
             </Col>
             <Col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
@@ -40,8 +46,8 @@
         <TabPane tab="存储监管" key="3">
           <Row>
             <Col :xl="16" :lg="12" :md="12" :sm="24" :xs="24" style="display: flex">
-              <Gauge :chartData="{ name: 'C盘', value: 70 }" height="30vh"></Gauge>
-              <Gauge :chartData="{ name: 'D盘', value: 50 }" height="30vh"></Gauge>
+              <Gauge :seriesColor="seriesColor" :chartData="{ name: 'C盘', value: 70 }" height="30vh" />
+              <Gauge :seriesColor="seriesColor" :chartData="{ name: 'D盘', value: 50 }" height="30vh" />
             </Col>
             <Col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
               <QuickNav :loading="loading" class="enter-y" :bordered="false" :body-style="{ padding: 0 }" />
@@ -53,15 +59,20 @@
   </Card>
 </template>
 <script lang="ts" setup>
+import { ref, computed } from 'vue';
 import { Card, Tabs, TabPane, Row, Col, RangePicker } from 'ant-design-vue';
 import { Bar, BarMulti, Gauge } from '@begcode/components';
 import QuickNav from './QuickNav.vue';
+import { useRootSetting } from '@/hooks/setting/useRootSetting';
 
 defineProps({
   loading: {
     type: Boolean,
   },
 });
+
+const { getThemeColor } = useRootSetting();
+const interactiveColor = ref();
 
 const rankList: any[] = [];
 for (let i = 0; i < 7; i++) {
@@ -87,6 +98,22 @@ for (let j = 0; j < 2; j++) {
       value: Math.floor(Math.random() * 1000) + 200,
     });
   }
+}
+
+const seriesColor = computed(() => {
+  interactiveColor.value = [
+    { type: 'jeecg', color: getThemeColor.value },
+    { type: 'jeebt', color: getRandomColor() },
+  ];
+  return getThemeColor.value;
+});
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
 }
 </script>
 

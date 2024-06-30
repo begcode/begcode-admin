@@ -1,7 +1,10 @@
 <template>
   <div class="head-info" :class="center && 'center'">
     <span>{{ title }}</span>
-    <p>{{ content }} <Icon :type="icon" style="font-size: 24px; color: #2b99ff" /></p>
+    <p :style="{ color: `${iconColor}` }">
+      {{ content }}
+      <Icon :type="icon" :style="{ fontSize: `24px`, color: `${iconColor}` }" />
+    </p>
     <em v-if="bordered" />
   </div>
 </template>
@@ -34,6 +37,10 @@ defineProps({
     type: String,
     default: false,
   },
+  iconColor: {
+    type: String,
+    default: '#2b99ff',
+  },
 });
 </script>
 
@@ -49,14 +56,12 @@ defineProps({
   padding: 0 32px;
 }
 .head-info span {
-  color: rgba(0, 0, 0, 0.45);
   display: inline-block;
   font-size: 14px;
   line-height: 22px;
   margin-bottom: 4px;
 }
 .head-info p {
-  color: rgba(0, 0, 0, 0.85);
   font-size: 24px;
   line-height: 32px;
   margin: 0;

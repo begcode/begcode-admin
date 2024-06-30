@@ -4,6 +4,7 @@ import com.begcode.monolith.domain.UploadFile;
 import com.diboot.core.binding.Binder;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.ibatis.annotations.*;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -32,6 +33,15 @@ public interface UploadFileBaseRepository<E extends UploadFile> extends BaseCrud
 
     @Select("delete from upload_file uploadFile where uploadFile.category = #{categoryId}")
     void deleteAllByCategoryId(@Param("categoryId") Long categoryId);
+
+    default UploadFile saveAndGet(UploadFile uploadFile) {
+        if (Objects.nonNull(uploadFile.getId())) {
+            this.updateById(uploadFile);
+        } else {
+            this.insert(uploadFile);
+        }
+        return this.selectById(uploadFile.getId());
+    }
     // jhipster-needle-repository-add-method - JHipster will add getters and setters here, do not remove
 
 }

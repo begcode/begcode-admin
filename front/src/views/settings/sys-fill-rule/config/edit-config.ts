@@ -57,7 +57,7 @@ const fields = (): FormSchema[] => {
       field: 'resetFrequency',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择重置频率', options: getEnumDict('ResetFrequency'), style: 'width: 100%' };
+        return { placeholder: '请选择重置频率', options: getEnumDict('ResetFrequency'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },
@@ -127,6 +127,7 @@ const ruleItemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'INTEGER' },
+      sortable: true,
       titlePrefix: { icon: 'vxe-icon-sort', content: '排序操作列' },
       editRender: { name: 'ADragSort', enabled: true, props: { remoteApi: fillRuleItemService.updateSortValue } },
     },
@@ -189,12 +190,12 @@ const ruleItemsColumns = () => {
     },
     {
       title: '操作',
-      field: 'operation',
+      field: 'recordOperation',
       fixed: 'right',
       headerAlign: 'center',
       align: 'right',
       showOverflow: false,
-      width: 170,
+      width: 120,
       slots: { default: 'recordAction' },
     },
   ];

@@ -24,6 +24,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -95,6 +96,8 @@ public class DepartmentResourceIT {
 
     private Department department;
 
+    private Department insertedDepartment;
+
     /**
      * Create an entity for this test.
      *
@@ -138,6 +141,14 @@ public class DepartmentResourceIT {
         department = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedDepartment != null) {
+            departmentRepository.deleteById(insertedDepartment.getId());
+            insertedDepartment = null;
+        }
+    }
+
     @Test
     @Transactional
     void createDepartment() throws Exception {
@@ -158,6 +169,8 @@ public class DepartmentResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedDepartment = departmentMapper.toEntity(returnedDepartmentDTO);
         assertDepartmentUpdatableFieldsEquals(returnedDepartment, getPersistedDepartment(returnedDepartment));
+
+        insertedDepartment = returnedDepartment;
     }
 
     @Test
@@ -182,7 +195,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartments() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList
         restDepartmentMockMvc
@@ -221,7 +234,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getDepartment() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get the department
         restDepartmentMockMvc
@@ -243,7 +256,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getDepartmentsByIdFiltering() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         Long id = department.getId();
 
@@ -258,7 +271,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where name equals to
         defaultDepartmentFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
@@ -268,7 +281,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByNameIsInShouldWork() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where name in
         defaultDepartmentFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
@@ -278,7 +291,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where name is not null
         defaultDepartmentFiltering("name.specified=true", "name.specified=false");
@@ -288,7 +301,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByNameContainsSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where name contains
         defaultDepartmentFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
@@ -298,7 +311,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByNameNotContainsSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where name does not contain
         defaultDepartmentFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
@@ -308,7 +321,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByCodeIsEqualToSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where code equals to
         defaultDepartmentFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
@@ -318,7 +331,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByCodeIsInShouldWork() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where code in
         defaultDepartmentFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
@@ -328,7 +341,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByCodeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where code is not null
         defaultDepartmentFiltering("code.specified=true", "code.specified=false");
@@ -338,7 +351,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByCodeContainsSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where code contains
         defaultDepartmentFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
@@ -348,7 +361,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByCodeNotContainsSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where code does not contain
         defaultDepartmentFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
@@ -358,7 +371,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByAddressIsEqualToSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where address equals to
         defaultDepartmentFiltering("address.equals=" + DEFAULT_ADDRESS, "address.equals=" + UPDATED_ADDRESS);
@@ -368,7 +381,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByAddressIsInShouldWork() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where address in
         defaultDepartmentFiltering("address.in=" + DEFAULT_ADDRESS + "," + UPDATED_ADDRESS, "address.in=" + UPDATED_ADDRESS);
@@ -378,7 +391,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByAddressIsNullOrNotNull() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where address is not null
         defaultDepartmentFiltering("address.specified=true", "address.specified=false");
@@ -388,7 +401,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByAddressContainsSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where address contains
         defaultDepartmentFiltering("address.contains=" + DEFAULT_ADDRESS, "address.contains=" + UPDATED_ADDRESS);
@@ -398,7 +411,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByAddressNotContainsSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where address does not contain
         defaultDepartmentFiltering("address.doesNotContain=" + UPDATED_ADDRESS, "address.doesNotContain=" + DEFAULT_ADDRESS);
@@ -408,7 +421,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByPhoneNumIsEqualToSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where phoneNum equals to
         defaultDepartmentFiltering("phoneNum.equals=" + DEFAULT_PHONE_NUM, "phoneNum.equals=" + UPDATED_PHONE_NUM);
@@ -418,7 +431,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByPhoneNumIsInShouldWork() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where phoneNum in
         defaultDepartmentFiltering("phoneNum.in=" + DEFAULT_PHONE_NUM + "," + UPDATED_PHONE_NUM, "phoneNum.in=" + UPDATED_PHONE_NUM);
@@ -428,7 +441,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByPhoneNumIsNullOrNotNull() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where phoneNum is not null
         defaultDepartmentFiltering("phoneNum.specified=true", "phoneNum.specified=false");
@@ -438,7 +451,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByPhoneNumContainsSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where phoneNum contains
         defaultDepartmentFiltering("phoneNum.contains=" + DEFAULT_PHONE_NUM, "phoneNum.contains=" + UPDATED_PHONE_NUM);
@@ -448,7 +461,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByPhoneNumNotContainsSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where phoneNum does not contain
         defaultDepartmentFiltering("phoneNum.doesNotContain=" + UPDATED_PHONE_NUM, "phoneNum.doesNotContain=" + DEFAULT_PHONE_NUM);
@@ -458,7 +471,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByLogoIsEqualToSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where logo equals to
         defaultDepartmentFiltering("logo.equals=" + DEFAULT_LOGO, "logo.equals=" + UPDATED_LOGO);
@@ -468,7 +481,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByLogoIsInShouldWork() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where logo in
         defaultDepartmentFiltering("logo.in=" + DEFAULT_LOGO + "," + UPDATED_LOGO, "logo.in=" + UPDATED_LOGO);
@@ -478,7 +491,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByLogoIsNullOrNotNull() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where logo is not null
         defaultDepartmentFiltering("logo.specified=true", "logo.specified=false");
@@ -488,7 +501,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByLogoContainsSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where logo contains
         defaultDepartmentFiltering("logo.contains=" + DEFAULT_LOGO, "logo.contains=" + UPDATED_LOGO);
@@ -498,7 +511,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByLogoNotContainsSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where logo does not contain
         defaultDepartmentFiltering("logo.doesNotContain=" + UPDATED_LOGO, "logo.doesNotContain=" + DEFAULT_LOGO);
@@ -508,7 +521,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByContactIsEqualToSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where contact equals to
         defaultDepartmentFiltering("contact.equals=" + DEFAULT_CONTACT, "contact.equals=" + UPDATED_CONTACT);
@@ -518,7 +531,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByContactIsInShouldWork() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where contact in
         defaultDepartmentFiltering("contact.in=" + DEFAULT_CONTACT + "," + UPDATED_CONTACT, "contact.in=" + UPDATED_CONTACT);
@@ -528,7 +541,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByContactIsNullOrNotNull() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where contact is not null
         defaultDepartmentFiltering("contact.specified=true", "contact.specified=false");
@@ -538,7 +551,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByContactContainsSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where contact contains
         defaultDepartmentFiltering("contact.contains=" + DEFAULT_CONTACT, "contact.contains=" + UPDATED_CONTACT);
@@ -548,7 +561,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByContactNotContainsSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where contact does not contain
         defaultDepartmentFiltering("contact.doesNotContain=" + UPDATED_CONTACT, "contact.doesNotContain=" + DEFAULT_CONTACT);
@@ -558,7 +571,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByCreateUserIdIsEqualToSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where createUserId equals to
         defaultDepartmentFiltering("createUserId.equals=" + DEFAULT_CREATE_USER_ID, "createUserId.equals=" + UPDATED_CREATE_USER_ID);
@@ -568,7 +581,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByCreateUserIdIsInShouldWork() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where createUserId in
         defaultDepartmentFiltering(
@@ -581,7 +594,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByCreateUserIdIsNullOrNotNull() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where createUserId is not null
         defaultDepartmentFiltering("createUserId.specified=true", "createUserId.specified=false");
@@ -591,7 +604,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByCreateUserIdIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where createUserId is greater than or equal to
         defaultDepartmentFiltering(
@@ -604,7 +617,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByCreateUserIdIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where createUserId is less than or equal to
         defaultDepartmentFiltering(
@@ -617,7 +630,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByCreateUserIdIsLessThanSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where createUserId is less than
         defaultDepartmentFiltering("createUserId.lessThan=" + UPDATED_CREATE_USER_ID, "createUserId.lessThan=" + DEFAULT_CREATE_USER_ID);
@@ -627,7 +640,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByCreateUserIdIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where createUserId is greater than
         defaultDepartmentFiltering(
@@ -640,7 +653,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByCreateTimeIsEqualToSomething() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where createTime equals to
         defaultDepartmentFiltering("createTime.equals=" + DEFAULT_CREATE_TIME, "createTime.equals=" + UPDATED_CREATE_TIME);
@@ -650,7 +663,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByCreateTimeIsInShouldWork() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where createTime in
         defaultDepartmentFiltering(
@@ -663,7 +676,7 @@ public class DepartmentResourceIT {
     @Transactional
     void getAllDepartmentsByCreateTimeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         // Get all the departmentList where createTime is not null
         defaultDepartmentFiltering("createTime.specified=true", "createTime.specified=false");
@@ -758,7 +771,7 @@ public class DepartmentResourceIT {
     @Transactional
     void putExistingDepartment() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -854,7 +867,7 @@ public class DepartmentResourceIT {
     @Transactional
     void partialUpdateDepartmentWithPatch() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -862,12 +875,7 @@ public class DepartmentResourceIT {
         Department partialUpdatedDepartment = new Department();
         partialUpdatedDepartment.setId(department.getId());
 
-        partialUpdatedDepartment
-            .address(UPDATED_ADDRESS)
-            .phoneNum(UPDATED_PHONE_NUM)
-            .logo(UPDATED_LOGO)
-            .contact(UPDATED_CONTACT)
-            .createTime(UPDATED_CREATE_TIME);
+        partialUpdatedDepartment.name(UPDATED_NAME).address(UPDATED_ADDRESS).contact(UPDATED_CONTACT).createTime(UPDATED_CREATE_TIME);
 
         restDepartmentMockMvc
             .perform(
@@ -890,7 +898,7 @@ public class DepartmentResourceIT {
     @Transactional
     void fullUpdateDepartmentWithPatch() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -988,7 +996,7 @@ public class DepartmentResourceIT {
     @Transactional
     void deleteDepartment() throws Exception {
         // Initialize the database
-        departmentRepository.save(department);
+        insertedDepartment = departmentRepository.saveAndGet(department);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

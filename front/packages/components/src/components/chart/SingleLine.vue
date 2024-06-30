@@ -28,6 +28,10 @@ const props = defineProps({
     type: String as PropType<string>,
     default: 'calc(100vh - 78px)',
   },
+  seriesColor: {
+    type: String,
+    default: '#1890ff',
+  },
 });
 
 const chartRef = ref<HTMLDivElement | null>(null);
@@ -57,6 +61,7 @@ const option = reactive({
       smooth: true,
       areaStyle: {},
       data: [],
+      color: props.seriesColor,
     },
   ] as any[],
 });
@@ -76,6 +81,7 @@ function initCharts() {
     return item.name;
   });
   option.series[0].data = seriesData;
+  option.series[0].color = props.seriesColor;
   option.xAxis.data = xAxisData;
   setOptions(option as EChartsOption);
 }

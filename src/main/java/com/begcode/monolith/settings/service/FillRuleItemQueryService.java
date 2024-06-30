@@ -38,7 +38,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class FillRuleItemQueryService implements QueryService<FillRuleItem> {
 
-    private final Logger log = LoggerFactory.getLogger(FillRuleItemQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(FillRuleItemQueryService.class);
 
     protected final FillRuleItemRepository fillRuleItemRepository;
 

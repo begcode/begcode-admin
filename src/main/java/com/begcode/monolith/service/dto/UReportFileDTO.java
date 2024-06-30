@@ -26,7 +26,7 @@ public class UReportFileDTO implements Serializable {
      * 名称
      */
     @NotNull
-    @Schema(description = "名称", required = true)
+    @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
 
     /**

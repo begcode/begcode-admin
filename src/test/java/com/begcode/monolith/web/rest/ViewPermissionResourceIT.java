@@ -24,6 +24,7 @@ import com.begcode.monolith.service.mapper.ViewPermissionMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -131,6 +132,8 @@ public class ViewPermissionResourceIT {
 
     private ViewPermission viewPermission;
 
+    private ViewPermission insertedViewPermission;
+
     /**
      * Create an entity for this test.
      *
@@ -198,6 +201,14 @@ public class ViewPermissionResourceIT {
         viewPermission = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedViewPermission != null) {
+            viewPermissionRepository.deleteById(insertedViewPermission.getId());
+            insertedViewPermission = null;
+        }
+    }
+
     @Test
     @Transactional
     void createViewPermission() throws Exception {
@@ -218,6 +229,8 @@ public class ViewPermissionResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedViewPermission = viewPermissionMapper.toEntity(returnedViewPermissionDTO);
         assertViewPermissionUpdatableFieldsEquals(returnedViewPermission, getPersistedViewPermission(returnedViewPermission));
+
+        insertedViewPermission = returnedViewPermission;
     }
 
     @Test
@@ -276,7 +289,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissions() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList
         restViewPermissionMockMvc
@@ -327,7 +340,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getViewPermission() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get the viewPermission
         restViewPermissionMockMvc
@@ -361,7 +374,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getViewPermissionsByIdFiltering() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         Long id = viewPermission.getId();
 
@@ -376,7 +389,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByTextIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where text equals to
         defaultViewPermissionFiltering("text.equals=" + DEFAULT_TEXT, "text.equals=" + UPDATED_TEXT);
@@ -386,7 +399,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByTextIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where text in
         defaultViewPermissionFiltering("text.in=" + DEFAULT_TEXT + "," + UPDATED_TEXT, "text.in=" + UPDATED_TEXT);
@@ -396,7 +409,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByTextIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where text is not null
         defaultViewPermissionFiltering("text.specified=true", "text.specified=false");
@@ -406,7 +419,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByTextContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where text contains
         defaultViewPermissionFiltering("text.contains=" + DEFAULT_TEXT, "text.contains=" + UPDATED_TEXT);
@@ -416,7 +429,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByTextNotContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where text does not contain
         defaultViewPermissionFiltering("text.doesNotContain=" + UPDATED_TEXT, "text.doesNotContain=" + DEFAULT_TEXT);
@@ -426,7 +439,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByTypeIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where type equals to
         defaultViewPermissionFiltering("type.equals=" + DEFAULT_TYPE, "type.equals=" + UPDATED_TYPE);
@@ -436,7 +449,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByTypeIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where type in
         defaultViewPermissionFiltering("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE, "type.in=" + UPDATED_TYPE);
@@ -446,7 +459,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByTypeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where type is not null
         defaultViewPermissionFiltering("type.specified=true", "type.specified=false");
@@ -456,7 +469,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByI18nIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where i18n equals to
         defaultViewPermissionFiltering("i18n.equals=" + DEFAULT_I_18_N, "i18n.equals=" + UPDATED_I_18_N);
@@ -466,7 +479,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByI18nIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where i18n in
         defaultViewPermissionFiltering("i18n.in=" + DEFAULT_I_18_N + "," + UPDATED_I_18_N, "i18n.in=" + UPDATED_I_18_N);
@@ -476,7 +489,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByI18nIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where i18n is not null
         defaultViewPermissionFiltering("i18n.specified=true", "i18n.specified=false");
@@ -486,7 +499,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByI18nContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where i18n contains
         defaultViewPermissionFiltering("i18n.contains=" + DEFAULT_I_18_N, "i18n.contains=" + UPDATED_I_18_N);
@@ -496,7 +509,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByI18nNotContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where i18n does not contain
         defaultViewPermissionFiltering("i18n.doesNotContain=" + UPDATED_I_18_N, "i18n.doesNotContain=" + DEFAULT_I_18_N);
@@ -506,7 +519,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByGroupIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where group equals to
         defaultViewPermissionFiltering("group.equals=" + DEFAULT_GROUP, "group.equals=" + UPDATED_GROUP);
@@ -516,7 +529,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByGroupIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where group in
         defaultViewPermissionFiltering("group.in=" + DEFAULT_GROUP + "," + UPDATED_GROUP, "group.in=" + UPDATED_GROUP);
@@ -526,7 +539,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByGroupIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where group is not null
         defaultViewPermissionFiltering("group.specified=true", "group.specified=false");
@@ -536,7 +549,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByLinkIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where link equals to
         defaultViewPermissionFiltering("link.equals=" + DEFAULT_LINK, "link.equals=" + UPDATED_LINK);
@@ -546,7 +559,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByLinkIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where link in
         defaultViewPermissionFiltering("link.in=" + DEFAULT_LINK + "," + UPDATED_LINK, "link.in=" + UPDATED_LINK);
@@ -556,7 +569,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByLinkIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where link is not null
         defaultViewPermissionFiltering("link.specified=true", "link.specified=false");
@@ -566,7 +579,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByLinkContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where link contains
         defaultViewPermissionFiltering("link.contains=" + DEFAULT_LINK, "link.contains=" + UPDATED_LINK);
@@ -576,7 +589,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByLinkNotContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where link does not contain
         defaultViewPermissionFiltering("link.doesNotContain=" + UPDATED_LINK, "link.doesNotContain=" + DEFAULT_LINK);
@@ -586,7 +599,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByExternalLinkIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where externalLink equals to
         defaultViewPermissionFiltering("externalLink.equals=" + DEFAULT_EXTERNAL_LINK, "externalLink.equals=" + UPDATED_EXTERNAL_LINK);
@@ -596,7 +609,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByExternalLinkIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where externalLink in
         defaultViewPermissionFiltering(
@@ -609,7 +622,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByExternalLinkIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where externalLink is not null
         defaultViewPermissionFiltering("externalLink.specified=true", "externalLink.specified=false");
@@ -619,7 +632,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByExternalLinkContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where externalLink contains
         defaultViewPermissionFiltering("externalLink.contains=" + DEFAULT_EXTERNAL_LINK, "externalLink.contains=" + UPDATED_EXTERNAL_LINK);
@@ -629,7 +642,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByExternalLinkNotContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where externalLink does not contain
         defaultViewPermissionFiltering(
@@ -642,7 +655,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByTargetIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where target equals to
         defaultViewPermissionFiltering("target.equals=" + DEFAULT_TARGET, "target.equals=" + UPDATED_TARGET);
@@ -652,7 +665,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByTargetIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where target in
         defaultViewPermissionFiltering("target.in=" + DEFAULT_TARGET + "," + UPDATED_TARGET, "target.in=" + UPDATED_TARGET);
@@ -662,7 +675,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByTargetIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where target is not null
         defaultViewPermissionFiltering("target.specified=true", "target.specified=false");
@@ -672,7 +685,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByIconIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where icon equals to
         defaultViewPermissionFiltering("icon.equals=" + DEFAULT_ICON, "icon.equals=" + UPDATED_ICON);
@@ -682,7 +695,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByIconIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where icon in
         defaultViewPermissionFiltering("icon.in=" + DEFAULT_ICON + "," + UPDATED_ICON, "icon.in=" + UPDATED_ICON);
@@ -692,7 +705,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByIconIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where icon is not null
         defaultViewPermissionFiltering("icon.specified=true", "icon.specified=false");
@@ -702,7 +715,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByIconContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where icon contains
         defaultViewPermissionFiltering("icon.contains=" + DEFAULT_ICON, "icon.contains=" + UPDATED_ICON);
@@ -712,7 +725,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByIconNotContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where icon does not contain
         defaultViewPermissionFiltering("icon.doesNotContain=" + UPDATED_ICON, "icon.doesNotContain=" + DEFAULT_ICON);
@@ -722,7 +735,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByDisabledIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where disabled equals to
         defaultViewPermissionFiltering("disabled.equals=" + DEFAULT_DISABLED, "disabled.equals=" + UPDATED_DISABLED);
@@ -732,7 +745,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByDisabledIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where disabled in
         defaultViewPermissionFiltering("disabled.in=" + DEFAULT_DISABLED + "," + UPDATED_DISABLED, "disabled.in=" + UPDATED_DISABLED);
@@ -742,7 +755,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByDisabledIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where disabled is not null
         defaultViewPermissionFiltering("disabled.specified=true", "disabled.specified=false");
@@ -752,7 +765,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByHideIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where hide equals to
         defaultViewPermissionFiltering("hide.equals=" + DEFAULT_HIDE, "hide.equals=" + UPDATED_HIDE);
@@ -762,7 +775,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByHideIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where hide in
         defaultViewPermissionFiltering("hide.in=" + DEFAULT_HIDE + "," + UPDATED_HIDE, "hide.in=" + UPDATED_HIDE);
@@ -772,7 +785,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByHideIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where hide is not null
         defaultViewPermissionFiltering("hide.specified=true", "hide.specified=false");
@@ -782,7 +795,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByHideInBreadcrumbIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where hideInBreadcrumb equals to
         defaultViewPermissionFiltering(
@@ -795,7 +808,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByHideInBreadcrumbIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where hideInBreadcrumb in
         defaultViewPermissionFiltering(
@@ -808,7 +821,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByHideInBreadcrumbIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where hideInBreadcrumb is not null
         defaultViewPermissionFiltering("hideInBreadcrumb.specified=true", "hideInBreadcrumb.specified=false");
@@ -818,7 +831,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByShortcutIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where shortcut equals to
         defaultViewPermissionFiltering("shortcut.equals=" + DEFAULT_SHORTCUT, "shortcut.equals=" + UPDATED_SHORTCUT);
@@ -828,7 +841,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByShortcutIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where shortcut in
         defaultViewPermissionFiltering("shortcut.in=" + DEFAULT_SHORTCUT + "," + UPDATED_SHORTCUT, "shortcut.in=" + UPDATED_SHORTCUT);
@@ -838,7 +851,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByShortcutIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where shortcut is not null
         defaultViewPermissionFiltering("shortcut.specified=true", "shortcut.specified=false");
@@ -848,7 +861,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByShortcutRootIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where shortcutRoot equals to
         defaultViewPermissionFiltering("shortcutRoot.equals=" + DEFAULT_SHORTCUT_ROOT, "shortcutRoot.equals=" + UPDATED_SHORTCUT_ROOT);
@@ -858,7 +871,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByShortcutRootIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where shortcutRoot in
         defaultViewPermissionFiltering(
@@ -871,7 +884,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByShortcutRootIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where shortcutRoot is not null
         defaultViewPermissionFiltering("shortcutRoot.specified=true", "shortcutRoot.specified=false");
@@ -881,7 +894,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByReuseIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where reuse equals to
         defaultViewPermissionFiltering("reuse.equals=" + DEFAULT_REUSE, "reuse.equals=" + UPDATED_REUSE);
@@ -891,7 +904,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByReuseIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where reuse in
         defaultViewPermissionFiltering("reuse.in=" + DEFAULT_REUSE + "," + UPDATED_REUSE, "reuse.in=" + UPDATED_REUSE);
@@ -901,7 +914,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByReuseIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where reuse is not null
         defaultViewPermissionFiltering("reuse.specified=true", "reuse.specified=false");
@@ -911,7 +924,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByCodeIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where code equals to
         defaultViewPermissionFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
@@ -921,7 +934,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByCodeIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where code in
         defaultViewPermissionFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
@@ -931,7 +944,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByCodeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where code is not null
         defaultViewPermissionFiltering("code.specified=true", "code.specified=false");
@@ -941,7 +954,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByCodeContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where code contains
         defaultViewPermissionFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
@@ -951,7 +964,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByCodeNotContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where code does not contain
         defaultViewPermissionFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
@@ -961,7 +974,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByDescriptionIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where description equals to
         defaultViewPermissionFiltering("description.equals=" + DEFAULT_DESCRIPTION, "description.equals=" + UPDATED_DESCRIPTION);
@@ -971,7 +984,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByDescriptionIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where description in
         defaultViewPermissionFiltering(
@@ -984,7 +997,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByDescriptionIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where description is not null
         defaultViewPermissionFiltering("description.specified=true", "description.specified=false");
@@ -994,7 +1007,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByDescriptionContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where description contains
         defaultViewPermissionFiltering("description.contains=" + DEFAULT_DESCRIPTION, "description.contains=" + UPDATED_DESCRIPTION);
@@ -1004,7 +1017,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByDescriptionNotContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where description does not contain
         defaultViewPermissionFiltering(
@@ -1017,7 +1030,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByOrderIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where order equals to
         defaultViewPermissionFiltering("order.equals=" + DEFAULT_ORDER, "order.equals=" + UPDATED_ORDER);
@@ -1027,7 +1040,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByOrderIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where order in
         defaultViewPermissionFiltering("order.in=" + DEFAULT_ORDER + "," + UPDATED_ORDER, "order.in=" + UPDATED_ORDER);
@@ -1037,7 +1050,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByOrderIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where order is not null
         defaultViewPermissionFiltering("order.specified=true", "order.specified=false");
@@ -1047,7 +1060,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByOrderIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where order is greater than or equal to
         defaultViewPermissionFiltering("order.greaterThanOrEqual=" + DEFAULT_ORDER, "order.greaterThanOrEqual=" + UPDATED_ORDER);
@@ -1057,7 +1070,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByOrderIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where order is less than or equal to
         defaultViewPermissionFiltering("order.lessThanOrEqual=" + DEFAULT_ORDER, "order.lessThanOrEqual=" + SMALLER_ORDER);
@@ -1067,7 +1080,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByOrderIsLessThanSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where order is less than
         defaultViewPermissionFiltering("order.lessThan=" + UPDATED_ORDER, "order.lessThan=" + DEFAULT_ORDER);
@@ -1077,7 +1090,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByOrderIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where order is greater than
         defaultViewPermissionFiltering("order.greaterThan=" + SMALLER_ORDER, "order.greaterThan=" + DEFAULT_ORDER);
@@ -1087,7 +1100,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByApiPermissionCodesIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where apiPermissionCodes equals to
         defaultViewPermissionFiltering(
@@ -1100,7 +1113,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByApiPermissionCodesIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where apiPermissionCodes in
         defaultViewPermissionFiltering(
@@ -1113,7 +1126,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByApiPermissionCodesIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where apiPermissionCodes is not null
         defaultViewPermissionFiltering("apiPermissionCodes.specified=true", "apiPermissionCodes.specified=false");
@@ -1123,7 +1136,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByApiPermissionCodesContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where apiPermissionCodes contains
         defaultViewPermissionFiltering(
@@ -1136,7 +1149,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByApiPermissionCodesNotContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where apiPermissionCodes does not contain
         defaultViewPermissionFiltering(
@@ -1149,7 +1162,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByComponentFileIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where componentFile equals to
         defaultViewPermissionFiltering("componentFile.equals=" + DEFAULT_COMPONENT_FILE, "componentFile.equals=" + UPDATED_COMPONENT_FILE);
@@ -1159,7 +1172,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByComponentFileIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where componentFile in
         defaultViewPermissionFiltering(
@@ -1172,7 +1185,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByComponentFileIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where componentFile is not null
         defaultViewPermissionFiltering("componentFile.specified=true", "componentFile.specified=false");
@@ -1182,7 +1195,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByComponentFileContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where componentFile contains
         defaultViewPermissionFiltering(
@@ -1195,7 +1208,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByComponentFileNotContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where componentFile does not contain
         defaultViewPermissionFiltering(
@@ -1208,7 +1221,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByRedirectIsEqualToSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where redirect equals to
         defaultViewPermissionFiltering("redirect.equals=" + DEFAULT_REDIRECT, "redirect.equals=" + UPDATED_REDIRECT);
@@ -1218,7 +1231,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByRedirectIsInShouldWork() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where redirect in
         defaultViewPermissionFiltering("redirect.in=" + DEFAULT_REDIRECT + "," + UPDATED_REDIRECT, "redirect.in=" + UPDATED_REDIRECT);
@@ -1228,7 +1241,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByRedirectIsNullOrNotNull() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where redirect is not null
         defaultViewPermissionFiltering("redirect.specified=true", "redirect.specified=false");
@@ -1238,7 +1251,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByRedirectContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where redirect contains
         defaultViewPermissionFiltering("redirect.contains=" + DEFAULT_REDIRECT, "redirect.contains=" + UPDATED_REDIRECT);
@@ -1248,7 +1261,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void getAllViewPermissionsByRedirectNotContainsSomething() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         // Get all the viewPermissionList where redirect does not contain
         defaultViewPermissionFiltering("redirect.doesNotContain=" + UPDATED_REDIRECT, "redirect.doesNotContain=" + DEFAULT_REDIRECT);
@@ -1355,7 +1368,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void putExistingViewPermission() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1463,7 +1476,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void partialUpdateViewPermissionWithPatch() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1472,14 +1485,15 @@ public class ViewPermissionResourceIT {
         partialUpdatedViewPermission.setId(viewPermission.getId());
 
         partialUpdatedViewPermission
+            .text(UPDATED_TEXT)
             .i18n(UPDATED_I_18_N)
-            .group(UPDATED_GROUP)
             .externalLink(UPDATED_EXTERNAL_LINK)
+            .icon(UPDATED_ICON)
             .disabled(UPDATED_DISABLED)
-            .hideInBreadcrumb(UPDATED_HIDE_IN_BREADCRUMB)
+            .hide(UPDATED_HIDE)
             .shortcutRoot(UPDATED_SHORTCUT_ROOT)
+            .reuse(UPDATED_REUSE)
             .code(UPDATED_CODE)
-            .description(UPDATED_DESCRIPTION)
             .order(UPDATED_ORDER);
 
         restViewPermissionMockMvc
@@ -1503,7 +1517,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void fullUpdateViewPermissionWithPatch() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1613,7 +1627,7 @@ public class ViewPermissionResourceIT {
     @Transactional
     void deleteViewPermission() throws Exception {
         // Initialize the database
-        viewPermissionRepository.save(viewPermission);
+        insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

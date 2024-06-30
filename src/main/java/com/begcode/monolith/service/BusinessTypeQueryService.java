@@ -38,7 +38,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class BusinessTypeQueryService implements QueryService<BusinessType> {
 
-    private final Logger log = LoggerFactory.getLogger(BusinessTypeQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(BusinessTypeQueryService.class);
 
     protected final BusinessTypeRepository businessTypeRepository;
 

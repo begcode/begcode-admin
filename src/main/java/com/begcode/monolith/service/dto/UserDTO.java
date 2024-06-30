@@ -26,14 +26,14 @@ public class UserDTO extends AbstractAuditingEntity<Long, UserDTO> {
      * 用户ID
      */
     @NotNull
-    @Schema(description = "用户ID", required = true)
+    @Schema(description = "用户ID", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long id;
 
     /**
      * 账户名
      */
     @NotNull
-    @Schema(description = "账户名", required = true)
+    @Schema(description = "账户名", requiredMode = Schema.RequiredMode.REQUIRED)
     private String login;
 
     /**
@@ -52,7 +52,7 @@ public class UserDTO extends AbstractAuditingEntity<Long, UserDTO> {
      * 电子邮箱
      */
     @NotNull
-    @Schema(description = "电子邮箱", required = true)
+    @Schema(description = "电子邮箱", requiredMode = Schema.RequiredMode.REQUIRED)
     private String email;
 
     /**

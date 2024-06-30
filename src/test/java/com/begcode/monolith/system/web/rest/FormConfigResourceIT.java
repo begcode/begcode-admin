@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -89,6 +90,8 @@ public class FormConfigResourceIT {
 
     private FormConfig formConfig;
 
+    private FormConfig insertedFormConfig;
+
     /**
      * Create an entity for this test.
      *
@@ -128,6 +131,14 @@ public class FormConfigResourceIT {
         formConfig = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedFormConfig != null) {
+            formConfigRepository.deleteById(insertedFormConfig.getId());
+            insertedFormConfig = null;
+        }
+    }
+
     @Test
     @Transactional
     void createFormConfig() throws Exception {
@@ -148,6 +159,8 @@ public class FormConfigResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedFormConfig = formConfigMapper.toEntity(returnedFormConfigDTO);
         assertFormConfigUpdatableFieldsEquals(returnedFormConfig, getPersistedFormConfig(returnedFormConfig));
+
+        insertedFormConfig = returnedFormConfig;
     }
 
     @Test
@@ -172,7 +185,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigs() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList
         restFormConfigMockMvc
@@ -209,7 +222,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getFormConfig() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get the formConfig
         restFormConfigMockMvc
@@ -229,7 +242,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getFormConfigsByIdFiltering() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         Long id = formConfig.getId();
 
@@ -244,7 +257,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByFormKeyIsEqualToSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where formKey equals to
         defaultFormConfigFiltering("formKey.equals=" + DEFAULT_FORM_KEY, "formKey.equals=" + UPDATED_FORM_KEY);
@@ -254,7 +267,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByFormKeyIsInShouldWork() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where formKey in
         defaultFormConfigFiltering("formKey.in=" + DEFAULT_FORM_KEY + "," + UPDATED_FORM_KEY, "formKey.in=" + UPDATED_FORM_KEY);
@@ -264,7 +277,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByFormKeyIsNullOrNotNull() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where formKey is not null
         defaultFormConfigFiltering("formKey.specified=true", "formKey.specified=false");
@@ -274,7 +287,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByFormKeyContainsSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where formKey contains
         defaultFormConfigFiltering("formKey.contains=" + DEFAULT_FORM_KEY, "formKey.contains=" + UPDATED_FORM_KEY);
@@ -284,7 +297,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByFormKeyNotContainsSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where formKey does not contain
         defaultFormConfigFiltering("formKey.doesNotContain=" + UPDATED_FORM_KEY, "formKey.doesNotContain=" + DEFAULT_FORM_KEY);
@@ -294,7 +307,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByFormNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where formName equals to
         defaultFormConfigFiltering("formName.equals=" + DEFAULT_FORM_NAME, "formName.equals=" + UPDATED_FORM_NAME);
@@ -304,7 +317,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByFormNameIsInShouldWork() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where formName in
         defaultFormConfigFiltering("formName.in=" + DEFAULT_FORM_NAME + "," + UPDATED_FORM_NAME, "formName.in=" + UPDATED_FORM_NAME);
@@ -314,7 +327,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByFormNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where formName is not null
         defaultFormConfigFiltering("formName.specified=true", "formName.specified=false");
@@ -324,7 +337,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByFormNameContainsSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where formName contains
         defaultFormConfigFiltering("formName.contains=" + DEFAULT_FORM_NAME, "formName.contains=" + UPDATED_FORM_NAME);
@@ -334,7 +347,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByFormNameNotContainsSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where formName does not contain
         defaultFormConfigFiltering("formName.doesNotContain=" + UPDATED_FORM_NAME, "formName.doesNotContain=" + DEFAULT_FORM_NAME);
@@ -344,7 +357,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByCreatedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where createdBy equals to
         defaultFormConfigFiltering("createdBy.equals=" + DEFAULT_CREATED_BY, "createdBy.equals=" + UPDATED_CREATED_BY);
@@ -354,7 +367,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByCreatedByIsInShouldWork() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where createdBy in
         defaultFormConfigFiltering("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY, "createdBy.in=" + UPDATED_CREATED_BY);
@@ -364,7 +377,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByCreatedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where createdBy is not null
         defaultFormConfigFiltering("createdBy.specified=true", "createdBy.specified=false");
@@ -374,7 +387,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByCreatedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where createdBy is greater than or equal to
         defaultFormConfigFiltering(
@@ -387,7 +400,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByCreatedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where createdBy is less than or equal to
         defaultFormConfigFiltering("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
@@ -397,7 +410,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByCreatedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where createdBy is less than
         defaultFormConfigFiltering("createdBy.lessThan=" + UPDATED_CREATED_BY, "createdBy.lessThan=" + DEFAULT_CREATED_BY);
@@ -407,7 +420,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByCreatedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where createdBy is greater than
         defaultFormConfigFiltering("createdBy.greaterThan=" + SMALLER_CREATED_BY, "createdBy.greaterThan=" + DEFAULT_CREATED_BY);
@@ -417,7 +430,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByCreatedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where createdDate equals to
         defaultFormConfigFiltering("createdDate.equals=" + DEFAULT_CREATED_DATE, "createdDate.equals=" + UPDATED_CREATED_DATE);
@@ -427,7 +440,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByCreatedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where createdDate in
         defaultFormConfigFiltering(
@@ -440,7 +453,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByCreatedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where createdDate is not null
         defaultFormConfigFiltering("createdDate.specified=true", "createdDate.specified=false");
@@ -450,7 +463,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByLastModifiedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where lastModifiedBy equals to
         defaultFormConfigFiltering(
@@ -463,7 +476,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByLastModifiedByIsInShouldWork() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where lastModifiedBy in
         defaultFormConfigFiltering(
@@ -476,7 +489,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByLastModifiedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where lastModifiedBy is not null
         defaultFormConfigFiltering("lastModifiedBy.specified=true", "lastModifiedBy.specified=false");
@@ -486,7 +499,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByLastModifiedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where lastModifiedBy is greater than or equal to
         defaultFormConfigFiltering(
@@ -499,7 +512,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByLastModifiedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where lastModifiedBy is less than or equal to
         defaultFormConfigFiltering(
@@ -512,7 +525,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByLastModifiedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where lastModifiedBy is less than
         defaultFormConfigFiltering(
@@ -525,7 +538,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByLastModifiedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where lastModifiedBy is greater than
         defaultFormConfigFiltering(
@@ -538,7 +551,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByLastModifiedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where lastModifiedDate equals to
         defaultFormConfigFiltering(
@@ -551,7 +564,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByLastModifiedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where lastModifiedDate in
         defaultFormConfigFiltering(
@@ -564,7 +577,7 @@ public class FormConfigResourceIT {
     @Transactional
     void getAllFormConfigsByLastModifiedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         // Get all the formConfigList where lastModifiedDate is not null
         defaultFormConfigFiltering("lastModifiedDate.specified=true", "lastModifiedDate.specified=false");
@@ -643,7 +656,7 @@ public class FormConfigResourceIT {
     @Transactional
     void putExistingFormConfig() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -737,7 +750,7 @@ public class FormConfigResourceIT {
     @Transactional
     void partialUpdateFormConfigWithPatch() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -746,10 +759,10 @@ public class FormConfigResourceIT {
         partialUpdatedFormConfig.setId(formConfig.getId());
 
         partialUpdatedFormConfig
-            .formKey(UPDATED_FORM_KEY)
-            .formName(UPDATED_FORM_NAME)
             .createdBy(UPDATED_CREATED_BY)
-            .createdDate(UPDATED_CREATED_DATE);
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restFormConfigMockMvc
             .perform(
@@ -772,7 +785,7 @@ public class FormConfigResourceIT {
     @Transactional
     void fullUpdateFormConfigWithPatch() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -868,7 +881,7 @@ public class FormConfigResourceIT {
     @Transactional
     void deleteFormConfig() throws Exception {
         // Initialize the database
-        formConfigRepository.save(formConfig);
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

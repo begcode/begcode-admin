@@ -29,7 +29,7 @@ public class ViewPermissionDTO implements Serializable {
      * 权限名称
      */
     @NotNull
-    @Schema(description = "权限名称", required = true)
+    @Schema(description = "权限名称", requiredMode = Schema.RequiredMode.REQUIRED)
     private String text;
 
     /**
@@ -115,7 +115,7 @@ public class ViewPermissionDTO implements Serializable {
      * (ROLE_开头)
      */
     @NotNull
-    @Schema(description = "权限代码\n(ROLE_开头)", required = true)
+    @Schema(description = "权限代码\n(ROLE_开头)", requiredMode = Schema.RequiredMode.REQUIRED)
     private String code;
 
     /**

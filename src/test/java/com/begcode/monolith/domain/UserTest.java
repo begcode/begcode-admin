@@ -27,7 +27,7 @@ class UserTest {
     }
 
     @Test
-    void departmentTest() throws Exception {
+    void departmentTest() {
         User user = getUserRandomSampleGenerator();
         Department departmentBack = getDepartmentRandomSampleGenerator();
 
@@ -39,7 +39,7 @@ class UserTest {
     }
 
     @Test
-    void positionTest() throws Exception {
+    void positionTest() {
         User user = getUserRandomSampleGenerator();
         Position positionBack = getPositionRandomSampleGenerator();
 
@@ -51,7 +51,7 @@ class UserTest {
     }
 
     @Test
-    void authoritiesTest() throws Exception {
+    void authoritiesTest() {
         User user = getUserRandomSampleGenerator();
         Authority authorityBack = getAuthorityRandomSampleGenerator();
 

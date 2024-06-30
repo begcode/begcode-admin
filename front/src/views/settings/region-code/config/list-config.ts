@@ -151,7 +151,6 @@ const columns = (): VxeGridPropTypes.Columns => {
       visible: false,
       treeNode: false,
       params: { type: 'LONG' },
-      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '名称',
@@ -226,7 +225,6 @@ const columns = (): VxeGridPropTypes.Columns => {
       visible: true,
       treeNode: false,
       params: { type: 'DOUBLE' },
-      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '纬度',
@@ -235,22 +233,21 @@ const columns = (): VxeGridPropTypes.Columns => {
       visible: true,
       treeNode: false,
       params: { type: 'DOUBLE' },
-      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '操作',
-      field: 'operation',
+      field: 'recordOperation',
       fixed: 'right',
       headerAlign: 'center',
       align: 'right',
       showOverflow: false,
-      width: 170,
+      width: 120,
       slots: { default: 'recordAction' },
     },
   ];
 };
 
-const baseGridOptions = (): VxeGridProps => {
+const baseGridOptions = (ajax, toolbarButtons, toolbarTools, pagerLeft): VxeGridProps => {
   return {
     rowConfig: {
       keyField: 'id',
@@ -260,7 +257,7 @@ const baseGridOptions = (): VxeGridProps => {
     showHeaderOverflow: true,
     showOverflow: true,
     keepSource: true,
-    id: 'full_edit_1',
+    id: 'vxe_grid_region_code',
     height: 600,
     printConfig: {
       columns: [
@@ -278,6 +275,7 @@ const baseGridOptions = (): VxeGridProps => {
       remote: true,
       orders: ['asc', 'desc', null],
       multiple: true,
+      showIcon: true,
       defaultSort: {
         field: 'id',
         order: 'desc',
@@ -291,6 +289,9 @@ const baseGridOptions = (): VxeGridProps => {
       pagerCount: 5,
       currentPage: 1,
       autoHidden: true,
+      slots: {
+        left: pagerLeft,
+      },
     },
     importConfig: {},
     exportConfig: {},
@@ -305,6 +306,37 @@ const baseGridOptions = (): VxeGridProps => {
       mode: 'cell',
       showStatus: true,
     },
+    customConfig: {
+      storage: {
+        visible: true,
+        resizable: false,
+        sort: true,
+        fixed: true,
+      },
+    },
+    proxyConfig: {
+      enabled: true,
+      autoLoad: true,
+      seq: true,
+      sort: true,
+      filter: true,
+      props: {
+        result: 'records',
+        total: 'total',
+      },
+      ajax,
+    },
+    toolbarConfig: {
+      custom: false,
+      import: false,
+      print: false,
+      export: false,
+      slots: {
+        buttons: 'toolbar_buttons',
+      },
+      buttons: toolbarButtons,
+      tools: toolbarTools,
+    },
     treeConfig: {
       childrenField: 'children',
       indent: 20,
@@ -316,8 +348,50 @@ const baseGridOptions = (): VxeGridProps => {
   };
 };
 
+const ListProps = {
+  query: {
+    type: Object,
+    default: () => ({}),
+  },
+  editIn: {
+    ype: String,
+    default: 'page',
+  },
+  baseData: {
+    type: Object,
+    default: () => ({}),
+  },
+  cardExtra: {
+    type: Array,
+    default: ['import', 'export', 'print'],
+  },
+  gridOptions: {
+    type: Object,
+    default: () => ({}),
+  },
+  selectType: {
+    type: String,
+    default: 'checkbox', // checkbox/radio/none/seq
+  },
+  searchFormOptions: {
+    type: Object,
+    default: () => ({
+      disabled: false,
+    }),
+  },
+  gridCustomConfig: {
+    type: Object,
+    default: () => ({
+      hideOperations: false,
+      hideSlots: [],
+      hideColumns: [],
+    }),
+  },
+};
+
 export default {
   searchForm,
   columns,
   baseGridOptions,
+  ListProps,
 };

@@ -18,7 +18,7 @@ const fields: DescItem[] = [
     field: 'provider',
     format: (value, _data) => {
       const { getEnumDict } = useI18n();
-      return getEnumDict('OssProvider').find(item => item.value === value) || value;
+      return (getEnumDict('OssProvider').find(item => item.value === value) || { value: value, label: value }).label;
     },
   },
   {

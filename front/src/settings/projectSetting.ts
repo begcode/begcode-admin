@@ -83,7 +83,7 @@ const setting: ProjectConfig = {
   headerSetting: {
     // header bg color
     // 背景色
-    bgColor: HEADER_PRESET_BG_COLOR_LIST[0],
+    bgColor: HEADER_PRESET_BG_COLOR_LIST[4],
     // Fixed at the top
     // 固定头部
     fixed: true,
@@ -95,10 +95,10 @@ const setting: ProjectConfig = {
     theme: ThemeEnum.LIGHT,
     // Whether to enable the lock screen function
     // 开启锁屏功能
-    useLockPage: true,
+    useLockPage: false,
     // Whether to show the full screen button
     // 显示全屏按钮
-    showFullScreen: true,
+    showFullScreen: false,
     // Whether to show the document button
     // 显示文档按钮
     showDoc: false,

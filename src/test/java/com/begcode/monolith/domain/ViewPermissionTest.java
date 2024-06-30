@@ -26,7 +26,7 @@ class ViewPermissionTest {
     }
 
     @Test
-    void childrenTest() throws Exception {
+    void childrenTest() {
         ViewPermission viewPermission = getViewPermissionRandomSampleGenerator();
         ViewPermission viewPermissionBack = getViewPermissionRandomSampleGenerator();
 
@@ -48,7 +48,7 @@ class ViewPermissionTest {
     }
 
     @Test
-    void parentTest() throws Exception {
+    void parentTest() {
         ViewPermission viewPermission = getViewPermissionRandomSampleGenerator();
         ViewPermission viewPermissionBack = getViewPermissionRandomSampleGenerator();
 
@@ -60,7 +60,7 @@ class ViewPermissionTest {
     }
 
     @Test
-    void authoritiesTest() throws Exception {
+    void authoritiesTest() {
         ViewPermission viewPermission = getViewPermissionRandomSampleGenerator();
         Authority authorityBack = getAuthorityRandomSampleGenerator();
 

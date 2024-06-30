@@ -6,6 +6,7 @@ import com.begcode.monolith.domain.ViewPermission;
 import com.diboot.core.binding.Binder;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Select;
@@ -38,6 +39,15 @@ public interface ViewPermissionBaseRepository<E extends ViewPermission> extends 
 
     default IPage<ViewPermission> findAllByParentIsNull(IPage<ViewPermission> pageable) {
         return this.selectPage(pageable, new QueryWrapper<ViewPermission>().isNull("parent_id"));
+    }
+
+    default ViewPermission saveAndGet(ViewPermission viewPermission) {
+        if (Objects.nonNull(viewPermission.getId())) {
+            this.updateById(viewPermission);
+        } else {
+            this.insert(viewPermission);
+        }
+        return this.selectById(viewPermission.getId());
     }
 
     @Select(

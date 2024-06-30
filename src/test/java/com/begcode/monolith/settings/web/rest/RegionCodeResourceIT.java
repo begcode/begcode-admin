@@ -22,6 +22,7 @@ import com.begcode.monolith.settings.service.mapper.RegionCodeMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -97,6 +98,8 @@ public class RegionCodeResourceIT {
 
     private RegionCode regionCode;
 
+    private RegionCode insertedRegionCode;
+
     /**
      * Create an entity for this test.
      *
@@ -142,6 +145,14 @@ public class RegionCodeResourceIT {
         regionCode = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedRegionCode != null) {
+            regionCodeRepository.deleteById(insertedRegionCode.getId());
+            insertedRegionCode = null;
+        }
+    }
+
     @Test
     @Transactional
     void createRegionCode() throws Exception {
@@ -162,6 +173,8 @@ public class RegionCodeResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedRegionCode = regionCodeMapper.toEntity(returnedRegionCodeDTO);
         assertRegionCodeUpdatableFieldsEquals(returnedRegionCode, getPersistedRegionCode(returnedRegionCode));
+
+        insertedRegionCode = returnedRegionCode;
     }
 
     @Test
@@ -186,7 +199,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodes() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList
         restRegionCodeMockMvc
@@ -226,7 +239,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getRegionCode() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get the regionCode
         restRegionCodeMockMvc
@@ -249,7 +262,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getRegionCodesByIdFiltering() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         Long id = regionCode.getId();
 
@@ -264,7 +277,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where name equals to
         defaultRegionCodeFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
@@ -274,7 +287,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByNameIsInShouldWork() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where name in
         defaultRegionCodeFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
@@ -284,7 +297,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where name is not null
         defaultRegionCodeFiltering("name.specified=true", "name.specified=false");
@@ -294,7 +307,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByNameContainsSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where name contains
         defaultRegionCodeFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
@@ -304,7 +317,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByNameNotContainsSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where name does not contain
         defaultRegionCodeFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
@@ -314,7 +327,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByAreaCodeIsEqualToSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where areaCode equals to
         defaultRegionCodeFiltering("areaCode.equals=" + DEFAULT_AREA_CODE, "areaCode.equals=" + UPDATED_AREA_CODE);
@@ -324,7 +337,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByAreaCodeIsInShouldWork() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where areaCode in
         defaultRegionCodeFiltering("areaCode.in=" + DEFAULT_AREA_CODE + "," + UPDATED_AREA_CODE, "areaCode.in=" + UPDATED_AREA_CODE);
@@ -334,7 +347,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByAreaCodeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where areaCode is not null
         defaultRegionCodeFiltering("areaCode.specified=true", "areaCode.specified=false");
@@ -344,7 +357,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByAreaCodeContainsSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where areaCode contains
         defaultRegionCodeFiltering("areaCode.contains=" + DEFAULT_AREA_CODE, "areaCode.contains=" + UPDATED_AREA_CODE);
@@ -354,7 +367,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByAreaCodeNotContainsSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where areaCode does not contain
         defaultRegionCodeFiltering("areaCode.doesNotContain=" + UPDATED_AREA_CODE, "areaCode.doesNotContain=" + DEFAULT_AREA_CODE);
@@ -364,7 +377,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByCityCodeIsEqualToSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where cityCode equals to
         defaultRegionCodeFiltering("cityCode.equals=" + DEFAULT_CITY_CODE, "cityCode.equals=" + UPDATED_CITY_CODE);
@@ -374,7 +387,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByCityCodeIsInShouldWork() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where cityCode in
         defaultRegionCodeFiltering("cityCode.in=" + DEFAULT_CITY_CODE + "," + UPDATED_CITY_CODE, "cityCode.in=" + UPDATED_CITY_CODE);
@@ -384,7 +397,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByCityCodeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where cityCode is not null
         defaultRegionCodeFiltering("cityCode.specified=true", "cityCode.specified=false");
@@ -394,7 +407,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByCityCodeContainsSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where cityCode contains
         defaultRegionCodeFiltering("cityCode.contains=" + DEFAULT_CITY_CODE, "cityCode.contains=" + UPDATED_CITY_CODE);
@@ -404,7 +417,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByCityCodeNotContainsSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where cityCode does not contain
         defaultRegionCodeFiltering("cityCode.doesNotContain=" + UPDATED_CITY_CODE, "cityCode.doesNotContain=" + DEFAULT_CITY_CODE);
@@ -414,7 +427,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByMergerNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where mergerName equals to
         defaultRegionCodeFiltering("mergerName.equals=" + DEFAULT_MERGER_NAME, "mergerName.equals=" + UPDATED_MERGER_NAME);
@@ -424,7 +437,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByMergerNameIsInShouldWork() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where mergerName in
         defaultRegionCodeFiltering(
@@ -437,7 +450,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByMergerNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where mergerName is not null
         defaultRegionCodeFiltering("mergerName.specified=true", "mergerName.specified=false");
@@ -447,7 +460,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByMergerNameContainsSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where mergerName contains
         defaultRegionCodeFiltering("mergerName.contains=" + DEFAULT_MERGER_NAME, "mergerName.contains=" + UPDATED_MERGER_NAME);
@@ -457,7 +470,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByMergerNameNotContainsSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where mergerName does not contain
         defaultRegionCodeFiltering("mergerName.doesNotContain=" + UPDATED_MERGER_NAME, "mergerName.doesNotContain=" + DEFAULT_MERGER_NAME);
@@ -467,7 +480,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByShortNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where shortName equals to
         defaultRegionCodeFiltering("shortName.equals=" + DEFAULT_SHORT_NAME, "shortName.equals=" + UPDATED_SHORT_NAME);
@@ -477,7 +490,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByShortNameIsInShouldWork() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where shortName in
         defaultRegionCodeFiltering("shortName.in=" + DEFAULT_SHORT_NAME + "," + UPDATED_SHORT_NAME, "shortName.in=" + UPDATED_SHORT_NAME);
@@ -487,7 +500,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByShortNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where shortName is not null
         defaultRegionCodeFiltering("shortName.specified=true", "shortName.specified=false");
@@ -497,7 +510,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByShortNameContainsSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where shortName contains
         defaultRegionCodeFiltering("shortName.contains=" + DEFAULT_SHORT_NAME, "shortName.contains=" + UPDATED_SHORT_NAME);
@@ -507,7 +520,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByShortNameNotContainsSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where shortName does not contain
         defaultRegionCodeFiltering("shortName.doesNotContain=" + UPDATED_SHORT_NAME, "shortName.doesNotContain=" + DEFAULT_SHORT_NAME);
@@ -517,7 +530,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByZipCodeIsEqualToSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where zipCode equals to
         defaultRegionCodeFiltering("zipCode.equals=" + DEFAULT_ZIP_CODE, "zipCode.equals=" + UPDATED_ZIP_CODE);
@@ -527,7 +540,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByZipCodeIsInShouldWork() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where zipCode in
         defaultRegionCodeFiltering("zipCode.in=" + DEFAULT_ZIP_CODE + "," + UPDATED_ZIP_CODE, "zipCode.in=" + UPDATED_ZIP_CODE);
@@ -537,7 +550,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByZipCodeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where zipCode is not null
         defaultRegionCodeFiltering("zipCode.specified=true", "zipCode.specified=false");
@@ -547,7 +560,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByZipCodeContainsSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where zipCode contains
         defaultRegionCodeFiltering("zipCode.contains=" + DEFAULT_ZIP_CODE, "zipCode.contains=" + UPDATED_ZIP_CODE);
@@ -557,7 +570,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByZipCodeNotContainsSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where zipCode does not contain
         defaultRegionCodeFiltering("zipCode.doesNotContain=" + UPDATED_ZIP_CODE, "zipCode.doesNotContain=" + DEFAULT_ZIP_CODE);
@@ -567,7 +580,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByLevelIsEqualToSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where level equals to
         defaultRegionCodeFiltering("level.equals=" + DEFAULT_LEVEL, "level.equals=" + UPDATED_LEVEL);
@@ -577,7 +590,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByLevelIsInShouldWork() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where level in
         defaultRegionCodeFiltering("level.in=" + DEFAULT_LEVEL + "," + UPDATED_LEVEL, "level.in=" + UPDATED_LEVEL);
@@ -587,7 +600,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByLevelIsNullOrNotNull() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where level is not null
         defaultRegionCodeFiltering("level.specified=true", "level.specified=false");
@@ -597,7 +610,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByLngIsEqualToSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where lng equals to
         defaultRegionCodeFiltering("lng.equals=" + DEFAULT_LNG, "lng.equals=" + UPDATED_LNG);
@@ -607,7 +620,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByLngIsInShouldWork() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where lng in
         defaultRegionCodeFiltering("lng.in=" + DEFAULT_LNG + "," + UPDATED_LNG, "lng.in=" + UPDATED_LNG);
@@ -617,7 +630,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByLngIsNullOrNotNull() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where lng is not null
         defaultRegionCodeFiltering("lng.specified=true", "lng.specified=false");
@@ -627,7 +640,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByLngIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where lng is greater than or equal to
         defaultRegionCodeFiltering("lng.greaterThanOrEqual=" + DEFAULT_LNG, "lng.greaterThanOrEqual=" + UPDATED_LNG);
@@ -637,7 +650,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByLngIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where lng is less than or equal to
         defaultRegionCodeFiltering("lng.lessThanOrEqual=" + DEFAULT_LNG, "lng.lessThanOrEqual=" + SMALLER_LNG);
@@ -647,7 +660,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByLngIsLessThanSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where lng is less than
         defaultRegionCodeFiltering("lng.lessThan=" + UPDATED_LNG, "lng.lessThan=" + DEFAULT_LNG);
@@ -657,7 +670,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByLngIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where lng is greater than
         defaultRegionCodeFiltering("lng.greaterThan=" + SMALLER_LNG, "lng.greaterThan=" + DEFAULT_LNG);
@@ -667,7 +680,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByLatIsEqualToSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where lat equals to
         defaultRegionCodeFiltering("lat.equals=" + DEFAULT_LAT, "lat.equals=" + UPDATED_LAT);
@@ -677,7 +690,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByLatIsInShouldWork() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where lat in
         defaultRegionCodeFiltering("lat.in=" + DEFAULT_LAT + "," + UPDATED_LAT, "lat.in=" + UPDATED_LAT);
@@ -687,7 +700,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByLatIsNullOrNotNull() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where lat is not null
         defaultRegionCodeFiltering("lat.specified=true", "lat.specified=false");
@@ -697,7 +710,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByLatIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where lat is greater than or equal to
         defaultRegionCodeFiltering("lat.greaterThanOrEqual=" + DEFAULT_LAT, "lat.greaterThanOrEqual=" + UPDATED_LAT);
@@ -707,7 +720,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByLatIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where lat is less than or equal to
         defaultRegionCodeFiltering("lat.lessThanOrEqual=" + DEFAULT_LAT, "lat.lessThanOrEqual=" + SMALLER_LAT);
@@ -717,7 +730,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByLatIsLessThanSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where lat is less than
         defaultRegionCodeFiltering("lat.lessThan=" + UPDATED_LAT, "lat.lessThan=" + DEFAULT_LAT);
@@ -727,7 +740,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void getAllRegionCodesByLatIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         // Get all the regionCodeList where lat is greater than
         defaultRegionCodeFiltering("lat.greaterThan=" + SMALLER_LAT, "lat.greaterThan=" + DEFAULT_LAT);
@@ -809,7 +822,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void putExistingRegionCode() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -906,7 +919,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void partialUpdateRegionCodeWithPatch() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -915,10 +928,9 @@ public class RegionCodeResourceIT {
         partialUpdatedRegionCode.setId(regionCode.getId());
 
         partialUpdatedRegionCode
+            .name(UPDATED_NAME)
             .areaCode(UPDATED_AREA_CODE)
-            .cityCode(UPDATED_CITY_CODE)
-            .shortName(UPDATED_SHORT_NAME)
-            .level(UPDATED_LEVEL)
+            .mergerName(UPDATED_MERGER_NAME)
             .lng(UPDATED_LNG)
             .lat(UPDATED_LAT);
 
@@ -943,7 +955,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void fullUpdateRegionCodeWithPatch() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1042,7 +1054,7 @@ public class RegionCodeResourceIT {
     @Transactional
     void deleteRegionCode() throws Exception {
         // Initialize the database
-        regionCodeRepository.save(regionCode);
+        insertedRegionCode = regionCodeRepository.saveAndGet(regionCode);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

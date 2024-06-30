@@ -50,7 +50,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class UReportFileBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(UReportFileBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(UReportFileBaseResource.class);
 
     protected static final String ENTITY_NAME = "reportUReportFile";
 

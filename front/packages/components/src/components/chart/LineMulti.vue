@@ -81,6 +81,10 @@ function initCharts() {
   let seriesData: any[] = [];
   typeArr.forEach(type => {
     let obj: any = { name: type, type: props.type };
+    const findItem: any = props.chartData.find((item: any) => item.type == type);
+    if (findItem && findItem.color) {
+      obj.color = findItem.color;
+    }
     let data: any[] = [];
     xAxisData.forEach(x => {
       let dataArr = props.chartData.filter(item => type === item.type && item.name == x);

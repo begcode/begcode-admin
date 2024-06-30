@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AnnouncementBaseService<R extends AnnouncementRepository, E extends Announcement>
     extends BaseServiceImpl<AnnouncementRepository, Announcement> {
 
-    private final Logger log = LoggerFactory.getLogger(AnnouncementBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(AnnouncementBaseService.class);
     private final List<String> relationNames = List.of();
 
     protected final UserQueryService userQueryService;

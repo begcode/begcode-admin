@@ -3,6 +3,7 @@ package com.begcode.monolith.settings.repository.base;
 import com.begcode.monolith.settings.domain.CommonFieldData;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.ibatis.annotations.*;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -28,6 +29,15 @@ public interface CommonFieldDataBaseRepository<E extends CommonFieldData> extend
 
     @Select("delete from common_field_data commonFieldData where commonFieldData.dictionary = #{dictionaryId}")
     void deleteAllByDictionaryId(@Param("dictionaryId") Long dictionaryId);
+
+    default CommonFieldData saveAndGet(CommonFieldData commonFieldData) {
+        if (Objects.nonNull(commonFieldData.getId())) {
+            this.updateById(commonFieldData);
+        } else {
+            this.insert(commonFieldData);
+        }
+        return this.selectById(commonFieldData.getId());
+    }
     // jhipster-needle-repository-add-method - JHipster will add getters and setters here, do not remove
 
 }

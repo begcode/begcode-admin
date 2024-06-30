@@ -40,7 +40,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class ViewPermissionQueryService implements QueryService<ViewPermission> {
 
-    private final Logger log = LoggerFactory.getLogger(ViewPermissionQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(ViewPermissionQueryService.class);
 
     protected final ViewPermissionRepository viewPermissionRepository;
 

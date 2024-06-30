@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +85,8 @@ public class SiteConfigResourceIT {
 
     private SiteConfig siteConfig;
 
+    private SiteConfig insertedSiteConfig;
+
     /**
      * Create an entity for this test.
      *
@@ -129,6 +132,14 @@ public class SiteConfigResourceIT {
         siteConfig = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedSiteConfig != null) {
+            siteConfigRepository.deleteById(insertedSiteConfig.getId());
+            insertedSiteConfig = null;
+        }
+    }
+
     @Test
     @Transactional
     void createSiteConfig() throws Exception {
@@ -149,6 +160,8 @@ public class SiteConfigResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedSiteConfig = siteConfigMapper.toEntity(returnedSiteConfigDTO);
         assertSiteConfigUpdatableFieldsEquals(returnedSiteConfig, getPersistedSiteConfig(returnedSiteConfig));
+
+        insertedSiteConfig = returnedSiteConfig;
     }
 
     @Test
@@ -207,7 +220,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigs() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList
         restSiteConfigMockMvc
@@ -230,7 +243,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getSiteConfig() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get the siteConfig
         restSiteConfigMockMvc
@@ -253,7 +266,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getSiteConfigsByIdFiltering() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         Long id = siteConfig.getId();
 
@@ -268,7 +281,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCategoryNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where categoryName equals to
         defaultSiteConfigFiltering("categoryName.equals=" + DEFAULT_CATEGORY_NAME, "categoryName.equals=" + UPDATED_CATEGORY_NAME);
@@ -278,7 +291,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCategoryNameIsInShouldWork() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where categoryName in
         defaultSiteConfigFiltering(
@@ -291,7 +304,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCategoryNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where categoryName is not null
         defaultSiteConfigFiltering("categoryName.specified=true", "categoryName.specified=false");
@@ -301,7 +314,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCategoryNameContainsSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where categoryName contains
         defaultSiteConfigFiltering("categoryName.contains=" + DEFAULT_CATEGORY_NAME, "categoryName.contains=" + UPDATED_CATEGORY_NAME);
@@ -311,7 +324,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCategoryNameNotContainsSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where categoryName does not contain
         defaultSiteConfigFiltering(
@@ -324,7 +337,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCategoryKeyIsEqualToSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where categoryKey equals to
         defaultSiteConfigFiltering("categoryKey.equals=" + DEFAULT_CATEGORY_KEY, "categoryKey.equals=" + UPDATED_CATEGORY_KEY);
@@ -334,7 +347,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCategoryKeyIsInShouldWork() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where categoryKey in
         defaultSiteConfigFiltering(
@@ -347,7 +360,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCategoryKeyIsNullOrNotNull() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where categoryKey is not null
         defaultSiteConfigFiltering("categoryKey.specified=true", "categoryKey.specified=false");
@@ -357,7 +370,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCategoryKeyContainsSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where categoryKey contains
         defaultSiteConfigFiltering("categoryKey.contains=" + DEFAULT_CATEGORY_KEY, "categoryKey.contains=" + UPDATED_CATEGORY_KEY);
@@ -367,7 +380,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCategoryKeyNotContainsSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where categoryKey does not contain
         defaultSiteConfigFiltering(
@@ -380,7 +393,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByDisabledIsEqualToSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where disabled equals to
         defaultSiteConfigFiltering("disabled.equals=" + DEFAULT_DISABLED, "disabled.equals=" + UPDATED_DISABLED);
@@ -390,7 +403,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByDisabledIsInShouldWork() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where disabled in
         defaultSiteConfigFiltering("disabled.in=" + DEFAULT_DISABLED + "," + UPDATED_DISABLED, "disabled.in=" + UPDATED_DISABLED);
@@ -400,7 +413,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByDisabledIsNullOrNotNull() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where disabled is not null
         defaultSiteConfigFiltering("disabled.specified=true", "disabled.specified=false");
@@ -410,7 +423,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsBySortValueIsEqualToSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where sortValue equals to
         defaultSiteConfigFiltering("sortValue.equals=" + DEFAULT_SORT_VALUE, "sortValue.equals=" + UPDATED_SORT_VALUE);
@@ -420,7 +433,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsBySortValueIsInShouldWork() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where sortValue in
         defaultSiteConfigFiltering("sortValue.in=" + DEFAULT_SORT_VALUE + "," + UPDATED_SORT_VALUE, "sortValue.in=" + UPDATED_SORT_VALUE);
@@ -430,7 +443,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsBySortValueIsNullOrNotNull() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where sortValue is not null
         defaultSiteConfigFiltering("sortValue.specified=true", "sortValue.specified=false");
@@ -440,7 +453,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsBySortValueIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where sortValue is greater than or equal to
         defaultSiteConfigFiltering(
@@ -453,7 +466,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsBySortValueIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where sortValue is less than or equal to
         defaultSiteConfigFiltering("sortValue.lessThanOrEqual=" + DEFAULT_SORT_VALUE, "sortValue.lessThanOrEqual=" + SMALLER_SORT_VALUE);
@@ -463,7 +476,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsBySortValueIsLessThanSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where sortValue is less than
         defaultSiteConfigFiltering("sortValue.lessThan=" + UPDATED_SORT_VALUE, "sortValue.lessThan=" + DEFAULT_SORT_VALUE);
@@ -473,7 +486,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsBySortValueIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where sortValue is greater than
         defaultSiteConfigFiltering("sortValue.greaterThan=" + SMALLER_SORT_VALUE, "sortValue.greaterThan=" + DEFAULT_SORT_VALUE);
@@ -483,7 +496,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByBuiltInIsEqualToSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where builtIn equals to
         defaultSiteConfigFiltering("builtIn.equals=" + DEFAULT_BUILT_IN, "builtIn.equals=" + UPDATED_BUILT_IN);
@@ -493,7 +506,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByBuiltInIsInShouldWork() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where builtIn in
         defaultSiteConfigFiltering("builtIn.in=" + DEFAULT_BUILT_IN + "," + UPDATED_BUILT_IN, "builtIn.in=" + UPDATED_BUILT_IN);
@@ -503,7 +516,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByBuiltInIsNullOrNotNull() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where builtIn is not null
         defaultSiteConfigFiltering("builtIn.specified=true", "builtIn.specified=false");
@@ -513,7 +526,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCreatedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where createdBy equals to
         defaultSiteConfigFiltering("createdBy.equals=" + DEFAULT_CREATED_BY, "createdBy.equals=" + UPDATED_CREATED_BY);
@@ -523,7 +536,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCreatedByIsInShouldWork() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where createdBy in
         defaultSiteConfigFiltering("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY, "createdBy.in=" + UPDATED_CREATED_BY);
@@ -533,7 +546,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCreatedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where createdBy is not null
         defaultSiteConfigFiltering("createdBy.specified=true", "createdBy.specified=false");
@@ -543,7 +556,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCreatedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where createdBy is greater than or equal to
         defaultSiteConfigFiltering(
@@ -556,7 +569,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCreatedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where createdBy is less than or equal to
         defaultSiteConfigFiltering("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
@@ -566,7 +579,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCreatedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where createdBy is less than
         defaultSiteConfigFiltering("createdBy.lessThan=" + UPDATED_CREATED_BY, "createdBy.lessThan=" + DEFAULT_CREATED_BY);
@@ -576,7 +589,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCreatedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where createdBy is greater than
         defaultSiteConfigFiltering("createdBy.greaterThan=" + SMALLER_CREATED_BY, "createdBy.greaterThan=" + DEFAULT_CREATED_BY);
@@ -586,7 +599,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCreatedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where createdDate equals to
         defaultSiteConfigFiltering("createdDate.equals=" + DEFAULT_CREATED_DATE, "createdDate.equals=" + UPDATED_CREATED_DATE);
@@ -596,7 +609,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCreatedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where createdDate in
         defaultSiteConfigFiltering(
@@ -609,7 +622,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByCreatedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where createdDate is not null
         defaultSiteConfigFiltering("createdDate.specified=true", "createdDate.specified=false");
@@ -619,7 +632,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByLastModifiedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where lastModifiedBy equals to
         defaultSiteConfigFiltering(
@@ -632,7 +645,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByLastModifiedByIsInShouldWork() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where lastModifiedBy in
         defaultSiteConfigFiltering(
@@ -645,7 +658,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByLastModifiedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where lastModifiedBy is not null
         defaultSiteConfigFiltering("lastModifiedBy.specified=true", "lastModifiedBy.specified=false");
@@ -655,7 +668,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByLastModifiedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where lastModifiedBy is greater than or equal to
         defaultSiteConfigFiltering(
@@ -668,7 +681,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByLastModifiedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where lastModifiedBy is less than or equal to
         defaultSiteConfigFiltering(
@@ -681,7 +694,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByLastModifiedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where lastModifiedBy is less than
         defaultSiteConfigFiltering(
@@ -694,7 +707,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByLastModifiedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where lastModifiedBy is greater than
         defaultSiteConfigFiltering(
@@ -707,7 +720,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByLastModifiedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where lastModifiedDate equals to
         defaultSiteConfigFiltering(
@@ -720,7 +733,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByLastModifiedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where lastModifiedDate in
         defaultSiteConfigFiltering(
@@ -733,7 +746,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void getAllSiteConfigsByLastModifiedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         // Get all the siteConfigList where lastModifiedDate is not null
         defaultSiteConfigFiltering("lastModifiedDate.specified=true", "lastModifiedDate.specified=false");
@@ -801,7 +814,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void putExistingSiteConfig() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -898,7 +911,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void partialUpdateSiteConfigWithPatch() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -906,7 +919,11 @@ public class SiteConfigResourceIT {
         SiteConfig partialUpdatedSiteConfig = new SiteConfig();
         partialUpdatedSiteConfig.setId(siteConfig.getId());
 
-        partialUpdatedSiteConfig.categoryKey(UPDATED_CATEGORY_KEY).createdBy(UPDATED_CREATED_BY);
+        partialUpdatedSiteConfig
+            .categoryKey(UPDATED_CATEGORY_KEY)
+            .disabled(UPDATED_DISABLED)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restSiteConfigMockMvc
             .perform(
@@ -929,7 +946,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void fullUpdateSiteConfigWithPatch() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1028,7 +1045,7 @@ public class SiteConfigResourceIT {
     @Transactional
     void deleteSiteConfig() throws Exception {
         // Initialize the database
-        siteConfigRepository.save(siteConfig);
+        insertedSiteConfig = siteConfigRepository.saveAndGet(siteConfig);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

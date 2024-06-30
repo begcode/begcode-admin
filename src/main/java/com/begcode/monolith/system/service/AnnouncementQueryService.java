@@ -38,7 +38,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class AnnouncementQueryService implements QueryService<Announcement> {
 
-    private final Logger log = LoggerFactory.getLogger(AnnouncementQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(AnnouncementQueryService.class);
 
     protected final AnnouncementRepository announcementRepository;
 

@@ -21,7 +21,7 @@ const fields: DescItem[] = [
     field: 'sendType',
     format: (value, _data) => {
       const { getEnumDict } = useI18n();
-      return getEnumDict('MessageSendType').find(item => item.value === value) || value;
+      return (getEnumDict('MessageSendType').find(item => item.value === value) || { value: value, label: value }).label;
     },
   },
   {
@@ -48,7 +48,7 @@ const fields: DescItem[] = [
     field: 'sendStatus',
     format: (value, _data) => {
       const { getEnumDict } = useI18n();
-      return getEnumDict('SendStatus').find(item => item.value === value) || value;
+      return (getEnumDict('SendStatus').find(item => item.value === value) || { value: value, label: value }).label;
     },
   },
   {

@@ -14,6 +14,7 @@ enum Api {
   bindThirdAppAccount = '/sys/thirdApp/bindThirdAppAccount',
   deleteThirdAccount = '/sys/thirdApp/deleteThirdAccount',
   agreeOrRefuseJoinTenant = '/sys/tenant/agreeOrRefuseJoinTenant',
+  changePhone = '/sys/user/changePhone',
 }
 
 /**
@@ -118,4 +119,12 @@ export const deleteThirdAccount = params => {
  */
 export const agreeOrRefuseJoinTenant = params => {
   return defHttp.put({ url: Api.agreeOrRefuseJoinTenant, params }, { joinParamsToUrl: true });
+};
+
+/**
+ * 更改手机号
+ * @param params
+ */
+export const changePhone = params => {
+  return defHttp.put({ url: Api.changePhone, params }, { joinParamsToUrl: true, isTransformResponse: false });
 };

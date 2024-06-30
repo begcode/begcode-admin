@@ -4,6 +4,7 @@ import com.begcode.monolith.settings.domain.FillRuleItem;
 import com.diboot.core.binding.Binder;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.ibatis.annotations.*;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -32,6 +33,15 @@ public interface FillRuleItemBaseRepository<E extends FillRuleItem> extends Base
 
     @Select("delete from fill_rule_item fillRuleItem where fillRuleItem.fill_rule = #{fillRuleId}")
     void deleteAllByFillRuleId(@Param("fillRuleId") Long fillRuleId);
+
+    default FillRuleItem saveAndGet(FillRuleItem fillRuleItem) {
+        if (Objects.nonNull(fillRuleItem.getId())) {
+            this.updateById(fillRuleItem);
+        } else {
+            this.insert(fillRuleItem);
+        }
+        return this.selectById(fillRuleItem.getId());
+    }
     // jhipster-needle-repository-add-method - JHipster will add getters and setters here, do not remove
 
 }

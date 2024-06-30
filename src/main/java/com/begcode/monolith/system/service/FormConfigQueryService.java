@@ -38,7 +38,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class FormConfigQueryService implements QueryService<FormConfig> {
 
-    private final Logger log = LoggerFactory.getLogger(FormConfigQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(FormConfigQueryService.class);
 
     protected final FormConfigRepository formConfigRepository;
 

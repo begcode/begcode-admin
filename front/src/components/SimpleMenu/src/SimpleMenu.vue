@@ -3,12 +3,18 @@
     v-bind="getBindValues"
     :activeName="menuState.activeName"
     :openNames="getOpenKeys"
-    :class="prefixCls"
+    :class="`${prefixCls} ${isThemeBright ? 'bright' : ''}`"
     :activeSubMenuNames="menuState.activeSubMenuNames"
     @select="handleSelect"
   >
     <template v-for="item in items" :key="item.path">
-      <SimpleSubMenu :item="item" :parent="true" :collapsedShowTitle="collapsedShowTitle" :collapse="collapse" />
+      <SimpleSubMenu
+        :item="item"
+        :parent="true"
+        :collapsedShowTitle="collapsedShowTitle"
+        :collapse="collapse"
+        :isThemeBright="isThemeBright"
+      />
     </template>
   </Menu>
 </template>
@@ -26,6 +32,7 @@ import { REDIRECT_NAME } from '@/router/constant';
 import { useRouter } from 'vue-router';
 import { isFunction } from 'lodash-es';
 import { useOpenKeys } from './useOpenKeys';
+import { useAppStore } from '@/store/modules/app';
 
 defineOptions({ name: 'SimpleMenu', inheritAttrs: false });
 
@@ -50,6 +57,8 @@ const emit = defineEmits(['menuClick']);
 const attrs = useAttrs();
 const currentActiveMenu = ref('');
 const isClickGo = ref(false);
+const appStore = useAppStore();
+const isThemeBright = ref(false);
 const menuState = reactive<MenuState>({
   activeName: '',
   openNames: [],
@@ -85,6 +94,14 @@ watch(
     setOpenKeys(currentRoute.value.path);
   },
   { flush: 'post' },
+);
+
+watch(
+  () => appStore.getProjectConfig.menuSetting,
+  menuSetting => {
+    isThemeBright.value = !!menuSetting?.isThemeBright;
+  },
+  { immediate: true, deep: true },
 );
 
 listenerRouteChange(route => {
@@ -128,11 +145,6 @@ async function handleSelect(key: string) {
   menuState.activeName = key;
 }
 
-/**
- * 2024-02-27
- * liaozhiyang
- * 获取菜单中匹配的path所在的项
- */
 const getMatchingMenu = (menus, path) => {
   for (let i = 0, len = menus.length; i < len; i++) {
     const item = menus[i];

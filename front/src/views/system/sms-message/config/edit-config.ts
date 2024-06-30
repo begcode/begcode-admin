@@ -33,7 +33,7 @@ const fields = (): FormSchema[] => {
       field: 'sendType',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择发送方式', options: getEnumDict('MessageSendType'), style: 'width: 100%' };
+        return { placeholder: '请选择发送方式', options: getEnumDict('MessageSendType'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },
@@ -55,7 +55,7 @@ const fields = (): FormSchema[] => {
       label: '推送内容',
       field: 'content',
       component: 'Editor',
-      componentProps: { placeholder: '请输入推送内容', style: 'width: 100%' },
+      componentProps: { editorId: 'form_item_content_editor', placeholder: '请输入推送内容', style: 'width: 100%' },
       rules: [],
     },
     {
@@ -70,7 +70,7 @@ const fields = (): FormSchema[] => {
       field: 'sendStatus',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择推送状态', options: getEnumDict('SendStatus'), style: 'width: 100%' };
+        return { placeholder: '请选择推送状态', options: getEnumDict('SendStatus'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },

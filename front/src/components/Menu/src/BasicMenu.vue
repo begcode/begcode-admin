@@ -29,10 +29,12 @@ import { isFunction } from 'lodash-es';
 import { basicProps } from './props';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
 import { REDIRECT_NAME } from '@/router/constant';
-import { useDesign } from '@begcode/components';
+import { useDesign, isUrl } from '@begcode/components';
 import { getCurrentParentPath } from '@/router/menus';
 import { listenerRouteChange } from '@/logics/mitt/routeChange';
 import { getAllParentPath } from '@/router/helper/menuHelper';
+import { createBasicRootMenuContext } from './useBasicMenuContext';
+import { getMenus } from '@/router/menus';
 
 defineOptions({ name: 'BasicMenu' });
 
@@ -49,6 +51,8 @@ const menuState = reactive<MenuState>({
   selectedKeys: [],
   collapsedOpenKeys: [],
 });
+
+createBasicRootMenuContext({ menuState: menuState });
 
 const { prefixCls } = useDesign('basic-menu');
 const { items, mode, accordion } = toRefs(props);
@@ -103,13 +107,39 @@ listenerRouteChange(route => {
     },
   );
 
-const handleMenuClick: MenuProps['onClick'] = async ({ key }) => {
+const handleMenuClick: MenuProps['onClick'] = async ({ item, key }) => {
   const { beforeClickFn } = props;
+  if (isUrl(key)) {
+    window.open(key);
+    return;
+  }
   if (beforeClickFn && isFunction(beforeClickFn)) {
     const flag = await beforeClickFn(key);
     if (!flag) return;
   }
-  emit('menuClick', key);
+  if (props.type === MenuTypeEnum.MIX) {
+    const menus = await getMenus();
+    const menuItem = getMatchingPath(menus, key);
+    if (menuItem && !menuItem.redirect && menuItem.children?.length) {
+      const subMenuItem = getSubMenu(menuItem.children);
+      if (subMenuItem?.path) {
+        const path = subMenuItem.redirect ?? subMenuItem.path;
+        let _key = path;
+        if (isUrl(path)) {
+          window.open(path);
+          // 外部打开emit出去的key不能是url，否则左侧菜单出不来
+          _key = key;
+        }
+        emit('menuClick', _key, { title: subMenuItem.title });
+      } else {
+        emit('menuClick', key, item);
+      }
+    } else {
+      emit('menuClick', key, item);
+    }
+  } else {
+    emit('menuClick', key, item);
+  }
   isClickGo.value = true;
   menuState.selectedKeys = [key];
 };
@@ -128,6 +158,42 @@ async function handleMenuChange(route?: RouteLocationNormalizedLoaded) {
   } else {
     menuState.selectedKeys = await getAllParentPath(props.items, path);
   }
+}
+
+/**
+ * 获取指定菜单下的第一个菜单
+ */
+function getSubMenu(menus) {
+  for (let i = 0, len = menus.length; i < len; i++) {
+    const item = menus[i];
+    if (item.path && !item.children?.length) {
+      return item;
+    } else if (item.children?.length) {
+      const result = getSubMenu(item.children);
+      if (result) {
+        return result;
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * 获取匹配path的菜单
+ */
+function getMatchingPath(menus, path) {
+  for (let i = 0, len = menus.length; i < len; i++) {
+    const item = menus[i];
+    if (item.path === path) {
+      return item;
+    } else if (item.children?.length) {
+      const result = getMatchingPath(item.children, path);
+      if (result) {
+        return result;
+      }
+    }
+  }
+  return null;
 }
 </script>
 <style lang="less">

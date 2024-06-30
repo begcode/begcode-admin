@@ -1,1 +1,1 @@
-id;name;job_class_name;cron_expression;parameter;description;jobStatus
+id;name;job_class_name;cron_expression;parameter;description;job_status

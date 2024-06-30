@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FillRuleItemBaseService<R extends FillRuleItemRepository, E extends FillRuleItem>
     extends BaseServiceImpl<FillRuleItemRepository, FillRuleItem> {
 
-    private final Logger log = LoggerFactory.getLogger(FillRuleItemBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(FillRuleItemBaseService.class);
 
     private final List<String> relationCacheNames = List.of(
         com.begcode.monolith.settings.domain.SysFillRule.class.getName() + ".ruleItems"

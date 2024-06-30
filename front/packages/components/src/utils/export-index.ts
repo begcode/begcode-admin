@@ -15,3 +15,4 @@ export * from './props';
 export * from './propTypes';
 export * from './uuid';
 export * from './useSlide';
+export * from './factory/createAsyncComponent';

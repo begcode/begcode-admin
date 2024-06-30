@@ -56,13 +56,3 @@ export interface GetUserInfoModel {
   sysAllDictItems?: any;
   login?: string;
 }
-
-/**
- * @description: Get user information return value
- */
-export interface GetResultModel {
-  code: number;
-  message: string;
-  result: object;
-  success: Boolean;
-}

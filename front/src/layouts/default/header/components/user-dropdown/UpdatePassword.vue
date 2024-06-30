@@ -1,5 +1,5 @@
 <template>
-  <BasicModal v-bind="$attrs" @register="registerModal" :title="title" @ok="handleSubmit" width="600px">
+  <BasicModal v-bind="$attrs" @register="registerModal" :title="title" @ok="handleSubmit" width="600px" data-cy="changePasswordModal">
     <BasicForm @register="registerForm" />
   </BasicModal>
 </template>
@@ -73,6 +73,8 @@ async function handleSubmit() {
       .catch(() => {
         $message.createMessage.error('修改密码失败');
       });
+  } catch (e) {
+    console.log(e);
   } finally {
     setModalProps({ confirmLoading: false });
   }

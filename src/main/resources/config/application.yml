@@ -113,6 +113,12 @@ spring:
       matching-strategy: ant_path_matcher
     problemdetails:
       enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          authority-prefix: ''
+          authorities-claim-name: auth
   task:
     execution:
       thread-name-prefix: monolith-mybatis-task-

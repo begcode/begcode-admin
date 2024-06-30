@@ -16,6 +16,8 @@ export enum ExceptionEnum {
 
   // No data on the page. In fact, it is not an exception page
   PAGE_NOT_DATA = 10100,
+
+  PHONE_SMS_FAIL_CODE = 40002,
 }
 
 export enum ErrorTypeEnum {

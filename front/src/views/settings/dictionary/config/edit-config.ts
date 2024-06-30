@@ -132,6 +132,7 @@ const itemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'INTEGER' },
+      sortable: true,
       titlePrefix: { icon: 'vxe-icon-sort', content: '排序操作列' },
       editRender: { name: 'ADragSort', enabled: true, props: { remoteApi: commonFieldDataService.updateSortValue } },
     },
@@ -142,7 +143,7 @@ const itemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'BOOLEAN' },
-      cellRender: { name: 'ASwitch', props: { disabled: true } },
+      cellRender: { name: 'ASwitch', props: { disabled: false } },
     },
     {
       title: '实体名称',
@@ -164,12 +165,12 @@ const itemsColumns = () => {
     },
     {
       title: '操作',
-      field: 'operation',
+      field: 'recordOperation',
       fixed: 'right',
       headerAlign: 'center',
       align: 'right',
       showOverflow: false,
-      width: 170,
+      width: 120,
       slots: { default: 'recordAction' },
     },
   ];

@@ -9,6 +9,7 @@
       {
         open: openMenu,
         mini: getCollapsed,
+        bright: isThemeBright,
       },
     ]"
     v-bind="getMenuEvents"
@@ -55,7 +56,7 @@
           },
         ]"
       >
-        <span class="text"> {{ title }}</span>
+        <span class="text truncate"> {{ shortTitle }}</span>
         <Icon :size="16" :icon="getMixSideFixed ? 'ri:pushpin-2-fill' : 'ri:pushpin-2-line'" class="pushpin" @click="handleFixedMenu" />
       </div>
       <ScrollContainer :class="`${prefixCls}-menu-list__content`">
@@ -77,7 +78,7 @@ import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
 import { usePermissionStore } from '@/store/modules/permission';
 import { useDragLine } from './useLayoutSider';
 import { useGlobSetting } from '@/hooks/setting';
-import { useDesign } from '@begcode/components';
+import { useDesign, createAsyncComponent } from '@begcode/components';
 import { useI18n } from '@/hooks/web/useI18n';
 import { useGo } from '@/hooks/web/usePage';
 import { SIDE_BAR_MINI_WIDTH, SIDE_BAR_SHOW_TIT_MINI_WIDTH } from '@/enums/appEnum';
@@ -85,7 +86,7 @@ import vClickOutside from '@/directives/clickOutside';
 import { getChildrenMenus, getCurrentParentPath, getShallowMenus } from '@/router/menus';
 import { listenerRouteChange } from '@/logics/mitt/routeChange';
 import LayoutTrigger from '../trigger/index.vue';
-import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
+import { useAppStore } from '@/store/modules/app';
 
 const SimpleMenuTag = createAsyncComponent(() => import('@/components/SimpleMenu/src/SimpleMenuTag.vue'));
 
@@ -98,6 +99,8 @@ const openMenu = ref(false);
 const dragBarRef = ref(null);
 const sideRef = ref(null);
 const currentRoute = ref<RouteLocationNormalized | null>(null);
+const appStore = useAppStore();
+const isThemeBright = ref(false);
 
 const { prefixCls } = useDesign('layout-mix-sider');
 const go = useGo();
@@ -117,14 +120,14 @@ const {
   getCollapsed,
 } = useMenuSetting();
 
-const { title } = useGlobSetting();
+const { shortTitle } = useGlobSetting();
 const permissionStore = usePermissionStore();
 
 useDragLine(sideRef, dragBarRef, true);
 
 const getMenuStyle = computed((): CSSProperties => {
   return {
-    width: unref(openMenu) ? `${unref(getMenuWidth)}px` : 0,
+    width: unref(openMenu) ? `${unref(getMenuWidth) - 60}px` : 0,
     left: `${unref(getMixSideWidth)}px`,
   };
 });
@@ -293,6 +296,14 @@ function closeMenu() {
     openMenu.value = false;
   }
 }
+
+watch(
+  () => appStore.getProjectConfig.menuSetting,
+  menuSetting => {
+    isThemeBright.value = !!menuSetting?.isThemeBright;
+  },
+  { immediate: true, deep: true },
+);
 </script>
 <style lang="less">
 @prefix-cls: ~'@{namespace}-layout-mix-sider';
@@ -386,6 +397,17 @@ function closeMenu() {
         color: @white;
         border-bottom: none;
         border-bottom: 1px solid @border-color;
+      }
+    }
+    &.bright {
+      .@{prefix-cls}-module {
+        &__item {
+          font-weight: normal;
+          color: rgba(255, 255, 255, 1);
+          &:hover {
+            color: rgba(255, 255, 255, 0.8);
+          }
+        }
       }
     }
   }
@@ -489,6 +511,10 @@ function closeMenu() {
       transition: unset;
       align-items: center;
       justify-content: space-between;
+      text-align: center;
+      .text {
+        flex: 1;
+      }
 
       &.show {
         min-width: 130px;
@@ -505,6 +531,10 @@ function closeMenu() {
           color: #fff;
         }
       }
+    }
+
+    .@{namespace}-simple-menu-sub-title {
+      font-size: 14px;
     }
 
     &__content {

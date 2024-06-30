@@ -57,13 +57,6 @@ const [registerModal, { setModalProps, closeModal }] = useModalInner(async data 
 });
 
 /**
- * 倒计时执行前的函数
- */
-function sendCodeApi() {
-  return getSmsCaptcha({ mobile: formState.phone, smsmode: SmsEnum.REGISTER });
-}
-
-/**
  * 更新邮箱
  */
 async function updateEmail() {

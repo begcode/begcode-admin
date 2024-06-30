@@ -10,67 +10,11 @@
       <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" />
     </Card>
     <Card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
-      <template #title>
-        <Button type="text" preIcon="ant-design:unordered-list-outlined" shape="default" size="large" @click="formSearch"
-          >通告阅读记录列表</Button
-        >
-      </template>
-      <template #extra>
-        <Space>
-          <Divider type="vertical" />
-          <Button
-            v-if="cardExtra?.includes('import')"
-            type="default"
-            @click="xGrid.openImport()"
-            preIcon="ant-design:cloud-upload-outlined"
-            shape="circle"
-            size="small"
-          ></Button>
-          <Button
-            v-if="cardExtra?.includes('export')"
-            type="default"
-            @click="xGrid.openExport()"
-            preIcon="ant-design:download-outlined"
-            shape="circle"
-            size="small"
-          ></Button>
-          <Button
-            v-if="cardExtra?.includes('print')"
-            type="default"
-            @click="xGrid.openPrint()"
-            preIcon="ant-design:printer-outlined"
-            shape="circle"
-            size="small"
-          ></Button>
-          <!--          <Button type="default" preIcon="ant-design:setting-outlined" shape="circle" size="small"></Button>-->
-        </Space>
-      </template>
       <Row :gutter="16">
-        <Col :span="filterTreeConfig.filterTreeSpan" v-if="filterTreeConfig.filterTreeSpan > 0">
-          <Tree
-            style="border: #bbcedd 1px solid; height: 100%"
-            v-model="filterTreeConfig.checkedKeys"
-            :expandedKeys="filterTreeConfig.expandedKeys"
-            :autoExpandParent="filterTreeConfig.autoExpandParent"
-            :selectedKeys="filterTreeConfig.selectedKeys"
-            :treeData="filterTreeConfig.treeFilterData"
-            @select="onSelect"
-            @expand="onExpand"
-          />
-        </Col>
-        <Col :span="24 - filterTreeConfig.filterTreeSpan">
-          <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
+        <Col :span="24">
+          <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents" data-cy="entityTable">
             <template #toolbar_buttons>
               <Row :gutter="16">
-                <Col :lg="2" :md="2" :sm="4" v-if="filterTreeConfig.treeFilterData.length > 0">
-                  <span class="table-page-search-submitButtons">
-                    <Button
-                      type="primary"
-                      :icon="filterTreeConfig.filterTreeSpan > 0 ? 'pic-center' : 'pic-right'"
-                      @click="switchFilterTree"
-                    />
-                  </span>
-                </Col>
                 <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
                   <Space>
                     <Input
@@ -112,8 +56,13 @@
                 </Col>
               </Row>
             </template>
-            <template #recordAction="{ row, column }">
-              <ButtonGroup :row="row" :buttons="rowOperations" @click="rowClick" />
+            <template #recordAction="{ row }">
+              <ButtonGroup
+                :row="row"
+                :buttons="rowOperations"
+                @click="rowClick"
+                :ref="el => rowOperationRef('row_operation_' + row.id, el)"
+              />
             </template>
           </Grid>
         </Col>
@@ -141,62 +90,22 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, getCurrentInstance, h, onMounted, toRaw, shallowRef } from 'vue';
-import { Alert, message, Modal, Space, Card, Divider, Row, Col, Tree, Input, Dropdown, Menu, MenuItem } from 'ant-design-vue';
+import { reactive, ref, getCurrentInstance, h, onMounted, toRaw, shallowRef, onUnmounted, watch } from 'vue';
+import { Alert, message, Modal, Space, Card, Divider, Row, Col, Input, Dropdown, Menu, MenuItem } from 'ant-design-vue';
 import { VxeGridInstance, VxeGridListeners, VxeGridProps, Grid } from 'vxe-table';
-import { mergeWith, isArray, isObject, isString, debounce } from 'lodash-es';
+import { debounce } from 'lodash-es';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { transVxeSorts } from '@/utils/jhipster/sorts';
-import { Button, Icon, useModalInner, BasicModal, useDrawerInner, BasicDrawer, SearchForm, ButtonGroup } from '@begcode/components';
+import { Button, ButtonGroup, Icon, BasicModal, BasicDrawer, SearchForm, useModalInner, useDrawerInner } from '@begcode/components';
 import { useGo } from '@/hooks/web/usePage';
 import ServerProvider from '@/api-service/index';
-import AnnouncementRecordEdit from './announcement-record-edit.vue';
-import AnnouncementRecordDetail from './announcement-record-detail.vue';
-
+import { useMergeGridProps, useColumnsConfig, useSetOperationColumn, useSetShortcutButtons } from '@/components/VxeTable/src/helper';
+import AnnouncementRecordEdit from './components/form-component.vue';
+import AnnouncementRecordDetail from './components/detail-component.vue';
 import config from './config/list-config';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
-
-const props = defineProps({
-  query: {
-    type: Object,
-    default: () => ({}),
-  },
-  editIn: {
-    type: String,
-    default: 'page',
-  },
-  baseData: {
-    type: Object,
-    default: () => ({}),
-  },
-  cardExtra: {
-    type: Array,
-    default: ['import', 'export', 'print'],
-  },
-  gridOptions: {
-    type: Object,
-    default: () => ({}),
-  },
-  selectType: {
-    type: String,
-    default: 'checkbox', // checkbox/radio/none/seq
-  },
-  searchFormOptions: {
-    type: Object,
-    default: () => ({
-      disabled: false,
-    }),
-  },
-  gridCustomConfig: {
-    type: Object,
-    default: () => ({
-      hideOperations: false,
-      hideSlots: [],
-      hideColumns: [],
-    }),
-  },
-});
+const props = defineProps(config.ListProps);
 
 const [registerModal, { closeModal, setModalProps }] = useModalInner(data => {
   console.log(data);
@@ -220,23 +129,8 @@ const pageConfig = {
   title: '通告阅读记录列表',
   baseRouteName: 'systemAnnouncementRecord',
 };
-const columns = config.columns();
-if (props.selectType !== 'checkbox') {
-  const checkBoxColumn = columns.find(column => column.type === 'checkbox');
-  if (checkBoxColumn) {
-    if (['radio', 'seq'].includes(props.selectType)) {
-      checkBoxColumn.type = props.selectType;
-    } else if (props.selectType === 'none') {
-      checkBoxColumn.visible = false;
-    }
-  }
-}
+const { columns } = useColumnsConfig(config.columns(), props.selectType, props.gridCustomConfig);
 const searchFormFields = config.searchForm();
-if (props.gridCustomConfig?.hideColumns?.length > 0) {
-  const filterColumns = columns.filter(column => !props.gridCustomConfig.hideColumns.includes(column.field));
-  columns.length = 0;
-  columns.push(...filterColumns);
-}
 const xGrid = ref({} as VxeGridInstance);
 const searchInputRef = ref(null);
 const searchFormConfig = reactive(
@@ -251,56 +145,69 @@ const searchFormConfig = reactive(
     props.searchFormOptions,
   ),
 );
-const batchOperations = [];
-let rowOperations = [
+const rowOperations = ref<any[]>([
   {
-    hide: row => !xGrid.value.isEditByRow(row) || !xGrid.value.props.editConfig.mode === 'row',
     title: '保存',
+    hide: row => !xGrid.value.isEditByRow(row) || !xGrid.value.props.editConfig?.mode === 'row',
     name: 'save',
     type: 'link',
   },
   {
     title: '编辑',
-    hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig.mode === 'row',
+    hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig?.mode === 'row',
     name: 'edit',
     type: 'link',
   },
   {
     title: '删除',
-    hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig.mode === 'row',
+    hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig?.mode === 'row',
     name: 'delete',
     type: 'link',
   },
   {
     title: '详情',
-    hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig.mode === 'row',
     name: 'detail',
+    hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig?.mode === 'row',
     containerType: 'drawer',
     type: 'link',
   },
-];
-if (props.gridCustomConfig?.rowOperations && isArray(props.gridCustomConfig.rowOperations)) {
-  if (props.gridCustomConfig.rowOperations.length === 0) {
-    rowOperations = [];
-  } else {
-    rowOperations = rowOperations.filter(item =>
-      props.gridCustomConfig.rowOperations.some(rowItem => (isObject(rowItem) ? item.name === rowItem['name'] : item.name === rowItem)),
-    );
-  }
-}
+]);
+const { rowOperationRef } = useSetOperationColumn(props.gridCustomConfig, rowOperations, xGrid);
+
+const extraButtons = ref([
+  {
+    show: props.cardExtra?.includes('import'),
+    title: '导入',
+    name: 'import',
+    icon: 'ant-design:cloud-upload-outlined',
+    click: () => {
+      xGrid.value.openImport();
+    },
+  },
+  {
+    show: props.cardExtra?.includes('export'),
+    name: 'export',
+    title: '导出',
+    icon: 'ant-design:download-outlined',
+    click: () => {
+      xGrid.value.openExport();
+    },
+  },
+  {
+    show: props.cardExtra?.includes('print'),
+    title: '打印',
+    name: 'print',
+    icon: 'ant-design:printer-outlined',
+    click: () => {
+      xGrid.value.openPrint();
+    },
+  },
+]);
+useSetShortcutButtons('SystemAnnouncementRecordList', extraButtons);
+
 const selectedRows = reactive<any>([]);
 const searchFormRef = ref<any>(null);
 const searchValue = ref('');
-const mapOfFilter = ref({});
-const treeFilterData = [];
-const filterTreeConfig = reactive({
-  filterTreeSpan: treeFilterData && treeFilterData.length > 0 ? 6 : 0,
-  treeFilterData,
-  expandedKeys: [],
-  checkedKeys: [],
-  selectedKeys: [],
-  autoExpandParent: true,
-});
 const modalConfig = reactive<any>({
   componentName: '',
   entityId: '',
@@ -308,103 +215,64 @@ const modalConfig = reactive<any>({
   baseData: props.baseData,
   width: '80%',
   destroyOnClose: true,
+  okText: '确定',
+  cancelText: '取消',
+  needSubmit: false,
 });
 const drawerConfig = reactive<any>({
   componentName: '',
   containerType: 'drawer',
   entityId: '',
   baseData: props.baseData,
-  width: '30%',
+  width: '45%',
   destroyOnClose: true,
+  okText: '确定',
+  cancelText: '取消',
+  needSubmit: false,
 });
 const queryParams = ref<any>({ ...props.query });
+const ajax = {
+  query: async ({ filters, page, sort, sorts }) => {
+    console.log('filters', filters);
+    queryParams.value.page = page?.currentPage > 0 ? page.currentPage - 1 : 0;
+    queryParams.value.size = page?.pageSize;
+    const allSort = sorts || [];
+    sort && allSort.push(sort);
+    queryParams.value.sort = transVxeSorts(allSort);
+    if (searchValue.value) {
+      queryParams.value['jhiCommonSearchKeywords'] = searchValue.value;
+    } else {
+      delete queryParams.value['jhiCommonSearchKeywords'];
+      Object.assign(queryParams.value, getSearchQueryData(searchFormConfig));
+    }
+    return await apis.find(queryParams.value);
+  },
+  queryAll: async () => await apis.find({ size: -1 }),
+  delete: async records => await apis.deleteByIds(records.body.removeRecords.map(record => record.id)),
+};
+// 表格左上角自定义按钮
+const toolbarButtons = [
+  {
+    name: '批量操作',
+    circle: false,
+    icon: 'vxe-icon-add',
+    status: 'primary',
+    dropdowns: [{ code: 'batchDelete', name: '删除', circle: false, icon: 'ant-design:delete-filled', status: 'primary' }],
+  },
+];
+// 表格右上角自定义按钮
+const toolbarTools = [
+  { code: 'new', name: '新增', circle: false, icon: 'vxe-icon-add' },
+  { code: 'custom-column', name: '列配置', circle: false, icon: 'vxe-icon-custom-column' },
+];
+const pagerLeft = () => {
+  return h(Alert, { type: 'warning', banner: true, message: `已选择 ${selectedRows.length} 项`, style: 'height: 30px' });
+};
 const gridOptions = reactive<VxeGridProps>({
-  ...config.baseGridOptions(),
-  customConfig: {
-    storage: true,
-    checkMethod({ column }) {
-      return !['nickname', 'role'].includes(column.field);
-    },
-  },
-  proxyConfig: {
-    enabled: true,
-    autoLoad: true,
-    seq: true,
-    sort: true,
-    filter: true,
-    props: {
-      result: 'records',
-      total: 'total',
-    },
-    ajax: {
-      query: async ({ filters, page, sort, sorts }) => {
-        console.log('filters', filters);
-        queryParams.value.page = page?.currentPage > 0 ? page.currentPage - 1 : 0;
-        queryParams.value.size = page?.pageSize;
-        const allSort = sorts || [];
-        sort && allSort.push(sort);
-        queryParams.value.sort = transVxeSorts(allSort);
-        if (searchValue.value) {
-          queryParams.value['jhiCommonSearchKeywords'] = searchValue.value;
-        } else {
-          delete queryParams.value['jhiCommonSearchKeywords'];
-          Object.assign(queryParams.value, getSearchQueryData(searchFormConfig));
-        }
-        return await apis.find(queryParams.value);
-      },
-      queryAll: async () => await apis.find({ size: -1 }),
-      delete: async records => await apis.deleteByIds(records.body.removeRecords.map(record => record.id)),
-    },
-  },
-  toolbarConfig: {
-    custom: true,
-    import: false,
-    print: false,
-    export: false,
-    slots: {
-      buttons: 'toolbar_buttons',
-    },
-    // 表格左上角自定义按钮
-    buttons: [
-      {
-        name: '批量操作',
-        circle: false,
-        icon: 'vxe-icon-add',
-        status: 'primary',
-        dropdowns: [{ code: 'batchDelete', name: '删除', circle: false, icon: 'ant-design:delete-filled', status: 'primary' }],
-      },
-    ],
-    // 表格右上角自定义按钮
-    tools: [{ code: 'new', name: '新增', circle: false, icon: 'vxe-icon-add' }],
-  },
+  ...config.baseGridOptions(ajax, toolbarButtons, toolbarTools, pagerLeft),
   columns,
 });
-gridOptions!.pagerConfig!.slots = {
-  left: () => {
-    return h(Alert, { type: 'warning', banner: true, message: `已选择 ${selectedRows.length} 项`, style: 'height: 30px' });
-  },
-};
-mergeWith(gridOptions, props.gridOptions, (objValue: any, srcValue: any, key: any) => {
-  if (isArray(objValue) && ['buttons', 'tools'].includes(key)) {
-    if (!srcValue) {
-      return objValue;
-    } else if (isArray(srcValue) && srcValue.length === 0) {
-      return srcValue;
-    } else if (isArray(srcValue) && srcValue.length > 0) {
-      const newObjValue: any[] = [];
-      srcValue.forEach((srcItem: any) => {
-        if (isObject(srcItem)) {
-          const objItem = objValue.find(item => item.code === srcItem['code']) || {};
-          newObjValue.push(Object.assign(objItem, srcItem));
-        } else if (isString(srcItem)) {
-          const objItem = objValue.find(item => item.code === srcItem);
-          objItem && newObjValue.push(objItem);
-        }
-      });
-      return newObjValue;
-    }
-  }
-});
+useMergeGridProps(gridOptions, props.gridOptions);
 const toolbarClick = ({ code }) => {
   const $grid = xGrid.value;
   switch (code) {
@@ -424,15 +292,26 @@ const toolbarClick = ({ code }) => {
       }
       break;
     }
+    case 'custom-column':
+      xGrid.value.openCustom();
+      break;
     case 'new':
+      const containerConfig: any = {
+        componentName: shallowRef(AnnouncementRecordEdit),
+        entityId: '',
+        title: '新建',
+        okText: '保存',
+        cancelText: '取消',
+        needSubmit: true,
+        showOkBtn: true,
+        showCancelBtn: true,
+      };
       if (props.editIn === 'modal') {
-        modalConfig.componentName = shallowRef(AnnouncementRecordEdit);
-        modalConfig.entityId = '';
-        setModalProps({ open: true, title: '新建' });
+        Object.assign(modalConfig, containerConfig);
+        setModalProps({ open: true });
       } else if (props.editIn === 'drawer') {
-        drawerConfig.componentName = shallowRef(AnnouncementRecordEdit);
-        drawerConfig.entityId = '';
-        setDrawerProps({ open: true, title: '新建' });
+        Object.assign(drawerConfig, containerConfig);
+        setDrawerProps({ open: true });
       } else {
         console.log('未定义方法');
       }
@@ -463,45 +342,22 @@ const gridEvents = reactive<VxeGridListeners>({
   toolbarButtonClick: toolbarClick,
   // 表格右上角自定义按钮事件
   toolbarToolClick: toolbarClick,
-  editClosed({ row, column }) {
-    const field = column.property;
-    const cellValue = row[field];
-    // 判断单元格值是否被修改
-    if (xGrid.value.isUpdateByRow(row, field)) {
-      const entity = { id: row.id };
-      entity[field] = cellValue;
-      apis
-        .update(entity, [row.id], [field])
-        .then(() => {
-          message.success({
-            content: `信息更新成功。 ${field}=${cellValue}`,
-            duration: 1,
-          });
-          xGrid.value.reloadRow(row, null, field);
-        })
-        .catch(error => {
-          console.log('error', error);
-          message.error({
-            content: `信息保存可能存在问题！ ${field}=${cellValue}`,
-            onClose: () => {},
-          });
-        });
-    }
-  },
 });
-const okModal = () => {
-  if (modalConfig.containerType === 'modal') {
-    if (modalComponentRef.value) {
-      modalComponentRef.value.saveOrUpdate();
+const okModal = async () => {
+  if (modalConfig.needSubmit && modalComponentRef.value) {
+    const result = await modalComponentRef.value.submit();
+    if (result) {
       formSearch();
+      closeModal();
     }
   }
 };
-const okDrawer = () => {
-  if (drawerConfig.containerType === 'drawer') {
-    if (drawerComponentRef.value) {
-      drawerComponentRef.value.saveOrUpdate();
+const okDrawer = async () => {
+  if (drawerConfig.needSubmit && drawerComponentRef.value) {
+    const result = await drawerComponentRef.value.submit();
+    if (result) {
       formSearch();
+      closeDrawer();
     }
   }
 };
@@ -509,96 +365,42 @@ const formSearch = () => {
   xGrid.value.commitProxy('reload');
 };
 const inputSearch = debounce(formSearch, 700);
-onMounted(() => {
-  const $grid: HTMLElement = xGrid.value.$el as HTMLElement;
-  const myElement = $grid.querySelector('.vxe-toolbar .vxe-custom--wrapper .vxe-button.type--button');
-  if (myElement?.className) {
-    myElement.className = myElement.className.replace('is--circle', '');
-    myElement.setAttribute('style', 'border-radius: 4px !important;');
-  }
-
-  const parent = myElement?.parentElement;
-  if (parent) {
-    parent.className = parent.className + ' begcode';
-  }
-  const text = document.createElement('span');
-  text.className = 'vxe-button--content';
-  text.innerText = '列配置';
-  myElement?.appendChild(text);
-});
-
 const handleToggleSearch = () => {
   searchFormConfig.toggleSearchStatus = !searchFormConfig.toggleSearchStatus;
 };
-
-const onCheck = checkedKeys => {
-  filterTreeConfig.checkedKeys = checkedKeys;
-};
-
 const showSearchFormSetting = () => {
   if (searchFormRef.value) {
     searchFormRef.value.showSettingModal();
   }
 };
 
-const onSelect = (selectedKeys, info) => {
-  const filterData = info.node.dataRef;
-  if (filterData.type === 'filterGroup') {
-    mapOfFilter.value[info.node.dataRef.key].value = [];
-  } else if (filterData.type === 'filterItem') {
-    mapOfFilter.value[info.node.dataRef.filterName].value = [info.node.dataRef.filterValue];
-  }
-  formSearch();
-  filterTreeConfig.selectedKeys = selectedKeys;
-};
-
-const switchFilterTree = () => {
-  filterTreeConfig.filterTreeSpan = filterTreeConfig.filterTreeSpan > 0 ? 0 : 6;
-};
-
 const rowClick = ({ name, data }) => {
   const row = data;
-  const operation = rowOperations.find(operation => operation.name === name);
-  switch (name) {
-    case 'save':
-      break;
-    case 'edit':
-      if (operation) {
-        if (operation.click) {
-          operation.click(row);
-        } else {
-          const containerType = props.editIn || operation.containerType;
-          switch (containerType) {
-            case 'modal':
-              modalConfig.componentName = shallowRef(AnnouncementRecordEdit);
-              modalConfig.entityId = row.id;
-              setModalProps({ open: true });
-              break;
-            case 'drawer':
-              drawerConfig.componentName = shallowRef(AnnouncementRecordEdit);
-              drawerConfig.entityId = row.id;
-              drawerConfig.title = '编辑';
-              setDrawerProps({ open: true });
-              break;
-            case 'route':
-            default:
-              if (pageConfig.baseRouteName) {
-                go({ name: `${pageConfig.baseRouteName}Edit`, params: { entityId: row.id } });
-              } else {
-                console.log('未定义方法');
-              }
-          }
-        }
-      } else {
-        switch (props.editIn) {
+  const operation = rowOperations.value.find(operation => operation.name === name);
+  if (operation?.click) {
+    operation.click(row);
+  } else {
+    const containerConfig: any = {
+      entityId: row.id,
+    };
+    switch (name) {
+      case 'save':
+        break;
+      case 'edit':
+        containerConfig.componentName = shallowRef(AnnouncementRecordEdit);
+        containerConfig.title = '编辑通告阅读记录';
+        containerConfig.okText = '更新';
+        containerConfig.cancelText = '取消';
+        containerConfig.showCancelBtn = true;
+        containerConfig.showOkBtn = true;
+        containerConfig.needSubmit = true;
+        switch (operation?.containerType || props.editIn) {
           case 'modal':
-            modalConfig.componentName = shallowRef(AnnouncementRecordEdit);
-            modalConfig.entityId = row.id;
+            Object.assign(modalConfig, containerConfig);
             setModalProps({ open: true });
             break;
           case 'drawer':
-            drawerConfig.componentName = shallowRef(AnnouncementRecordEdit);
-            drawerConfig.entityId = row.id;
+            Object.assign(drawerConfig, containerConfig);
             setDrawerProps({ open: true });
             break;
           case 'route':
@@ -609,24 +411,22 @@ const rowClick = ({ name, data }) => {
               console.log('未定义方法');
             }
         }
-      }
-      break;
-    case 'detail':
-      if (operation) {
-        if (operation.click) {
-          operation.click(row);
-        } else {
+        break;
+      case 'detail':
+        if (operation?.containerType) {
+          containerConfig.componentName = shallowRef(AnnouncementRecordDetail);
+          containerConfig.title = '详情';
+          containerConfig.showCancelBtn = true;
+          containerConfig.showOkBtn = false;
+          containerConfig.cancelText = '关闭';
+          containerConfig.needSubmit = false;
           switch (operation.containerType) {
             case 'modal':
-              modalConfig.componentName = shallowRef(AnnouncementRecordDetail);
-              modalConfig.entityId = row.id;
-              modalConfig.title = '详情';
+              Object.assign(modalConfig, containerConfig);
               setModalProps({ open: true });
               break;
             case 'drawer':
-              drawerConfig.componentName = shallowRef(AnnouncementRecordDetail);
-              drawerConfig.entityId = row.id;
-              drawerConfig.title = '详情';
+              Object.assign(drawerConfig, containerConfig);
               setDrawerProps({ open: true });
               break;
             case 'route':
@@ -637,45 +437,34 @@ const rowClick = ({ name, data }) => {
                 console.log('未定义方法');
               }
           }
-        }
-      } else {
-        if (pageConfig.baseRouteName) {
-          go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
         } else {
-          console.log('未定义方法');
-        }
-      }
-      break;
-    case 'delete':
-      Modal.confirm({
-        title: `操作提示`,
-        content: `是否确认删除ID为${row.id}的记录？`,
-        onOk() {
-          if (operation.click) {
-            operation.click(row);
+          if (pageConfig.baseRouteName) {
+            go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
           } else {
+            console.log('未定义方法');
+          }
+        }
+        break;
+      case 'delete':
+        Modal.confirm({
+          title: `操作提示`,
+          content: `是否确认删除ID为${row.id}的记录？`,
+          onOk() {
             apis.deleteById(row.id).then(() => {
               formSearch();
             });
-          }
-        },
-      });
-      break;
-    default:
-      if (operation) {
-        if (operation.click) {
-          operation.click(row);
-        } else {
-          console.log('error', `click方法未定义`);
-        }
-      } else {
+          },
+        });
+        break;
+      default:
         console.log('error', `${name}未定义`);
-      }
+    }
   }
 };
 
 const getSelectRows = () => {
   return toRaw(selectedRows);
 };
+
 defineExpose({ getSelectRows });
 </script>

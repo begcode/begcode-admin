@@ -10,82 +10,109 @@
       <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" />
     </Card>
     <Card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
-      <template #title>
-        <Button type="text" preIcon="ant-design:unordered-list-outlined" shape="default" size="large" @click="formSearch"
-          >报表存储列表</Button
-        >
-      </template>
-      <template #extra>
-        <Space>
-          <Divider type="vertical" />
-          <Button
-            type="default"
-            @click="xGrid.openImport()"
-            preIcon="ant-design:cloud-upload-outlined"
-            shape="circle"
-            size="small"
-          ></Button>
-          <Button type="default" @click="xGrid.openExport()" preIcon="ant-design:download-outlined" shape="circle" size="small"></Button>
-          <!--          <Button type="default" @click="xGrid.openPrint()" preIcon="ant-design:printer-outlined" shape="circle" size="small"></Button>-->
-          <!--          <Button type="default" preIcon="ant-design:setting-outlined" shape="circle" size="small"></Button>-->
-        </Space>
-      </template>
       <Row :gutter="16">
-        <Col :span="filterTreeConfig.filterTreeSpan" v-if="filterTreeConfig.filterTreeSpan > 0">
-          <Tree
-            style="border: #bbcedd 1px solid; height: 100%"
-            v-model="filterTreeConfig.checkedKeys"
-            :expandedKeys="filterTreeConfig.expandedKeys"
-            :autoExpandParent="filterTreeConfig.autoExpandParent"
-            :selectedKeys="filterTreeConfig.selectedKeys"
-            :treeData="filterTreeConfig.treeFilterData"
-            @select="onSelect"
-            @expand="onExpand"
-          />
-        </Col>
-        <Col :span="24 - filterTreeConfig.filterTreeSpan">
-          <CardList ref="cardList" v-bind="cardListOptions" @getMethod="cardListFetchMethod" @delete="deleteById">
-            <template #header_left>
-              <Row class="toolbar_buttons_xgrid" :gutter="16">
-                <Col :lg="2" :md="2" :sm="4" v-if="filterTreeConfig.treeFilterData.length > 0">
-                  <span class="table-page-search-submitButtons">
-                    <Button
-                      type="primary"
-                      :icon="filterTreeConfig.filterTreeSpan > 0 ? 'pic-center' : 'pic-right'"
-                      @click="switchFilterTree"
-                    ></Button>
-                  </span>
-                </Col>
-                <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
-                  <Input
-                    placeholder="请输入关键字"
-                    v-model:value="searchValue"
-                    allow-clear
-                    @search="formSearch"
-                    enterButton
-                    ref="searchInputRef"
-                  >
-                    <template #prefix>
-                      <Icon icon="ant-design:search-outlined" />
+        <Col :span="24">
+          <List :grid="listGrid" item-layout="vertical" :data-source="listData" :pagination="false">
+            <template #header>
+              <div class="flex justify-between space-x-2">
+                <div>
+                  <Row class="toolbar_buttons_xgrid" :gutter="16">
+                    <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
+                      <Space>
+                        <Input
+                          placeholder="请输入关键字"
+                          v-model:value="searchValue"
+                          allow-clear
+                          @search="formSearch"
+                          enterButton
+                          ref="searchInputRef"
+                        >
+                          <template #prefix>
+                            <Icon icon="ant-design:search-outlined" />
+                          </template>
+                          <template #addonAfter v-if="searchFormConfig.allowSwitch">
+                            <Button type="link" @click="formSearch" style="height: 30px"
+                              >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch"></Icon
+                            ></Button>
+                          </template>
+                        </Input>
+                        <Dropdown v-if="selectedRows.length && batchOperations.length">
+                          <template #overlay>
+                            <Menu @click="batchOperationClick">
+                              <MenuItem :key="batchOperation.name" v-for="batchOperation of batchOperations">
+                                <Icon :icon="batchOperation.icon" v-if="batchOperation.icon"></Icon>
+                                {{ batchOperation.title }}
+                              </MenuItem>
+                            </Menu>
+                          </template>
+                          <Button>
+                            批量处理
+                            <Icon icon="ant-design:down-outlined" />
+                          </Button>
+                        </Dropdown>
+                      </Space>
+                    </Col>
+                  </Row>
+                </div>
+                <div>
+                  <Space>
+                    <template v-for="button in cardListOptions.toolButtons">
+                      <Tooltip v-if="!button.hidden">
+                        <template #title>{{ button.title }}</template>
+                        <ImageUpload v-if="button.name === 'uploadImg'">{{ button.title }}</ImageUpload>
+                        <Upload v-else-if="button.name === 'uploadFile'">{{ button.title }}</Upload>
+                        <Button :disabled="button.disabled" @click="button.click" v-else>
+                          <Icon :icon="button.icon" v-if="button.icon"></Icon>
+                          {{ button.title }}
+                        </Button>
+                      </Tooltip>
                     </template>
-                    <template #addonAfter v-if="searchFormConfig.allowSwitch">
-                      <Button type="link" @click="formSearch" style="height: 30px"
-                        >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch"></Icon
-                      ></Button>
+                    <Tooltip>
+                      <template #title>
+                        <div class="w-50">每行显示数量</div>
+                        <Slider id="slider" v-bind="sliderProp" :value="listColumns" @change="sliderChange" />
+                      </template>
+                      <Button><Icon icon="ant-design:table-outlined" />列数</Button>
+                    </Tooltip>
+                  </Space>
+                </div>
+              </div>
+            </template>
+            <template #renderItem="{ item }">
+              <div style="margin-bottom: 24px"></div>
+              <List.Item>
+                <Badge>
+                  <template #count>
+                    <Checkbox :checked="getItemSelected(item)" @change="selectChange($event, item)" />
+                  </template>
+                  <Card :body-style="{ padding: '12px 4px' }">
+                    <template #title></template>
+                    <template #cover>
+                      <Badge.Ribbon placement="start" :text="metaConfig.titleValue(item)">
+                        <div class="cover-height">
+                          <Image
+                            v-if="coverConfig.showImage"
+                            :src="item[coverConfig.coverFieldName] || '/resource/img/filetype/other.png'"
+                            v-bind="coverConfig.props"
+                            @click="coverConfig.click"
+                          />
+                        </div>
+                      </Badge.Ribbon>
                     </template>
-                  </Input>
-                </Col>
-              </Row>
+                    <template class="ant-card-actions" #actions>
+                      <ButtonGroup :row="item" :buttons="rowOperations" @click="rowClick" />
+                    </template>
+                    <Card.Meta>
+                      <template #avatar>
+                        <Avatar :src="item.avatar" v-if="metaConfig.showAvatar" />
+                      </template>
+                      <template #description v-if="metaConfig.showDesc">{{ metaConfig.descValue(item) }}</template>
+                    </Card.Meta>
+                  </Card>
+                </Badge>
+              </List.Item>
             </template>
-            <template #loadMore>
-              <div v-if="loading" style="text-align: center; margin-top: 12px; height: 32px; line-height: 32px">
-                <Spin />
-              </div>
-              <div v-else style="text-align: center; margin-top: 12px; height: 32px; line-height: 32px">
-                <!--              <Button @click="handleLoadMore">加载更多</Button>-->
-              </div>
-            </template>
-          </CardList>
+          </List>
         </Col>
       </Row>
       <BasicModal v-bind="modalConfig" @register="registerModal" @cancel="closeModal" @ok="okModal">
@@ -106,20 +133,67 @@
           ref="drawerComponentRef"
         />
       </BasicDrawer>
+      <Affix :offset-bottom="0">
+        <Row justify="space-between" style="background: #fff; padding: 10px 0">
+          <Col :span="12" style="display: flex; justify-content: flex-start">
+            <Alert type="warning" :banner="true" style="height: 30px" :message="alertMessage"></Alert>
+          </Col>
+          <Col :span="12" style="display: flex; justify-content: flex-end">
+            <Pagination v-model:current="paginationProps.current" :total="500" />
+          </Col>
+        </Row>
+      </Affix>
     </Card>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, getCurrentInstance, shallowRef } from 'vue';
-import { Modal, Card, Space, Divider, Row, Col, Tree, Input, Spin, message } from 'ant-design-vue';
+import { reactive, ref, getCurrentInstance, shallowRef, onMounted, computed, onUnmounted } from 'vue';
+import {
+  Modal,
+  Card,
+  Space,
+  Divider,
+  Row,
+  Col,
+  Input,
+  message,
+  TypographyParagraph,
+  List,
+  Tooltip,
+  Upload,
+  Slider,
+  Avatar,
+  Image,
+  Badge,
+  Checkbox,
+  Affix,
+  Pagination,
+  Alert,
+  Dropdown,
+  MenuItem,
+  Menu,
+} from 'ant-design-vue';
+import { breakpointsAntDesign, useBreakpoints } from '@vueuse/core';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
-import { useModalInner, BasicModal, useDrawerInner, BasicDrawer, Icon, Button, SearchForm, CardList } from '@begcode/components';
+import {
+  useModalInner,
+  BasicModal,
+  useDrawerInner,
+  BasicDrawer,
+  Icon,
+  Button,
+  SearchForm,
+  ButtonGroup,
+  ImageUpload,
+} from '@begcode/components';
 import { useGo } from '@/hooks/web/usePage';
 import ServerProvider from '@/api-service/index';
-import UReportFileEdit from './u-report-file-edit.vue';
-import UReportFileDetail from './u-report-file-detail.vue';
+import UReportFileEdit from './components/form-component.vue';
+import UReportFileDetail from './components/detail-component.vue';
+import { IUReportFile } from '@/models/report/u-report-file.model';
 import config from './config/list-config';
+import { useSetShortcutButtons } from '@/components/VxeTable/src/helper';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
@@ -127,6 +201,10 @@ const props = defineProps({
   baseData: {
     type: Object,
     default: () => ({}),
+  },
+  cardExtra: {
+    type: Array,
+    default: ['import', 'export'],
   },
 });
 
@@ -136,12 +214,71 @@ const [registerModal, { closeModal, setModalProps }] = useModalInner(data => {
 const [registerDrawer, { closeDrawer, setDrawerProps }] = useDrawerInner(data => {
   console.log(data);
 });
+const breakpoints = useBreakpoints(breakpointsAntDesign);
+const listGrid = reactive({ gutter: 5, xs: 1, sm: 2, md: 3, lg: 4, xl: 5, xxl: 6, xxxl: 8 });
+const listColumns = computed(() => {
+  const breakpoint = breakpoints.current().value.pop();
+  return listGrid[breakpoint!];
+});
+
+const useSlider = (min = 6, max = 12) => {
+  // 每行显示个数滑动条
+  const getMarks = () => {
+    const l = {};
+    for (let i = min; i < max + 1; i++) {
+      l[i] = {
+        style: {
+          color: '#fff',
+        },
+        label: i,
+      };
+    }
+    return l;
+  };
+  return {
+    min,
+    max,
+    marks: getMarks(),
+    step: 1,
+  };
+};
+const sliderProp = computed(() => useSlider(3));
+
+function sliderChange(n) {
+  paginationProps.pageSize = n * 2;
+  const breakpoint = breakpoints.current().value.pop();
+  listGrid[breakpoint!] = n;
+  formSearch();
+}
+const metaConfig = reactive({
+  titleValue: item => {
+    return item.name;
+  },
+  showAvatar: false,
+  showDesc: true,
+  descValue: item => {
+    return item.createAt;
+  },
+});
+const coverConfig = reactive({
+  showImage: true,
+  coverFieldName: 'url',
+  props: {
+    preview: true,
+  },
+  click: item => {
+    console.log('item:::', item);
+  },
+});
+const listData = ref<IUReportFile[]>([]);
+const height = computed(() => {
+  return 140 - listColumns.value * 6 + 'px';
+});
 const modalComponentRef = ref<any>(null);
 const drawerComponentRef = ref<any>(null);
 const ctx = getCurrentInstance()?.proxy;
 const go = useGo();
 const apiService = ctx?.$apiService as typeof ServerProvider;
-const relationshipApis: any = {};
 const apis = {
   find: apiService.report.uReportFileService.retrieve,
   deleteById: apiService.report.uReportFileService.delete,
@@ -152,94 +289,109 @@ const pageConfig = {
   title: '报表存储列表',
   baseRouteName: 'reportUReportFile',
 };
-const columns = config.columns();
 const searchFormFields = config.searchForm();
-const cardList = ref<any>(null);
 const searchInputRef = ref(null);
 const searchFormRef = ref<any>(null);
-const searchFormConfig = reactive({
+const searchFormConfig = reactive<any>({
   fieldList: searchFormFields,
   toggleSearchStatus: false,
   matchType: 'and',
   disabled: false,
   allowSwitch: true,
 });
-const batchOperations = [];
-const rowOperations = [
+const rowOperations: any[] = [
   {
+    title: '编辑',
     disabled: false,
-    name: 'save',
+    name: 'edit',
+    containerType: 'modal',
+    type: 'link',
   },
   {
+    title: '删除',
     name: 'delete',
+    type: 'link',
   },
   {
     title: '详情',
     name: 'detail',
+    type: 'link',
     containerType: 'drawer',
   },
 ];
-const tableRowOperations = reactive<any[]>([]);
-const tableRowMoreOperations = reactive<any[]>([]);
-const saveOperation = rowOperations.find(operation => operation.name === 'save');
-if (rowOperations.length > 4 || (saveOperation && rowOperations.length > 3)) {
-  if (saveOperation) {
-    tableRowOperations.push(...rowOperations?.slice(0, 2));
-    tableRowMoreOperations.push(...rowOperations.slice(3));
-  } else {
-    tableRowOperations.push(...rowOperations?.slice(0, 3));
-    tableRowMoreOperations.push(...rowOperations.slice(4));
-  }
-} else {
-  tableRowOperations.push(...rowOperations);
-}
-const selectedRows = reactive<any>([]);
-const loading = ref(false);
-const searchValue = ref('');
-const mapOfFilter = ref({});
-const mapOfSort = ref({});
-columns?.forEach(column => {
-  if (column.sortable && column.field) {
-    mapOfSort.value[column.field] = false;
-  }
+const selectedRows = ref<any[]>([]);
+const getItemSelected = computed(() => {
+  return item => {
+    return selectedRows.value.some(row => row.id === item.id);
+  };
 });
-const sort = () => {
-  const result: any[] = [];
-  Object.keys(mapOfSort.value).forEach(key => {
-    if (mapOfSort.value[key] && mapOfSort.value[key] !== false) {
-      if (mapOfSort.value[key] === 'asc') {
-        result.push(key + ',asc');
-      } else if (mapOfSort.value[key] === 'desc') {
-        result.push(key + ',desc');
-      }
+const selectChange = (e, item) => {
+  if (e.target.checked) {
+    if (!selectedRows.value.some(row => row.id === item.id)) {
+      selectedRows.value.push(item);
     }
-  });
-  return result;
+  } else {
+    selectedRows.value = selectedRows.value.filter(row => row.id !== item.id);
+  }
 };
-const treeFilterData = [];
-const filterTreeConfig = reactive({
-  filterTreeSpan: treeFilterData && treeFilterData.length > 0 ? 6 : 0,
-  treeFilterData,
-  expandedKeys: [],
-  checkedKeys: [],
-  selectedKeys: [],
-  autoExpandParent: true,
+const alertMessage = computed(() => {
+  return `已选${selectedRows.value.length}条记录。`;
 });
+
+const batchOperations = ref<any[]>([
+  {
+    title: '批量删除',
+    name: 'batchDelete',
+    type: 'link',
+    icon: 'ant-design:delete-outlined',
+  },
+]);
+
+const batchOperationClick = ({ key }) => {
+  console.log('key', key);
+  switch (key) {
+    case 'batchDelete':
+      Modal.confirm({
+        title: `操作提示`,
+        content: `是否确认删除ID为${selectedRows.value.map(row => row.id).join(',')}的记录？`,
+        onOk() {
+          apis.deleteByIds(selectedRows.value.map(row => row.id)).then(() => {
+            message.success('删除成功。');
+            formSearch();
+          });
+        },
+      });
+      break;
+    default:
+      console.log('error', `${key}未定义`);
+  }
+};
+
+const searchValue = ref('');
+
 const modalConfig = reactive<any>({
   componentName: '',
   entityId: '',
   containerType: 'modal',
   baseData: props.baseData,
+  width: '80%',
   destroyOnClose: true,
+  okText: '确定',
+  cancelText: '取消',
+  needSubmit: false,
 });
 const drawerConfig = reactive<any>({
   componentName: '',
   containerType: 'drawer',
   entityId: '',
   baseData: props.baseData,
+  width: '30%',
   destroyOnClose: true,
+  okText: '确定',
+  cancelText: '取消',
+  needSubmit: false,
 });
-const cardListOptions = reactive({
+const cardListOptions = reactive<any>({
   params: {},
   api: apis.find,
   imageField: 'url',
@@ -256,76 +408,72 @@ const cardListOptions = reactive({
         modalConfig.componentName = shallowRef(UReportFileEdit);
         modalConfig.entityId = '';
         modalConfig.containerType = 'modal';
-        setModalProps({
-          open: true,
-          title: '新增报表存储',
-          width: 800,
-        });
+        modalConfig.okText = '保存';
+        modalConfig.cancelText = '取消';
+        modalConfig.needSubmit = true;
+        modalConfig.showOkBtn = true;
+        modalConfig.showCancelBtn = true;
+        modalConfig.title = '新增报表存储';
+        setModalProps({ open: true });
       },
       hidden: false,
       disabled: false,
     },
-    { code: 'new', name: '', circle: true, icon: 'vxe-icon-add' },
   ],
-  rowOperations: [
-    {
-      title: '编辑',
-      click: (row: any) => {
-        rowClickHandler('edit', { containerType: 'modal', title: '编辑' }, row);
-      },
-    },
-  ],
-  fetchMethod: params =>
-    new Promise(resolve => {
-      resolve(params);
-    }),
 });
-const okModal = () => {
-  if (modalConfig.containerType === 'modal') {
-    if (modalComponentRef.value) {
-      modalComponentRef.value.saveOrUpdate();
+const extraButtons = ref([
+  {
+    show: props.cardExtra?.includes('import'),
+    title: '导入',
+    name: 'import',
+    icon: 'ant-design:cloud-upload-outlined',
+    click: () => {},
+  },
+  {
+    show: props.cardExtra?.includes('export'),
+    name: 'export',
+    title: '导出',
+    icon: 'ant-design:download-outlined',
+    click: () => {},
+  },
+]);
+useSetShortcutButtons('ReportUReportFileList', extraButtons);
+
+const okModal = async () => {
+  if (modalConfig.needSubmit && modalComponentRef.value) {
+    const result = await modalComponentRef.value.submit();
+    if (result) {
       formSearch();
+      closeModal();
     }
   }
 };
-const okDrawer = () => {
-  if (drawerConfig.containerType === 'drawer') {
-    if (drawerComponentRef.value) {
-      drawerComponentRef.value.saveOrUpdate();
+const okDrawer = async () => {
+  if (drawerConfig.needSubmit && drawerComponentRef.value) {
+    const result = await drawerComponentRef.value.submit();
+    if (result) {
       formSearch();
+      closeDrawer();
     }
   }
 };
 const formSearch = () => {
-  let params = {};
+  selectedRows.value = [];
+  let params: any = {};
   if (searchValue.value) {
     params['jhiCommonSearchKeywords'] = searchValue.value;
   } else {
     params = Object.assign({}, cardListOptions.params, getSearchQueryData(searchFormConfig));
   }
-  cardListOptions.fetchMethod(params).then(res => {
-    console.log('fetch.res', res);
+  params.page = paginationProps.current;
+  params.size = paginationProps.pageSize;
+  apis.find(params).then(data => {
+    listData.value = data.records;
   });
-};
-
-const cardListFetchMethod = method => {
-  cardListOptions.fetchMethod = method;
 };
 
 const handleToggleSearch = () => {
   searchFormConfig.toggleSearchStatus = !searchFormConfig.toggleSearchStatus;
-};
-
-const deleteById = id => {
-  apis
-    .deleteById(id)
-    .then(() => {
-      message.success('删除成功。');
-      formSearch();
-    })
-    .catch(err => {
-      console.log('err', err);
-    });
 };
 
 const closeModalOrDrawer = ({ containerType, update }) => {
@@ -338,9 +486,6 @@ const closeModalOrDrawer = ({ containerType, update }) => {
     formSearch();
   }
 };
-const onCheck = checkedKeys => {
-  filterTreeConfig.checkedKeys = checkedKeys;
-};
 
 const showSearchFormSetting = () => {
   if (searchFormRef.value) {
@@ -348,53 +493,27 @@ const showSearchFormSetting = () => {
   }
 };
 
-const onSelect = (selectedKeys, info) => {
-  const filterData = info.node.dataRef;
-  if (filterData.type === 'filterGroup') {
-    mapOfFilter.value[info.node.dataRef.key].value = [];
-  } else if (filterData.type === 'filterItem') {
-    mapOfFilter.value[info.node.dataRef.filterName].value = [info.node.dataRef.filterValue];
-  }
+//分页相关
+const paginationProps = reactive({
+  showSizeChanger: false,
+  showQuickJumper: true,
+  pageSize: 36,
+  current: 0,
+  total: 0,
+  showTotal: (total: number) => `总 ${total} 条`,
+  onChange: pageChange,
+  onShowSizeChange: pageChange,
+});
+
+function pageChange(p: number, pz: number) {
+  paginationProps.current = p;
+  paginationProps.pageSize = pz;
   formSearch();
-  filterTreeConfig.selectedKeys = selectedKeys;
-};
+}
 
-const xGridSortChange = ({ property, order }) => {
-  mapOfSort.value = {};
-  mapOfSort.value[property] = order;
-  formSearch();
-};
-
-const xGridFilterChange = ({ column, property, values, datas }) => {
-  const type = column.params ? column.params.type : '';
-  let tempValues;
-  if (type === 'STRING') {
-    tempValues = datas[0];
-  } else if (type === 'INTEGER' || type === 'LONG' || type === 'DOUBLE' || type === 'FLOAT' || type === 'ZONED_DATE_TIME') {
-    tempValues = datas[0];
-  } else if (type === 'BOOLEAN') {
-    tempValues = values;
-  }
-  mapOfFilter.value[property] = { value: tempValues, type: type };
-  formSearch();
-};
-
-const switchFilterTree = () => {
-  filterTreeConfig.filterTreeSpan = filterTreeConfig.filterTreeSpan > 0 ? 0 : 6;
-};
-
-const rowMoreClick = (e, row) => {
-  const { key } = e;
-  const operation = tableRowMoreOperations.find(operation => operation.name === key);
-  rowClickHandler(key, operation, row);
-};
-
-const rowClick = (name, row) => {
-  const operation = tableRowOperations.find(operation => operation.name === name);
-  rowClickHandler(name, operation, row);
-};
-
-const rowClickHandler = (name, operation, row) => {
+const rowClick = ({ name, data }) => {
+  const row = data;
+  const operation = rowOperations.find(operation => operation.name === name);
   switch (name) {
     case 'save':
       break;
@@ -405,15 +524,25 @@ const rowClickHandler = (name, operation, row) => {
         } else {
           switch (operation.containerType) {
             case 'modal':
-              operation.title && (modalConfig.title = operation.title);
+              modalConfig.title = '编辑报表存储';
               modalConfig.componentName = shallowRef(UReportFileEdit);
               modalConfig.entityId = row.id;
+              modalConfig.okText = '更新';
+              modalConfig.cancelText = '取消';
+              modalConfig.showCancelBtn = true;
+              modalConfig.showOkBtn = true;
+              modalConfig.needSubmit = true;
               setModalProps({ open: true });
               break;
             case 'drawer':
-              operation.title && (drawerConfig.title = operation.title);
+              drawerConfig.title = '编辑报表存储';
               drawerConfig.componentName = shallowRef(UReportFileEdit);
               drawerConfig.entityId = row.id;
+              drawerConfig.okText = '更新';
+              drawerConfig.cancelText = '取消';
+              drawerConfig.showCancelBtn = true;
+              drawerConfig.showOkBtn = true;
+              drawerConfig.needSubmit = true;
               setDrawerProps({ open: true });
               break;
             case 'route':
@@ -440,15 +569,23 @@ const rowClickHandler = (name, operation, row) => {
         } else {
           switch (operation.containerType) {
             case 'modal':
-              operation.title && (modalConfig.title = operation.title);
+              modalConfig.title = '报表存储详情';
               modalConfig.componentName = shallowRef(UReportFileDetail);
               modalConfig.entityId = row.id;
+              modalConfig.showCancelBtn = true;
+              modalConfig.showOkBtn = false;
+              modalConfig.cancelText = '关闭';
+              modalConfig.needSubmit = false;
               setModalProps({ open: true });
               break;
             case 'drawer':
-              operation.title && (drawerConfig.title = operation.title);
+              drawerConfig.title = '报表存储详情';
               drawerConfig.componentName = shallowRef(UReportFileDetail);
               drawerConfig.entityId = row.id;
+              drawerConfig.showCancelBtn = true;
+              drawerConfig.showOkBtn = false;
+              drawerConfig.cancelText = '关闭';
+              drawerConfig.needSubmit = false;
               setDrawerProps({ open: true });
               break;
             case 'route':
@@ -479,6 +616,7 @@ const rowClickHandler = (name, operation, row) => {
             apis
               .deleteById(row.id)
               .then(() => {
+                message.success('删除成功。');
                 formSearch();
               })
               .catch(err => {
@@ -491,19 +629,19 @@ const rowClickHandler = (name, operation, row) => {
     case 'design':
       switch (operation.containerType) {
         case 'modal':
-          this.modalConfig.componentName = 'a-iframe';
-          this.modalConfig.iframeUrl = '/ureport/designer?_u=db:' + row.name;
-          this.setModalProps({ open: true });
+          modalConfig.componentName = 'a-iframe';
+          modalConfig.iframeUrl = '/ureport/designer?_u=db:' + row.name;
+          setModalProps({ open: true });
           break;
         case 'drawer':
-          this.drawerConfig.componentName = 'a-iframe';
-          this.modalConfig.iframeUrl = '/ureport/designer?_u=db:' + row.name;
-          this.setDrawerProps({ open: true });
+          drawerConfig.componentName = 'a-iframe';
+          modalConfig.iframeUrl = '/ureport/designer?_u=db:' + row.name;
+          setDrawerProps({ open: true });
           break;
         case 'route':
         default:
-          if (this.pageConfig.baseRouteName) {
-            this.go({ name: `${this.pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
+          if (pageConfig.baseRouteName) {
+            go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
           } else {
             console.log('未定义方法');
           }
@@ -512,19 +650,19 @@ const rowClickHandler = (name, operation, row) => {
     case 'preview':
       switch (operation.containerType) {
         case 'modal':
-          this.modalConfig.componentName = 'a-iframe';
-          this.modalConfig.iframeUrl = '/ureport/preview?_u=db:' + row.name;
-          this.setModalProps({ open: true });
+          modalConfig.componentName = 'a-iframe';
+          modalConfig.iframeUrl = '/ureport/preview?_u=db:' + row.name;
+          setModalProps({ open: true });
           break;
         case 'drawer':
-          this.drawerConfig.componentName = 'a-iframe';
-          this.modalConfig.iframeUrl = '/ureport/preview?_u=db:' + row.name;
-          this.setDrawerProps({ open: true });
+          drawerConfig.componentName = 'a-iframe';
+          modalConfig.iframeUrl = '/ureport/preview?_u=db:' + row.name;
+          setDrawerProps({ open: true });
           break;
         case 'route':
         default:
-          if (this.pageConfig.baseRouteName) {
-            this.go({ name: `${this.pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
+          if (pageConfig.baseRouteName) {
+            go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
           } else {
             console.log('未定义方法');
           }
@@ -542,8 +680,12 @@ const rowClickHandler = (name, operation, row) => {
       }
   }
 };
+
+onMounted(() => {
+  formSearch();
+});
 </script>
-<style>
+<style scoped>
 .toolbar_buttons_xgrid {
   margin-left: 5px !important;
 }
@@ -552,5 +694,9 @@ const rowClickHandler = (name, operation, row) => {
 }
 .vxe-tools--wrapper {
   padding-right: 12px;
+}
+.cover-height {
+  height: v-bind('height');
+  overflow: hidden;
 }
 </style>

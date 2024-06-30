@@ -30,7 +30,7 @@ const fields = (): FormSchema[] => {
       label: '内容',
       field: 'content',
       component: 'Editor',
-      componentProps: { placeholder: '请输入内容', style: 'width: 100%' },
+      componentProps: { editorId: 'form_item_content_editor', placeholder: '请输入内容', style: 'width: 100%' },
       rules: [],
     },
     {

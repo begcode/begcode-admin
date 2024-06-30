@@ -17,6 +17,7 @@ import com.begcode.monolith.settings.service.mapper.CommonFieldDataMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +83,8 @@ public class CommonFieldDataResourceIT {
 
     private CommonFieldData commonFieldData;
 
+    private CommonFieldData insertedCommonFieldData;
+
     /**
      * Create an entity for this test.
      *
@@ -127,6 +130,14 @@ public class CommonFieldDataResourceIT {
         commonFieldData = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedCommonFieldData != null) {
+            commonFieldDataRepository.deleteById(insertedCommonFieldData.getId());
+            insertedCommonFieldData = null;
+        }
+    }
+
     @Test
     @Transactional
     void createCommonFieldData() throws Exception {
@@ -147,6 +158,8 @@ public class CommonFieldDataResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedCommonFieldData = commonFieldDataMapper.toEntity(returnedCommonFieldDataDTO);
         assertCommonFieldDataUpdatableFieldsEquals(returnedCommonFieldData, getPersistedCommonFieldData(returnedCommonFieldData));
+
+        insertedCommonFieldData = returnedCommonFieldData;
     }
 
     @Test
@@ -171,7 +184,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldData() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList
         restCommonFieldDataMockMvc
@@ -194,7 +207,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getCommonFieldData() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get the commonFieldData
         restCommonFieldDataMockMvc
@@ -217,7 +230,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getCommonFieldDataByIdFiltering() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         Long id = commonFieldData.getId();
 
@@ -232,7 +245,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where name equals to
         defaultCommonFieldDataFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
@@ -242,7 +255,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByNameIsInShouldWork() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where name in
         defaultCommonFieldDataFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
@@ -252,7 +265,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where name is not null
         defaultCommonFieldDataFiltering("name.specified=true", "name.specified=false");
@@ -262,7 +275,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByNameContainsSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where name contains
         defaultCommonFieldDataFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
@@ -272,7 +285,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByNameNotContainsSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where name does not contain
         defaultCommonFieldDataFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
@@ -282,7 +295,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByValueIsEqualToSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where value equals to
         defaultCommonFieldDataFiltering("value.equals=" + DEFAULT_VALUE, "value.equals=" + UPDATED_VALUE);
@@ -292,7 +305,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByValueIsInShouldWork() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where value in
         defaultCommonFieldDataFiltering("value.in=" + DEFAULT_VALUE + "," + UPDATED_VALUE, "value.in=" + UPDATED_VALUE);
@@ -302,7 +315,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByValueIsNullOrNotNull() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where value is not null
         defaultCommonFieldDataFiltering("value.specified=true", "value.specified=false");
@@ -312,7 +325,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByValueContainsSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where value contains
         defaultCommonFieldDataFiltering("value.contains=" + DEFAULT_VALUE, "value.contains=" + UPDATED_VALUE);
@@ -322,7 +335,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByValueNotContainsSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where value does not contain
         defaultCommonFieldDataFiltering("value.doesNotContain=" + UPDATED_VALUE, "value.doesNotContain=" + DEFAULT_VALUE);
@@ -332,7 +345,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByLabelIsEqualToSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where label equals to
         defaultCommonFieldDataFiltering("label.equals=" + DEFAULT_LABEL, "label.equals=" + UPDATED_LABEL);
@@ -342,7 +355,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByLabelIsInShouldWork() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where label in
         defaultCommonFieldDataFiltering("label.in=" + DEFAULT_LABEL + "," + UPDATED_LABEL, "label.in=" + UPDATED_LABEL);
@@ -352,7 +365,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByLabelIsNullOrNotNull() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where label is not null
         defaultCommonFieldDataFiltering("label.specified=true", "label.specified=false");
@@ -362,7 +375,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByLabelContainsSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where label contains
         defaultCommonFieldDataFiltering("label.contains=" + DEFAULT_LABEL, "label.contains=" + UPDATED_LABEL);
@@ -372,7 +385,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByLabelNotContainsSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where label does not contain
         defaultCommonFieldDataFiltering("label.doesNotContain=" + UPDATED_LABEL, "label.doesNotContain=" + DEFAULT_LABEL);
@@ -382,7 +395,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByValueTypeIsEqualToSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where valueType equals to
         defaultCommonFieldDataFiltering("valueType.equals=" + DEFAULT_VALUE_TYPE, "valueType.equals=" + UPDATED_VALUE_TYPE);
@@ -392,7 +405,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByValueTypeIsInShouldWork() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where valueType in
         defaultCommonFieldDataFiltering(
@@ -405,7 +418,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByValueTypeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where valueType is not null
         defaultCommonFieldDataFiltering("valueType.specified=true", "valueType.specified=false");
@@ -415,7 +428,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByRemarkIsEqualToSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where remark equals to
         defaultCommonFieldDataFiltering("remark.equals=" + DEFAULT_REMARK, "remark.equals=" + UPDATED_REMARK);
@@ -425,7 +438,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByRemarkIsInShouldWork() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where remark in
         defaultCommonFieldDataFiltering("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK, "remark.in=" + UPDATED_REMARK);
@@ -435,7 +448,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByRemarkIsNullOrNotNull() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where remark is not null
         defaultCommonFieldDataFiltering("remark.specified=true", "remark.specified=false");
@@ -445,7 +458,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByRemarkContainsSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where remark contains
         defaultCommonFieldDataFiltering("remark.contains=" + DEFAULT_REMARK, "remark.contains=" + UPDATED_REMARK);
@@ -455,7 +468,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByRemarkNotContainsSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where remark does not contain
         defaultCommonFieldDataFiltering("remark.doesNotContain=" + UPDATED_REMARK, "remark.doesNotContain=" + DEFAULT_REMARK);
@@ -465,7 +478,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataBySortValueIsEqualToSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where sortValue equals to
         defaultCommonFieldDataFiltering("sortValue.equals=" + DEFAULT_SORT_VALUE, "sortValue.equals=" + UPDATED_SORT_VALUE);
@@ -475,7 +488,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataBySortValueIsInShouldWork() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where sortValue in
         defaultCommonFieldDataFiltering(
@@ -488,7 +501,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataBySortValueIsNullOrNotNull() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where sortValue is not null
         defaultCommonFieldDataFiltering("sortValue.specified=true", "sortValue.specified=false");
@@ -498,7 +511,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataBySortValueIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where sortValue is greater than or equal to
         defaultCommonFieldDataFiltering(
@@ -511,7 +524,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataBySortValueIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where sortValue is less than or equal to
         defaultCommonFieldDataFiltering(
@@ -524,7 +537,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataBySortValueIsLessThanSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where sortValue is less than
         defaultCommonFieldDataFiltering("sortValue.lessThan=" + UPDATED_SORT_VALUE, "sortValue.lessThan=" + DEFAULT_SORT_VALUE);
@@ -534,7 +547,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataBySortValueIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where sortValue is greater than
         defaultCommonFieldDataFiltering("sortValue.greaterThan=" + SMALLER_SORT_VALUE, "sortValue.greaterThan=" + DEFAULT_SORT_VALUE);
@@ -544,7 +557,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByDisabledIsEqualToSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where disabled equals to
         defaultCommonFieldDataFiltering("disabled.equals=" + DEFAULT_DISABLED, "disabled.equals=" + UPDATED_DISABLED);
@@ -554,7 +567,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByDisabledIsInShouldWork() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where disabled in
         defaultCommonFieldDataFiltering("disabled.in=" + DEFAULT_DISABLED + "," + UPDATED_DISABLED, "disabled.in=" + UPDATED_DISABLED);
@@ -564,7 +577,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByDisabledIsNullOrNotNull() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where disabled is not null
         defaultCommonFieldDataFiltering("disabled.specified=true", "disabled.specified=false");
@@ -574,7 +587,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByOwnerEntityNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where ownerEntityName equals to
         defaultCommonFieldDataFiltering(
@@ -587,7 +600,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByOwnerEntityNameIsInShouldWork() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where ownerEntityName in
         defaultCommonFieldDataFiltering(
@@ -600,7 +613,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByOwnerEntityNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where ownerEntityName is not null
         defaultCommonFieldDataFiltering("ownerEntityName.specified=true", "ownerEntityName.specified=false");
@@ -610,7 +623,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByOwnerEntityNameContainsSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where ownerEntityName contains
         defaultCommonFieldDataFiltering(
@@ -623,7 +636,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByOwnerEntityNameNotContainsSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where ownerEntityName does not contain
         defaultCommonFieldDataFiltering(
@@ -636,7 +649,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByOwnerEntityIdIsEqualToSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where ownerEntityId equals to
         defaultCommonFieldDataFiltering(
@@ -649,7 +662,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByOwnerEntityIdIsInShouldWork() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where ownerEntityId in
         defaultCommonFieldDataFiltering(
@@ -662,7 +675,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByOwnerEntityIdIsNullOrNotNull() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where ownerEntityId is not null
         defaultCommonFieldDataFiltering("ownerEntityId.specified=true", "ownerEntityId.specified=false");
@@ -672,7 +685,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByOwnerEntityIdIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where ownerEntityId is greater than or equal to
         defaultCommonFieldDataFiltering(
@@ -685,7 +698,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByOwnerEntityIdIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where ownerEntityId is less than or equal to
         defaultCommonFieldDataFiltering(
@@ -698,7 +711,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByOwnerEntityIdIsLessThanSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where ownerEntityId is less than
         defaultCommonFieldDataFiltering(
@@ -711,7 +724,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void getAllCommonFieldDataByOwnerEntityIdIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         // Get all the commonFieldDataList where ownerEntityId is greater than
         defaultCommonFieldDataFiltering(
@@ -782,7 +795,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void putExistingCommonFieldData() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -879,7 +892,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void partialUpdateCommonFieldDataWithPatch() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -890,8 +903,9 @@ public class CommonFieldDataResourceIT {
         partialUpdatedCommonFieldData
             .name(UPDATED_NAME)
             .value(UPDATED_VALUE)
+            .label(UPDATED_LABEL)
             .valueType(UPDATED_VALUE_TYPE)
-            .sortValue(UPDATED_SORT_VALUE)
+            .remark(UPDATED_REMARK)
             .disabled(UPDATED_DISABLED)
             .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
             .ownerEntityId(UPDATED_OWNER_ENTITY_ID);
@@ -917,7 +931,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void fullUpdateCommonFieldDataWithPatch() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1019,7 +1033,7 @@ public class CommonFieldDataResourceIT {
     @Transactional
     void deleteCommonFieldData() throws Exception {
         // Initialize the database
-        commonFieldDataRepository.save(commonFieldData);
+        insertedCommonFieldData = commonFieldDataRepository.saveAndGet(commonFieldData);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

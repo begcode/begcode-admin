@@ -29,6 +29,10 @@ const props = defineProps({
     type: String as PropType<string>,
     default: 'calc(100vh - 78px)',
   },
+  seriesColor: {
+    type: String,
+    default: '#1890ff',
+  },
 });
 
 const chartRef = ref<HTMLDivElement | null>(null);
@@ -97,6 +101,7 @@ function initCharts() {
   }
   option.series[0].data[0].name = props.chartData.name;
   option.series[0].data[0].value = props.chartData.value;
+  option.series[0].color = props.seriesColor;
   setOptions(option as EChartsOption);
 }
 </script>

@@ -22,6 +22,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,6 +99,8 @@ public class SysFillRuleResourceIT {
 
     private SysFillRule sysFillRule;
 
+    private SysFillRule insertedSysFillRule;
+
     /**
      * Create an entity for this test.
      *
@@ -149,6 +152,14 @@ public class SysFillRuleResourceIT {
         sysFillRule = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedSysFillRule != null) {
+            sysFillRuleRepository.deleteById(insertedSysFillRule.getId());
+            insertedSysFillRule = null;
+        }
+    }
+
     @Test
     @Transactional
     void createSysFillRule() throws Exception {
@@ -169,6 +180,8 @@ public class SysFillRuleResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedSysFillRule = sysFillRuleMapper.toEntity(returnedSysFillRuleDTO);
         assertSysFillRuleUpdatableFieldsEquals(returnedSysFillRule, getPersistedSysFillRule(returnedSysFillRule));
+
+        insertedSysFillRule = returnedSysFillRule;
     }
 
     @Test
@@ -193,7 +206,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRules() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList
         restSysFillRuleMockMvc
@@ -219,7 +232,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getSysFillRule() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get the sysFillRule
         restSysFillRuleMockMvc
@@ -245,7 +258,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getSysFillRulesByIdFiltering() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         Long id = sysFillRule.getId();
 
@@ -260,7 +273,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where name equals to
         defaultSysFillRuleFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
@@ -270,7 +283,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByNameIsInShouldWork() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where name in
         defaultSysFillRuleFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
@@ -280,7 +293,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where name is not null
         defaultSysFillRuleFiltering("name.specified=true", "name.specified=false");
@@ -290,7 +303,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByNameContainsSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where name contains
         defaultSysFillRuleFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
@@ -300,7 +313,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByNameNotContainsSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where name does not contain
         defaultSysFillRuleFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
@@ -310,7 +323,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByCodeIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where code equals to
         defaultSysFillRuleFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
@@ -320,7 +333,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByCodeIsInShouldWork() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where code in
         defaultSysFillRuleFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
@@ -330,7 +343,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByCodeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where code is not null
         defaultSysFillRuleFiltering("code.specified=true", "code.specified=false");
@@ -340,7 +353,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByCodeContainsSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where code contains
         defaultSysFillRuleFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
@@ -350,7 +363,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByCodeNotContainsSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where code does not contain
         defaultSysFillRuleFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
@@ -360,7 +373,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByDescIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where desc equals to
         defaultSysFillRuleFiltering("desc.equals=" + DEFAULT_DESC, "desc.equals=" + UPDATED_DESC);
@@ -370,7 +383,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByDescIsInShouldWork() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where desc in
         defaultSysFillRuleFiltering("desc.in=" + DEFAULT_DESC + "," + UPDATED_DESC, "desc.in=" + UPDATED_DESC);
@@ -380,7 +393,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByDescIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where desc is not null
         defaultSysFillRuleFiltering("desc.specified=true", "desc.specified=false");
@@ -390,7 +403,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByDescContainsSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where desc contains
         defaultSysFillRuleFiltering("desc.contains=" + DEFAULT_DESC, "desc.contains=" + UPDATED_DESC);
@@ -400,7 +413,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByDescNotContainsSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where desc does not contain
         defaultSysFillRuleFiltering("desc.doesNotContain=" + UPDATED_DESC, "desc.doesNotContain=" + DEFAULT_DESC);
@@ -410,7 +423,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByEnabledIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where enabled equals to
         defaultSysFillRuleFiltering("enabled.equals=" + DEFAULT_ENABLED, "enabled.equals=" + UPDATED_ENABLED);
@@ -420,7 +433,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByEnabledIsInShouldWork() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where enabled in
         defaultSysFillRuleFiltering("enabled.in=" + DEFAULT_ENABLED + "," + UPDATED_ENABLED, "enabled.in=" + UPDATED_ENABLED);
@@ -430,7 +443,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByEnabledIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where enabled is not null
         defaultSysFillRuleFiltering("enabled.specified=true", "enabled.specified=false");
@@ -440,7 +453,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetFrequencyIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetFrequency equals to
         defaultSysFillRuleFiltering("resetFrequency.equals=" + DEFAULT_RESET_FREQUENCY, "resetFrequency.equals=" + UPDATED_RESET_FREQUENCY);
@@ -450,7 +463,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetFrequencyIsInShouldWork() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetFrequency in
         defaultSysFillRuleFiltering(
@@ -463,7 +476,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetFrequencyIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetFrequency is not null
         defaultSysFillRuleFiltering("resetFrequency.specified=true", "resetFrequency.specified=false");
@@ -473,7 +486,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesBySeqValueIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where seqValue equals to
         defaultSysFillRuleFiltering("seqValue.equals=" + DEFAULT_SEQ_VALUE, "seqValue.equals=" + UPDATED_SEQ_VALUE);
@@ -483,7 +496,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesBySeqValueIsInShouldWork() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where seqValue in
         defaultSysFillRuleFiltering("seqValue.in=" + DEFAULT_SEQ_VALUE + "," + UPDATED_SEQ_VALUE, "seqValue.in=" + UPDATED_SEQ_VALUE);
@@ -493,7 +506,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesBySeqValueIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where seqValue is not null
         defaultSysFillRuleFiltering("seqValue.specified=true", "seqValue.specified=false");
@@ -503,7 +516,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesBySeqValueIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where seqValue is greater than or equal to
         defaultSysFillRuleFiltering("seqValue.greaterThanOrEqual=" + DEFAULT_SEQ_VALUE, "seqValue.greaterThanOrEqual=" + UPDATED_SEQ_VALUE);
@@ -513,7 +526,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesBySeqValueIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where seqValue is less than or equal to
         defaultSysFillRuleFiltering("seqValue.lessThanOrEqual=" + DEFAULT_SEQ_VALUE, "seqValue.lessThanOrEqual=" + SMALLER_SEQ_VALUE);
@@ -523,7 +536,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesBySeqValueIsLessThanSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where seqValue is less than
         defaultSysFillRuleFiltering("seqValue.lessThan=" + UPDATED_SEQ_VALUE, "seqValue.lessThan=" + DEFAULT_SEQ_VALUE);
@@ -533,7 +546,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesBySeqValueIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where seqValue is greater than
         defaultSysFillRuleFiltering("seqValue.greaterThan=" + SMALLER_SEQ_VALUE, "seqValue.greaterThan=" + DEFAULT_SEQ_VALUE);
@@ -543,7 +556,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByFillValueIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where fillValue equals to
         defaultSysFillRuleFiltering("fillValue.equals=" + DEFAULT_FILL_VALUE, "fillValue.equals=" + UPDATED_FILL_VALUE);
@@ -553,7 +566,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByFillValueIsInShouldWork() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where fillValue in
         defaultSysFillRuleFiltering("fillValue.in=" + DEFAULT_FILL_VALUE + "," + UPDATED_FILL_VALUE, "fillValue.in=" + UPDATED_FILL_VALUE);
@@ -563,7 +576,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByFillValueIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where fillValue is not null
         defaultSysFillRuleFiltering("fillValue.specified=true", "fillValue.specified=false");
@@ -573,7 +586,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByFillValueContainsSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where fillValue contains
         defaultSysFillRuleFiltering("fillValue.contains=" + DEFAULT_FILL_VALUE, "fillValue.contains=" + UPDATED_FILL_VALUE);
@@ -583,7 +596,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByFillValueNotContainsSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where fillValue does not contain
         defaultSysFillRuleFiltering("fillValue.doesNotContain=" + UPDATED_FILL_VALUE, "fillValue.doesNotContain=" + DEFAULT_FILL_VALUE);
@@ -593,7 +606,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByImplClassIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where implClass equals to
         defaultSysFillRuleFiltering("implClass.equals=" + DEFAULT_IMPL_CLASS, "implClass.equals=" + UPDATED_IMPL_CLASS);
@@ -603,7 +616,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByImplClassIsInShouldWork() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where implClass in
         defaultSysFillRuleFiltering("implClass.in=" + DEFAULT_IMPL_CLASS + "," + UPDATED_IMPL_CLASS, "implClass.in=" + UPDATED_IMPL_CLASS);
@@ -613,7 +626,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByImplClassIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where implClass is not null
         defaultSysFillRuleFiltering("implClass.specified=true", "implClass.specified=false");
@@ -623,7 +636,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByImplClassContainsSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where implClass contains
         defaultSysFillRuleFiltering("implClass.contains=" + DEFAULT_IMPL_CLASS, "implClass.contains=" + UPDATED_IMPL_CLASS);
@@ -633,7 +646,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByImplClassNotContainsSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where implClass does not contain
         defaultSysFillRuleFiltering("implClass.doesNotContain=" + UPDATED_IMPL_CLASS, "implClass.doesNotContain=" + DEFAULT_IMPL_CLASS);
@@ -643,7 +656,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByParamsIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where params equals to
         defaultSysFillRuleFiltering("params.equals=" + DEFAULT_PARAMS, "params.equals=" + UPDATED_PARAMS);
@@ -653,7 +666,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByParamsIsInShouldWork() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where params in
         defaultSysFillRuleFiltering("params.in=" + DEFAULT_PARAMS + "," + UPDATED_PARAMS, "params.in=" + UPDATED_PARAMS);
@@ -663,7 +676,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByParamsIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where params is not null
         defaultSysFillRuleFiltering("params.specified=true", "params.specified=false");
@@ -673,7 +686,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByParamsContainsSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where params contains
         defaultSysFillRuleFiltering("params.contains=" + DEFAULT_PARAMS, "params.contains=" + UPDATED_PARAMS);
@@ -683,7 +696,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByParamsNotContainsSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where params does not contain
         defaultSysFillRuleFiltering("params.doesNotContain=" + UPDATED_PARAMS, "params.doesNotContain=" + DEFAULT_PARAMS);
@@ -693,7 +706,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetStartTimeIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetStartTime equals to
         defaultSysFillRuleFiltering(
@@ -706,7 +719,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetStartTimeIsInShouldWork() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetStartTime in
         defaultSysFillRuleFiltering(
@@ -719,7 +732,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetStartTimeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetStartTime is not null
         defaultSysFillRuleFiltering("resetStartTime.specified=true", "resetStartTime.specified=false");
@@ -729,7 +742,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetStartTimeIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetStartTime is greater than or equal to
         defaultSysFillRuleFiltering(
@@ -742,7 +755,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetStartTimeIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetStartTime is less than or equal to
         defaultSysFillRuleFiltering(
@@ -755,7 +768,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetStartTimeIsLessThanSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetStartTime is less than
         defaultSysFillRuleFiltering(
@@ -768,7 +781,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetStartTimeIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetStartTime is greater than
         defaultSysFillRuleFiltering(
@@ -781,7 +794,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetEndTimeIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetEndTime equals to
         defaultSysFillRuleFiltering("resetEndTime.equals=" + DEFAULT_RESET_END_TIME, "resetEndTime.equals=" + UPDATED_RESET_END_TIME);
@@ -791,7 +804,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetEndTimeIsInShouldWork() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetEndTime in
         defaultSysFillRuleFiltering(
@@ -804,7 +817,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetEndTimeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetEndTime is not null
         defaultSysFillRuleFiltering("resetEndTime.specified=true", "resetEndTime.specified=false");
@@ -814,7 +827,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetEndTimeIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetEndTime is greater than or equal to
         defaultSysFillRuleFiltering(
@@ -827,7 +840,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetEndTimeIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetEndTime is less than or equal to
         defaultSysFillRuleFiltering(
@@ -840,7 +853,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetEndTimeIsLessThanSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetEndTime is less than
         defaultSysFillRuleFiltering("resetEndTime.lessThan=" + UPDATED_RESET_END_TIME, "resetEndTime.lessThan=" + DEFAULT_RESET_END_TIME);
@@ -850,7 +863,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetEndTimeIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetEndTime is greater than
         defaultSysFillRuleFiltering(
@@ -863,7 +876,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetTimeIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetTime equals to
         defaultSysFillRuleFiltering("resetTime.equals=" + DEFAULT_RESET_TIME, "resetTime.equals=" + UPDATED_RESET_TIME);
@@ -873,7 +886,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetTimeIsInShouldWork() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetTime in
         defaultSysFillRuleFiltering("resetTime.in=" + DEFAULT_RESET_TIME + "," + UPDATED_RESET_TIME, "resetTime.in=" + UPDATED_RESET_TIME);
@@ -883,7 +896,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetTimeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetTime is not null
         defaultSysFillRuleFiltering("resetTime.specified=true", "resetTime.specified=false");
@@ -893,7 +906,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetTimeIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetTime is greater than or equal to
         defaultSysFillRuleFiltering(
@@ -906,7 +919,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetTimeIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetTime is less than or equal to
         defaultSysFillRuleFiltering("resetTime.lessThanOrEqual=" + DEFAULT_RESET_TIME, "resetTime.lessThanOrEqual=" + SMALLER_RESET_TIME);
@@ -916,7 +929,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetTimeIsLessThanSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetTime is less than
         defaultSysFillRuleFiltering("resetTime.lessThan=" + UPDATED_RESET_TIME, "resetTime.lessThan=" + DEFAULT_RESET_TIME);
@@ -926,7 +939,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void getAllSysFillRulesByResetTimeIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         // Get all the sysFillRuleList where resetTime is greater than
         defaultSysFillRuleFiltering("resetTime.greaterThan=" + SMALLER_RESET_TIME, "resetTime.greaterThan=" + DEFAULT_RESET_TIME);
@@ -997,7 +1010,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void putExistingSysFillRule() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1097,7 +1110,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void partialUpdateSysFillRuleWithPatch() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1106,13 +1119,14 @@ public class SysFillRuleResourceIT {
         partialUpdatedSysFillRule.setId(sysFillRule.getId());
 
         partialUpdatedSysFillRule
+            .name(UPDATED_NAME)
             .code(UPDATED_CODE)
+            .desc(UPDATED_DESC)
             .enabled(UPDATED_ENABLED)
             .resetFrequency(UPDATED_RESET_FREQUENCY)
             .fillValue(UPDATED_FILL_VALUE)
             .resetStartTime(UPDATED_RESET_START_TIME)
-            .resetEndTime(UPDATED_RESET_END_TIME)
-            .resetTime(UPDATED_RESET_TIME);
+            .resetEndTime(UPDATED_RESET_END_TIME);
 
         restSysFillRuleMockMvc
             .perform(
@@ -1135,7 +1149,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void fullUpdateSysFillRuleWithPatch() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1237,7 +1251,7 @@ public class SysFillRuleResourceIT {
     @Transactional
     void deleteSysFillRule() throws Exception {
         // Initialize the database
-        sysFillRuleRepository.save(sysFillRule);
+        insertedSysFillRule = sysFillRuleRepository.saveAndGet(sysFillRule);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

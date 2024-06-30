@@ -1,10 +1,10 @@
+import type { DropMenu } from '@begcode/components';
 import type { ComputedRef } from 'vue';
+
 import { computed, unref, reactive } from 'vue';
 import { RouteLocationNormalized, useRouter } from 'vue-router';
-import type { TabContentProps } from './types';
 import { MenuEventEnum } from './types';
-import type { DropMenu } from '@/components/Dropdown';
-
+import type { TabContentProps } from './types';
 import { useMultipleTabStore } from '@/store/modules/multipleTab';
 import { useTabs } from '@/hooks/web/useTabs';
 import { useI18n } from '@/hooks/web/useI18n';
@@ -42,12 +42,27 @@ export function useTabDropdown(tabContentProps: TabContentProps, getIsTabs: Comp
     const index = state.currentIndex;
     const refreshDisabled = !isCurItem;
     // Close left
-    const closeLeftDisabled = index === 0 || !isCurItem;
+    const closeLeftDisabled = () => {
+      if (index === 0) {
+        return true;
+      } else {
+        const validTabList = tabStore.getTabList.filter(item => !item?.meta?.affix);
+        return validTabList[0].path === state.current?.path;
+      }
+    };
 
-    const disabled = tabStore.getTabList.length === 1;
+    const closeOtherDisabled = () => {
+      if (tabStore.getTabList.length === 1) {
+        return true;
+      } else {
+        const validTabList = tabStore.getTabList.filter(item => !item?.meta?.affix);
+        return validTabList.length == 1;
+      }
+    };
 
     // Close right
     const closeRightDisabled = !isCurItem || (index === tabStore.getTabList.length - 1 && tabStore.getLastDragEndIndex >= 0);
+    const disabled = tabStore.getTabList.length === 1;
     const dropMenuList: DropMenu[] = [
       {
         icon: 'ion:reload-sharp',
@@ -66,7 +81,7 @@ export function useTabDropdown(tabContentProps: TabContentProps, getIsTabs: Comp
         icon: 'line-md:arrow-close-left',
         event: MenuEventEnum.CLOSE_LEFT,
         text: t('layout.multipleTab.closeLeft'),
-        disabled: closeLeftDisabled,
+        disabled: closeLeftDisabled(),
         divider: false,
       },
       {
@@ -119,19 +134,19 @@ export function useTabDropdown(tabContentProps: TabContentProps, getIsTabs: Comp
         break;
       // Close left
       case MenuEventEnum.CLOSE_LEFT:
-        closeLeft();
+        closeLeft(state.current);
         break;
       // Close right
       case MenuEventEnum.CLOSE_RIGHT:
-        closeRight();
+        closeRight(state.current);
         break;
       // Close other
       case MenuEventEnum.CLOSE_OTHER:
-        closeOther();
+        closeOther(state.current);
         break;
       // Close all
       case MenuEventEnum.CLOSE_ALL:
-        closeAll();
+        closeAll(state.current);
         break;
     }
   }

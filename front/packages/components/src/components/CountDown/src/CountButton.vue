@@ -2,12 +2,17 @@
   <Button v-bind="$attrs" :disabled="isStart" @click="handleStart" :loading="loading">
     {{ getButtonText }}
   </Button>
+  <CaptchaModal @register="captchaRegisterModal" @ok="handleStart" />
 </template>
 <script lang="ts" setup>
 import { ref, watchEffect, computed, unref, PropType } from 'vue';
 import { Button } from 'ant-design-vue';
 import { useCountdown } from './useCountdown';
 import { isFunction } from 'lodash-es';
+import { useModal } from '@/components/Modal';
+import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
+const CaptchaModal = createAsyncComponent(() => import('@/components/Captcha/src/CaptchaModal.vue'));
+const [captchaRegisterModal, { openModal: openCaptchaModal }] = useModal();
 import { useI18n } from '@/hooks/web/useI18nOut';
 
 defineOptions({ name: 'CountButton' });
@@ -18,6 +23,10 @@ const props = defineProps({
   beforeStartFunc: {
     type: Function as PropType<() => Promise<boolean>>,
     default: null,
+  },
+  openCaptchaModalCode: {
+    type: Number,
+    default: 'NEED_CAPTCHA',
   },
 });
 
@@ -42,7 +51,11 @@ async function handleStart() {
   if (beforeStartFunc && isFunction(beforeStartFunc)) {
     loading.value = true;
     try {
-      const canStart = await beforeStartFunc();
+      const canStart = await beforeStartFunc().catch(res => {
+        if (res.code === props.openCaptchaModalCode) {
+          openCaptchaModal(true, {});
+        }
+      });
       canStart && start();
     } finally {
       loading.value = false;

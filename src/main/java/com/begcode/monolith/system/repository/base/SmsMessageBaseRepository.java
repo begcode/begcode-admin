@@ -3,6 +3,7 @@ package com.begcode.monolith.system.repository.base;
 import com.begcode.monolith.system.domain.SmsMessage;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.ibatis.annotations.*;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -21,6 +22,15 @@ public interface SmsMessageBaseRepository<E extends SmsMessage> extends BaseCrud
 
     default Optional<SmsMessage> findById(Long id) {
         return Optional.ofNullable(this.selectById(id));
+    }
+
+    default SmsMessage saveAndGet(SmsMessage smsMessage) {
+        if (Objects.nonNull(smsMessage.getId())) {
+            this.updateById(smsMessage);
+        } else {
+            this.insert(smsMessage);
+        }
+        return this.selectById(smsMessage.getId());
     }
     // jhipster-needle-repository-add-method - JHipster will add getters and setters here, do not remove
 

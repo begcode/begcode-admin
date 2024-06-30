@@ -8,6 +8,7 @@ import com.begcode.monolith.domain.enumeration.ApiPermissionType;
 import com.diboot.core.binding.Binder;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Select;
@@ -40,6 +41,15 @@ public interface ApiPermissionBaseRepository<E extends ApiPermission> extends Ba
 
     default IPage<ApiPermission> findAllByParentIsNull(IPage<ApiPermission> pageable) {
         return this.selectPage(pageable, new QueryWrapper<ApiPermission>().isNull("parent_id"));
+    }
+
+    default ApiPermission saveAndGet(ApiPermission apiPermission) {
+        if (Objects.nonNull(apiPermission.getId())) {
+            this.updateById(apiPermission);
+        } else {
+            this.insert(apiPermission);
+        }
+        return this.selectById(apiPermission.getId());
     }
 
     default Optional<ApiPermission> findOneByCode(String groupCode) {

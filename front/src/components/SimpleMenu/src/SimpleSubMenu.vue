@@ -6,15 +6,16 @@
       {{ getI18nName }}
     </div>
     <template #title>
-      <span :class="['ml-2', `${prefixCls}-sub-title`]">
+      <span :class="['ml-2', `${prefixCls}-sub-title`]" :data-cy="item.path">
         {{ getI18nName }}
       </span>
       <SimpleMenuTag :item="item" :collapseParent="getIsCollapseParent" />
     </template>
   </MenuItem>
   <SubMenu
-    :name="item.path"
     v-if="menuHasChildren(item) && getShowMenu"
+    :isThemeBright="isThemeBright"
+    :name="item.path"
     :class="[getLevelClass, theme]"
     :collapsedShowTitle="collapsedShowTitle"
   >
@@ -26,13 +27,13 @@
         {{ getI18nName }}
       </div>
 
-      <span v-show="getShowSubTitle" :class="['ml-2', `${prefixCls}-sub-title`]">
+      <span v-show="getShowSubTitle" :class="['ml-2', `${prefixCls}-sub-title`]" :data-cy="item.path">
         {{ getI18nName }}
       </span>
       <SimpleMenuTag :item="item" :collapseParent="!!collapse && !!parent" />
     </template>
     <template v-for="childrenItem in item.children || []" :key="childrenItem.paramPath || childrenItem.path">
-      <SimpleSubMenu v-bind="$props" :item="childrenItem" :parent="false" />
+      <SimpleSubMenu v-bind="$props" :isThemeBright="isThemeBright" :item="childrenItem" :parent="false" />
     </template>
   </SubMenu>
 </template>
@@ -40,13 +41,12 @@
 import type { PropType } from 'vue';
 import type { Menu } from '@/router/types';
 import { computed } from 'vue';
-import { Icon, useDesign } from '@begcode/components';
+import { Icon, useDesign, createAsyncComponent } from '@begcode/components';
 import { checkChildrenHidden } from '@/utils/common/compUtils';
 import MenuItem from './components/MenuItem.vue';
 import SubMenu from './components/SubMenuItem.vue';
 import { propTypes } from '@begcode/components';
 import { useI18n } from '@/hooks/web/useI18n';
-import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
 
 const SimpleMenuTag = createAsyncComponent(() => import('./SimpleMenuTag.vue'));
 
@@ -59,10 +59,23 @@ const props = defineProps({
     type: Object as PropType<Menu>,
     default: () => ({}),
   },
-  parent: propTypes.bool,
-  collapsedShowTitle: propTypes.bool,
-  collapse: propTypes.bool,
+  parent: {
+    type: Boolean,
+    default: false,
+  },
+  collapsedShowTitle: {
+    type: Boolean,
+    default: false,
+  },
+  collapse: {
+    type: Boolean,
+    default: false,
+  },
   theme: propTypes.oneOf(['dark', 'light']),
+  isThemeBright: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const { t } = useI18n();

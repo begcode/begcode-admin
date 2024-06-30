@@ -38,7 +38,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class PositionQueryService implements QueryService<Position> {
 
-    private final Logger log = LoggerFactory.getLogger(PositionQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(PositionQueryService.class);
 
     protected final PositionRepository positionRepository;
 

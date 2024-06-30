@@ -19,12 +19,15 @@ import com.begcode.monolith.domain.User;
 import com.begcode.monolith.domain.ViewPermission;
 import com.begcode.monolith.repository.AuthorityRepository;
 import com.begcode.monolith.repository.AuthorityRepository;
+import com.begcode.monolith.repository.UserRepository;
+import com.begcode.monolith.repository.UserRepository;
 import com.begcode.monolith.service.AuthorityService;
 import com.begcode.monolith.service.dto.AuthorityDTO;
 import com.begcode.monolith.service.mapper.AuthorityMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -73,6 +76,9 @@ public class AuthorityResourceIT {
     @Autowired
     private AuthorityRepository authorityRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Mock
     private AuthorityRepository authorityRepositoryMock;
 
@@ -86,6 +92,8 @@ public class AuthorityResourceIT {
     private MockMvc restAuthorityMockMvc;
 
     private Authority authority;
+
+    private Authority insertedAuthority;
 
     /**
      * Create an entity for this test.
@@ -124,6 +132,14 @@ public class AuthorityResourceIT {
         authority = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedAuthority != null) {
+            authorityRepository.deleteById(insertedAuthority.getId());
+            insertedAuthority = null;
+        }
+    }
+
     @Test
     @Transactional
     void createAuthority() throws Exception {
@@ -144,6 +160,8 @@ public class AuthorityResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedAuthority = authorityMapper.toEntity(returnedAuthorityDTO);
         assertAuthorityUpdatableFieldsEquals(returnedAuthority, getPersistedAuthority(returnedAuthority));
+
+        insertedAuthority = returnedAuthority;
     }
 
     @Test
@@ -168,7 +186,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthorities() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList
         restAuthorityMockMvc
@@ -204,7 +222,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAuthority() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get the authority
         restAuthorityMockMvc
@@ -223,7 +241,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAuthoritiesByIdFiltering() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         Long id = authority.getId();
 
@@ -238,7 +256,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where name equals to
         defaultAuthorityFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
@@ -248,7 +266,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByNameIsInShouldWork() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where name in
         defaultAuthorityFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
@@ -258,7 +276,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where name is not null
         defaultAuthorityFiltering("name.specified=true", "name.specified=false");
@@ -268,7 +286,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByNameContainsSomething() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where name contains
         defaultAuthorityFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
@@ -278,7 +296,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByNameNotContainsSomething() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where name does not contain
         defaultAuthorityFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
@@ -288,7 +306,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByCodeIsEqualToSomething() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where code equals to
         defaultAuthorityFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
@@ -298,7 +316,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByCodeIsInShouldWork() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where code in
         defaultAuthorityFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
@@ -308,7 +326,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByCodeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where code is not null
         defaultAuthorityFiltering("code.specified=true", "code.specified=false");
@@ -318,7 +336,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByCodeContainsSomething() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where code contains
         defaultAuthorityFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
@@ -328,7 +346,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByCodeNotContainsSomething() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where code does not contain
         defaultAuthorityFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
@@ -338,7 +356,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByInfoIsEqualToSomething() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where info equals to
         defaultAuthorityFiltering("info.equals=" + DEFAULT_INFO, "info.equals=" + UPDATED_INFO);
@@ -348,7 +366,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByInfoIsInShouldWork() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where info in
         defaultAuthorityFiltering("info.in=" + DEFAULT_INFO + "," + UPDATED_INFO, "info.in=" + UPDATED_INFO);
@@ -358,7 +376,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByInfoIsNullOrNotNull() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where info is not null
         defaultAuthorityFiltering("info.specified=true", "info.specified=false");
@@ -368,7 +386,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByInfoContainsSomething() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where info contains
         defaultAuthorityFiltering("info.contains=" + DEFAULT_INFO, "info.contains=" + UPDATED_INFO);
@@ -378,7 +396,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByInfoNotContainsSomething() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where info does not contain
         defaultAuthorityFiltering("info.doesNotContain=" + UPDATED_INFO, "info.doesNotContain=" + DEFAULT_INFO);
@@ -388,7 +406,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByOrderIsEqualToSomething() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where order equals to
         defaultAuthorityFiltering("order.equals=" + DEFAULT_ORDER, "order.equals=" + UPDATED_ORDER);
@@ -398,7 +416,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByOrderIsInShouldWork() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where order in
         defaultAuthorityFiltering("order.in=" + DEFAULT_ORDER + "," + UPDATED_ORDER, "order.in=" + UPDATED_ORDER);
@@ -408,7 +426,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByOrderIsNullOrNotNull() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where order is not null
         defaultAuthorityFiltering("order.specified=true", "order.specified=false");
@@ -418,7 +436,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByOrderIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where order is greater than or equal to
         defaultAuthorityFiltering("order.greaterThanOrEqual=" + DEFAULT_ORDER, "order.greaterThanOrEqual=" + UPDATED_ORDER);
@@ -428,7 +446,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByOrderIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where order is less than or equal to
         defaultAuthorityFiltering("order.lessThanOrEqual=" + DEFAULT_ORDER, "order.lessThanOrEqual=" + SMALLER_ORDER);
@@ -438,7 +456,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByOrderIsLessThanSomething() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where order is less than
         defaultAuthorityFiltering("order.lessThan=" + UPDATED_ORDER, "order.lessThan=" + DEFAULT_ORDER);
@@ -448,7 +466,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByOrderIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where order is greater than
         defaultAuthorityFiltering("order.greaterThan=" + SMALLER_ORDER, "order.greaterThan=" + DEFAULT_ORDER);
@@ -458,7 +476,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByDisplayIsEqualToSomething() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where display equals to
         defaultAuthorityFiltering("display.equals=" + DEFAULT_DISPLAY, "display.equals=" + UPDATED_DISPLAY);
@@ -468,7 +486,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByDisplayIsInShouldWork() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where display in
         defaultAuthorityFiltering("display.in=" + DEFAULT_DISPLAY + "," + UPDATED_DISPLAY, "display.in=" + UPDATED_DISPLAY);
@@ -478,7 +496,7 @@ public class AuthorityResourceIT {
     @Transactional
     void getAllAuthoritiesByDisplayIsNullOrNotNull() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         // Get all the authorityList where display is not null
         defaultAuthorityFiltering("display.specified=true", "display.specified=false");
@@ -612,7 +630,7 @@ public class AuthorityResourceIT {
     @Transactional
     void putExistingAuthority() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -700,7 +718,7 @@ public class AuthorityResourceIT {
     @Transactional
     void partialUpdateAuthorityWithPatch() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -708,7 +726,7 @@ public class AuthorityResourceIT {
         Authority partialUpdatedAuthority = new Authority();
         partialUpdatedAuthority.setId(authority.getId());
 
-        partialUpdatedAuthority.info(UPDATED_INFO).order(UPDATED_ORDER);
+        partialUpdatedAuthority.name(UPDATED_NAME).display(UPDATED_DISPLAY);
 
         restAuthorityMockMvc
             .perform(
@@ -731,7 +749,7 @@ public class AuthorityResourceIT {
     @Transactional
     void fullUpdateAuthorityWithPatch() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -821,7 +839,7 @@ public class AuthorityResourceIT {
     @Transactional
     void deleteAuthority() throws Exception {
         // Initialize the database
-        authorityRepository.save(authority);
+        insertedAuthority = authorityRepository.saveAndGet(authority);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

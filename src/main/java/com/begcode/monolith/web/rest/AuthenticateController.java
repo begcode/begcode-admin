@@ -50,7 +50,7 @@ import org.springframework.web.bind.annotation.*;
  */
 public class AuthenticateController {
 
-    private final Logger log = LoggerFactory.getLogger(AuthenticateController.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthenticateController.class);
     private static final String BASE_CHECK_CODES = "qwertyuiplkjhgfdsazxcvbnmQWERTYUPLKJHGFDSAZXCVBNM1234567890";
 
     protected final JwtEncoder jwtEncoder;

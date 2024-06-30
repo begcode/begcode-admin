@@ -61,7 +61,7 @@ const fields = (): FormSchema[] => {
       field: 'jobStatus',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择任务状态', options: getEnumDict('JobStatus'), style: 'width: 100%' };
+        return { placeholder: '请选择任务状态', options: getEnumDict('JobStatus'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },

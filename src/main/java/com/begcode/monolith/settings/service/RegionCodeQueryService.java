@@ -40,7 +40,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class RegionCodeQueryService implements QueryService<RegionCode> {
 
-    private final Logger log = LoggerFactory.getLogger(RegionCodeQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(RegionCodeQueryService.class);
 
     protected final RegionCodeRepository regionCodeRepository;
 

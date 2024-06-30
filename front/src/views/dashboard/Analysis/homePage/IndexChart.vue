@@ -5,17 +5,11 @@
     <Row>
       <Col :span="24">
         <Card :loading="loading" :bordered="false" title="最近一周访问量统计" :style="{ marginTop: '24px' }">
-          <Row>
-            <Col :span="6">
-              <HeadInfo title="今日IP" :content="loginfo.todayIp" icon="environment"></HeadInfo>
-            </Col>
-            <Col :span="6">
-              <HeadInfo title="今日访问" :content="loginfo.todayVisitCount" icon="team"></HeadInfo>
-            </Col>
-            <Col :span="6">
-              <HeadInfo title="总访问量" :content="loginfo.totalVisitCount" icon="rise"></HeadInfo>
-            </Col>
-          </Row>
+          <div class="infoArea">
+            <HeadInfo title="今日IP" :iconColor="ipColor" :content="loginfo.todayIp" icon="environment" />
+            <HeadInfo title="今日访问" :iconColor="visitColor" :content="loginfo.todayVisitCount" icon="team" />
+            <HeadInfo title="总访问量" :iconColor="seriesColor" :content="loginfo.totalVisitCount" icon="rise" />
+          </div>
           <LineMulti :chartData="lineMultiData" height="50vh" type="line" :option="{ legend: { top: 'bottom' } }"></LineMulti>
         </Card>
       </Col>
@@ -23,14 +17,16 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { Row, Col, Card } from 'ant-design-vue';
 import ChartGroupCard from '../components/ChartGroupCard.vue';
 import SaleTabCard from '../components/SaleTabCard.vue';
 import { HeadInfo, LineMulti } from '@begcode/components';
 import { getLoginfo, getVisitInfo } from '../api';
+import { useRootSetting } from '@/hooks/setting/useRootSetting';
 
 const loading = ref(true);
+const { getThemeColor } = useRootSetting();
 
 setTimeout(() => {
   loading.value = false;
@@ -52,17 +48,49 @@ function initLogInfo() {
     if (res.success) {
       lineMultiData.value = [];
       res.result.forEach(item => {
-        lineMultiData.value.push({ name: item.type, type: 'ip', value: item.ip });
-        lineMultiData.value.push({ name: item.type, type: 'visit', value: item.visit });
+        lineMultiData.value.push({ name: item.type, type: 'ip', value: item.ip, color: ipColor.value });
+        lineMultiData.value.push({ name: item.type, type: 'visit', value: item.visit, color: visitColor.value });
       });
     }
   });
 }
 
-initLogInfo();
+const ipColor = ref();
+const visitColor = ref();
+const seriesColor = ref();
+watch(
+  () => getThemeColor.value,
+  () => {
+    seriesColor.value = getThemeColor.value;
+    visitColor.value = '#67B962';
+    ipColor.value = getThemeColor.value;
+    initLogInfo();
+  },
+  { immediate: true },
+);
+
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
 </script>
 
 <style lang="less" scoped>
+.infoArea {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10%;
+  .head-info.center {
+    padding: 0;
+  }
+  .head-info {
+    min-width: 0;
+  }
+}
 .circle-cust {
   position: relative;
   top: 28px;
@@ -111,6 +139,11 @@ initLogInfo();
       font-weight: 600;
       font-size: 1rem;
     }
+  }
+}
+.ant-card {
+  ::v-deep(.ant-card-head-title) {
+    font-weight: normal;
   }
 }
 </style>

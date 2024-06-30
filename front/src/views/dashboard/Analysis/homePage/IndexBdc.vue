@@ -143,6 +143,14 @@ loadDataSource1();
 </script>
 
 <style lang="less" scoped>
+.ant-table-wrapper {
+  :deep(.ant-table) {
+    td,
+    th {
+      padding: 10px;
+    }
+  }
+}
 .extra-wrapper {
   line-height: 55px;
   padding-right: 24px;

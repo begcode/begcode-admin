@@ -28,6 +28,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,6 +127,8 @@ public class AnnouncementResourceIT {
 
     private Announcement announcement;
 
+    private Announcement insertedAnnouncement;
+
     /**
      * Create an entity for this test.
      *
@@ -189,6 +192,14 @@ public class AnnouncementResourceIT {
         announcement = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedAnnouncement != null) {
+            announcementRepository.deleteById(insertedAnnouncement.getId());
+            insertedAnnouncement = null;
+        }
+    }
+
     @Test
     @Transactional
     void createAnnouncement() throws Exception {
@@ -209,6 +220,8 @@ public class AnnouncementResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedAnnouncement = announcementMapper.toEntity(returnedAnnouncementDTO);
         assertAnnouncementUpdatableFieldsEquals(returnedAnnouncement, getPersistedAnnouncement(returnedAnnouncement));
+
+        insertedAnnouncement = returnedAnnouncement;
     }
 
     @Test
@@ -267,7 +280,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncements() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList
         restAnnouncementMockMvc
@@ -299,7 +312,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAnnouncement() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get the announcement
         restAnnouncementMockMvc
@@ -331,7 +344,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAnnouncementsByIdFiltering() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         Long id = announcement.getId();
 
@@ -346,7 +359,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByTitleIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where title equals to
         defaultAnnouncementFiltering("title.equals=" + DEFAULT_TITLE, "title.equals=" + UPDATED_TITLE);
@@ -356,7 +369,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByTitleIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where title in
         defaultAnnouncementFiltering("title.in=" + DEFAULT_TITLE + "," + UPDATED_TITLE, "title.in=" + UPDATED_TITLE);
@@ -366,7 +379,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByTitleIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where title is not null
         defaultAnnouncementFiltering("title.specified=true", "title.specified=false");
@@ -376,7 +389,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByTitleContainsSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where title contains
         defaultAnnouncementFiltering("title.contains=" + DEFAULT_TITLE, "title.contains=" + UPDATED_TITLE);
@@ -386,7 +399,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByTitleNotContainsSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where title does not contain
         defaultAnnouncementFiltering("title.doesNotContain=" + UPDATED_TITLE, "title.doesNotContain=" + DEFAULT_TITLE);
@@ -396,7 +409,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByStartTimeIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where startTime equals to
         defaultAnnouncementFiltering("startTime.equals=" + DEFAULT_START_TIME, "startTime.equals=" + UPDATED_START_TIME);
@@ -406,7 +419,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByStartTimeIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where startTime in
         defaultAnnouncementFiltering("startTime.in=" + DEFAULT_START_TIME + "," + UPDATED_START_TIME, "startTime.in=" + UPDATED_START_TIME);
@@ -416,7 +429,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByStartTimeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where startTime is not null
         defaultAnnouncementFiltering("startTime.specified=true", "startTime.specified=false");
@@ -426,7 +439,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByStartTimeIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where startTime is greater than or equal to
         defaultAnnouncementFiltering(
@@ -439,7 +452,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByStartTimeIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where startTime is less than or equal to
         defaultAnnouncementFiltering("startTime.lessThanOrEqual=" + DEFAULT_START_TIME, "startTime.lessThanOrEqual=" + SMALLER_START_TIME);
@@ -449,7 +462,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByStartTimeIsLessThanSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where startTime is less than
         defaultAnnouncementFiltering("startTime.lessThan=" + UPDATED_START_TIME, "startTime.lessThan=" + DEFAULT_START_TIME);
@@ -459,7 +472,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByStartTimeIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where startTime is greater than
         defaultAnnouncementFiltering("startTime.greaterThan=" + SMALLER_START_TIME, "startTime.greaterThan=" + DEFAULT_START_TIME);
@@ -469,7 +482,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByEndTimeIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where endTime equals to
         defaultAnnouncementFiltering("endTime.equals=" + DEFAULT_END_TIME, "endTime.equals=" + UPDATED_END_TIME);
@@ -479,7 +492,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByEndTimeIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where endTime in
         defaultAnnouncementFiltering("endTime.in=" + DEFAULT_END_TIME + "," + UPDATED_END_TIME, "endTime.in=" + UPDATED_END_TIME);
@@ -489,7 +502,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByEndTimeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where endTime is not null
         defaultAnnouncementFiltering("endTime.specified=true", "endTime.specified=false");
@@ -499,7 +512,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByEndTimeIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where endTime is greater than or equal to
         defaultAnnouncementFiltering("endTime.greaterThanOrEqual=" + DEFAULT_END_TIME, "endTime.greaterThanOrEqual=" + UPDATED_END_TIME);
@@ -509,7 +522,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByEndTimeIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where endTime is less than or equal to
         defaultAnnouncementFiltering("endTime.lessThanOrEqual=" + DEFAULT_END_TIME, "endTime.lessThanOrEqual=" + SMALLER_END_TIME);
@@ -519,7 +532,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByEndTimeIsLessThanSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where endTime is less than
         defaultAnnouncementFiltering("endTime.lessThan=" + UPDATED_END_TIME, "endTime.lessThan=" + DEFAULT_END_TIME);
@@ -529,7 +542,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByEndTimeIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where endTime is greater than
         defaultAnnouncementFiltering("endTime.greaterThan=" + SMALLER_END_TIME, "endTime.greaterThan=" + DEFAULT_END_TIME);
@@ -539,7 +552,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsBySenderIdIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where senderId equals to
         defaultAnnouncementFiltering("senderId.equals=" + DEFAULT_SENDER_ID, "senderId.equals=" + UPDATED_SENDER_ID);
@@ -549,7 +562,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsBySenderIdIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where senderId in
         defaultAnnouncementFiltering("senderId.in=" + DEFAULT_SENDER_ID + "," + UPDATED_SENDER_ID, "senderId.in=" + UPDATED_SENDER_ID);
@@ -559,7 +572,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsBySenderIdIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where senderId is not null
         defaultAnnouncementFiltering("senderId.specified=true", "senderId.specified=false");
@@ -569,7 +582,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsBySenderIdIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where senderId is greater than or equal to
         defaultAnnouncementFiltering(
@@ -582,7 +595,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsBySenderIdIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where senderId is less than or equal to
         defaultAnnouncementFiltering("senderId.lessThanOrEqual=" + DEFAULT_SENDER_ID, "senderId.lessThanOrEqual=" + SMALLER_SENDER_ID);
@@ -592,7 +605,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsBySenderIdIsLessThanSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where senderId is less than
         defaultAnnouncementFiltering("senderId.lessThan=" + UPDATED_SENDER_ID, "senderId.lessThan=" + DEFAULT_SENDER_ID);
@@ -602,7 +615,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsBySenderIdIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where senderId is greater than
         defaultAnnouncementFiltering("senderId.greaterThan=" + SMALLER_SENDER_ID, "senderId.greaterThan=" + DEFAULT_SENDER_ID);
@@ -612,7 +625,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByPriorityIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where priority equals to
         defaultAnnouncementFiltering("priority.equals=" + DEFAULT_PRIORITY, "priority.equals=" + UPDATED_PRIORITY);
@@ -622,7 +635,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByPriorityIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where priority in
         defaultAnnouncementFiltering("priority.in=" + DEFAULT_PRIORITY + "," + UPDATED_PRIORITY, "priority.in=" + UPDATED_PRIORITY);
@@ -632,7 +645,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByPriorityIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where priority is not null
         defaultAnnouncementFiltering("priority.specified=true", "priority.specified=false");
@@ -642,7 +655,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCategoryIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where category equals to
         defaultAnnouncementFiltering("category.equals=" + DEFAULT_CATEGORY, "category.equals=" + UPDATED_CATEGORY);
@@ -652,7 +665,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCategoryIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where category in
         defaultAnnouncementFiltering("category.in=" + DEFAULT_CATEGORY + "," + UPDATED_CATEGORY, "category.in=" + UPDATED_CATEGORY);
@@ -662,7 +675,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCategoryIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where category is not null
         defaultAnnouncementFiltering("category.specified=true", "category.specified=false");
@@ -672,7 +685,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByReceiverTypeIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where receiverType equals to
         defaultAnnouncementFiltering("receiverType.equals=" + DEFAULT_RECEIVER_TYPE, "receiverType.equals=" + UPDATED_RECEIVER_TYPE);
@@ -682,7 +695,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByReceiverTypeIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where receiverType in
         defaultAnnouncementFiltering(
@@ -695,7 +708,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByReceiverTypeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where receiverType is not null
         defaultAnnouncementFiltering("receiverType.specified=true", "receiverType.specified=false");
@@ -705,7 +718,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsBySendStatusIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where sendStatus equals to
         defaultAnnouncementFiltering("sendStatus.equals=" + DEFAULT_SEND_STATUS, "sendStatus.equals=" + UPDATED_SEND_STATUS);
@@ -715,7 +728,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsBySendStatusIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where sendStatus in
         defaultAnnouncementFiltering(
@@ -728,7 +741,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsBySendStatusIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where sendStatus is not null
         defaultAnnouncementFiltering("sendStatus.specified=true", "sendStatus.specified=false");
@@ -738,7 +751,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsBySendTimeIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where sendTime equals to
         defaultAnnouncementFiltering("sendTime.equals=" + DEFAULT_SEND_TIME, "sendTime.equals=" + UPDATED_SEND_TIME);
@@ -748,7 +761,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsBySendTimeIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where sendTime in
         defaultAnnouncementFiltering("sendTime.in=" + DEFAULT_SEND_TIME + "," + UPDATED_SEND_TIME, "sendTime.in=" + UPDATED_SEND_TIME);
@@ -758,7 +771,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsBySendTimeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where sendTime is not null
         defaultAnnouncementFiltering("sendTime.specified=true", "sendTime.specified=false");
@@ -768,7 +781,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsBySendTimeIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where sendTime is greater than or equal to
         defaultAnnouncementFiltering(
@@ -781,7 +794,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsBySendTimeIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where sendTime is less than or equal to
         defaultAnnouncementFiltering("sendTime.lessThanOrEqual=" + DEFAULT_SEND_TIME, "sendTime.lessThanOrEqual=" + SMALLER_SEND_TIME);
@@ -791,7 +804,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsBySendTimeIsLessThanSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where sendTime is less than
         defaultAnnouncementFiltering("sendTime.lessThan=" + UPDATED_SEND_TIME, "sendTime.lessThan=" + DEFAULT_SEND_TIME);
@@ -801,7 +814,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsBySendTimeIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where sendTime is greater than
         defaultAnnouncementFiltering("sendTime.greaterThan=" + SMALLER_SEND_TIME, "sendTime.greaterThan=" + DEFAULT_SEND_TIME);
@@ -811,7 +824,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCancelTimeIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where cancelTime equals to
         defaultAnnouncementFiltering("cancelTime.equals=" + DEFAULT_CANCEL_TIME, "cancelTime.equals=" + UPDATED_CANCEL_TIME);
@@ -821,7 +834,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCancelTimeIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where cancelTime in
         defaultAnnouncementFiltering(
@@ -834,7 +847,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCancelTimeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where cancelTime is not null
         defaultAnnouncementFiltering("cancelTime.specified=true", "cancelTime.specified=false");
@@ -844,7 +857,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCancelTimeIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where cancelTime is greater than or equal to
         defaultAnnouncementFiltering(
@@ -857,7 +870,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCancelTimeIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where cancelTime is less than or equal to
         defaultAnnouncementFiltering(
@@ -870,7 +883,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCancelTimeIsLessThanSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where cancelTime is less than
         defaultAnnouncementFiltering("cancelTime.lessThan=" + UPDATED_CANCEL_TIME, "cancelTime.lessThan=" + DEFAULT_CANCEL_TIME);
@@ -880,7 +893,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCancelTimeIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where cancelTime is greater than
         defaultAnnouncementFiltering("cancelTime.greaterThan=" + SMALLER_CANCEL_TIME, "cancelTime.greaterThan=" + DEFAULT_CANCEL_TIME);
@@ -890,7 +903,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByBusinessTypeIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where businessType equals to
         defaultAnnouncementFiltering("businessType.equals=" + DEFAULT_BUSINESS_TYPE, "businessType.equals=" + UPDATED_BUSINESS_TYPE);
@@ -900,7 +913,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByBusinessTypeIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where businessType in
         defaultAnnouncementFiltering(
@@ -913,7 +926,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByBusinessTypeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where businessType is not null
         defaultAnnouncementFiltering("businessType.specified=true", "businessType.specified=false");
@@ -923,7 +936,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByBusinessIdIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where businessId equals to
         defaultAnnouncementFiltering("businessId.equals=" + DEFAULT_BUSINESS_ID, "businessId.equals=" + UPDATED_BUSINESS_ID);
@@ -933,7 +946,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByBusinessIdIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where businessId in
         defaultAnnouncementFiltering(
@@ -946,7 +959,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByBusinessIdIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where businessId is not null
         defaultAnnouncementFiltering("businessId.specified=true", "businessId.specified=false");
@@ -956,7 +969,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByBusinessIdIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where businessId is greater than or equal to
         defaultAnnouncementFiltering(
@@ -969,7 +982,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByBusinessIdIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where businessId is less than or equal to
         defaultAnnouncementFiltering(
@@ -982,7 +995,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByBusinessIdIsLessThanSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where businessId is less than
         defaultAnnouncementFiltering("businessId.lessThan=" + UPDATED_BUSINESS_ID, "businessId.lessThan=" + DEFAULT_BUSINESS_ID);
@@ -992,7 +1005,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByBusinessIdIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where businessId is greater than
         defaultAnnouncementFiltering("businessId.greaterThan=" + SMALLER_BUSINESS_ID, "businessId.greaterThan=" + DEFAULT_BUSINESS_ID);
@@ -1002,7 +1015,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByOpenTypeIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where openType equals to
         defaultAnnouncementFiltering("openType.equals=" + DEFAULT_OPEN_TYPE, "openType.equals=" + UPDATED_OPEN_TYPE);
@@ -1012,7 +1025,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByOpenTypeIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where openType in
         defaultAnnouncementFiltering("openType.in=" + DEFAULT_OPEN_TYPE + "," + UPDATED_OPEN_TYPE, "openType.in=" + UPDATED_OPEN_TYPE);
@@ -1022,7 +1035,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByOpenTypeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where openType is not null
         defaultAnnouncementFiltering("openType.specified=true", "openType.specified=false");
@@ -1032,7 +1045,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByOpenPageIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where openPage equals to
         defaultAnnouncementFiltering("openPage.equals=" + DEFAULT_OPEN_PAGE, "openPage.equals=" + UPDATED_OPEN_PAGE);
@@ -1042,7 +1055,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByOpenPageIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where openPage in
         defaultAnnouncementFiltering("openPage.in=" + DEFAULT_OPEN_PAGE + "," + UPDATED_OPEN_PAGE, "openPage.in=" + UPDATED_OPEN_PAGE);
@@ -1052,7 +1065,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByOpenPageIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where openPage is not null
         defaultAnnouncementFiltering("openPage.specified=true", "openPage.specified=false");
@@ -1062,7 +1075,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByOpenPageContainsSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where openPage contains
         defaultAnnouncementFiltering("openPage.contains=" + DEFAULT_OPEN_PAGE, "openPage.contains=" + UPDATED_OPEN_PAGE);
@@ -1072,7 +1085,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByOpenPageNotContainsSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where openPage does not contain
         defaultAnnouncementFiltering("openPage.doesNotContain=" + UPDATED_OPEN_PAGE, "openPage.doesNotContain=" + DEFAULT_OPEN_PAGE);
@@ -1082,7 +1095,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCreatedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where createdBy equals to
         defaultAnnouncementFiltering("createdBy.equals=" + DEFAULT_CREATED_BY, "createdBy.equals=" + UPDATED_CREATED_BY);
@@ -1092,7 +1105,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCreatedByIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where createdBy in
         defaultAnnouncementFiltering("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY, "createdBy.in=" + UPDATED_CREATED_BY);
@@ -1102,7 +1115,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCreatedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where createdBy is not null
         defaultAnnouncementFiltering("createdBy.specified=true", "createdBy.specified=false");
@@ -1112,7 +1125,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCreatedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where createdBy is greater than or equal to
         defaultAnnouncementFiltering(
@@ -1125,7 +1138,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCreatedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where createdBy is less than or equal to
         defaultAnnouncementFiltering("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
@@ -1135,7 +1148,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCreatedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where createdBy is less than
         defaultAnnouncementFiltering("createdBy.lessThan=" + UPDATED_CREATED_BY, "createdBy.lessThan=" + DEFAULT_CREATED_BY);
@@ -1145,7 +1158,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCreatedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where createdBy is greater than
         defaultAnnouncementFiltering("createdBy.greaterThan=" + SMALLER_CREATED_BY, "createdBy.greaterThan=" + DEFAULT_CREATED_BY);
@@ -1155,7 +1168,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCreatedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where createdDate equals to
         defaultAnnouncementFiltering("createdDate.equals=" + DEFAULT_CREATED_DATE, "createdDate.equals=" + UPDATED_CREATED_DATE);
@@ -1165,7 +1178,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCreatedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where createdDate in
         defaultAnnouncementFiltering(
@@ -1178,7 +1191,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByCreatedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where createdDate is not null
         defaultAnnouncementFiltering("createdDate.specified=true", "createdDate.specified=false");
@@ -1188,7 +1201,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByLastModifiedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where lastModifiedBy equals to
         defaultAnnouncementFiltering(
@@ -1201,7 +1214,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByLastModifiedByIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where lastModifiedBy in
         defaultAnnouncementFiltering(
@@ -1214,7 +1227,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByLastModifiedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where lastModifiedBy is not null
         defaultAnnouncementFiltering("lastModifiedBy.specified=true", "lastModifiedBy.specified=false");
@@ -1224,7 +1237,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByLastModifiedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where lastModifiedBy is greater than or equal to
         defaultAnnouncementFiltering(
@@ -1237,7 +1250,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByLastModifiedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where lastModifiedBy is less than or equal to
         defaultAnnouncementFiltering(
@@ -1250,7 +1263,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByLastModifiedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where lastModifiedBy is less than
         defaultAnnouncementFiltering(
@@ -1263,7 +1276,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByLastModifiedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where lastModifiedBy is greater than
         defaultAnnouncementFiltering(
@@ -1276,7 +1289,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByLastModifiedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where lastModifiedDate equals to
         defaultAnnouncementFiltering(
@@ -1289,7 +1302,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByLastModifiedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where lastModifiedDate in
         defaultAnnouncementFiltering(
@@ -1302,7 +1315,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void getAllAnnouncementsByLastModifiedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         // Get all the announcementList where lastModifiedDate is not null
         defaultAnnouncementFiltering("lastModifiedDate.specified=true", "lastModifiedDate.specified=false");
@@ -1379,7 +1392,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void putExistingAnnouncement() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1485,7 +1498,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void partialUpdateAnnouncementWithPatch() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1494,16 +1507,14 @@ public class AnnouncementResourceIT {
         partialUpdatedAnnouncement.setId(announcement.getId());
 
         partialUpdatedAnnouncement
-            .title(UPDATED_TITLE)
-            .startTime(UPDATED_START_TIME)
-            .priority(UPDATED_PRIORITY)
+            .senderId(UPDATED_SENDER_ID)
             .category(UPDATED_CATEGORY)
-            .receiverType(UPDATED_RECEIVER_TYPE)
             .sendStatus(UPDATED_SEND_STATUS)
-            .cancelTime(UPDATED_CANCEL_TIME)
+            .sendTime(UPDATED_SEND_TIME)
+            .businessType(UPDATED_BUSINESS_TYPE)
             .businessId(UPDATED_BUSINESS_ID)
             .openType(UPDATED_OPEN_TYPE)
-            .openPage(UPDATED_OPEN_PAGE)
+            .createdBy(UPDATED_CREATED_BY)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
             .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
@@ -1528,7 +1539,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void fullUpdateAnnouncementWithPatch() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1636,7 +1647,7 @@ public class AnnouncementResourceIT {
     @Transactional
     void deleteAnnouncement() throws Exception {
         // Initialize the database
-        announcementRepository.save(announcement);
+        insertedAnnouncement = announcementRepository.saveAndGet(announcement);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

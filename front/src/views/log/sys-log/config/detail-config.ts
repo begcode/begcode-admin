@@ -16,7 +16,7 @@ const fields: DescItem[] = [
     field: 'logType',
     format: (value, _data) => {
       const { getEnumDict } = useI18n();
-      return getEnumDict('LogType').find(item => item.value === value) || value;
+      return (getEnumDict('LogType').find(item => item.value === value) || { value: value, label: value }).label;
     },
   },
   {
@@ -28,7 +28,7 @@ const fields: DescItem[] = [
     field: 'operateType',
     format: (value, _data) => {
       const { getEnumDict } = useI18n();
-      return getEnumDict('OperateType').find(item => item.value === value) || value;
+      return (getEnumDict('OperateType').find(item => item.value === value) || { value: value, label: value }).label;
     },
   },
   {

@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BusinessTypeBaseService<R extends BusinessTypeRepository, E extends BusinessType>
     extends BaseServiceImpl<BusinessTypeRepository, BusinessType> {
 
-    private final Logger log = LoggerFactory.getLogger(BusinessTypeBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(BusinessTypeBaseService.class);
     private final List<String> relationNames = List.of();
 
     protected final BusinessTypeRepository businessTypeRepository;

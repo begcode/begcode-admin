@@ -2,24 +2,26 @@
   <div ref="chartRef" :style="{ height, width }"></div>
 </template>
 <script lang="ts" setup>
-import { onMounted, ref, Ref } from 'vue';
+import { onMounted, ref, Ref, watchEffect } from 'vue';
 import { useECharts } from '@begcode/components';
 import { basicProps } from './props';
+import { useRootSetting } from '@/hooks/setting/useRootSetting';
 
 defineProps({
   ...basicProps,
 });
 
 const chartRef = ref<HTMLDivElement | null>(null);
+const { getThemeColor } = useRootSetting();
 const { setOptions } = useECharts(chartRef as Ref<HTMLDivElement>);
-onMounted(() => {
+const init = () => {
   setOptions({
     tooltip: {
       trigger: 'axis',
       axisPointer: {
         lineStyle: {
           width: 1,
-          color: '#019680',
+          color: getThemeColor.value,
         },
       },
     },
@@ -38,8 +40,13 @@ onMounted(() => {
         data: [3000, 2000, 3333, 5000, 3200, 4200, 3200, 2100, 3000, 5100, 6000, 3200, 4800],
         type: 'bar',
         barMaxWidth: 80,
+        color: getThemeColor.value,
       },
     ],
   });
+};
+
+watchEffect(() => {
+  init();
 });
 </script>

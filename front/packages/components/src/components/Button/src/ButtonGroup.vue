@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, toRaw } from 'vue';
+import { ref, toRaw, watchEffect } from 'vue';
 import { Space, Dropdown, Menu, MenuItem } from 'ant-design-vue';
 import Icon from '@/components/Icon/Icon.vue';
 import Button from './BasicButton.vue';
@@ -28,16 +28,18 @@ const props = defineProps({
 });
 const emit = defineEmits(['click']);
 
-const rawRow = toRaw(props.row);
 const showButtons = ref<any>([]);
 const dropdownButtons = ref<any>([]);
-const allButtons = props.buttons.filter(rowOperation => !rowOperation.disabled && !(rowOperation.hide && rowOperation.hide(rawRow)));
-if (allButtons.length > props.showMaxNum) {
-  showButtons.value = allButtons.slice(0, props.showMaxNum);
-  dropdownButtons.value = allButtons.slice(props.showMaxNum);
-} else {
-  showButtons.value = allButtons;
-}
+watchEffect(() => {
+  const rawRow = toRaw(props.row);
+  const allButtons = props.buttons.filter(rowOperation => !rowOperation.disabled && !(rowOperation.hide && rowOperation.hide(rawRow)));
+  if (allButtons.length > props.showMaxNum) {
+    showButtons.value = allButtons.slice(0, props.showMaxNum);
+    dropdownButtons.value = allButtons.slice(props.showMaxNum);
+  } else {
+    showButtons.value = allButtons;
+  }
+});
 
 const getButtonTitle = (title: any, row: any) => {
   if (typeof title === 'function') {
@@ -52,31 +54,39 @@ const buttonClick = (buttonName: any, row: any) => {
 const menuClick = ({ key }, row) => {
   buttonClick(key, row);
 };
+const getElementCount = () => {
+  return showButtons.value.length + (dropdownButtons.value.length ? 1 : 0);
+};
+
+defineExpose({
+  getElementCount,
+});
 </script>
 
 <template>
-  <Space :size="spaceSize" v-if="allButtons.length">
+  <Space :size="spaceSize" v-if="showButtons.length">
     <Button
       v-for="operation in showButtons"
       :type="operation.type || 'link'"
-      :title="getButtonTitle(operation.title, rawRow)"
+      :title="getButtonTitle(operation.title, row)"
       :status="operation.primary"
-      @click="buttonClick(operation.name, rawRow)"
+      @click="buttonClick(operation.name, row)"
       class="padding-0"
+      v-bind="operation.attrs"
     >
-      <Icon icon="ant-design:save-outlined" #icon v-if="operation.type !== 'link'" />
-      <span v-else>{{ getButtonTitle(operation.title, rawRow) }}</span>
+      <Icon icon="ant-design:save-outlined" #icon v-if="operation.icon" />
+      <span v-else>{{ getButtonTitle(operation.title, row) }}</span>
     </Button>
     <Dropdown v-if="dropdownButtons && dropdownButtons.length">
       <template #overlay>
-        <Menu @click="menuClick($event, rawRow)">
-          <MenuItem :key="operation.name" v-for="operation in dropdownButtons">
+        <Menu @click="menuClick($event, row)">
+          <MenuItem :key="operation.name" v-for="operation in dropdownButtons" v-bind="operation.attrs">
             <Icon :icon="operation.icon" v-if="operation.icon" />
-            <span v-if="operation.type === 'link'">{{ getButtonTitle(operation.title, rawRow) }}</span>
+            <span v-if="operation.type === 'link'">{{ getButtonTitle(operation.title, row) }}</span>
           </MenuItem>
         </Menu>
       </template>
-      <a class="ant-dropdown-link" @click.prevent>
+      <a class="ant-dropdown-link" @click.prevent data-cy="buttonGroupDropdown">
         &nbsp;
         <Icon icon="ant-design:down-outlined" />
       </a>

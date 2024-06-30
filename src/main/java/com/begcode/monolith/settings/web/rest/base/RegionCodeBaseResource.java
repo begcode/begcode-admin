@@ -48,7 +48,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class RegionCodeBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(RegionCodeBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(RegionCodeBaseResource.class);
 
     protected static final String ENTITY_NAME = "settingsRegionCode";
 

@@ -25,7 +25,7 @@ class DictionaryTest {
     }
 
     @Test
-    void itemsTest() throws Exception {
+    void itemsTest() {
         Dictionary dictionary = getDictionaryRandomSampleGenerator();
         CommonFieldData commonFieldDataBack = getCommonFieldDataRandomSampleGenerator();
 

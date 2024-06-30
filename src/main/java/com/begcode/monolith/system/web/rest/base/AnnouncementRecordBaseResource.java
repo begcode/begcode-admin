@@ -48,7 +48,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class AnnouncementRecordBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(AnnouncementRecordBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(AnnouncementRecordBaseResource.class);
 
     protected static final String ENTITY_NAME = "systemAnnouncementRecord";
 

@@ -25,7 +25,7 @@ class SmsTemplateTest {
     }
 
     @Test
-    void supplierTest() throws Exception {
+    void supplierTest() {
         SmsTemplate smsTemplate = getSmsTemplateRandomSampleGenerator();
         SmsSupplier smsSupplierBack = getSmsSupplierRandomSampleGenerator();
 

@@ -9,10 +9,10 @@
       <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" />
     </Card>
     <Card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
-      <template #title>
+      <template #title v-if="cardSlots?.includes('title')">
         <Button type="text" preIcon="ant-design:unordered-list-outlined" shape="default" size="large" @click="formSearch">角色列表</Button>
       </template>
-      <template #extra>
+      <template #extra v-if="cardSlots?.includes('extra')">
         <Space>
           <Divider type="vertical" />
           <Button
@@ -43,31 +43,10 @@
         </Space>
       </template>
       <Row :gutter="16">
-        <Col :span="filterTreeConfig.filterTreeSpan" v-if="filterTreeConfig.filterTreeSpan > 0">
-          <Tree
-            style="border: #bbcedd 1px solid; height: 100%"
-            v-model="filterTreeConfig.checkedKeys"
-            :expandedKeys="filterTreeConfig.expandedKeys"
-            :autoExpandParent="filterTreeConfig.autoExpandParent"
-            :selectedKeys="filterTreeConfig.selectedKeys"
-            :treeData="filterTreeConfig.treeFilterData"
-            @select="onSelect"
-            @expand="onExpand"
-          />
-        </Col>
-        <Col :span="24 - filterTreeConfig.filterTreeSpan">
+        <Col :span="24">
           <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
             <template #toolbar_buttons>
               <Row :gutter="16">
-                <Col :lg="2" :md="2" :sm="4" v-if="filterTreeConfig.treeFilterData.length > 0">
-                  <span class="table-page-search-submitButtons">
-                    <Button
-                      type="primary"
-                      :icon="filterTreeConfig.filterTreeSpan > 0 ? 'pic-center' : 'pic-right'"
-                      @click="switchFilterTree"
-                    />
-                  </span>
-                </Col>
                 <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
                   <Space>
                     <Input
@@ -101,7 +80,7 @@
                         </template>
                         <Button>
                           {{ button.name }}
-                          <DownOutlined />
+                          <Icon icon="ant-design:down-outlined" />
                         </Button>
                       </Dropdown>
                     </template>
@@ -109,83 +88,8 @@
                 </Col>
               </Row>
             </template>
-            <template #recordAction="{ row, column }">
-              <template v-if="tableRowOperations.length">
-                <Space :size="4">
-                  <template
-                    v-for="operation in tableRowOperations.filter(
-                      rowOperation => !rowOperation.disabled && !(rowOperation.hide && rowOperation.hide(row)),
-                    )"
-                  >
-                    <template v-if="operation.name === 'save'">
-                      <Button
-                        v-if="xGrid.isEditByRow(row) && xGrid.props.editConfig.mode === 'row'"
-                        :type="operation.type || 'link'"
-                        :key="operation.name"
-                        :title="operation.title || '保存'"
-                        @click="rowClick('save', row)"
-                        status="primary"
-                      >
-                        <Icon icon="ant-design:save-outlined" #icon v-if="operation.type !== 'link'" />
-                        <span v-else>{{ operation.title || '保存' }}</span>
-                      </Button>
-                      <Button
-                        :type="operation.type || 'link'"
-                        :key="operation.name"
-                        v-else
-                        :title="operation.title || '编辑'"
-                        shape="circle"
-                        @click="rowClick('edit', row)"
-                      >
-                        <Icon icon="ant-design:edit-outlined" #icon v-if="operation.type !== 'link'" />
-                        <span v-else>{{ operation.title || '编辑' }}</span>
-                      </Button>
-                    </template>
-                    <template v-else-if="operation.name === 'delete' && !operation.disabled">
-                      <Button
-                        :type="operation.type || 'link'"
-                        :key="operation.name"
-                        :title="operation.title || '删除'"
-                        @click="rowClick('delete', row)"
-                        shape="circle"
-                      >
-                        <Icon :icon="operation.icon || 'ant-design:delete-outlined'" #icon v-if="operation.type !== 'link'" />
-                        <span v-else>{{ operation.title || '删除' }}</span>
-                      </Button>
-                    </template>
-                    <template v-else>
-                      <Button
-                        v-if="!operation.disabled"
-                        :type="operation.type || 'link'"
-                        :key="operation.name"
-                        :title="operation.title || '操作'"
-                        @click="rowClick(operation.name, row)"
-                        shape="circle"
-                      >
-                        <Icon :icon="operation.icon || 'ant-design:info-circle-outlined'" v-if="operation.type !== 'link'" #icon />
-                        <span v-else>{{ operation.title || '操作' }}</span>
-                      </Button>
-                    </template>
-                  </template>
-                  <Dropdown v-if="tableRowMoreOperations && tableRowMoreOperations.length">
-                    <template #overlay>
-                      <Menu @click="rowMoreClick($event, row)">
-                        <MenuItem
-                          :key="operation.name"
-                          v-for="operation in tableRowMoreOperations.filter(operation => !operation.disabled)"
-                        >
-                          <Icon :icon="operation.icon" v-if="operation.icon" />
-                          <span v-if="operation.type === 'link'">{{ operation.title }}</span>
-                        </MenuItem>
-                      </Menu>
-                    </template>
-                    <a class="ant-dropdown-link" @click.prevent>
-                      &nbsp;
-                      <DownOutlined />
-                    </a>
-                  </Dropdown>
-                </Space>
-              </template>
+            <template #recordAction="{ row }">
+              <ButtonGroup :row="row" :buttons="rowOperations" @click="rowClick" />
             </template>
           </Grid>
         </Col>
@@ -214,14 +118,13 @@
 
 <script lang="ts" setup>
 import { reactive, ref, getCurrentInstance, h, onMounted, shallowRef, toRaw } from 'vue';
-import { Alert, message, Modal, Space, Card, Divider, Row, Col, Tree, Input, Dropdown, Menu, MenuItem } from 'ant-design-vue';
-import { DownOutlined } from '@ant-design/icons-vue';
+import { Alert, message, Modal, Space, Card, Divider, Row, Col, Input, Dropdown, Menu, MenuItem } from 'ant-design-vue';
 import { Grid } from 'vxe-table';
 import type { VxeGridPropTypes, VxeGridInstance, VxeGridListeners, VxeGridProps } from 'vxe-table/types/grid';
 import { mergeWith, isArray, isObject, isString, merge, debounce, pickBy, isEmpty } from 'lodash-es';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { transVxeSorts } from '@/utils/jhipster/sorts';
-import { Button, Icon, useModalInner, BasicModal, useDrawerInner, BasicDrawer, SearchForm } from '@begcode/components';
+import { Button, ButtonGroup, BasicModal, BasicDrawer, Icon, SearchForm, useModalInner, useDrawerInner } from '@begcode/components';
 import { useGo } from '@/hooks/web/usePage';
 import ServerProvider from '@/api-service/index';
 import AuthorityEdit from '../authority-edit.vue';
@@ -364,7 +267,6 @@ const config = {
         visible: false,
         treeNode: false,
         params: { type: 'LONG' },
-        editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
       },
       {
         title: '角色名称',
@@ -400,7 +302,6 @@ const config = {
         visible: true,
         treeNode: false,
         params: { type: 'INTEGER' },
-        editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
       },
       {
         title: '展示',
@@ -409,16 +310,16 @@ const config = {
         visible: true,
         treeNode: false,
         params: { type: 'BOOLEAN' },
-        cellRender: { name: 'ASwitch', props: { disabled: false } },
+        cellRender: { name: 'ASwitch', props: { disabled: true } },
       },
       {
         title: '操作',
-        field: 'operation',
+        field: 'recordOperation',
         fixed: 'right',
         headerAlign: 'center',
         align: 'right',
         showOverflow: false,
-        width: 170,
+        width: 120,
         slots: { default: 'recordAction' },
       },
     ];
@@ -455,6 +356,7 @@ const config = {
           field: 'id',
           order: 'desc',
         },
+        showIcon: true,
       },
       pagerConfig: {
         layouts: ['Sizes', 'PrevJump', 'PrevPage', 'Number', 'NextPage', 'NextJump', 'FullJump', 'Total'],
@@ -517,6 +419,10 @@ const props = defineProps({
     type: Array,
     default: ['import', 'export', 'print'],
   },
+  cardSlots: {
+    type: Array,
+    default: ['title', 'extra'],
+  },
   gridOptions: {
     type: Object,
     default: () => ({}),
@@ -563,9 +469,6 @@ const relationshipApis: any = {
 const apis = {
   authorityService: apiService.system.authorityService,
   find: apiService.system.authorityService.tree,
-  deleteById: apiService.system.authorityService.delete,
-  deleteByIds: apiService.system.authorityService.deleteByIds,
-  update: apiService.system.authorityService.update,
   updateRelations: apiService.system.authorityService.updateRelations,
 };
 const pageConfig = {
@@ -593,26 +496,10 @@ const searchFormConfig = reactive(
     props.searchFormOptions,
   ),
 );
-const batchOperations = [];
 let rowOperations = [
   {
-    disabled: false,
-    name: 'save',
-    type: 'link',
-  },
-  {
-    title: '下级',
-    name: 'addChildren',
-    containerType: 'modal',
-    type: 'link',
-  },
-  {
-    name: 'delete',
-    type: 'link',
-  },
-  {
-    name: 'cancelRelate',
     title: '取消关联',
+    name: 'cancelRelate',
     type: 'link',
   },
   {
@@ -646,19 +533,8 @@ if (rowOperations.length > 4 || (saveOperation && rowOperations.length > 3)) {
   tableRowOperations.push(...rowOperations);
 }
 const selectedRows = reactive<any>([]);
-const loading = ref(false);
 const searchFormRef = ref<any>(null);
 const searchValue = ref('');
-const mapOfFilter = ref({});
-const treeFilterData = [];
-const filterTreeConfig = reactive({
-  filterTreeSpan: treeFilterData && treeFilterData.length > 0 ? 6 : 0,
-  treeFilterData,
-  expandedKeys: [],
-  checkedKeys: [],
-  selectedKeys: [],
-  autoExpandParent: true,
-});
 const modalConfig = reactive<any>({
   componentName: '',
   entityId: '',
@@ -774,6 +650,74 @@ mergeWith(gridOptions, props.gridOptions, (objValue: any, srcValue: any, key: an
     }
   }
 });
+
+const toolbarClick = ({ code }) => {
+  const $grid = xGrid.value;
+  switch (code) {
+    case 'batchCancelRelate': {
+      const records = $grid.getCheckboxRecords(true);
+      if (records?.length > 0) {
+        if (props.updateType === 'remoteApi') {
+          const ids = records.map(record => record.id);
+          Modal.confirm({
+            title: `操作提示`,
+            content: `是否取消ID为【${ids.join(',')}】的${records.length}项数据的关联？`,
+            onOk() {
+              const relatedIds = ids;
+              const otherEntityIds: any[] = [];
+              if (props.query) {
+                Object.values(props.query).forEach((value: any) => {
+                  if (value !== null && value !== undefined) {
+                    otherEntityIds.push(`${value}`);
+                  }
+                });
+              }
+              const relationshipName = relationships[props.source + '.' + props.field];
+              apis.updateRelations(otherEntityIds, relationshipName, relatedIds, 'delete').then(result => {
+                if (result) {
+                  message.success({ content: `取消关联成功`, duration: 1 });
+                  formSearch();
+                } else {
+                  message.error({ content: `取消关联失败`, duration: 1 });
+                }
+              });
+            },
+          });
+        } else {
+          if (xGrid.value && records?.length > 0) {
+            xGrid.value.remove(records).then(() => {
+              message.success({ content: `取消关联成功`, duration: 1 });
+            });
+          }
+        }
+      }
+      break;
+    }
+    case 'add': {
+      const result: any = {};
+      const tools: string[] = [];
+      const buttons: string[] = [];
+      const rowOperations = ['detail'];
+      result.gridOptions = merge({}, { toolbarConfig: { import: false, print: false, export: false, custom: false, tools, buttons } });
+      result.cardExtra = [];
+      result.searchFormOptions = merge({});
+      result.gridCustomConfig = merge({}, { rowOperations });
+      result.componentName = shallowRef(AuthorityList);
+      result.entityId = '';
+      if (props.editIn === 'drawer') {
+        Object.assign(drawerConfig, result);
+        setDrawerProps({ open: true });
+      } else {
+        Object.assign(modalConfig, result);
+        setModalProps({ open: true });
+      }
+      break;
+    }
+    default:
+      console.log('事件未定义', code);
+  }
+};
+
 const gridEvents = reactive<VxeGridListeners>({
   checkboxAll: () => {
     const $grid = xGrid.value;
@@ -797,140 +741,9 @@ const gridEvents = reactive<VxeGridListeners>({
     selectedRows.push($grid.getRadioRecord());
   },
   // 表格左上角按钮事件
-  toolbarButtonClick({ code }) {
-    const $grid = xGrid.value;
-    switch (code) {
-      case 'batchDelete': {
-        const records = $grid.getCheckboxRecords(true);
-        if (records?.length > 0) {
-          const ids = records.map(record => record.id);
-          Modal.confirm({
-            title: `操作提示`,
-            content: `是否删除ID为【${ids.join(',')}】的${records.length}项数据？`,
-            onOk() {
-              apis.deleteByIds(ids).then(() => {
-                formSearch();
-              });
-            },
-          });
-        }
-        break;
-      }
-      case 'batchCancelRelate': {
-        const records = $grid.getCheckboxRecords(true);
-        if (records?.length > 0) {
-          if (props.updateType === 'remoteApi') {
-            const ids = records.map(record => record.id);
-            Modal.confirm({
-              title: `操作提示`,
-              content: `是否取消ID为【${ids.join(',')}】的${records.length}项数据的关联？`,
-              onOk() {
-                const relatedIds = ids;
-                const otherEntityIds: any[] = [];
-                if (props.query) {
-                  Object.values(props.query).forEach((value: any) => {
-                    if (value !== null && value !== undefined) {
-                      otherEntityIds.push(`${value}`);
-                    }
-                  });
-                }
-                const relationshipName = relationships[props.source + '.' + props.field];
-                apis.updateRelations(otherEntityIds, relationshipName, relatedIds, 'delete').then(result => {
-                  if (result) {
-                    message.success({
-                      content: `取消关联成功`,
-                      duration: 1,
-                    });
-                    formSearch();
-                  } else {
-                    message.error({
-                      content: `取消关联失败`,
-                      duration: 1,
-                    });
-                  }
-                });
-              },
-            });
-          } else {
-            if (xGrid.value && records?.length > 0) {
-              xGrid.value.remove(records).then(() => {
-                message.success({
-                  content: `取消关联成功`,
-                  duration: 1,
-                });
-              });
-            }
-          }
-        }
-        break;
-      }
-      default:
-        console.log('事件未定义', code);
-    }
-  },
+  toolbarButtonClick: toolbarClick,
   // 表格右上角自定义按钮事件
-  toolbarToolClick({ code }) {
-    switch (code) {
-      case 'new': {
-        const newConfig: any = {};
-        newConfig.componentName = shallowRef(AuthorityEdit);
-        newConfig.entityId = '';
-        if (props.editIn === 'drawer') {
-          Object.assign(drawerConfig, newConfig);
-          setDrawerProps({ open: true });
-        } else {
-          Object.assign(modalConfig, newConfig);
-          setModalProps({ open: true });
-        }
-        break;
-      }
-      case 'add': {
-        const result: any = {};
-        const tools: string[] = [];
-        const buttons: string[] = [];
-        const rowOperations = ['detail'];
-        result.gridOptions = merge({}, { toolbarConfig: { import: false, print: false, export: false, custom: false, tools, buttons } });
-        result.cardExtra = [];
-        result.searchFormOptions = merge({});
-        result.gridCustomConfig = merge({}, { rowOperations });
-        result.componentName = shallowRef(AuthorityList);
-        result.entityId = '';
-        if (props.editIn === 'drawer') {
-          Object.assign(drawerConfig, result);
-          setDrawerProps({ open: true });
-        } else {
-          Object.assign(modalConfig, result);
-          setModalProps({ open: true });
-        }
-        break;
-      }
-    }
-  },
-  editClosed({ row, column }) {
-    const field = column.property;
-    const cellValue = row[field];
-    // 判断单元格值是否被修改
-    if (xGrid.value.isUpdateByRow(row, field)) {
-      const entity = { id: row.id };
-      entity[field] = cellValue;
-      apis
-        .update(entity, [row.id], [field])
-        .then(() => {
-          message.success({
-            content: `信息更新成功。 ${field}=${cellValue}`,
-            duration: 1,
-          });
-          xGrid.value.reloadRow(row, null, field);
-        })
-        .catch(error => {
-          console.log('error', error);
-          message.error({
-            content: `信息保存可能存在问题！ ${field}=${cellValue}`,
-            onClose: () => {},
-          });
-        });
-    }
-  },
+  toolbarToolClick: toolbarClick,
 });
 const okModal = async () => {
   if (modalComponentRef.value) {
@@ -1020,31 +833,9 @@ const formSearch = () => {
   xGrid.value.commitProxy('reload');
 };
 const inputSearch = debounce(formSearch, 700);
-onMounted(() => {
-  // 临时方案
-  const $grid: HTMLElement = xGrid.value.$el as HTMLElement;
-  const myElement = $grid.querySelector('.vxe-toolbar .vxe-custom--wrapper .vxe-button.type--button');
-  if (myElement?.className) {
-    myElement.className = myElement.className.replace('is--circle', '');
-    myElement.setAttribute('style', 'border-radius: 4px !important;');
-  }
-
-  const parent = myElement?.parentElement;
-  if (parent) {
-    parent.className = parent.className + ' begcode';
-  }
-  const text = document.createElement('span');
-  text.className = 'vxe-button--content';
-  text.innerText = '列配置';
-  myElement?.appendChild(text);
-});
 
 const handleToggleSearch = () => {
   searchFormConfig.toggleSearchStatus = !searchFormConfig.toggleSearchStatus;
-};
-
-const onCheck = checkedKeys => {
-  filterTreeConfig.checkedKeys = checkedKeys;
 };
 
 const showSearchFormSetting = () => {
@@ -1053,85 +844,10 @@ const showSearchFormSetting = () => {
   }
 };
 
-const onSelect = (selectedKeys, info) => {
-  const filterData = info.node.dataRef;
-  if (filterData.type === 'filterGroup') {
-    mapOfFilter.value[info.node.dataRef.key].value = [];
-  } else if (filterData.type === 'filterItem') {
-    mapOfFilter.value[info.node.dataRef.filterName].value = [info.node.dataRef.filterValue];
-  }
-  formSearch();
-  filterTreeConfig.selectedKeys = selectedKeys;
-};
-
-const switchFilterTree = () => {
-  filterTreeConfig.filterTreeSpan = filterTreeConfig.filterTreeSpan > 0 ? 0 : 6;
-};
-
-const rowMoreClick = (e, row) => {
-  const { key } = e;
-  const operation = tableRowMoreOperations.find(operation => operation.name === key);
-  rowClickHandler(key, operation, row);
-};
-
-const rowClick = (name, row) => {
+const rowClick = ({ name, data }) => {
+  const row = data;
   const operation = tableRowOperations.find(operation => operation.name === name);
-  rowClickHandler(name, operation, row);
-};
-
-const rowClickHandler = (name, operation, row) => {
   switch (name) {
-    case 'save':
-      break;
-    case 'edit':
-      if (operation) {
-        if (operation.click) {
-          operation.click(row);
-        } else {
-          const containerType = props.editIn || operation.containerType;
-          switch (containerType) {
-            case 'drawer':
-              drawerConfig.componentName = shallowRef(AuthorityEdit);
-              drawerConfig.entityId = row.id;
-              drawerConfig.title = '编辑';
-              setDrawerProps({ open: true });
-              break;
-            case 'route':
-              if (pageConfig.baseRouteName) {
-                go({ name: `${pageConfig.baseRouteName}Edit`, params: { entityId: row.id } });
-              } else {
-                console.log('未定义方法');
-              }
-              break;
-            case 'modal':
-            default:
-              modalConfig.componentName = shallowRef(AuthorityEdit);
-              modalConfig.entityId = row.id;
-              setModalProps({ open: true });
-          }
-        }
-      } else {
-        switch (props.editIn) {
-          case 'drawer':
-            drawerConfig.componentName = shallowRef(AuthorityEdit);
-            drawerConfig.entityId = row.id;
-            setDrawerProps({ open: true });
-            break;
-          case 'route':
-            if (pageConfig.baseRouteName) {
-              go({ name: `${pageConfig.baseRouteName}Edit`, params: { entityId: row.id } });
-            } else {
-              console.log('未定义方法');
-            }
-            break;
-          case 'modal':
-          default:
-            modalConfig.componentName = shallowRef(AuthorityEdit);
-            modalConfig.entityId = row.id;
-            setModalProps({ open: true });
-        }
-      }
-      break;
     case 'detail':
       if (operation) {
         if (operation.click) {
@@ -1166,58 +882,6 @@ const rowClickHandler = (name, operation, row) => {
           console.log('未定义方法');
         }
       }
-      break;
-    case 'addChildren':
-      if (operation) {
-        if (operation.click) {
-          operation.click(row);
-        } else {
-          switch (operation.containerType) {
-            case 'drawer':
-              drawerConfig.componentName = shallowRef(AuthorityEdit);
-              drawerConfig.entityId = '';
-              drawerConfig.baseData = { parentId: row.id, parent: row };
-              drawerConfig.title = '添加下级';
-              setDrawerProps({ open: true });
-              break;
-            case 'route':
-              if (pageConfig.baseRouteName) {
-                go({ name: `${pageConfig.baseRouteName}New`, query: { parentId: row.id, parent: row } });
-              } else {
-                console.log('未定义方法');
-              }
-              break;
-            case 'modal':
-            default:
-              modalConfig.componentName = shallowRef(AuthorityEdit);
-              modalConfig.entityId = '';
-              modalConfig.baseData = { parentId: row.id, parent: row };
-              modalConfig.title = '添加下级';
-              setModalProps({ open: true });
-          }
-        }
-      } else {
-        if (pageConfig.baseRouteName) {
-          go({ name: `${pageConfig.baseRouteName}New`, query: { parentId: row.id, parent: row } });
-        } else {
-          console.log('未定义方法');
-        }
-      }
-      break;
-    case 'delete':
-      Modal.confirm({
-        title: `操作提示`,
-        content: `是否确认删除ID为${row.id}的记录？`,
-        onOk() {
-          if (operation.click) {
-            operation.click(row);
-          } else {
-            apis.deleteById(row.id).then(() => {
-              formSearch();
-            });
-          }
-        },
-      });
       break;
     case 'cancelRelate':
       Modal.confirm({
@@ -1278,6 +942,7 @@ const rowClickHandler = (name, operation, row) => {
       }
   }
 };
+
 const getSelectRows = () => {
   return toRaw(selectedRows);
 };
@@ -1289,7 +954,6 @@ const getData = () => {
     return [];
   }
 };
-
 defineExpose({
   getSelectRows,
   getData,

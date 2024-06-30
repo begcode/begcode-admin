@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RegionCodeBaseService<R extends RegionCodeRepository, E extends RegionCode>
     extends BaseServiceImpl<RegionCodeRepository, RegionCode> {
 
-    private final Logger log = LoggerFactory.getLogger(RegionCodeBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(RegionCodeBaseService.class);
 
     private final List<String> relationCacheNames = List.of(
         com.begcode.monolith.settings.domain.RegionCode.class.getName() + ".parent",

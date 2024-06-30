@@ -27,14 +27,14 @@ public class DictionaryDTO implements Serializable {
      * 字典名称
      */
     @NotNull
-    @Schema(description = "字典名称", required = true)
+    @Schema(description = "字典名称", requiredMode = Schema.RequiredMode.REQUIRED)
     private String dictName;
 
     /**
      * 字典Key
      */
     @NotNull
-    @Schema(description = "字典Key", required = true)
+    @Schema(description = "字典Key", requiredMode = Schema.RequiredMode.REQUIRED)
     private String dictKey;
 
     /**

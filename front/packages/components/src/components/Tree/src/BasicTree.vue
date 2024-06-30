@@ -2,7 +2,7 @@
 import type { CSSProperties } from 'vue';
 import type { FieldNames, TreeState, TreeItem, KeyType, CheckKeys, TreeActionType } from './types/tree.d';
 
-import { defineComponent, reactive, computed, unref, ref, watchEffect, toRaw, watch, onMounted } from 'vue';
+import { defineComponent, reactive, computed, unref, ref, watchEffect, toRaw, watch, onMounted, nextTick } from 'vue';
 import TreeHeader from './components/TreeHeader.vue';
 import { Tree, Spin, Empty } from 'ant-design-vue';
 import { TreeIcon } from './TreeIcon';
@@ -54,6 +54,8 @@ export default defineComponent({
       };
     });
 
+    const treeRef = ref<any>(null);
+
     const getBindValues = computed(() => {
       let propsData = {
         blockNode: true,
@@ -73,26 +75,29 @@ export default defineComponent({
           emit('update:selectedKeys', v);
         },
         onCheck: (v: CheckKeys, e) => {
-          let currentValue = toRaw(state.checkedKeys) as KeyType[];
-          if (isArray(currentValue) && searchState.startSearch) {
-            const value = e.node.eventKey;
-            currentValue = difference(currentValue, getChildrenKeys(value));
-            if (e.checked) {
-              currentValue.push(value);
-            }
-            state.checkedKeys = currentValue;
-          } else {
-            state.checkedKeys = v;
-          }
-
-          const rawVal = toRaw(state.checkedKeys);
-          emit('update:value', rawVal);
-          emit('check', rawVal, e);
+          handleCheck(v, e);
         },
         onRightClick: handleRightClick,
       };
       return omit(propsData, 'treeData', 'class') as TreeProps;
     });
+
+    const handleCheck = (v: CheckKeys, e?) => {
+      let currentValue = toRaw(state.checkedKeys) as KeyType[];
+      if (isArray(currentValue) && searchState.startSearch && e) {
+        const value = e.node.eventKey;
+        currentValue = difference(currentValue, getChildrenKeys(value));
+        if (e.checked) {
+          currentValue.push(value);
+        }
+        state.checkedKeys = currentValue;
+      } else {
+        state.checkedKeys = v;
+      }
+      const rawVal = toRaw(state.checkedKeys);
+      emit('update:value', rawVal);
+      emit('check', rawVal, e);
+    };
 
     const getTreeSearchData = computed((): TreeItem[] => (searchState.startSearch ? searchState.searchData : unref(treeDataRef)));
 
@@ -299,9 +304,16 @@ export default defineComponent({
       },
     );
 
-    watchEffect(() => {
-      state.checkStrictly = props.checkStrictly;
-    });
+    watch(
+      () => props.checkStrictly,
+      () => {
+        state.checkStrictly = props.checkStrictly;
+        nextTick(() => {
+          const value = treeRef.value?.checkedKeys;
+          handleCheck([...value]);
+        });
+      },
+    );
 
     const instance: TreeActionType = {
       getTreeData,
@@ -423,7 +435,7 @@ export default defineComponent({
           )}
           <Spin wrapperClassName={unref(props.treeWrapperClassName)} spinning={unref(props.loading)} tip="加载中...">
             <ScrollContainer style={scrollStyle} v-show={!unref(getNotFound)}>
-              <Tree {...unref(getBindValues)} showIcon={false} treeData={treeData.value}>
+              <Tree ref={treeRef} {...unref(getBindValues)} showIcon={false} treeData={treeData.value}>
                 {extendSlots(slots, ['title'])}
               </Tree>
             </ScrollContainer>

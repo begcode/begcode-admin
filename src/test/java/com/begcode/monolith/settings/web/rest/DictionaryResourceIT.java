@@ -16,6 +16,7 @@ import com.begcode.monolith.settings.service.mapper.DictionaryMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +72,8 @@ public class DictionaryResourceIT {
 
     private Dictionary dictionary;
 
+    private Dictionary insertedDictionary;
+
     /**
      * Create an entity for this test.
      *
@@ -110,6 +113,14 @@ public class DictionaryResourceIT {
         dictionary = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedDictionary != null) {
+            dictionaryRepository.deleteById(insertedDictionary.getId());
+            insertedDictionary = null;
+        }
+    }
+
     @Test
     @Transactional
     void createDictionary() throws Exception {
@@ -130,6 +141,8 @@ public class DictionaryResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedDictionary = dictionaryMapper.toEntity(returnedDictionaryDTO);
         assertDictionaryUpdatableFieldsEquals(returnedDictionary, getPersistedDictionary(returnedDictionary));
+
+        insertedDictionary = returnedDictionary;
     }
 
     @Test
@@ -188,7 +201,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionaries() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList
         restDictionaryMockMvc
@@ -208,7 +221,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getDictionary() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get the dictionary
         restDictionaryMockMvc
@@ -228,7 +241,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getDictionariesByIdFiltering() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         Long id = dictionary.getId();
 
@@ -243,7 +256,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesByDictNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where dictName equals to
         defaultDictionaryFiltering("dictName.equals=" + DEFAULT_DICT_NAME, "dictName.equals=" + UPDATED_DICT_NAME);
@@ -253,7 +266,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesByDictNameIsInShouldWork() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where dictName in
         defaultDictionaryFiltering("dictName.in=" + DEFAULT_DICT_NAME + "," + UPDATED_DICT_NAME, "dictName.in=" + UPDATED_DICT_NAME);
@@ -263,7 +276,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesByDictNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where dictName is not null
         defaultDictionaryFiltering("dictName.specified=true", "dictName.specified=false");
@@ -273,7 +286,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesByDictNameContainsSomething() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where dictName contains
         defaultDictionaryFiltering("dictName.contains=" + DEFAULT_DICT_NAME, "dictName.contains=" + UPDATED_DICT_NAME);
@@ -283,7 +296,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesByDictNameNotContainsSomething() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where dictName does not contain
         defaultDictionaryFiltering("dictName.doesNotContain=" + UPDATED_DICT_NAME, "dictName.doesNotContain=" + DEFAULT_DICT_NAME);
@@ -293,7 +306,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesByDictKeyIsEqualToSomething() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where dictKey equals to
         defaultDictionaryFiltering("dictKey.equals=" + DEFAULT_DICT_KEY, "dictKey.equals=" + UPDATED_DICT_KEY);
@@ -303,7 +316,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesByDictKeyIsInShouldWork() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where dictKey in
         defaultDictionaryFiltering("dictKey.in=" + DEFAULT_DICT_KEY + "," + UPDATED_DICT_KEY, "dictKey.in=" + UPDATED_DICT_KEY);
@@ -313,7 +326,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesByDictKeyIsNullOrNotNull() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where dictKey is not null
         defaultDictionaryFiltering("dictKey.specified=true", "dictKey.specified=false");
@@ -323,7 +336,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesByDictKeyContainsSomething() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where dictKey contains
         defaultDictionaryFiltering("dictKey.contains=" + DEFAULT_DICT_KEY, "dictKey.contains=" + UPDATED_DICT_KEY);
@@ -333,7 +346,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesByDictKeyNotContainsSomething() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where dictKey does not contain
         defaultDictionaryFiltering("dictKey.doesNotContain=" + UPDATED_DICT_KEY, "dictKey.doesNotContain=" + DEFAULT_DICT_KEY);
@@ -343,7 +356,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesByDisabledIsEqualToSomething() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where disabled equals to
         defaultDictionaryFiltering("disabled.equals=" + DEFAULT_DISABLED, "disabled.equals=" + UPDATED_DISABLED);
@@ -353,7 +366,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesByDisabledIsInShouldWork() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where disabled in
         defaultDictionaryFiltering("disabled.in=" + DEFAULT_DISABLED + "," + UPDATED_DISABLED, "disabled.in=" + UPDATED_DISABLED);
@@ -363,7 +376,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesByDisabledIsNullOrNotNull() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where disabled is not null
         defaultDictionaryFiltering("disabled.specified=true", "disabled.specified=false");
@@ -373,7 +386,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesBySortValueIsEqualToSomething() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where sortValue equals to
         defaultDictionaryFiltering("sortValue.equals=" + DEFAULT_SORT_VALUE, "sortValue.equals=" + UPDATED_SORT_VALUE);
@@ -383,7 +396,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesBySortValueIsInShouldWork() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where sortValue in
         defaultDictionaryFiltering("sortValue.in=" + DEFAULT_SORT_VALUE + "," + UPDATED_SORT_VALUE, "sortValue.in=" + UPDATED_SORT_VALUE);
@@ -393,7 +406,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesBySortValueIsNullOrNotNull() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where sortValue is not null
         defaultDictionaryFiltering("sortValue.specified=true", "sortValue.specified=false");
@@ -403,7 +416,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesBySortValueIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where sortValue is greater than or equal to
         defaultDictionaryFiltering(
@@ -416,7 +429,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesBySortValueIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where sortValue is less than or equal to
         defaultDictionaryFiltering("sortValue.lessThanOrEqual=" + DEFAULT_SORT_VALUE, "sortValue.lessThanOrEqual=" + SMALLER_SORT_VALUE);
@@ -426,7 +439,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesBySortValueIsLessThanSomething() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where sortValue is less than
         defaultDictionaryFiltering("sortValue.lessThan=" + UPDATED_SORT_VALUE, "sortValue.lessThan=" + DEFAULT_SORT_VALUE);
@@ -436,7 +449,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesBySortValueIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where sortValue is greater than
         defaultDictionaryFiltering("sortValue.greaterThan=" + SMALLER_SORT_VALUE, "sortValue.greaterThan=" + DEFAULT_SORT_VALUE);
@@ -446,7 +459,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesByBuiltInIsEqualToSomething() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where builtIn equals to
         defaultDictionaryFiltering("builtIn.equals=" + DEFAULT_BUILT_IN, "builtIn.equals=" + UPDATED_BUILT_IN);
@@ -456,7 +469,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesByBuiltInIsInShouldWork() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where builtIn in
         defaultDictionaryFiltering("builtIn.in=" + DEFAULT_BUILT_IN + "," + UPDATED_BUILT_IN, "builtIn.in=" + UPDATED_BUILT_IN);
@@ -466,7 +479,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesByBuiltInIsNullOrNotNull() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where builtIn is not null
         defaultDictionaryFiltering("builtIn.specified=true", "builtIn.specified=false");
@@ -476,7 +489,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesBySyncEnumIsEqualToSomething() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where syncEnum equals to
         defaultDictionaryFiltering("syncEnum.equals=" + DEFAULT_SYNC_ENUM, "syncEnum.equals=" + UPDATED_SYNC_ENUM);
@@ -486,7 +499,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesBySyncEnumIsInShouldWork() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where syncEnum in
         defaultDictionaryFiltering("syncEnum.in=" + DEFAULT_SYNC_ENUM + "," + UPDATED_SYNC_ENUM, "syncEnum.in=" + UPDATED_SYNC_ENUM);
@@ -496,7 +509,7 @@ public class DictionaryResourceIT {
     @Transactional
     void getAllDictionariesBySyncEnumIsNullOrNotNull() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         // Get all the dictionaryList where syncEnum is not null
         defaultDictionaryFiltering("syncEnum.specified=true", "syncEnum.specified=false");
@@ -561,7 +574,7 @@ public class DictionaryResourceIT {
     @Transactional
     void putExistingDictionary() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -655,7 +668,7 @@ public class DictionaryResourceIT {
     @Transactional
     void partialUpdateDictionaryWithPatch() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -663,7 +676,7 @@ public class DictionaryResourceIT {
         Dictionary partialUpdatedDictionary = new Dictionary();
         partialUpdatedDictionary.setId(dictionary.getId());
 
-        partialUpdatedDictionary.dictName(UPDATED_DICT_NAME).syncEnum(UPDATED_SYNC_ENUM);
+        partialUpdatedDictionary.disabled(UPDATED_DISABLED).sortValue(UPDATED_SORT_VALUE).syncEnum(UPDATED_SYNC_ENUM);
 
         restDictionaryMockMvc
             .perform(
@@ -686,7 +699,7 @@ public class DictionaryResourceIT {
     @Transactional
     void fullUpdateDictionaryWithPatch() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -782,7 +795,7 @@ public class DictionaryResourceIT {
     @Transactional
     void deleteDictionary() throws Exception {
         // Initialize the database
-        dictionaryRepository.save(dictionary);
+        insertedDictionary = dictionaryRepository.saveAndGet(dictionary);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

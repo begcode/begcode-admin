@@ -71,7 +71,7 @@ const fields = (): FormSchema[] => {
       field: 'level',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择等级', options: getEnumDict('RegionCodeLevel'), style: 'width: 100%' };
+        return { placeholder: '请选择等级', options: getEnumDict('RegionCodeLevel'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },

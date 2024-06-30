@@ -52,7 +52,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class FillRuleItemBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(FillRuleItemBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(FillRuleItemBaseResource.class);
 
     protected static final String ENTITY_NAME = "settingsFillRuleItem";
 

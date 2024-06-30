@@ -40,7 +40,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class DepartmentQueryService implements QueryService<Department> {
 
-    private final Logger log = LoggerFactory.getLogger(DepartmentQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(DepartmentQueryService.class);
 
     protected final DepartmentRepository departmentRepository;
 

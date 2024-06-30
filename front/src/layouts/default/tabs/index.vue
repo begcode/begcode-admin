@@ -20,8 +20,9 @@
 
       <template #rightExtra v-if="getShowRedo || getShowQuick">
         <SettingButton v-if="(getShowFold && getIsUnFold) || !getShowHeader" />
-        <TabRedo v-if="getShowRedo" />
-        <TabContent isExtra :tabItem="$route" v-if="getShowQuick" />
+        <TabRedo v-if="getShowRedo && shortcutButtons.length < 1" />
+        <TabContent isExtra :tabItem="$route" v-if="getShowQuick && shortcutButtons.length < 2" />
+        <ShortcutButton :shortcut-buttons="shortcutButtons"></ShortcutButton>
         <FoldButton v-if="getShowFold" />
       </template>
     </Tabs>
@@ -55,6 +56,7 @@ import { useMultipleTabSetting } from '@/hooks/setting/useMultipleTabSetting';
 
 import { REDIRECT_NAME } from '@/router/constant';
 import { listenerRouteChange } from '@/logics/mitt/routeChange';
+import ShortcutButton from './components/ShortcutButton.vue';
 
 defineOptions({ name: 'MultipleTabs' });
 
@@ -72,6 +74,10 @@ const { getShowQuick, getShowRedo, getShowFold, getTabsTheme } = useMultipleTabS
 
 const getTabsState = computed(() => {
   return tabStore.getTabList.filter(item => !item.meta?.hideTab);
+});
+
+const shortcutButtons = computed(() => {
+  return tabStore.getShortcutButtons;
 });
 
 const unClose = computed(() => unref(getTabsState).length === 1);

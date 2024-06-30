@@ -356,3 +356,71 @@ export const getFileAccessHttpUrl = (fileUrl, prefix = 'http', baseApiUrl = '/')
 export const getRandom = (length: number = 1) => {
   return '-' + parseInt(String(Math.random() * 10000 + 1), length);
 };
+
+/**
+ * 通过时间或者时间戳获取对应antd的年、月、周、季度。
+ */
+export function getWeekMonthQuarterYear(date) {
+  // 获取 ISO 周数的函数
+  const getISOWeek = date => {
+    const jan4 = new Date(date.getFullYear(), 0, 4);
+    const oneDay = 86400000; // 一天的毫秒数
+    return Math.ceil(((date - jan4.getTime()) / oneDay + jan4.getDay() + 1) / 7);
+  };
+  // 将时间戳转换为日期对象
+  const dateObj = new Date(date);
+  // 计算周
+  const week = getISOWeek(dateObj);
+  // 计算月
+  const month = dateObj.getMonth() + 1; // 月份是从0开始的，所以要加1
+  // 计算季度
+  const quarter = Math.floor(dateObj.getMonth() / 3) + 1;
+  // 计算年
+  const year = dateObj.getFullYear();
+  return {
+    year: `${year}`,
+    month: `${year}-${month.toString().padStart(2, '0')}`,
+    week: `${year}-${week}周`,
+    quarter: `${year}-Q${quarter}`,
+  };
+}
+
+/**
+ * 设置挂载的modal元素有可能会有多个，需要找到对应的。
+ */
+export const setPopContainer = (node, selector) => {
+  if (typeof selector === 'string') {
+    const targetEles = Array.from(document.querySelectorAll(selector));
+    if (targetEles.length > 1) {
+      const retrospect = (node, elems) => {
+        let ele = node.parentNode;
+        while (ele) {
+          const findParentNode = elems.find(item => item === ele);
+          if (findParentNode) {
+            ele = null;
+            return findParentNode;
+          } else {
+            ele = ele.parentNode;
+          }
+        }
+        return null;
+      };
+      const elem = retrospect(node, targetEles);
+      if (elem) {
+        return elem;
+      } else {
+        return document.querySelector(selector);
+      }
+    } else {
+      return document.querySelector(selector);
+    }
+  } else {
+    return selector;
+  }
+};
+
+export function isUrl(path: string): boolean {
+  const reg =
+    /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
+  return reg.test(path);
+}

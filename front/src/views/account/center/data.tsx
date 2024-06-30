@@ -91,7 +91,7 @@ export const articleList = (() => {
       title: 'BegCode Admin',
       description: ['BegCode', '设计语言', 'Typescript'],
       content: '基于Vue Next, TypeScript, Ant Design实现的一套完整的企业级后台管理系统。',
-      time: '2020-11-14 11:20',
+      time: '2023-11-15 13:20',
     });
   }
   return result;

@@ -1,5 +1,6 @@
-import { HandlerEnum } from './enum';
-import { MenuTypeEnum } from '@/enums/menuEnum';
+import { isObject } from 'lodash-es';
+import { HandlerEnum, tabsThemeOptions } from './enum';
+import { MenuTypeEnum, MenuModeEnum } from '@/enums/menuEnum';
 import { updateHeaderBgColor, updateSidebarBgColor } from '@/logics/theme/updateBackground';
 import { updateColorWeak } from '@/logics/theme/updateColorWeak';
 import { updateGrayMode } from '@/logics/theme/updateGrayMode';
@@ -10,6 +11,58 @@ import { changeTheme } from '@/logics/theme';
 import { updateDarkTheme } from '@/logics/theme/dark';
 import { useRootSetting } from '@/hooks/setting/useRootSetting';
 import projectSetting from '@/settings/projectSetting';
+
+import { HEADER_PRESET_BG_COLOR_LIST, APP_PRESET_COLOR_LIST, SIDE_BAR_BG_COLOR_LIST } from '@/settings/designSetting';
+import { ThemeEnum } from '@/enums/appEnum';
+import { APP__THEME__COLOR } from '@/enums/cacheEnum';
+
+export function layoutHandler(event: HandlerEnum, value: any) {
+  const isHTopMenu = isObject(value) && value.type == MenuTypeEnum.TOP_MENU && value.mode == MenuModeEnum.HORIZONTAL;
+  const isMixMenu = isObject(value) && value.type == MenuTypeEnum.MIX && value.mode == MenuModeEnum.INLINE;
+  const isMixSidebarMenu = isObject(value) && value.type == MenuTypeEnum.MIX_SIDEBAR && value.mode == MenuModeEnum.INLINE;
+  const appStore = useAppStore();
+  const darkMode = appStore.getDarkMode === ThemeEnum.DARK;
+  if (isHTopMenu) {
+    baseHandler(event, value);
+    baseHandler(HandlerEnum.HEADER_THEME, HEADER_PRESET_BG_COLOR_LIST[2]);
+    baseHandler(HandlerEnum.CHANGE_THEME_COLOR, APP_PRESET_COLOR_LIST[2]);
+    if (darkMode) {
+      updateHeaderBgColor();
+      updateSidebarBgColor();
+    }
+    baseHandler(HandlerEnum.TABS_THEME, tabsThemeOptions[1].value);
+  } else if (isMixMenu) {
+    baseHandler(event, value);
+    baseHandler(HandlerEnum.HEADER_THEME, HEADER_PRESET_BG_COLOR_LIST[4]);
+    baseHandler(HandlerEnum.MENU_THEME, SIDE_BAR_BG_COLOR_LIST[3]);
+    if (darkMode) {
+      updateHeaderBgColor();
+      updateSidebarBgColor();
+    }
+    baseHandler(HandlerEnum.CHANGE_THEME_COLOR, APP_PRESET_COLOR_LIST[1]);
+    baseHandler(HandlerEnum.TABS_THEME, tabsThemeOptions[1].value);
+  } else if (isMixSidebarMenu) {
+    baseHandler(event, value);
+    baseHandler(HandlerEnum.CHANGE_THEME_COLOR, APP_PRESET_COLOR_LIST[1]);
+    baseHandler(HandlerEnum.HEADER_THEME, HEADER_PRESET_BG_COLOR_LIST[0]);
+    baseHandler(HandlerEnum.MENU_THEME, SIDE_BAR_BG_COLOR_LIST[0]);
+    if (darkMode) {
+      updateHeaderBgColor();
+      updateSidebarBgColor();
+    }
+    baseHandler(HandlerEnum.TABS_THEME, tabsThemeOptions[1].value);
+  } else {
+    baseHandler(event, value);
+    baseHandler(HandlerEnum.HEADER_THEME, HEADER_PRESET_BG_COLOR_LIST[4]);
+    baseHandler(HandlerEnum.MENU_THEME, SIDE_BAR_BG_COLOR_LIST[7]);
+    if (darkMode) {
+      updateHeaderBgColor();
+      updateSidebarBgColor();
+    }
+    baseHandler(HandlerEnum.CHANGE_THEME_COLOR, APP_PRESET_COLOR_LIST[1]);
+    baseHandler(HandlerEnum.TABS_THEME, tabsThemeOptions[1].value);
+  }
+}
 
 export function baseHandler(event: HandlerEnum, value: any) {
   const appStore = useAppStore();
@@ -49,6 +102,7 @@ export function handler(event: HandlerEnum, value: any): DeepPartial<ProjectConf
       if (getThemeColor.value === value) {
         return {};
       }
+      localStorage.setItem(APP__THEME__COLOR, value);
       changeTheme(value);
       return { themeColor: value };
 

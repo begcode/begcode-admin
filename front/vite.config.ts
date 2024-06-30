@@ -137,7 +137,6 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         'axios',
         'china-area-data',
         'clipboard',
-        'codemirror',
         'cron-parser',
         'cropperjs',
         'crypto-js/aes',

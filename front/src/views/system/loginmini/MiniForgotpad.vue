@@ -89,6 +89,8 @@
       </div>
     </div>
   </div>
+  <!-- 图片验证码弹窗 -->
+  <CaptchaModal @register="captchaRegisterModal" @ok="getLoginCode" />
 </template>
 <script lang="ts" setup>
 import { reactive, ref, toRaw, unref } from 'vue';
@@ -99,6 +101,9 @@ import { useMessage } from '@/hooks/web/useMessage';
 import { getImageCaptcha, passwordChange, phoneVerify } from '@/api-service/sys/user';
 import adTextImg from '@/assets/loginmini/icon/jeecg_ad_text.png';
 import successImg from '@/assets/loginmini/icon/icon-success.png';
+import { useModal, CaptchaModal } from '@begcode/components';
+import { ExceptionEnum } from '@/enums/exceptionEnum';
+const [captchaRegisterModal, { openModal: openCaptchaModal }] = useModal();
 
 defineOptions({
   name: 'MiniForgotpad',
@@ -238,7 +243,11 @@ async function getLoginCode() {
     createMessage.warn(t('sys.login.mobilePlaceholder'));
     return;
   }
-  const result = await getImageCaptcha({ mobile: formData.mobile, smsmode: SmsEnum.FORGET_PASSWORD });
+  const result = await getImageCaptcha({ mobile: formData.mobile, smsmode: SmsEnum.FORGET_PASSWORD }).catch(res => {
+    if (res.code === ExceptionEnum.PHONE_SMS_FAIL_CODE) {
+      openCaptchaModal(true, {});
+    }
+  });
   if (result) {
     const TIME_COUNT = 60;
     if (!unref(timer)) {

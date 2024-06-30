@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UReportFileBaseService<R extends UReportFileRepository, E extends UReportFile>
     extends BaseServiceImpl<UReportFileRepository, UReportFile> {
 
-    private final Logger log = LoggerFactory.getLogger(UReportFileBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(UReportFileBaseService.class);
     private final List<String> relationNames = List.of();
 
     protected final UReportFileRepository uReportFileRepository;

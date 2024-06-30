@@ -104,6 +104,9 @@ export default defineComponent({
 
     const getDisable = computed(() => {
       const { disabled: globDisabled } = props.formProps;
+      if (!!globDisabled) {
+        return globDisabled;
+      }
       const { dynamicDisabled } = props.schema;
       const { disabled: itemDisabled = false } = unref(getComponentsProps);
       let disabled = !!globDisabled || itemDisabled;
@@ -156,6 +159,13 @@ export default defineComponent({
 
     function handleRules(): ValidationRule[] {
       const { rules: defRules = [], component, rulesMessageJoinLabel, label, dynamicRules, required } = props.schema;
+
+      const { disabled: globDisabled } = props.formProps;
+      const { disabled: itemDisabled = false } = unref(getComponentsProps);
+      if (!!globDisabled || !!itemDisabled) {
+        props.clearValidate(field);
+        return [];
+      }
 
       if (isFunction(dynamicRules)) {
         return dynamicRules(unref(getValues)) as ValidationRule[];
@@ -288,6 +298,7 @@ export default defineComponent({
             value = e;
           }
           props.setFormModel(field, value, props.schema);
+          props.validateFields([field]).catch(_ => {});
         },
       };
       const Comp = componentMap.get(component) as ReturnType<typeof defineComponent>;
@@ -339,11 +350,11 @@ export default defineComponent({
     }
 
     function renderLabelHelpMessage() {
-      //label宽度支持自定义
+      // label宽度支持自定义
       const { label, helpMessage, helpComponentProps, subLabel, labelLength } = props.schema;
       let showLabel: string = label + '';
-      if (labelLength && showLabel.length > 4) {
-        showLabel = showLabel.substr(0, labelLength);
+      if (labelLength) {
+        showLabel = showLabel.substring(0, labelLength);
       }
       const renderLabel = subLabel ? (
         <span>
@@ -354,6 +365,7 @@ export default defineComponent({
       ) : (
         label
       );
+
       const getHelpMessage = isFunction(helpMessage) ? helpMessage(unref(getValues)) : helpMessage;
       if (!getHelpMessage || (Array.isArray(getHelpMessage) && getHelpMessage.length === 0)) {
         return renderLabel;

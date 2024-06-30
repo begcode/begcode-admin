@@ -1,9 +1,3 @@
-/**
- * 字典 util
- * author: scott
- * date: 20190109
- */
-
 import { ajaxGetDictItems, getDictItemsByCode } from './index';
 
 /**
@@ -38,7 +32,6 @@ export async function initDictOptions(dictCode, isTransformResponse = true) {
  * @return String
  */
 export function filterDictText(dictOptions, text) {
-  // --update-begin----author:sunjianlei---date:20200323------for: 字典翻译 text 允许逗号分隔 ---
   if (text != null && Array.isArray(dictOptions)) {
     let result = [];
     // 允许多个逗号分隔，允许传数组对象
@@ -61,7 +54,6 @@ export function filterDictText(dictOptions, text) {
     return result.join(',');
   }
   return text;
-  // --update-end----author:sunjianlei---date:20200323------for: 字典翻译 text 允许逗号分隔 ---
 }
 
 /**

@@ -46,7 +46,7 @@ public class SmsSupplierBaseService<R extends SmsSupplierRepository, E extends S
     extends BaseServiceImpl<SmsSupplierRepository, SmsSupplier>
     implements SmsReadConfig {
 
-    private final Logger log = LoggerFactory.getLogger(SmsSupplierBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(SmsSupplierBaseService.class);
     private final List<String> relationNames = List.of();
 
     protected final SmsSupplierRepository smsSupplierRepository;

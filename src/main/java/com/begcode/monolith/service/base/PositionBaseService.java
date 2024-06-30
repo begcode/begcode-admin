@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SuppressWarnings("UnusedReturnValue")
 public class PositionBaseService<R extends PositionRepository, E extends Position> extends BaseServiceImpl<PositionRepository, Position> {
 
-    private final Logger log = LoggerFactory.getLogger(PositionBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(PositionBaseService.class);
     private final List<String> relationNames = List.of("users");
 
     protected final PositionRepository positionRepository;

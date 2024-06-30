@@ -1,5 +1,5 @@
+import type { DropMenu } from '@begcode/components';
 import type { RouteLocationNormalized } from 'vue-router';
-import type { DropMenu } from '@/components/Dropdown';
 
 export enum TabContentEnum {
   TAB_TYPE,

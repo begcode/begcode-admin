@@ -13,7 +13,7 @@ export const toolbar =
 export const simplePlugins = ['lists image link fullscreen wordcount'];
 
 export const simpleToolbar = [
-  'undo redo  formatselect bold italic alignleft aligncenter alignright alignjustify bullist lists link unlink image media removeformat',
+  'undo redo styles bold italic alignleft aligncenter alignright alignjustify bullist lists link unlink image media removeformat',
 ];
 
 export const menubar = 'file edit insert view format table';

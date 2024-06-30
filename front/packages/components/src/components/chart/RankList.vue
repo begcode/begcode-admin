@@ -46,12 +46,12 @@ defineProps({
   margin-top: 16px;
 }
 .rank .list li span {
-  color: rgba(0, 0, 0, 0.65);
   font-size: 14px;
   line-height: 22px;
 }
 .rank .list li span:first-child {
   background-color: #f5f5f5;
+  color: rgba(0, 0, 0, 0.65);
   border-radius: 20px;
   display: inline-block;
   font-size: 12px;

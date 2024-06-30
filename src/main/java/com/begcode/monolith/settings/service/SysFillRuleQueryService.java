@@ -38,7 +38,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class SysFillRuleQueryService implements QueryService<SysFillRule> {
 
-    private final Logger log = LoggerFactory.getLogger(SysFillRuleQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(SysFillRuleQueryService.class);
 
     protected final SysFillRuleRepository sysFillRuleRepository;
 

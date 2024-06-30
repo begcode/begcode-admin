@@ -3,6 +3,7 @@ package com.begcode.monolith.repository.base;
 import com.begcode.monolith.domain.Position;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.ibatis.annotations.*;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -21,6 +22,15 @@ public interface PositionBaseRepository<E extends Position> extends BaseCrudMapp
 
     default Optional<Position> findById(Long id) {
         return Optional.ofNullable(this.selectById(id));
+    }
+
+    default Position saveAndGet(Position position) {
+        if (Objects.nonNull(position.getId())) {
+            this.updateById(position);
+        } else {
+            this.insert(position);
+        }
+        return this.selectById(position.getId());
     }
     // jhipster-needle-repository-add-method - JHipster will add getters and setters here, do not remove
 

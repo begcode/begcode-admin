@@ -58,7 +58,7 @@ const fields = (): FormSchema[] => {
       field: 'type',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择类型', options: getEnumDict('ApiPermissionType'), style: 'width: 100%' };
+        return { placeholder: '请选择类型', options: getEnumDict('ApiPermissionType'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },
@@ -81,7 +81,7 @@ const fields = (): FormSchema[] => {
       field: 'status',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择状态', options: getEnumDict('ApiPermissionState'), style: 'width: 100%' };
+        return { placeholder: '请选择状态', options: getEnumDict('ApiPermissionState'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },

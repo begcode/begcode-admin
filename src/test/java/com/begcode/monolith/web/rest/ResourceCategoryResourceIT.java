@@ -21,6 +21,7 @@ import com.begcode.monolith.service.mapper.ResourceCategoryMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,6 +78,8 @@ public class ResourceCategoryResourceIT {
 
     private ResourceCategory resourceCategory;
 
+    private ResourceCategory insertedResourceCategory;
+
     /**
      * Create an entity for this test.
      *
@@ -110,6 +113,14 @@ public class ResourceCategoryResourceIT {
         resourceCategory = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedResourceCategory != null) {
+            resourceCategoryRepository.deleteById(insertedResourceCategory.getId());
+            insertedResourceCategory = null;
+        }
+    }
+
     @Test
     @Transactional
     void createResourceCategory() throws Exception {
@@ -130,6 +141,8 @@ public class ResourceCategoryResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedResourceCategory = resourceCategoryMapper.toEntity(returnedResourceCategoryDTO);
         assertResourceCategoryUpdatableFieldsEquals(returnedResourceCategory, getPersistedResourceCategory(returnedResourceCategory));
+
+        insertedResourceCategory = returnedResourceCategory;
     }
 
     @Test
@@ -154,7 +167,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategories() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList
         restResourceCategoryMockMvc
@@ -188,7 +201,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getResourceCategory() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get the resourceCategory
         restResourceCategoryMockMvc
@@ -205,7 +218,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getResourceCategoriesByIdFiltering() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         Long id = resourceCategory.getId();
 
@@ -220,7 +233,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategoriesByTitleIsEqualToSomething() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList where title equals to
         defaultResourceCategoryFiltering("title.equals=" + DEFAULT_TITLE, "title.equals=" + UPDATED_TITLE);
@@ -230,7 +243,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategoriesByTitleIsInShouldWork() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList where title in
         defaultResourceCategoryFiltering("title.in=" + DEFAULT_TITLE + "," + UPDATED_TITLE, "title.in=" + UPDATED_TITLE);
@@ -240,7 +253,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategoriesByTitleIsNullOrNotNull() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList where title is not null
         defaultResourceCategoryFiltering("title.specified=true", "title.specified=false");
@@ -250,7 +263,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategoriesByTitleContainsSomething() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList where title contains
         defaultResourceCategoryFiltering("title.contains=" + DEFAULT_TITLE, "title.contains=" + UPDATED_TITLE);
@@ -260,7 +273,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategoriesByTitleNotContainsSomething() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList where title does not contain
         defaultResourceCategoryFiltering("title.doesNotContain=" + UPDATED_TITLE, "title.doesNotContain=" + DEFAULT_TITLE);
@@ -270,7 +283,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategoriesByCodeIsEqualToSomething() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList where code equals to
         defaultResourceCategoryFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
@@ -280,7 +293,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategoriesByCodeIsInShouldWork() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList where code in
         defaultResourceCategoryFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
@@ -290,7 +303,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategoriesByCodeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList where code is not null
         defaultResourceCategoryFiltering("code.specified=true", "code.specified=false");
@@ -300,7 +313,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategoriesByCodeContainsSomething() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList where code contains
         defaultResourceCategoryFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
@@ -310,7 +323,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategoriesByCodeNotContainsSomething() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList where code does not contain
         defaultResourceCategoryFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
@@ -320,7 +333,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategoriesByOrderNumberIsEqualToSomething() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList where orderNumber equals to
         defaultResourceCategoryFiltering("orderNumber.equals=" + DEFAULT_ORDER_NUMBER, "orderNumber.equals=" + UPDATED_ORDER_NUMBER);
@@ -330,7 +343,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategoriesByOrderNumberIsInShouldWork() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList where orderNumber in
         defaultResourceCategoryFiltering(
@@ -343,7 +356,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategoriesByOrderNumberIsNullOrNotNull() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList where orderNumber is not null
         defaultResourceCategoryFiltering("orderNumber.specified=true", "orderNumber.specified=false");
@@ -353,7 +366,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategoriesByOrderNumberIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList where orderNumber is greater than or equal to
         defaultResourceCategoryFiltering(
@@ -366,7 +379,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategoriesByOrderNumberIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList where orderNumber is less than or equal to
         defaultResourceCategoryFiltering(
@@ -379,7 +392,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategoriesByOrderNumberIsLessThanSomething() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList where orderNumber is less than
         defaultResourceCategoryFiltering("orderNumber.lessThan=" + UPDATED_ORDER_NUMBER, "orderNumber.lessThan=" + DEFAULT_ORDER_NUMBER);
@@ -389,7 +402,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void getAllResourceCategoriesByOrderNumberIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         // Get all the resourceCategoryList where orderNumber is greater than
         defaultResourceCategoryFiltering(
@@ -468,7 +481,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void putExistingResourceCategory() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -556,7 +569,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void partialUpdateResourceCategoryWithPatch() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -587,7 +600,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void fullUpdateResourceCategoryWithPatch() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -680,7 +693,7 @@ public class ResourceCategoryResourceIT {
     @Transactional
     void deleteResourceCategory() throws Exception {
         // Initialize the database
-        resourceCategoryRepository.save(resourceCategory);
+        insertedResourceCategory = resourceCategoryRepository.saveAndGet(resourceCategory);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

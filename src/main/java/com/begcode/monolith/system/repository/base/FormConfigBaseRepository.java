@@ -4,6 +4,7 @@ import com.begcode.monolith.system.domain.FormConfig;
 import com.diboot.core.binding.Binder;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.ibatis.annotations.*;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -32,6 +33,15 @@ public interface FormConfigBaseRepository<E extends FormConfig> extends BaseCrud
 
     @Select("delete from form_config formConfig where formConfig.business_type = #{businessTypeId}")
     void deleteAllByBusinessTypeId(@Param("businessTypeId") Long businessTypeId);
+
+    default FormConfig saveAndGet(FormConfig formConfig) {
+        if (Objects.nonNull(formConfig.getId())) {
+            this.updateById(formConfig);
+        } else {
+            this.insert(formConfig);
+        }
+        return this.selectById(formConfig.getId());
+    }
     // jhipster-needle-repository-add-method - JHipster will add getters and setters here, do not remove
 
 }

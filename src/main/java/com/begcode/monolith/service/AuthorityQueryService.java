@@ -40,7 +40,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class AuthorityQueryService implements QueryService<Authority> {
 
-    private final Logger log = LoggerFactory.getLogger(AuthorityQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthorityQueryService.class);
 
     protected final AuthorityRepository authorityRepository;
 

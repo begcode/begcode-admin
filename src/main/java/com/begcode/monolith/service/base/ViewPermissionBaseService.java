@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ViewPermissionBaseService<R extends ViewPermissionRepository, E extends ViewPermission>
     extends BaseServiceImpl<ViewPermissionRepository, ViewPermission> {
 
-    private final Logger log = LoggerFactory.getLogger(ViewPermissionBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(ViewPermissionBaseService.class);
 
     private final List<String> relationCacheNames = List.of(
         com.begcode.monolith.domain.ViewPermission.class.getName() + ".parent",

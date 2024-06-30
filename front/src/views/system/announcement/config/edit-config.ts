@@ -39,7 +39,7 @@ const fields = (): FormSchema[] => {
       label: '内容',
       field: 'content',
       component: 'Editor',
-      componentProps: { placeholder: '请输入内容', style: 'width: 100%' },
+      componentProps: { editorId: 'form_item_content_editor', placeholder: '请输入内容', style: 'width: 100%' },
       rules: [],
     },
     {
@@ -69,7 +69,7 @@ const fields = (): FormSchema[] => {
       field: 'priority',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择优先级', options: getEnumDict('PriorityLevel'), style: 'width: 100%' };
+        return { placeholder: '请选择优先级', options: getEnumDict('PriorityLevel'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },
@@ -78,7 +78,7 @@ const fields = (): FormSchema[] => {
       field: 'category',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择消息类型', options: getEnumDict('AnnoCategory'), style: 'width: 100%' };
+        return { placeholder: '请选择消息类型', options: getEnumDict('AnnoCategory'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },
@@ -87,7 +87,7 @@ const fields = (): FormSchema[] => {
       field: 'receiverType',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择通告对象类型', options: getEnumDict('ReceiverType'), style: 'width: 100%' };
+        return { placeholder: '请选择通告对象类型', options: getEnumDict('ReceiverType'), showSearch: true, style: 'width: 100%' };
       },
       rules: [{ required: true, message: '必填项' }],
     },
@@ -97,7 +97,7 @@ const fields = (): FormSchema[] => {
       show: false,
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择发布状态', options: getEnumDict('AnnoSendStatus'), style: 'width: 100%' };
+        return { placeholder: '请选择发布状态', options: getEnumDict('AnnoSendStatus'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },
@@ -123,7 +123,7 @@ const fields = (): FormSchema[] => {
       show: false,
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择业务类型', options: getEnumDict('AnnoBusinessType'), style: 'width: 100%' };
+        return { placeholder: '请选择业务类型', options: getEnumDict('AnnoBusinessType'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },
@@ -140,7 +140,7 @@ const fields = (): FormSchema[] => {
       field: 'openType',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择打开方式', options: getEnumDict('AnnoOpenType'), style: 'width: 100%' };
+        return { placeholder: '请选择打开方式', options: getEnumDict('AnnoOpenType'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },

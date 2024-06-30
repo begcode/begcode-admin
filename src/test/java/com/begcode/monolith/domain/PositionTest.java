@@ -25,7 +25,7 @@ class PositionTest {
     }
 
     @Test
-    void usersTest() throws Exception {
+    void usersTest() {
         Position position = getPositionRandomSampleGenerator();
         User userBack = getUserRandomSampleGenerator();
 

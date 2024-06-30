@@ -38,7 +38,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class UReportFileQueryService implements QueryService<UReportFile> {
 
-    private final Logger log = LoggerFactory.getLogger(UReportFileQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(UReportFileQueryService.class);
 
     protected final UReportFileRepository uReportFileRepository;
 

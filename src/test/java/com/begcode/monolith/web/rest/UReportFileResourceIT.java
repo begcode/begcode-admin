@@ -21,6 +21,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,8 @@ public class UReportFileResourceIT {
 
     private UReportFile uReportFile;
 
+    private UReportFile insertedUReportFile;
+
     /**
      * Create an entity for this test.
      *
@@ -95,6 +98,14 @@ public class UReportFileResourceIT {
         uReportFile = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedUReportFile != null) {
+            uReportFileRepository.deleteById(insertedUReportFile.getId());
+            insertedUReportFile = null;
+        }
+    }
+
     @Test
     @Transactional
     void createUReportFile() throws Exception {
@@ -115,6 +126,8 @@ public class UReportFileResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedUReportFile = uReportFileMapper.toEntity(returnedUReportFileDTO);
         assertUReportFileUpdatableFieldsEquals(returnedUReportFile, getPersistedUReportFile(returnedUReportFile));
+
+        insertedUReportFile = returnedUReportFile;
     }
 
     @Test
@@ -156,7 +169,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFiles() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList
         restUReportFileMockMvc
@@ -173,7 +186,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getUReportFile() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get the uReportFile
         restUReportFileMockMvc
@@ -190,7 +203,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getUReportFilesByIdFiltering() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         Long id = uReportFile.getId();
 
@@ -205,7 +218,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where name equals to
         defaultUReportFileFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
@@ -215,7 +228,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByNameIsInShouldWork() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where name in
         defaultUReportFileFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
@@ -225,7 +238,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where name is not null
         defaultUReportFileFiltering("name.specified=true", "name.specified=false");
@@ -235,7 +248,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByNameContainsSomething() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where name contains
         defaultUReportFileFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
@@ -245,7 +258,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByNameNotContainsSomething() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where name does not contain
         defaultUReportFileFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
@@ -255,7 +268,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByCreateAtIsEqualToSomething() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where createAt equals to
         defaultUReportFileFiltering("createAt.equals=" + DEFAULT_CREATE_AT, "createAt.equals=" + UPDATED_CREATE_AT);
@@ -265,7 +278,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByCreateAtIsInShouldWork() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where createAt in
         defaultUReportFileFiltering("createAt.in=" + DEFAULT_CREATE_AT + "," + UPDATED_CREATE_AT, "createAt.in=" + UPDATED_CREATE_AT);
@@ -275,7 +288,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByCreateAtIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where createAt is not null
         defaultUReportFileFiltering("createAt.specified=true", "createAt.specified=false");
@@ -285,7 +298,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByCreateAtIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where createAt is greater than or equal to
         defaultUReportFileFiltering("createAt.greaterThanOrEqual=" + DEFAULT_CREATE_AT, "createAt.greaterThanOrEqual=" + UPDATED_CREATE_AT);
@@ -295,7 +308,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByCreateAtIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where createAt is less than or equal to
         defaultUReportFileFiltering("createAt.lessThanOrEqual=" + DEFAULT_CREATE_AT, "createAt.lessThanOrEqual=" + SMALLER_CREATE_AT);
@@ -305,7 +318,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByCreateAtIsLessThanSomething() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where createAt is less than
         defaultUReportFileFiltering("createAt.lessThan=" + UPDATED_CREATE_AT, "createAt.lessThan=" + DEFAULT_CREATE_AT);
@@ -315,7 +328,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByCreateAtIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where createAt is greater than
         defaultUReportFileFiltering("createAt.greaterThan=" + SMALLER_CREATE_AT, "createAt.greaterThan=" + DEFAULT_CREATE_AT);
@@ -325,7 +338,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByUpdateAtIsEqualToSomething() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where updateAt equals to
         defaultUReportFileFiltering("updateAt.equals=" + DEFAULT_UPDATE_AT, "updateAt.equals=" + UPDATED_UPDATE_AT);
@@ -335,7 +348,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByUpdateAtIsInShouldWork() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where updateAt in
         defaultUReportFileFiltering("updateAt.in=" + DEFAULT_UPDATE_AT + "," + UPDATED_UPDATE_AT, "updateAt.in=" + UPDATED_UPDATE_AT);
@@ -345,7 +358,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByUpdateAtIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where updateAt is not null
         defaultUReportFileFiltering("updateAt.specified=true", "updateAt.specified=false");
@@ -355,7 +368,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByUpdateAtIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where updateAt is greater than or equal to
         defaultUReportFileFiltering("updateAt.greaterThanOrEqual=" + DEFAULT_UPDATE_AT, "updateAt.greaterThanOrEqual=" + UPDATED_UPDATE_AT);
@@ -365,7 +378,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByUpdateAtIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where updateAt is less than or equal to
         defaultUReportFileFiltering("updateAt.lessThanOrEqual=" + DEFAULT_UPDATE_AT, "updateAt.lessThanOrEqual=" + SMALLER_UPDATE_AT);
@@ -375,7 +388,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByUpdateAtIsLessThanSomething() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where updateAt is less than
         defaultUReportFileFiltering("updateAt.lessThan=" + UPDATED_UPDATE_AT, "updateAt.lessThan=" + DEFAULT_UPDATE_AT);
@@ -385,7 +398,7 @@ public class UReportFileResourceIT {
     @Transactional
     void getAllUReportFilesByUpdateAtIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         // Get all the uReportFileList where updateAt is greater than
         defaultUReportFileFiltering("updateAt.greaterThan=" + SMALLER_UPDATE_AT, "updateAt.greaterThan=" + DEFAULT_UPDATE_AT);
@@ -447,7 +460,7 @@ public class UReportFileResourceIT {
     @Transactional
     void putExistingUReportFile() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -535,7 +548,7 @@ public class UReportFileResourceIT {
     @Transactional
     void partialUpdateUReportFileWithPatch() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -543,7 +556,7 @@ public class UReportFileResourceIT {
         UReportFile partialUpdatedUReportFile = new UReportFile();
         partialUpdatedUReportFile.setId(uReportFile.getId());
 
-        partialUpdatedUReportFile.name(UPDATED_NAME).updateAt(UPDATED_UPDATE_AT);
+        partialUpdatedUReportFile.createAt(UPDATED_CREATE_AT);
 
         restUReportFileMockMvc
             .perform(
@@ -566,7 +579,7 @@ public class UReportFileResourceIT {
     @Transactional
     void fullUpdateUReportFileWithPatch() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -656,7 +669,7 @@ public class UReportFileResourceIT {
     @Transactional
     void deleteUReportFile() throws Exception {
         // Initialize the database
-        uReportFileRepository.save(uReportFile);
+        insertedUReportFile = uReportFileRepository.saveAndGet(uReportFile);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

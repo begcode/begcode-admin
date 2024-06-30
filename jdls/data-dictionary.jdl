@@ -222,6 +222,7 @@ relationship OneToMany {
 entity FormConfig {
     formKey String maxlength(100) /** 表单Key */
     formName String maxlength(100) /** 名称 */
+    @endUsed(codeEditor)
     formJson TextBlob /** 表单配置 */
 }
 

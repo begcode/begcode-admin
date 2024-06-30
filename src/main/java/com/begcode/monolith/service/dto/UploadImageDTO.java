@@ -28,7 +28,7 @@ public class UploadImageDTO extends AbstractAuditingEntity<Long, UploadImageDTO>
      * Url地址
      */
     @NotNull
-    @Schema(description = "Url地址", required = true)
+    @Schema(description = "Url地址", requiredMode = Schema.RequiredMode.REQUIRED)
     private String url;
 
     /**

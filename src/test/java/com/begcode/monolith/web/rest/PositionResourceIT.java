@@ -16,6 +16,7 @@ import com.begcode.monolith.service.mapper.PositionMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +66,8 @@ public class PositionResourceIT {
 
     private Position position;
 
+    private Position insertedPosition;
+
     /**
      * Create an entity for this test.
      *
@@ -92,6 +95,14 @@ public class PositionResourceIT {
         position = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedPosition != null) {
+            positionRepository.deleteById(insertedPosition.getId());
+            insertedPosition = null;
+        }
+    }
+
     @Test
     @Transactional
     void createPosition() throws Exception {
@@ -112,6 +123,8 @@ public class PositionResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedPosition = positionMapper.toEntity(returnedPositionDTO);
         assertPositionUpdatableFieldsEquals(returnedPosition, getPersistedPosition(returnedPosition));
+
+        insertedPosition = returnedPosition;
     }
 
     @Test
@@ -170,7 +183,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositions() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList
         restPositionMockMvc
@@ -188,7 +201,7 @@ public class PositionResourceIT {
     @Transactional
     void getPosition() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get the position
         restPositionMockMvc
@@ -206,7 +219,7 @@ public class PositionResourceIT {
     @Transactional
     void getPositionsByIdFiltering() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         Long id = position.getId();
 
@@ -221,7 +234,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsByCodeIsEqualToSomething() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where code equals to
         defaultPositionFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
@@ -231,7 +244,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsByCodeIsInShouldWork() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where code in
         defaultPositionFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
@@ -241,7 +254,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsByCodeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where code is not null
         defaultPositionFiltering("code.specified=true", "code.specified=false");
@@ -251,7 +264,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsByCodeContainsSomething() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where code contains
         defaultPositionFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
@@ -261,7 +274,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsByCodeNotContainsSomething() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where code does not contain
         defaultPositionFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
@@ -271,7 +284,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsByNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where name equals to
         defaultPositionFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
@@ -281,7 +294,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsByNameIsInShouldWork() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where name in
         defaultPositionFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
@@ -291,7 +304,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsByNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where name is not null
         defaultPositionFiltering("name.specified=true", "name.specified=false");
@@ -301,7 +314,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsByNameContainsSomething() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where name contains
         defaultPositionFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
@@ -311,7 +324,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsByNameNotContainsSomething() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where name does not contain
         defaultPositionFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
@@ -321,7 +334,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsBySortNoIsEqualToSomething() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where sortNo equals to
         defaultPositionFiltering("sortNo.equals=" + DEFAULT_SORT_NO, "sortNo.equals=" + UPDATED_SORT_NO);
@@ -331,7 +344,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsBySortNoIsInShouldWork() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where sortNo in
         defaultPositionFiltering("sortNo.in=" + DEFAULT_SORT_NO + "," + UPDATED_SORT_NO, "sortNo.in=" + UPDATED_SORT_NO);
@@ -341,7 +354,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsBySortNoIsNullOrNotNull() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where sortNo is not null
         defaultPositionFiltering("sortNo.specified=true", "sortNo.specified=false");
@@ -351,7 +364,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsBySortNoIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where sortNo is greater than or equal to
         defaultPositionFiltering("sortNo.greaterThanOrEqual=" + DEFAULT_SORT_NO, "sortNo.greaterThanOrEqual=" + UPDATED_SORT_NO);
@@ -361,7 +374,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsBySortNoIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where sortNo is less than or equal to
         defaultPositionFiltering("sortNo.lessThanOrEqual=" + DEFAULT_SORT_NO, "sortNo.lessThanOrEqual=" + SMALLER_SORT_NO);
@@ -371,7 +384,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsBySortNoIsLessThanSomething() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where sortNo is less than
         defaultPositionFiltering("sortNo.lessThan=" + UPDATED_SORT_NO, "sortNo.lessThan=" + DEFAULT_SORT_NO);
@@ -381,7 +394,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsBySortNoIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where sortNo is greater than
         defaultPositionFiltering("sortNo.greaterThan=" + SMALLER_SORT_NO, "sortNo.greaterThan=" + DEFAULT_SORT_NO);
@@ -391,7 +404,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsByDescriptionIsEqualToSomething() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where description equals to
         defaultPositionFiltering("description.equals=" + DEFAULT_DESCRIPTION, "description.equals=" + UPDATED_DESCRIPTION);
@@ -401,7 +414,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsByDescriptionIsInShouldWork() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where description in
         defaultPositionFiltering(
@@ -414,7 +427,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsByDescriptionIsNullOrNotNull() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where description is not null
         defaultPositionFiltering("description.specified=true", "description.specified=false");
@@ -424,7 +437,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsByDescriptionContainsSomething() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where description contains
         defaultPositionFiltering("description.contains=" + DEFAULT_DESCRIPTION, "description.contains=" + UPDATED_DESCRIPTION);
@@ -434,7 +447,7 @@ public class PositionResourceIT {
     @Transactional
     void getAllPositionsByDescriptionNotContainsSomething() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         // Get all the positionList where description does not contain
         defaultPositionFiltering("description.doesNotContain=" + UPDATED_DESCRIPTION, "description.doesNotContain=" + DEFAULT_DESCRIPTION);
@@ -497,7 +510,7 @@ public class PositionResourceIT {
     @Transactional
     void putExistingPosition() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -585,7 +598,7 @@ public class PositionResourceIT {
     @Transactional
     void partialUpdatePositionWithPatch() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -593,7 +606,7 @@ public class PositionResourceIT {
         Position partialUpdatedPosition = new Position();
         partialUpdatedPosition.setId(position.getId());
 
-        partialUpdatedPosition.code(UPDATED_CODE).description(UPDATED_DESCRIPTION);
+        partialUpdatedPosition.sortNo(UPDATED_SORT_NO);
 
         restPositionMockMvc
             .perform(
@@ -613,7 +626,7 @@ public class PositionResourceIT {
     @Transactional
     void fullUpdatePositionWithPatch() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -703,7 +716,7 @@ public class PositionResourceIT {
     @Transactional
     void deletePosition() throws Exception {
         // Initialize the database
-        positionRepository.save(position);
+        insertedPosition = positionRepository.saveAndGet(position);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

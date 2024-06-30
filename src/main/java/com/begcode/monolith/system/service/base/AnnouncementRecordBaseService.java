@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AnnouncementRecordBaseService<R extends AnnouncementRecordRepository, E extends AnnouncementRecord>
     extends BaseServiceImpl<AnnouncementRecordRepository, AnnouncementRecord> {
 
-    private final Logger log = LoggerFactory.getLogger(AnnouncementRecordBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(AnnouncementRecordBaseService.class);
     private final List<String> relationNames = List.of();
 
     protected final AnnouncementRecordRepository announcementRecordRepository;

@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SmsMessageBaseService<R extends SmsMessageRepository, E extends SmsMessage>
     extends BaseServiceImpl<SmsMessageRepository, SmsMessage> {
 
-    private final Logger log = LoggerFactory.getLogger(SmsMessageBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(SmsMessageBaseService.class);
     private final List<String> relationNames = List.of();
 
     protected final SmsMessageRepository smsMessageRepository;

@@ -6,6 +6,7 @@ import com.begcode.monolith.domain.ResourceCategory;
 import com.diboot.core.binding.Binder;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.ibatis.annotations.*;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -37,6 +38,15 @@ public interface ResourceCategoryBaseRepository<E extends ResourceCategory> exte
 
     default IPage<ResourceCategory> findAllByParentIsNull(IPage<ResourceCategory> pageable) {
         return this.selectPage(pageable, new QueryWrapper<ResourceCategory>().isNull("parent_id"));
+    }
+
+    default ResourceCategory saveAndGet(ResourceCategory resourceCategory) {
+        if (Objects.nonNull(resourceCategory.getId())) {
+            this.updateById(resourceCategory);
+        } else {
+            this.insert(resourceCategory);
+        }
+        return this.selectById(resourceCategory.getId());
     }
     // jhipster-needle-repository-add-method - JHipster will add getters and setters here, do not remove
 

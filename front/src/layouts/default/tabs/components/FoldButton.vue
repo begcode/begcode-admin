@@ -1,6 +1,6 @@
 <template>
   <span :class="`${prefixCls}__extra-fold`" @click="handleFold">
-    <Icon :icon="getIcon" />
+    <Icon :icon="getIcon" :size="18" />
   </span>
 </template>
 <script lang="ts" setup>

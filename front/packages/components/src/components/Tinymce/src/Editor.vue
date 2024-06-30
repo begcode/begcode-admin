@@ -1,13 +1,15 @@
 <template>
-  <div :class="prefixCls" :style="{ width: containerWidth }">
-    <ImgUpload
-      :fullscreen="fullscreen"
-      @uploading="handleImageUploading"
-      @done="handleDone"
-      v-if="showImageUpload"
-      v-show="editorRef"
-      :disabled="disabled"
-    />
+  <div ref="editorRootRef" :class="prefixCls" :style="{ width: containerWidth }">
+    <Teleport v-if="imgUploadShow" :to="targetElem">
+      <ImgUpload
+        :fullscreen="fullscreen"
+        @uploading="handleImageUploading"
+        @done="handleDone"
+        v-if="showImageUpload"
+        v-show="editorRef"
+        :disabled="disabled"
+      />
+    </Teleport>
     <textarea :id="tinymceId" ref="elRef" :style="{ visibility: 'hidden' }" v-if="!initOptions.inline"></textarea>
     <slot v-else></slot>
   </div>
@@ -52,7 +54,7 @@ import 'tinymce/plugins/table';
 import 'tinymce/plugins/textcolor';
 import 'tinymce/plugins/contextmenu';
 
-import { computed, nextTick, ref, unref, watch, onDeactivated, onBeforeUnmount, PropType, useAttrs } from 'vue';
+import { computed, nextTick, ref, unref, watch, onDeactivated, onBeforeUnmount, PropType, useAttrs, onMounted, inject } from 'vue';
 import ImgUpload from './ImgUpload.vue';
 import { plugins as defaultPlugins, toolbar as defaultToolbar, simplePlugins, simpleToolbar, menubar as defaultMenubar } from './tinymce';
 import { buildShortUUID } from '@/utils/uuid';
@@ -112,6 +114,10 @@ const props = defineProps({
     type: Function,
     default: null,
   },
+  editorId: {
+    type: String,
+    default: '',
+  },
 });
 
 const emit = defineEmits(['change', 'update:modelValue', 'inited', 'init-error']);
@@ -122,8 +128,12 @@ const uploadApi = uploadFile || uploadImage;
 const attrs = useAttrs();
 const editorRef = ref<Editor | null>(null);
 const fullscreen = ref(false);
-const tinymceId = ref<string>(buildShortUUID('tiny-vue'));
+const tinymceId = ref<string>(props.editorId || buildShortUUID('tiny-vue'));
 const elRef = ref<HTMLElement | null>(null);
+const editorRootRef = ref<Nullable<HTMLElement>>(null);
+const imgUploadShow = ref(false);
+const targetElem = ref<null | HTMLDivElement>(null);
+const appMarkMode = inject('APP_DARK_MODE', ref('light'));
 
 const { prefixCls } = useDesign('tinymce-container');
 
@@ -150,7 +160,10 @@ const langName = computed(() => {
 
 const initOptions = computed((): RawEditorSettings => {
   const { height, options, toolbar, plugins, menubar, mini } = props;
-  const publicPath = import.meta.env.VITE_PUBLIC_PATH || '/';
+  let publicPath = import.meta.env.VITE_PUBLIC_PATH || '/';
+  if (!publicPath.endsWith('/')) {
+    publicPath += '/';
+  }
   return {
     selector: `#${unref(tinymceId)}`,
     height: mini ? 200 : height,
@@ -215,7 +228,7 @@ watch(
 
 onMountedOrActivated(() => {
   if (!initOptions.value.inline) {
-    tinymceId.value = buildShortUUID('tiny-vue');
+    tinymceId.value = props.editorId || buildShortUUID('tiny-vue');
   }
   nextTick(() => {
     setTimeout(() => {
@@ -246,6 +259,7 @@ function initEditor() {
   tinymce
     .init(unref(initOptions))
     .then(editor => {
+      changeColor();
       emit('inited', editor);
     })
     .catch(err => {
@@ -319,6 +333,55 @@ function handleDone(name: string, url: string) {
 function getUploadingImgName(name: string) {
   return `[uploading:${name}]`;
 }
+let executeCount = 0;
+watch(
+  () => props.showImageUpload,
+  () => {
+    mountElem();
+  },
+);
+onMounted(() => {
+  mountElem();
+});
+const mountElem = () => {
+  if (executeCount > 20) return;
+  setTimeout(() => {
+    if (targetElem.value) {
+      imgUploadShow.value = props.showImageUpload;
+    } else {
+      const toxToolbar = editorRootRef.value?.querySelector('.tox-toolbar__group');
+      if (toxToolbar) {
+        const divElem = document.createElement('div');
+        divElem.setAttribute('class', `tox-tbtn`);
+        toxToolbar!.appendChild(divElem);
+        targetElem.value = divElem;
+        imgUploadShow.value = props.showImageUpload;
+        executeCount = 0;
+      } else {
+        mountElem();
+      }
+    }
+    executeCount++;
+  }, 100);
+};
+function changeColor() {
+  setTimeout(() => {
+    const iframe = editorRootRef.value?.querySelector('iframe');
+    const body = iframe?.contentDocument?.querySelector('body');
+    if (body) {
+      if (appMarkMode.value === 'light') {
+        body.style.color = '#000';
+      } else {
+        body.style.color = '#fff';
+      }
+    }
+  }, 300);
+}
+
+watch(
+  () => appMarkMode.value,
+  () => changeColor(),
+);
 </script>
 <style>
 .vben-tinymce-container {
@@ -328,5 +391,18 @@ function getUploadingImgName(name: string) {
 .vben-tinymce-container textarea {
   z-index: -1;
   visibility: hidden;
+}
+.vben-tinymce-container .tox:not(.tox-tinymce-inline) .tox-editor-header {
+  padding: 0;
+}
+.vben-tinymce-container .tox .tox-tbtn--disabled,
+.vben-tinymce-container .tox .tox-tbtn--disabled:hover,
+.vben-tinymce-container .tox .tox-tbtn:disabled,
+.vben-tinymce-container .tox .tox-tbtn:disabled:hover {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg height='39px' viewBox='0 0 40 39px' width='40' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0' y='38px' width='100' height='1' fill='%23d9d9d9'/%3E%3C/svg%3E");
+  background-position: left 0;
+}
+html[data-theme='dark'] .vben-tinymce-container .tox .tox-edit-area__iframe {
+  background-color: #141414;
 }
 </style>

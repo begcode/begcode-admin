@@ -42,7 +42,7 @@ html[data-theme='light'] {
   }
 
   .ant-tabs.ant-tabs-card {
-    padding-left: 10px;
+    padding-left: 0;
 
     .ant-tabs-nav {
       height: calc(@multiple-height);
@@ -76,11 +76,10 @@ html[data-theme='light'] {
         }
 
         .ant-tabs-tab-remove {
-          margin: 0;
           padding: 0;
           position: relative;
           top: 0;
-          left: 4px;
+          margin: 0 0 0 4px;
 
           .anticon-close {
             width: 8px;
@@ -120,8 +119,8 @@ html[data-theme='light'] {
         position: relative;
         padding-left: 18px;
         color: @white !important;
-        background: @primary-color;
-        border: 1px solid transparent;
+        // background: @primary-color;
+        border: 0;
         transition: none;
 
         .ant-tabs-tab-btn {

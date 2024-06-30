@@ -25,7 +25,7 @@ class RegionCodeTest {
     }
 
     @Test
-    void childrenTest() throws Exception {
+    void childrenTest() {
         RegionCode regionCode = getRegionCodeRandomSampleGenerator();
         RegionCode regionCodeBack = getRegionCodeRandomSampleGenerator();
 
@@ -47,7 +47,7 @@ class RegionCodeTest {
     }
 
     @Test
-    void parentTest() throws Exception {
+    void parentTest() {
         RegionCode regionCode = getRegionCodeRandomSampleGenerator();
         RegionCode regionCodeBack = getRegionCodeRandomSampleGenerator();
 

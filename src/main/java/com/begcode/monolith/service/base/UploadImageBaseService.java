@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UploadImageBaseService<R extends UploadImageRepository, E extends UploadImage>
     extends BaseServiceImpl<UploadImageRepository, UploadImage> {
 
-    private final Logger log = LoggerFactory.getLogger(UploadImageBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(UploadImageBaseService.class);
 
     private final List<String> relationCacheNames = List.of(com.begcode.monolith.domain.ResourceCategory.class.getName() + ".images");
     private final List<String> relationNames = List.of("category");

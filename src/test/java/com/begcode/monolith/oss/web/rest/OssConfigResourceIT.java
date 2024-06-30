@@ -17,6 +17,7 @@ import com.begcode.monolith.oss.service.mapper.OssConfigMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,8 @@ public class OssConfigResourceIT {
 
     private OssConfig ossConfig;
 
+    private OssConfig insertedOssConfig;
+
     /**
      * Create an entity for this test.
      *
@@ -105,6 +108,14 @@ public class OssConfigResourceIT {
         ossConfig = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedOssConfig != null) {
+            ossConfigRepository.deleteById(insertedOssConfig.getId());
+            insertedOssConfig = null;
+        }
+    }
+
     @Test
     @Transactional
     void createOssConfig() throws Exception {
@@ -125,6 +136,8 @@ public class OssConfigResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedOssConfig = ossConfigMapper.toEntity(returnedOssConfigDTO);
         assertOssConfigUpdatableFieldsEquals(returnedOssConfig, getPersistedOssConfig(returnedOssConfig));
+
+        insertedOssConfig = returnedOssConfig;
     }
 
     @Test
@@ -183,7 +196,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigs() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList
         restOssConfigMockMvc
@@ -202,7 +215,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getOssConfig() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get the ossConfig
         restOssConfigMockMvc
@@ -221,7 +234,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getOssConfigsByIdFiltering() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         Long id = ossConfig.getId();
 
@@ -236,7 +249,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByProviderIsEqualToSomething() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where provider equals to
         defaultOssConfigFiltering("provider.equals=" + DEFAULT_PROVIDER, "provider.equals=" + UPDATED_PROVIDER);
@@ -246,7 +259,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByProviderIsInShouldWork() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where provider in
         defaultOssConfigFiltering("provider.in=" + DEFAULT_PROVIDER + "," + UPDATED_PROVIDER, "provider.in=" + UPDATED_PROVIDER);
@@ -256,7 +269,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByProviderIsNullOrNotNull() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where provider is not null
         defaultOssConfigFiltering("provider.specified=true", "provider.specified=false");
@@ -266,7 +279,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByPlatformIsEqualToSomething() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where platform equals to
         defaultOssConfigFiltering("platform.equals=" + DEFAULT_PLATFORM, "platform.equals=" + UPDATED_PLATFORM);
@@ -276,7 +289,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByPlatformIsInShouldWork() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where platform in
         defaultOssConfigFiltering("platform.in=" + DEFAULT_PLATFORM + "," + UPDATED_PLATFORM, "platform.in=" + UPDATED_PLATFORM);
@@ -286,7 +299,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByPlatformIsNullOrNotNull() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where platform is not null
         defaultOssConfigFiltering("platform.specified=true", "platform.specified=false");
@@ -296,7 +309,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByPlatformContainsSomething() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where platform contains
         defaultOssConfigFiltering("platform.contains=" + DEFAULT_PLATFORM, "platform.contains=" + UPDATED_PLATFORM);
@@ -306,7 +319,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByPlatformNotContainsSomething() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where platform does not contain
         defaultOssConfigFiltering("platform.doesNotContain=" + UPDATED_PLATFORM, "platform.doesNotContain=" + DEFAULT_PLATFORM);
@@ -316,7 +329,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByEnabledIsEqualToSomething() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where enabled equals to
         defaultOssConfigFiltering("enabled.equals=" + DEFAULT_ENABLED, "enabled.equals=" + UPDATED_ENABLED);
@@ -326,7 +339,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByEnabledIsInShouldWork() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where enabled in
         defaultOssConfigFiltering("enabled.in=" + DEFAULT_ENABLED + "," + UPDATED_ENABLED, "enabled.in=" + UPDATED_ENABLED);
@@ -336,7 +349,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByEnabledIsNullOrNotNull() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where enabled is not null
         defaultOssConfigFiltering("enabled.specified=true", "enabled.specified=false");
@@ -346,7 +359,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByRemarkIsEqualToSomething() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where remark equals to
         defaultOssConfigFiltering("remark.equals=" + DEFAULT_REMARK, "remark.equals=" + UPDATED_REMARK);
@@ -356,7 +369,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByRemarkIsInShouldWork() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where remark in
         defaultOssConfigFiltering("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK, "remark.in=" + UPDATED_REMARK);
@@ -366,7 +379,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByRemarkIsNullOrNotNull() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where remark is not null
         defaultOssConfigFiltering("remark.specified=true", "remark.specified=false");
@@ -376,7 +389,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByRemarkContainsSomething() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where remark contains
         defaultOssConfigFiltering("remark.contains=" + DEFAULT_REMARK, "remark.contains=" + UPDATED_REMARK);
@@ -386,7 +399,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByRemarkNotContainsSomething() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where remark does not contain
         defaultOssConfigFiltering("remark.doesNotContain=" + UPDATED_REMARK, "remark.doesNotContain=" + DEFAULT_REMARK);
@@ -396,7 +409,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByConfigDataIsEqualToSomething() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where configData equals to
         defaultOssConfigFiltering("configData.equals=" + DEFAULT_CONFIG_DATA, "configData.equals=" + UPDATED_CONFIG_DATA);
@@ -406,7 +419,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByConfigDataIsInShouldWork() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where configData in
         defaultOssConfigFiltering(
@@ -419,7 +432,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByConfigDataIsNullOrNotNull() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where configData is not null
         defaultOssConfigFiltering("configData.specified=true", "configData.specified=false");
@@ -429,7 +442,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByConfigDataContainsSomething() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where configData contains
         defaultOssConfigFiltering("configData.contains=" + DEFAULT_CONFIG_DATA, "configData.contains=" + UPDATED_CONFIG_DATA);
@@ -439,7 +452,7 @@ public class OssConfigResourceIT {
     @Transactional
     void getAllOssConfigsByConfigDataNotContainsSomething() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         // Get all the ossConfigList where configData does not contain
         defaultOssConfigFiltering("configData.doesNotContain=" + UPDATED_CONFIG_DATA, "configData.doesNotContain=" + DEFAULT_CONFIG_DATA);
@@ -503,7 +516,7 @@ public class OssConfigResourceIT {
     @Transactional
     void putExistingOssConfig() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -596,7 +609,7 @@ public class OssConfigResourceIT {
     @Transactional
     void partialUpdateOssConfigWithPatch() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -604,7 +617,7 @@ public class OssConfigResourceIT {
         OssConfig partialUpdatedOssConfig = new OssConfig();
         partialUpdatedOssConfig.setId(ossConfig.getId());
 
-        partialUpdatedOssConfig.enabled(UPDATED_ENABLED);
+        partialUpdatedOssConfig.provider(UPDATED_PROVIDER);
 
         restOssConfigMockMvc
             .perform(
@@ -627,7 +640,7 @@ public class OssConfigResourceIT {
     @Transactional
     void fullUpdateOssConfigWithPatch() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -722,7 +735,7 @@ public class OssConfigResourceIT {
     @Transactional
     void deleteOssConfig() throws Exception {
         // Initialize the database
-        ossConfigRepository.save(ossConfig);
+        insertedOssConfig = ossConfigRepository.saveAndGet(ossConfig);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

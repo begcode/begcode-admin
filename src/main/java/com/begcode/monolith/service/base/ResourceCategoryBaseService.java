@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ResourceCategoryBaseService<R extends ResourceCategoryRepository, E extends ResourceCategory>
     extends BaseServiceImpl<ResourceCategoryRepository, ResourceCategory> {
 
-    private final Logger log = LoggerFactory.getLogger(ResourceCategoryBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(ResourceCategoryBaseService.class);
 
     private final List<String> relationCacheNames = List.of(
         com.begcode.monolith.domain.ResourceCategory.class.getName() + ".parent",

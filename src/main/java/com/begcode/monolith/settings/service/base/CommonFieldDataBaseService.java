@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommonFieldDataBaseService<R extends CommonFieldDataRepository, E extends CommonFieldData>
     extends BaseServiceImpl<CommonFieldDataRepository, CommonFieldData> {
 
-    private final Logger log = LoggerFactory.getLogger(CommonFieldDataBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(CommonFieldDataBaseService.class);
 
     private final List<String> relationCacheNames = List.of(
         com.begcode.monolith.settings.domain.SiteConfig.class.getName() + ".items",

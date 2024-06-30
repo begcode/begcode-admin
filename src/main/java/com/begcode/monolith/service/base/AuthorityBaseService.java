@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthorityBaseService<R extends AuthorityRepository, E extends Authority>
     extends BaseServiceImpl<AuthorityRepository, Authority> {
 
-    private final Logger log = LoggerFactory.getLogger(AuthorityBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthorityBaseService.class);
 
     private final List<String> relationCacheNames = List.of(
         com.begcode.monolith.domain.Authority.class.getName() + ".parent",

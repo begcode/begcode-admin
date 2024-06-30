@@ -38,7 +38,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class UploadImageQueryService implements QueryService<UploadImage> {
 
-    private final Logger log = LoggerFactory.getLogger(UploadImageQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(UploadImageQueryService.class);
 
     protected final UploadImageRepository uploadImageRepository;
 

@@ -44,7 +44,7 @@ public class DictionaryBaseService<R extends DictionaryRepository, E extends Dic
     extends BaseServiceImpl<DictionaryRepository, Dictionary>
     implements DictionaryServiceExtProvider {
 
-    private final Logger log = LoggerFactory.getLogger(DictionaryBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(DictionaryBaseService.class);
     private final List<String> relationNames = List.of("items");
 
     protected final DictionaryRepository dictionaryRepository;

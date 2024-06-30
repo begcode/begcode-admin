@@ -26,7 +26,7 @@ const fields = (): FormSchema[] => {
       field: 'provider',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择提供商', options: getEnumDict('SmsProvider'), style: 'width: 100%' };
+        return { placeholder: '请选择提供商', options: getEnumDict('SmsProvider'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },

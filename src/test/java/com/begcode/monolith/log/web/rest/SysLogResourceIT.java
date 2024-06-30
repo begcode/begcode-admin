@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,6 +102,8 @@ public class SysLogResourceIT {
 
     private SysLog sysLog;
 
+    private SysLog insertedSysLog;
+
     /**
      * Create an entity for this test.
      *
@@ -156,6 +159,14 @@ public class SysLogResourceIT {
         sysLog = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedSysLog != null) {
+            sysLogRepository.deleteById(insertedSysLog.getId());
+            insertedSysLog = null;
+        }
+    }
+
     @Test
     @Transactional
     void createSysLog() throws Exception {
@@ -176,6 +187,8 @@ public class SysLogResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedSysLog = sysLogMapper.toEntity(returnedSysLogDTO);
         assertSysLogUpdatableFieldsEquals(returnedSysLog, getPersistedSysLog(returnedSysLog));
+
+        insertedSysLog = returnedSysLog;
     }
 
     @Test
@@ -200,7 +213,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogs() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList
         restSysLogMockMvc
@@ -228,7 +241,7 @@ public class SysLogResourceIT {
     @Transactional
     void getSysLog() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get the sysLog
         restSysLogMockMvc
@@ -256,7 +269,7 @@ public class SysLogResourceIT {
     @Transactional
     void getSysLogsByIdFiltering() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         Long id = sysLog.getId();
 
@@ -271,7 +284,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLogTypeIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where logType equals to
         defaultSysLogFiltering("logType.equals=" + DEFAULT_LOG_TYPE, "logType.equals=" + UPDATED_LOG_TYPE);
@@ -281,7 +294,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLogTypeIsInShouldWork() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where logType in
         defaultSysLogFiltering("logType.in=" + DEFAULT_LOG_TYPE + "," + UPDATED_LOG_TYPE, "logType.in=" + UPDATED_LOG_TYPE);
@@ -291,7 +304,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLogTypeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where logType is not null
         defaultSysLogFiltering("logType.specified=true", "logType.specified=false");
@@ -301,7 +314,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLogContentIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where logContent equals to
         defaultSysLogFiltering("logContent.equals=" + DEFAULT_LOG_CONTENT, "logContent.equals=" + UPDATED_LOG_CONTENT);
@@ -311,7 +324,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLogContentIsInShouldWork() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where logContent in
         defaultSysLogFiltering("logContent.in=" + DEFAULT_LOG_CONTENT + "," + UPDATED_LOG_CONTENT, "logContent.in=" + UPDATED_LOG_CONTENT);
@@ -321,7 +334,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLogContentIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where logContent is not null
         defaultSysLogFiltering("logContent.specified=true", "logContent.specified=false");
@@ -331,7 +344,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLogContentContainsSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where logContent contains
         defaultSysLogFiltering("logContent.contains=" + DEFAULT_LOG_CONTENT, "logContent.contains=" + UPDATED_LOG_CONTENT);
@@ -341,7 +354,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLogContentNotContainsSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where logContent does not contain
         defaultSysLogFiltering("logContent.doesNotContain=" + UPDATED_LOG_CONTENT, "logContent.doesNotContain=" + DEFAULT_LOG_CONTENT);
@@ -351,7 +364,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByOperateTypeIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where operateType equals to
         defaultSysLogFiltering("operateType.equals=" + DEFAULT_OPERATE_TYPE, "operateType.equals=" + UPDATED_OPERATE_TYPE);
@@ -361,7 +374,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByOperateTypeIsInShouldWork() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where operateType in
         defaultSysLogFiltering(
@@ -374,7 +387,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByOperateTypeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where operateType is not null
         defaultSysLogFiltering("operateType.specified=true", "operateType.specified=false");
@@ -384,7 +397,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByUseridIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where userid equals to
         defaultSysLogFiltering("userid.equals=" + DEFAULT_USERID, "userid.equals=" + UPDATED_USERID);
@@ -394,7 +407,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByUseridIsInShouldWork() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where userid in
         defaultSysLogFiltering("userid.in=" + DEFAULT_USERID + "," + UPDATED_USERID, "userid.in=" + UPDATED_USERID);
@@ -404,7 +417,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByUseridIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where userid is not null
         defaultSysLogFiltering("userid.specified=true", "userid.specified=false");
@@ -414,7 +427,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByUseridContainsSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where userid contains
         defaultSysLogFiltering("userid.contains=" + DEFAULT_USERID, "userid.contains=" + UPDATED_USERID);
@@ -424,7 +437,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByUseridNotContainsSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where userid does not contain
         defaultSysLogFiltering("userid.doesNotContain=" + UPDATED_USERID, "userid.doesNotContain=" + DEFAULT_USERID);
@@ -434,7 +447,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByUsernameIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where username equals to
         defaultSysLogFiltering("username.equals=" + DEFAULT_USERNAME, "username.equals=" + UPDATED_USERNAME);
@@ -444,7 +457,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByUsernameIsInShouldWork() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where username in
         defaultSysLogFiltering("username.in=" + DEFAULT_USERNAME + "," + UPDATED_USERNAME, "username.in=" + UPDATED_USERNAME);
@@ -454,7 +467,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByUsernameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where username is not null
         defaultSysLogFiltering("username.specified=true", "username.specified=false");
@@ -464,7 +477,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByUsernameContainsSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where username contains
         defaultSysLogFiltering("username.contains=" + DEFAULT_USERNAME, "username.contains=" + UPDATED_USERNAME);
@@ -474,7 +487,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByUsernameNotContainsSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where username does not contain
         defaultSysLogFiltering("username.doesNotContain=" + UPDATED_USERNAME, "username.doesNotContain=" + DEFAULT_USERNAME);
@@ -484,7 +497,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByIpIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where ip equals to
         defaultSysLogFiltering("ip.equals=" + DEFAULT_IP, "ip.equals=" + UPDATED_IP);
@@ -494,7 +507,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByIpIsInShouldWork() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where ip in
         defaultSysLogFiltering("ip.in=" + DEFAULT_IP + "," + UPDATED_IP, "ip.in=" + UPDATED_IP);
@@ -504,7 +517,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByIpIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where ip is not null
         defaultSysLogFiltering("ip.specified=true", "ip.specified=false");
@@ -514,7 +527,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByIpContainsSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where ip contains
         defaultSysLogFiltering("ip.contains=" + DEFAULT_IP, "ip.contains=" + UPDATED_IP);
@@ -524,7 +537,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByIpNotContainsSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where ip does not contain
         defaultSysLogFiltering("ip.doesNotContain=" + UPDATED_IP, "ip.doesNotContain=" + DEFAULT_IP);
@@ -534,7 +547,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByMethodIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where method equals to
         defaultSysLogFiltering("method.equals=" + DEFAULT_METHOD, "method.equals=" + UPDATED_METHOD);
@@ -544,7 +557,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByMethodIsInShouldWork() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where method in
         defaultSysLogFiltering("method.in=" + DEFAULT_METHOD + "," + UPDATED_METHOD, "method.in=" + UPDATED_METHOD);
@@ -554,7 +567,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByMethodIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where method is not null
         defaultSysLogFiltering("method.specified=true", "method.specified=false");
@@ -564,7 +577,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByMethodContainsSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where method contains
         defaultSysLogFiltering("method.contains=" + DEFAULT_METHOD, "method.contains=" + UPDATED_METHOD);
@@ -574,7 +587,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByMethodNotContainsSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where method does not contain
         defaultSysLogFiltering("method.doesNotContain=" + UPDATED_METHOD, "method.doesNotContain=" + DEFAULT_METHOD);
@@ -584,7 +597,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByRequestUrlIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where requestUrl equals to
         defaultSysLogFiltering("requestUrl.equals=" + DEFAULT_REQUEST_URL, "requestUrl.equals=" + UPDATED_REQUEST_URL);
@@ -594,7 +607,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByRequestUrlIsInShouldWork() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where requestUrl in
         defaultSysLogFiltering("requestUrl.in=" + DEFAULT_REQUEST_URL + "," + UPDATED_REQUEST_URL, "requestUrl.in=" + UPDATED_REQUEST_URL);
@@ -604,7 +617,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByRequestUrlIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where requestUrl is not null
         defaultSysLogFiltering("requestUrl.specified=true", "requestUrl.specified=false");
@@ -614,7 +627,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByRequestUrlContainsSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where requestUrl contains
         defaultSysLogFiltering("requestUrl.contains=" + DEFAULT_REQUEST_URL, "requestUrl.contains=" + UPDATED_REQUEST_URL);
@@ -624,7 +637,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByRequestUrlNotContainsSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where requestUrl does not contain
         defaultSysLogFiltering("requestUrl.doesNotContain=" + UPDATED_REQUEST_URL, "requestUrl.doesNotContain=" + DEFAULT_REQUEST_URL);
@@ -634,7 +647,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByRequestTypeIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where requestType equals to
         defaultSysLogFiltering("requestType.equals=" + DEFAULT_REQUEST_TYPE, "requestType.equals=" + UPDATED_REQUEST_TYPE);
@@ -644,7 +657,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByRequestTypeIsInShouldWork() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where requestType in
         defaultSysLogFiltering(
@@ -657,7 +670,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByRequestTypeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where requestType is not null
         defaultSysLogFiltering("requestType.specified=true", "requestType.specified=false");
@@ -667,7 +680,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByRequestTypeContainsSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where requestType contains
         defaultSysLogFiltering("requestType.contains=" + DEFAULT_REQUEST_TYPE, "requestType.contains=" + UPDATED_REQUEST_TYPE);
@@ -677,7 +690,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByRequestTypeNotContainsSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where requestType does not contain
         defaultSysLogFiltering("requestType.doesNotContain=" + UPDATED_REQUEST_TYPE, "requestType.doesNotContain=" + DEFAULT_REQUEST_TYPE);
@@ -687,7 +700,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByCostTimeIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where costTime equals to
         defaultSysLogFiltering("costTime.equals=" + DEFAULT_COST_TIME, "costTime.equals=" + UPDATED_COST_TIME);
@@ -697,7 +710,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByCostTimeIsInShouldWork() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where costTime in
         defaultSysLogFiltering("costTime.in=" + DEFAULT_COST_TIME + "," + UPDATED_COST_TIME, "costTime.in=" + UPDATED_COST_TIME);
@@ -707,7 +720,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByCostTimeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where costTime is not null
         defaultSysLogFiltering("costTime.specified=true", "costTime.specified=false");
@@ -717,7 +730,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByCostTimeIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where costTime is greater than or equal to
         defaultSysLogFiltering("costTime.greaterThanOrEqual=" + DEFAULT_COST_TIME, "costTime.greaterThanOrEqual=" + UPDATED_COST_TIME);
@@ -727,7 +740,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByCostTimeIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where costTime is less than or equal to
         defaultSysLogFiltering("costTime.lessThanOrEqual=" + DEFAULT_COST_TIME, "costTime.lessThanOrEqual=" + SMALLER_COST_TIME);
@@ -737,7 +750,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByCostTimeIsLessThanSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where costTime is less than
         defaultSysLogFiltering("costTime.lessThan=" + UPDATED_COST_TIME, "costTime.lessThan=" + DEFAULT_COST_TIME);
@@ -747,7 +760,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByCostTimeIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where costTime is greater than
         defaultSysLogFiltering("costTime.greaterThan=" + SMALLER_COST_TIME, "costTime.greaterThan=" + DEFAULT_COST_TIME);
@@ -757,7 +770,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByCreatedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where createdBy equals to
         defaultSysLogFiltering("createdBy.equals=" + DEFAULT_CREATED_BY, "createdBy.equals=" + UPDATED_CREATED_BY);
@@ -767,7 +780,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByCreatedByIsInShouldWork() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where createdBy in
         defaultSysLogFiltering("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY, "createdBy.in=" + UPDATED_CREATED_BY);
@@ -777,7 +790,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByCreatedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where createdBy is not null
         defaultSysLogFiltering("createdBy.specified=true", "createdBy.specified=false");
@@ -787,7 +800,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByCreatedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where createdBy is greater than or equal to
         defaultSysLogFiltering("createdBy.greaterThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.greaterThanOrEqual=" + UPDATED_CREATED_BY);
@@ -797,7 +810,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByCreatedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where createdBy is less than or equal to
         defaultSysLogFiltering("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
@@ -807,7 +820,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByCreatedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where createdBy is less than
         defaultSysLogFiltering("createdBy.lessThan=" + UPDATED_CREATED_BY, "createdBy.lessThan=" + DEFAULT_CREATED_BY);
@@ -817,7 +830,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByCreatedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where createdBy is greater than
         defaultSysLogFiltering("createdBy.greaterThan=" + SMALLER_CREATED_BY, "createdBy.greaterThan=" + DEFAULT_CREATED_BY);
@@ -827,7 +840,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByCreatedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where createdDate equals to
         defaultSysLogFiltering("createdDate.equals=" + DEFAULT_CREATED_DATE, "createdDate.equals=" + UPDATED_CREATED_DATE);
@@ -837,7 +850,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByCreatedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where createdDate in
         defaultSysLogFiltering(
@@ -850,7 +863,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByCreatedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where createdDate is not null
         defaultSysLogFiltering("createdDate.specified=true", "createdDate.specified=false");
@@ -860,7 +873,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLastModifiedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where lastModifiedBy equals to
         defaultSysLogFiltering("lastModifiedBy.equals=" + DEFAULT_LAST_MODIFIED_BY, "lastModifiedBy.equals=" + UPDATED_LAST_MODIFIED_BY);
@@ -870,7 +883,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLastModifiedByIsInShouldWork() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where lastModifiedBy in
         defaultSysLogFiltering(
@@ -883,7 +896,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLastModifiedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where lastModifiedBy is not null
         defaultSysLogFiltering("lastModifiedBy.specified=true", "lastModifiedBy.specified=false");
@@ -893,7 +906,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLastModifiedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where lastModifiedBy is greater than or equal to
         defaultSysLogFiltering(
@@ -906,7 +919,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLastModifiedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where lastModifiedBy is less than or equal to
         defaultSysLogFiltering(
@@ -919,7 +932,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLastModifiedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where lastModifiedBy is less than
         defaultSysLogFiltering(
@@ -932,7 +945,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLastModifiedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where lastModifiedBy is greater than
         defaultSysLogFiltering(
@@ -945,7 +958,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLastModifiedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where lastModifiedDate equals to
         defaultSysLogFiltering(
@@ -958,7 +971,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLastModifiedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where lastModifiedDate in
         defaultSysLogFiltering(
@@ -971,7 +984,7 @@ public class SysLogResourceIT {
     @Transactional
     void getAllSysLogsByLastModifiedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         // Get all the sysLogList where lastModifiedDate is not null
         defaultSysLogFiltering("lastModifiedDate.specified=true", "lastModifiedDate.specified=false");
@@ -1044,7 +1057,7 @@ public class SysLogResourceIT {
     @Transactional
     void putExistingSysLog() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1142,7 +1155,7 @@ public class SysLogResourceIT {
     @Transactional
     void partialUpdateSysLogWithPatch() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1151,17 +1164,12 @@ public class SysLogResourceIT {
         partialUpdatedSysLog.setId(sysLog.getId());
 
         partialUpdatedSysLog
-            .logType(UPDATED_LOG_TYPE)
             .logContent(UPDATED_LOG_CONTENT)
             .operateType(UPDATED_OPERATE_TYPE)
             .userid(UPDATED_USERID)
-            .username(UPDATED_USERNAME)
-            .method(UPDATED_METHOD)
             .requestUrl(UPDATED_REQUEST_URL)
             .requestType(UPDATED_REQUEST_TYPE)
-            .costTime(UPDATED_COST_TIME)
             .createdDate(UPDATED_CREATED_DATE)
-            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
             .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restSysLogMockMvc
@@ -1182,7 +1190,7 @@ public class SysLogResourceIT {
     @Transactional
     void fullUpdateSysLogWithPatch() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1286,7 +1294,7 @@ public class SysLogResourceIT {
     @Transactional
     void deleteSysLog() throws Exception {
         // Initialize the database
-        sysLogRepository.save(sysLog);
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

@@ -27,7 +27,7 @@ class DepartmentTest {
     }
 
     @Test
-    void childrenTest() throws Exception {
+    void childrenTest() {
         Department department = getDepartmentRandomSampleGenerator();
         Department departmentBack = getDepartmentRandomSampleGenerator();
 
@@ -49,7 +49,7 @@ class DepartmentTest {
     }
 
     @Test
-    void authoritiesTest() throws Exception {
+    void authoritiesTest() {
         Department department = getDepartmentRandomSampleGenerator();
         Authority authorityBack = getAuthorityRandomSampleGenerator();
 
@@ -67,7 +67,7 @@ class DepartmentTest {
     }
 
     @Test
-    void parentTest() throws Exception {
+    void parentTest() {
         Department department = getDepartmentRandomSampleGenerator();
         Department departmentBack = getDepartmentRandomSampleGenerator();
 
@@ -79,7 +79,7 @@ class DepartmentTest {
     }
 
     @Test
-    void usersTest() throws Exception {
+    void usersTest() {
         Department department = getDepartmentRandomSampleGenerator();
         User userBack = getUserRandomSampleGenerator();
 

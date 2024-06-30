@@ -13,6 +13,7 @@
           :formModel="formModel"
           :setFormModel="setFormModel"
           :validateFields="validateFields"
+          :clearValidate="clearValidate"
         >
           <template #[item]="data" v-for="item in Object.keys($slots)">
             <slot :name="item" v-bind="data || {}"></slot>
@@ -125,13 +126,15 @@ const getSchema = computed((): FormSchema[] => {
           : componentProps['valueFormat']
         : null;
       if (!Array.isArray(defaultValue)) {
-        schema.defaultValue = valueFormat ? dateUtil(defaultValue).format(valueFormat) : dateUtil(defaultValue);
+        schema.defaultValue = valueFormat ? dateUtil(defaultValue, valueFormat).format(valueFormat) : dateUtil(defaultValue);
       } else {
         const def: any[] = [];
         defaultValue.forEach(item => {
-          def.push(valueFormat ? dateUtil(item).format(valueFormat) : dateUtil(item));
+          def.push(valueFormat ? dateUtil(item, valueFormat).format(valueFormat) : dateUtil(item));
         });
-        schema.defaultValue = def;
+        def.forEach((item, index) => {
+          defaultValue[index] = item;
+        });
       }
     }
   }
@@ -297,7 +300,7 @@ onMounted(() => {
   margin-bottom: 0;
 }
 .vben-basic-form .ant-form-item:not(.ant-form-item-with-help) {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 .vben-basic-form .ant-form-item.suffix-item .ant-form-item-children {
   display: flex;

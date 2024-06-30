@@ -52,7 +52,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class UploadFileBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(UploadFileBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(UploadFileBaseResource.class);
 
     protected static final String ENTITY_NAME = "filesUploadFile";
 

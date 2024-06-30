@@ -33,6 +33,10 @@ const props = defineProps({
     type: String as PropType<string>,
     default: 'calc(100vh - 78px)',
   },
+  seriesColor: {
+    type: Array,
+    default: () => [],
+  },
 });
 
 const emit = defineEmits(['click']);
@@ -92,6 +96,12 @@ function initCharts() {
     });
     //data数据
     obj['data'] = data;
+    if (props.seriesColor?.length) {
+      const findItem = props.seriesColor.find((item: any) => item.type === type);
+      if (findItem?.color) {
+        obj['color'] = findItem.color;
+      }
+    }
     seriesData.push(obj);
   });
   option.series = seriesData;

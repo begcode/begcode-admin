@@ -83,7 +83,7 @@ const fields = (): FormSchema[] => {
       },
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择链接目标', options: getEnumDict('TargetType'), style: 'width: 100%' };
+        return { placeholder: '请选择链接目标', options: getEnumDict('TargetType'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },

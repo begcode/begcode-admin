@@ -6,6 +6,7 @@ import com.begcode.monolith.domain.Department;
 import com.diboot.core.binding.Binder;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.ibatis.annotations.*;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -40,6 +41,15 @@ public interface DepartmentBaseRepository<E extends Department> extends BaseCrud
 
     default IPage<Department> findAllByParentIsNull(IPage<Department> pageable) {
         return this.selectPage(pageable, new QueryWrapper<Department>().isNull("parent_id"));
+    }
+
+    default Department saveAndGet(Department department) {
+        if (Objects.nonNull(department.getId())) {
+            this.updateById(department);
+        } else {
+            this.insert(department);
+        }
+        return this.selectById(department.getId());
     }
     // jhipster-needle-repository-add-method - JHipster will add getters and setters here, do not remove
 

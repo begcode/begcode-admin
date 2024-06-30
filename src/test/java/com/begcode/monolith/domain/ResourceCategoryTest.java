@@ -27,7 +27,7 @@ class ResourceCategoryTest {
     }
 
     @Test
-    void childrenTest() throws Exception {
+    void childrenTest() {
         ResourceCategory resourceCategory = getResourceCategoryRandomSampleGenerator();
         ResourceCategory resourceCategoryBack = getResourceCategoryRandomSampleGenerator();
 
@@ -49,7 +49,7 @@ class ResourceCategoryTest {
     }
 
     @Test
-    void parentTest() throws Exception {
+    void parentTest() {
         ResourceCategory resourceCategory = getResourceCategoryRandomSampleGenerator();
         ResourceCategory resourceCategoryBack = getResourceCategoryRandomSampleGenerator();
 
@@ -61,7 +61,7 @@ class ResourceCategoryTest {
     }
 
     @Test
-    void imagesTest() throws Exception {
+    void imagesTest() {
         ResourceCategory resourceCategory = getResourceCategoryRandomSampleGenerator();
         UploadImage uploadImageBack = getUploadImageRandomSampleGenerator();
 
@@ -83,7 +83,7 @@ class ResourceCategoryTest {
     }
 
     @Test
-    void filesTest() throws Exception {
+    void filesTest() {
         ResourceCategory resourceCategory = getResourceCategoryRandomSampleGenerator();
         UploadFile uploadFileBack = getUploadFileRandomSampleGenerator();
 

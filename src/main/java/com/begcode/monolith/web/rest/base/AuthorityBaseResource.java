@@ -52,7 +52,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class AuthorityBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(AuthorityBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(AuthorityBaseResource.class);
 
     protected static final String ENTITY_NAME = "systemAuthority";
 

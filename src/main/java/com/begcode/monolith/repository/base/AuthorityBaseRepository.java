@@ -7,6 +7,7 @@ import com.begcode.monolith.domain.Authority;
 import com.diboot.core.binding.Binder;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.ibatis.annotations.*;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -44,6 +45,15 @@ public interface AuthorityBaseRepository<E extends Authority> extends BaseCrudMa
 
     default IPage<Authority> findAllByParentIsNull(IPage<Authority> pageable) {
         return this.selectPage(pageable, new QueryWrapper<Authority>().isNull("parent_id"));
+    }
+
+    default Authority saveAndGet(Authority authority) {
+        if (Objects.nonNull(authority.getId())) {
+            this.updateById(authority);
+        } else {
+            this.insert(authority);
+        }
+        return this.selectById(authority.getId());
     }
 
     default Optional<Authority> findFirstByCode(String code) {

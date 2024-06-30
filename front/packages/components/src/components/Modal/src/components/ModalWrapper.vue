@@ -41,15 +41,47 @@ let stopElResizeFn: AnyFunction = () => {};
 
 useWindowSizeFn(setModalHeight.bind(null));
 
-useMutationObserver(
-  spinRef,
+let observer,
+  recordCount: any = {};
+watch(
+  () => props.visible,
   () => {
-    setModalHeight();
+    if (props.visible && !observer && !(props.maxHeight || props.height)) {
+      recordCount = {};
+      observer = useMutationObserver(
+        spinRef,
+        () => {
+          setModalHeight({
+            source: 'muob',
+            callBack: height => {
+              const count = recordCount[height];
+              if (count) {
+                recordCount[height] = ++recordCount[height];
+                if (count > 10) {
+                  observer.stop();
+                  recordCount = {};
+                  observer = null;
+                }
+              } else {
+                recordCount = {};
+                recordCount[height] = 1;
+              }
+            },
+          });
+        },
+        {
+          attributes: true,
+          subtree: true,
+        },
+      );
+    } else {
+      if (observer) {
+        observer.stop();
+        observer = null;
+      }
+    }
   },
-  {
-    attributes: true,
-    subtree: true,
-  },
+  { immediate: true },
 );
 
 createModalContext({
@@ -96,15 +128,19 @@ async function scrollTop() {
   });
 }
 
-async function setModalHeight() {
+async function setModalHeight(option?) {
   // 解决在弹窗关闭的时候监听还存在,导致再次打开弹窗没有高度
   // 加上这个,就必须在使用的时候传递父级的open
+  console.log('---------性能监控--------setModalHeight----------');
+  const options = option || {};
+  const source = options.source;
+  const callBack = options.callBack;
   if (!props.open) return;
   const wrapperRefDom = unref(wrapperRef);
   if (!wrapperRefDom) return;
-  const bodyDom = (wrapperRefDom as any).$el.parentElement;
+  const bodyDom = wrapperRefDom.$el.parentElement?.parentElement?.parentElement;
   if (!bodyDom) return;
-  bodyDom.style.padding = '0';
+  // bodyDom.style.padding = '0';
   await nextTick();
   try {
     const modalDom = bodyDom.parentElement && bodyDom.parentElement.parentElement;
@@ -127,6 +163,9 @@ async function setModalHeight() {
       realHeightRef.value = window.innerHeight - props.modalFooterHeight - props.modalHeaderHeight - 28;
     } else {
       realHeightRef.value = props.height ? props.height : realHeight.value > maxHeight ? maxHeight : realHeight.value;
+    }
+    if (source == 'muob') {
+      callBack(realHeightRef.value);
     }
     emit('height-change', unref(realHeightRef));
   } catch (error) {

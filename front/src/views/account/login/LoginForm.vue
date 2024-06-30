@@ -2,10 +2,22 @@
   <LoginFormTitle v-show="getShow" class="enter-x" />
   <Form class="p-4 enter-x" :model="formData" :rules="getFormRules" ref="formRef" v-show="getShow" @keypress.enter="handleLogin">
     <FormItem name="account" class="enter-x">
-      <Input size="large" v-model:value="formData.account" :placeholder="t('sys.login.userName')" class="fix-auto-fill" />
+      <Input
+        size="large"
+        v-model:value="formData.account"
+        :placeholder="t('sys.login.userName')"
+        class="fix-auto-fill"
+        data-cy="username"
+      />
     </FormItem>
     <FormItem name="password" class="enter-x">
-      <InputPassword size="large" visibilityToggle v-model:value="formData.password" :placeholder="t('sys.login.password')" />
+      <InputPassword
+        size="large"
+        visibilityToggle
+        v-model:value="formData.password"
+        :placeholder="t('sys.login.password')"
+        data-cy="password"
+      />
     </FormItem>
     <!--验证码-->
     <ARow class="enter-x">
@@ -46,7 +58,7 @@
     </ARow>
 
     <FormItem class="enter-x">
-      <Button type="primary" size="large" block @click="handleLogin" :loading="loading">
+      <Button type="primary" size="large" block @click="handleLogin" :loading="loading" data-cy="submit">
         {{ t('sys.login.loginButton') }}
       </Button>
       <!-- <Button size="large" class="mt-4 enter-x" block @click="handleRegister">
@@ -87,16 +99,7 @@
 import { reactive, ref, toRaw, unref, computed, onMounted } from 'vue';
 
 import { Checkbox, Form, Input, Row, Col, Button, Divider } from 'ant-design-vue';
-import {
-  GithubFilled,
-  WechatFilled,
-  AlipayCircleFilled,
-  GoogleCircleFilled,
-  TwitterCircleFilled,
-  DingtalkCircleFilled,
-  QuestionCircleFilled,
-  createFromIconfontCN,
-} from '@ant-design/icons-vue';
+import { GithubFilled, WechatFilled, DingtalkCircleFilled, createFromIconfontCN } from '@ant-design/icons-vue';
 import LoginFormTitle from './LoginFormTitle.vue';
 import ThirdModal from './ThirdModal.vue';
 

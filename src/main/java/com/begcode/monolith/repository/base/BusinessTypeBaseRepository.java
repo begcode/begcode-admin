@@ -3,6 +3,7 @@ package com.begcode.monolith.repository.base;
 import com.begcode.monolith.domain.BusinessType;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.ibatis.annotations.*;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -21,6 +22,15 @@ public interface BusinessTypeBaseRepository<E extends BusinessType> extends Base
 
     default Optional<BusinessType> findById(Long id) {
         return Optional.ofNullable(this.selectById(id));
+    }
+
+    default BusinessType saveAndGet(BusinessType businessType) {
+        if (Objects.nonNull(businessType.getId())) {
+            this.updateById(businessType);
+        } else {
+            this.insert(businessType);
+        }
+        return this.selectById(businessType.getId());
     }
     // jhipster-needle-repository-add-method - JHipster will add getters and setters here, do not remove
 

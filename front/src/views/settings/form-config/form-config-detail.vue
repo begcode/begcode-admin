@@ -1,265 +1,62 @@
-<script lang="tsx">
-import { getCurrentInstance, ref, reactive, h, resolveComponent, toRef, Component } from 'vue';
-import { Space, Button, Collapse, CollapsePanel, Card, Tabs, TabPane } from 'ant-design-vue';
-import { useRoute } from 'vue-router';
-import config from './config/detail-config';
-import { defineComponent } from 'vue';
-import { IFormConfig } from '@/models/settings/form-config.model';
+<template>
+  <PageWrapper v-bind="pageProps">
+    <template #default>
+      <FormConfigDescriptions ref="formConfigDescriptionsRef" v-bind="descriptionProps"> </FormConfigDescriptions>
+    </template>
+    <template #rightFooter>
+      <Space>
+        <Button v-for="operation in operations" :type="operation.type" @click="operation.click">
+          <Icon icon="operation.icon" v-if="operation.icon" />{{ operation.title }}</Button
+        >
+      </Space>
+    </template>
+  </PageWrapper>
+</template>
+<script lang="ts" setup>
+import { ref, reactive } from 'vue';
+import { Space, Button } from 'ant-design-vue';
+import { useRoute, useRouter } from 'vue-router';
+import { PageWrapper, Icon } from '@begcode/components';
+import { useMultipleTabStore } from '@/store/modules/multipleTab';
+import FormConfigDescriptions from './components/detail-component.vue';
 
-import ServerProvider from '@/api-service/index';
-import { PageWrapper, Icon, getButtonConfig, Descriptions, DescList } from '@begcode/components';
+// begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
-export default defineComponent({
-  // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
+defineOptions({
   name: 'SystemFormConfigDetail',
-  props: {
-    entityId: {
-      type: Number || String,
-      default: 0,
-    },
-    containerType: {
-      type: String,
-      default: 'router',
-    },
-  },
-  components: {
-    DescList,
-  },
-  emits: ['cancel', 'refresh'],
-  async setup(props) {
-    const ctx = getCurrentInstance()?.proxy;
-    const route = useRoute();
-    // const pageControl = control(ctx);
-    // const formConfig = pageControl.formRender();
-    const activeNames = ref<any[]>([]);
-    const handleChange = val => {
-      activeNames.value = val;
-      ctx?.$emit('change', activeNames.value);
-    };
-    const apiService = ctx?.$apiService as typeof ServerProvider;
-    const formConfig = reactive<IFormConfig>({});
-    let entityId: any = '';
-    if (props.containerType === 'router') {
-      entityId = route.params?.entityId;
-    } else {
-      entityId = props.entityId;
-    }
-    if (entityId) {
-      const data = await apiService.settings.formConfigService.find(Number(entityId));
-      if (data) {
-        Object.assign(formConfig, data);
-      }
-    }
-    const formItemsConfig = reactive(config.fields);
-    //获得关联表属性。
-    const pageConfig = reactive({
-      active: '0',
-      operations: [
-        {
-          theme: 'close',
-          click: () => {
-            console.log('close');
-          },
-        },
-      ],
-      canExpand: false,
-      title: '详情',
-    });
-    const formGroup = reactive([
-      {
-        title: '表单配置详情',
-        operation: [],
-        component: {
-          name: 'a-desc',
-          props: {
-            schema: formItemsConfig,
-            isEdit: () => false,
-            // formConfig,
-            labelWidth: '120px',
-            data: formConfig,
-            column: 1,
-          },
-        },
-      },
-    ]);
-    const getXGridSlots = component => {
-      if (component.recordActions) {
-        const buttons = reactive(component.recordActions.map(action => getButtonConfig(action)));
-        buttons.filter(button => button.icon).forEach(button => (button.slots = { default: () => <Icon icon={button.icon} /> }));
-        buttons.filter(button => !button.icon).forEach(button => (button.slots = { default: () => button.text }));
-        return {
-          recordAction: row => (
-            <div>
-              <Space>
-                {buttons.map(button => {
-                  return (
-                    <Button
-                      {...{
-                        type: button.type || 'primary',
-                        shape: button.shape || 'circle',
-                        title: button.text || button.name,
-                        onClick: () => {
-                          if (button.onClick) {
-                            button.onClick(row.row, button.name);
-                          } else {
-                            console.log(button.name, 'onClick事件未定义！');
-                          }
-                        },
-                      }}
-                      v-slots={button.slots}
-                    ></Button>
-                  );
-                })}
-              </Space>
-            </div>
-          ),
-        };
-      } else {
-        return {
-          recordAction: () => <div />,
-        };
-      }
-    };
-    const renderChild = () => {
-      const wrapperPros: any = {};
-      if (!pageConfig?.canExpand) {
-        wrapperPros.bordered = false;
-        wrapperPros.size = 'small';
-      }
+  inheritAttrs: false,
+});
 
-      return formGroup.map(item => {
-        var componentRef = toRef(item, 'component').value;
-        if (componentRef && !(componentRef instanceof Array)) {
-          if (componentRef.name === 'a-desc') {
-            if (pageConfig?.canExpand) {
-              return (
-                <CollapsePanel>
-                  <Descriptions {...componentRef.props} />
-                </CollapsePanel>
-              );
-            } else {
-              return <Descriptions {...componentRef.props} />;
-            }
-          } else {
-            const component = resolveComponent(componentRef.name);
-            return h(
-              pageConfig?.canExpand ? CollapsePanel : Card,
-              { ...wrapperPros },
-              h(component, componentRef.props, () => []),
-            );
-          }
-        } else if (componentRef && componentRef instanceof Array) {
-          return h(pageConfig?.canExpand ? CollapsePanel : Card, { ...wrapperPros }, () =>
-            h(Tabs, {}, () =>
-              componentRef.map((child, index) => {
-                return h(TabPane, { tab: child.title || index, key: index }, () =>
-                  h(resolveComponent(child?.name) as Component, child.props, child?.name === 'vxe-grid' ? getXGridSlots(child) : () => []),
-                );
-              }),
-            ),
-          );
-        } else {
-          return <div>无内容</div>;
-        }
-      });
-    };
-    const slots = {
-      rightFooter: () => (
-        <div>
-          <Space>
-            {pageConfig.operations.map((operation: any) => {
-              const buttonSlots: any = {};
-              if (operation.icon) {
-                buttonSlots.icon = () => <Icon icon={operation.icon} />;
-              }
-              if (operation.text) {
-                buttonSlots.default = () => operation.text;
-              }
-              switch (operation.theme) {
-                case 'save':
-                  if (!buttonSlots.icon) {
-                    buttonSlots.icon = () => <Icon icon={'ant-design:save-outlined'} />;
-                  }
-                  if (!buttonSlots.default) {
-                    buttonSlots.default = () => '保存';
-                  }
-                  return (
-                    <Button
-                      {...{
-                        type: 'primary',
-                        onClick: operation.click,
-                      }}
-                      v-slots={buttonSlots}
-                    ></Button>
-                  );
-                case 'update':
-                  if (!buttonSlots.icon) {
-                    buttonSlots.icon = () => <Icon icon={'ant-design:check-outlined'} />;
-                  }
-                  if (!buttonSlots.default) {
-                    buttonSlots.default = () => '更新';
-                  }
-                  return (
-                    <Button
-                      {...{
-                        type: 'primary',
-                        onClick: operation.click,
-                      }}
-                      v-slots={buttonSlots}
-                    ></Button>
-                  );
-                default:
-                  return (
-                    <Button
-                      {...{
-                        type: 'primary',
-                        onClick: operation.click,
-                      }}
-                    >
-                      {operation.title}
-                    </Button>
-                  );
-              }
-            })}
-          </Space>
-        </div>
-      ),
-      default: () => {
-        if (pageConfig?.canExpand) {
-          return (
-            <div>
-              <Collapse value={activeNames} onchange={handleChange} v-slots={{ default: () => renderChild() }} />
-            </div>
-          );
-        } else {
-          return renderChild();
-        }
-      },
-    };
-    return {
-      // formConfig,
-      pageConfig,
-      // pageControl,
-      formGroup,
-      slots,
-    };
-  },
-  methods: {},
-  render() {
-    if (this.containerType === 'modal' || this.containerType === 'drawer') {
-      return this.slots.default();
-    } else {
-      return (
-        <PageWrapper
-          {...{
-            props: {
-              title: this.pageConfig?.title || '详情',
-            },
-          }}
-          v-slots={this.slots}
-        />
-      );
-    }
+const props = defineProps({
+  entityId: {
+    type: [String, Number] as PropType<string | number>,
+    default: 0,
   },
 });
+
+const route = useRoute();
+const router = useRouter();
+const tabStore = useMultipleTabStore();
+
+const formConfigDescriptionsRef = ref(null);
+const descriptionProps = reactive({
+  entityId: route.params?.entityId || props.entityId || '',
+});
+
+const pageProps = reactive({
+  title: '详情',
+});
+
+const operations = ref([
+  {
+    title: '关闭',
+    name: 'close',
+    type: 'default',
+    icon: '',
+    click: async () => {
+      const { fullPath } = route;
+      await tabStore.closeTabByKey(fullPath, router);
+    },
+  },
+]);
 </script>

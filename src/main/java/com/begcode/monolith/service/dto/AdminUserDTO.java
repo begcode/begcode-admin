@@ -115,7 +115,7 @@ public class AdminUserDTO implements Serializable {
         return activated;
     }
 
-    public void setActivated(boolean activated) {
+    public void setActivated(Boolean activated) {
         this.activated = activated;
     }
 

@@ -77,7 +77,6 @@ const itemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'LONG' },
-      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '名称',
@@ -134,7 +133,6 @@ const itemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'INTEGER' },
-      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '是否禁用',
@@ -143,7 +141,7 @@ const itemsColumns = () => {
       visible: true,
       treeNode: false,
       params: { type: 'BOOLEAN' },
-      cellRender: { name: 'ASwitch', props: { disabled: false } },
+      cellRender: { name: 'ASwitch', props: { disabled: true } },
     },
     {
       title: '实体名称',
@@ -161,16 +159,15 @@ const itemsColumns = () => {
       visible: false,
       treeNode: false,
       params: { type: 'LONG' },
-      editRender: { name: 'AInputNumber', enabled: false, props: { controls: false } },
     },
     {
       title: '操作',
-      field: 'operation',
+      field: 'recordOperation',
       fixed: 'right',
       headerAlign: 'center',
       align: 'right',
       showOverflow: false,
-      width: 170,
+      width: 120,
       slots: { default: 'recordAction' },
     },
   ];

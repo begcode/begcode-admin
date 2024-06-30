@@ -3,7 +3,7 @@
     <div class="my-account">账户</div>
     <div class="account-row-item clearfix">
       <div class="account-label gray-75">手机</div>
-      <span class="gray" v-if="userDetail.mobile">{{ userDetail.mobile }}</span>
+      <span class="gray" v-if="userDetail.mobileText">{{ userDetail.mobile }}</span>
       <span class="pointer blue-e5 phone-margin" @click="updatePhone" v-if="userDetail.mobile">修改</span>
       <span class="pointer blue-e5 phone-margin" @click="bindPhone" v-else>绑定</span>
       <span class="pointer blue-e5" @click="unbindPhone" v-if="userDetail.mobile">解绑</span>
@@ -47,6 +47,9 @@ const wechatData = reactive<any>({
 function initUserDetail() {
   //获取用户数据
   accountService.getAccount().then(data => {
+    if (data.mobile) {
+      userDetail.value.mobileText = data.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+    }
     userDetail.value = data;
   });
 }
@@ -56,7 +59,12 @@ function initUserDetail() {
  */
 function updatePhone() {
   openModal(true, {
-    record: { mobile: userDetail.value.mobile, login: userDetail.value.login, id: userDetail.value.id },
+    record: {
+      mobile: userDetail.value.mobile,
+      login: userDetail.value.login,
+      id: userDetail.value.id,
+      mobileText: userDetail.value.mobileText,
+    },
   });
 }
 

@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DepartmentBaseService<R extends DepartmentRepository, E extends Department>
     extends BaseServiceImpl<DepartmentRepository, Department> {
 
-    private final Logger log = LoggerFactory.getLogger(DepartmentBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(DepartmentBaseService.class);
 
     private final List<String> relationCacheNames = List.of(
         com.begcode.monolith.domain.Department.class.getName() + ".parent",

@@ -14,7 +14,7 @@ import { useMultipleTabSetting } from '@/hooks/setting/useMultipleTabSetting';
 import { useTransitionSetting } from '@/hooks/setting/useTransitionSetting';
 import { useI18n } from '@/hooks/web/useI18n';
 
-import { baseHandler } from './handler';
+import { layoutHandler } from './handler';
 
 import {
   HandlerEnum,
@@ -78,13 +78,15 @@ export default defineComponent({
       return unref(getShowMenu) && !unref(getIsHorizontal);
     });
 
+    const isDev = import.meta.env.DEV;
+
     function renderSidebar() {
       return (
         <>
           <TypePicker
             menuTypeList={menuTypeListEnum}
             handler={(item: (typeof menuTypeListEnum)[0]) => {
-              baseHandler(HandlerEnum.CHANGE_LAYOUT, {
+              layoutHandler(HandlerEnum.CHANGE_LAYOUT, {
                 mode: item.mode,
                 type: item.type,
                 split: unref(getIsHorizontal) ? false : undefined,
@@ -213,31 +215,37 @@ export default defineComponent({
             options={triggerOptions}
             disabled={!unref(getShowMenuRef) || unref(getIsMixSidebar)}
           />
-          <SelectItem
-            title={t('layout.setting.contentMode')}
-            event={HandlerEnum.CONTENT_MODE}
-            def={unref(getContentMode)}
-            options={contentModeOptions}
-          />
-          <InputNumberItem
-            title={t('layout.setting.autoScreenLock')}
-            min={0}
-            event={HandlerEnum.LOCK_TIME}
-            defaultValue={unref(getLockTime)}
-            formatter={(value: string) => {
-              return parseInt(value) === 0 ? `0(${t('layout.setting.notAutoScreenLock')})` : `${value}${t('layout.setting.minute')}`;
-            }}
-          />
-          <InputNumberItem
-            title={t('layout.setting.expandedMenuWidth')}
-            max={600}
-            min={100}
-            step={10}
-            event={HandlerEnum.MENU_WIDTH}
-            disabled={!unref(getShowMenuRef)}
-            defaultValue={unref(getMenuWidth)}
-            formatter={(value: string) => `${parseInt(value)}px`}
-          />
+          {isDev && (
+            <SelectItem
+              title={t('layout.setting.contentMode')}
+              event={HandlerEnum.CONTENT_MODE}
+              def={unref(getContentMode)}
+              options={contentModeOptions}
+            />
+          )}
+          {isDev && (
+            <InputNumberItem
+              title={t('layout.setting.autoScreenLock')}
+              min={0}
+              event={HandlerEnum.LOCK_TIME}
+              defaultValue={unref(getLockTime)}
+              formatter={(value: string) => {
+                return parseInt(value) === 0 ? `0(${t('layout.setting.notAutoScreenLock')})` : `${value}${t('layout.setting.minute')}`;
+              }}
+            />
+          )}
+          {isDev && (
+            <InputNumberItem
+              title={t('layout.setting.expandedMenuWidth')}
+              max={600}
+              min={100}
+              step={10}
+              event={HandlerEnum.MENU_WIDTH}
+              disabled={!unref(getShowMenuRef)}
+              defaultValue={unref(getMenuWidth)}
+              formatter={(value: string) => `${parseInt(value)}px`}
+            />
+          )}
         </>
       );
     }
@@ -245,19 +253,23 @@ export default defineComponent({
     function renderContent() {
       return (
         <>
-          <SwitchItem
-            title={t('layout.setting.breadcrumb')}
-            event={HandlerEnum.SHOW_BREADCRUMB}
-            def={unref(getShowBreadCrumb)}
-            disabled={!unref(getShowHeader)}
-          />
+          {isDev && (
+            <SwitchItem
+              title={t('layout.setting.breadcrumb')}
+              event={HandlerEnum.SHOW_BREADCRUMB}
+              def={unref(getShowBreadCrumb)}
+              disabled={!unref(getShowHeader)}
+            />
+          )}
 
-          <SwitchItem
-            title={t('layout.setting.breadcrumbIcon')}
-            event={HandlerEnum.SHOW_BREADCRUMB_ICON}
-            def={unref(getShowBreadCrumbIcon)}
-            disabled={!unref(getShowHeader)}
-          />
+          {isDev && (
+            <SwitchItem
+              title={t('layout.setting.breadcrumbIcon')}
+              event={HandlerEnum.SHOW_BREADCRUMB_ICON}
+              def={unref(getShowBreadCrumbIcon)}
+              disabled={!unref(getShowHeader)}
+            />
+          )}
 
           <SwitchItem title={t('layout.setting.tabs')} event={HandlerEnum.TABS_SHOW} def={unref(getShowMultipleTab)} />
 

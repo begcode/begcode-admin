@@ -48,7 +48,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class SysFillRuleBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(SysFillRuleBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(SysFillRuleBaseResource.class);
 
     protected static final String ENTITY_NAME = "settingsSysFillRule";
 

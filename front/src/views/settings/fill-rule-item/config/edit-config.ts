@@ -35,7 +35,7 @@ const fields = (): FormSchema[] => {
       field: 'fieldParamType',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择字段参数类型', options: getEnumDict('FieldParamType'), style: 'width: 100%' };
+        return { placeholder: '请选择字段参数类型', options: getEnumDict('FieldParamType'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },

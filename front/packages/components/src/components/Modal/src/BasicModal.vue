@@ -59,12 +59,13 @@ import { deepMerge } from '@/utils';
 import { useFullScreen } from './hooks/useModalFullScreen';
 import { useDesign } from '@/hooks/web/useDesign';
 import { basicProps } from './props';
+import { useAppInject } from '@/hooks/useAppInject';
 
 defineOptions({ name: 'BasicModal', inheritAttrs: false });
 
 const props = defineProps(basicProps);
 
-const emit = defineEmits(['open-change', 'height-change', 'cancel', 'ok', 'register', 'update:open', 'fullScreen']);
+const emit = defineEmits(['open-change', 'height-change', 'cancel', 'ok', 'register', 'update:open', 'fullScreen', 'comment-open']);
 
 const attrs = useAttrs();
 const openRef = ref(false);
@@ -90,13 +91,19 @@ const instance = getCurrentInstance();
 if (instance) {
   emit('register', modalMethods, instance.uid);
 }
+const { getIsMobile } = useAppInject();
 
 // Custom title component: get title
 const getMergeProps = computed((): Recordable => {
-  return {
+  const result = {
     ...props,
     ...(unref(propsRef) as any),
   };
+  if (getIsMobile.value) {
+    result.canFullscreen = false;
+    result.defaultFullscreen = true;
+  }
+  return result;
 });
 
 const { handleFullScreen, getWrapClassName, fullScreenRef } = useFullScreen({
@@ -141,6 +148,9 @@ const getWrapperHeight = computed(() => {
 watchEffect(() => {
   openRef.value = !!props.open;
   fullScreenRef.value = !!props.defaultFullscreen;
+  if (getIsMobile.value) {
+    fullScreenRef.value = true;
+  }
 });
 
 watch(
@@ -187,6 +197,9 @@ function setModalProps(props: Partial<ModalProps>): void {
   }
   if (Reflect.has(props, 'defaultFullscreen')) {
     fullScreenRef.value = !!props.defaultFullscreen;
+    if (getIsMobile.value) {
+      fullScreenRef.value = true;
+    }
   }
 }
 

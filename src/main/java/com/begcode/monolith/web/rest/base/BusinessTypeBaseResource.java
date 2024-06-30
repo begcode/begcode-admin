@@ -48,7 +48,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class BusinessTypeBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(BusinessTypeBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(BusinessTypeBaseResource.class);
 
     protected static final String ENTITY_NAME = "settingsBusinessType";
 

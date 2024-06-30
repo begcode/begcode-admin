@@ -276,10 +276,8 @@ async function initDataSource() {
       }
     } else {
       setInitedValue();
-      //update-end---author:wangshuai ---date:202307049  for：[QQYUN-5608]用户导入后，邀请后,被导入人同意即可,新增被邀信息------------
     }
   });
-  //update-end---author:wangshuai ---date:20230109  for：[QQYUN-3645]个人设置我的租户查询审核中和正常的------------
 }
 function setInitedValue() {
   dataSource.value = [];
@@ -680,7 +678,6 @@ onMounted(() => {
   font-size: 14px;
   font-weight: 700;
 }
-//update-begin---author:wangshuai ---date:20230704  for：被邀弹窗样式------------
 .approved-count {
   background: #ffd2d2;
   border-radius: 19px;
@@ -712,11 +709,9 @@ onMounted(() => {
 .pointer {
   cursor: pointer;
 }
-//update-end---author:wangshuai ---date:20230704  for：被邀弹窗样式------------
 </style>
 
 <style lang="less">
-// update-begin-author:liusq date:20230625 for: [issues/563]暗色主题部分失效
 @prefix-cls: ~'@{namespace}-j-user-tenant-setting-container';
 /*begin 兼容暗夜模式*/
 .@{prefix-cls} {
@@ -763,5 +758,4 @@ onMounted(() => {
   }
 }
 /*end 兼容暗夜模式*/
-// update-end-author:liusq date:20230625 for: [issues/563]暗色主题部分失效
 </style>

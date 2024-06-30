@@ -6,6 +6,7 @@ import com.begcode.monolith.settings.domain.RegionCode;
 import com.diboot.core.binding.Binder;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.ibatis.annotations.*;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -37,6 +38,15 @@ public interface RegionCodeBaseRepository<E extends RegionCode> extends BaseCrud
 
     default IPage<RegionCode> findAllByParentIsNull(IPage<RegionCode> pageable) {
         return this.selectPage(pageable, new QueryWrapper<RegionCode>().isNull("parent_id"));
+    }
+
+    default RegionCode saveAndGet(RegionCode regionCode) {
+        if (Objects.nonNull(regionCode.getId())) {
+            this.updateById(regionCode);
+        } else {
+            this.insert(regionCode);
+        }
+        return this.selectById(regionCode.getId());
     }
     // jhipster-needle-repository-add-method - JHipster will add getters and setters here, do not remove
 

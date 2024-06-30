@@ -26,6 +26,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -138,6 +139,8 @@ public class UploadFileResourceIT {
 
     private UploadFile uploadFile;
 
+    private UploadFile insertedUploadFile;
+
     /**
      * Create an entity for this test.
      *
@@ -205,6 +208,14 @@ public class UploadFileResourceIT {
         uploadFile = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedUploadFile != null) {
+            uploadFileRepository.deleteById(insertedUploadFile.getId());
+            insertedUploadFile = null;
+        }
+    }
+
     @Test
     @Transactional
     void createUploadFile() throws Exception {
@@ -225,6 +236,8 @@ public class UploadFileResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedUploadFile = uploadFileMapper.toEntity(returnedUploadFileDTO);
         assertUploadFileUpdatableFieldsEquals(returnedUploadFile, getPersistedUploadFile(returnedUploadFile));
+
+        insertedUploadFile = returnedUploadFile;
     }
 
     @Test
@@ -266,7 +279,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFiles() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList
         restUploadFileMockMvc
@@ -317,7 +330,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getUploadFile() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get the uploadFile
         restUploadFileMockMvc
@@ -351,7 +364,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getUploadFilesByIdFiltering() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         Long id = uploadFile.getId();
 
@@ -366,7 +379,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByUrlIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where url equals to
         defaultUploadFileFiltering("url.equals=" + DEFAULT_URL, "url.equals=" + UPDATED_URL);
@@ -376,7 +389,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByUrlIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where url in
         defaultUploadFileFiltering("url.in=" + DEFAULT_URL + "," + UPDATED_URL, "url.in=" + UPDATED_URL);
@@ -386,7 +399,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByUrlIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where url is not null
         defaultUploadFileFiltering("url.specified=true", "url.specified=false");
@@ -396,7 +409,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByUrlContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where url contains
         defaultUploadFileFiltering("url.contains=" + DEFAULT_URL, "url.contains=" + UPDATED_URL);
@@ -406,7 +419,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByUrlNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where url does not contain
         defaultUploadFileFiltering("url.doesNotContain=" + UPDATED_URL, "url.doesNotContain=" + DEFAULT_URL);
@@ -416,7 +429,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByFullNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where fullName equals to
         defaultUploadFileFiltering("fullName.equals=" + DEFAULT_FULL_NAME, "fullName.equals=" + UPDATED_FULL_NAME);
@@ -426,7 +439,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByFullNameIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where fullName in
         defaultUploadFileFiltering("fullName.in=" + DEFAULT_FULL_NAME + "," + UPDATED_FULL_NAME, "fullName.in=" + UPDATED_FULL_NAME);
@@ -436,7 +449,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByFullNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where fullName is not null
         defaultUploadFileFiltering("fullName.specified=true", "fullName.specified=false");
@@ -446,7 +459,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByFullNameContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where fullName contains
         defaultUploadFileFiltering("fullName.contains=" + DEFAULT_FULL_NAME, "fullName.contains=" + UPDATED_FULL_NAME);
@@ -456,7 +469,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByFullNameNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where fullName does not contain
         defaultUploadFileFiltering("fullName.doesNotContain=" + UPDATED_FULL_NAME, "fullName.doesNotContain=" + DEFAULT_FULL_NAME);
@@ -466,7 +479,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where name equals to
         defaultUploadFileFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
@@ -476,7 +489,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByNameIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where name in
         defaultUploadFileFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
@@ -486,7 +499,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where name is not null
         defaultUploadFileFiltering("name.specified=true", "name.specified=false");
@@ -496,7 +509,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByNameContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where name contains
         defaultUploadFileFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
@@ -506,7 +519,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByNameNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where name does not contain
         defaultUploadFileFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
@@ -516,7 +529,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByThumbIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where thumb equals to
         defaultUploadFileFiltering("thumb.equals=" + DEFAULT_THUMB, "thumb.equals=" + UPDATED_THUMB);
@@ -526,7 +539,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByThumbIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where thumb in
         defaultUploadFileFiltering("thumb.in=" + DEFAULT_THUMB + "," + UPDATED_THUMB, "thumb.in=" + UPDATED_THUMB);
@@ -536,7 +549,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByThumbIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where thumb is not null
         defaultUploadFileFiltering("thumb.specified=true", "thumb.specified=false");
@@ -546,7 +559,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByThumbContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where thumb contains
         defaultUploadFileFiltering("thumb.contains=" + DEFAULT_THUMB, "thumb.contains=" + UPDATED_THUMB);
@@ -556,7 +569,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByThumbNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where thumb does not contain
         defaultUploadFileFiltering("thumb.doesNotContain=" + UPDATED_THUMB, "thumb.doesNotContain=" + DEFAULT_THUMB);
@@ -566,7 +579,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByExtIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where ext equals to
         defaultUploadFileFiltering("ext.equals=" + DEFAULT_EXT, "ext.equals=" + UPDATED_EXT);
@@ -576,7 +589,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByExtIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where ext in
         defaultUploadFileFiltering("ext.in=" + DEFAULT_EXT + "," + UPDATED_EXT, "ext.in=" + UPDATED_EXT);
@@ -586,7 +599,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByExtIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where ext is not null
         defaultUploadFileFiltering("ext.specified=true", "ext.specified=false");
@@ -596,7 +609,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByExtContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where ext contains
         defaultUploadFileFiltering("ext.contains=" + DEFAULT_EXT, "ext.contains=" + UPDATED_EXT);
@@ -606,7 +619,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByExtNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where ext does not contain
         defaultUploadFileFiltering("ext.doesNotContain=" + UPDATED_EXT, "ext.doesNotContain=" + DEFAULT_EXT);
@@ -616,7 +629,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByTypeIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where type equals to
         defaultUploadFileFiltering("type.equals=" + DEFAULT_TYPE, "type.equals=" + UPDATED_TYPE);
@@ -626,7 +639,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByTypeIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where type in
         defaultUploadFileFiltering("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE, "type.in=" + UPDATED_TYPE);
@@ -636,7 +649,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByTypeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where type is not null
         defaultUploadFileFiltering("type.specified=true", "type.specified=false");
@@ -646,7 +659,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByTypeContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where type contains
         defaultUploadFileFiltering("type.contains=" + DEFAULT_TYPE, "type.contains=" + UPDATED_TYPE);
@@ -656,7 +669,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByTypeNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where type does not contain
         defaultUploadFileFiltering("type.doesNotContain=" + UPDATED_TYPE, "type.doesNotContain=" + DEFAULT_TYPE);
@@ -666,7 +679,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByPathIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where path equals to
         defaultUploadFileFiltering("path.equals=" + DEFAULT_PATH, "path.equals=" + UPDATED_PATH);
@@ -676,7 +689,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByPathIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where path in
         defaultUploadFileFiltering("path.in=" + DEFAULT_PATH + "," + UPDATED_PATH, "path.in=" + UPDATED_PATH);
@@ -686,7 +699,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByPathIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where path is not null
         defaultUploadFileFiltering("path.specified=true", "path.specified=false");
@@ -696,7 +709,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByPathContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where path contains
         defaultUploadFileFiltering("path.contains=" + DEFAULT_PATH, "path.contains=" + UPDATED_PATH);
@@ -706,7 +719,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByPathNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where path does not contain
         defaultUploadFileFiltering("path.doesNotContain=" + UPDATED_PATH, "path.doesNotContain=" + DEFAULT_PATH);
@@ -716,7 +729,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByFolderIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where folder equals to
         defaultUploadFileFiltering("folder.equals=" + DEFAULT_FOLDER, "folder.equals=" + UPDATED_FOLDER);
@@ -726,7 +739,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByFolderIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where folder in
         defaultUploadFileFiltering("folder.in=" + DEFAULT_FOLDER + "," + UPDATED_FOLDER, "folder.in=" + UPDATED_FOLDER);
@@ -736,7 +749,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByFolderIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where folder is not null
         defaultUploadFileFiltering("folder.specified=true", "folder.specified=false");
@@ -746,7 +759,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByFolderContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where folder contains
         defaultUploadFileFiltering("folder.contains=" + DEFAULT_FOLDER, "folder.contains=" + UPDATED_FOLDER);
@@ -756,7 +769,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByFolderNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where folder does not contain
         defaultUploadFileFiltering("folder.doesNotContain=" + UPDATED_FOLDER, "folder.doesNotContain=" + DEFAULT_FOLDER);
@@ -766,7 +779,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByOwnerEntityNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where ownerEntityName equals to
         defaultUploadFileFiltering(
@@ -779,7 +792,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByOwnerEntityNameIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where ownerEntityName in
         defaultUploadFileFiltering(
@@ -792,7 +805,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByOwnerEntityNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where ownerEntityName is not null
         defaultUploadFileFiltering("ownerEntityName.specified=true", "ownerEntityName.specified=false");
@@ -802,7 +815,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByOwnerEntityNameContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where ownerEntityName contains
         defaultUploadFileFiltering(
@@ -815,7 +828,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByOwnerEntityNameNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where ownerEntityName does not contain
         defaultUploadFileFiltering(
@@ -828,7 +841,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByOwnerEntityIdIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where ownerEntityId equals to
         defaultUploadFileFiltering("ownerEntityId.equals=" + DEFAULT_OWNER_ENTITY_ID, "ownerEntityId.equals=" + UPDATED_OWNER_ENTITY_ID);
@@ -838,7 +851,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByOwnerEntityIdIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where ownerEntityId in
         defaultUploadFileFiltering(
@@ -851,7 +864,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByOwnerEntityIdIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where ownerEntityId is not null
         defaultUploadFileFiltering("ownerEntityId.specified=true", "ownerEntityId.specified=false");
@@ -861,7 +874,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByOwnerEntityIdIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where ownerEntityId is greater than or equal to
         defaultUploadFileFiltering(
@@ -874,7 +887,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByOwnerEntityIdIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where ownerEntityId is less than or equal to
         defaultUploadFileFiltering(
@@ -887,7 +900,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByOwnerEntityIdIsLessThanSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where ownerEntityId is less than
         defaultUploadFileFiltering(
@@ -900,7 +913,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByOwnerEntityIdIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where ownerEntityId is greater than
         defaultUploadFileFiltering(
@@ -913,7 +926,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByBusinessTitleIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where businessTitle equals to
         defaultUploadFileFiltering("businessTitle.equals=" + DEFAULT_BUSINESS_TITLE, "businessTitle.equals=" + UPDATED_BUSINESS_TITLE);
@@ -923,7 +936,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByBusinessTitleIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where businessTitle in
         defaultUploadFileFiltering(
@@ -936,7 +949,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByBusinessTitleIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where businessTitle is not null
         defaultUploadFileFiltering("businessTitle.specified=true", "businessTitle.specified=false");
@@ -946,7 +959,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByBusinessTitleContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where businessTitle contains
         defaultUploadFileFiltering("businessTitle.contains=" + DEFAULT_BUSINESS_TITLE, "businessTitle.contains=" + UPDATED_BUSINESS_TITLE);
@@ -956,7 +969,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByBusinessTitleNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where businessTitle does not contain
         defaultUploadFileFiltering(
@@ -969,7 +982,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByBusinessDescIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where businessDesc equals to
         defaultUploadFileFiltering("businessDesc.equals=" + DEFAULT_BUSINESS_DESC, "businessDesc.equals=" + UPDATED_BUSINESS_DESC);
@@ -979,7 +992,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByBusinessDescIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where businessDesc in
         defaultUploadFileFiltering(
@@ -992,7 +1005,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByBusinessDescIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where businessDesc is not null
         defaultUploadFileFiltering("businessDesc.specified=true", "businessDesc.specified=false");
@@ -1002,7 +1015,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByBusinessDescContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where businessDesc contains
         defaultUploadFileFiltering("businessDesc.contains=" + DEFAULT_BUSINESS_DESC, "businessDesc.contains=" + UPDATED_BUSINESS_DESC);
@@ -1012,7 +1025,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByBusinessDescNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where businessDesc does not contain
         defaultUploadFileFiltering(
@@ -1025,7 +1038,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByBusinessStatusIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where businessStatus equals to
         defaultUploadFileFiltering("businessStatus.equals=" + DEFAULT_BUSINESS_STATUS, "businessStatus.equals=" + UPDATED_BUSINESS_STATUS);
@@ -1035,7 +1048,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByBusinessStatusIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where businessStatus in
         defaultUploadFileFiltering(
@@ -1048,7 +1061,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByBusinessStatusIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where businessStatus is not null
         defaultUploadFileFiltering("businessStatus.specified=true", "businessStatus.specified=false");
@@ -1058,7 +1071,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByBusinessStatusContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where businessStatus contains
         defaultUploadFileFiltering(
@@ -1071,7 +1084,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByBusinessStatusNotContainsSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where businessStatus does not contain
         defaultUploadFileFiltering(
@@ -1084,7 +1097,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByCreateAtIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where createAt equals to
         defaultUploadFileFiltering("createAt.equals=" + DEFAULT_CREATE_AT, "createAt.equals=" + UPDATED_CREATE_AT);
@@ -1094,7 +1107,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByCreateAtIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where createAt in
         defaultUploadFileFiltering("createAt.in=" + DEFAULT_CREATE_AT + "," + UPDATED_CREATE_AT, "createAt.in=" + UPDATED_CREATE_AT);
@@ -1104,7 +1117,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByCreateAtIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where createAt is not null
         defaultUploadFileFiltering("createAt.specified=true", "createAt.specified=false");
@@ -1114,7 +1127,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByCreateAtIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where createAt is greater than or equal to
         defaultUploadFileFiltering("createAt.greaterThanOrEqual=" + DEFAULT_CREATE_AT, "createAt.greaterThanOrEqual=" + UPDATED_CREATE_AT);
@@ -1124,7 +1137,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByCreateAtIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where createAt is less than or equal to
         defaultUploadFileFiltering("createAt.lessThanOrEqual=" + DEFAULT_CREATE_AT, "createAt.lessThanOrEqual=" + SMALLER_CREATE_AT);
@@ -1134,7 +1147,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByCreateAtIsLessThanSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where createAt is less than
         defaultUploadFileFiltering("createAt.lessThan=" + UPDATED_CREATE_AT, "createAt.lessThan=" + DEFAULT_CREATE_AT);
@@ -1144,7 +1157,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByCreateAtIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where createAt is greater than
         defaultUploadFileFiltering("createAt.greaterThan=" + SMALLER_CREATE_AT, "createAt.greaterThan=" + DEFAULT_CREATE_AT);
@@ -1154,7 +1167,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByFileSizeIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where fileSize equals to
         defaultUploadFileFiltering("fileSize.equals=" + DEFAULT_FILE_SIZE, "fileSize.equals=" + UPDATED_FILE_SIZE);
@@ -1164,7 +1177,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByFileSizeIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where fileSize in
         defaultUploadFileFiltering("fileSize.in=" + DEFAULT_FILE_SIZE + "," + UPDATED_FILE_SIZE, "fileSize.in=" + UPDATED_FILE_SIZE);
@@ -1174,7 +1187,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByFileSizeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where fileSize is not null
         defaultUploadFileFiltering("fileSize.specified=true", "fileSize.specified=false");
@@ -1184,7 +1197,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByFileSizeIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where fileSize is greater than or equal to
         defaultUploadFileFiltering("fileSize.greaterThanOrEqual=" + DEFAULT_FILE_SIZE, "fileSize.greaterThanOrEqual=" + UPDATED_FILE_SIZE);
@@ -1194,7 +1207,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByFileSizeIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where fileSize is less than or equal to
         defaultUploadFileFiltering("fileSize.lessThanOrEqual=" + DEFAULT_FILE_SIZE, "fileSize.lessThanOrEqual=" + SMALLER_FILE_SIZE);
@@ -1204,7 +1217,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByFileSizeIsLessThanSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where fileSize is less than
         defaultUploadFileFiltering("fileSize.lessThan=" + UPDATED_FILE_SIZE, "fileSize.lessThan=" + DEFAULT_FILE_SIZE);
@@ -1214,7 +1227,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByFileSizeIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where fileSize is greater than
         defaultUploadFileFiltering("fileSize.greaterThan=" + SMALLER_FILE_SIZE, "fileSize.greaterThan=" + DEFAULT_FILE_SIZE);
@@ -1224,7 +1237,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByReferenceCountIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where referenceCount equals to
         defaultUploadFileFiltering("referenceCount.equals=" + DEFAULT_REFERENCE_COUNT, "referenceCount.equals=" + UPDATED_REFERENCE_COUNT);
@@ -1234,7 +1247,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByReferenceCountIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where referenceCount in
         defaultUploadFileFiltering(
@@ -1247,7 +1260,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByReferenceCountIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where referenceCount is not null
         defaultUploadFileFiltering("referenceCount.specified=true", "referenceCount.specified=false");
@@ -1257,7 +1270,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByReferenceCountIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where referenceCount is greater than or equal to
         defaultUploadFileFiltering(
@@ -1270,7 +1283,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByReferenceCountIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where referenceCount is less than or equal to
         defaultUploadFileFiltering(
@@ -1283,7 +1296,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByReferenceCountIsLessThanSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where referenceCount is less than
         defaultUploadFileFiltering(
@@ -1296,7 +1309,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByReferenceCountIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where referenceCount is greater than
         defaultUploadFileFiltering(
@@ -1309,7 +1322,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByCreatedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where createdBy equals to
         defaultUploadFileFiltering("createdBy.equals=" + DEFAULT_CREATED_BY, "createdBy.equals=" + UPDATED_CREATED_BY);
@@ -1319,7 +1332,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByCreatedByIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where createdBy in
         defaultUploadFileFiltering("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY, "createdBy.in=" + UPDATED_CREATED_BY);
@@ -1329,7 +1342,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByCreatedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where createdBy is not null
         defaultUploadFileFiltering("createdBy.specified=true", "createdBy.specified=false");
@@ -1339,7 +1352,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByCreatedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where createdBy is greater than or equal to
         defaultUploadFileFiltering(
@@ -1352,7 +1365,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByCreatedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where createdBy is less than or equal to
         defaultUploadFileFiltering("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
@@ -1362,7 +1375,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByCreatedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where createdBy is less than
         defaultUploadFileFiltering("createdBy.lessThan=" + UPDATED_CREATED_BY, "createdBy.lessThan=" + DEFAULT_CREATED_BY);
@@ -1372,7 +1385,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByCreatedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where createdBy is greater than
         defaultUploadFileFiltering("createdBy.greaterThan=" + SMALLER_CREATED_BY, "createdBy.greaterThan=" + DEFAULT_CREATED_BY);
@@ -1382,7 +1395,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByCreatedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where createdDate equals to
         defaultUploadFileFiltering("createdDate.equals=" + DEFAULT_CREATED_DATE, "createdDate.equals=" + UPDATED_CREATED_DATE);
@@ -1392,7 +1405,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByCreatedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where createdDate in
         defaultUploadFileFiltering(
@@ -1405,7 +1418,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByCreatedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where createdDate is not null
         defaultUploadFileFiltering("createdDate.specified=true", "createdDate.specified=false");
@@ -1415,7 +1428,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByLastModifiedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where lastModifiedBy equals to
         defaultUploadFileFiltering(
@@ -1428,7 +1441,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByLastModifiedByIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where lastModifiedBy in
         defaultUploadFileFiltering(
@@ -1441,7 +1454,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByLastModifiedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where lastModifiedBy is not null
         defaultUploadFileFiltering("lastModifiedBy.specified=true", "lastModifiedBy.specified=false");
@@ -1451,7 +1464,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByLastModifiedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where lastModifiedBy is greater than or equal to
         defaultUploadFileFiltering(
@@ -1464,7 +1477,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByLastModifiedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where lastModifiedBy is less than or equal to
         defaultUploadFileFiltering(
@@ -1477,7 +1490,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByLastModifiedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where lastModifiedBy is less than
         defaultUploadFileFiltering(
@@ -1490,7 +1503,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByLastModifiedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where lastModifiedBy is greater than
         defaultUploadFileFiltering(
@@ -1503,7 +1516,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByLastModifiedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where lastModifiedDate equals to
         defaultUploadFileFiltering(
@@ -1516,7 +1529,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByLastModifiedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where lastModifiedDate in
         defaultUploadFileFiltering(
@@ -1529,7 +1542,7 @@ public class UploadFileResourceIT {
     @Transactional
     void getAllUploadFilesByLastModifiedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         // Get all the uploadFileList where lastModifiedDate is not null
         defaultUploadFileFiltering("lastModifiedDate.specified=true", "lastModifiedDate.specified=false");
@@ -1622,7 +1635,7 @@ public class UploadFileResourceIT {
     @Transactional
     void putExistingUploadFile() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1730,7 +1743,7 @@ public class UploadFileResourceIT {
     @Transactional
     void partialUpdateUploadFileWithPatch() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1741,15 +1754,13 @@ public class UploadFileResourceIT {
         partialUpdatedUploadFile
             .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
-            .name(UPDATED_NAME)
-            .thumb(UPDATED_THUMB)
+            .ext(UPDATED_EXT)
+            .type(UPDATED_TYPE)
             .ownerEntityId(UPDATED_OWNER_ENTITY_ID)
             .businessTitle(UPDATED_BUSINESS_TITLE)
-            .businessDesc(UPDATED_BUSINESS_DESC)
-            .businessStatus(UPDATED_BUSINESS_STATUS)
+            .fileSize(UPDATED_FILE_SIZE)
             .referenceCount(UPDATED_REFERENCE_COUNT)
-            .createdDate(UPDATED_CREATED_DATE)
-            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY);
+            .createdBy(UPDATED_CREATED_BY);
 
         restUploadFileMockMvc
             .perform(
@@ -1772,7 +1783,7 @@ public class UploadFileResourceIT {
     @Transactional
     void fullUpdateUploadFileWithPatch() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1882,7 +1893,7 @@ public class UploadFileResourceIT {
     @Transactional
     void deleteUploadFile() throws Exception {
         // Initialize the database
-        uploadFileRepository.save(uploadFile);
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

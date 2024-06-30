@@ -1,6 +1,6 @@
 <template>
   <span :class="`${prefixCls}__extra-redo`" @click="handleRedo">
-    <RedoOutlined :spin="loading" />
+    <RedoOutlined :spin="loading" :size="18" />
   </span>
 </template>
 <script lang="ts" setup>

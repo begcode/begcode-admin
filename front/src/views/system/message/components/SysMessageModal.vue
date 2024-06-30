@@ -88,15 +88,17 @@
 <script lang="ts" setup>
 import { ref, unref, reactive, computed } from 'vue';
 import { Tabs, TabPane, RangePicker, Button, Popover } from 'ant-design-vue';
-import { BasicModal, useModalInner, useModal } from '@begcode/components';
+import { BasicModal, useModalInner, useModal, createAsyncComponent } from '@begcode/components';
 import { FilterOutlined, CloseOutlined, BellFilled, ExclamationOutlined, PlusOutlined } from '@ant-design/icons-vue';
-import SysMessageList from './SysMessageList.vue';
+// import SysMessageList from './SysMessageList.vue';
 import { SelectModal } from '@begcode/components';
 import DetailModal from '@/views/monitor/mynews/DetailModal.vue';
 
 defineOptions({ name: 'SysMessageModal' });
 
 const emit = defineEmits(['register', 'refresh']);
+
+const SysMessageList = createAsyncComponent(() => import('./SysMessageList.vue'));
 
 const allMessageRef = ref();
 const starMessageRef = ref();
@@ -124,7 +126,9 @@ function loadData() {
     rangeDate: searchParams.rangeDate,
   };
   if (activeKey.value === 'all') {
-    allMessageRef.value.reload(params);
+    getRefPromise(allMessageRef).then(() => {
+      allMessageRef.value.reload(params);
+    });
   } else {
     starMessageRef.value.reload(params);
   }
@@ -231,6 +235,21 @@ function openSelectPerson() {
 function clearSearchParamsUser() {
   searchParams.fromUser = '';
   searchParams.realname = '';
+}
+
+function getRefPromise(componentRef) {
+  return new Promise(resolve => {
+    (function next() {
+      let ref = componentRef.value;
+      if (ref) {
+        resolve(ref);
+      } else {
+        setTimeout(() => {
+          next();
+        }, 100);
+      }
+    })();
+  });
 }
 
 function clearAll() {

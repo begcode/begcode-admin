@@ -27,10 +27,9 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { List } from 'ant-design-vue';
-import { CollapseContainer } from '@begcode/components';
+import { CollapseContainer, createAsyncComponent } from '@begcode/components';
 
 import { secureSettingList } from './data';
-import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
 import { useUserStore } from '@/store/modules/user';
 import { useMessage } from '@/hooks/web/useMessage';
 const UpdatePassword = createAsyncComponent(() => import('@/layouts/default/header/components/user-dropdown/UpdatePassword.vue'));

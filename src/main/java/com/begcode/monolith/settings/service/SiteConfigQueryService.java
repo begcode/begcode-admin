@@ -38,7 +38,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class SiteConfigQueryService implements QueryService<SiteConfig> {
 
-    private final Logger log = LoggerFactory.getLogger(SiteConfigQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(SiteConfigQueryService.class);
 
     protected final SiteConfigRepository siteConfigRepository;
 

@@ -16,7 +16,12 @@
         <TabPane loading="true" tab="销售额" key="1">
           <Row>
             <Col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
-              <Bar :chartData="barData" :option="{ title: { text: '销售额排行', textStyle: { fontWeight: 'lighter' } } }" height="40vh" />
+              <Bar
+                :chartData="barData"
+                :option="{ title: { text: '', textStyle: { fontWeight: 'lighter' } } }"
+                :seriesColor="seriesColor"
+                height="40vh"
+              />
             </Col>
             <Col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
               <RankList title="门店销售排行榜" :list="rankList" />
@@ -28,7 +33,8 @@
             <Col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
               <Bar
                 :chartData="barData.reverse()"
-                :option="{ title: { text: '销售额排行', textStyle: { fontWeight: 'lighter' } } }"
+                :option="{ title: { text: '', textStyle: { fontWeight: 'lighter' } } }"
+                :seriesColor="seriesColor"
                 height="40vh"
               />
             </Col>
@@ -42,14 +48,18 @@
   </Card>
 </template>
 <script lang="ts" setup>
+import { ref, computed } from 'vue';
 import { Card, Tabs, TabPane, Row, Col, RangePicker } from 'ant-design-vue';
 import { Bar, RankList } from '@begcode/components';
+import { useRootSetting } from '@/hooks/setting/useRootSetting';
 
 defineProps({
   loading: {
     type: Boolean,
   },
 });
+
+const { getThemeColor } = useRootSetting();
 const rankList: any[] = [];
 for (let i = 0; i < 7; i++) {
   rankList.push({
@@ -57,6 +67,10 @@ for (let i = 0; i < 7; i++) {
     total: 1234.56 - i * 100,
   });
 }
+
+const seriesColor = computed(() => {
+  return getThemeColor.value;
+});
 
 const barData: any[] = [];
 for (let i = 0; i < 12; i += 1) {

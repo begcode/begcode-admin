@@ -1,6 +1,6 @@
 <template>
   <span :class="`${prefixCls}__extra-fold`" @click="openDrawer(true)">
-    <Icon icon="ion:settings-outline" />
+    <Icon icon="ion:settings-outline" :size="18" />
     <SettingDrawer @register="register" />
   </span>
 </template>

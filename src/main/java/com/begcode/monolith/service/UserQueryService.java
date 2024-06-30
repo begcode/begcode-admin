@@ -38,7 +38,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class UserQueryService implements QueryService<User> {
 
-    private final Logger log = LoggerFactory.getLogger(UserQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(UserQueryService.class);
 
     protected final UserRepository userRepository;
 

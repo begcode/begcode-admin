@@ -2,9 +2,10 @@
 // The axios configuration can be changed according to the project, just change the file, other files can be left unchanged
 
 import type { AxiosInstance, AxiosResponse } from 'axios';
-import { clone, isString, isNull, isEmpty } from 'lodash-es';
-import { setObjToUrlParams, deepMerge } from '@begcode/components';
+import { clone, isString, isNull, isEmpty, cloneDeep } from 'lodash-es';
+import { setObjToUrlParams, deepMerge, isUndefined } from '@begcode/components';
 import axios from 'axios';
+import qs from 'qs';
 import type { AxiosTransform, CreateAxiosOptions } from './axiosTransform';
 import { VAxios } from './Axios';
 import { checkStatus } from './checkStatus';
@@ -130,7 +131,6 @@ const transform: AxiosTransform = {
         } else {
           config.url = config.url + timestampstr;
         }
-
         config.params = undefined;
       }
     } else {
@@ -163,12 +163,12 @@ const transform: AxiosTransform = {
     // 请求之前处理config
     const token = getToken();
     let tenantId: string | number = getTenantId();
+    config.headers[ConfigEnum.TIMESTAMP] = signMd5Utils.getTimestamp();
+    config.headers[ConfigEnum.Sign] = signMd5Utils.getSign(config.url, cloneDeep(config.params), cloneDeep(config.data));
     if (token && (config as Recordable)?.requestOptions?.withToken !== false) {
       // jwt token
       (config as Recordable).headers.Authorization = options.authenticationScheme ? `${options.authenticationScheme} ${token}` : token;
       config.headers[ConfigEnum.TOKEN] = token;
-      config.headers[ConfigEnum.TIMESTAMP] = signMd5Utils.getTimestamp();
-      config.headers[ConfigEnum.Sign] = signMd5Utils.getSign(config.url, config.params);
       if (!tenantId) {
         tenantId = 0;
       }
@@ -293,6 +293,9 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
             count: 5,
             waitTime: 100,
           },
+        },
+        paramsSerializer: function (params) {
+          return qs.stringify(params, { arrayFormat: 'repeat' });
         },
       },
       opt || {},

@@ -61,7 +61,7 @@ export const defaultValueComponents = ['Input', 'InputPassword', 'InputSearch', 
 
 export function handleInputNumberValue(component?: ComponentType, val?: any) {
   if (!component) return val;
-  if (defaultValueComponents.includes(component)) {
+  if (defaultValueComponents.includes(component) && typeof val === 'string' && val != '') {
     return val && isNumber(val) ? `${val}` : val;
   }
   return val;

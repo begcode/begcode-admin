@@ -14,7 +14,6 @@
       <span
         v-if="getShowContent && getShowBreadTitle && !getIsMobile"
         :class="[prefixCls, `${prefixCls}--${getHeaderTheme}`, 'headerIntroductionClass']"
-        style="border: 0"
       >
         {{ t('layout.header.welcomeIn') }} {{ title }}
       </span>
@@ -58,12 +57,9 @@ import { MenuModeEnum, MenuSplitTyeEnum } from '@/enums/menuEnum';
 import { useHeaderSetting } from '@/hooks/setting/useHeaderSetting';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
 import { useRootSetting } from '@/hooks/setting/useRootSetting';
-import { useAppInject } from '@begcode/components';
-import { useDesign } from '@begcode/components';
+import { useDesign, createAsyncComponent, useAppInject, propTypes } from '@begcode/components';
 import { useLocale } from '@/i18n/useLocale';
-import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
 import { useGlobSetting } from '@/hooks/setting';
-import { propTypes } from '@begcode/components';
 import { useI18n } from '@/hooks/web/useI18n';
 
 import LayoutMenu from '../menu/index.vue';
@@ -172,14 +168,10 @@ onMounted(() => {
 @import url('./index.less');
 @prefix-cls: ~'@{namespace}-layout-header';
 
-.ant-layout .ant-layout-header {
-  padding-inline: 0 !important;
-}
-
-.ant-layout.@{prefix-cls} {
+.ant-layout .@{prefix-cls} {
   display: flex;
   padding: 0 8px !important;
-  height: 48px;
+  height: @header-height;
   align-items: center;
 
   .headerIntroductionClass {
@@ -191,18 +183,18 @@ onMounted(() => {
 
   &--light {
     .headerIntroductionClass {
-      color: @breadcrumb-item-normal-color;
+      color: #000;
     }
   }
 
   &--dark {
     .headerIntroductionClass {
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(255, 255, 255, 1);
     }
 
     .anticon,
     .truncate {
-      color: rgba(255, 255, 255, 0.8);
+      color: rgba(255, 255, 255, 1);
     }
   }
 }

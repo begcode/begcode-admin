@@ -39,7 +39,7 @@ const fields = (): FormSchema[] => {
       label: '表单配置',
       field: 'formJson',
       component: 'Editor',
-      componentProps: { placeholder: '请输入表单配置', style: 'width: 100%' },
+      componentProps: { editorId: 'form_item_formJson_editor', placeholder: '请输入表单配置', style: 'width: 100%' },
       rules: [],
     },
     {

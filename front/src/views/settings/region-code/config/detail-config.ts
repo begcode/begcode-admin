@@ -40,7 +40,7 @@ const fields: DescItem[] = [
     field: 'level',
     format: (value, _data) => {
       const { getEnumDict } = useI18n();
-      return getEnumDict('RegionCodeLevel').find(item => item.value === value) || value;
+      return (getEnumDict('RegionCodeLevel').find(item => item.value === value) || { value: value, label: value }).label;
     },
   },
   {

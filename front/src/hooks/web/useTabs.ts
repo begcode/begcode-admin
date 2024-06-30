@@ -71,15 +71,15 @@ export function useTabs(_router?: Router) {
         break;
 
       case TableActionEnum.CLOSE_LEFT:
-        await tabStore.closeLeftTabs(currentTab, router);
+        await tabStore.closeLeftTabs(tab || currentTab, router);
         break;
 
       case TableActionEnum.CLOSE_RIGHT:
-        await tabStore.closeRightTabs(currentTab, router);
+        await tabStore.closeRightTabs(tab || currentTab, router);
         break;
 
       case TableActionEnum.CLOSE_OTHER:
-        await tabStore.closeOtherTabs(currentTab, router);
+        await tabStore.closeOtherTabs(tab || currentTab, router);
         break;
 
       case TableActionEnum.CLOSE_CURRENT:
@@ -105,10 +105,10 @@ export function useTabs(_router?: Router) {
 
   return {
     refreshPage: () => handleTabAction(TableActionEnum.REFRESH),
-    closeAll: () => handleTabAction(TableActionEnum.CLOSE_ALL),
-    closeLeft: () => handleTabAction(TableActionEnum.CLOSE_LEFT),
-    closeRight: () => handleTabAction(TableActionEnum.CLOSE_RIGHT),
-    closeOther: () => handleTabAction(TableActionEnum.CLOSE_OTHER),
+    closeAll: tab => handleTabAction(TableActionEnum.CLOSE_ALL, tab),
+    closeLeft: tab => handleTabAction(TableActionEnum.CLOSE_LEFT, tab),
+    closeRight: tab => handleTabAction(TableActionEnum.CLOSE_RIGHT, tab),
+    closeOther: tab => handleTabAction(TableActionEnum.CLOSE_OTHER, tab),
     closeCurrent: () => handleTabAction(TableActionEnum.CLOSE_CURRENT),
     close: (tab?: RouteLocationNormalized) => handleTabAction(TableActionEnum.CLOSE, tab),
     setTitle: (title: string, tab?: RouteLocationNormalized) => updateTabTitle(title, tab),

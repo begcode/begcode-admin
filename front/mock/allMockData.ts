@@ -1,8 +1,9 @@
 import Papa from 'papaparse';
 import { camelCase } from 'lodash-es';
+import { useGlobSetting } from '@/hooks/setting';
 
-const allDataModules = import.meta.glob('./data/*.csv');
-const allFakeDataModules = import.meta.glob('./fake-data/*.csv');
+const allDataModules = useGlobSetting().useMock ? import.meta.glob('./data/*.csv') : {};
+const allFakeDataModules = useGlobSetting().useMock ? import.meta.glob('./fake-data/*.csv') : {};
 
 const allData: any = {};
 

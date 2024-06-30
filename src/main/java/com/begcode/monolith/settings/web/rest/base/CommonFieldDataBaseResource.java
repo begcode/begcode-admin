@@ -52,7 +52,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class CommonFieldDataBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(CommonFieldDataBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(CommonFieldDataBaseResource.class);
 
     protected static final String ENTITY_NAME = "settingsCommonFieldData";
 

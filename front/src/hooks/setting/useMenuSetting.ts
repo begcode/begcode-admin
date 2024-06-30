@@ -83,7 +83,7 @@ export function useMenuSetting() {
 
   const getRealWidth = computed(() => {
     if (unref(getIsMixSidebar)) {
-      return unref(getCollapsed) && !unref(getMixSideFixed) ? unref(getMiniWidthNumber) : unref(getMenuWidth);
+      return unref(getCollapsed) && !unref(getMixSideFixed) ? unref(getMiniWidthNumber) : unref(getMenuWidth) - 60;
     }
     return unref(getCollapsed) ? unref(getMiniWidthNumber) : unref(getMenuWidth);
   });

@@ -28,7 +28,7 @@ public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
      * Url地址
      */
     @NotNull
-    @Schema(description = "Url地址", required = true)
+    @Schema(description = "Url地址", requiredMode = Schema.RequiredMode.REQUIRED)
     private String url;
 
     /**

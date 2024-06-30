@@ -54,7 +54,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class SiteConfigBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(SiteConfigBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(SiteConfigBaseResource.class);
 
     protected static final String ENTITY_NAME = "settingsSiteConfig";
 

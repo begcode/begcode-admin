@@ -43,7 +43,7 @@
               </template>
               <template class="ant-card-actions" #actions>
                 <template v-for="operation in rowOperations">
-                  <Button @click="operation.click(item)">{{ operation.title }}</Button>
+                  <Button :type="operation.type" @click="operation.click(item)">{{ operation.title }}</Button>
                 </template>
                 <Dropdown
                   :trigger="['hover']"
@@ -83,7 +83,6 @@ import { computed, onMounted, ref } from 'vue';
 import { List, Card, Image, TypographyParagraph, Tooltip, Slider, Avatar, Space, Upload } from 'ant-design-vue';
 import { EllipsisOutlined, TableOutlined } from '@ant-design/icons-vue';
 import { Dropdown } from '@/components/Dropdown';
-import { propTypes } from '@/utils/propTypes';
 import { Button } from '@/components/Button';
 import Icon from '@/components/Icon/Icon.vue';
 import { isFunction } from 'lodash-es';
@@ -97,23 +96,61 @@ const sliderProp = computed(() => useSlider(4));
 // 组件接收参数
 const props = defineProps({
   // 请求API的参数
-  params: propTypes.object.def({}),
+  params: {
+    type: Object,
+    default: () => ({}),
+  },
   //api
-  api: propTypes.func,
+  api: {
+    type: Function,
+    default: null,
+  },
   // imageField
-  imageField: propTypes.string.def('url'),
-  resultField: propTypes.string.def('data'),
-  totalField: propTypes.string.def('total'),
-  toolButtons: propTypes.arrayOf(propTypes.object).def([]),
-  rowOperations: propTypes.arrayOf(propTypes.object).def([]),
-  showAvatar: propTypes.bool.def(false),
-  showDesc: propTypes.bool.def(true),
-  metaDesc: propTypes.oneOfType([propTypes.string, propTypes.func]).def(''),
-  metaTitle: propTypes.oneOfType([propTypes.string, propTypes.func]).def(''),
-  metaAvatar: propTypes.oneOfType([propTypes.string, propTypes.func]).def(''),
-  imageConfig: propTypes.object.def({ preview: true }),
+  imageField: {
+    type: String,
+    default: 'url',
+  },
+  resultField: {
+    type: String,
+    default: 'data',
+  },
+  totalField: {
+    type: String,
+    default: 'total',
+  },
+  toolButtons: {
+    type: Array<any>,
+    default: [],
+  },
+  rowOperations: {
+    type: Array<any>,
+    default: [],
+  },
+  showAvatar: {
+    type: Boolean,
+    default: false,
+  },
+  showDesc: {
+    type: Boolean,
+    default: true,
+  },
+  metaDesc: {
+    type: [String, Function],
+    default: '',
+  },
+  metaTitle: {
+    type: [String, Function],
+    default: '',
+  },
+  metaAvatar: {
+    type: [String, Function],
+    default: '',
+  },
+  imageConfig: {
+    type: Object,
+    default: () => ({ preview: true }),
+  },
 });
-//暴露内部方法
 const emit = defineEmits(['getMethod', 'delete']);
 //数据
 const data = ref([]);

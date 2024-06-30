@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SmsTemplateBaseService<R extends SmsTemplateRepository, E extends SmsTemplate>
     extends BaseServiceImpl<SmsTemplateRepository, SmsTemplate> {
 
-    private final Logger log = LoggerFactory.getLogger(SmsTemplateBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(SmsTemplateBaseService.class);
     private final List<String> relationNames = List.of("supplier");
 
     protected final SmsSupplierService smsSupplierService;

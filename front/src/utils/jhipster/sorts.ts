@@ -27,7 +27,10 @@ export function transVxeSorts(sorts: any) {
   const result: string[] = [];
   (sorts || []).forEach(sort => {
     if (sort && sort.field) {
-      result.push(sort.field + ',' + (sort.order === 'desc' ? 'DESC' : 'ASC'));
+      const sortValue = sort.field + ',' + (sort.order === 'desc' ? 'DESC' : 'ASC');
+      if (!result.includes(sortValue)) {
+        result.push(sortValue);
+      }
     }
   });
   return result;

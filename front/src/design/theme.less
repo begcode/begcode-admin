@@ -3,6 +3,9 @@
 }
 
 html[data-theme='light'] {
+  body {
+    color: rgba(0, 0, 0, 0.65);
+  }
   .text-secondary {
     color: rgba(0, 0, 0, 0.45);
   }
@@ -17,7 +20,9 @@ html[data-theme='light'] {
     color: rgba(0, 0, 0, 0.65);
   }
   .ant-input-affix-wrapper > input.ant-input {
-    color: rgba(0, 0, 0, 0.65);
+    &:not([disabled]) {
+      color: rgba(0, 0, 0, 0.65);
+    }
   }
   .ant-select-single.ant-select-show-arrow .ant-select-selection-item, .ant-select-single.ant-select-show-arrow .ant-select-selection-placeholder{
     color: rgba(0, 0, 0, 0.65);
@@ -47,7 +52,11 @@ html[data-theme='light'] {
 [data-theme='dark'] {
   body {
     background-color: #000;
-    color: @text-color-base;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .ant-list .ant-list-item {
+    color: rgba(255, 255, 255, 0.85);
   }
 
   .ant-btn {

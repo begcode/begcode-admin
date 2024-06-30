@@ -22,7 +22,7 @@ const fields: DescItem[] = [
     field: 'type',
     format: (value, _data) => {
       const { getEnumDict } = useI18n();
-      return getEnumDict('ViewPermissionType').find(item => item.value === value) || value;
+      return (getEnumDict('ViewPermissionType').find(item => item.value === value) || { value: value, label: value }).label;
     },
   },
   {
@@ -63,7 +63,7 @@ const fields: DescItem[] = [
     },
     format: (value, _data) => {
       const { getEnumDict } = useI18n();
-      return getEnumDict('TargetType').find(item => item.value === value) || value;
+      return (getEnumDict('TargetType').find(item => item.value === value) || { value: value, label: value }).label;
     },
   },
   {

@@ -38,7 +38,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class TaskJobConfigQueryService implements QueryService<TaskJobConfig> {
 
-    private final Logger log = LoggerFactory.getLogger(TaskJobConfigQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(TaskJobConfigQueryService.class);
 
     protected final TaskJobConfigRepository taskJobConfigRepository;
 

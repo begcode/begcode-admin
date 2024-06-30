@@ -1,6 +1,6 @@
 # monolithMybatis
 
-本应用程序由BegCode8.4.4生成, 你可以在 [https://www.begcode.com](https://www.begcode.com) 找到文档和帮助。
+本应用程序由BegCode8.6.0-beta.0生成, 你可以在 [https://www.begcode.com](https://www.begcode.com) 找到文档和帮助。
 
 ## 截图展示
 
@@ -76,16 +76,13 @@
 
 ## 开发
 
-在构建此项目之前，您必须在计算机上安装并配置以下依赖项：
+The build system will install automatically the recommended version of Node and pnpm.
 
-1. [Node.js](https://nodejs.org/): 我们使用 Node 来运行开发 Web 服务器并构建项目。
-   根据您的系统，您可以从源代码安装 Node，也可以将 Node 安装为预打包的捆绑包。
-
-安装 Node 后，您应该能够运行以下命令来安装开发工具。
+We provide a wrapper to launch pnpm.
 仅当 [package.json](package.json) 中的依赖项发生更改时，您才需要再次运行此命令。
 
 ```
-pnpm install
+./npmw install
 ```
 
 我们使用 pnpm 脚本和 [Vite][] 作为我们的构建系统。
@@ -94,14 +91,14 @@ pnpm install
 
 ```
 ./mvnw
-pnpm start
+./npmw start
 ```
 
 Npm 还用于管理此应用程序中使用的 CSS 和 JavaScript 依赖项。 您可以通过以下方式升级依赖项
 在 [package.json](package.json) 中指定较新版本。 您还可以运行`pnpm update`和`pnpm install`来管理依赖项。
 在任何命令上添加`help`标志以查看如何使用它。 例如，`pnpm help update`。
 
-`pnpm run` 命令将列出可用于该项目运行的所有脚本。
+`./npmw run` 命令将列出可用于该项目运行的所有脚本。
 
 ## 系统构建
 
@@ -142,20 +139,20 @@ docker compose -f src/main/docker/jhipster-control-center.yml up
 
 ## 测试
 
-### Client tests
-
-Unit tests are run by [Jest][]. They're located in [front/src/test/javascript/](front/src/test/javascript/) and can be run with:
-
-```
-pnpm test
-```
-
 ### Spring Boot tests
 
 To launch your application's tests, run:
 
 ```
 ./mvnw verify
+```
+
+### Client tests
+
+Unit tests are run by [Jest][]. They're located in [front/src/test/javascript/](front/src/test/javascript/) and can be run with:
+
+```
+./npmw test
 ```
 
 ## 其他

@@ -30,19 +30,19 @@
               {{ userInfo.realName }}
             </p>
           </div>
-          <InputPassword :placeholder="t('sys.lock.placeholder')" class="enter-x" v-model:value="password" />
+          <InputPassword
+            :placeholder="t('sys.lock.placeholder')"
+            @change="unLock('change')"
+            @keyup.enter="unLock('enter')"
+            class="enter-x"
+            v-model:value="password"
+          />
           <span :class="`${prefixCls}-entry__err-msg enter-x`" v-if="errMsg">
             {{ t('sys.lock.alert') }}
           </span>
-          <div :class="`${prefixCls}-entry__footer enter-x`">
-            <Button type="link" size="small" class="mt-2 mr-2 enter-x" :disabled="loading" @click="handleShowForm(true)">
-              {{ t('common.back') }}
-            </Button>
-            <Button type="link" size="small" class="mt-2 mr-2 enter-x" :disabled="loading" @click="goLogin">
+          <div :class="`${prefixCls}-entry__footer enter-x`" style="justify-content: center; margin-top: 4px">
+            <Button type="link" size="small" :disabled="loading" @click="goLogin">
               {{ t('sys.lock.backToLogin') }}
-            </Button>
-            <Button class="mt-2" type="link" size="small" @click="unLock()" :loading="loading">
-              {{ t('sys.lock.entry') }}
             </Button>
           </div>
         </div>
@@ -58,7 +58,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Input, Button } from 'ant-design-vue';
 import { useUserStore } from '@/store/modules/user';
 import { useLockStore } from '@/store/modules/lock';
@@ -89,7 +89,7 @@ const userInfo = computed(() => {
 /**
  * @description: unLock
  */
-async function unLock() {
+async function unLock(type) {
   if (!password.value) {
     return;
   }
@@ -97,6 +97,9 @@ async function unLock() {
   try {
     loading.value = true;
     const res = await lockStore.unLock(pwd);
+    if (type === 'enter') {
+      errMsg.value = !res;
+    }
     errMsg.value = !res;
   } finally {
     loading.value = false;
@@ -111,6 +114,26 @@ function goLogin() {
 function handleShowForm(show = false) {
   showDate.value = show;
 }
+/**
+ * 监听键盘触发事件
+ *
+ * @param event
+ */
+function handleKeyDown(event) {
+  if (event.key === 'Escape') {
+    // 处理回车键按下事件
+    handleShowForm(true);
+    password.value = '';
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyDown);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown);
+});
 </script>
 <style lang="less" scoped>
 /* stylelint-disable media-query-no-invalid */

@@ -24,6 +24,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,6 +104,8 @@ public class SmsMessageResourceIT {
 
     private SmsMessage smsMessage;
 
+    private SmsMessage insertedSmsMessage;
+
     /**
      * Create an entity for this test.
      *
@@ -156,6 +159,14 @@ public class SmsMessageResourceIT {
         smsMessage = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedSmsMessage != null) {
+            smsMessageRepository.deleteById(insertedSmsMessage.getId());
+            insertedSmsMessage = null;
+        }
+    }
+
     @Test
     @Transactional
     void createSmsMessage() throws Exception {
@@ -176,6 +187,8 @@ public class SmsMessageResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedSmsMessage = smsMessageMapper.toEntity(returnedSmsMessageDTO);
         assertSmsMessageUpdatableFieldsEquals(returnedSmsMessage, getPersistedSmsMessage(returnedSmsMessage));
+
+        insertedSmsMessage = returnedSmsMessage;
     }
 
     @Test
@@ -200,7 +213,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessages() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList
         restSmsMessageMockMvc
@@ -227,7 +240,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getSmsMessage() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get the smsMessage
         restSmsMessageMockMvc
@@ -254,7 +267,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getSmsMessagesByIdFiltering() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         Long id = smsMessage.getId();
 
@@ -269,7 +282,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByTitleIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where title equals to
         defaultSmsMessageFiltering("title.equals=" + DEFAULT_TITLE, "title.equals=" + UPDATED_TITLE);
@@ -279,7 +292,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByTitleIsInShouldWork() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where title in
         defaultSmsMessageFiltering("title.in=" + DEFAULT_TITLE + "," + UPDATED_TITLE, "title.in=" + UPDATED_TITLE);
@@ -289,7 +302,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByTitleIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where title is not null
         defaultSmsMessageFiltering("title.specified=true", "title.specified=false");
@@ -299,7 +312,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByTitleContainsSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where title contains
         defaultSmsMessageFiltering("title.contains=" + DEFAULT_TITLE, "title.contains=" + UPDATED_TITLE);
@@ -309,7 +322,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByTitleNotContainsSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where title does not contain
         defaultSmsMessageFiltering("title.doesNotContain=" + UPDATED_TITLE, "title.doesNotContain=" + DEFAULT_TITLE);
@@ -319,7 +332,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesBySendTypeIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where sendType equals to
         defaultSmsMessageFiltering("sendType.equals=" + DEFAULT_SEND_TYPE, "sendType.equals=" + UPDATED_SEND_TYPE);
@@ -329,7 +342,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesBySendTypeIsInShouldWork() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where sendType in
         defaultSmsMessageFiltering("sendType.in=" + DEFAULT_SEND_TYPE + "," + UPDATED_SEND_TYPE, "sendType.in=" + UPDATED_SEND_TYPE);
@@ -339,7 +352,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesBySendTypeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where sendType is not null
         defaultSmsMessageFiltering("sendType.specified=true", "sendType.specified=false");
@@ -349,7 +362,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByReceiverIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where receiver equals to
         defaultSmsMessageFiltering("receiver.equals=" + DEFAULT_RECEIVER, "receiver.equals=" + UPDATED_RECEIVER);
@@ -359,7 +372,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByReceiverIsInShouldWork() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where receiver in
         defaultSmsMessageFiltering("receiver.in=" + DEFAULT_RECEIVER + "," + UPDATED_RECEIVER, "receiver.in=" + UPDATED_RECEIVER);
@@ -369,7 +382,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByReceiverIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where receiver is not null
         defaultSmsMessageFiltering("receiver.specified=true", "receiver.specified=false");
@@ -379,7 +392,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByReceiverContainsSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where receiver contains
         defaultSmsMessageFiltering("receiver.contains=" + DEFAULT_RECEIVER, "receiver.contains=" + UPDATED_RECEIVER);
@@ -389,7 +402,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByReceiverNotContainsSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where receiver does not contain
         defaultSmsMessageFiltering("receiver.doesNotContain=" + UPDATED_RECEIVER, "receiver.doesNotContain=" + DEFAULT_RECEIVER);
@@ -399,7 +412,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByParamsIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where params equals to
         defaultSmsMessageFiltering("params.equals=" + DEFAULT_PARAMS, "params.equals=" + UPDATED_PARAMS);
@@ -409,7 +422,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByParamsIsInShouldWork() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where params in
         defaultSmsMessageFiltering("params.in=" + DEFAULT_PARAMS + "," + UPDATED_PARAMS, "params.in=" + UPDATED_PARAMS);
@@ -419,7 +432,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByParamsIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where params is not null
         defaultSmsMessageFiltering("params.specified=true", "params.specified=false");
@@ -429,7 +442,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByParamsContainsSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where params contains
         defaultSmsMessageFiltering("params.contains=" + DEFAULT_PARAMS, "params.contains=" + UPDATED_PARAMS);
@@ -439,7 +452,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByParamsNotContainsSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where params does not contain
         defaultSmsMessageFiltering("params.doesNotContain=" + UPDATED_PARAMS, "params.doesNotContain=" + DEFAULT_PARAMS);
@@ -449,7 +462,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesBySendTimeIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where sendTime equals to
         defaultSmsMessageFiltering("sendTime.equals=" + DEFAULT_SEND_TIME, "sendTime.equals=" + UPDATED_SEND_TIME);
@@ -459,7 +472,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesBySendTimeIsInShouldWork() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where sendTime in
         defaultSmsMessageFiltering("sendTime.in=" + DEFAULT_SEND_TIME + "," + UPDATED_SEND_TIME, "sendTime.in=" + UPDATED_SEND_TIME);
@@ -469,7 +482,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesBySendTimeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where sendTime is not null
         defaultSmsMessageFiltering("sendTime.specified=true", "sendTime.specified=false");
@@ -479,7 +492,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesBySendTimeIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where sendTime is greater than or equal to
         defaultSmsMessageFiltering("sendTime.greaterThanOrEqual=" + DEFAULT_SEND_TIME, "sendTime.greaterThanOrEqual=" + UPDATED_SEND_TIME);
@@ -489,7 +502,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesBySendTimeIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where sendTime is less than or equal to
         defaultSmsMessageFiltering("sendTime.lessThanOrEqual=" + DEFAULT_SEND_TIME, "sendTime.lessThanOrEqual=" + SMALLER_SEND_TIME);
@@ -499,7 +512,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesBySendTimeIsLessThanSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where sendTime is less than
         defaultSmsMessageFiltering("sendTime.lessThan=" + UPDATED_SEND_TIME, "sendTime.lessThan=" + DEFAULT_SEND_TIME);
@@ -509,7 +522,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesBySendTimeIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where sendTime is greater than
         defaultSmsMessageFiltering("sendTime.greaterThan=" + SMALLER_SEND_TIME, "sendTime.greaterThan=" + DEFAULT_SEND_TIME);
@@ -519,7 +532,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesBySendStatusIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where sendStatus equals to
         defaultSmsMessageFiltering("sendStatus.equals=" + DEFAULT_SEND_STATUS, "sendStatus.equals=" + UPDATED_SEND_STATUS);
@@ -529,7 +542,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesBySendStatusIsInShouldWork() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where sendStatus in
         defaultSmsMessageFiltering(
@@ -542,7 +555,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesBySendStatusIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where sendStatus is not null
         defaultSmsMessageFiltering("sendStatus.specified=true", "sendStatus.specified=false");
@@ -552,7 +565,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByRetryNumIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where retryNum equals to
         defaultSmsMessageFiltering("retryNum.equals=" + DEFAULT_RETRY_NUM, "retryNum.equals=" + UPDATED_RETRY_NUM);
@@ -562,7 +575,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByRetryNumIsInShouldWork() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where retryNum in
         defaultSmsMessageFiltering("retryNum.in=" + DEFAULT_RETRY_NUM + "," + UPDATED_RETRY_NUM, "retryNum.in=" + UPDATED_RETRY_NUM);
@@ -572,7 +585,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByRetryNumIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where retryNum is not null
         defaultSmsMessageFiltering("retryNum.specified=true", "retryNum.specified=false");
@@ -582,7 +595,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByRetryNumIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where retryNum is greater than or equal to
         defaultSmsMessageFiltering("retryNum.greaterThanOrEqual=" + DEFAULT_RETRY_NUM, "retryNum.greaterThanOrEqual=" + UPDATED_RETRY_NUM);
@@ -592,7 +605,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByRetryNumIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where retryNum is less than or equal to
         defaultSmsMessageFiltering("retryNum.lessThanOrEqual=" + DEFAULT_RETRY_NUM, "retryNum.lessThanOrEqual=" + SMALLER_RETRY_NUM);
@@ -602,7 +615,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByRetryNumIsLessThanSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where retryNum is less than
         defaultSmsMessageFiltering("retryNum.lessThan=" + UPDATED_RETRY_NUM, "retryNum.lessThan=" + DEFAULT_RETRY_NUM);
@@ -612,7 +625,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByRetryNumIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where retryNum is greater than
         defaultSmsMessageFiltering("retryNum.greaterThan=" + SMALLER_RETRY_NUM, "retryNum.greaterThan=" + DEFAULT_RETRY_NUM);
@@ -622,7 +635,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByFailResultIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where failResult equals to
         defaultSmsMessageFiltering("failResult.equals=" + DEFAULT_FAIL_RESULT, "failResult.equals=" + UPDATED_FAIL_RESULT);
@@ -632,7 +645,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByFailResultIsInShouldWork() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where failResult in
         defaultSmsMessageFiltering(
@@ -645,7 +658,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByFailResultIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where failResult is not null
         defaultSmsMessageFiltering("failResult.specified=true", "failResult.specified=false");
@@ -655,7 +668,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByFailResultContainsSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where failResult contains
         defaultSmsMessageFiltering("failResult.contains=" + DEFAULT_FAIL_RESULT, "failResult.contains=" + UPDATED_FAIL_RESULT);
@@ -665,7 +678,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByFailResultNotContainsSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where failResult does not contain
         defaultSmsMessageFiltering("failResult.doesNotContain=" + UPDATED_FAIL_RESULT, "failResult.doesNotContain=" + DEFAULT_FAIL_RESULT);
@@ -675,7 +688,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByRemarkIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where remark equals to
         defaultSmsMessageFiltering("remark.equals=" + DEFAULT_REMARK, "remark.equals=" + UPDATED_REMARK);
@@ -685,7 +698,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByRemarkIsInShouldWork() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where remark in
         defaultSmsMessageFiltering("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK, "remark.in=" + UPDATED_REMARK);
@@ -695,7 +708,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByRemarkIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where remark is not null
         defaultSmsMessageFiltering("remark.specified=true", "remark.specified=false");
@@ -705,7 +718,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByRemarkContainsSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where remark contains
         defaultSmsMessageFiltering("remark.contains=" + DEFAULT_REMARK, "remark.contains=" + UPDATED_REMARK);
@@ -715,7 +728,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByRemarkNotContainsSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where remark does not contain
         defaultSmsMessageFiltering("remark.doesNotContain=" + UPDATED_REMARK, "remark.doesNotContain=" + DEFAULT_REMARK);
@@ -725,7 +738,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByCreatedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where createdBy equals to
         defaultSmsMessageFiltering("createdBy.equals=" + DEFAULT_CREATED_BY, "createdBy.equals=" + UPDATED_CREATED_BY);
@@ -735,7 +748,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByCreatedByIsInShouldWork() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where createdBy in
         defaultSmsMessageFiltering("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY, "createdBy.in=" + UPDATED_CREATED_BY);
@@ -745,7 +758,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByCreatedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where createdBy is not null
         defaultSmsMessageFiltering("createdBy.specified=true", "createdBy.specified=false");
@@ -755,7 +768,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByCreatedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where createdBy is greater than or equal to
         defaultSmsMessageFiltering(
@@ -768,7 +781,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByCreatedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where createdBy is less than or equal to
         defaultSmsMessageFiltering("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
@@ -778,7 +791,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByCreatedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where createdBy is less than
         defaultSmsMessageFiltering("createdBy.lessThan=" + UPDATED_CREATED_BY, "createdBy.lessThan=" + DEFAULT_CREATED_BY);
@@ -788,7 +801,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByCreatedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where createdBy is greater than
         defaultSmsMessageFiltering("createdBy.greaterThan=" + SMALLER_CREATED_BY, "createdBy.greaterThan=" + DEFAULT_CREATED_BY);
@@ -798,7 +811,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByCreatedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where createdDate equals to
         defaultSmsMessageFiltering("createdDate.equals=" + DEFAULT_CREATED_DATE, "createdDate.equals=" + UPDATED_CREATED_DATE);
@@ -808,7 +821,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByCreatedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where createdDate in
         defaultSmsMessageFiltering(
@@ -821,7 +834,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByCreatedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where createdDate is not null
         defaultSmsMessageFiltering("createdDate.specified=true", "createdDate.specified=false");
@@ -831,7 +844,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByLastModifiedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where lastModifiedBy equals to
         defaultSmsMessageFiltering(
@@ -844,7 +857,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByLastModifiedByIsInShouldWork() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where lastModifiedBy in
         defaultSmsMessageFiltering(
@@ -857,7 +870,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByLastModifiedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where lastModifiedBy is not null
         defaultSmsMessageFiltering("lastModifiedBy.specified=true", "lastModifiedBy.specified=false");
@@ -867,7 +880,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByLastModifiedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where lastModifiedBy is greater than or equal to
         defaultSmsMessageFiltering(
@@ -880,7 +893,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByLastModifiedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where lastModifiedBy is less than or equal to
         defaultSmsMessageFiltering(
@@ -893,7 +906,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByLastModifiedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where lastModifiedBy is less than
         defaultSmsMessageFiltering(
@@ -906,7 +919,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByLastModifiedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where lastModifiedBy is greater than
         defaultSmsMessageFiltering(
@@ -919,7 +932,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByLastModifiedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where lastModifiedDate equals to
         defaultSmsMessageFiltering(
@@ -932,7 +945,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByLastModifiedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where lastModifiedDate in
         defaultSmsMessageFiltering(
@@ -945,7 +958,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void getAllSmsMessagesByLastModifiedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         // Get all the smsMessageList where lastModifiedDate is not null
         defaultSmsMessageFiltering("lastModifiedDate.specified=true", "lastModifiedDate.specified=false");
@@ -1017,7 +1030,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void putExistingSmsMessage() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1118,7 +1131,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void partialUpdateSmsMessageWithPatch() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1127,15 +1140,13 @@ public class SmsMessageResourceIT {
         partialUpdatedSmsMessage.setId(smsMessage.getId());
 
         partialUpdatedSmsMessage
-            .title(UPDATED_TITLE)
+            .sendType(UPDATED_SEND_TYPE)
             .receiver(UPDATED_RECEIVER)
             .params(UPDATED_PARAMS)
-            .sendTime(UPDATED_SEND_TIME)
-            .retryNum(UPDATED_RETRY_NUM)
             .failResult(UPDATED_FAIL_RESULT)
             .remark(UPDATED_REMARK)
-            .createdBy(UPDATED_CREATED_BY)
-            .createdDate(UPDATED_CREATED_DATE);
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restSmsMessageMockMvc
             .perform(
@@ -1158,7 +1169,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void fullUpdateSmsMessageWithPatch() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1261,7 +1272,7 @@ public class SmsMessageResourceIT {
     @Transactional
     void deleteSmsMessage() throws Exception {
         // Initialize the database
-        smsMessageRepository.save(smsMessage);
+        insertedSmsMessage = smsMessageRepository.saveAndGet(smsMessage);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

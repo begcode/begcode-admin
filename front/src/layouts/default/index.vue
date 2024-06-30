@@ -16,7 +16,6 @@
 <script lang="ts" setup>
 import { computed, unref } from 'vue';
 import { Layout } from 'ant-design-vue';
-import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
 
 import LayoutHeader from './header/index.vue';
 import LayoutContent from './content/index.vue';
@@ -25,10 +24,8 @@ import LayoutMultipleHeader from './header/MultipleHeader.vue';
 
 import { useHeaderSetting } from '@/hooks/setting/useHeaderSetting';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
-import { useDesign } from '@begcode/components';
+import { useDesign, createAsyncComponent, useAppInject } from '@begcode/components';
 import { useLockPage } from '@/hooks/web/useLockPage';
-
-import { useAppInject } from '@begcode/components';
 
 import { useMultipleTabSetting } from '@/hooks/setting/useMultipleTabSetting';
 

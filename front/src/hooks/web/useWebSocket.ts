@@ -34,6 +34,8 @@ export function connectWebSocket(url: string) {
     if (ws != null) {
       ws.onerror = onError;
       ws.onmessage = onMessage;
+      ws.onopen = onOpen;
+      ws.onclose = onClose;
     }
   }
 }
@@ -53,6 +55,9 @@ function onError(e) {
 function onMessage(e) {
   console.debug('[WebSocket] -----接收消息-------', e.data);
   try {
+    if (e === 'ping') {
+      return;
+    }
     const data = JSON.parse(e.data);
     for (const callback of listeners.keys()) {
       try {

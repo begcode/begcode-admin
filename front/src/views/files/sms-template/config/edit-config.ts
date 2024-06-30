@@ -42,7 +42,7 @@ const fields = (): FormSchema[] => {
       field: 'sendType',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择通知类型', options: getEnumDict('MessageSendType'), style: 'width: 100%' };
+        return { placeholder: '请选择通知类型', options: getEnumDict('MessageSendType'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },
@@ -65,7 +65,7 @@ const fields = (): FormSchema[] => {
       field: 'type',
       component: 'Select',
       componentProps: () => {
-        return { placeholder: '请选择模板类型', options: getEnumDict('SmsTemplateType'), style: 'width: 100%' };
+        return { placeholder: '请选择模板类型', options: getEnumDict('SmsTemplateType'), showSearch: true, style: 'width: 100%' };
       },
       rules: [],
     },

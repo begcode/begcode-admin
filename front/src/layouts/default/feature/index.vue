@@ -10,11 +10,10 @@ import { BackTop } from 'ant-design-vue';
 
 import { useRootSetting } from '@/hooks/setting/useRootSetting';
 import { useHeaderSetting } from '@/hooks/setting/useHeaderSetting';
-import { useDesign } from '@begcode/components';
+import { useDesign, createAsyncComponent } from '@begcode/components';
 import { useUserStoreWithOut } from '@/store/modules/user';
 
 import { SettingButtonPositionEnum } from '@/enums/appEnum';
-import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
 
 import SessionTimeoutLogin from '@/views/account/login/SessionTimeoutLogin.vue';
 import { useMultipleTabSetting } from '@/hooks/setting/useMultipleTabSetting';

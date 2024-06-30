@@ -24,6 +24,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -108,6 +109,8 @@ public class SmsTemplateResourceIT {
 
     private SmsTemplate smsTemplate;
 
+    private SmsTemplate insertedSmsTemplate;
+
     /**
      * Create an entity for this test.
      *
@@ -159,6 +162,14 @@ public class SmsTemplateResourceIT {
         smsTemplate = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedSmsTemplate != null) {
+            smsTemplateRepository.deleteById(insertedSmsTemplate.getId());
+            insertedSmsTemplate = null;
+        }
+    }
+
     @Test
     @Transactional
     void createSmsTemplate() throws Exception {
@@ -179,6 +190,8 @@ public class SmsTemplateResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedSmsTemplate = smsTemplateMapper.toEntity(returnedSmsTemplateDTO);
         assertSmsTemplateUpdatableFieldsEquals(returnedSmsTemplate, getPersistedSmsTemplate(returnedSmsTemplate));
+
+        insertedSmsTemplate = returnedSmsTemplate;
     }
 
     @Test
@@ -203,7 +216,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplates() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList
         restSmsTemplateMockMvc
@@ -246,7 +259,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getSmsTemplate() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get the smsTemplate
         restSmsTemplateMockMvc
@@ -272,7 +285,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getSmsTemplatesByIdFiltering() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         Long id = smsTemplate.getId();
 
@@ -287,7 +300,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where name equals to
         defaultSmsTemplateFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
@@ -297,7 +310,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByNameIsInShouldWork() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where name in
         defaultSmsTemplateFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
@@ -307,7 +320,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where name is not null
         defaultSmsTemplateFiltering("name.specified=true", "name.specified=false");
@@ -317,7 +330,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByNameContainsSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where name contains
         defaultSmsTemplateFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
@@ -327,7 +340,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByNameNotContainsSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where name does not contain
         defaultSmsTemplateFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
@@ -337,7 +350,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByCodeIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where code equals to
         defaultSmsTemplateFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
@@ -347,7 +360,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByCodeIsInShouldWork() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where code in
         defaultSmsTemplateFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
@@ -357,7 +370,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByCodeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where code is not null
         defaultSmsTemplateFiltering("code.specified=true", "code.specified=false");
@@ -367,7 +380,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByCodeContainsSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where code contains
         defaultSmsTemplateFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
@@ -377,7 +390,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByCodeNotContainsSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where code does not contain
         defaultSmsTemplateFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
@@ -387,7 +400,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesBySendTypeIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where sendType equals to
         defaultSmsTemplateFiltering("sendType.equals=" + DEFAULT_SEND_TYPE, "sendType.equals=" + UPDATED_SEND_TYPE);
@@ -397,7 +410,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesBySendTypeIsInShouldWork() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where sendType in
         defaultSmsTemplateFiltering("sendType.in=" + DEFAULT_SEND_TYPE + "," + UPDATED_SEND_TYPE, "sendType.in=" + UPDATED_SEND_TYPE);
@@ -407,7 +420,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesBySendTypeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where sendType is not null
         defaultSmsTemplateFiltering("sendType.specified=true", "sendType.specified=false");
@@ -417,7 +430,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByContentIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where content equals to
         defaultSmsTemplateFiltering("content.equals=" + DEFAULT_CONTENT, "content.equals=" + UPDATED_CONTENT);
@@ -427,7 +440,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByContentIsInShouldWork() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where content in
         defaultSmsTemplateFiltering("content.in=" + DEFAULT_CONTENT + "," + UPDATED_CONTENT, "content.in=" + UPDATED_CONTENT);
@@ -437,7 +450,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByContentIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where content is not null
         defaultSmsTemplateFiltering("content.specified=true", "content.specified=false");
@@ -447,7 +460,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByContentContainsSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where content contains
         defaultSmsTemplateFiltering("content.contains=" + DEFAULT_CONTENT, "content.contains=" + UPDATED_CONTENT);
@@ -457,7 +470,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByContentNotContainsSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where content does not contain
         defaultSmsTemplateFiltering("content.doesNotContain=" + UPDATED_CONTENT, "content.doesNotContain=" + DEFAULT_CONTENT);
@@ -467,7 +480,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByTestJsonIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where testJson equals to
         defaultSmsTemplateFiltering("testJson.equals=" + DEFAULT_TEST_JSON, "testJson.equals=" + UPDATED_TEST_JSON);
@@ -477,7 +490,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByTestJsonIsInShouldWork() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where testJson in
         defaultSmsTemplateFiltering("testJson.in=" + DEFAULT_TEST_JSON + "," + UPDATED_TEST_JSON, "testJson.in=" + UPDATED_TEST_JSON);
@@ -487,7 +500,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByTestJsonIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where testJson is not null
         defaultSmsTemplateFiltering("testJson.specified=true", "testJson.specified=false");
@@ -497,7 +510,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByTestJsonContainsSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where testJson contains
         defaultSmsTemplateFiltering("testJson.contains=" + DEFAULT_TEST_JSON, "testJson.contains=" + UPDATED_TEST_JSON);
@@ -507,7 +520,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByTestJsonNotContainsSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where testJson does not contain
         defaultSmsTemplateFiltering("testJson.doesNotContain=" + UPDATED_TEST_JSON, "testJson.doesNotContain=" + DEFAULT_TEST_JSON);
@@ -517,7 +530,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByTypeIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where type equals to
         defaultSmsTemplateFiltering("type.equals=" + DEFAULT_TYPE, "type.equals=" + UPDATED_TYPE);
@@ -527,7 +540,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByTypeIsInShouldWork() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where type in
         defaultSmsTemplateFiltering("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE, "type.in=" + UPDATED_TYPE);
@@ -537,7 +550,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByTypeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where type is not null
         defaultSmsTemplateFiltering("type.specified=true", "type.specified=false");
@@ -547,7 +560,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByRemarkIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where remark equals to
         defaultSmsTemplateFiltering("remark.equals=" + DEFAULT_REMARK, "remark.equals=" + UPDATED_REMARK);
@@ -557,7 +570,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByRemarkIsInShouldWork() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where remark in
         defaultSmsTemplateFiltering("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK, "remark.in=" + UPDATED_REMARK);
@@ -567,7 +580,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByRemarkIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where remark is not null
         defaultSmsTemplateFiltering("remark.specified=true", "remark.specified=false");
@@ -577,7 +590,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByRemarkContainsSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where remark contains
         defaultSmsTemplateFiltering("remark.contains=" + DEFAULT_REMARK, "remark.contains=" + UPDATED_REMARK);
@@ -587,7 +600,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByRemarkNotContainsSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where remark does not contain
         defaultSmsTemplateFiltering("remark.doesNotContain=" + UPDATED_REMARK, "remark.doesNotContain=" + DEFAULT_REMARK);
@@ -597,7 +610,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByEnabledIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where enabled equals to
         defaultSmsTemplateFiltering("enabled.equals=" + DEFAULT_ENABLED, "enabled.equals=" + UPDATED_ENABLED);
@@ -607,7 +620,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByEnabledIsInShouldWork() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where enabled in
         defaultSmsTemplateFiltering("enabled.in=" + DEFAULT_ENABLED + "," + UPDATED_ENABLED, "enabled.in=" + UPDATED_ENABLED);
@@ -617,7 +630,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByEnabledIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where enabled is not null
         defaultSmsTemplateFiltering("enabled.specified=true", "enabled.specified=false");
@@ -627,7 +640,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByCreatedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where createdBy equals to
         defaultSmsTemplateFiltering("createdBy.equals=" + DEFAULT_CREATED_BY, "createdBy.equals=" + UPDATED_CREATED_BY);
@@ -637,7 +650,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByCreatedByIsInShouldWork() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where createdBy in
         defaultSmsTemplateFiltering("createdBy.in=" + DEFAULT_CREATED_BY + "," + UPDATED_CREATED_BY, "createdBy.in=" + UPDATED_CREATED_BY);
@@ -647,7 +660,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByCreatedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where createdBy is not null
         defaultSmsTemplateFiltering("createdBy.specified=true", "createdBy.specified=false");
@@ -657,7 +670,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByCreatedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where createdBy is greater than or equal to
         defaultSmsTemplateFiltering(
@@ -670,7 +683,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByCreatedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where createdBy is less than or equal to
         defaultSmsTemplateFiltering("createdBy.lessThanOrEqual=" + DEFAULT_CREATED_BY, "createdBy.lessThanOrEqual=" + SMALLER_CREATED_BY);
@@ -680,7 +693,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByCreatedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where createdBy is less than
         defaultSmsTemplateFiltering("createdBy.lessThan=" + UPDATED_CREATED_BY, "createdBy.lessThan=" + DEFAULT_CREATED_BY);
@@ -690,7 +703,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByCreatedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where createdBy is greater than
         defaultSmsTemplateFiltering("createdBy.greaterThan=" + SMALLER_CREATED_BY, "createdBy.greaterThan=" + DEFAULT_CREATED_BY);
@@ -700,7 +713,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByCreatedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where createdDate equals to
         defaultSmsTemplateFiltering("createdDate.equals=" + DEFAULT_CREATED_DATE, "createdDate.equals=" + UPDATED_CREATED_DATE);
@@ -710,7 +723,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByCreatedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where createdDate in
         defaultSmsTemplateFiltering(
@@ -723,7 +736,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByCreatedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where createdDate is not null
         defaultSmsTemplateFiltering("createdDate.specified=true", "createdDate.specified=false");
@@ -733,7 +746,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByLastModifiedByIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where lastModifiedBy equals to
         defaultSmsTemplateFiltering(
@@ -746,7 +759,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByLastModifiedByIsInShouldWork() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where lastModifiedBy in
         defaultSmsTemplateFiltering(
@@ -759,7 +772,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByLastModifiedByIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where lastModifiedBy is not null
         defaultSmsTemplateFiltering("lastModifiedBy.specified=true", "lastModifiedBy.specified=false");
@@ -769,7 +782,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByLastModifiedByIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where lastModifiedBy is greater than or equal to
         defaultSmsTemplateFiltering(
@@ -782,7 +795,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByLastModifiedByIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where lastModifiedBy is less than or equal to
         defaultSmsTemplateFiltering(
@@ -795,7 +808,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByLastModifiedByIsLessThanSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where lastModifiedBy is less than
         defaultSmsTemplateFiltering(
@@ -808,7 +821,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByLastModifiedByIsGreaterThanSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where lastModifiedBy is greater than
         defaultSmsTemplateFiltering(
@@ -821,7 +834,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByLastModifiedDateIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where lastModifiedDate equals to
         defaultSmsTemplateFiltering(
@@ -834,7 +847,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByLastModifiedDateIsInShouldWork() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where lastModifiedDate in
         defaultSmsTemplateFiltering(
@@ -847,7 +860,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void getAllSmsTemplatesByLastModifiedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         // Get all the smsTemplateList where lastModifiedDate is not null
         defaultSmsTemplateFiltering("lastModifiedDate.specified=true", "lastModifiedDate.specified=false");
@@ -932,7 +945,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void putExistingSmsTemplate() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1032,7 +1045,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void partialUpdateSmsTemplateWithPatch() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1040,12 +1053,7 @@ public class SmsTemplateResourceIT {
         SmsTemplate partialUpdatedSmsTemplate = new SmsTemplate();
         partialUpdatedSmsTemplate.setId(smsTemplate.getId());
 
-        partialUpdatedSmsTemplate
-            .name(UPDATED_NAME)
-            .remark(UPDATED_REMARK)
-            .enabled(UPDATED_ENABLED)
-            .createdDate(UPDATED_CREATED_DATE)
-            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
+        partialUpdatedSmsTemplate.type(UPDATED_TYPE).lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restSmsTemplateMockMvc
             .perform(
@@ -1068,7 +1076,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void fullUpdateSmsTemplateWithPatch() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -1170,7 +1178,7 @@ public class SmsTemplateResourceIT {
     @Transactional
     void deleteSmsTemplate() throws Exception {
         // Initialize the database
-        smsTemplateRepository.save(smsTemplate);
+        insertedSmsTemplate = smsTemplateRepository.saveAndGet(smsTemplate);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

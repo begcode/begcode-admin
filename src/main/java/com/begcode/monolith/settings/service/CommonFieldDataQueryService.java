@@ -38,7 +38,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class CommonFieldDataQueryService implements QueryService<CommonFieldData> {
 
-    private final Logger log = LoggerFactory.getLogger(CommonFieldDataQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(CommonFieldDataQueryService.class);
 
     protected final CommonFieldDataRepository commonFieldDataRepository;
 

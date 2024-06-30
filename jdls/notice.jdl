@@ -160,6 +160,7 @@ enum PriorityLevel {
 @entityPackage(system)
 @addCustomMethod(service)
 @skipMenu
+@skipWebButton(listEdit-listDelete-listAdd)
 @moduleName(system)
 entity AnnouncementRecord {
   anntId Long /** 通告ID */

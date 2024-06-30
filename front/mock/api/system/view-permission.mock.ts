@@ -18,6 +18,14 @@ const getById = id => {
   return allData.find(item => item.id === id);
 };
 
+const updateById = (id, data) => {
+  const result = allData.find(item => item.id === id);
+  if (result) {
+    Object.assign(result, JSON.parse(data));
+  }
+  return result;
+};
+
 const getIdFromUrl = url => {
   const regExp = new RegExp(`${baseApiUrl}/`.replace('/', '\\/') + '(?<id>\\d+)');
   const match = regExp.exec(url);
@@ -29,6 +37,18 @@ const getIdFromUrl = url => {
 
 export function setViewPermissionMock(mock) {
   mock.onGet(`${baseApiUrl}`).reply(config => {
+    fetchData();
+    const { params = '' } = config;
+    const { page = '0', size = '15' } = qs.parse(params);
+    return [200, resultPageSuccess(Number(page), Number(size), allData)];
+  });
+  mock.onGet(`${baseApiUrl}/tree`).reply(config => {
+    fetchData();
+    const { params = '' } = config;
+    const { page = '0', size = '15' } = qs.parse(params);
+    return [200, resultPageSuccess(Number(page), Number(size), allData)];
+  });
+  mock.onGet(`${baseApiUrl}/\\d+/tree`).reply(config => {
     fetchData();
     const { params = '' } = config;
     const { page = '0', size = '15' } = qs.parse(params);
@@ -58,7 +78,7 @@ export function setViewPermissionMock(mock) {
     const id = getIdFromUrl(url);
     if (id) {
       console.log('id:', id);
-      const entity = getById(id);
+      const entity = updateById(id, data);
       if (entity) {
         console.log('entity:', entity);
         return [200, entity];
@@ -81,5 +101,24 @@ export function setViewPermissionMock(mock) {
       return [204, {}];
     }
     return [404, {}];
+  });
+  mock.onGet(`${baseApiUrl}/stats`).reply(config => {
+    fetchData();
+    console.log('config', config);
+    return [200, { id_count: allData.length }];
+  });
+  mock.onDelete(`${baseApiUrl}`).reply(config => {
+    fetchData();
+    const { data = '{}' } = config;
+    const { ids = [] } = JSON.parse(data);
+    const newData = allData.filter(item => !ids.includes(item.id));
+    allData.length = 0;
+    allData.push(...newData);
+    return [204, {}];
+  });
+  mock.onPut(new RegExp(`${baseApiUrl}/relations/\\w+`)).reply(config => {
+    fetchData();
+    console.log('config:', config);
+    return [200, {}];
   });
 }

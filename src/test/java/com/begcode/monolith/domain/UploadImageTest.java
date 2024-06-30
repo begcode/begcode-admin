@@ -25,7 +25,7 @@ class UploadImageTest {
     }
 
     @Test
-    void categoryTest() throws Exception {
+    void categoryTest() {
         UploadImage uploadImage = getUploadImageRandomSampleGenerator();
         ResourceCategory resourceCategoryBack = getResourceCategoryRandomSampleGenerator();
 

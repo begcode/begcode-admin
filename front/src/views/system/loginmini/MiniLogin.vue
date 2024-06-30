@@ -166,6 +166,8 @@
     </div>
     <!-- 第三方登录相关弹框 -->
     <ThirdModal ref="thirdModalRef"></ThirdModal>
+    <!-- 图片验证码弹窗 -->
+    <CaptchaModal @register="captchaRegisterModal" @ok="getLoginCode" />
   </div>
 </template>
 <script lang="ts" setup>
@@ -185,12 +187,18 @@ import MiniCodelogin from './MiniCodelogin.vue';
 import logoImg from '@/assets/loginmini/icon/jeecg_logo.png';
 import adTextImg from '@/assets/loginmini/icon/jeecg_ad_text.png';
 import { AppLocalePicker, AppDarkModeToggle } from '@/components/Application';
-import { useDesign } from '@begcode/components';
-import { useAppInject } from '@begcode/components';
+import { useDesign, useAppInject, useModal, CaptchaModal } from '@begcode/components';
 import { GithubFilled, WechatFilled, DingtalkCircleFilled, createFromIconfontCN } from '@ant-design/icons-vue';
+import { ExceptionEnum } from '@/enums/exceptionEnum';
 
 defineOptions({
   name: 'LoginMini',
+});
+
+defineProps({
+  sessionTimeout: {
+    type: Boolean,
+  },
 });
 
 const IconFont = createFromIconfontCN({
@@ -240,12 +248,7 @@ const forgotRef = ref();
 const registerRef = ref();
 const loginLoading = ref<boolean>(false);
 const { getIsMobile } = useAppInject();
-
-defineProps({
-  sessionTimeout: {
-    type: Boolean,
-  },
-});
+const [captchaRegisterModal, { openModal: openCaptchaModal }] = useModal();
 
 /**
  * 获取验证码
@@ -363,7 +366,11 @@ async function getLoginCode() {
     createMessage.warn(t('sys.login.mobilePlaceholder'));
     return;
   }
-  const result = await getImageCaptcha({ mobile: phoneFormData.mobile, smsmode: SmsEnum.FORGET_PASSWORD });
+  const result = await getImageCaptcha({ mobile: phoneFormData.mobile, smsmode: SmsEnum.FORGET_PASSWORD }).catch(res => {
+    if (res.code === ExceptionEnum.PHONE_SMS_FAIL_CODE) {
+      openCaptchaModal(true, {});
+    }
+  });
   if (result) {
     const TIME_COUNT = 60;
     if (!unref(timer)) {

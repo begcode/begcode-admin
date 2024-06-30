@@ -8,10 +8,8 @@
 import { defineComponent, ref } from 'vue';
 import { Tooltip } from 'ant-design-vue';
 import { LockOutlined } from '@ant-design/icons-vue';
-import { Icon, useModal } from '@begcode/components';
-import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
+import { Icon, useModal, createAsyncComponent, getRefPromise } from '@begcode/components';
 import { useI18n } from '@/hooks/web/useI18n';
-import { getRefPromise } from '@begcode/components';
 
 export default defineComponent({
   name: 'LockScreen',

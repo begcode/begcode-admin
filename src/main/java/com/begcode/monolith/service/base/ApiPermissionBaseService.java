@@ -37,7 +37,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 public class ApiPermissionBaseService<R extends ApiPermissionRepository, E extends ApiPermission>
     extends BaseServiceImpl<ApiPermissionRepository, ApiPermission> {
 
-    private final Logger log = LoggerFactory.getLogger(ApiPermissionBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(ApiPermissionBaseService.class);
 
     private final List<String> relationCacheNames = List.of(
         com.begcode.monolith.domain.ApiPermission.class.getName() + ".parent",

@@ -26,7 +26,7 @@ class FormConfigTest {
     }
 
     @Test
-    void businessTypeTest() throws Exception {
+    void businessTypeTest() {
         FormConfig formConfig = getFormConfigRandomSampleGenerator();
         BusinessType businessTypeBack = getBusinessTypeRandomSampleGenerator();
 

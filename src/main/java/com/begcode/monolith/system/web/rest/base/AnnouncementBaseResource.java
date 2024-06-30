@@ -60,7 +60,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class AnnouncementBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(AnnouncementBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(AnnouncementBaseResource.class);
 
     protected static final String ENTITY_NAME = "systemAnnouncement";
 

@@ -40,7 +40,7 @@ import tech.jhipster.service.mybatis.QueryService;
 @Service
 public class ResourceCategoryQueryService implements QueryService<ResourceCategory> {
 
-    private final Logger log = LoggerFactory.getLogger(ResourceCategoryQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(ResourceCategoryQueryService.class);
 
     protected final ResourceCategoryRepository resourceCategoryRepository;
 

@@ -17,6 +17,7 @@ import com.begcode.monolith.system.service.mapper.SmsSupplierMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,8 @@ public class SmsSupplierResourceIT {
 
     private SmsSupplier smsSupplier;
 
+    private SmsSupplier insertedSmsSupplier;
+
     /**
      * Create an entity for this test.
      *
@@ -105,6 +108,14 @@ public class SmsSupplierResourceIT {
         smsSupplier = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedSmsSupplier != null) {
+            smsSupplierRepository.deleteById(insertedSmsSupplier.getId());
+            insertedSmsSupplier = null;
+        }
+    }
+
     @Test
     @Transactional
     void createSmsSupplier() throws Exception {
@@ -125,6 +136,8 @@ public class SmsSupplierResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedSmsSupplier = smsSupplierMapper.toEntity(returnedSmsSupplierDTO);
         assertSmsSupplierUpdatableFieldsEquals(returnedSmsSupplier, getPersistedSmsSupplier(returnedSmsSupplier));
+
+        insertedSmsSupplier = returnedSmsSupplier;
     }
 
     @Test
@@ -149,7 +162,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliers() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList
         restSmsSupplierMockMvc
@@ -168,7 +181,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getSmsSupplier() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get the smsSupplier
         restSmsSupplierMockMvc
@@ -187,7 +200,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getSmsSuppliersByIdFiltering() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         Long id = smsSupplier.getId();
 
@@ -202,7 +215,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersByProviderIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where provider equals to
         defaultSmsSupplierFiltering("provider.equals=" + DEFAULT_PROVIDER, "provider.equals=" + UPDATED_PROVIDER);
@@ -212,7 +225,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersByProviderIsInShouldWork() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where provider in
         defaultSmsSupplierFiltering("provider.in=" + DEFAULT_PROVIDER + "," + UPDATED_PROVIDER, "provider.in=" + UPDATED_PROVIDER);
@@ -222,7 +235,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersByProviderIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where provider is not null
         defaultSmsSupplierFiltering("provider.specified=true", "provider.specified=false");
@@ -232,7 +245,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersByConfigDataIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where configData equals to
         defaultSmsSupplierFiltering("configData.equals=" + DEFAULT_CONFIG_DATA, "configData.equals=" + UPDATED_CONFIG_DATA);
@@ -242,7 +255,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersByConfigDataIsInShouldWork() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where configData in
         defaultSmsSupplierFiltering(
@@ -255,7 +268,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersByConfigDataIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where configData is not null
         defaultSmsSupplierFiltering("configData.specified=true", "configData.specified=false");
@@ -265,7 +278,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersByConfigDataContainsSomething() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where configData contains
         defaultSmsSupplierFiltering("configData.contains=" + DEFAULT_CONFIG_DATA, "configData.contains=" + UPDATED_CONFIG_DATA);
@@ -275,7 +288,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersByConfigDataNotContainsSomething() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where configData does not contain
         defaultSmsSupplierFiltering("configData.doesNotContain=" + UPDATED_CONFIG_DATA, "configData.doesNotContain=" + DEFAULT_CONFIG_DATA);
@@ -285,7 +298,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersBySignNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where signName equals to
         defaultSmsSupplierFiltering("signName.equals=" + DEFAULT_SIGN_NAME, "signName.equals=" + UPDATED_SIGN_NAME);
@@ -295,7 +308,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersBySignNameIsInShouldWork() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where signName in
         defaultSmsSupplierFiltering("signName.in=" + DEFAULT_SIGN_NAME + "," + UPDATED_SIGN_NAME, "signName.in=" + UPDATED_SIGN_NAME);
@@ -305,7 +318,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersBySignNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where signName is not null
         defaultSmsSupplierFiltering("signName.specified=true", "signName.specified=false");
@@ -315,7 +328,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersBySignNameContainsSomething() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where signName contains
         defaultSmsSupplierFiltering("signName.contains=" + DEFAULT_SIGN_NAME, "signName.contains=" + UPDATED_SIGN_NAME);
@@ -325,7 +338,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersBySignNameNotContainsSomething() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where signName does not contain
         defaultSmsSupplierFiltering("signName.doesNotContain=" + UPDATED_SIGN_NAME, "signName.doesNotContain=" + DEFAULT_SIGN_NAME);
@@ -335,7 +348,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersByRemarkIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where remark equals to
         defaultSmsSupplierFiltering("remark.equals=" + DEFAULT_REMARK, "remark.equals=" + UPDATED_REMARK);
@@ -345,7 +358,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersByRemarkIsInShouldWork() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where remark in
         defaultSmsSupplierFiltering("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK, "remark.in=" + UPDATED_REMARK);
@@ -355,7 +368,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersByRemarkIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where remark is not null
         defaultSmsSupplierFiltering("remark.specified=true", "remark.specified=false");
@@ -365,7 +378,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersByRemarkContainsSomething() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where remark contains
         defaultSmsSupplierFiltering("remark.contains=" + DEFAULT_REMARK, "remark.contains=" + UPDATED_REMARK);
@@ -375,7 +388,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersByRemarkNotContainsSomething() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where remark does not contain
         defaultSmsSupplierFiltering("remark.doesNotContain=" + UPDATED_REMARK, "remark.doesNotContain=" + DEFAULT_REMARK);
@@ -385,7 +398,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersByEnabledIsEqualToSomething() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where enabled equals to
         defaultSmsSupplierFiltering("enabled.equals=" + DEFAULT_ENABLED, "enabled.equals=" + UPDATED_ENABLED);
@@ -395,7 +408,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersByEnabledIsInShouldWork() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where enabled in
         defaultSmsSupplierFiltering("enabled.in=" + DEFAULT_ENABLED + "," + UPDATED_ENABLED, "enabled.in=" + UPDATED_ENABLED);
@@ -405,7 +418,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void getAllSmsSuppliersByEnabledIsNullOrNotNull() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         // Get all the smsSupplierList where enabled is not null
         defaultSmsSupplierFiltering("enabled.specified=true", "enabled.specified=false");
@@ -469,7 +482,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void putExistingSmsSupplier() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -562,7 +575,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void partialUpdateSmsSupplierWithPatch() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -597,7 +610,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void fullUpdateSmsSupplierWithPatch() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -692,7 +705,7 @@ public class SmsSupplierResourceIT {
     @Transactional
     void deleteSmsSupplier() throws Exception {
         // Initialize the database
-        smsSupplierRepository.save(smsSupplier);
+        insertedSmsSupplier = smsSupplierRepository.saveAndGet(smsSupplier);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

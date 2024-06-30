@@ -32,7 +32,7 @@ const fields: DescItem[] = [
     field: 'type',
     format: (value, _data) => {
       const { getEnumDict } = useI18n();
-      return getEnumDict('ApiPermissionType').find(item => item.value === value) || value;
+      return (getEnumDict('ApiPermissionType').find(item => item.value === value) || { value: value, label: value }).label;
     },
   },
   {
@@ -48,7 +48,7 @@ const fields: DescItem[] = [
     field: 'status',
     format: (value, _data) => {
       const { getEnumDict } = useI18n();
-      return getEnumDict('ApiPermissionState').find(item => item.value === value) || value;
+      return (getEnumDict('ApiPermissionState').find(item => item.value === value) || { value: value, label: value }).label;
     },
   },
   {

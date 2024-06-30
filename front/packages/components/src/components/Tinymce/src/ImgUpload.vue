@@ -9,19 +9,18 @@
       :headers="headers"
       accept=".jpg,.jpeg,.gif,.png,.webp"
     >
-      <Button type="primary" v-bind="{ ...getButtonProps }">
-        {{ t('component.upload.imgUpload') }}
-      </Button>
+      <Icon icon="ant-design:picture-twotone" :size="24" />
     </Upload>
   </div>
 </template>
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { Upload, Button } from 'ant-design-vue';
+import { Upload } from 'ant-design-vue';
 import { useDesign } from '@/hooks/web/useDesign';
 import { useI18n } from '@/hooks/web/useI18nOut';
 import { useUpload } from '@/hooks/web/useUploadOut';
 import { getFileAccessHttpUrl } from '@/utils';
+import { Icon } from '@/components/Icon';
 
 defineOptions({ name: 'TinymceImageUpload' });
 
@@ -88,10 +87,16 @@ function handleChange(info: Record<string, any>) {
 </script>
 <style scoped>
 .vben-tinymce-img-upload {
-  position: absolute;
-  top: 4px;
-  right: 10px;
-  z-index: 20;
+  margin: 0 3px;
+}
+
+.vben-tinymce-img-upload .ant-btn {
+  padding: 2px 4px;
+  font-size: 12px;
+  height: 24px;
+}
+.vben-tinymce-img-upload .ant-btn.is-disabled {
+  color: rgba(255, 255, 255, 0.5);
 }
 .vben-tinymce-img-upload.fullscreen {
   position: fixed;

@@ -16,6 +16,7 @@ import com.begcode.monolith.service.mapper.BusinessTypeMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,8 @@ public class BusinessTypeResourceIT {
 
     private BusinessType businessType;
 
+    private BusinessType insertedBusinessType;
+
     /**
      * Create an entity for this test.
      *
@@ -99,6 +102,14 @@ public class BusinessTypeResourceIT {
         businessType = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedBusinessType != null) {
+            businessTypeRepository.deleteById(insertedBusinessType.getId());
+            insertedBusinessType = null;
+        }
+    }
+
     @Test
     @Transactional
     void createBusinessType() throws Exception {
@@ -119,6 +130,8 @@ public class BusinessTypeResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedBusinessType = businessTypeMapper.toEntity(returnedBusinessTypeDTO);
         assertBusinessTypeUpdatableFieldsEquals(returnedBusinessType, getPersistedBusinessType(returnedBusinessType));
+
+        insertedBusinessType = returnedBusinessType;
     }
 
     @Test
@@ -143,7 +156,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypes() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList
         restBusinessTypeMockMvc
@@ -161,7 +174,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getBusinessType() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get the businessType
         restBusinessTypeMockMvc
@@ -179,7 +192,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getBusinessTypesByIdFiltering() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         Long id = businessType.getId();
 
@@ -194,7 +207,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where name equals to
         defaultBusinessTypeFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
@@ -204,7 +217,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByNameIsInShouldWork() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where name in
         defaultBusinessTypeFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
@@ -214,7 +227,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where name is not null
         defaultBusinessTypeFiltering("name.specified=true", "name.specified=false");
@@ -224,7 +237,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByNameContainsSomething() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where name contains
         defaultBusinessTypeFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
@@ -234,7 +247,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByNameNotContainsSomething() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where name does not contain
         defaultBusinessTypeFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
@@ -244,7 +257,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByCodeIsEqualToSomething() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where code equals to
         defaultBusinessTypeFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
@@ -254,7 +267,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByCodeIsInShouldWork() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where code in
         defaultBusinessTypeFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
@@ -264,7 +277,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByCodeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where code is not null
         defaultBusinessTypeFiltering("code.specified=true", "code.specified=false");
@@ -274,7 +287,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByCodeContainsSomething() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where code contains
         defaultBusinessTypeFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
@@ -284,7 +297,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByCodeNotContainsSomething() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where code does not contain
         defaultBusinessTypeFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
@@ -294,7 +307,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByDescriptionIsEqualToSomething() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where description equals to
         defaultBusinessTypeFiltering("description.equals=" + DEFAULT_DESCRIPTION, "description.equals=" + UPDATED_DESCRIPTION);
@@ -304,7 +317,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByDescriptionIsInShouldWork() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where description in
         defaultBusinessTypeFiltering(
@@ -317,7 +330,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByDescriptionIsNullOrNotNull() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where description is not null
         defaultBusinessTypeFiltering("description.specified=true", "description.specified=false");
@@ -327,7 +340,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByDescriptionContainsSomething() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where description contains
         defaultBusinessTypeFiltering("description.contains=" + DEFAULT_DESCRIPTION, "description.contains=" + UPDATED_DESCRIPTION);
@@ -337,7 +350,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByDescriptionNotContainsSomething() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where description does not contain
         defaultBusinessTypeFiltering(
@@ -350,7 +363,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByIconIsEqualToSomething() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where icon equals to
         defaultBusinessTypeFiltering("icon.equals=" + DEFAULT_ICON, "icon.equals=" + UPDATED_ICON);
@@ -360,7 +373,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByIconIsInShouldWork() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where icon in
         defaultBusinessTypeFiltering("icon.in=" + DEFAULT_ICON + "," + UPDATED_ICON, "icon.in=" + UPDATED_ICON);
@@ -370,7 +383,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByIconIsNullOrNotNull() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where icon is not null
         defaultBusinessTypeFiltering("icon.specified=true", "icon.specified=false");
@@ -380,7 +393,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByIconContainsSomething() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where icon contains
         defaultBusinessTypeFiltering("icon.contains=" + DEFAULT_ICON, "icon.contains=" + UPDATED_ICON);
@@ -390,7 +403,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void getAllBusinessTypesByIconNotContainsSomething() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         // Get all the businessTypeList where icon does not contain
         defaultBusinessTypeFiltering("icon.doesNotContain=" + UPDATED_ICON, "icon.doesNotContain=" + DEFAULT_ICON);
@@ -453,7 +466,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void putExistingBusinessType() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -541,7 +554,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void partialUpdateBusinessTypeWithPatch() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -549,7 +562,7 @@ public class BusinessTypeResourceIT {
         BusinessType partialUpdatedBusinessType = new BusinessType();
         partialUpdatedBusinessType.setId(businessType.getId());
 
-        partialUpdatedBusinessType.name(UPDATED_NAME).description(UPDATED_DESCRIPTION);
+        partialUpdatedBusinessType.name(UPDATED_NAME);
 
         restBusinessTypeMockMvc
             .perform(
@@ -572,7 +585,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void fullUpdateBusinessTypeWithPatch() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -662,7 +675,7 @@ public class BusinessTypeResourceIT {
     @Transactional
     void deleteBusinessType() throws Exception {
         // Initialize the database
-        businessTypeRepository.save(businessType);
+        insertedBusinessType = businessTypeRepository.saveAndGet(businessType);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

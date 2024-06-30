@@ -2,12 +2,13 @@
   <div :class="prefixCls">
     <template v-for="color in colorList || []" :key="color">
       <span
-        @click="handleClick(color)"
+        @click="!isDisabledColor && handleClick(color)"
         :class="[
           `${prefixCls}__item`,
           {
             [`${prefixCls}__item--active`]: def === color,
             [`${prefixCls}__item--black`]: color == '#ffffff',
+            disabledColor: isDisabledColor,
           },
         ]"
         :style="{ background: color }"
@@ -19,12 +20,15 @@
 </template>
 <script lang="ts" setup>
 import type { PropType } from 'vue';
+import { watch, ref } from 'vue';
 import { CheckOutlined } from '@ant-design/icons-vue';
 
 import { useDesign } from '@begcode/components';
 
 import { baseHandler } from '../handler';
 import { HandlerEnum } from '../enum';
+import { useRootSetting } from '@/hooks/setting/useRootSetting';
+import { ThemeEnum } from '@/enums/appEnum';
 
 defineOptions({ name: 'ThemeColorPicker' });
 
@@ -41,7 +45,19 @@ const props = defineProps({
   },
 });
 
+const { getDarkMode } = useRootSetting();
+const isDisabledColor = ref(false);
+
 const { prefixCls } = useDesign('setting-theme-picker');
+
+watch(
+  () => getDarkMode.value,
+  newValue => {
+    isDisabledColor.value = props.event === 1 ? false : newValue === ThemeEnum.DARK;
+  },
+  { immediate: true },
+);
+
 function handleClick(color: string) {
   props.event && baseHandler(props.event, color);
 }
@@ -62,14 +78,16 @@ function handleClick(color: string) {
     cursor: pointer;
     border: 1px solid #ddd;
     border-radius: 2px;
+    &.disabledColor {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
 
     svg {
       display: none;
     }
 
     &--active {
-      border: 1px solid lighten(@primary-color, 10%);
-
       svg {
         display: inline-block;
         margin: 0 0 3px 3px;

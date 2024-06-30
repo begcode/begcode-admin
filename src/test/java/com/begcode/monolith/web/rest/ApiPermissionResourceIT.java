@@ -24,6 +24,7 @@ import com.begcode.monolith.service.mapper.ApiPermissionMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -94,6 +95,8 @@ public class ApiPermissionResourceIT {
 
     private ApiPermission apiPermission;
 
+    private ApiPermission insertedApiPermission;
+
     /**
      * Create an entity for this test.
      *
@@ -137,6 +140,14 @@ public class ApiPermissionResourceIT {
         apiPermission = createEntity();
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedApiPermission != null) {
+            apiPermissionRepository.deleteById(insertedApiPermission.getId());
+            insertedApiPermission = null;
+        }
+    }
+
     @Test
     @Transactional
     void createApiPermission() throws Exception {
@@ -157,6 +168,8 @@ public class ApiPermissionResourceIT {
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
         var returnedApiPermission = apiPermissionMapper.toEntity(returnedApiPermissionDTO);
         assertApiPermissionUpdatableFieldsEquals(returnedApiPermission, getPersistedApiPermission(returnedApiPermission));
+
+        insertedApiPermission = returnedApiPermission;
     }
 
     @Test
@@ -181,7 +194,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissions() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList
         restApiPermissionMockMvc
@@ -220,7 +233,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getApiPermission() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get the apiPermission
         restApiPermissionMockMvc
@@ -242,7 +255,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getApiPermissionsByIdFiltering() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         Long id = apiPermission.getId();
 
@@ -257,7 +270,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByServiceNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where serviceName equals to
         defaultApiPermissionFiltering("serviceName.equals=" + DEFAULT_SERVICE_NAME, "serviceName.equals=" + UPDATED_SERVICE_NAME);
@@ -267,7 +280,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByServiceNameIsInShouldWork() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where serviceName in
         defaultApiPermissionFiltering(
@@ -280,7 +293,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByServiceNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where serviceName is not null
         defaultApiPermissionFiltering("serviceName.specified=true", "serviceName.specified=false");
@@ -290,7 +303,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByServiceNameContainsSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where serviceName contains
         defaultApiPermissionFiltering("serviceName.contains=" + DEFAULT_SERVICE_NAME, "serviceName.contains=" + UPDATED_SERVICE_NAME);
@@ -300,7 +313,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByServiceNameNotContainsSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where serviceName does not contain
         defaultApiPermissionFiltering(
@@ -313,7 +326,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByNameIsEqualToSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where name equals to
         defaultApiPermissionFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
@@ -323,7 +336,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByNameIsInShouldWork() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where name in
         defaultApiPermissionFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
@@ -333,7 +346,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByNameIsNullOrNotNull() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where name is not null
         defaultApiPermissionFiltering("name.specified=true", "name.specified=false");
@@ -343,7 +356,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByNameContainsSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where name contains
         defaultApiPermissionFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
@@ -353,7 +366,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByNameNotContainsSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where name does not contain
         defaultApiPermissionFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
@@ -363,7 +376,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByCodeIsEqualToSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where code equals to
         defaultApiPermissionFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
@@ -373,7 +386,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByCodeIsInShouldWork() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where code in
         defaultApiPermissionFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
@@ -383,7 +396,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByCodeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where code is not null
         defaultApiPermissionFiltering("code.specified=true", "code.specified=false");
@@ -393,7 +406,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByCodeContainsSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where code contains
         defaultApiPermissionFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
@@ -403,7 +416,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByCodeNotContainsSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where code does not contain
         defaultApiPermissionFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
@@ -413,7 +426,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByDescriptionIsEqualToSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where description equals to
         defaultApiPermissionFiltering("description.equals=" + DEFAULT_DESCRIPTION, "description.equals=" + UPDATED_DESCRIPTION);
@@ -423,7 +436,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByDescriptionIsInShouldWork() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where description in
         defaultApiPermissionFiltering(
@@ -436,7 +449,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByDescriptionIsNullOrNotNull() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where description is not null
         defaultApiPermissionFiltering("description.specified=true", "description.specified=false");
@@ -446,7 +459,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByDescriptionContainsSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where description contains
         defaultApiPermissionFiltering("description.contains=" + DEFAULT_DESCRIPTION, "description.contains=" + UPDATED_DESCRIPTION);
@@ -456,7 +469,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByDescriptionNotContainsSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where description does not contain
         defaultApiPermissionFiltering(
@@ -469,7 +482,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByTypeIsEqualToSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where type equals to
         defaultApiPermissionFiltering("type.equals=" + DEFAULT_TYPE, "type.equals=" + UPDATED_TYPE);
@@ -479,7 +492,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByTypeIsInShouldWork() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where type in
         defaultApiPermissionFiltering("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE, "type.in=" + UPDATED_TYPE);
@@ -489,7 +502,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByTypeIsNullOrNotNull() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where type is not null
         defaultApiPermissionFiltering("type.specified=true", "type.specified=false");
@@ -499,7 +512,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByMethodIsEqualToSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where method equals to
         defaultApiPermissionFiltering("method.equals=" + DEFAULT_METHOD, "method.equals=" + UPDATED_METHOD);
@@ -509,7 +522,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByMethodIsInShouldWork() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where method in
         defaultApiPermissionFiltering("method.in=" + DEFAULT_METHOD + "," + UPDATED_METHOD, "method.in=" + UPDATED_METHOD);
@@ -519,7 +532,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByMethodIsNullOrNotNull() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where method is not null
         defaultApiPermissionFiltering("method.specified=true", "method.specified=false");
@@ -529,7 +542,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByMethodContainsSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where method contains
         defaultApiPermissionFiltering("method.contains=" + DEFAULT_METHOD, "method.contains=" + UPDATED_METHOD);
@@ -539,7 +552,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByMethodNotContainsSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where method does not contain
         defaultApiPermissionFiltering("method.doesNotContain=" + UPDATED_METHOD, "method.doesNotContain=" + DEFAULT_METHOD);
@@ -549,7 +562,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByUrlIsEqualToSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where url equals to
         defaultApiPermissionFiltering("url.equals=" + DEFAULT_URL, "url.equals=" + UPDATED_URL);
@@ -559,7 +572,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByUrlIsInShouldWork() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where url in
         defaultApiPermissionFiltering("url.in=" + DEFAULT_URL + "," + UPDATED_URL, "url.in=" + UPDATED_URL);
@@ -569,7 +582,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByUrlIsNullOrNotNull() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where url is not null
         defaultApiPermissionFiltering("url.specified=true", "url.specified=false");
@@ -579,7 +592,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByUrlContainsSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where url contains
         defaultApiPermissionFiltering("url.contains=" + DEFAULT_URL, "url.contains=" + UPDATED_URL);
@@ -589,7 +602,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByUrlNotContainsSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where url does not contain
         defaultApiPermissionFiltering("url.doesNotContain=" + UPDATED_URL, "url.doesNotContain=" + DEFAULT_URL);
@@ -599,7 +612,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByStatusIsEqualToSomething() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where status equals to
         defaultApiPermissionFiltering("status.equals=" + DEFAULT_STATUS, "status.equals=" + UPDATED_STATUS);
@@ -609,7 +622,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByStatusIsInShouldWork() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where status in
         defaultApiPermissionFiltering("status.in=" + DEFAULT_STATUS + "," + UPDATED_STATUS, "status.in=" + UPDATED_STATUS);
@@ -619,7 +632,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void getAllApiPermissionsByStatusIsNullOrNotNull() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         // Get all the apiPermissionList where status is not null
         defaultApiPermissionFiltering("status.specified=true", "status.specified=false");
@@ -714,7 +727,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void putExistingApiPermission() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -810,7 +823,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void partialUpdateApiPermissionWithPatch() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -818,7 +831,13 @@ public class ApiPermissionResourceIT {
         ApiPermission partialUpdatedApiPermission = new ApiPermission();
         partialUpdatedApiPermission.setId(apiPermission.getId());
 
-        partialUpdatedApiPermission.code(UPDATED_CODE).type(UPDATED_TYPE).method(UPDATED_METHOD);
+        partialUpdatedApiPermission
+            .name(UPDATED_NAME)
+            .description(UPDATED_DESCRIPTION)
+            .type(UPDATED_TYPE)
+            .method(UPDATED_METHOD)
+            .url(UPDATED_URL)
+            .status(UPDATED_STATUS);
 
         restApiPermissionMockMvc
             .perform(
@@ -841,7 +860,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void fullUpdateApiPermissionWithPatch() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
@@ -939,7 +958,7 @@ public class ApiPermissionResourceIT {
     @Transactional
     void deleteApiPermission() throws Exception {
         // Initialize the database
-        apiPermissionRepository.save(apiPermission);
+        insertedApiPermission = apiPermissionRepository.saveAndGet(apiPermission);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 

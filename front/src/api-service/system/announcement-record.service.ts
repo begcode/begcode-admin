@@ -17,12 +17,12 @@ export default {
 
   retrieve(paginationQuery?: any): Promise<PageRecord<IAnnouncementRecord>> {
     const options = buildPaginationQueryOpts(paginationQuery);
-    return defHttp.get({ url: apiUrl, params: qs.stringify(options, { arrayFormat: 'repeat' }) });
+    return defHttp.get({ url: apiUrl, params: options });
   },
 
   stats(queryParams?: any): Promise<any> {
-    const options = buildPaginationQueryOpts(queryParams);
-    return defHttp.get({ url: `${apiUrl}/stats`, params: qs.stringify(options, { arrayFormat: 'repeat' }) });
+    const params = buildPaginationQueryOpts(queryParams);
+    return defHttp.get({ url: `${apiUrl}/stats`, params });
   },
 
   exist(queryParams?: any): Promise<Boolean> {
@@ -32,7 +32,7 @@ export default {
     const options = buildPaginationQueryOpts(queryParams);
     return new Promise((resolve, reject) => {
       defHttp
-        .get({ url: `${apiUrl}/stats?`, params: qs.stringify(options, { arrayFormat: 'repeat' }) })
+        .get({ url: `${apiUrl}/stats?`, params: options })
         .then(res => {
           resolve(res && res[0] && res[0]['id_count'] > 0);
         })
@@ -45,11 +45,11 @@ export default {
   },
 
   deleteByIds(ids: number[]): Promise<any> {
-    return defHttp.delete({ url: `${apiUrl}` + `?${qs.stringify({ ids }, { arrayFormat: 'repeat' })}` });
+    return defHttp.delete({ url: apiUrl, params: { ids } }, { joinParamsToUrl: true });
   },
 
   create(announcementRecord: IAnnouncementRecord): Promise<IAnnouncementRecord> {
-    return defHttp.post({ url: `${apiUrl}`, params: announcementRecord });
+    return defHttp.post({ url: `${apiUrl}`, data: announcementRecord });
   },
 
   update(announcementRecord: IAnnouncementRecord, batchIds?: number[], batchFields?: String[]): Promise<IAnnouncementRecord> {
@@ -57,7 +57,7 @@ export default {
     if (batchIds && batchFields) {
       queryParams = qs.stringify({ batchIds, batchFields }, { arrayFormat: 'repeat' });
     }
-    return defHttp.put({ url: `${apiUrl}/${announcementRecord.id}?${queryParams}`, params: announcementRecord });
+    return defHttp.put({ url: `${apiUrl}/${announcementRecord.id}?${queryParams}`, data: announcementRecord });
   },
 
   updateRelations(otherEntityIds: String[], relationshipName: String, relatedIds: number[], operateType: String): Promise<Boolean> {

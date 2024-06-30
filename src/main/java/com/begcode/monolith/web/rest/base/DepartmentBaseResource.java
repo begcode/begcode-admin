@@ -48,7 +48,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class DepartmentBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(DepartmentBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(DepartmentBaseResource.class);
 
     protected static final String ENTITY_NAME = "settingsDepartment";
 

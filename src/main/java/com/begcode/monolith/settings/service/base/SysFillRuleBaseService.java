@@ -30,7 +30,7 @@ public class SysFillRuleBaseService<R extends SysFillRuleRepository, E extends S
     extends BaseServiceImpl<SysFillRuleRepository, SysFillRule>
     implements IFillRuleHandler {
 
-    private final Logger log = LoggerFactory.getLogger(SysFillRuleBaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(SysFillRuleBaseService.class);
     private final List<String> relationNames = List.of("ruleItems");
 
     protected final SysFillRuleRepository sysFillRuleRepository;

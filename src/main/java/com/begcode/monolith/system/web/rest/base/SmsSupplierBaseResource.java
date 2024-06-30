@@ -48,7 +48,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class SmsSupplierBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(SmsSupplierBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(SmsSupplierBaseResource.class);
 
     protected static final String ENTITY_NAME = "filesSmsSupplier";
 

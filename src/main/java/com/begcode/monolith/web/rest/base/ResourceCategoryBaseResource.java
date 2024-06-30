@@ -50,7 +50,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 public class ResourceCategoryBaseResource {
 
-    protected final Logger log = LoggerFactory.getLogger(ResourceCategoryBaseResource.class);
+    protected static final Logger log = LoggerFactory.getLogger(ResourceCategoryBaseResource.class);
 
     protected static final String ENTITY_NAME = "filesResourceCategory";
 

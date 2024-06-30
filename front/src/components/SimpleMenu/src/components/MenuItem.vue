@@ -71,7 +71,7 @@ function handleClickItem() {
   }
   const { uidList } = getParentList();
   rootMenuEmitter.emit('on-update-opened', {
-    opend: false,
+    opened: false,
     parent: instance?.parent,
     uidList: uidList,
   });

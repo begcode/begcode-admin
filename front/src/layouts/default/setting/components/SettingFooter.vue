@@ -1,6 +1,6 @@
 <template>
   <div :class="prefixCls">
-    <Button type="primary" block @click="handleCopy">
+    <Button v-if="isDev" type="primary" block @click="handleCopy">
       <CopyOutlined class="mr-2" />
       {{ t('layout.setting.copyBtn') }}
     </Button>
@@ -37,6 +37,8 @@ import defaultSetting from '@/settings/projectSetting';
 import { updateSidebarBgColor } from '@/logics/theme/updateBackground';
 
 defineOptions({ name: 'SettingFooter' });
+
+const isDev = import.meta.env.DEV;
 
 const permissionStore = usePermissionStore();
 const { prefixCls } = useDesign('setting-footer');

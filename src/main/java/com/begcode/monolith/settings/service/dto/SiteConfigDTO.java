@@ -28,14 +28,14 @@ public class SiteConfigDTO extends AbstractAuditingEntity<Long, SiteConfigDTO> {
      * 分类名称
      */
     @NotNull
-    @Schema(description = "分类名称", required = true)
+    @Schema(description = "分类名称", requiredMode = Schema.RequiredMode.REQUIRED)
     private String categoryName;
 
     /**
      * 分类Key
      */
     @NotNull
-    @Schema(description = "分类Key", required = true)
+    @Schema(description = "分类Key", requiredMode = Schema.RequiredMode.REQUIRED)
     private String categoryKey;
 
     /**

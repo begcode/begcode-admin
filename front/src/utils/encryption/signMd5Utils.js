@@ -28,9 +28,12 @@ export default class signMd5Utils {
    * @param requestParams 请求参数(POST的JSON参数)
    * @returns {string} 获取签名
    */
-  static getSign(url, requestParams) {
+  static getSign(url, requestParams, requestBodyParams) {
     let urlParams = this.parseQueryString(url);
     let jsonObj = this.mergeObject(urlParams, requestParams);
+    if (requestBodyParams) {
+      jsonObj = this.mergeObject(jsonObj, requestBodyParams);
+    }
     let requestBody = this.sortAsc(jsonObj);
     delete requestBody._t;
     return md5(JSON.stringify(requestBody) + signatureSecret).toUpperCase();
@@ -79,6 +82,10 @@ export default class signMd5Utils {
         if (objectTwo.hasOwnProperty(key) === true) {
           //数字值转为string类型，前后端加密规则保持一致
           if (this.myIsNaN(objectTwo[key])) {
+            objectTwo[key] = objectTwo[key].toString();
+          }
+          //布尔类型转成string类型，前后端加密规则保持一致
+          if (typeof objectTwo[key] === 'boolean') {
             objectTwo[key] = objectTwo[key].toString();
           }
           objectOne[key] = objectTwo[key];

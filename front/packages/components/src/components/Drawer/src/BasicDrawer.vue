@@ -35,6 +35,7 @@ import { ScrollContainer } from '@/components/Container';
 import { basicProps } from './props';
 import { useDesign } from '@/hooks/web/useDesign';
 import { useAttrs } from '@/hooks/vben';
+import { cloneDeep } from 'lodash-es';
 
 defineOptions({ inheritAttrs: false });
 
@@ -59,7 +60,7 @@ const instance = getCurrentInstance();
 instance && emit('register', drawerInstance, instance.uid);
 
 const getMergeProps = computed(() => {
-  return deepMerge(props, unref(propsRef));
+  return { ...deepMerge(cloneDeep(props), unref(propsRef)) };
 });
 
 const getProps = computed(() => {

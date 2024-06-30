@@ -25,7 +25,7 @@ class SiteConfigTest {
     }
 
     @Test
-    void itemsTest() throws Exception {
+    void itemsTest() {
         SiteConfig siteConfig = getSiteConfigRandomSampleGenerator();
         CommonFieldData commonFieldDataBack = getCommonFieldDataRandomSampleGenerator();
 
