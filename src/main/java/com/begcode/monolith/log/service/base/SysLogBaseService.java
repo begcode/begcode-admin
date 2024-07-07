@@ -51,7 +51,6 @@ public class SysLogBaseService<R extends SysLogRepository, E extends SysLog> ext
     public SysLogDTO save(SysLogDTO sysLogDTO) {
         log.debug("Request to save SysLog : {}", sysLogDTO);
         SysLog sysLog = sysLogMapper.toEntity(sysLogDTO);
-
         this.saveOrUpdate(sysLog);
         return findOne(sysLog.getId()).orElseThrow();
     }
@@ -66,7 +65,6 @@ public class SysLogBaseService<R extends SysLogRepository, E extends SysLog> ext
     public SysLogDTO update(SysLogDTO sysLogDTO) {
         log.debug("Request to update SysLog : {}", sysLogDTO);
         SysLog sysLog = sysLogMapper.toEntity(sysLogDTO);
-
         this.saveOrUpdate(sysLog);
         return findOne(sysLog.getId()).orElseThrow();
     }
@@ -167,13 +165,6 @@ public class SysLogBaseService<R extends SysLogRepository, E extends SysLog> ext
                 });
             }
         }
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            SysLog byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
     // jhipster-needle-service-add-method - JHipster will add getters and setters here, do not remove
 

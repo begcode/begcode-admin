@@ -41,7 +41,6 @@ const fields = (): FormSchema[] => {
       label: '是否禁用',
       field: 'disabled',
       component: 'Switch',
-      componentProps: { placeholder: '请选择是否禁用' },
       rules: [],
     },
     {
@@ -56,7 +55,6 @@ const fields = (): FormSchema[] => {
       field: 'builtIn',
       show: false,
       component: 'Switch',
-      componentProps: { placeholder: '请选择是否内置' },
       rules: [],
     },
     {
@@ -64,7 +62,6 @@ const fields = (): FormSchema[] => {
       field: 'syncEnum',
       show: false,
       component: 'Switch',
-      componentProps: { placeholder: '请选择更新枚举' },
       rules: [],
     },
   ];

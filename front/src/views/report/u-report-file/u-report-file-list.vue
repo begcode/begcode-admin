@@ -1,7 +1,13 @@
 <template>
   <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
   <div>
-    <Card v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled" title="高级搜索" class="bc-list-search-form-card">
+    <Card
+      v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
+      title="高级搜索"
+      class="bc-list-search-form-card"
+      :body-style="{ 'padding-top': '12px', 'padding-bottom': '8px' }"
+      :head-style="{ 'min-height': '40px' }"
+    >
       <template #extra>
         <Space>
           <Button type="default" @click="showSearchFormSetting" preIcon="ant-design:setting-outlined" shape="circle" size="small"></Button>
@@ -10,111 +16,125 @@
       <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" />
     </Card>
     <Card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
-      <Row :gutter="16">
-        <Col :span="24">
-          <List :grid="listGrid" item-layout="vertical" :data-source="listData" :pagination="false">
-            <template #header>
-              <div class="flex justify-between space-x-2">
-                <div>
-                  <Row class="toolbar_buttons_xgrid" :gutter="16">
-                    <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
-                      <Space>
-                        <Input
-                          placeholder="请输入关键字"
-                          v-model:value="searchValue"
-                          allow-clear
-                          @search="formSearch"
-                          enterButton
-                          ref="searchInputRef"
-                        >
-                          <template #prefix>
-                            <Icon icon="ant-design:search-outlined" />
-                          </template>
-                          <template #addonAfter v-if="searchFormConfig.allowSwitch">
-                            <Button type="link" @click="formSearch" style="height: 30px"
-                              >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch"></Icon
-                            ></Button>
-                          </template>
-                        </Input>
-                        <Dropdown v-if="selectedRows.length && batchOperations.length">
-                          <template #overlay>
-                            <Menu @click="batchOperationClick">
-                              <MenuItem :key="batchOperation.name" v-for="batchOperation of batchOperations">
-                                <Icon :icon="batchOperation.icon" v-if="batchOperation.icon"></Icon>
-                                {{ batchOperation.title }}
-                              </MenuItem>
-                            </Menu>
-                          </template>
-                          <Button>
-                            批量处理
-                            <Icon icon="ant-design:down-outlined" />
-                          </Button>
-                        </Dropdown>
-                      </Space>
-                    </Col>
-                  </Row>
-                </div>
-                <div>
+      <List :grid="listGrid" item-layout="vertical" :data-source="listData" :pagination="false">
+        <template #header>
+          <div class="flex justify-between space-x-2">
+            <div>
+              <Row class="toolbar_buttons_xgrid" :gutter="16">
+                <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
                   <Space>
-                    <template v-for="button in cardListOptions.toolButtons">
-                      <Tooltip v-if="!button.hidden">
-                        <template #title>{{ button.title }}</template>
-                        <ImageUpload v-if="button.name === 'uploadImg'">{{ button.title }}</ImageUpload>
-                        <Upload v-else-if="button.name === 'uploadFile'">{{ button.title }}</Upload>
-                        <Button :disabled="button.disabled" @click="button.click" v-else>
-                          <Icon :icon="button.icon" v-if="button.icon"></Icon>
-                          {{ button.title }}
-                        </Button>
-                      </Tooltip>
-                    </template>
-                    <Tooltip>
-                      <template #title>
-                        <div class="w-50">每行显示数量</div>
-                        <Slider id="slider" v-bind="sliderProp" :value="listColumns" @change="sliderChange" />
+                    <Input
+                      placeholder="请输入关键字"
+                      v-model:value="searchValue"
+                      allow-clear
+                      @search="formSearch"
+                      enterButton
+                      ref="searchInputRef"
+                    >
+                      <template #prefix>
+                        <Icon icon="ant-design:search-outlined" />
                       </template>
-                      <Button><Icon icon="ant-design:table-outlined" />列数</Button>
-                    </Tooltip>
+                      <template #addonAfter v-if="searchFormConfig.allowSwitch">
+                        <Button type="link" @click="formSearch" style="height: 30px"
+                          >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch"></Icon
+                        ></Button>
+                      </template>
+                    </Input>
+                    <Dropdown v-if="selectedRows.length && batchOperations.length">
+                      <template #overlay>
+                        <Menu @click="batchOperationClick">
+                          <MenuItem :key="batchOperation.name" v-for="batchOperation of batchOperations">
+                            <Icon :icon="batchOperation.icon" v-if="batchOperation.icon"></Icon>
+                            {{ batchOperation.title }}
+                          </MenuItem>
+                        </Menu>
+                      </template>
+                      <Button>
+                        批量处理
+                        <Icon icon="ant-design:down-outlined" />
+                      </Button>
+                    </Dropdown>
                   </Space>
-                </div>
-              </div>
-            </template>
-            <template #renderItem="{ item }">
-              <div style="margin-bottom: 24px"></div>
-              <List.Item>
-                <Badge>
-                  <template #count>
-                    <Checkbox :checked="getItemSelected(item)" @change="selectChange($event, item)" />
+                </Col>
+              </Row>
+            </div>
+            <div>
+              <Space>
+                <template v-for="button in cardListOptions.toolButtons">
+                  <Tooltip v-if="!button.hidden">
+                    <template #title>{{ button.title }}</template>
+                    <ImageUpload v-if="button.name === 'uploadImg'">{{ button.title }}</ImageUpload>
+                    <Upload v-else-if="button.name === 'uploadFile'">{{ button.title }}</Upload>
+                    <Button :disabled="button.disabled" @click="button.click" v-else>
+                      <Icon :icon="button.icon" v-if="button.icon"></Icon>
+                      {{ button.title }}
+                    </Button>
+                  </Tooltip>
+                </template>
+                <Tooltip>
+                  <template #title>
+                    <div class="w-50">每行显示数量</div>
+                    <Slider id="slider" v-bind="sliderProp" :value="listColumns" @change="sliderChange" />
                   </template>
-                  <Card :body-style="{ padding: '12px 4px' }">
-                    <template #title></template>
-                    <template #cover>
-                      <Badge.Ribbon placement="start" :text="metaConfig.titleValue(item)">
-                        <div class="cover-height">
-                          <Image
-                            v-if="coverConfig.showImage"
-                            :src="item[coverConfig.coverFieldName] || '/resource/img/filetype/other.png'"
-                            v-bind="coverConfig.props"
-                            @click="coverConfig.click"
-                          />
-                        </div>
-                      </Badge.Ribbon>
-                    </template>
-                    <template class="ant-card-actions" #actions>
-                      <ButtonGroup :row="item" :buttons="rowOperations" @click="rowClick" />
-                    </template>
-                    <Card.Meta>
-                      <template #avatar>
-                        <Avatar :src="item.avatar" v-if="metaConfig.showAvatar" />
-                      </template>
-                      <template #description v-if="metaConfig.showDesc">{{ metaConfig.descValue(item) }}</template>
-                    </Card.Meta>
-                  </Card>
-                </Badge>
-              </List.Item>
-            </template>
-          </List>
-        </Col>
-      </Row>
+                  <Button><Icon icon="ant-design:table-outlined" />列数</Button>
+                </Tooltip>
+              </Space>
+            </div>
+          </div>
+        </template>
+        <template #renderItem="{ item }">
+          <div style="margin-bottom: 24px"></div>
+          <List.Item>
+            <Badge>
+              <template #count>
+                <Checkbox :checked="getItemSelected(item)" @change="selectChange($event, item)" />
+              </template>
+              <Card :body-style="{ padding: '12px 4px' }">
+                <template #title></template>
+                <template #cover>
+                  <Badge.Ribbon :text="metaConfig.titleValue(item)" placement="start" class="cover-ribbon">
+                    <div class="cover-height">
+                      <Image
+                        v-if="coverConfig.showImage"
+                        :src="item[coverConfig.coverFieldName] || '/resource/img/filetype/other.png'"
+                        v-bind="coverConfig.props"
+                        @click="coverConfig.click"
+                        fallback="/resource/img/filetype/other.png"
+                      />
+                    </div>
+                  </Badge.Ribbon>
+                </template>
+                <template class="ant-card-actions" #actions>
+                  <ButtonGroup :row="item" :buttons="rowOperations" @click="rowClick" />
+                </template>
+                <Card.Meta>
+                  <template #avatar>
+                    <Avatar :src="item.avatar" v-if="metaConfig.showAvatar" />
+                  </template>
+                  <template #description v-if="metaConfig.showDesc">{{ metaConfig.descValue(item) }}</template>
+                </Card.Meta>
+              </Card>
+            </Badge>
+          </List.Item>
+        </template>
+      </List>
+      <Affix :offset-bottom="0">
+        <Row justify="space-between" style="background: #fff; padding: 10px 0">
+          <Col :span="12" style="display: flex; justify-content: flex-start">
+            <Alert type="warning" :banner="true" style="height: 30px" :message="alertMessage"></Alert>
+          </Col>
+          <Col :span="12" style="display: flex; justify-content: flex-end">
+            <Pagination
+              v-model:current="paginationProps.current"
+              :page-size="paginationProps.pageSize"
+              :total="paginationProps.total"
+              :show-size-changer="false"
+              :show-quick-jumper="false"
+              @change="pageChange"
+            />
+          </Col>
+        </Row>
+      </Affix>
       <BasicModal v-bind="modalConfig" @register="registerModal" @cancel="closeModal" @ok="okModal">
         <component
           :is="modalConfig.componentName"
@@ -133,16 +153,6 @@
           ref="drawerComponentRef"
         />
       </BasicDrawer>
-      <Affix :offset-bottom="0">
-        <Row justify="space-between" style="background: #fff; padding: 10px 0">
-          <Col :span="12" style="display: flex; justify-content: flex-start">
-            <Alert type="warning" :banner="true" style="height: 30px" :message="alertMessage"></Alert>
-          </Col>
-          <Col :span="12" style="display: flex; justify-content: flex-end">
-            <Pagination v-model:current="paginationProps.current" :total="500" />
-          </Col>
-        </Row>
-      </Affix>
     </Card>
   </div>
 </template>
@@ -257,7 +267,7 @@ const metaConfig = reactive({
   showAvatar: false,
   showDesc: true,
   descValue: item => {
-    return item.createAt;
+    return item.createdDate;
   },
 });
 const coverConfig = reactive({
@@ -298,6 +308,7 @@ const searchFormConfig = reactive<any>({
   matchType: 'and',
   disabled: false,
   allowSwitch: true,
+  compact: true,
 });
 const rowOperations: any[] = [
   {
@@ -311,6 +322,18 @@ const rowOperations: any[] = [
     title: '删除',
     name: 'delete',
     type: 'link',
+  },
+  {
+    title: '报表设计',
+    name: 'design',
+    icon: 'schedule',
+    containerType: 'drawer',
+  },
+  {
+    title: '报表预览',
+    name: 'preview',
+    icon: 'area-chart',
+    containerType: 'drawer',
   },
   {
     title: '详情',
@@ -393,13 +416,7 @@ const drawerConfig = reactive<any>({
 });
 const cardListOptions = reactive<any>({
   params: {},
-  api: apis.find,
-  imageField: 'url',
-  resultField: 'records',
-  totalField: 'total',
-  metaTitle: '',
   metaDesc: 'createAt',
-  showAvatar: false,
   toolButtons: [
     {
       title: '新增',
@@ -469,6 +486,7 @@ const formSearch = () => {
   params.size = paginationProps.pageSize;
   apis.find(params).then(data => {
     listData.value = data.records;
+    paginationProps.total = data.total;
   });
 };
 
@@ -501,183 +519,151 @@ const paginationProps = reactive({
   current: 0,
   total: 0,
   showTotal: (total: number) => `总 ${total} 条`,
-  onChange: pageChange,
-  onShowSizeChange: pageChange,
 });
 
-function pageChange(p: number, pz: number) {
-  paginationProps.current = p;
-  paginationProps.pageSize = pz;
+function pageChange(page: number, pageSize: number) {
+  paginationProps.current = page;
+  paginationProps.pageSize = pageSize;
   formSearch();
 }
 
 const rowClick = ({ name, data }) => {
   const row = data;
   const operation = rowOperations.find(operation => operation.name === name);
-  switch (name) {
-    case 'save':
-      break;
-    case 'edit':
-      if (operation) {
-        if (operation.click) {
-          operation.click(row);
-        } else {
-          switch (operation.containerType) {
-            case 'modal':
-              modalConfig.title = '编辑报表存储';
-              modalConfig.componentName = shallowRef(UReportFileEdit);
-              modalConfig.entityId = row.id;
-              modalConfig.okText = '更新';
-              modalConfig.cancelText = '取消';
-              modalConfig.showCancelBtn = true;
-              modalConfig.showOkBtn = true;
-              modalConfig.needSubmit = true;
-              setModalProps({ open: true });
-              break;
-            case 'drawer':
-              drawerConfig.title = '编辑报表存储';
-              drawerConfig.componentName = shallowRef(UReportFileEdit);
-              drawerConfig.entityId = row.id;
-              drawerConfig.okText = '更新';
-              drawerConfig.cancelText = '取消';
-              drawerConfig.showCancelBtn = true;
-              drawerConfig.showOkBtn = true;
-              drawerConfig.needSubmit = true;
-              setDrawerProps({ open: true });
-              break;
-            case 'route':
-            default:
-              if (pageConfig.baseRouteName) {
-                go({ name: `${pageConfig.baseRouteName}Edit`, params: { entityId: row.id } });
-              } else {
-                console.log('未定义方法');
-              }
-          }
+  if (operation?.click) {
+    operation.click(row);
+  } else {
+    switch (name) {
+      case 'edit':
+        switch (operation?.containerType || 'route') {
+          case 'modal':
+            modalConfig.title = '编辑报表存储';
+            modalConfig.componentName = shallowRef(UReportFileEdit);
+            modalConfig.entityId = row.id;
+            modalConfig.okText = '更新';
+            modalConfig.cancelText = '取消';
+            modalConfig.showCancelBtn = true;
+            modalConfig.showOkBtn = true;
+            modalConfig.needSubmit = true;
+            setModalProps({ open: true });
+            break;
+          case 'drawer':
+            drawerConfig.title = '编辑报表存储';
+            drawerConfig.componentName = shallowRef(UReportFileEdit);
+            drawerConfig.entityId = row.id;
+            drawerConfig.okText = '更新';
+            drawerConfig.cancelText = '取消';
+            drawerConfig.showCancelBtn = true;
+            drawerConfig.showOkBtn = true;
+            drawerConfig.needSubmit = true;
+            setDrawerProps({ open: true });
+            break;
+          case 'route':
+          default:
+            if (pageConfig.baseRouteName) {
+              go({ name: `${pageConfig.baseRouteName}Edit`, params: { entityId: row.id } });
+            } else {
+              console.log('未定义方法');
+            }
         }
-      } else {
-        if (pageConfig.baseRouteName) {
-          go({ name: `${pageConfig.baseRouteName}Edit`, params: { entityId: row.id } });
-        } else {
-          console.log('未定义方法');
+        break;
+      case 'detail':
+        switch (operation?.containerType || 'route') {
+          case 'modal':
+            modalConfig.title = '报表存储详情';
+            modalConfig.componentName = shallowRef(UReportFileDetail);
+            modalConfig.entityId = row.id;
+            modalConfig.showCancelBtn = true;
+            modalConfig.showOkBtn = false;
+            modalConfig.cancelText = '关闭';
+            modalConfig.needSubmit = false;
+            setModalProps({ open: true });
+            break;
+          case 'drawer':
+            drawerConfig.title = '报表存储详情';
+            drawerConfig.componentName = shallowRef(UReportFileDetail);
+            drawerConfig.entityId = row.id;
+            drawerConfig.showCancelBtn = true;
+            drawerConfig.showOkBtn = false;
+            drawerConfig.cancelText = '关闭';
+            drawerConfig.needSubmit = false;
+            setDrawerProps({ open: true });
+            break;
+          case 'route':
+          default:
+            if (pageConfig.baseRouteName) {
+              go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
+            } else {
+              console.log('未定义方法');
+            }
         }
-      }
-      break;
-    case 'detail':
-      if (operation) {
-        if (operation.click) {
-          operation.click(row);
-        } else {
-          switch (operation.containerType) {
-            case 'modal':
-              modalConfig.title = '报表存储详情';
-              modalConfig.componentName = shallowRef(UReportFileDetail);
-              modalConfig.entityId = row.id;
-              modalConfig.showCancelBtn = true;
-              modalConfig.showOkBtn = false;
-              modalConfig.cancelText = '关闭';
-              modalConfig.needSubmit = false;
-              setModalProps({ open: true });
-              break;
-            case 'drawer':
-              drawerConfig.title = '报表存储详情';
-              drawerConfig.componentName = shallowRef(UReportFileDetail);
-              drawerConfig.entityId = row.id;
-              drawerConfig.showCancelBtn = true;
-              drawerConfig.showOkBtn = false;
-              drawerConfig.cancelText = '关闭';
-              drawerConfig.needSubmit = false;
-              setDrawerProps({ open: true });
-              break;
-            case 'route':
-            default:
-              if (pageConfig.baseRouteName) {
-                go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
-              } else {
-                console.log('未定义方法');
-              }
-          }
+        break;
+      case 'delete':
+        Modal.confirm({
+          title: `操作提示`,
+          content: `是否确认删除ID为${row.id}的记录？`,
+          onOk() {
+            if (operation.click) {
+              operation.click(row);
+            } else {
+              apis
+                .deleteById(row.id)
+                .then(() => {
+                  message.success('删除成功。');
+                  formSearch();
+                })
+                .catch(err => {
+                  console.log('err', err);
+                });
+            }
+          },
+        });
+        break;
+      case 'design':
+        switch (operation.containerType) {
+          case 'modal':
+            modalConfig.componentName = 'a-iframe';
+            modalConfig.iframeUrl = '/ureport/designer?_u=db:' + row.name;
+            setModalProps({ open: true });
+            break;
+          case 'drawer':
+            drawerConfig.componentName = 'a-iframe';
+            modalConfig.iframeUrl = '/ureport/designer?_u=db:' + row.name;
+            setDrawerProps({ open: true });
+            break;
+          case 'route':
+          default:
+            if (pageConfig.baseRouteName) {
+              go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
+            } else {
+              console.log('未定义方法');
+            }
         }
-      } else {
-        if (pageConfig.baseRouteName) {
-          go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
-        } else {
-          console.log('未定义方法');
+        break;
+      case 'preview':
+        switch (operation.containerType) {
+          case 'modal':
+            modalConfig.componentName = 'a-iframe';
+            modalConfig.iframeUrl = '/ureport/preview?_u=db:' + row.name;
+            setModalProps({ open: true });
+            break;
+          case 'drawer':
+            drawerConfig.componentName = 'a-iframe';
+            modalConfig.iframeUrl = '/ureport/preview?_u=db:' + row.name;
+            setDrawerProps({ open: true });
+            break;
+          case 'route':
+          default:
+            if (pageConfig.baseRouteName) {
+              go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
+            } else {
+              console.log('未定义方法');
+            }
         }
-      }
-      break;
-    case 'delete':
-      Modal.confirm({
-        title: `操作提示`,
-        content: `是否确认删除ID为${row.id}的记录？`,
-        onOk() {
-          if (operation.click) {
-            operation.click(row);
-          } else {
-            apis
-              .deleteById(row.id)
-              .then(() => {
-                message.success('删除成功。');
-                formSearch();
-              })
-              .catch(err => {
-                console.log('err', err);
-              });
-          }
-        },
-      });
-      break;
-    case 'design':
-      switch (operation.containerType) {
-        case 'modal':
-          modalConfig.componentName = 'a-iframe';
-          modalConfig.iframeUrl = '/ureport/designer?_u=db:' + row.name;
-          setModalProps({ open: true });
-          break;
-        case 'drawer':
-          drawerConfig.componentName = 'a-iframe';
-          modalConfig.iframeUrl = '/ureport/designer?_u=db:' + row.name;
-          setDrawerProps({ open: true });
-          break;
-        case 'route':
-        default:
-          if (pageConfig.baseRouteName) {
-            go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
-          } else {
-            console.log('未定义方法');
-          }
-      }
-      break;
-    case 'preview':
-      switch (operation.containerType) {
-        case 'modal':
-          modalConfig.componentName = 'a-iframe';
-          modalConfig.iframeUrl = '/ureport/preview?_u=db:' + row.name;
-          setModalProps({ open: true });
-          break;
-        case 'drawer':
-          drawerConfig.componentName = 'a-iframe';
-          modalConfig.iframeUrl = '/ureport/preview?_u=db:' + row.name;
-          setDrawerProps({ open: true });
-          break;
-        case 'route':
-        default:
-          if (pageConfig.baseRouteName) {
-            go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
-          } else {
-            console.log('未定义方法');
-          }
-      }
-      break;
-    default:
-      if (operation) {
-        if (operation.click) {
-          operation.click(row);
-        } else {
-          console.log('error', `click方法未定义`);
-        }
-      } else {
+        break;
+      default:
         console.log('error', `${name}未定义`);
-      }
+    }
   }
 };
 
@@ -698,5 +684,10 @@ onMounted(() => {
 .cover-height {
   height: v-bind('height');
   overflow: hidden;
+}
+:deep(.ant-ribbon-wrapper) .cover-ribbon {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 95%;
 }
 </style>

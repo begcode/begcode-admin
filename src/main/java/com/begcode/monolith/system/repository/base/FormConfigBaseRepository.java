@@ -31,7 +31,7 @@ public interface FormConfigBaseRepository<E extends FormConfig> extends BaseCrud
         return Optional.ofNullable(this.selectById(id));
     }
 
-    @Select("delete from form_config formConfig where formConfig.business_type = #{businessTypeId}")
+    @Select("delete from form_config form_config where form_config.business_type_id = #{businessTypeId}")
     void deleteAllByBusinessTypeId(@Param("businessTypeId") Long businessTypeId);
 
     default FormConfig saveAndGet(FormConfig formConfig) {

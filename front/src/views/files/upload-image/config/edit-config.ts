@@ -203,7 +203,6 @@ const fields = (): FormSchema[] => {
         api: relationshipApis.category,
         style: 'width: 100%',
         labelInValue: true,
-        numberToString: true,
         fieldNames: { children: 'children', value: 'id', label: 'title' },
         resultField: 'records',
         placeholder: '请选择所属分类',

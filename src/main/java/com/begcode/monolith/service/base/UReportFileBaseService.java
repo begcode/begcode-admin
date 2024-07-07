@@ -56,7 +56,6 @@ public class UReportFileBaseService<R extends UReportFileRepository, E extends U
     public UReportFileDTO save(UReportFileDTO uReportFileDTO) {
         log.debug("Request to save UReportFile : {}", uReportFileDTO);
         UReportFile uReportFile = uReportFileMapper.toEntity(uReportFileDTO);
-
         this.saveOrUpdate(uReportFile);
         return findOne(uReportFile.getId()).orElseThrow();
     }
@@ -71,7 +70,6 @@ public class UReportFileBaseService<R extends UReportFileRepository, E extends U
     public UReportFileDTO update(UReportFileDTO uReportFileDTO) {
         log.debug("Request to update UReportFile : {}", uReportFileDTO);
         UReportFile uReportFile = uReportFileMapper.toEntity(uReportFileDTO);
-
         this.saveOrUpdate(uReportFile);
         return findOne(uReportFile.getId()).orElseThrow();
     }
@@ -192,13 +190,6 @@ public class UReportFileBaseService<R extends UReportFileRepository, E extends U
                 });
             }
         }
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            UReportFile byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
     // jhipster-needle-service-add-method - JHipster will add getters and setters here, do not remove
 

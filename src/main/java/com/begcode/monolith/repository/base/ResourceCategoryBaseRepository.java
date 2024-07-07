@@ -33,7 +33,7 @@ public interface ResourceCategoryBaseRepository<E extends ResourceCategory> exte
         return Optional.ofNullable(this.selectById(id));
     }
 
-    @Select("delete from resource_category resourceCategory where resourceCategory.parent = #{parentId}")
+    @Select("delete from resource_category resource_category where resource_category.parent_id = #{parentId}")
     void deleteAllByParentId(@Param("parentId") Long parentId);
 
     default IPage<ResourceCategory> findAllByParentIsNull(IPage<ResourceCategory> pageable) {

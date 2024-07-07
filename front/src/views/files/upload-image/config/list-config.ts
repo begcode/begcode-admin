@@ -2,7 +2,6 @@ import type { VxeGridPropTypes, VxeGridProps } from 'vxe-table/types/grid';
 import dayjs from 'dayjs';
 import apiService from '@/api-service/index';
 
-const uploadImageService = apiService.files.uploadImageService;
 const relationshipApis: any = {
   category: apiService.files.resourceCategoryService.tree,
 };
@@ -144,7 +143,7 @@ const searchForm = (): any[] => {
     {
       title: '创建时间',
       field: 'createAt',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'ZonedDateTime',
@@ -203,7 +202,7 @@ const searchForm = (): any[] => {
     {
       title: '创建时间',
       field: 'createdDate',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'Instant',
@@ -222,7 +221,7 @@ const searchForm = (): any[] => {
     {
       title: '修改时间',
       field: 'lastModifiedDate',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'Instant',

@@ -149,7 +149,7 @@ const transform: AxiosTransform = {
         }
       } else {
         // 兼容restful风格
-        config.url = config.url + params;
+        config.url = config.url + '?' + params;
         config.params = undefined;
       }
     }

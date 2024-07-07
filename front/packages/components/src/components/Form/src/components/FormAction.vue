@@ -13,7 +13,7 @@
         </Button>
 
         <slot name="advanceBefore"></slot>
-        <Button type="link" size="small" @click="toggleAdvanced" v-if="showAdvancedButton && !hideAdvanceBtn">
+        <Button type="link" size="small" @click="toggleAdvanced" v-if="showAdvancedButton && !hideAdvanceBtn" data-cy="formAdvanceToggle">
           {{ isAdvanced ? t('component.form.putAway') : t('component.form.unfold') }}
           <BasicArrow class="ml-1" :expand="!isAdvanced" up />
         </Button>
@@ -51,7 +51,7 @@ const props = defineProps({
     type: Object as PropType<Partial<ColEx>>,
     default: () => ({}),
   },
-  actionSpan: propTypes.number.def(6),
+  actionSpan: propTypes.number.def(8),
   isAdvanced: propTypes.bool,
   hideAdvanceBtn: propTypes.bool,
   layout: propTypes.oneOf(['horizontal', 'vertical', 'inline']).def('horizontal'),
@@ -65,8 +65,8 @@ const { resetAction, submitAction } = useFormContext();
 const actionColOpt = computed(() => {
   const { showAdvancedButton, actionSpan: span, actionColOptions } = props;
   const actionSpan = 24 - span;
-  const advancedSpanObj = showAdvancedButton ? { span: actionSpan < 6 ? 24 : actionSpan } : {};
-  const defaultSpan = props.layout === 'inline' ? {} : { span: showAdvancedButton ? 6 : 4 };
+  const advancedSpanObj = showAdvancedButton ? { span: actionSpan < 8 ? 24 : actionSpan } : {};
+  const defaultSpan = props.layout === 'inline' ? {} : { span: showAdvancedButton ? 10 : 8 };
   const actionColOpt: Partial<ColEx> = {
     style: { textAlign: 'right' },
     ...defaultSpan,
@@ -74,7 +74,7 @@ const actionColOpt = computed(() => {
     ...actionColOptions,
   };
   if (props.layout !== 'inline') {
-    actionColOpt['span'] = showAdvancedButton ? 6 : 4;
+    actionColOpt['span'] = showAdvancedButton ? 10 : 8;
   }
   return actionColOpt;
 });

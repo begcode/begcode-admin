@@ -77,7 +77,6 @@ public class ApiPermissionBaseService<R extends ApiPermissionRepository, E exten
         log.debug("Request to save ApiPermission : {}", apiPermissionDTO);
         ApiPermission apiPermission = apiPermissionMapper.toEntity(apiPermissionDTO);
         clearChildrenCache();
-
         this.saveOrUpdate(apiPermission);
         return findOne(apiPermission.getId()).orElseThrow();
     }
@@ -93,7 +92,6 @@ public class ApiPermissionBaseService<R extends ApiPermissionRepository, E exten
         log.debug("Request to update ApiPermission : {}", apiPermissionDTO);
         ApiPermission apiPermission = apiPermissionMapper.toEntity(apiPermissionDTO);
         clearChildrenCache();
-
         this.saveOrUpdate(apiPermission);
         return findOne(apiPermission.getId()).orElseThrow();
     }

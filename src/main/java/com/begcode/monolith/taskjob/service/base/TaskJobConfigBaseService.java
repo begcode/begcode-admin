@@ -67,7 +67,6 @@ public class TaskJobConfigBaseService<R extends TaskJobConfigRepository, E exten
     public TaskJobConfigDTO save(TaskJobConfigDTO taskJobConfigDTO) {
         log.debug("Request to save TaskJobConfig : {}", taskJobConfigDTO);
         TaskJobConfig taskJobConfig = taskJobConfigMapper.toEntity(taskJobConfigDTO);
-
         this.saveOrUpdate(taskJobConfig);
         return findOne(taskJobConfig.getId()).orElseThrow();
     }
@@ -82,7 +81,6 @@ public class TaskJobConfigBaseService<R extends TaskJobConfigRepository, E exten
     public TaskJobConfigDTO update(TaskJobConfigDTO taskJobConfigDTO) {
         log.debug("Request to update TaskJobConfig : {}", taskJobConfigDTO);
         TaskJobConfig taskJobConfig = taskJobConfigMapper.toEntity(taskJobConfigDTO);
-
         this.saveOrUpdate(taskJobConfig);
         return findOne(taskJobConfig.getId()).orElseThrow();
     }
@@ -338,13 +336,6 @@ public class TaskJobConfigBaseService<R extends TaskJobConfigRepository, E exten
                 });
             }
         }
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            TaskJobConfig byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
     // jhipster-needle-service-add-method - JHipster will add getters and setters here, do not remove
 

@@ -75,7 +75,6 @@ public class SmsSupplierBaseService<R extends SmsSupplierRepository, E extends S
     public SmsSupplierDTO save(SmsSupplierDTO smsSupplierDTO) {
         log.debug("Request to save SmsSupplier : {}", smsSupplierDTO);
         SmsSupplier smsSupplier = smsSupplierMapper.toEntity(smsSupplierDTO);
-
         this.saveOrUpdate(smsSupplier);
         SmsFactory.createSmsBlend(this, smsSupplier.getId().toString());
         return findOne(smsSupplier.getId()).orElseThrow();
@@ -91,7 +90,6 @@ public class SmsSupplierBaseService<R extends SmsSupplierRepository, E extends S
     public SmsSupplierDTO update(SmsSupplierDTO smsSupplierDTO) {
         log.debug("Request to update SmsSupplier : {}", smsSupplierDTO);
         SmsSupplier smsSupplier = smsSupplierMapper.toEntity(smsSupplierDTO);
-
         this.saveOrUpdate(smsSupplier);
         SmsFactory.createSmsBlend(this, smsSupplier.getId().toString());
         return findOne(smsSupplier.getId()).orElseThrow();
@@ -455,13 +453,6 @@ public class SmsSupplierBaseService<R extends SmsSupplierRepository, E extends S
                 });
             }
         }
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            SmsSupplier byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
     // jhipster-needle-service-add-method - JHipster will add getters and setters here, do not remove
 

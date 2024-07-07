@@ -46,8 +46,6 @@ export function handleRangeTimeValue(props, values) {
  * 处理数字转换成2个字段
  * @param props
  * @param values
- * @updateby liusq
- * @updateDate:2021-09-16
  */
 export function handleRangeNumberValue(props, values) {
   const fieldMapToNumber = unref(props).fieldMapToNumber;

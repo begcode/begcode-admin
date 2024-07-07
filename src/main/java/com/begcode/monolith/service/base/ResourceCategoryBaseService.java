@@ -5,8 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.update.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.begcode.monolith.domain.ResourceCategory;
-import com.begcode.monolith.domain.UploadFile;
-import com.begcode.monolith.domain.UploadImage;
 import com.begcode.monolith.repository.ResourceCategoryRepository;
 import com.begcode.monolith.service.dto.ResourceCategoryDTO;
 import com.begcode.monolith.service.mapper.ResourceCategoryMapper;
@@ -67,7 +65,6 @@ public class ResourceCategoryBaseService<R extends ResourceCategoryRepository, E
         log.debug("Request to save ResourceCategory : {}", resourceCategoryDTO);
         ResourceCategory resourceCategory = resourceCategoryMapper.toEntity(resourceCategoryDTO);
         clearChildrenCache();
-
         this.saveOrUpdate(resourceCategory);
         return findOne(resourceCategory.getId()).orElseThrow();
     }
@@ -83,7 +80,6 @@ public class ResourceCategoryBaseService<R extends ResourceCategoryRepository, E
         log.debug("Request to update ResourceCategory : {}", resourceCategoryDTO);
         ResourceCategory resourceCategory = resourceCategoryMapper.toEntity(resourceCategoryDTO);
         clearChildrenCache();
-
         this.saveOrUpdate(resourceCategory);
         return findOne(resourceCategory.getId()).orElseThrow();
     }
@@ -199,13 +195,6 @@ public class ResourceCategoryBaseService<R extends ResourceCategoryRepository, E
 
     protected void clearRelationsCache() {
         this.relationCacheNames.forEach(cacheName -> Optional.ofNullable(cacheManager.getCache(cacheName)).ifPresent(Cache::clear));
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            ResourceCategory byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
     // jhipster-needle-service-add-method - JHipster will add getters and setters here, do not remove
 

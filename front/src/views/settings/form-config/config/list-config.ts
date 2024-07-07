@@ -2,7 +2,6 @@ import type { VxeGridPropTypes, VxeGridProps } from 'vxe-table/types/grid';
 import dayjs from 'dayjs';
 import apiService from '@/api-service/index';
 
-const formConfigService = apiService.settings.formConfigService;
 const relationshipApis: any = {
   businessType: apiService.settings.businessTypeService.retrieve,
 };
@@ -54,7 +53,7 @@ const searchForm = (): any[] => {
     {
       title: '创建时间',
       field: 'createdDate',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'Instant',
@@ -73,7 +72,7 @@ const searchForm = (): any[] => {
     {
       title: '修改时间',
       field: 'lastModifiedDate',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'Instant',

@@ -36,7 +36,7 @@ public interface DepartmentBaseRepository<E extends Department> extends BaseCrud
         return Optional.ofNullable(this.selectById(id));
     }
 
-    @Select("delete from department department where department.parent = #{parentId}")
+    @Select("delete from department department where department.parent_id = #{parentId}")
     void deleteAllByParentId(@Param("parentId") Long parentId);
 
     default IPage<Department> findAllByParentIsNull(IPage<Department> pageable) {

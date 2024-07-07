@@ -49,7 +49,6 @@ const fields = (): FormSchema[] => {
       label: '是否启用',
       field: 'enabled',
       component: 'Switch',
-      componentProps: { placeholder: '请选择是否启用' },
       rules: [],
     },
     {

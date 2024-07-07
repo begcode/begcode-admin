@@ -62,7 +62,6 @@ public class DepartmentBaseService<R extends DepartmentRepository, E extends Dep
         log.debug("Request to save Department : {}", departmentDTO);
         Department department = departmentMapper.toEntity(departmentDTO);
         clearChildrenCache();
-
         this.createOrUpdateAndRelatedRelations(department, Arrays.asList("authorities"));
         return findOne(department.getId()).orElseThrow();
     }
@@ -78,7 +77,6 @@ public class DepartmentBaseService<R extends DepartmentRepository, E extends Dep
         log.debug("Request to update Department : {}", departmentDTO);
         Department department = departmentMapper.toEntity(departmentDTO);
         clearChildrenCache();
-
         this.createOrUpdateAndRelatedRelations(department, Arrays.asList("authorities"));
         return findOne(department.getId()).orElseThrow();
     }
@@ -197,13 +195,6 @@ public class DepartmentBaseService<R extends DepartmentRepository, E extends Dep
 
     protected void clearRelationsCache() {
         this.relationCacheNames.forEach(cacheName -> Optional.ofNullable(cacheManager.getCache(cacheName)).ifPresent(Cache::clear));
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            Department byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
     // jhipster-needle-service-add-method - JHipster will add getters and setters here, do not remove
 

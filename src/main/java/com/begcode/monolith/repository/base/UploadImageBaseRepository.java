@@ -31,7 +31,7 @@ public interface UploadImageBaseRepository<E extends UploadImage> extends BaseCr
         return Optional.ofNullable(this.selectById(id));
     }
 
-    @Select("delete from upload_image uploadImage where uploadImage.category = #{categoryId}")
+    @Select("delete from upload_image upload_image where upload_image.category_id = #{categoryId}")
     void deleteAllByCategoryId(@Param("categoryId") Long categoryId);
 
     default UploadImage saveAndGet(UploadImage uploadImage) {

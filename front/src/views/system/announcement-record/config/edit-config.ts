@@ -37,7 +37,6 @@ const fields = (): FormSchema[] => {
       label: '是否已读',
       field: 'hasRead',
       component: 'Switch',
-      componentProps: { placeholder: '请选择是否已读' },
       rules: [],
     },
     {

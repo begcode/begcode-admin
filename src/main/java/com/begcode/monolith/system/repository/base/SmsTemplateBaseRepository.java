@@ -31,7 +31,7 @@ public interface SmsTemplateBaseRepository<E extends SmsTemplate> extends BaseCr
         return Optional.ofNullable(this.selectById(id));
     }
 
-    @Select("delete from sms_template smsTemplate where smsTemplate.supplier = #{supplierId}")
+    @Select("delete from sms_template sms_template where sms_template.supplier_id = #{supplierId}")
     void deleteAllBySupplierId(@Param("supplierId") Long supplierId);
 
     default SmsTemplate saveAndGet(SmsTemplate smsTemplate) {

@@ -20,6 +20,7 @@ import { createContextMenu, destroyContextMenu } from '@/components/ContextMenu'
 import Ellipsis from '@/components/Ellipsis/Ellipsis.vue';
 
 export * from '@/components/Button';
+export * from '@/components/AvatarGroupInfo';
 export { Bar, Line, Pie, Radar, BarAndLine, BarMulti, Gauge, HeadInfo, LineMulti, RankList, SingleLine, StackBar, Trend, ChartCard };
 export { CollapseContainer, ScrollContainer };
 export { createContextMenu, destroyContextMenu };
@@ -41,10 +42,11 @@ export * from '@/components/DescList';
 export * from '@/components/Icon';
 export * from '@/components/InFilter';
 export * from '@/components/Modal';
-export * from '@/components/search-form';
-export * from '@/components/SelectModal';
 export * from '@/components/Page';
 export * from '@/components/Preview';
+export * from '@/components/search-form';
+export * from '@/components/SelectModal';
+export * from '@/components/SplitPanes';
 export * from '@/components/StrengthMeter';
 export * from '@/components/Time';
 export * from '@/components/Tinymce';

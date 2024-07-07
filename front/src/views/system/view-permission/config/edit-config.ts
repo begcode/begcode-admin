@@ -52,7 +52,6 @@ const fields = (): FormSchema[] => {
       label: '显示分组名',
       field: 'group',
       component: 'Switch',
-      componentProps: { placeholder: '请选择显示分组名' },
       rules: [],
     },
     {
@@ -98,7 +97,6 @@ const fields = (): FormSchema[] => {
       label: '禁用菜单',
       field: 'disabled',
       component: 'Switch',
-      componentProps: { placeholder: '请选择禁用菜单' },
       rules: [],
     },
     {
@@ -108,7 +106,6 @@ const fields = (): FormSchema[] => {
         return values && values.type === 'MENU';
       },
       component: 'Switch',
-      componentProps: { placeholder: '请选择隐藏菜单' },
       rules: [],
     },
     {
@@ -118,7 +115,6 @@ const fields = (): FormSchema[] => {
         return values && values.type === 'MENU';
       },
       component: 'Switch',
-      componentProps: { placeholder: '请选择隐藏面包屑' },
       rules: [],
     },
     {
@@ -128,7 +124,6 @@ const fields = (): FormSchema[] => {
         return values && values.type === 'MENU';
       },
       component: 'Switch',
-      componentProps: { placeholder: '请选择快捷菜单项' },
       rules: [],
     },
     {
@@ -138,7 +133,6 @@ const fields = (): FormSchema[] => {
         return values && values.type === 'MENU';
       },
       component: 'Switch',
-      componentProps: { placeholder: '请选择菜单根节点' },
       rules: [],
     },
     {
@@ -148,7 +142,6 @@ const fields = (): FormSchema[] => {
         return values && values.type === 'MENU';
       },
       component: 'Switch',
-      componentProps: { placeholder: '请选择允许复用' },
       rules: [],
     },
     {
@@ -207,7 +200,6 @@ const fields = (): FormSchema[] => {
         api: relationshipApis.parent,
         style: 'width: 100%',
         labelInValue: true,
-        numberToString: true,
         fieldNames: { children: 'children', value: 'id', label: 'text' },
         resultField: 'records',
         placeholder: '请选择上级',

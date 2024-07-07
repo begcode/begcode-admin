@@ -1,11 +1,5 @@
 package com.begcode.monolith.settings.service;
 
-import static com.diboot.core.binding.QueryBuilder.criteriaToWrapper;
-import static com.diboot.core.binding.QueryBuilder.criteriaToWrapperNoJoin;
-import static tech.jhipster.service.mybatis.AggregateUtil.buildAggregate;
-import static tech.jhipster.service.mybatis.AggregateUtil.buildGroupBy;
-
-import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -18,15 +12,11 @@ import com.diboot.core.binding.Binder;
 import com.diboot.core.binding.query.dynamic.DynamicJoinQueryWrapper;
 import java.util.*;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import tech.jhipster.service.aggregate.*;
 import tech.jhipster.service.filter.*;
-import tech.jhipster.service.mybatis.CriteriaUtil;
 import tech.jhipster.service.mybatis.QueryService;
 
 /**
@@ -124,7 +114,7 @@ public class SysFillRuleQueryService implements QueryService<SysFillRule> {
             tempCriteria.setAnd(keywordsCriteria);
         }
         QueryWrapper<SysFillRule> queryWrapper = new DynamicJoinQueryWrapper<>(SysFillRuleCriteria.class, null);
-        return createQueryWrapper(queryWrapper, criteria.getUseOr(), criteria);
+        return createQueryWrapper(queryWrapper, criteria.getUseOr(), criteria, SysFillRule.class);
     }
 
     /**
@@ -134,149 +124,7 @@ public class SysFillRuleQueryService implements QueryService<SysFillRule> {
      */
     public QueryWrapper<SysFillRule> createQueryWrapperNoJoin(SysFillRuleCriteria criteria) {
         QueryWrapper<SysFillRule> queryWrapper = new QueryWrapper<>();
-        return createQueryWrapperNoJoin(queryWrapper, criteria.getUseOr(), criteria);
-    }
-
-    private QueryWrapper<SysFillRule> createQueryWrapper(
-        QueryWrapper<SysFillRule> queryWrapper,
-        Boolean useOr,
-        SysFillRuleCriteria criteria
-    ) {
-        if (criteria != null) {
-            if (useOr == null) {
-                useOr = false;
-            }
-            Map<QueryWrapper<SysFillRule>, Map<String, Object>> queryWrapperMapMap = criteriaToWrapper(criteria, SysFillRule.class);
-            Map.Entry<QueryWrapper<SysFillRule>, Map<String, Object>> queryWrapperMapEntry = queryWrapperMapMap
-                .entrySet()
-                .stream()
-                .findFirst()
-                .orElseThrow();
-            Map<String, Object> fieldMap = queryWrapperMapEntry.getValue();
-            if (MapUtils.isNotEmpty(fieldMap)) {
-                if (queryWrapper == null) {
-                    queryWrapper = queryWrapperMapEntry.getKey();
-                }
-                QueryWrapper<SysFillRule> finalQueryWrapper = queryWrapper;
-                Boolean finalUseOr = useOr;
-                fieldMap.forEach((fieldName, filter) -> {
-                    if (filter instanceof StringFilter) {
-                        CriteriaUtil.build(
-                            finalUseOr,
-                            finalQueryWrapper,
-                            buildStringSpecification((StringFilter) filter, fieldName, finalUseOr)
-                        );
-                    } else if (filter instanceof RangeFilter) {
-                        CriteriaUtil.build(
-                            finalUseOr,
-                            finalQueryWrapper,
-                            buildRangeSpecification((RangeFilter) filter, fieldName, finalUseOr)
-                        );
-                    } else if (filter instanceof Filter) {
-                        CriteriaUtil.build(finalUseOr, finalQueryWrapper, buildSpecification((Filter) filter, fieldName, finalUseOr));
-                    }
-                });
-            }
-            if (criteria.getAnd() != null) {
-                Map<String, Object> stringObjectMap = BeanUtil.beanToMap(criteria.getAnd(), false, true);
-                if (
-                    !((stringObjectMap.containsKey("useOr") && stringObjectMap.keySet().size() == 1) ||
-                        ObjectUtils.isEmpty(stringObjectMap))
-                ) {
-                    if (queryWrapper != null) {
-                        queryWrapper.and(q -> createQueryWrapper(q, criteria.getAnd().getUseOr(), criteria.getAnd()));
-                    } else {
-                        queryWrapper = createQueryWrapper(null, criteria.getAnd().getUseOr(), criteria.getAnd());
-                    }
-                }
-            } else {
-                if (criteria.getOr() != null) {
-                    Map<String, Object> stringObjectMap = BeanUtil.beanToMap(criteria.getOr(), false, true);
-                    if (
-                        !((stringObjectMap.containsKey("useOr") && stringObjectMap.keySet().size() == 1) ||
-                            ObjectUtils.isEmpty(stringObjectMap))
-                    ) {
-                        if (queryWrapper != null) {
-                            queryWrapper.or(q -> createQueryWrapper(q, criteria.getOr().getUseOr(), criteria.getOr()));
-                        } else {
-                            queryWrapper = createQueryWrapper(null, criteria.getOr().getUseOr(), criteria.getOr());
-                        }
-                    }
-                }
-            }
-        }
-        return queryWrapper;
-    }
-
-    private QueryWrapper<SysFillRule> createQueryWrapperNoJoin(
-        QueryWrapper<SysFillRule> queryWrapper,
-        Boolean useOr,
-        SysFillRuleCriteria criteria
-    ) {
-        if (criteria != null) {
-            if (useOr == null) {
-                useOr = false;
-            }
-            Map<QueryWrapper<SysFillRule>, Map<String, Object>> queryWrapperMapMap = criteriaToWrapperNoJoin(criteria, SysFillRule.class);
-            Map.Entry<QueryWrapper<SysFillRule>, Map<String, Object>> queryWrapperMapEntry = queryWrapperMapMap
-                .entrySet()
-                .stream()
-                .findFirst()
-                .orElseThrow();
-            Map<String, Object> fieldMap = queryWrapperMapEntry.getValue();
-            if (MapUtils.isNotEmpty(fieldMap)) {
-                if (queryWrapper == null) {
-                    queryWrapper = queryWrapperMapEntry.getKey();
-                }
-                QueryWrapper<SysFillRule> finalQueryWrapper = queryWrapper;
-                Boolean finalUseOr = useOr;
-                fieldMap.forEach((fieldName, filter) -> {
-                    if (filter instanceof StringFilter) {
-                        CriteriaUtil.build(
-                            finalUseOr,
-                            finalQueryWrapper,
-                            buildStringSpecification((StringFilter) filter, fieldName, finalUseOr)
-                        );
-                    } else if (filter instanceof RangeFilter) {
-                        CriteriaUtil.build(
-                            finalUseOr,
-                            finalQueryWrapper,
-                            buildRangeSpecification((RangeFilter) filter, fieldName, finalUseOr)
-                        );
-                    } else if (filter instanceof Filter) {
-                        CriteriaUtil.build(finalUseOr, finalQueryWrapper, buildSpecification((Filter) filter, fieldName, finalUseOr));
-                    }
-                });
-            }
-            if (criteria.getAnd() != null) {
-                Map<String, Object> stringObjectMap = BeanUtil.beanToMap(criteria.getAnd(), false, true);
-                if (
-                    !((stringObjectMap.containsKey("useOr") && stringObjectMap.keySet().size() == 1) ||
-                        ObjectUtils.isEmpty(stringObjectMap))
-                ) {
-                    if (queryWrapper != null) {
-                        queryWrapper.and(q -> createQueryWrapperNoJoin(q, criteria.getAnd().getUseOr(), criteria.getAnd()));
-                    } else {
-                        queryWrapper = createQueryWrapperNoJoin(null, criteria.getAnd().getUseOr(), criteria.getAnd());
-                    }
-                }
-            } else {
-                if (criteria.getOr() != null) {
-                    Map<String, Object> stringObjectMap = BeanUtil.beanToMap(criteria.getOr(), false, true);
-                    if (
-                        !((stringObjectMap.containsKey("useOr") && stringObjectMap.keySet().size() == 1) ||
-                            ObjectUtils.isEmpty(stringObjectMap))
-                    ) {
-                        if (queryWrapper != null) {
-                            queryWrapper.or(q -> createQueryWrapperNoJoin(q, criteria.getOr().getUseOr(), criteria.getOr()));
-                        } else {
-                            queryWrapper = createQueryWrapperNoJoin(null, criteria.getOr().getUseOr(), criteria.getOr());
-                        }
-                    }
-                }
-            }
-        }
-        return queryWrapper;
+        return createQueryWrapperNoJoin(queryWrapper, criteria.getUseOr(), criteria, SysFillRule.class);
     }
 
     /**
@@ -294,66 +142,31 @@ public class SysFillRuleQueryService implements QueryService<SysFillRule> {
         QueryWrapper<SysFillRule> queryWrapper = createQueryWrapper(criteria);
         List<String> selectFields = new ArrayList<>();
         List<String> groupByFields = new ArrayList<>();
-        if (criteria.getId() != null) {
-            getAggregateAndGroupBy(criteria.getId(), "id", selectFields, groupByFields);
-        }
-        if (criteria.getName() != null) {
-            getAggregateAndGroupBy(criteria.getName(), "name", selectFields, groupByFields);
-        }
-        if (criteria.getCode() != null) {
-            getAggregateAndGroupBy(criteria.getCode(), "code", selectFields, groupByFields);
-        }
-        if (criteria.getDesc() != null) {
-            getAggregateAndGroupBy(criteria.getDesc(), "desc", selectFields, groupByFields);
-        }
-        if (criteria.getEnabled() != null) {
-            getAggregateAndGroupBy(criteria.getEnabled(), "enabled", selectFields, groupByFields);
-        }
-        if (criteria.getResetFrequency() != null) {
-            getAggregateAndGroupBy(criteria.getResetFrequency(), "reset_frequency", selectFields, groupByFields);
-        }
-        if (criteria.getSeqValue() != null) {
-            getAggregateAndGroupBy(criteria.getSeqValue(), "seq_value", selectFields, groupByFields);
-        }
-        if (criteria.getFillValue() != null) {
-            getAggregateAndGroupBy(criteria.getFillValue(), "fill_value", selectFields, groupByFields);
-        }
-        if (criteria.getImplClass() != null) {
-            getAggregateAndGroupBy(criteria.getImplClass(), "impl_class", selectFields, groupByFields);
-        }
-        if (criteria.getParams() != null) {
-            getAggregateAndGroupBy(criteria.getParams(), "params", selectFields, groupByFields);
-        }
-        if (criteria.getResetStartTime() != null) {
-            getAggregateAndGroupBy(criteria.getResetStartTime(), "reset_start_time", selectFields, groupByFields);
-        }
-        if (criteria.getResetEndTime() != null) {
-            getAggregateAndGroupBy(criteria.getResetEndTime(), "reset_end_time", selectFields, groupByFields);
-        }
-        if (criteria.getResetTime() != null) {
-            getAggregateAndGroupBy(criteria.getResetTime(), "reset_time", selectFields, groupByFields);
-        }
+        Map<String, Filter<?>> fieldNameMap = new HashMap<>();
+        fieldNameMap.put("self.id", criteria.getId());
+        fieldNameMap.put("self.name", criteria.getName());
+        fieldNameMap.put("self.code", criteria.getCode());
+        fieldNameMap.put("self.desc", criteria.getDesc());
+        fieldNameMap.put("self.enabled", criteria.getEnabled());
+        fieldNameMap.put("self.reset_frequency", criteria.getResetFrequency());
+        fieldNameMap.put("self.seq_value", criteria.getSeqValue());
+        fieldNameMap.put("self.fill_value", criteria.getFillValue());
+        fieldNameMap.put("self.impl_class", criteria.getImplClass());
+        fieldNameMap.put("self.params", criteria.getParams());
+        fieldNameMap.put("self.reset_start_time", criteria.getResetStartTime());
+        fieldNameMap.put("self.reset_end_time", criteria.getResetEndTime());
+        fieldNameMap.put("self.reset_time", criteria.getResetTime());
+        fieldNameMap
+            .entrySet()
+            .stream()
+            .filter(entry -> entry.getValue() != null)
+            .forEach(entry -> {
+                getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields);
+            });
         if (CollectionUtils.isNotEmpty(selectFields)) {
             queryWrapper.select(selectFields.toArray(new String[0])).groupBy(CollectionUtils.isNotEmpty(groupByFields), groupByFields);
-            return sysFillRuleRepository.selectMaps(queryWrapper);
+            return Binder.joinQueryMapsPage(queryWrapper, SysFillRule.class, null).getRecords();
         }
         return Collections.emptyList();
-    }
-
-    private void getAggregateAndGroupBy(Filter<?> filter, String fieldName, List<String> selects, List<String> groupBys) {
-        if (filter.getAggregate() != null) {
-            if (filter.getAggregate() instanceof NumberAggregate) {
-                buildAggregate((NumberAggregate) filter.getAggregate(), fieldName, selects);
-            } else {
-                buildAggregate(filter.getAggregate(), fieldName, selects);
-            }
-        }
-        if (filter.getGroupBy() != null) {
-            if (filter.getGroupBy() instanceof DateTimeGroupBy) {
-                buildGroupBy((DateTimeGroupBy) filter.getGroupBy(), fieldName, groupBys, selects);
-            } else {
-                buildGroupBy(filter.getGroupBy(), fieldName, groupBys, selects);
-            }
-        }
     }
 }

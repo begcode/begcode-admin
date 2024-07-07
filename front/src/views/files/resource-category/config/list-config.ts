@@ -1,7 +1,6 @@
 import type { VxeGridPropTypes, VxeGridProps } from 'vxe-table/types/grid';
 import apiService from '@/api-service/index';
 
-const resourceCategoryService = apiService.files.resourceCategoryService;
 const relationshipApis: any = {
   children: apiService.files.resourceCategoryService.tree,
   parent: apiService.files.resourceCategoryService.tree,
@@ -39,16 +38,6 @@ const searchForm = (): any[] => {
       componentType: 'Text',
       value: '',
       type: 'String',
-      operator: '',
-      span: 8,
-      componentProps: {},
-    },
-    {
-      title: '排序',
-      field: 'orderNumber',
-      componentType: 'Text',
-      value: '',
-      type: 'Integer',
       operator: '',
       span: 8,
       componentProps: {},
@@ -137,49 +126,15 @@ const columns = (): VxeGridPropTypes.Columns => {
       title: '图片列表',
       field: 'images',
       minWidth: 120,
-      editRender: {
-        name: 'ASelectModal',
-        enabled: false,
-        props: {
-          showComponentName: 'Select',
-          container: 'modal',
-          componentName: 'UploadImageList',
-          multiple: true,
-          style: { width: '100%' },
-          gridCustomConfig: { hideColumns: ['category'] },
-          queryNames: ['categoryId'],
-          modalTitle: '图片列表',
-          avatarSlotName: 'default',
-          avatarSlotField: 'url',
-          avatarTipField: 'url',
-          rowIdField: 'row.id',
-          source: 'ResourceCategory',
-        },
-      },
+      slots: { default: 'images_default' },
+      editRender: { name: 'ASelectModal' },
     },
     {
       title: '文件列表',
       field: 'files',
       minWidth: 120,
-      editRender: {
-        name: 'ASelectModal',
-        enabled: false,
-        props: {
-          showComponentName: 'Select',
-          container: 'modal',
-          componentName: 'UploadFileList',
-          multiple: true,
-          style: { width: '100%' },
-          gridCustomConfig: { hideColumns: ['category'] },
-          queryNames: ['categoryId'],
-          modalTitle: '文件列表',
-          avatarSlotName: 'default',
-          avatarSlotField: 'url',
-          avatarTipField: 'url',
-          rowIdField: 'row.id',
-          source: 'ResourceCategory',
-        },
-      },
+      slots: { default: 'files_default' },
+      editRender: { name: 'ASelectModal' },
     },
     {
       title: '操作',

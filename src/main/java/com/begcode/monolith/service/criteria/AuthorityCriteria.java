@@ -54,28 +54,28 @@ public class AuthorityCriteria implements Serializable, Criteria {
     @BindQuery(
         entity = ViewPermission.class,
         column = "id",
-        condition = "this.id=rel_jhi_authority__view_permissions.jhi_authority_id AND rel_jhi_authority__view_permissions.view_permissions_id=[object Object]"
+        condition = "this.id=rel_jhi_authority__view_permissions.jhi_authority_id AND rel_jhi_authority__view_permissions.view_permissions_id=id"
     )
     private LongFilter viewPermissionsId;
 
     @BindQuery(
         entity = ViewPermission.class,
         column = "text",
-        condition = "this.id=rel_jhi_authority__view_permissions.jhi_authority_id AND rel_jhi_authority__view_permissions.view_permissions_id=[object Object]"
+        condition = "this.id=rel_jhi_authority__view_permissions.jhi_authority_id AND rel_jhi_authority__view_permissions.view_permissions_id=id"
     )
     private StringFilter viewPermissionsText;
 
     @BindQuery(
         entity = ApiPermission.class,
         column = "id",
-        condition = "this.id=rel_jhi_authority__api_permissions.jhi_authority_id AND rel_jhi_authority__api_permissions.api_permissions_id=[object Object]"
+        condition = "this.id=rel_jhi_authority__api_permissions.jhi_authority_id AND rel_jhi_authority__api_permissions.api_permissions_id=id"
     )
     private LongFilter apiPermissionsId;
 
     @BindQuery(
         entity = ApiPermission.class,
         column = "name",
-        condition = "this.id=rel_jhi_authority__api_permissions.jhi_authority_id AND rel_jhi_authority__api_permissions.api_permissions_id=[object Object]"
+        condition = "this.id=rel_jhi_authority__api_permissions.jhi_authority_id AND rel_jhi_authority__api_permissions.api_permissions_id=id"
     )
     private StringFilter apiPermissionsName;
 

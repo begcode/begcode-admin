@@ -83,14 +83,14 @@ public class UserCriteria implements Serializable, Criteria {
     @BindQuery(
         entity = Authority.class,
         column = "id",
-        condition = "this.id=rel_jhi_user__authorities.jhi_user_id AND rel_jhi_user__authorities.authorities_id=[object Object]"
+        condition = "this.id=rel_jhi_user__authorities.jhi_user_id AND rel_jhi_user__authorities.authorities_id=id"
     )
     private LongFilter authoritiesId;
 
     @BindQuery(
         entity = Authority.class,
         column = "name",
-        condition = "this.id=rel_jhi_user__authorities.jhi_user_id AND rel_jhi_user__authorities.authorities_id=[object Object]"
+        condition = "this.id=rel_jhi_user__authorities.jhi_user_id AND rel_jhi_user__authorities.authorities_id=id"
     )
     private StringFilter authoritiesName;
 

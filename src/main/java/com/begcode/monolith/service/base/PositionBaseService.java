@@ -55,7 +55,6 @@ public class PositionBaseService<R extends PositionRepository, E extends Positio
     public PositionDTO save(PositionDTO positionDTO) {
         log.debug("Request to save Position : {}", positionDTO);
         Position position = positionMapper.toEntity(positionDTO);
-
         this.saveOrUpdate(position);
         return findOne(position.getId()).orElseThrow();
     }
@@ -70,7 +69,6 @@ public class PositionBaseService<R extends PositionRepository, E extends Positio
     public PositionDTO update(PositionDTO positionDTO) {
         log.debug("Request to update Position : {}", positionDTO);
         Position position = positionMapper.toEntity(positionDTO);
-
         this.saveOrUpdate(position);
         return findOne(position.getId()).orElseThrow();
     }
@@ -171,13 +169,6 @@ public class PositionBaseService<R extends PositionRepository, E extends Positio
                 });
             }
         }
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            Position byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
 
     @Transactional

@@ -20,13 +20,11 @@ import { LoadingOutlined } from '@ant-design/icons-vue';
 defineOptions({ name: 'ApiTreeSelect' });
 
 const props = defineProps({
-  value: [Array, Object, String, Number],
   api: { type: Function as PropType<(arg?: any) => Promise<Recordable<any>>> },
   params: { type: Object },
   immediate: { type: Boolean, default: true },
   async: { type: Boolean, default: false },
   resultField: propTypes.string.def(''),
-  numberToString: propTypes.bool.def(false),
 });
 
 const emit = defineEmits(['options-change', 'change', 'load-data']);
@@ -41,26 +39,21 @@ const getAttrs = computed(() => {
     ...attrs,
   };
   if (result.labelInValue) {
-    if (result.fieldNames && result.fieldNames.value) {
-      if (Array.isArray(props.value)) {
-        props.value.forEach(item => {
-          item.value = item[result.fieldNames.value] + '';
+    if (!result.value) {
+      result.value = {};
+    } else {
+      const { value = 'value', label = 'label' } = result.fieldNames || {};
+      if (Array.isArray(result.value)) {
+        result.value.forEach(item => {
+          value !== 'value' && (item.value = item[value]);
+          label !== 'label' && (item.label = item[label]);
         });
-      } else if (props.value) {
-        props.value['value'] = props.value[result.fieldNames.value] + '';
-      }
-    }
-    if (result.fieldNames && result.fieldNames.label) {
-      if (Array.isArray(props.value)) {
-        props.value.forEach(item => {
-          item.label = item[result.fieldNames.label];
-        });
-      } else if (props.value) {
-        props.value['label'] = props.value[result.fieldNames.label];
+      } else if (result.value) {
+        value !== 'value' && (result.value['value'] = result.value[value]);
+        label !== 'label' && (result.value['label'] = result.value[label]);
       }
     }
   }
-  result.value = props.value;
   return result;
 });
 
@@ -137,27 +130,8 @@ async function fetch() {
   if (!isArray(result)) {
     result = get(result, props.resultField);
   }
-  if (props.numberToString) {
-    result = numberToString(result);
-  }
   treeData.value = (result as Recordable<any>[]) || [];
   isFirstLoaded.value = true;
   emit('options-change', treeData.value);
-}
-
-function numberToString(value) {
-  if (Array.isArray(value)) {
-    return value.map(item => {
-      const valueName = (getAttrs.value.fieldNames as any)?.value ?? 'value';
-      const result = { ...item, [valueName]: item[valueName] + '' };
-      const childrenName = (getAttrs.value.fieldNames as any)?.children ?? 'children';
-      if (result[childrenName] && result[childrenName].length > 0) {
-        result[childrenName] = numberToString(item[childrenName]);
-      }
-      return result;
-    });
-  } else {
-    return value + '';
-  }
 }
 </script>

@@ -33,7 +33,7 @@ public interface RegionCodeBaseRepository<E extends RegionCode> extends BaseCrud
         return Optional.ofNullable(this.selectById(id));
     }
 
-    @Select("delete from region_code regionCode where regionCode.parent = #{parentId}")
+    @Select("delete from region_code region_code where region_code.parent_id = #{parentId}")
     void deleteAllByParentId(@Param("parentId") Long parentId);
 
     default IPage<RegionCode> findAllByParentIsNull(IPage<RegionCode> pageable) {

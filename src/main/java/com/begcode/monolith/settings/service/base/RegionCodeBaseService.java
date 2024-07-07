@@ -59,7 +59,6 @@ public class RegionCodeBaseService<R extends RegionCodeRepository, E extends Reg
         log.debug("Request to save RegionCode : {}", regionCodeDTO);
         RegionCode regionCode = regionCodeMapper.toEntity(regionCodeDTO);
         clearChildrenCache();
-
         this.saveOrUpdate(regionCode);
         return findOne(regionCode.getId()).orElseThrow();
     }
@@ -75,7 +74,6 @@ public class RegionCodeBaseService<R extends RegionCodeRepository, E extends Reg
         log.debug("Request to update RegionCode : {}", regionCodeDTO);
         RegionCode regionCode = regionCodeMapper.toEntity(regionCodeDTO);
         clearChildrenCache();
-
         this.saveOrUpdate(regionCode);
         return findOne(regionCode.getId()).orElseThrow();
     }
@@ -193,13 +191,6 @@ public class RegionCodeBaseService<R extends RegionCodeRepository, E extends Reg
 
     protected void clearRelationsCache() {
         this.relationCacheNames.forEach(cacheName -> Optional.ofNullable(cacheManager.getCache(cacheName)).ifPresent(Cache::clear));
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            RegionCode byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
     // jhipster-needle-service-add-method - JHipster will add getters and setters here, do not remove
 

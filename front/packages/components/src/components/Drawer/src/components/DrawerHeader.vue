@@ -49,22 +49,21 @@ function handleClose() {
   display: flex;
   height: 100%;
   align-items: center;
+}
+.vben-basic-drawer-header__back {
+  padding: 0 12px;
+  cursor: pointer;
+}
 
-  .vben-basic-drawer-header__back {
-    padding: 0 12px;
-    cursor: pointer;
+.vben-basic-drawer-header:hover {
+  color: v-bind('token["colorPrimary"]');
+}
 
-    .vben-basic-drawer-header:hover {
-      color: v-bind('token["colorPrimary"]');
-    }
-  }
+.vben-basic-drawer-header__twrap {
+  flex: 1;
+}
 
-  .vben-basic-drawer-header__twrap {
-    flex: 1;
-  }
-
-  .vben-basic-drawer-header__toolbar {
-    padding-right: 50px;
-  }
+.vben-basic-drawer-header__toolbar {
+  padding-right: 50px;
 }
 </style>

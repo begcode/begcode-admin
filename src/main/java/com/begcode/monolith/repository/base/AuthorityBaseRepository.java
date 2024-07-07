@@ -40,7 +40,7 @@ public interface AuthorityBaseRepository<E extends Authority> extends BaseCrudMa
         return Optional.ofNullable(this.selectById(id));
     }
 
-    @Select("delete from jhi_authority authority where authority.parent = #{parentId}")
+    @Select("delete from jhi_authority jhi_authority where jhi_authority.parent_id = #{parentId}")
     void deleteAllByParentId(@Param("parentId") Long parentId);
 
     default IPage<Authority> findAllByParentIsNull(IPage<Authority> pageable) {

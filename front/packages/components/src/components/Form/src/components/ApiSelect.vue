@@ -27,7 +27,7 @@ import { PropType, ref, computed, unref, watch, useAttrs } from 'vue';
 import { Select } from 'ant-design-vue';
 import type { SelectValue } from 'ant-design-vue/es/select';
 import { useRuleFormItem } from '@/hooks/component/useFormItem';
-import { get, omit, isFunction, isEqual } from 'lodash-es';
+import { get, isFunction, isEqual, isArray } from 'lodash-es';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons-vue';
 import { propTypes } from '@/utils/propTypes';
 import type { Recordable } from '#/utils';
@@ -39,7 +39,6 @@ defineOptions({ name: 'ApiSelect', inheritAttrs: false });
 
 const props = defineProps({
   value: { type: [Array, Object, String, Number] as PropType<SelectValue> },
-  numberToString: propTypes.bool,
   api: {
     type: Function as PropType<(arg?: any) => Promise<OptionsItem[]>>,
     default: null,
@@ -92,14 +91,14 @@ const searchParamValues = computed(() => {
 });
 
 const getOptions = computed(() => {
-  const { labelField, valueField, numberToString } = props;
+  const { labelField, valueField } = props;
   let data = unref(optionsRef).reduce((prev, next: any) => {
     if (next) {
       const value = get(next, valueField);
       prev.push({
-        ...omit(next, [labelField, valueField]),
+        ...next,
         label: get(next, labelField),
-        value: numberToString ? `${value}` : value,
+        value: value,
       });
     }
     return prev;
@@ -181,19 +180,14 @@ const emitAdd = () => {
   emit('show-add');
 };
 function handleChange(_, ...args) {
-  emitData.value = args;
-  // 需要还原为原始值
-  const { valueField, labelField } = props;
-  if (attrs?.labelInValue) {
-    args.forEach((item: any) => {
-      if (valueField !== 'value') {
-        item[valueField] = item.value;
-      }
-      if (labelField !== 'label') {
-        item[labelField] = item.label;
-      }
-    });
-    Object.assign(_, args[0].option);
+  if (unref(attrs).labelInValue) {
+    if (isArray(_)) {
+      _.forEach(item => {
+        Object.assign(item, item.option);
+      });
+    } else {
+      Object.assign(_, _.option);
+    }
   }
   emitData.value = args;
 }
@@ -202,6 +196,18 @@ function initValue() {
   let value = props.value;
   if (value && typeof value === 'string' && value != 'null' && value != 'undefined') {
     state.value = value.split(',');
+  }
+  if (unref(attrs).labelInValue) {
+    const { valueField, labelField } = props;
+    if (isArray(value)) {
+      value.forEach(item => {
+        item.value = item[valueField];
+        item.label = item[labelField];
+      });
+    } else if (value) {
+      value['value'] = value[valueField];
+      value['label'] = value[labelField];
+    }
   }
 }
 </script>

@@ -2,7 +2,6 @@ import type { VxeGridPropTypes, VxeGridProps } from 'vxe-table/types/grid';
 import apiService from '@/api-service/index';
 import { useI18n } from '@/hooks/web/useI18n';
 
-const apiPermissionService = apiService.system.apiPermissionService;
 const relationshipApis: any = {
   children: apiService.system.apiPermissionService.tree,
   parent: apiService.system.apiPermissionService.tree,
@@ -236,25 +235,8 @@ const columns = (): VxeGridPropTypes.Columns => {
       title: '角色列表',
       field: 'authorities',
       minWidth: 120,
-      editRender: {
-        name: 'ASelectModal',
-        enabled: true,
-        props: {
-          showComponentName: 'TreeSelect',
-          api: relationshipApis.authorities,
-          container: 'drawer',
-          labelInValue: true,
-          componentName: 'ApiTree',
-          multiple: true,
-          modalTitle: '角色列表',
-          avatarSlotName: 'default',
-          avatarSlotField: 'name',
-          avatarTipField: 'name',
-          checkStrictly: true,
-          fieldNames: { label: 'name', value: 'id', children: 'children' },
-          style: { width: '100%' },
-        },
-      },
+      slots: { default: 'authorities_default', edit: 'authorities_default' },
+      editRender: { name: 'ASelectModal' },
     },
     {
       title: '操作',

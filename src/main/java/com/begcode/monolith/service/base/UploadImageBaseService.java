@@ -70,7 +70,9 @@ public class UploadImageBaseService<R extends UploadImageRepository, E extends U
     public UploadImageDTO update(UploadImageDTO uploadImageDTO) {
         log.debug("Request to update UploadImage : {}", uploadImageDTO);
         UploadImage uploadImage = uploadImageMapper.toEntity(uploadImageDTO);
-
+        uploadImage.setCategoryId(
+            Optional.ofNullable(uploadImageDTO.getCategory()).map(resourceCategoryDTO -> resourceCategoryDTO.getId()).orElse(null)
+        );
         this.saveOrUpdate(uploadImage);
         return findOne(uploadImage.getId()).orElseThrow();
     }
@@ -244,13 +246,6 @@ public class UploadImageBaseService<R extends UploadImageRepository, E extends U
 
     protected void clearRelationsCache() {
         this.relationCacheNames.forEach(cacheName -> Optional.ofNullable(cacheManager.getCache(cacheName)).ifPresent(Cache::clear));
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            UploadImage byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
     // jhipster-needle-service-add-method - JHipster will add getters and setters here, do not remove
 

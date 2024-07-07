@@ -139,34 +139,6 @@ public class SmsTemplateBaseResource {
     }
 
     /**
-     * {@code PUT  /sms-templates/relations/:operateType} : Updates relationships an existing smsTemplate.
-     *
-     * @param operateType the operateType of the smsTemplateDTO to update.
-     * @param otherEntityIds the otherEntityIds to update.
-     * @param relationshipName the relationshipName to update.
-     * @param relatedIds the relation relatedIds.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated smsTemplateDTO,
-     * or with status {@code 400 (Bad Request)} if the smsTemplateDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the smsTemplateDTO couldn't be updated.
-     */
-    @PutMapping("/relations/{operateType}")
-    @Operation(tags = "更新消息模板关联关系", description = "根据主键更新消息模板关联关系")
-    @AutoLog(value = "更新消息模板关联关系", logType = LogType.OPERATE, operateType = OperateType.EDIT)
-    public ResponseEntity<Boolean> updateRelationships(
-        @PathVariable(value = "operateType") final String operateType,
-        @RequestParam(value = "otherEntityIds") ArrayList<String> otherEntityIds,
-        @RequestParam(value = "relationshipName") String relationshipName,
-        @RequestParam(value = "relatedIds") ArrayList<Long> relatedIds
-    ) {
-        log.debug("REST request to update SmsTemplate : {}, {}", otherEntityIds, operateType);
-        if (CollectionUtils.isEmpty(relatedIds)) {
-            return ResponseEntity.ok(true);
-        }
-        smsTemplateService.updateRelationships(otherEntityIds, relationshipName, relatedIds, operateType);
-        return ResponseEntity.ok(true);
-    }
-
-    /**
      * {@code PATCH  /sms-templates/:id} : Partial updates given fields of an existing smsTemplate, field will ignore if it is null
      *
      * @param id the id of the smsTemplateDTO to save.

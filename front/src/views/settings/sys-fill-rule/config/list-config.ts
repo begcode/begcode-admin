@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 import apiService from '@/api-service/index';
 import { useI18n } from '@/hooks/web/useI18n';
 
-const sysFillRuleService = apiService.settings.sysFillRuleService;
 const relationshipApis: any = {
   ruleItems: apiService.settings.fillRuleItemService.retrieve,
 };
@@ -125,7 +124,7 @@ const searchForm = (): any[] => {
     {
       title: '重置开始日期',
       field: 'resetStartTime',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'ZonedDateTime',
@@ -134,7 +133,7 @@ const searchForm = (): any[] => {
     {
       title: '重置结束日期',
       field: 'resetEndTime',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'ZonedDateTime',
@@ -143,7 +142,7 @@ const searchForm = (): any[] => {
     {
       title: '重置时间',
       field: 'resetTime',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'ZonedDateTime',
@@ -291,25 +290,8 @@ const columns = (): VxeGridPropTypes.Columns => {
       title: '配置项列表',
       field: 'ruleItems',
       minWidth: 120,
-      editRender: {
-        name: 'ASelectModal',
-        enabled: false,
-        props: {
-          showComponentName: 'Select',
-          container: 'modal',
-          componentName: 'FillRuleItemList',
-          multiple: true,
-          style: { width: '100%' },
-          gridCustomConfig: { hideColumns: ['fillRule'] },
-          queryNames: ['id.in'],
-          modalTitle: '配置项列表',
-          avatarSlotName: 'default',
-          avatarSlotField: 'datePattern',
-          avatarTipField: 'datePattern',
-          rowIdField: 'value.id',
-          source: 'SysFillRule',
-        },
-      },
+      slots: { default: 'ruleItems_default' },
+      editRender: { name: 'ASelectModal' },
     },
     {
       title: '操作',

@@ -69,7 +69,6 @@ public class DictionaryBaseService<R extends DictionaryRepository, E extends Dic
     public DictionaryDTO save(DictionaryDTO dictionaryDTO) {
         log.debug("Request to save Dictionary : {}", dictionaryDTO);
         Dictionary dictionary = dictionaryMapper.toEntity(dictionaryDTO);
-
         this.createEntityAndRelatedEntities(
                 dictionary,
                 dictionary.getItems(),
@@ -90,7 +89,6 @@ public class DictionaryBaseService<R extends DictionaryRepository, E extends Dic
     public DictionaryDTO update(DictionaryDTO dictionaryDTO) {
         log.debug("Request to update Dictionary : {}", dictionaryDTO);
         Dictionary dictionary = dictionaryMapper.toEntity(dictionaryDTO);
-
         this.createEntityAndRelatedEntities(
                 dictionary,
                 dictionary.getItems(),
@@ -307,13 +305,6 @@ public class DictionaryBaseService<R extends DictionaryRepository, E extends Dic
                 });
             }
         }
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            Dictionary byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
 
     @Transactional

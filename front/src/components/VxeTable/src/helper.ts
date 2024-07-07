@@ -45,7 +45,6 @@ export function useSetOperationColumn(gridCustomConfig, rowOperations, xGrid) {
         const titleLength = operationColumn.title?.length || 0;
         const widthValue = Math.max(titleLength * 14, maxButtonCount * 40) + 20;
         if (operationColumn.width !== widthValue) {
-          console.log('setOperationColumnWith:', widthValue);
           operationColumn.width = widthValue;
         }
       }

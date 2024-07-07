@@ -62,7 +62,9 @@ public class SmsTemplateBaseService<R extends SmsTemplateRepository, E extends S
     public SmsTemplateDTO save(SmsTemplateDTO smsTemplateDTO) {
         log.debug("Request to save SmsTemplate : {}", smsTemplateDTO);
         SmsTemplate smsTemplate = smsTemplateMapper.toEntity(smsTemplateDTO);
-
+        smsTemplate.setSupplierId(
+            Optional.ofNullable(smsTemplateDTO.getSupplier()).map(smsSupplierDTO -> smsSupplierDTO.getId()).orElse(null)
+        );
         this.saveOrUpdate(smsTemplate);
         return findOne(smsTemplate.getId()).orElseThrow();
     }
@@ -77,7 +79,9 @@ public class SmsTemplateBaseService<R extends SmsTemplateRepository, E extends S
     public SmsTemplateDTO update(SmsTemplateDTO smsTemplateDTO) {
         log.debug("Request to update SmsTemplate : {}", smsTemplateDTO);
         SmsTemplate smsTemplate = smsTemplateMapper.toEntity(smsTemplateDTO);
-
+        smsTemplate.setSupplierId(
+            Optional.ofNullable(smsTemplateDTO.getSupplier()).map(smsSupplierDTO -> smsSupplierDTO.getId()).orElse(null)
+        );
         this.saveOrUpdate(smsTemplate);
         return findOne(smsTemplate.getId()).orElseThrow();
     }
@@ -209,13 +213,6 @@ public class SmsTemplateBaseService<R extends SmsTemplateRepository, E extends S
                 });
             }
         }
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            SmsTemplate byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
     // jhipster-needle-service-add-method - JHipster will add getters and setters here, do not remove
 

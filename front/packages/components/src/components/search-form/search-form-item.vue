@@ -4,6 +4,7 @@
     :labelCol="{ md: field.hideLabel ? 1 : field.labelSpan || 8, xs: field.hideLabel ? 0 : 24 }"
     :wrapperCol="{ md: 24 - (field.hideLabel ? 1 : field.labelSpan || 8), xs: 24 }"
     :labelAlign="field.labelAlign || 'right'"
+    :name="field.field"
     style="width: 100%"
   >
     <template #label @click="changeFieldValue">

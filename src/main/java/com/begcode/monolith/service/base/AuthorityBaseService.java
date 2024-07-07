@@ -69,7 +69,6 @@ public class AuthorityBaseService<R extends AuthorityRepository, E extends Autho
         log.debug("Request to save Authority : {}", authorityDTO);
         Authority authority = authorityMapper.toEntity(authorityDTO);
         clearChildrenCache();
-
         this.createOrUpdateAndRelatedRelations(authority, Arrays.asList("viewPermissions", "apiPermissions"));
         return findOne(authority.getId()).orElseThrow();
     }
@@ -85,7 +84,6 @@ public class AuthorityBaseService<R extends AuthorityRepository, E extends Autho
         log.debug("Request to update Authority : {}", authorityDTO);
         Authority authority = authorityMapper.toEntity(authorityDTO);
         clearChildrenCache();
-
         this.createOrUpdateAndRelatedRelations(authority, Arrays.asList("viewPermissions", "apiPermissions"));
         return findOne(authority.getId()).orElseThrow();
     }

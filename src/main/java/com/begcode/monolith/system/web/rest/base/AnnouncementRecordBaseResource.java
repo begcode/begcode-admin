@@ -140,34 +140,6 @@ public class AnnouncementRecordBaseResource {
     }
 
     /**
-     * {@code PUT  /announcement-records/relations/:operateType} : Updates relationships an existing announcementRecord.
-     *
-     * @param operateType the operateType of the announcementRecordDTO to update.
-     * @param otherEntityIds the otherEntityIds to update.
-     * @param relationshipName the relationshipName to update.
-     * @param relatedIds the relation relatedIds.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated announcementRecordDTO,
-     * or with status {@code 400 (Bad Request)} if the announcementRecordDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the announcementRecordDTO couldn't be updated.
-     */
-    @PutMapping("/relations/{operateType}")
-    @Operation(tags = "更新通告阅读记录关联关系", description = "根据主键更新通告阅读记录关联关系")
-    @AutoLog(value = "更新通告阅读记录关联关系", logType = LogType.OPERATE, operateType = OperateType.EDIT)
-    public ResponseEntity<Boolean> updateRelationships(
-        @PathVariable(value = "operateType") final String operateType,
-        @RequestParam(value = "otherEntityIds") ArrayList<String> otherEntityIds,
-        @RequestParam(value = "relationshipName") String relationshipName,
-        @RequestParam(value = "relatedIds") ArrayList<Long> relatedIds
-    ) {
-        log.debug("REST request to update AnnouncementRecord : {}, {}", otherEntityIds, operateType);
-        if (CollectionUtils.isEmpty(relatedIds)) {
-            return ResponseEntity.ok(true);
-        }
-        announcementRecordService.updateRelationships(otherEntityIds, relationshipName, relatedIds, operateType);
-        return ResponseEntity.ok(true);
-    }
-
-    /**
      * {@code PATCH  /announcement-records/:id} : Partial updates given fields of an existing announcementRecord, field will ignore if it is null
      *
      * @param id the id of the announcementRecordDTO to save.

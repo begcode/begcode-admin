@@ -70,7 +70,6 @@ public class ViewPermissionBaseService<R extends ViewPermissionRepository, E ext
         log.debug("Request to save ViewPermission : {}", viewPermissionDTO);
         ViewPermission viewPermission = viewPermissionMapper.toEntity(viewPermissionDTO);
         clearChildrenCache();
-
         this.saveOrUpdate(viewPermission);
         return findOne(viewPermission.getId()).orElseThrow();
     }
@@ -86,7 +85,6 @@ public class ViewPermissionBaseService<R extends ViewPermissionRepository, E ext
         log.debug("Request to update ViewPermission : {}", viewPermissionDTO);
         ViewPermission viewPermission = viewPermissionMapper.toEntity(viewPermissionDTO);
         clearChildrenCache();
-
         this.saveOrUpdate(viewPermission);
         return findOne(viewPermission.getId()).orElseThrow();
     }
@@ -300,13 +298,6 @@ public class ViewPermissionBaseService<R extends ViewPermissionRepository, E ext
 
     protected void clearRelationsCache() {
         this.relationCacheNames.forEach(cacheName -> Optional.ofNullable(cacheManager.getCache(cacheName)).ifPresent(Cache::clear));
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            ViewPermission byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
 
     @Transactional

@@ -2,7 +2,6 @@ import type { VxeGridPropTypes, VxeGridProps } from 'vxe-table/types/grid';
 import apiService from '@/api-service/index';
 import { useI18n } from '@/hooks/web/useI18n';
 
-const regionCodeService = apiService.settings.regionCodeService;
 const relationshipApis: any = {
   children: apiService.settings.regionCodeService.tree,
   parent: apiService.settings.regionCodeService.tree,
@@ -94,26 +93,6 @@ const searchForm = (): any[] => {
       componentProps: () => {
         return { options: getEnumDict('RegionCodeLevel'), style: 'width: 100%' };
       },
-    },
-    {
-      title: '经度',
-      field: 'lng',
-      componentType: 'Text',
-      value: '',
-      type: 'Double',
-      operator: '',
-      span: 8,
-      componentProps: {},
-    },
-    {
-      title: '纬度',
-      field: 'lat',
-      componentType: 'Text',
-      value: '',
-      type: 'Double',
-      operator: '',
-      span: 8,
-      componentProps: {},
     },
     {
       title: '子节点',

@@ -34,7 +34,7 @@ public interface ViewPermissionBaseRepository<E extends ViewPermission> extends 
         return Optional.ofNullable(this.selectById(id));
     }
 
-    @Select("delete from view_permission viewPermission where viewPermission.parent = #{parentId}")
+    @Select("delete from view_permission view_permission where view_permission.parent_id = #{parentId}")
     void deleteAllByParentId(@Param("parentId") Long parentId);
 
     default IPage<ViewPermission> findAllByParentIsNull(IPage<ViewPermission> pageable) {

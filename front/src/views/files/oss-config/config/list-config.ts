@@ -1,8 +1,6 @@
 import type { VxeGridPropTypes, VxeGridProps } from 'vxe-table/types/grid';
-import apiService from '@/api-service/index';
 import { useI18n } from '@/hooks/web/useI18n';
 
-const ossConfigService = apiService.files.ossConfigService;
 const relationshipApis: any = {};
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
@@ -62,16 +60,6 @@ const searchForm = (): any[] => {
     {
       title: '备注',
       field: 'remark',
-      componentType: 'Text',
-      value: '',
-      type: 'String',
-      operator: '',
-      span: 8,
-      componentProps: {},
-    },
-    {
-      title: '配置数据',
-      field: 'configData',
       componentType: 'Text',
       value: '',
       type: 'String',

@@ -59,7 +59,6 @@ public class SysFillRuleBaseService<R extends SysFillRuleRepository, E extends S
     public SysFillRuleDTO save(SysFillRuleDTO sysFillRuleDTO) {
         log.debug("Request to save SysFillRule : {}", sysFillRuleDTO);
         SysFillRule sysFillRule = sysFillRuleMapper.toEntity(sysFillRuleDTO);
-
         this.createEntityAndRelatedEntities(sysFillRule, sysFillRule.getRuleItems(), FillRuleItem::setFillRuleId);
         return findOne(sysFillRule.getId()).orElseThrow();
     }
@@ -74,7 +73,6 @@ public class SysFillRuleBaseService<R extends SysFillRuleRepository, E extends S
     public SysFillRuleDTO update(SysFillRuleDTO sysFillRuleDTO) {
         log.debug("Request to update SysFillRule : {}", sysFillRuleDTO);
         SysFillRule sysFillRule = sysFillRuleMapper.toEntity(sysFillRuleDTO);
-
         this.createEntityAndRelatedEntities(sysFillRule, sysFillRule.getRuleItems(), FillRuleItem::setFillRuleId);
         return findOne(sysFillRule.getId()).orElseThrow();
     }
@@ -180,13 +178,6 @@ public class SysFillRuleBaseService<R extends SysFillRuleRepository, E extends S
                 });
             }
         }
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            SysFillRule byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
     // jhipster-needle-service-add-method - JHipster will add getters and setters here, do not remove
 

@@ -58,16 +58,16 @@
         <commons-collections.version>3.2.2</commons-collections.version>
         <commons-io.version>2.7</commons-io.version>
         <cos_api.version>5.6.98</cos_api.version>
-        <diboot-core.version>3.1.2.7</diboot-core.version>
+        <diboot-core.version>3.4.0</diboot-core.version>
         <dysmsapi20170525.version>2.0.23</dysmsapi20170525.version>
         <easypoi-annotation.version>4.0.0</easypoi-annotation.version>
         <easypoi-base.version>4.0.0</easypoi-base.version>
         <esdk-obs-java.version>3.22.3.1</esdk-obs-java.version>
         <frontend-maven-plugin.version>1.15.0</frontend-maven-plugin.version>
         <git-commit-id-maven-plugin.version>9.0.0</git-commit-id-maven-plugin.version>
-        <hutool-core.version>5.8.24</hutool-core.version>
+        <hutool-core.version>5.8.28</hutool-core.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
-        <jhipster-framework.version>8.6.0</jhipster-framework.version>
+        <jhipster-framework.version>8.6.1</jhipster-framework.version>
         <jib-maven-plugin.architecture>amd64</jib-maven-plugin.architecture>
         <jib-maven-plugin.image>eclipse-temurin:17-jre-focal</jib-maven-plugin.image>
         <jib-maven-plugin.version>3.4.3</jib-maven-plugin.version>

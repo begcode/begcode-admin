@@ -24,11 +24,10 @@ public interface CommonFieldDataBaseRepository<E extends CommonFieldData> extend
         return Optional.ofNullable(this.selectById(id));
     }
 
-    @Select("delete from common_field_data commonFieldData where commonFieldData.site_config = #{siteConfigId}")
-    void deleteAllBySiteConfigId(@Param("siteConfigId") Long siteConfigId);
-
-    @Select("delete from common_field_data commonFieldData where commonFieldData.dictionary = #{dictionaryId}")
-    void deleteAllByDictionaryId(@Param("dictionaryId") Long dictionaryId);
+    @Select(
+        "delete from common_field_data common_field_data where common_field_data.owner_entity_name = #{ownerEntityName} and common_field_data.owner_entity_id = #{ownerEntityId}"
+    )
+    void deleteAllByIdEntity(@Param("ownerEntityName") String ownerEntityName, @Param("ownerEntityId") Long ownerEntityId);
 
     default CommonFieldData saveAndGet(CommonFieldData commonFieldData) {
         if (Objects.nonNull(commonFieldData.getId())) {

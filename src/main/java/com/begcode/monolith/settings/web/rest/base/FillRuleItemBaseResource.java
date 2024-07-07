@@ -143,34 +143,6 @@ public class FillRuleItemBaseResource {
     }
 
     /**
-     * {@code PUT  /fill-rule-items/relations/:operateType} : Updates relationships an existing fillRuleItem.
-     *
-     * @param operateType the operateType of the fillRuleItemDTO to update.
-     * @param otherEntityIds the otherEntityIds to update.
-     * @param relationshipName the relationshipName to update.
-     * @param relatedIds the relation relatedIds.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated fillRuleItemDTO,
-     * or with status {@code 400 (Bad Request)} if the fillRuleItemDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the fillRuleItemDTO couldn't be updated.
-     */
-    @PutMapping("/relations/{operateType}")
-    @Operation(tags = "更新填充规则条目关联关系", description = "根据主键更新填充规则条目关联关系")
-    @AutoLog(value = "更新填充规则条目关联关系", logType = LogType.OPERATE, operateType = OperateType.EDIT)
-    public ResponseEntity<Boolean> updateRelationships(
-        @PathVariable(value = "operateType") final String operateType,
-        @RequestParam(value = "otherEntityIds") ArrayList<String> otherEntityIds,
-        @RequestParam(value = "relationshipName") String relationshipName,
-        @RequestParam(value = "relatedIds") ArrayList<Long> relatedIds
-    ) {
-        log.debug("REST request to update FillRuleItem : {}, {}", otherEntityIds, operateType);
-        if (CollectionUtils.isEmpty(relatedIds)) {
-            return ResponseEntity.ok(true);
-        }
-        fillRuleItemService.updateRelationships(otherEntityIds, relationshipName, relatedIds, operateType);
-        return ResponseEntity.ok(true);
-    }
-
-    /**
      * {@code PUT  /fill-rule-items/sort-value/:id/:type} : Updates sort value fillRuleItem.
      *
      * @param id the id of the fillRuleItemDTO to update.

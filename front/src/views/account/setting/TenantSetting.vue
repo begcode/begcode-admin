@@ -414,9 +414,7 @@ async function handleOutClick() {
       if (res.success) {
         createMessage.success(res.message);
         cancelVisible.value = false;
-        //update-begin---author:wangshuai ---date:20230703  for：【QQYUN-5632】退出租户后 再点击主页 已退出的租户应用还可以操作------------
         userStore.setTenant(null);
-        //update-end---author:wangshuai ---date:20230703  for：【QQYUN-5632】退出租户后 再点击主页 已退出的租户应用还可以操作------------
         //切换租户后要刷新首页
         window.location.reload();
       } else {
@@ -424,7 +422,6 @@ async function handleOutClick() {
           //需要指定变更者
           owenVisible.value = true;
           cancelVisible.value = false;
-          //update-begin---author:wangshuai ---date:20230426  for：【QQYUN-5270】名下租户全部退出后，再次登录，提示租户全部冻结。拥有者提示前往注销------------
         } else if (res.message === 'cancelTenant') {
           cancelVisible.value = false;
           let fullPath = router.currentRoute.value.fullPath;
@@ -441,7 +438,6 @@ async function handleOutClick() {
               router.push('/myapps/settings/organization/organMessage/' + unref(myTenantInfo).tenantUserId);
             },
           });
-          //update-end---author:wangshuai ---date:20230426  for：【QQYUN-5270】名下租户全部退出后，再次登录，提示租户全部冻结。拥有者提示前往注销------------
         } else {
           createMessage.warning(res.message);
         }

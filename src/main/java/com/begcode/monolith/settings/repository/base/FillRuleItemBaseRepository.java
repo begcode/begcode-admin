@@ -31,7 +31,7 @@ public interface FillRuleItemBaseRepository<E extends FillRuleItem> extends Base
         return Optional.ofNullable(this.selectById(id));
     }
 
-    @Select("delete from fill_rule_item fillRuleItem where fillRuleItem.fill_rule = #{fillRuleId}")
+    @Select("delete from fill_rule_item fill_rule_item where fill_rule_item.fill_rule_id = #{fillRuleId}")
     void deleteAllByFillRuleId(@Param("fillRuleId") Long fillRuleId);
 
     default FillRuleItem saveAndGet(FillRuleItem fillRuleItem) {

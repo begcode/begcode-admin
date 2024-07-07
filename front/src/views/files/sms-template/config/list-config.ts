@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 import apiService from '@/api-service/index';
 import { useI18n } from '@/hooks/web/useI18n';
 
-const smsTemplateService = apiService.files.smsTemplateService;
 const relationshipApis: any = {
   supplier: apiService.files.smsSupplierService.retrieve,
 };
@@ -127,7 +126,7 @@ const searchForm = (): any[] => {
     {
       title: '创建时间',
       field: 'createdDate',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'Instant',
@@ -146,7 +145,7 @@ const searchForm = (): any[] => {
     {
       title: '修改时间',
       field: 'lastModifiedDate',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'Instant',

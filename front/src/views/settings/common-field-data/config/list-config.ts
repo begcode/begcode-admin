@@ -76,16 +76,6 @@ const searchForm = (): any[] => {
       componentProps: {},
     },
     {
-      title: '排序',
-      field: 'sortValue',
-      componentType: 'Text',
-      value: '',
-      type: 'Integer',
-      operator: '',
-      span: 8,
-      componentProps: {},
-    },
-    {
       title: '是否禁用',
       field: 'disabled',
       componentType: 'RadioGroup',

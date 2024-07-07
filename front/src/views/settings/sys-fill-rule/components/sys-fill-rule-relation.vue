@@ -1,6 +1,12 @@
 <template>
   <div>
-    <Card v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled" title="高级搜索" class="bc-list-search-form-card">
+    <Card
+      v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
+      title="高级搜索"
+      class="bc-list-search-form-card"
+      :body-style="{ 'padding-top': '12px', 'padding-bottom': '8px' }"
+      :head-style="{ 'min-height': '40px' }"
+    >
       <template #extra>
         <Space>
           <Button type="default" @click="showSearchFormSetting" preIcon="ant-design:setting-outlined" shape="circle" size="small"></Button>
@@ -59,14 +65,15 @@
                       @pressEnter="formSearch"
                       style="width: 280px"
                       ref="searchInputRef"
+                      data-cy="listSearchInput"
                     >
                       <template #prefix>
                         <Icon icon="ant-design:search-outlined" />
                       </template>
                       <template #addonAfter>
-                        <Button type="link" @click="formSearch" style="height: 30px"
-                          >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch"></Icon
-                        ></Button>
+                        <Button type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
+                          >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch" data-cy="listSearchMore"></Icon>
+                        </Button>
                       </template>
                     </Input>
                     <template v-for="button of gridOptions?.toolbarConfig?.buttons">
@@ -127,9 +134,7 @@ import { mergeWith, isArray, isObject, isString, merge, debounce, pickBy, isEmpt
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { transVxeSorts } from '@/utils/jhipster/sorts';
 import { Button, ButtonGroup, BasicModal, BasicDrawer, Icon, SearchForm, useModalInner, useDrawerInner } from '@begcode/components';
-import { useGo } from '@/hooks/web/usePage';
 import ServerProvider from '@/api-service/index';
-import SysFillRuleEdit from '../sys-fill-rule-edit.vue';
 import SysFillRuleDetail from '../sys-fill-rule-detail.vue';
 import SysFillRuleList from '../sys-fill-rule-list.vue';
 
@@ -254,7 +259,7 @@ const config = {
       {
         title: '重置开始日期',
         field: 'resetStartTime',
-        componentType: 'DateTime',
+        componentType: 'DateTimeRange',
         operator: '',
         span: 8,
         type: 'ZonedDateTime',
@@ -263,7 +268,7 @@ const config = {
       {
         title: '重置结束日期',
         field: 'resetEndTime',
-        componentType: 'DateTime',
+        componentType: 'DateTimeRange',
         operator: '',
         span: 8,
         type: 'ZonedDateTime',
@@ -272,7 +277,7 @@ const config = {
       {
         title: '重置时间',
         field: 'resetTime',
-        componentType: 'DateTime',
+        componentType: 'DateTimeRange',
         operator: '',
         span: 8,
         type: 'ZonedDateTime',
@@ -437,7 +442,7 @@ const config = {
       showHeaderOverflow: true,
       showOverflow: true,
       keepSource: true,
-      id: 'full_edit_1',
+      id: 'vxe_grid_sysFillRule_relation',
       height: 600,
       printConfig: {
         columns: [
@@ -551,7 +556,6 @@ const [registerDrawer, { closeDrawer, setDrawerProps }] = useDrawerInner(data =>
 const modalComponentRef = ref<any>(null);
 const drawerComponentRef = ref<any>(null);
 const ctx = getCurrentInstance()?.proxy;
-const go = useGo();
 const apiService = ctx?.$apiService as typeof ServerProvider;
 const relationshipApis: any = {
   ruleItems: apiService.settings.fillRuleItemService.retrieve,
@@ -560,10 +564,6 @@ const apis = {
   sysFillRuleService: apiService.settings.sysFillRuleService,
   find: apiService.settings.sysFillRuleService.retrieve,
   updateRelations: apiService.settings.sysFillRuleService.updateRelations,
-};
-const pageConfig = {
-  title: '填充规则列表',
-  baseRouteName: 'systemSysFillRule',
 };
 const columns = config.columns();
 const searchFormFields = config.searchForm();
@@ -582,6 +582,7 @@ const searchFormConfig = reactive(
       useOr: false,
       disabled: false,
       allowSwitch: true,
+      compact: true,
     },
     props.searchFormOptions,
   ),
@@ -685,11 +686,10 @@ const gridOptions = reactive<VxeGridProps>({
         return await apis.find(queryParams);
       },
       queryAll: async () => await apis.find({ size: -1 }),
-      delete: async records => await apis.deleteByIds(records.body.removeRecords.map(record => record.id)),
     },
   },
   toolbarConfig: {
-    custom: true,
+    custom: false,
     import: false,
     print: false,
     export: false,
@@ -710,7 +710,10 @@ const gridOptions = reactive<VxeGridProps>({
       },
     ],
     // 表格右上角自定义按钮
-    tools: [{ code: 'add', name: '新增', circle: false, icon: 'vxe-icon-add' }],
+    tools: [
+      { code: 'add', name: '新增', circle: false, icon: 'vxe-icon-add' },
+      { code: 'custom-column', name: '列配置', circle: false, icon: 'vxe-icon-custom-column' },
+    ],
   },
   columns,
 });
@@ -757,7 +760,7 @@ const toolbarClick = ({ code }) => {
               const otherEntityIds: any[] = [];
               if (props.query) {
                 Object.values(props.query).forEach((value: any) => {
-                  if (value !== null && value !== undefined) {
+                  if (value && value.toString().length > 0) {
                     otherEntityIds.push(`${value}`);
                   }
                 });
@@ -803,6 +806,9 @@ const toolbarClick = ({ code }) => {
       }
       break;
     }
+    case 'custom-column':
+      xGrid.value.openCustom();
+      break;
     default:
       console.log('事件未定义', code);
   }
@@ -844,7 +850,7 @@ const okModal = async () => {
       const otherEntityIds: any[] = [];
       if (props.query) {
         Object.values(props.query).forEach((value: any) => {
-          if (value && value.length > 0) {
+          if (value && value.toString().length > 0) {
             otherEntityIds.push(`${value}`);
           }
         });
@@ -886,7 +892,7 @@ const okDrawer = async () => {
       const otherEntityIds: any[] = [];
       if (props.query) {
         Object.values(props.query).forEach((value: any) => {
-          if (value && value.length > 0) {
+          if (value && value.toString().length > 0) {
             otherEntityIds.push(`${value}`);
           }
         });
@@ -937,99 +943,74 @@ const showSearchFormSetting = () => {
 const rowClick = ({ name, data }) => {
   const row = data;
   const operation = tableRowOperations.find(operation => operation.name === name);
-  switch (name) {
-    case 'detail':
-      if (operation) {
-        if (operation.click) {
-          operation.click(row);
+  if (operation?.click) {
+    operation.click(row);
+  } else {
+    switch (name) {
+      case 'detail':
+        if (operation?.containerType === 'drawer') {
+          drawerConfig.componentName = shallowRef(SysFillRuleDetail);
+          drawerConfig.entityId = row.id;
+          drawerConfig.title = '详情';
+          setDrawerProps({ open: true });
+          break;
         } else {
-          switch (operation.containerType) {
-            case 'drawer':
-              drawerConfig.componentName = shallowRef(SysFillRuleDetail);
-              drawerConfig.entityId = row.id;
-              drawerConfig.title = '详情';
-              setDrawerProps({ open: true });
-              break;
-            case 'route':
-              if (pageConfig.baseRouteName) {
-                go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
-              } else {
-                console.log('未定义方法');
-              }
-              break;
-            case 'modal':
-            default:
-              modalConfig.componentName = shallowRef(SysFillRuleDetail);
-              modalConfig.entityId = row.id;
-              modalConfig.title = '详情';
-              setModalProps({ open: true });
-          }
+          modalConfig.componentName = shallowRef(SysFillRuleDetail);
+          modalConfig.entityId = row.id;
+          modalConfig.title = '详情';
+          setModalProps({ open: true });
         }
-      } else {
-        if (pageConfig.baseRouteName) {
-          go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
-        } else {
-          console.log('未定义方法');
-        }
-      }
-      break;
-    case 'cancelRelate':
-      Modal.confirm({
-        title: `操作提示`,
-        content: `是否取消ID为${row.id}的关联？`,
-        onOk() {
-          if (operation.click) {
-            operation.click(row);
-          } else {
-            if (props.updateType === 'remoteApi') {
-              const relatedIds = [row.id];
-              const otherEntityIds: any[] = [];
-              if (props.query) {
-                Object.values(props.query).forEach((value: any) => {
-                  if (value !== null && value !== undefined) {
-                    otherEntityIds.push(`${value}`);
-                  }
-                });
-              }
-              const relationshipName = relationships[props.source + '.' + props.field];
-              apis.updateRelations(otherEntityIds, relationshipName, relatedIds, 'delete').then(result => {
-                if (result) {
-                  message.success({
-                    content: `取消关联成功`,
-                    duration: 1,
-                  });
-                  formSearch();
-                } else {
-                  message.error({
-                    content: `取消关联失败！`,
-                    duration: 1,
+        break;
+      case 'cancelRelate':
+        Modal.confirm({
+          title: `操作提示`,
+          content: `是否取消ID为${row.id}的关联？`,
+          onOk() {
+            if (operation.click) {
+              operation.click(row);
+            } else {
+              if (props.updateType === 'remoteApi') {
+                const relatedIds = [row.id];
+                const otherEntityIds: any[] = [];
+                if (props.query) {
+                  Object.values(props.query).forEach((value: any) => {
+                    if (value && value.toString().length > 0) {
+                      otherEntityIds.push(`${value}`);
+                    }
                   });
                 }
-              });
-            } else {
-              if (xGrid.value) {
-                xGrid.value.remove([row]).then(() => {
-                  message.success({
-                    content: `取消成功`,
-                    duration: 1,
-                  });
+                const relationshipName = relationships[props.source + '.' + props.field];
+                apis.updateRelations(otherEntityIds, relationshipName, relatedIds, 'delete').then(result => {
+                  if (result) {
+                    message.success({
+                      content: `取消关联成功`,
+                      duration: 1,
+                    });
+                    formSearch();
+                  } else {
+                    message.error({
+                      content: `取消关联失败！`,
+                      duration: 1,
+                    });
+                  }
                 });
+              } else {
+                if (xGrid.value) {
+                  xGrid.value.remove([row]).then(() => {
+                    message.success({
+                      content: `取消成功`,
+                      duration: 1,
+                    });
+                  });
+                }
               }
             }
-          }
-        },
-      });
-      break;
-    default:
-      if (operation) {
-        if (operation.click) {
-          operation.click(row);
-        } else {
-          console.log('error', `click方法未定义`);
-        }
-      } else {
+          },
+        });
+        break;
+      default:
         console.log('error', `${name}未定义`);
-      }
+    }
   }
 };
 

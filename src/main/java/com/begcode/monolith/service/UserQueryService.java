@@ -1,11 +1,5 @@
 package com.begcode.monolith.service;
 
-import static com.diboot.core.binding.QueryBuilder.criteriaToWrapper;
-import static com.diboot.core.binding.QueryBuilder.criteriaToWrapperNoJoin;
-import static tech.jhipster.service.mybatis.AggregateUtil.buildAggregate;
-import static tech.jhipster.service.mybatis.AggregateUtil.buildGroupBy;
-
-import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -18,15 +12,11 @@ import com.diboot.core.binding.Binder;
 import com.diboot.core.binding.query.dynamic.DynamicJoinQueryWrapper;
 import java.util.*;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import tech.jhipster.service.aggregate.*;
 import tech.jhipster.service.filter.*;
-import tech.jhipster.service.mybatis.CriteriaUtil;
 import tech.jhipster.service.mybatis.QueryService;
 
 /**
@@ -126,7 +116,7 @@ public class UserQueryService implements QueryService<User> {
             tempCriteria.setAnd(keywordsCriteria);
         }
         QueryWrapper<User> queryWrapper = new DynamicJoinQueryWrapper<>(UserCriteria.class, null);
-        return createQueryWrapper(queryWrapper, criteria.getUseOr(), criteria);
+        return createQueryWrapper(queryWrapper, criteria.getUseOr(), criteria, User.class);
     }
 
     /**
@@ -136,141 +126,7 @@ public class UserQueryService implements QueryService<User> {
      */
     public QueryWrapper<User> createQueryWrapperNoJoin(UserCriteria criteria) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        return createQueryWrapperNoJoin(queryWrapper, criteria.getUseOr(), criteria);
-    }
-
-    private QueryWrapper<User> createQueryWrapper(QueryWrapper<User> queryWrapper, Boolean useOr, UserCriteria criteria) {
-        if (criteria != null) {
-            if (useOr == null) {
-                useOr = false;
-            }
-            Map<QueryWrapper<User>, Map<String, Object>> queryWrapperMapMap = criteriaToWrapper(criteria, User.class);
-            Map.Entry<QueryWrapper<User>, Map<String, Object>> queryWrapperMapEntry = queryWrapperMapMap
-                .entrySet()
-                .stream()
-                .findFirst()
-                .orElseThrow();
-            Map<String, Object> fieldMap = queryWrapperMapEntry.getValue();
-            if (MapUtils.isNotEmpty(fieldMap)) {
-                if (queryWrapper == null) {
-                    queryWrapper = queryWrapperMapEntry.getKey();
-                }
-                QueryWrapper<User> finalQueryWrapper = queryWrapper;
-                Boolean finalUseOr = useOr;
-                fieldMap.forEach((fieldName, filter) -> {
-                    if (filter instanceof StringFilter) {
-                        CriteriaUtil.build(
-                            finalUseOr,
-                            finalQueryWrapper,
-                            buildStringSpecification((StringFilter) filter, fieldName, finalUseOr)
-                        );
-                    } else if (filter instanceof RangeFilter) {
-                        CriteriaUtil.build(
-                            finalUseOr,
-                            finalQueryWrapper,
-                            buildRangeSpecification((RangeFilter) filter, fieldName, finalUseOr)
-                        );
-                    } else if (filter instanceof Filter) {
-                        CriteriaUtil.build(finalUseOr, finalQueryWrapper, buildSpecification((Filter) filter, fieldName, finalUseOr));
-                    }
-                });
-            }
-            if (criteria.getAnd() != null) {
-                Map<String, Object> stringObjectMap = BeanUtil.beanToMap(criteria.getAnd(), false, true);
-                if (
-                    !((stringObjectMap.containsKey("useOr") && stringObjectMap.keySet().size() == 1) ||
-                        ObjectUtils.isEmpty(stringObjectMap))
-                ) {
-                    if (queryWrapper != null) {
-                        queryWrapper.and(q -> createQueryWrapper(q, criteria.getAnd().getUseOr(), criteria.getAnd()));
-                    } else {
-                        queryWrapper = createQueryWrapper(null, criteria.getAnd().getUseOr(), criteria.getAnd());
-                    }
-                }
-            } else {
-                if (criteria.getOr() != null) {
-                    Map<String, Object> stringObjectMap = BeanUtil.beanToMap(criteria.getOr(), false, true);
-                    if (
-                        !((stringObjectMap.containsKey("useOr") && stringObjectMap.keySet().size() == 1) ||
-                            ObjectUtils.isEmpty(stringObjectMap))
-                    ) {
-                        if (queryWrapper != null) {
-                            queryWrapper.or(q -> createQueryWrapper(q, criteria.getOr().getUseOr(), criteria.getOr()));
-                        } else {
-                            queryWrapper = createQueryWrapper(null, criteria.getOr().getUseOr(), criteria.getOr());
-                        }
-                    }
-                }
-            }
-        }
-        return queryWrapper;
-    }
-
-    private QueryWrapper<User> createQueryWrapperNoJoin(QueryWrapper<User> queryWrapper, Boolean useOr, UserCriteria criteria) {
-        if (criteria != null) {
-            if (useOr == null) {
-                useOr = false;
-            }
-            Map<QueryWrapper<User>, Map<String, Object>> queryWrapperMapMap = criteriaToWrapperNoJoin(criteria, User.class);
-            Map.Entry<QueryWrapper<User>, Map<String, Object>> queryWrapperMapEntry = queryWrapperMapMap
-                .entrySet()
-                .stream()
-                .findFirst()
-                .orElseThrow();
-            Map<String, Object> fieldMap = queryWrapperMapEntry.getValue();
-            if (MapUtils.isNotEmpty(fieldMap)) {
-                if (queryWrapper == null) {
-                    queryWrapper = queryWrapperMapEntry.getKey();
-                }
-                QueryWrapper<User> finalQueryWrapper = queryWrapper;
-                Boolean finalUseOr = useOr;
-                fieldMap.forEach((fieldName, filter) -> {
-                    if (filter instanceof StringFilter) {
-                        CriteriaUtil.build(
-                            finalUseOr,
-                            finalQueryWrapper,
-                            buildStringSpecification((StringFilter) filter, fieldName, finalUseOr)
-                        );
-                    } else if (filter instanceof RangeFilter) {
-                        CriteriaUtil.build(
-                            finalUseOr,
-                            finalQueryWrapper,
-                            buildRangeSpecification((RangeFilter) filter, fieldName, finalUseOr)
-                        );
-                    } else if (filter instanceof Filter) {
-                        CriteriaUtil.build(finalUseOr, finalQueryWrapper, buildSpecification((Filter) filter, fieldName, finalUseOr));
-                    }
-                });
-            }
-            if (criteria.getAnd() != null) {
-                Map<String, Object> stringObjectMap = BeanUtil.beanToMap(criteria.getAnd(), false, true);
-                if (
-                    !((stringObjectMap.containsKey("useOr") && stringObjectMap.keySet().size() == 1) ||
-                        ObjectUtils.isEmpty(stringObjectMap))
-                ) {
-                    if (queryWrapper != null) {
-                        queryWrapper.and(q -> createQueryWrapperNoJoin(q, criteria.getAnd().getUseOr(), criteria.getAnd()));
-                    } else {
-                        queryWrapper = createQueryWrapperNoJoin(null, criteria.getAnd().getUseOr(), criteria.getAnd());
-                    }
-                }
-            } else {
-                if (criteria.getOr() != null) {
-                    Map<String, Object> stringObjectMap = BeanUtil.beanToMap(criteria.getOr(), false, true);
-                    if (
-                        !((stringObjectMap.containsKey("useOr") && stringObjectMap.keySet().size() == 1) ||
-                            ObjectUtils.isEmpty(stringObjectMap))
-                    ) {
-                        if (queryWrapper != null) {
-                            queryWrapper.or(q -> createQueryWrapperNoJoin(q, criteria.getOr().getUseOr(), criteria.getOr()));
-                        } else {
-                            queryWrapper = createQueryWrapperNoJoin(null, criteria.getOr().getUseOr(), criteria.getOr());
-                        }
-                    }
-                }
-            }
-        }
-        return queryWrapper;
+        return createQueryWrapperNoJoin(queryWrapper, criteria.getUseOr(), criteria, User.class);
     }
 
     /**
@@ -288,69 +144,32 @@ public class UserQueryService implements QueryService<User> {
         QueryWrapper<User> queryWrapper = createQueryWrapper(criteria);
         List<String> selectFields = new ArrayList<>();
         List<String> groupByFields = new ArrayList<>();
-        if (criteria.getId() != null) {
-            getAggregateAndGroupBy(criteria.getId(), "id", selectFields, groupByFields);
-        }
-        if (criteria.getLogin() != null) {
-            getAggregateAndGroupBy(criteria.getLogin(), "login", selectFields, groupByFields);
-        }
-        if (criteria.getFirstName() != null) {
-            getAggregateAndGroupBy(criteria.getFirstName(), "first_name", selectFields, groupByFields);
-        }
-        if (criteria.getLastName() != null) {
-            getAggregateAndGroupBy(criteria.getLastName(), "last_name", selectFields, groupByFields);
-        }
-        if (criteria.getEmail() != null) {
-            getAggregateAndGroupBy(criteria.getEmail(), "email", selectFields, groupByFields);
-        }
-        if (criteria.getMobile() != null) {
-            getAggregateAndGroupBy(criteria.getMobile(), "mobile", selectFields, groupByFields);
-        }
-        if (criteria.getBirthday() != null) {
-            getAggregateAndGroupBy(criteria.getBirthday(), "birthday", selectFields, groupByFields);
-        }
-        if (criteria.getActivated() != null) {
-            getAggregateAndGroupBy(criteria.getActivated(), "activated", selectFields, groupByFields);
-        }
-        if (criteria.getLangKey() != null) {
-            getAggregateAndGroupBy(criteria.getLangKey(), "lang_key", selectFields, groupByFields);
-        }
-        if (criteria.getImageUrl() != null) {
-            getAggregateAndGroupBy(criteria.getImageUrl(), "image_url", selectFields, groupByFields);
-        }
-        if (criteria.getCreatedBy() != null) {
-            getAggregateAndGroupBy(criteria.getCreatedBy(), "created_by", selectFields, groupByFields);
-        }
-        if (criteria.getCreatedDate() != null) {
-            getAggregateAndGroupBy(criteria.getCreatedDate(), "created_date", selectFields, groupByFields);
-        }
-        if (criteria.getLastModifiedBy() != null) {
-            getAggregateAndGroupBy(criteria.getLastModifiedBy(), "last_modified_by", selectFields, groupByFields);
-        }
-        if (criteria.getLastModifiedDate() != null) {
-            getAggregateAndGroupBy(criteria.getLastModifiedDate(), "last_modified_date", selectFields, groupByFields);
-        }
+        Map<String, Filter<?>> fieldNameMap = new HashMap<>();
+        fieldNameMap.put("self.id", criteria.getId());
+        fieldNameMap.put("self.login", criteria.getLogin());
+        fieldNameMap.put("self.first_name", criteria.getFirstName());
+        fieldNameMap.put("self.last_name", criteria.getLastName());
+        fieldNameMap.put("self.email", criteria.getEmail());
+        fieldNameMap.put("self.mobile", criteria.getMobile());
+        fieldNameMap.put("self.birthday", criteria.getBirthday());
+        fieldNameMap.put("self.activated", criteria.getActivated());
+        fieldNameMap.put("self.lang_key", criteria.getLangKey());
+        fieldNameMap.put("self.image_url", criteria.getImageUrl());
+        fieldNameMap.put("self.created_by", criteria.getCreatedBy());
+        fieldNameMap.put("self.created_date", criteria.getCreatedDate());
+        fieldNameMap.put("self.last_modified_by", criteria.getLastModifiedBy());
+        fieldNameMap.put("self.last_modified_date", criteria.getLastModifiedDate());
+        fieldNameMap
+            .entrySet()
+            .stream()
+            .filter(entry -> entry.getValue() != null)
+            .forEach(entry -> {
+                getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields);
+            });
         if (CollectionUtils.isNotEmpty(selectFields)) {
             queryWrapper.select(selectFields.toArray(new String[0])).groupBy(CollectionUtils.isNotEmpty(groupByFields), groupByFields);
-            return userRepository.selectMaps(queryWrapper);
+            return Binder.joinQueryMapsPage(queryWrapper, User.class, null).getRecords();
         }
         return Collections.emptyList();
-    }
-
-    private void getAggregateAndGroupBy(Filter<?> filter, String fieldName, List<String> selects, List<String> groupBys) {
-        if (filter.getAggregate() != null) {
-            if (filter.getAggregate() instanceof NumberAggregate) {
-                buildAggregate((NumberAggregate) filter.getAggregate(), fieldName, selects);
-            } else {
-                buildAggregate(filter.getAggregate(), fieldName, selects);
-            }
-        }
-        if (filter.getGroupBy() != null) {
-            if (filter.getGroupBy() instanceof DateTimeGroupBy) {
-                buildGroupBy((DateTimeGroupBy) filter.getGroupBy(), fieldName, groupBys, selects);
-            } else {
-                buildGroupBy(filter.getGroupBy(), fieldName, groupBys, selects);
-            }
-        }
     }
 }

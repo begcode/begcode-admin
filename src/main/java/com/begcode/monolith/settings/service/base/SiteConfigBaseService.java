@@ -58,7 +58,6 @@ public class SiteConfigBaseService<R extends SiteConfigRepository, E extends Sit
     public SiteConfigDTO save(SiteConfigDTO siteConfigDTO) {
         log.debug("Request to save SiteConfig : {}", siteConfigDTO);
         SiteConfig siteConfig = siteConfigMapper.toEntity(siteConfigDTO);
-
         this.createEntityAndRelatedEntities(
                 siteConfig,
                 siteConfig.getItems(),
@@ -79,7 +78,6 @@ public class SiteConfigBaseService<R extends SiteConfigRepository, E extends Sit
     public SiteConfigDTO update(SiteConfigDTO siteConfigDTO) {
         log.debug("Request to update SiteConfig : {}", siteConfigDTO);
         SiteConfig siteConfig = siteConfigMapper.toEntity(siteConfigDTO);
-
         this.createEntityAndRelatedEntities(
                 siteConfig,
                 siteConfig.getItems(),
@@ -212,13 +210,6 @@ public class SiteConfigBaseService<R extends SiteConfigRepository, E extends Sit
                 });
             }
         }
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            SiteConfig byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
 
     @Transactional

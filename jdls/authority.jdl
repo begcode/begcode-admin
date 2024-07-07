@@ -274,10 +274,6 @@ entity Department {
     @endUsed(imageUrl)
     logo String /** logo地址 */
     contact String /** 联系人 */
-    @createdBy
-    createUserId Long /** 创建用户 Id */
-    @CreatedDate
-    createTime Instant /** 创建时间 */
 }
 
 /**

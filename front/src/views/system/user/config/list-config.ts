@@ -2,7 +2,6 @@ import type { VxeGridPropTypes, VxeGridProps } from 'vxe-table/types/grid';
 import dayjs from 'dayjs';
 import apiService from '@/api-service/index';
 
-const userService = apiService.system.userService;
 const relationshipApis: any = {
   department: apiService.settings.departmentService.tree,
   position: apiService.settings.positionService.retrieve,
@@ -76,7 +75,7 @@ const searchForm = (): any[] => {
     {
       title: '出生日期',
       field: 'birthday',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'ZonedDateTime',
@@ -110,16 +109,6 @@ const searchForm = (): any[] => {
       componentProps: {},
     },
     {
-      title: '头像地址',
-      field: 'imageUrl',
-      componentType: 'Text',
-      value: '',
-      type: 'String',
-      operator: '',
-      span: 8,
-      componentProps: {},
-    },
-    {
       title: '创建者Id',
       field: 'createdBy',
       componentType: 'Text',
@@ -132,7 +121,7 @@ const searchForm = (): any[] => {
     {
       title: '创建时间',
       field: 'createdDate',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'Instant',
@@ -151,7 +140,7 @@ const searchForm = (): any[] => {
     {
       title: '修改时间',
       field: 'lastModifiedDate',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'Instant',
@@ -333,24 +322,8 @@ const columns = (): VxeGridPropTypes.Columns => {
       title: '角色列表',
       field: 'authorities',
       minWidth: 120,
-      editRender: {
-        name: 'ASelectModal',
-        enabled: false,
-        props: {
-          showComponentName: 'TreeSelect',
-          container: 'modal',
-          componentName: 'AuthorityRelation',
-          multiple: true,
-          style: { width: '100%' },
-          queryNames: ['id.in'],
-          modalTitle: '角色列表',
-          avatarSlotName: 'default',
-          avatarSlotField: 'name',
-          avatarTipField: 'name',
-          rowIdField: 'value.id',
-          source: 'User',
-        },
-      },
+      slots: { default: 'authorities_default', edit: 'authorities_default' },
+      editRender: { name: 'ASelectModal' },
     },
     {
       title: '操作',

@@ -61,7 +61,6 @@ public class AnnouncementRecordBaseService<R extends AnnouncementRecordRepositor
     public AnnouncementRecordDTO save(AnnouncementRecordDTO announcementRecordDTO) {
         log.debug("Request to save AnnouncementRecord : {}", announcementRecordDTO);
         AnnouncementRecord announcementRecord = announcementRecordMapper.toEntity(announcementRecordDTO);
-
         this.saveOrUpdate(announcementRecord);
         return findOne(announcementRecord.getId()).orElseThrow();
     }
@@ -76,7 +75,6 @@ public class AnnouncementRecordBaseService<R extends AnnouncementRecordRepositor
     public AnnouncementRecordDTO update(AnnouncementRecordDTO announcementRecordDTO) {
         log.debug("Request to update AnnouncementRecord : {}", announcementRecordDTO);
         AnnouncementRecord announcementRecord = announcementRecordMapper.toEntity(announcementRecordDTO);
-
         this.saveOrUpdate(announcementRecord);
         return findOne(announcementRecord.getId()).orElseThrow();
     }
@@ -207,13 +205,6 @@ public class AnnouncementRecordBaseService<R extends AnnouncementRecordRepositor
                 });
             }
         }
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            AnnouncementRecord byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
     // jhipster-needle-service-add-method - JHipster will add getters and setters here, do not remove
 

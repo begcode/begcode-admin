@@ -70,7 +70,6 @@ public class OssConfigBaseService<R extends OssConfigRepository, E extends OssCo
     public OssConfigDTO save(OssConfigDTO ossConfigDTO) {
         log.debug("Request to save OssConfig : {}", ossConfigDTO);
         OssConfig ossConfig = ossConfigMapper.toEntity(ossConfigDTO);
-
         this.saveOrUpdate(ossConfig);
         this.initPlatforms();
         return findOne(ossConfig.getId()).orElseThrow();
@@ -86,7 +85,6 @@ public class OssConfigBaseService<R extends OssConfigRepository, E extends OssCo
     public OssConfigDTO update(OssConfigDTO ossConfigDTO) {
         log.debug("Request to update OssConfig : {}", ossConfigDTO);
         OssConfig ossConfig = ossConfigMapper.toEntity(ossConfigDTO);
-
         this.saveOrUpdate(ossConfig);
         this.initPlatforms();
         return findOne(ossConfig.getId()).orElseThrow();
@@ -264,13 +262,6 @@ public class OssConfigBaseService<R extends OssConfigRepository, E extends OssCo
                 });
             }
         }
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            OssConfig byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
     // jhipster-needle-service-add-method - JHipster will add getters and setters here, do not remove
 

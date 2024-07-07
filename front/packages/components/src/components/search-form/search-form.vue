@@ -1,28 +1,25 @@
 <template>
-  <Form>
-    <Row :gutter="[8, 16]">
-      <Col :md="item.span || 4" v-for="(item, index) in config.fieldList.filter(field => !field.hidden)" :key="index">
+  <Form data-cy="listSearchForm">
+    <Row :gutter="[8, 8]">
+      <Col :md="item.span || 6" v-for="(item, index) in config.fieldList.filter(field => !field.hidden)" :key="index">
         <search-form-item :field="item" />
       </Col>
       <Col v-for="index of formActionSlotsShow ? blankCols : 0" :key="'blank' + index" style="flex: 1"></Col>
-
-      <Col :md="config.showExportButton ? 6 : 4" v-if="config.compact && formActionSlotsShow">
-        <FormAction v-bind="formActionConfig" @toggle-advanced="handleToggleAdvanced">
-          <template #[item]="data" v-for="item in Object.keys(formActionSlots)">
-            <slot :name="item" v-bind="data || {}">
-              <div class="mr-2 inline-block" :key="item" v-if="formActionSlots[item].includes('mathType')">
-                <RadioGroup v-model:value="config.matchType" button-style="solid">
-                  <RadioButton value="and">AND</RadioButton>
-                  <RadioButton value="or">OR</RadioButton>
-                </RadioGroup>
-              </div>
-              <div class="mr-2 ml-2 inline-block" :key="item" v-if="formActionSlots[item].includes('exportButton')">
-                <Button type="primary" button-style="solid" @click="exportClick" preIcon="ant-design:file-excel-filled">导出</Button>
-              </div>
-            </slot>
-          </template>
-        </FormAction>
-      </Col>
+      <FormAction v-bind="formActionConfig" @toggle-advanced="handleToggleAdvanced" v-if="config.compact && formActionSlotsShow">
+        <template #[item]="data" v-for="item in Object.keys(formActionSlots)">
+          <slot :name="item" v-bind="data || {}">
+            <div class="mr-2 inline-block" :key="item" v-if="formActionSlots[item].includes('mathType')">
+              <RadioGroup v-model:value="config.matchType" button-style="solid">
+                <RadioButton value="and">AND</RadioButton>
+                <RadioButton value="or">OR</RadioButton>
+              </RadioGroup>
+            </div>
+            <div class="mr-2 ml-2 inline-block" :key="item" v-if="formActionSlots[item].includes('exportButton')">
+              <Button type="primary" button-style="solid" @click="exportClick" preIcon="ant-design:file-excel-filled">导出</Button>
+            </div>
+          </slot>
+        </template>
+      </FormAction>
     </Row>
     <BasicModal
       title="高级搜索设置"
@@ -52,7 +49,7 @@ import FormAction from '@/components/Form/src/components/FormAction.vue';
 import { createFormContext } from '@/components/Form/src/hooks/useFormContext';
 import BasicModal from '@/components/Modal/src/BasicModal.vue';
 import BasicForm from '@/components/Form/src/BasicForm.vue';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 
 defineOptions({
   name: 'SearchForm',
@@ -135,10 +132,10 @@ const formActionConfig = reactive({
   hideAdvanceBtn: props.config.hideAdvanceBtn || false,
   showResetButton: !(props.config.hideResetButton || false),
   showSubmitButton: !(props.config.hideResetButton || false),
-  submitButtonOptions: Object.assign({}, props.config.submitButtonOptions || {}),
-  resetButtonOptions: Object.assign({}, props.config.resetButtonOptions || {}),
+  submitButtonOptions: Object.assign({ 'data-cy': 'searchFormSubmit' }, props.config.submitButtonOptions || {}),
+  resetButtonOptions: Object.assign({ 'data-cy': 'searchFormReset' }, props.config.resetButtonOptions || {}),
   isLoad: false,
-  actionSpan: props.config.actionSpan || (props.config.compact ? 6 : 0),
+  actionSpan: props.config.actionSpan || (props.config.compact ? 8 : 24),
 });
 const settingModalVisible = ref(false);
 
@@ -147,18 +144,18 @@ const blankCols = computed(() => {
   props.config.fieldList
     .filter(field => !field.hidden)
     .forEach(field => {
-      count = count + (field.span || 4);
+      count = count + (field.span || 6);
       if (count > 24) {
-        count = field.span || 4;
+        count = field.span || 6;
       }
       if (count === 24) {
         count = 0;
       }
     });
-  if (count > props.config.showExportButton ? 18 : 20) {
+  if (count > props.config.showExportButton ? 14 : 16) {
     count = 0;
   }
-  return 24 - count - (props.config.showExportButton ? 6 : 4);
+  return 24 - count - (props.config.showExportButton ? 10 : 8);
 });
 
 const formActionSlots = computed(() => {
@@ -213,20 +210,21 @@ const submitAction = (): Promise<void> => {
   });
 };
 
+createFormContext({
+  resetAction: resetAction,
+  submitAction: submitAction,
+});
+
 const handleToggleAdvanced = () => {
-  // this.formActionConfig.isAdvanced = !this.formActionConfig.isAdvanced;
   emit('close');
-  // console.log('this.formActionConfig.isAdvanced', this.formActionConfig.isAdvanced)
 };
 
 const exportClick = () => {
   emit('export');
 };
-
-onMounted(() => {
-  createFormContext({
-    resetAction: resetAction,
-    submitAction: submitAction,
-  });
-});
 </script>
+<style scoped>
+:deep(.ant-form-item) {
+  margin-bottom: 4px;
+}
+</style>

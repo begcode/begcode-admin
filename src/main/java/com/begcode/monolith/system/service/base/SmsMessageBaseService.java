@@ -52,7 +52,6 @@ public class SmsMessageBaseService<R extends SmsMessageRepository, E extends Sms
     public SmsMessageDTO save(SmsMessageDTO smsMessageDTO) {
         log.debug("Request to save SmsMessage : {}", smsMessageDTO);
         SmsMessage smsMessage = smsMessageMapper.toEntity(smsMessageDTO);
-
         this.saveOrUpdate(smsMessage);
         return findOne(smsMessage.getId()).orElseThrow();
     }
@@ -67,7 +66,6 @@ public class SmsMessageBaseService<R extends SmsMessageRepository, E extends Sms
     public SmsMessageDTO update(SmsMessageDTO smsMessageDTO) {
         log.debug("Request to update SmsMessage : {}", smsMessageDTO);
         SmsMessage smsMessage = smsMessageMapper.toEntity(smsMessageDTO);
-
         this.saveOrUpdate(smsMessage);
         return findOne(smsMessage.getId()).orElseThrow();
     }
@@ -168,13 +166,6 @@ public class SmsMessageBaseService<R extends SmsMessageRepository, E extends Sms
                 });
             }
         }
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            SmsMessage byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
     // jhipster-needle-service-add-method - JHipster will add getters and setters here, do not remove
 

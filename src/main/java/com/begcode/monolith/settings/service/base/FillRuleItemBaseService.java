@@ -65,7 +65,6 @@ public class FillRuleItemBaseService<R extends FillRuleItemRepository, E extends
     public FillRuleItemDTO save(FillRuleItemDTO fillRuleItemDTO) {
         log.debug("Request to save FillRuleItem : {}", fillRuleItemDTO);
         FillRuleItem fillRuleItem = fillRuleItemMapper.toEntity(fillRuleItemDTO);
-
         this.saveOrUpdate(fillRuleItem);
         return findOne(fillRuleItem.getId()).orElseThrow();
     }
@@ -80,7 +79,6 @@ public class FillRuleItemBaseService<R extends FillRuleItemRepository, E extends
     public FillRuleItemDTO update(FillRuleItemDTO fillRuleItemDTO) {
         log.debug("Request to update FillRuleItem : {}", fillRuleItemDTO);
         FillRuleItem fillRuleItem = fillRuleItemMapper.toEntity(fillRuleItemDTO);
-
         this.saveOrUpdate(fillRuleItem);
         return findOne(fillRuleItem.getId()).orElseThrow();
     }
@@ -185,13 +183,6 @@ public class FillRuleItemBaseService<R extends FillRuleItemRepository, E extends
 
     protected void clearRelationsCache() {
         this.relationCacheNames.forEach(cacheName -> Optional.ofNullable(cacheManager.getCache(cacheName)).ifPresent(Cache::clear));
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            FillRuleItem byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
 
     @Transactional

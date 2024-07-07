@@ -63,14 +63,14 @@ public class DepartmentCriteria implements Serializable, Criteria {
     @BindQuery(
         entity = Authority.class,
         column = "id",
-        condition = "this.id=rel_department__authorities.department_id AND rel_department__authorities.authorities_id=[object Object]"
+        condition = "this.id=rel_department__authorities.department_id AND rel_department__authorities.authorities_id=id"
     )
     private LongFilter authoritiesId;
 
     @BindQuery(
         entity = Authority.class,
         column = "name",
-        condition = "this.id=rel_department__authorities.department_id AND rel_department__authorities.authorities_id=[object Object]"
+        condition = "this.id=rel_department__authorities.department_id AND rel_department__authorities.authorities_id=id"
     )
     private StringFilter authoritiesName;
 

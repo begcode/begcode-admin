@@ -52,7 +52,9 @@ public class FormConfigBaseService<R extends FormConfigRepository, E extends For
     public FormConfigDTO save(FormConfigDTO formConfigDTO) {
         log.debug("Request to save FormConfig : {}", formConfigDTO);
         FormConfig formConfig = formConfigMapper.toEntity(formConfigDTO);
-
+        formConfig.setBusinessTypeId(
+            Optional.ofNullable(formConfigDTO.getBusinessType()).map(businessTypeDTO -> businessTypeDTO.getId()).orElse(null)
+        );
         this.saveOrUpdate(formConfig);
         return findOne(formConfig.getId()).orElseThrow();
     }
@@ -67,7 +69,9 @@ public class FormConfigBaseService<R extends FormConfigRepository, E extends For
     public FormConfigDTO update(FormConfigDTO formConfigDTO) {
         log.debug("Request to update FormConfig : {}", formConfigDTO);
         FormConfig formConfig = formConfigMapper.toEntity(formConfigDTO);
-
+        formConfig.setBusinessTypeId(
+            Optional.ofNullable(formConfigDTO.getBusinessType()).map(businessTypeDTO -> businessTypeDTO.getId()).orElse(null)
+        );
         this.saveOrUpdate(formConfig);
         return findOne(formConfig.getId()).orElseThrow();
     }
@@ -168,13 +172,6 @@ public class FormConfigBaseService<R extends FormConfigRepository, E extends For
                 });
             }
         }
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            FormConfig byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
     // jhipster-needle-service-add-method - JHipster will add getters and setters here, do not remove
 

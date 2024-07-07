@@ -56,7 +56,6 @@ public class BusinessTypeBaseService<R extends BusinessTypeRepository, E extends
     public BusinessTypeDTO save(BusinessTypeDTO businessTypeDTO) {
         log.debug("Request to save BusinessType : {}", businessTypeDTO);
         BusinessType businessType = businessTypeMapper.toEntity(businessTypeDTO);
-
         this.saveOrUpdate(businessType);
         return findOne(businessType.getId()).orElseThrow();
     }
@@ -71,7 +70,6 @@ public class BusinessTypeBaseService<R extends BusinessTypeRepository, E extends
     public BusinessTypeDTO update(BusinessTypeDTO businessTypeDTO) {
         log.debug("Request to update BusinessType : {}", businessTypeDTO);
         BusinessType businessType = businessTypeMapper.toEntity(businessTypeDTO);
-
         this.saveOrUpdate(businessType);
         return findOne(businessType.getId()).orElseThrow();
     }
@@ -172,13 +170,6 @@ public class BusinessTypeBaseService<R extends BusinessTypeRepository, E extends
                 });
             }
         }
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            BusinessType byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
     // jhipster-needle-service-add-method - JHipster will add getters and setters here, do not remove
 

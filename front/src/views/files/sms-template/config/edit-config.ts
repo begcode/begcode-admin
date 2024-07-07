@@ -80,7 +80,6 @@ const fields = (): FormSchema[] => {
       label: '启用',
       field: 'enabled',
       component: 'Switch',
-      componentProps: { placeholder: '请选择启用' },
       rules: [],
     },
     {
@@ -123,7 +122,6 @@ const fields = (): FormSchema[] => {
         api: relationshipApis.supplier,
         style: 'width: 100%',
         labelInValue: true,
-        numberToString: true,
         valueField: 'id',
         labelField: 'signName',
         resultField: 'records',

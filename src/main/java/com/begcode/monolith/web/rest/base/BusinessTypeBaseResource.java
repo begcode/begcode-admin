@@ -139,34 +139,6 @@ public class BusinessTypeBaseResource {
     }
 
     /**
-     * {@code PUT  /business-types/relations/:operateType} : Updates relationships an existing businessType.
-     *
-     * @param operateType the operateType of the businessTypeDTO to update.
-     * @param otherEntityIds the otherEntityIds to update.
-     * @param relationshipName the relationshipName to update.
-     * @param relatedIds the relation relatedIds.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated businessTypeDTO,
-     * or with status {@code 400 (Bad Request)} if the businessTypeDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the businessTypeDTO couldn't be updated.
-     */
-    @PutMapping("/relations/{operateType}")
-    @Operation(tags = "更新业务类型关联关系", description = "根据主键更新业务类型关联关系")
-    @AutoLog(value = "更新业务类型关联关系", logType = LogType.OPERATE, operateType = OperateType.EDIT)
-    public ResponseEntity<Boolean> updateRelationships(
-        @PathVariable(value = "operateType") final String operateType,
-        @RequestParam(value = "otherEntityIds") ArrayList<String> otherEntityIds,
-        @RequestParam(value = "relationshipName") String relationshipName,
-        @RequestParam(value = "relatedIds") ArrayList<Long> relatedIds
-    ) {
-        log.debug("REST request to update BusinessType : {}, {}", otherEntityIds, operateType);
-        if (CollectionUtils.isEmpty(relatedIds)) {
-            return ResponseEntity.ok(true);
-        }
-        businessTypeService.updateRelationships(otherEntityIds, relationshipName, relatedIds, operateType);
-        return ResponseEntity.ok(true);
-    }
-
-    /**
      * {@code PATCH  /business-types/:id} : Partial updates given fields of an existing businessType, field will ignore if it is null
      *
      * @param id the id of the businessTypeDTO to save.

@@ -1,9 +1,7 @@
 import type { VxeGridPropTypes, VxeGridProps } from 'vxe-table/types/grid';
 import dayjs from 'dayjs';
-import apiService from '@/api-service/index';
 import { useI18n } from '@/hooks/web/useI18n';
 
-const sysLogService = apiService.log.sysLogService;
 const relationshipApis: any = {};
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
@@ -138,7 +136,7 @@ const searchForm = (): any[] => {
     {
       title: '创建时间',
       field: 'createdDate',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'Instant',
@@ -157,7 +155,7 @@ const searchForm = (): any[] => {
     {
       title: '修改时间',
       field: 'lastModifiedDate',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'Instant',

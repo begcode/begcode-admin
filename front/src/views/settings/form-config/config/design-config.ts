@@ -82,7 +82,6 @@ const fields = (): FormSchema[] => {
         api: relationshipApis.businessType,
         style: 'width: 100%',
         labelInValue: true,
-        numberToString: true,
         valueField: 'id',
         labelField: 'name',
         resultField: 'records',

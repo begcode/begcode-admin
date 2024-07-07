@@ -1,9 +1,7 @@
 import type { VxeGridPropTypes, VxeGridProps } from 'vxe-table/types/grid';
 import dayjs from 'dayjs';
-import apiService from '@/api-service/index';
 import { useI18n } from '@/hooks/web/useI18n';
 
-const announcementService = apiService.system.announcementService;
 const relationshipApis: any = {};
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
@@ -34,7 +32,7 @@ const searchForm = (): any[] => {
     {
       title: '开始时间',
       field: 'startTime',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'ZonedDateTime',
@@ -43,7 +41,7 @@ const searchForm = (): any[] => {
     {
       title: '结束时间',
       field: 'endTime',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'ZonedDateTime',
@@ -110,7 +108,7 @@ const searchForm = (): any[] => {
     {
       title: '发布时间',
       field: 'sendTime',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'ZonedDateTime',
@@ -119,7 +117,7 @@ const searchForm = (): any[] => {
     {
       title: '撤销时间',
       field: 'cancelTime',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'ZonedDateTime',
@@ -182,7 +180,7 @@ const searchForm = (): any[] => {
     {
       title: '创建时间',
       field: 'createdDate',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'Instant',
@@ -201,7 +199,7 @@ const searchForm = (): any[] => {
     {
       title: '修改时间',
       field: 'lastModifiedDate',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'Instant',

@@ -1,7 +1,13 @@
 <template>
   <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
   <div>
-    <Card v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled" title="高级搜索" class="bc-list-search-form-card">
+    <Card
+      v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
+      title="高级搜索"
+      class="bc-list-search-form-card"
+      :body-style="{ 'padding-top': '12px', 'padding-bottom': '8px' }"
+      :head-style="{ 'min-height': '40px' }"
+    >
       <template #extra>
         <Space>
           <Button type="default" @click="showSearchFormSetting" preIcon="ant-design:setting-outlined" shape="circle" size="small"></Button>
@@ -10,78 +16,110 @@
       <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" />
     </Card>
     <Card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
-      <Row :gutter="16">
-        <Col :span="24">
-          <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents" data-cy="entityTable">
-            <template #toolbar_buttons>
-              <Row :gutter="16">
-                <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
-                  <Space>
-                    <Input
-                      v-model:value="searchValue"
-                      ref="searchInputRef"
-                      placeholder="请输入关键字"
-                      allow-clear
-                      @change="inputSearch"
-                      @pressEnter="formSearch"
-                      style="width: 280px"
-                    >
-                      <template #prefix>
-                        <Icon icon="ant-design:search-outlined" />
-                      </template>
-                      <template #addonAfter>
-                        <Button type="link" @click="formSearch" style="height: 30px"
-                          >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch"></Icon
-                        ></Button>
-                      </template>
-                    </Input>
-                    <template v-for="button of gridOptions?.toolbarConfig?.buttons">
-                      <Button v-if="!button.dropdowns">{{ button.name }}</Button>
-                      <Dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
-                        <template #overlay>
-                          <Menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
-                            <MenuItem :key="subButton.name + 's'">
-                              <Icon :icon="subButton.icon"></Icon>
-                              {{ subButton.name }}
-                            </MenuItem>
-                          </Menu>
-                        </template>
-                        <Button>
-                          {{ button.name }}
-                          <Icon icon="ant-design:down-outlined" />
-                        </Button>
-                      </Dropdown>
+      <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents" data-cy="entityTable">
+        <template #toolbar_buttons>
+          <Row :gutter="16">
+            <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
+              <Space>
+                <Input
+                  v-model:value="searchValue"
+                  ref="searchInputRef"
+                  placeholder="请输入关键字"
+                  allow-clear
+                  @change="inputSearch"
+                  @pressEnter="formSearch"
+                  style="width: 280px"
+                  data-cy="listSearchInput"
+                >
+                  <template #prefix>
+                    <Icon icon="ant-design:search-outlined" />
+                  </template>
+                  <template #addonAfter>
+                    <Button type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
+                      >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch" data-cy="listSearchMore"></Icon>
+                    </Button>
+                  </template>
+                </Input>
+                <template v-for="button of gridOptions?.toolbarConfig?.buttons">
+                  <Button v-if="!button.dropdowns">{{ button.name }}</Button>
+                  <Dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
+                    <template #overlay>
+                      <Menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
+                        <MenuItem :key="subButton.name + 's'">
+                          <Icon :icon="subButton.icon"></Icon>
+                          {{ subButton.name }}
+                        </MenuItem>
+                      </Menu>
                     </template>
-                  </Space>
-                </Col>
-              </Row>
-            </template>
-            <template #recordAction="{ row }">
-              <ButtonGroup
-                :row="row"
-                :buttons="rowOperations"
-                @click="rowClick"
-                :ref="el => rowOperationRef('row_operation_' + row.id, el)"
-              />
-            </template>
-          </Grid>
-        </Col>
-      </Row>
-      <BasicModal v-bind="modalConfig" @register="registerModal" @cancel="closeModal" @ok="okModal">
+                    <Button>
+                      {{ button.name }}
+                      <Icon icon="ant-design:down-outlined" />
+                    </Button>
+                  </Dropdown>
+                </template>
+              </Space>
+            </Col>
+          </Row>
+        </template>
+        <template #recordAction="{ row }">
+          <ButtonGroup :row="row" :buttons="rowOperations" @click="rowClick" :ref="el => rowOperationRef('row_operation_' + row.id, el)" />
+        </template>
+
+        <template #authorities_default="{ row, column, $grid }">
+          <AvatarGroupInfo
+            :value="row.authorities"
+            :disabled="!$grid?.isEditByRow(row)"
+            :query="{ 'id.in': row.authorities }"
+            avatar-slot-name="default"
+            avatar-slot-field="name"
+            avatar-tip-field="name"
+            @click="buttonType => rowClick({ name: column.field + 'Column' + upperFirst(buttonType), data: row, params: column.params })"
+          />
+        </template>
+        <template #users_default="{ row, column }">
+          <AvatarGroupInfo
+            :value="row.users"
+            :disabled="true"
+            :query="{ departmentId: row.id, 'id.aggregate.count': true }"
+            :stats-api="async params => (await apis.usersStats(params).catch(() => [{ id_count: null }]))[0]['id_count']"
+            avatar-slot-name="default"
+            avatar-slot-field="firstName"
+            avatar-tip-field="firstName"
+            @click="buttonType => rowClick({ name: column.field + 'Column' + upperFirst(buttonType), data: row, params: column.params })"
+          />
+        </template>
+      </Grid>
+      <BasicModal
+        v-bind="popupConfig.containerProps"
+        @register="registerModal"
+        @cancel="closeModal"
+        @ok="okModal"
+        v-on="popupConfig.containerEvents"
+      >
         <component
-          :is="modalConfig.componentName"
+          v-if="popupConfig.componentProps.is"
+          v-bind="popupConfig.componentProps"
+          :is="popupConfig.componentProps.is"
           @cancel="closeModal"
           @refresh="formSearch"
-          v-bind="modalConfig"
+          v-on="popupConfig.componentEvents"
           ref="modalComponentRef"
         />
       </BasicModal>
-      <BasicDrawer v-bind="drawerConfig" @register="registerDrawer" @cancel="closeDrawer" @ok="okDrawer">
+      <BasicDrawer
+        v-bind="popupConfig.containerProps"
+        @register="registerDrawer"
+        @cancel="closeDrawer"
+        @ok="okDrawer"
+        v-on="popupConfig.containerEvents"
+      >
         <component
-          :is="drawerConfig.componentName"
+          v-if="popupConfig.componentProps.is"
+          v-bind="popupConfig.componentProps"
+          :is="popupConfig.componentProps.is"
           @cancel="closeDrawer"
           @refresh="formSearch"
-          v-bind="drawerConfig"
+          v-on="popupConfig.componentEvents"
           ref="drawerComponentRef"
         />
       </BasicDrawer>
@@ -93,7 +131,7 @@
 import { reactive, ref, getCurrentInstance, h, onMounted, toRaw, shallowRef, onUnmounted, watch } from 'vue';
 import { Alert, message, Modal, Space, Card, Divider, Row, Col, Input, Dropdown, Menu, MenuItem } from 'ant-design-vue';
 import { VxeGridInstance, VxeGridListeners, VxeGridProps, Grid } from 'vxe-table';
-import { debounce } from 'lodash-es';
+import { debounce, upperFirst } from 'lodash-es';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { transVxeSorts } from '@/utils/jhipster/sorts';
 import { Button, ButtonGroup, Icon, BasicModal, BasicDrawer, SearchForm, useModalInner, useDrawerInner } from '@begcode/components';
@@ -103,6 +141,8 @@ import { useMergeGridProps, useColumnsConfig, useSetOperationColumn, useSetShort
 import DepartmentEdit from './components/form-component.vue';
 import DepartmentDetail from './components/detail-component.vue';
 import config from './config/list-config';
+import { ApiTree, AvatarGroupInfo } from '@begcode/components';
+import UserList from '@/views/system/user/user-list.vue';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 const props = defineProps(config.ListProps);
@@ -113,6 +153,13 @@ const [registerModal, { closeModal, setModalProps }] = useModalInner(data => {
 const [registerDrawer, { closeDrawer, setDrawerProps }] = useDrawerInner(data => {
   console.log(data);
 });
+const shallowRefs = {
+  DepartmentEdit: shallowRef(DepartmentEdit),
+  DepartmentDetail: shallowRef(DepartmentDetail),
+  ApiTree: shallowRef(ApiTree),
+  UserList: shallowRef(UserList),
+  AvatarGroupInfo: shallowRef(AvatarGroupInfo),
+};
 const modalComponentRef = ref<any>(null);
 const drawerComponentRef = ref<any>(null);
 const ctx = getCurrentInstance()?.proxy;
@@ -124,6 +171,8 @@ const apis = {
   deleteById: apiService.settings.departmentService.delete,
   deleteByIds: apiService.settings.departmentService.deleteByIds,
   update: apiService.settings.departmentService.update,
+  authoritiesList: apiService.system.authorityService.tree,
+  usersStats: apiService.system.userService.stats,
 };
 const pageConfig = {
   title: '部门列表',
@@ -141,6 +190,7 @@ const searchFormConfig = reactive(
       useOr: false,
       disabled: false,
       allowSwitch: true,
+      compact: true,
     },
     props.searchFormOptions,
   ),
@@ -215,27 +265,23 @@ useSetShortcutButtons('SystemDepartmentList', extraButtons);
 const selectedRows = reactive<any>([]);
 const searchFormRef = ref<any>(null);
 const searchValue = ref('');
-const modalConfig = reactive<any>({
-  componentName: '',
-  entityId: '',
-  containerType: 'modal',
-  baseData: props.baseData,
-  width: '80%',
-  destroyOnClose: true,
-  okText: '确定',
-  cancelText: '取消',
+const popupConfig = reactive<any>({
   needSubmit: false,
-});
-const drawerConfig = reactive<any>({
-  componentName: '',
-  containerType: 'drawer',
-  entityId: '',
-  baseData: props.baseData,
-  width: '45%',
-  destroyOnClose: true,
-  okText: '确定',
-  cancelText: '取消',
-  needSubmit: false,
+  containerProps: {
+    width: '80%',
+    destroyOnClose: true,
+    okText: '确定',
+    cancelText: '取消',
+    needSubmit: false,
+  },
+  containerEvents: {},
+  componentProps: {
+    containerType: 'modal',
+    baseData: props.baseData,
+    is: '',
+    entityId: '',
+  },
+  componentEvents: {},
 });
 const queryParams = ref<any>({ ...props.query });
 const ajax = {
@@ -245,6 +291,7 @@ const ajax = {
     queryParams.value.size = page?.pageSize;
     const allSort = sorts || [];
     sort && allSort.push(sort);
+    queryParams.value = { ...props.query };
     queryParams.value.sort = transVxeSorts(allSort);
     if (searchValue.value) {
       queryParams.value['jhiCommonSearchKeywords'] = searchValue.value;
@@ -303,21 +350,19 @@ const toolbarClick = ({ code }) => {
       xGrid.value.openCustom();
       break;
     case 'new':
-      const containerConfig: any = {
-        componentName: shallowRef(DepartmentEdit),
-        entityId: '',
-        title: '新建',
-        okText: '保存',
-        cancelText: '取消',
-        needSubmit: true,
-        showOkBtn: true,
-        showCancelBtn: true,
-      };
+      popupConfig.containerProps.title = '新建';
+      popupConfig.containerProps.okText = '保存';
+      popupConfig.containerProps.cancelText = '取消';
+      popupConfig.needSubmit = true;
+      popupConfig.containerProps.showOkBtn = true;
+      popupConfig.containerProps.showCancelBtn = true;
+      popupConfig.componentProps.is = shallowRefs.DepartmentEdit;
+      popupConfig.componentProps.entityId = '';
       if (props.editIn === 'modal') {
-        Object.assign(modalConfig, containerConfig);
+        popupConfig.componentProps.containerType = 'modal';
         setModalProps({ open: true });
       } else if (props.editIn === 'drawer') {
-        Object.assign(drawerConfig, containerConfig);
+        popupConfig.componentProps.containerType = 'drawer';
         setDrawerProps({ open: true });
       } else {
         if (pageConfig.baseRouteName) {
@@ -355,7 +400,7 @@ const gridEvents = reactive<VxeGridListeners>({
   toolbarToolClick: toolbarClick,
 });
 const okModal = async () => {
-  if (modalConfig.needSubmit && modalComponentRef.value) {
+  if (popupConfig.needSubmit && modalComponentRef.value) {
     const result = await modalComponentRef.value.submit();
     if (result) {
       formSearch();
@@ -364,7 +409,7 @@ const okModal = async () => {
   }
 };
 const okDrawer = async () => {
-  if (drawerConfig.needSubmit && drawerComponentRef.value) {
+  if (popupConfig.needSubmit && drawerComponentRef.value) {
     const result = await drawerComponentRef.value.submit();
     if (result) {
       formSearch();
@@ -385,33 +430,31 @@ const showSearchFormSetting = () => {
   }
 };
 
-const rowClick = ({ name, data }) => {
+const rowClick = ({ name, data, params }) => {
   const row = data;
   const operation = rowOperations.value.find(operation => operation.name === name);
   if (operation?.click) {
     operation.click(row);
   } else {
-    const containerConfig: any = {
-      entityId: row.id,
-    };
     switch (name) {
       case 'save':
         break;
       case 'edit':
-        containerConfig.componentName = shallowRef(DepartmentEdit);
-        containerConfig.title = '编辑部门';
-        containerConfig.okText = '更新';
-        containerConfig.cancelText = '取消';
-        containerConfig.showCancelBtn = true;
-        containerConfig.showOkBtn = true;
-        containerConfig.needSubmit = true;
+        popupConfig.containerProps.title = '编辑部门';
+        popupConfig.containerProps.okText = '更新';
+        popupConfig.containerProps.cancelText = '取消';
+        popupConfig.needSubmit = true;
+        popupConfig.containerProps.showOkBtn = true;
+        popupConfig.containerProps.showCancelBtn = true;
+        popupConfig.componentProps.is = shallowRefs.DepartmentEdit;
+        popupConfig.componentProps.entityId = row.id;
         switch (operation?.containerType || props.editIn) {
           case 'modal':
-            Object.assign(modalConfig, containerConfig);
+            popupConfig.componentProps.containerType = 'modal';
             setModalProps({ open: true });
             break;
           case 'drawer':
-            Object.assign(drawerConfig, containerConfig);
+            popupConfig.componentProps.containerType = 'drawer';
             setDrawerProps({ open: true });
             break;
           case 'route':
@@ -425,19 +468,20 @@ const rowClick = ({ name, data }) => {
         break;
       case 'detail':
         if (operation?.containerType) {
-          containerConfig.componentName = shallowRef(DepartmentDetail);
-          containerConfig.title = '详情';
-          containerConfig.showCancelBtn = true;
-          containerConfig.showOkBtn = false;
-          containerConfig.cancelText = '关闭';
-          containerConfig.needSubmit = false;
+          popupConfig.containerProps.title = '详情';
+          popupConfig.containerProps.cancelText = '关闭';
+          popupConfig.needSubmit = false;
+          popupConfig.containerProps.showOkBtn = false;
+          popupConfig.containerProps.showCancelBtn = true;
+          popupConfig.componentProps.is = shallowRefs.DepartmentDetail;
+          popupConfig.componentProps.entityId = row.id;
           switch (operation.containerType) {
             case 'modal':
-              Object.assign(modalConfig, containerConfig);
+              popupConfig.componentProps.containerType = 'modal';
               setModalProps({ open: true });
               break;
             case 'drawer':
-              Object.assign(drawerConfig, containerConfig);
+              popupConfig.componentProps.containerType = 'drawer';
               setDrawerProps({ open: true });
               break;
             case 'route':
@@ -457,22 +501,22 @@ const rowClick = ({ name, data }) => {
         }
         break;
       case 'addChildren':
-        containerConfig.componentName = shallowRef(DepartmentEdit);
-        containerConfig.title = '添加下级';
-        containerConfig.okText = '更新';
-        containerConfig.cancelText = '取消';
-        containerConfig.showCancelBtn = true;
-        containerConfig.showOkBtn = true;
-        containerConfig.needSubmit = true;
-        containerConfig.entityId = '';
-        containerConfig.baseData = { parentId: row.id, parent: row };
+        popupConfig.containerProps.title = '添加下级';
+        popupConfig.containerProps.okText = '更新';
+        popupConfig.containerProps.cancelText = '取消';
+        popupConfig.needSubmit = true;
+        popupConfig.containerProps.showOkBtn = true;
+        popupConfig.containerProps.showCancelBtn = true;
+        popupConfig.componentProps.is = shallowRefs.DepartmentEdit;
+        popupConfig.componentProps.entityId = '';
+        popupConfig.componentProps.baseData = { parentId: row.id, parent: row };
         switch (operation?.containerType || props.editIn) {
           case 'modal':
-            Object.assign(modalConfig, containerConfig);
+            popupConfig.componentProps.containerType = 'modal';
             setModalProps({ open: true });
             break;
           case 'drawer':
-            Object.assign(drawerConfig, containerConfig);
+            popupConfig.componentProps.containerType = 'drawer';
             setDrawerProps({ open: true });
             break;
           case 'route':
@@ -495,6 +539,180 @@ const rowClick = ({ name, data }) => {
           },
         });
         break;
+      case 'authoritiesColumnView': {
+        popupConfig.containerProps.title = '关联角色';
+        popupConfig.containerProps.okText = '';
+        popupConfig.containerProps.cancelText = '关闭';
+        popupConfig.needSubmit = false;
+        popupConfig.containerProps.showOkBtn = false;
+        popupConfig.containerProps.showCancelBtn = true;
+        popupConfig.componentProps.is = shallowRefs.ApiTree;
+        const rowParams = {
+          ...params,
+          containerType: 'modal',
+          checkStrictly: true,
+          defaultExpandAll: true,
+          checkable: true,
+          fieldNames: { title: 'name', key: 'id', children: 'children' },
+          api: apis.authoritiesList,
+          resultField: 'records',
+          disabled: true,
+          multiple: true,
+          checkedKeys: (row.authorities || []).map(item => item.id),
+        };
+        Object.assign(popupConfig.componentProps, rowParams);
+        if (rowParams.containerType === 'drawer') {
+          popupConfig.containerProps.showFooter = true;
+          popupConfig.containerProps.width = '45%';
+          setDrawerProps({ open: true });
+        } else {
+          popupConfig.containerProps.width = '80%';
+          setModalProps({ open: true });
+        }
+        break;
+      }
+      case 'authoritiesColumnEdit': {
+        popupConfig.containerProps.title = '关联角色';
+        popupConfig.containerProps.okText = '保存';
+        popupConfig.containerProps.cancelText = '关闭';
+        popupConfig.needSubmit = false;
+        popupConfig.containerProps.showOkBtn = true;
+        popupConfig.containerProps.showCancelBtn = true;
+        popupConfig.componentProps.is = shallowRefs.ApiTree;
+        const rowParams = {
+          ...params,
+          containerType: 'drawer',
+          checkStrictly: true,
+          defaultExpandAll: true,
+          checkable: true,
+          fieldNames: { title: 'name', key: 'id', children: 'children' },
+          api: apis.authoritiesList,
+          resultField: 'records',
+          disabled: false,
+          multiple: true,
+          checkedKeys: (row.authorities || []).map(item => item.id),
+        };
+        popupConfig.componentEvents = {
+          check: ({ checked }: any) => {
+            popupConfig.componentProps.checkedKeys = checked;
+            row.authorities = checked.map(id => ({ id: id }));
+          },
+        };
+        popupConfig.containerEvents = {
+          ok: async () => {
+            const authorities = popupConfig.componentProps.checkedKeys.map(id => ({ id: id }));
+            const data = await apis.update({ id: row.id, authorities }, [row.id], ['authorities']).catch(err => {
+              console.log(err);
+              message.error('保存失败！');
+            });
+            if (data) {
+              xGrid.value.reloadRow(row, data, 'authorities');
+              message.success('保存成功！');
+              closeDrawer();
+            }
+          },
+        };
+        Object.assign(popupConfig.componentProps, rowParams);
+        if (rowParams.containerType === 'drawer') {
+          popupConfig.containerProps.width = '45%';
+          popupConfig.containerProps.showFooter = true;
+          setDrawerProps({ open: true });
+        } else {
+          popupConfig.containerProps.width = '80%';
+          setModalProps({ open: true });
+        }
+        break;
+      }
+      case 'usersColumnView': {
+        popupConfig.containerProps.title = '关联用户';
+        popupConfig.containerProps.okText = '';
+        popupConfig.containerProps.cancelText = '关闭';
+        popupConfig.needSubmit = false;
+        popupConfig.containerProps.showOkBtn = false;
+        popupConfig.containerProps.showCancelBtn = true;
+        popupConfig.componentProps.is = shallowRefs.UserList;
+        const rowParams = {
+          ...params,
+          containerType: 'modal',
+          cardExtra: [],
+          cardSlots: [],
+          selectType: 'none',
+          gridOptions: {
+            toolbarConfig: {
+              import: false,
+              print: false,
+              export: false,
+              custom: false,
+              tools: [],
+              buttons: [],
+            },
+          },
+          source: 'Department',
+          gridCustomConfig: {
+            rowOperations: ['detail'],
+            hideColumns: ['department', 'position', 'authorities'],
+          },
+          field: 'users',
+          query: {
+            departmentId: row.id,
+          },
+        };
+        Object.assign(popupConfig.componentProps, rowParams);
+        if (rowParams.containerType === 'drawer') {
+          popupConfig.containerProps.width = '45%';
+          popupConfig.containerProps.showFooter = true;
+          setDrawerProps({ open: true });
+        } else {
+          popupConfig.containerProps.width = '80%';
+          setModalProps({ open: true });
+        }
+        break;
+      }
+      case 'usersColumnEdit': {
+        popupConfig.containerProps.title = '关联用户';
+        popupConfig.containerProps.okText = '';
+        popupConfig.containerProps.cancelText = '关闭';
+        popupConfig.needSubmit = false;
+        popupConfig.containerProps.showOkBtn = false;
+        popupConfig.containerProps.showCancelBtn = true;
+        popupConfig.componentProps.is = shallowRefs.UserList;
+        const rowParams = {
+          ...params,
+          containerType: 'modal',
+          cardExtra: [],
+          cardSlots: [],
+          selectType: 'none',
+          gridOptions: {
+            toolbarConfig: {
+              import: false,
+              print: false,
+              export: false,
+              custom: false,
+              tools: [],
+              buttons: [],
+            },
+          },
+          source: 'Department',
+          gridCustomConfig: {
+            rowOperations: ['detail'],
+            hideColumns: ['department', 'position', 'authorities'],
+          },
+          field: 'users',
+          query: {
+            departmentId: row.id,
+          },
+        };
+        Object.assign(popupConfig.componentProps, rowParams);
+        if (rowParams.containerType === 'drawer') {
+          popupConfig.containerProps.width = '45%';
+          popupConfig.containerProps.showFooter = true;
+          setDrawerProps({ open: true });
+        } else {
+          popupConfig.containerProps.width = '80%';
+          setModalProps({ open: true });
+        }
+        break;
+      }
       default:
         console.log('error', `${name}未定义`);
     }

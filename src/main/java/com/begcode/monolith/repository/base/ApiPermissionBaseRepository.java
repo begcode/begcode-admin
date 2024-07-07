@@ -36,7 +36,7 @@ public interface ApiPermissionBaseRepository<E extends ApiPermission> extends Ba
         return Optional.ofNullable(this.selectById(id));
     }
 
-    @Select("delete from api_permission apiPermission where apiPermission.parent = #{parentId}")
+    @Select("delete from api_permission api_permission where api_permission.parent_id = #{parentId}")
     void deleteAllByParentId(@Param("parentId") Long parentId);
 
     default IPage<ApiPermission> findAllByParentIsNull(IPage<ApiPermission> pageable) {

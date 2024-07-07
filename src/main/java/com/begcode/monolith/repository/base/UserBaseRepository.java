@@ -43,10 +43,10 @@ public interface UserBaseRepository<E extends User> extends BaseCrudMapper<User>
         return Optional.ofNullable(this.selectById(id));
     }
 
-    @Select("delete from jhi_user user where user.department = #{departmentId}")
+    @Select("delete from jhi_user jhi_user where jhi_user.department_id = #{departmentId}")
     void deleteAllByDepartmentId(@Param("departmentId") Long departmentId);
 
-    @Select("delete from jhi_user user where user.position = #{positionId}")
+    @Select("delete from jhi_user jhi_user where jhi_user.position_id = #{positionId}")
     void deleteAllByPositionId(@Param("positionId") Long positionId);
 
     default User saveAndGet(User user) {

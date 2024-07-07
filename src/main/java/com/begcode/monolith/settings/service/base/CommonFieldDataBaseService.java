@@ -66,7 +66,6 @@ public class CommonFieldDataBaseService<R extends CommonFieldDataRepository, E e
     public CommonFieldDataDTO save(CommonFieldDataDTO commonFieldDataDTO) {
         log.debug("Request to save CommonFieldData : {}", commonFieldDataDTO);
         CommonFieldData commonFieldData = commonFieldDataMapper.toEntity(commonFieldDataDTO);
-
         this.saveOrUpdate(commonFieldData);
         return findOne(commonFieldData.getId()).orElseThrow();
     }
@@ -81,7 +80,6 @@ public class CommonFieldDataBaseService<R extends CommonFieldDataRepository, E e
     public CommonFieldDataDTO update(CommonFieldDataDTO commonFieldDataDTO) {
         log.debug("Request to update CommonFieldData : {}", commonFieldDataDTO);
         CommonFieldData commonFieldData = commonFieldDataMapper.toEntity(commonFieldDataDTO);
-
         this.saveOrUpdate(commonFieldData);
         return findOne(commonFieldData.getId()).orElseThrow();
     }
@@ -186,13 +184,6 @@ public class CommonFieldDataBaseService<R extends CommonFieldDataRepository, E e
 
     protected void clearRelationsCache() {
         this.relationCacheNames.forEach(cacheName -> Optional.ofNullable(cacheManager.getCache(cacheName)).ifPresent(Cache::clear));
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            CommonFieldData byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-        });
     }
 
     @Transactional

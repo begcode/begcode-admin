@@ -10,8 +10,6 @@ import com.begcode.monolith.security.AuthoritiesConstants;
 import com.begcode.monolith.security.SecurityUtils;
 import com.begcode.monolith.service.dto.AdminUserDTO;
 import com.begcode.monolith.service.dto.AuthorityDTO;
-import com.begcode.monolith.service.dto.DepartmentDTO;
-import com.begcode.monolith.service.dto.PositionDTO;
 import com.begcode.monolith.service.dto.UserDTO;
 import com.begcode.monolith.service.mapper.UserMapper;
 import com.diboot.core.binding.Binder;
@@ -242,8 +240,6 @@ public class UserService extends BaseServiceImpl<UserRepository, User> {
                     .map(Optional::get)
                     .forEach(managedAuthorities::add);
 
-                user.departmentId(Optional.ofNullable(userDTO.getDepartment()).map(DepartmentDTO::getId).orElse(null));
-                user.positionId(Optional.ofNullable(userDTO.getPosition()).map(PositionDTO::getId).orElse(null));
                 this.createOrUpdateAndRelatedRelations(user, List.of("authorities", "department", "position"));
                 this.clearUserCaches(user);
                 log.debug("Changed Information for User: {}", user);

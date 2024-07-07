@@ -145,34 +145,6 @@ public class PositionBaseResource {
     }
 
     /**
-     * {@code PUT  /positions/relations/:operateType} : Updates relationships an existing position.
-     *
-     * @param operateType the operateType of the positionDTO to update.
-     * @param otherEntityIds the otherEntityIds to update.
-     * @param relationshipName the relationshipName to update.
-     * @param relatedIds the relation relatedIds.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated positionDTO,
-     * or with status {@code 400 (Bad Request)} if the positionDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the positionDTO couldn't be updated.
-     */
-    @PutMapping("/relations/{operateType}")
-    @Operation(tags = "更新岗位关联关系", description = "根据主键更新岗位关联关系")
-    @AutoLog(value = "更新岗位关联关系", logType = LogType.OPERATE, operateType = OperateType.EDIT)
-    public ResponseEntity<Boolean> updateRelationships(
-        @PathVariable(value = "operateType") final String operateType,
-        @RequestParam(value = "otherEntityIds") ArrayList<String> otherEntityIds,
-        @RequestParam(value = "relationshipName") String relationshipName,
-        @RequestParam(value = "relatedIds") ArrayList<Long> relatedIds
-    ) {
-        log.debug("REST request to update Position : {}, {}", otherEntityIds, operateType);
-        if (CollectionUtils.isEmpty(relatedIds)) {
-            return ResponseEntity.ok(true);
-        }
-        positionService.updateRelationships(otherEntityIds, relationshipName, relatedIds, operateType);
-        return ResponseEntity.ok(true);
-    }
-
-    /**
      * {@code PUT  /positions/sort-value/:id/:type} : Updates sort value position.
      *
      * @param id the id of the positionDTO to update.

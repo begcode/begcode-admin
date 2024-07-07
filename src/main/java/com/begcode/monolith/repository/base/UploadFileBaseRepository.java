@@ -31,7 +31,7 @@ public interface UploadFileBaseRepository<E extends UploadFile> extends BaseCrud
         return Optional.ofNullable(this.selectById(id));
     }
 
-    @Select("delete from upload_file uploadFile where uploadFile.category = #{categoryId}")
+    @Select("delete from upload_file upload_file where upload_file.category_id = #{categoryId}")
     void deleteAllByCategoryId(@Param("categoryId") Long categoryId);
 
     default UploadFile saveAndGet(UploadFile uploadFile) {

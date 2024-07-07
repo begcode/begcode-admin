@@ -2,7 +2,6 @@ import type { VxeGridPropTypes, VxeGridProps } from 'vxe-table/types/grid';
 import dayjs from 'dayjs';
 import apiService from '@/api-service/index';
 
-const departmentService = apiService.settings.departmentService;
 const relationshipApis: any = {
   children: apiService.settings.departmentService.tree,
   authorities: apiService.system.authorityService.tree,
@@ -65,16 +64,6 @@ const searchForm = (): any[] => {
       componentProps: {},
     },
     {
-      title: 'logo地址',
-      field: 'logo',
-      componentType: 'Text',
-      value: '',
-      type: 'String',
-      operator: '',
-      span: 8,
-      componentProps: {},
-    },
-    {
       title: '联系人',
       field: 'contact',
       componentType: 'Text',
@@ -97,7 +86,7 @@ const searchForm = (): any[] => {
     {
       title: '创建时间',
       field: 'createTime',
-      componentType: 'DateTime',
+      componentType: 'DateTimeRange',
       operator: '',
       span: 8,
       type: 'Instant',
@@ -232,49 +221,15 @@ const columns = (): VxeGridPropTypes.Columns => {
       title: '角色列表',
       field: 'authorities',
       minWidth: 120,
-      editRender: {
-        name: 'ASelectModal',
-        enabled: true,
-        props: {
-          showComponentName: 'TreeSelect',
-          api: relationshipApis.authorities,
-          container: 'drawer',
-          labelInValue: true,
-          componentName: 'ApiTree',
-          multiple: true,
-          modalTitle: '角色列表',
-          avatarSlotName: 'default',
-          avatarSlotField: 'name',
-          avatarTipField: 'name',
-          checkStrictly: true,
-          fieldNames: { label: 'name', value: 'id', children: 'children' },
-          style: { width: '100%' },
-        },
-      },
+      slots: { default: 'authorities_default', edit: 'authorities_default' },
+      editRender: { name: 'ASelectModal' },
     },
     {
       title: '用户列表',
       field: 'users',
       minWidth: 120,
-      editRender: {
-        name: 'ASelectModal',
-        enabled: false,
-        props: {
-          showComponentName: 'Select',
-          container: 'modal',
-          componentName: 'UserList',
-          multiple: true,
-          style: { width: '100%' },
-          gridCustomConfig: { hideColumns: ['department', 'position', 'authorities'] },
-          queryNames: ['departmentId'],
-          modalTitle: '用户列表',
-          avatarSlotName: 'default',
-          avatarSlotField: 'firstName',
-          avatarTipField: 'firstName',
-          rowIdField: 'row.id',
-          source: 'Department',
-        },
-      },
+      slots: { default: 'users_default' },
+      editRender: { name: 'ASelectModal' },
     },
     {
       title: '操作',

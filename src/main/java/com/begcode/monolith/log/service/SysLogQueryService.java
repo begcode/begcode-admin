@@ -1,11 +1,5 @@
 package com.begcode.monolith.log.service;
 
-import static com.diboot.core.binding.QueryBuilder.criteriaToWrapper;
-import static com.diboot.core.binding.QueryBuilder.criteriaToWrapperNoJoin;
-import static tech.jhipster.service.mybatis.AggregateUtil.buildAggregate;
-import static tech.jhipster.service.mybatis.AggregateUtil.buildGroupBy;
-
-import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -23,15 +17,11 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import tech.jhipster.service.aggregate.*;
 import tech.jhipster.service.filter.*;
-import tech.jhipster.service.mybatis.CriteriaUtil;
 import tech.jhipster.service.mybatis.QueryService;
 
 /**
@@ -132,7 +122,7 @@ public class SysLogQueryService implements QueryService<SysLog> {
             tempCriteria.setAnd(keywordsCriteria);
         }
         QueryWrapper<SysLog> queryWrapper = new DynamicJoinQueryWrapper<>(SysLogCriteria.class, null);
-        return createQueryWrapper(queryWrapper, criteria.getUseOr(), criteria);
+        return createQueryWrapper(queryWrapper, criteria.getUseOr(), criteria, SysLog.class);
     }
 
     /**
@@ -142,141 +132,7 @@ public class SysLogQueryService implements QueryService<SysLog> {
      */
     public QueryWrapper<SysLog> createQueryWrapperNoJoin(SysLogCriteria criteria) {
         QueryWrapper<SysLog> queryWrapper = new QueryWrapper<>();
-        return createQueryWrapperNoJoin(queryWrapper, criteria.getUseOr(), criteria);
-    }
-
-    private QueryWrapper<SysLog> createQueryWrapper(QueryWrapper<SysLog> queryWrapper, Boolean useOr, SysLogCriteria criteria) {
-        if (criteria != null) {
-            if (useOr == null) {
-                useOr = false;
-            }
-            Map<QueryWrapper<SysLog>, Map<String, Object>> queryWrapperMapMap = criteriaToWrapper(criteria, SysLog.class);
-            Map.Entry<QueryWrapper<SysLog>, Map<String, Object>> queryWrapperMapEntry = queryWrapperMapMap
-                .entrySet()
-                .stream()
-                .findFirst()
-                .orElseThrow();
-            Map<String, Object> fieldMap = queryWrapperMapEntry.getValue();
-            if (MapUtils.isNotEmpty(fieldMap)) {
-                if (queryWrapper == null) {
-                    queryWrapper = queryWrapperMapEntry.getKey();
-                }
-                QueryWrapper<SysLog> finalQueryWrapper = queryWrapper;
-                Boolean finalUseOr = useOr;
-                fieldMap.forEach((fieldName, filter) -> {
-                    if (filter instanceof StringFilter) {
-                        CriteriaUtil.build(
-                            finalUseOr,
-                            finalQueryWrapper,
-                            buildStringSpecification((StringFilter) filter, fieldName, finalUseOr)
-                        );
-                    } else if (filter instanceof RangeFilter) {
-                        CriteriaUtil.build(
-                            finalUseOr,
-                            finalQueryWrapper,
-                            buildRangeSpecification((RangeFilter) filter, fieldName, finalUseOr)
-                        );
-                    } else if (filter instanceof Filter) {
-                        CriteriaUtil.build(finalUseOr, finalQueryWrapper, buildSpecification((Filter) filter, fieldName, finalUseOr));
-                    }
-                });
-            }
-            if (criteria.getAnd() != null) {
-                Map<String, Object> stringObjectMap = BeanUtil.beanToMap(criteria.getAnd(), false, true);
-                if (
-                    !((stringObjectMap.containsKey("useOr") && stringObjectMap.keySet().size() == 1) ||
-                        ObjectUtils.isEmpty(stringObjectMap))
-                ) {
-                    if (queryWrapper != null) {
-                        queryWrapper.and(q -> createQueryWrapper(q, criteria.getAnd().getUseOr(), criteria.getAnd()));
-                    } else {
-                        queryWrapper = createQueryWrapper(null, criteria.getAnd().getUseOr(), criteria.getAnd());
-                    }
-                }
-            } else {
-                if (criteria.getOr() != null) {
-                    Map<String, Object> stringObjectMap = BeanUtil.beanToMap(criteria.getOr(), false, true);
-                    if (
-                        !((stringObjectMap.containsKey("useOr") && stringObjectMap.keySet().size() == 1) ||
-                            ObjectUtils.isEmpty(stringObjectMap))
-                    ) {
-                        if (queryWrapper != null) {
-                            queryWrapper.or(q -> createQueryWrapper(q, criteria.getOr().getUseOr(), criteria.getOr()));
-                        } else {
-                            queryWrapper = createQueryWrapper(null, criteria.getOr().getUseOr(), criteria.getOr());
-                        }
-                    }
-                }
-            }
-        }
-        return queryWrapper;
-    }
-
-    private QueryWrapper<SysLog> createQueryWrapperNoJoin(QueryWrapper<SysLog> queryWrapper, Boolean useOr, SysLogCriteria criteria) {
-        if (criteria != null) {
-            if (useOr == null) {
-                useOr = false;
-            }
-            Map<QueryWrapper<SysLog>, Map<String, Object>> queryWrapperMapMap = criteriaToWrapperNoJoin(criteria, SysLog.class);
-            Map.Entry<QueryWrapper<SysLog>, Map<String, Object>> queryWrapperMapEntry = queryWrapperMapMap
-                .entrySet()
-                .stream()
-                .findFirst()
-                .orElseThrow();
-            Map<String, Object> fieldMap = queryWrapperMapEntry.getValue();
-            if (MapUtils.isNotEmpty(fieldMap)) {
-                if (queryWrapper == null) {
-                    queryWrapper = queryWrapperMapEntry.getKey();
-                }
-                QueryWrapper<SysLog> finalQueryWrapper = queryWrapper;
-                Boolean finalUseOr = useOr;
-                fieldMap.forEach((fieldName, filter) -> {
-                    if (filter instanceof StringFilter) {
-                        CriteriaUtil.build(
-                            finalUseOr,
-                            finalQueryWrapper,
-                            buildStringSpecification((StringFilter) filter, fieldName, finalUseOr)
-                        );
-                    } else if (filter instanceof RangeFilter) {
-                        CriteriaUtil.build(
-                            finalUseOr,
-                            finalQueryWrapper,
-                            buildRangeSpecification((RangeFilter) filter, fieldName, finalUseOr)
-                        );
-                    } else if (filter instanceof Filter) {
-                        CriteriaUtil.build(finalUseOr, finalQueryWrapper, buildSpecification((Filter) filter, fieldName, finalUseOr));
-                    }
-                });
-            }
-            if (criteria.getAnd() != null) {
-                Map<String, Object> stringObjectMap = BeanUtil.beanToMap(criteria.getAnd(), false, true);
-                if (
-                    !((stringObjectMap.containsKey("useOr") && stringObjectMap.keySet().size() == 1) ||
-                        ObjectUtils.isEmpty(stringObjectMap))
-                ) {
-                    if (queryWrapper != null) {
-                        queryWrapper.and(q -> createQueryWrapperNoJoin(q, criteria.getAnd().getUseOr(), criteria.getAnd()));
-                    } else {
-                        queryWrapper = createQueryWrapperNoJoin(null, criteria.getAnd().getUseOr(), criteria.getAnd());
-                    }
-                }
-            } else {
-                if (criteria.getOr() != null) {
-                    Map<String, Object> stringObjectMap = BeanUtil.beanToMap(criteria.getOr(), false, true);
-                    if (
-                        !((stringObjectMap.containsKey("useOr") && stringObjectMap.keySet().size() == 1) ||
-                            ObjectUtils.isEmpty(stringObjectMap))
-                    ) {
-                        if (queryWrapper != null) {
-                            queryWrapper.or(q -> createQueryWrapperNoJoin(q, criteria.getOr().getUseOr(), criteria.getOr()));
-                        } else {
-                            queryWrapper = createQueryWrapperNoJoin(null, criteria.getOr().getUseOr(), criteria.getOr());
-                        }
-                    }
-                }
-            }
-        }
-        return queryWrapper;
+        return createQueryWrapperNoJoin(queryWrapper, criteria.getUseOr(), criteria, SysLog.class);
     }
 
     /**
@@ -294,73 +150,34 @@ public class SysLogQueryService implements QueryService<SysLog> {
         QueryWrapper<SysLog> queryWrapper = createQueryWrapper(criteria);
         List<String> selectFields = new ArrayList<>();
         List<String> groupByFields = new ArrayList<>();
-        if (criteria.getId() != null) {
-            getAggregateAndGroupBy(criteria.getId(), "id", selectFields, groupByFields);
-        }
-        if (criteria.getLogType() != null) {
-            getAggregateAndGroupBy(criteria.getLogType(), "log_type", selectFields, groupByFields);
-        }
-        if (criteria.getLogContent() != null) {
-            getAggregateAndGroupBy(criteria.getLogContent(), "log_content", selectFields, groupByFields);
-        }
-        if (criteria.getOperateType() != null) {
-            getAggregateAndGroupBy(criteria.getOperateType(), "operate_type", selectFields, groupByFields);
-        }
-        if (criteria.getUserid() != null) {
-            getAggregateAndGroupBy(criteria.getUserid(), "userid", selectFields, groupByFields);
-        }
-        if (criteria.getUsername() != null) {
-            getAggregateAndGroupBy(criteria.getUsername(), "username", selectFields, groupByFields);
-        }
-        if (criteria.getIp() != null) {
-            getAggregateAndGroupBy(criteria.getIp(), "ip", selectFields, groupByFields);
-        }
-        if (criteria.getMethod() != null) {
-            getAggregateAndGroupBy(criteria.getMethod(), "method", selectFields, groupByFields);
-        }
-        if (criteria.getRequestUrl() != null) {
-            getAggregateAndGroupBy(criteria.getRequestUrl(), "request_url", selectFields, groupByFields);
-        }
-        if (criteria.getRequestType() != null) {
-            getAggregateAndGroupBy(criteria.getRequestType(), "request_type", selectFields, groupByFields);
-        }
-        if (criteria.getCostTime() != null) {
-            getAggregateAndGroupBy(criteria.getCostTime(), "cost_time", selectFields, groupByFields);
-        }
-        if (criteria.getCreatedBy() != null) {
-            getAggregateAndGroupBy(criteria.getCreatedBy(), "created_by", selectFields, groupByFields);
-        }
-        if (criteria.getCreatedDate() != null) {
-            getAggregateAndGroupBy(criteria.getCreatedDate(), "created_date", selectFields, groupByFields);
-        }
-        if (criteria.getLastModifiedBy() != null) {
-            getAggregateAndGroupBy(criteria.getLastModifiedBy(), "last_modified_by", selectFields, groupByFields);
-        }
-        if (criteria.getLastModifiedDate() != null) {
-            getAggregateAndGroupBy(criteria.getLastModifiedDate(), "last_modified_date", selectFields, groupByFields);
-        }
+        Map<String, Filter<?>> fieldNameMap = new HashMap<>();
+        fieldNameMap.put("self.id", criteria.getId());
+        fieldNameMap.put("self.log_type", criteria.getLogType());
+        fieldNameMap.put("self.log_content", criteria.getLogContent());
+        fieldNameMap.put("self.operate_type", criteria.getOperateType());
+        fieldNameMap.put("self.userid", criteria.getUserid());
+        fieldNameMap.put("self.username", criteria.getUsername());
+        fieldNameMap.put("self.ip", criteria.getIp());
+        fieldNameMap.put("self.method", criteria.getMethod());
+        fieldNameMap.put("self.request_url", criteria.getRequestUrl());
+        fieldNameMap.put("self.request_type", criteria.getRequestType());
+        fieldNameMap.put("self.cost_time", criteria.getCostTime());
+        fieldNameMap.put("self.created_by", criteria.getCreatedBy());
+        fieldNameMap.put("self.created_date", criteria.getCreatedDate());
+        fieldNameMap.put("self.last_modified_by", criteria.getLastModifiedBy());
+        fieldNameMap.put("self.last_modified_date", criteria.getLastModifiedDate());
+        fieldNameMap
+            .entrySet()
+            .stream()
+            .filter(entry -> entry.getValue() != null)
+            .forEach(entry -> {
+                getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields);
+            });
         if (CollectionUtils.isNotEmpty(selectFields)) {
             queryWrapper.select(selectFields.toArray(new String[0])).groupBy(CollectionUtils.isNotEmpty(groupByFields), groupByFields);
-            return sysLogRepository.selectMaps(queryWrapper);
+            return Binder.joinQueryMapsPage(queryWrapper, SysLog.class, null).getRecords();
         }
         return Collections.emptyList();
-    }
-
-    private void getAggregateAndGroupBy(Filter<?> filter, String fieldName, List<String> selects, List<String> groupBys) {
-        if (filter.getAggregate() != null) {
-            if (filter.getAggregate() instanceof NumberAggregate) {
-                buildAggregate((NumberAggregate) filter.getAggregate(), fieldName, selects);
-            } else {
-                buildAggregate(filter.getAggregate(), fieldName, selects);
-            }
-        }
-        if (filter.getGroupBy() != null) {
-            if (filter.getGroupBy() instanceof DateTimeGroupBy) {
-                buildGroupBy((DateTimeGroupBy) filter.getGroupBy(), fieldName, groupBys, selects);
-            } else {
-                buildGroupBy(filter.getGroupBy(), fieldName, groupBys, selects);
-            }
-        }
     }
 
     public Map<String, Object> logInfo() {

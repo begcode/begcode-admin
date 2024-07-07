@@ -13,7 +13,7 @@
 </template>
 <script lang="ts" setup>
 import type { UploadProps } from 'ant-design-vue';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { UploadOutlined } from '@ant-design/icons-vue';
 import { Upload, Button, Modal } from 'ant-design-vue';
 
@@ -31,9 +31,6 @@ const props = defineProps({
 const emit = defineEmits(['update:value', 'selectFile']);
 
 const fileList = ref<UploadProps['fileList']>([]);
-if (props.value) {
-  fileList.value?.push({ url: props.value, name: props.value, status: 'done', uid: props.value });
-}
 //预览图
 const previewImage = ref<string | undefined>('');
 //预览框状态
@@ -57,6 +54,14 @@ const requestMethod: UploadProps['customRequest'] = ({ file }) => {
 const handleCancel = () => {
   previewOpen.value = false;
 };
+watch(
+  () => props.value,
+  value => {
+    if (value) {
+      fileList.value = [{ url: value, name: value, status: 'done', uid: value }];
+    }
+  },
+);
 </script>
 <style scoped>
 .ant-upload-select-picture-card i {

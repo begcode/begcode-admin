@@ -97,7 +97,6 @@ const fields = (): FormSchema[] => {
         api: relationshipApis.parent,
         style: 'width: 100%',
         labelInValue: true,
-        numberToString: true,
         fieldNames: { children: 'children', value: 'id', label: 'name' },
         resultField: 'records',
         placeholder: '请选择上级节点',
