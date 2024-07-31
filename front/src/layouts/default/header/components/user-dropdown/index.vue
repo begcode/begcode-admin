@@ -74,8 +74,8 @@ const lockActionVisible = ref(false);
 const lockActionRef = ref(null);
 
 const getUserInfo = computed(() => {
-  const { firstName = '', imageUrl, desc } = userStore.getUserInfo || {};
-  return { firstName, avatar: imageUrl || headerImg, desc };
+  const { firstName = '', imageUrl } = userStore.getUserInfo || {};
+  return { firstName, avatar: imageUrl || headerImg };
 });
 
 const getAvatarUrl = computed(() => {

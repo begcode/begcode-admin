@@ -28,11 +28,10 @@ import {
 
 import { HEADER_PRESET_BG_COLOR_LIST, SIDE_BAR_BG_COLOR_LIST, APP_PRESET_COLOR_LIST } from '@/settings/designSetting';
 
-const { t } = useI18n();
-
 export default defineComponent({
   name: 'SettingDrawer',
   setup(_, { attrs }) {
+    const { t } = useI18n();
     const {
       getContentMode,
       getShowFooter,

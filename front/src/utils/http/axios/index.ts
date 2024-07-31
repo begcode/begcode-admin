@@ -295,7 +295,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
           },
         },
         paramsSerializer: function (params) {
-          return qs.stringify(params, { arrayFormat: 'repeat' });
+          return qs.stringify(params, { arrayFormat: 'repeat', allowDots: true });
         },
       },
       opt || {},

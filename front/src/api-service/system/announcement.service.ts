@@ -27,7 +27,7 @@ export default {
   },
 
   exist(queryParams?: any): Promise<Boolean> {
-    if (!queryParams.hasOwnProperty('id.aggregate.count') && get(queryParams, 'id.aggregate.count')) {
+    if (!queryParams.hasOwnProperty('id.aggregate.count') || !get(queryParams, 'id.aggregate.count')) {
       queryParams['id.aggregate.count'] = true;
     }
     const options = buildPaginationQueryOpts(queryParams);

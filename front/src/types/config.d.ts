@@ -171,7 +171,7 @@ export interface GlobEnvConfig {
   VITE_GLOB_API_URL_PREFIX?: string;
   // Upload url
   VITE_GLOB_UPLOAD_URL?: string;
-  VITE_USE_MOCK?: string;
+  VITE_GLOB_MOCK?: string;
   VITE_GLOB_APP_SHORT_NAME?: string;
   VITE_GLOB_APP_OPEN_SSO?: string;
   VITE_GLOB_APP_OPEN_QIANKUN?: string;

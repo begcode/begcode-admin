@@ -5,7 +5,6 @@ import { unref } from 'vue';
 import { useRouter } from 'vue-router';
 import { PageEnum } from '@/enums/pageEnum';
 import { REDIRECT_NAME } from '@/router/constant';
-import { useUserStore } from '@/store/modules/user';
 
 import { useMultipleTabStore } from '@/store/modules/multipleTab';
 
@@ -25,8 +24,6 @@ export enum GoType {
  * page switch
  */
 export function useGo(_router?: Router) {
-  const userStore = useUserStore();
-  const homePath = userStore.getUserInfo.homePath || PageEnum.BASE_HOME;
   const { push, replace, currentRoute } = _router || useRouter();
   function go(opt?: RouteLocationRawEx): void;
   function go(opt: RouteLocationRawEx, isReplace: boolean): void;
@@ -56,7 +53,7 @@ export function useGo(_router?: Router) {
             // 新 tab 在 当前 tab 的后面
             if (currentIndex > -1 && targetIndex > currentIndex) {
               // 移动 tab
-              tabStore.sortTabs(targetIndex, currentIndex + 1);
+              tabStore.sortTabs(targetIndex, currentIndex + 1).then(() => {});
             }
           }
         })

@@ -10,7 +10,7 @@ export const useGlobSetting = (): Readonly<GlobConfig> => {
     VITE_GLOB_APP_SHORT_NAME,
     VITE_GLOB_APP_OPEN_SSO,
     VITE_GLOB_DOMAIN_URL,
-    VITE_USE_MOCK,
+    VITE_GLOB_MOCK,
   } = getAppEnvConfig();
 
   // Take global configuration
@@ -24,7 +24,7 @@ export const useGlobSetting = (): Readonly<GlobConfig> => {
     openSso: VITE_GLOB_APP_OPEN_SSO,
     urlPrefix: VITE_GLOB_API_URL_PREFIX,
     uploadUrl: VITE_GLOB_DOMAIN_URL,
-    useMock: VITE_USE_MOCK === 'true',
+    useMock: VITE_GLOB_MOCK === 'true' || VITE_GLOB_MOCK === true,
   };
   return glob as Readonly<GlobConfig>;
 };
