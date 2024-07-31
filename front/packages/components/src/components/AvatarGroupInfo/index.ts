@@ -1,1 +1,4 @@
-export { default as AvatarGroupInfo } from './src/AvatarGroupInfo.vue';
+import avatarGroupInfo from './src/AvatarGroupInfo.vue';
+import { withInstall } from '@/utils';
+
+export const AvatarGroupInfo = withInstall(avatarGroupInfo);

@@ -2,8 +2,7 @@
 import { h } from 'vue';
 
 export default {
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: 'splitpanes',
+  name: 'BSplitPanes',
   emits: ['ready', 'resize', 'resized', 'pane-click', 'pane-maximize', 'pane-add', 'pane-remove', 'splitter-click'],
 
   props: {

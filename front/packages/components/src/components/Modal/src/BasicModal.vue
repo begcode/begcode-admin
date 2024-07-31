@@ -61,7 +61,10 @@ import { useDesign } from '@/hooks/web/useDesign';
 import { basicProps } from './props';
 import { useAppInject } from '@/hooks/useAppInject';
 
-defineOptions({ name: 'BasicModal', inheritAttrs: false });
+defineOptions({
+  name: 'BasicModal',
+  inheritAttrs: false,
+});
 
 const props = defineProps(basicProps);
 

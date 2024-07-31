@@ -52,7 +52,7 @@ import BasicForm from '@/components/Form/src/BasicForm.vue';
 import { computed, reactive, ref } from 'vue';
 
 defineOptions({
-  name: 'SearchForm',
+  name: 'BSearchForm',
 });
 
 const props = defineProps({

@@ -12,7 +12,7 @@ import { propTypes } from '@/utils/propTypes';
 
 const SVG_END_WITH_FLAG = '|svg';
 
-defineOptions({ name: 'Icon' });
+defineOptions({ name: 'BIcon' });
 
 const props = defineProps({
   // icon name

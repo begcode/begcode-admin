@@ -12,15 +12,13 @@ import { configSvgIconsPlugin } from './svgSprite';
 import { configHtmlPlugin } from './html';
 
 export function createVitePlugins(viteEnv: ViteEnv, isBuild: boolean) {
-  const { VITE_USE_MOCK, VITE_BUILD_COMPRESS, VITE_BUILD_COMPRESS_DELETE_ORIGIN_FILE } = viteEnv;
+  const { VITE_BUILD_COMPRESS, VITE_BUILD_COMPRESS_DELETE_ORIGIN_FILE } = viteEnv;
 
   const vitePlugins: (PluginOption | PluginOption[])[] = [
     // have to
     vue(),
     // have to
     vueJsx(),
-    // support name
-    // vueSetupExtend(),
     VitePluginCertificate({
       source: 'coding',
     }),

@@ -18,7 +18,7 @@ import { buttonProps } from './props';
 import { useAttrs } from '@/hooks/vben';
 
 defineOptions({
-  name: 'AButton',
+  name: 'BButton',
   extends: Button,
   inheritAttrs: false,
 });

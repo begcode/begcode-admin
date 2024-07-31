@@ -16,6 +16,8 @@ for (const path in allFakeDataModules) {
       if (!allData[name]) {
         allData[name] = [];
         Papa.parse(csvString, {
+          delimiter: ';',
+          dynamicTyping: true,
           header: true,
           transformHeader: header => camelCase(header),
           skipEmptyLines: true,
@@ -38,6 +40,8 @@ for (const path in allDataModules) {
     .then(csvString => {
       allData[name] = [];
       Papa.parse(csvString, {
+        delimiter: ';',
+        dynamicTyping: true,
         header: true,
         transformHeader: header => camelCase(header),
         skipEmptyLines: true,

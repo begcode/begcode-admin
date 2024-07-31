@@ -37,7 +37,10 @@ import { useDesign } from '@/hooks/web/useDesign';
 import { useAttrs } from '@/hooks/vben';
 import { cloneDeep } from 'lodash-es';
 
-defineOptions({ inheritAttrs: false });
+defineOptions({
+  name: 'BasicDrawer',
+  inheritAttrs: false,
+});
 
 const props = defineProps(basicProps);
 
@@ -118,7 +121,7 @@ watch(
   (newVal, oldVal) => {
     if (newVal !== oldVal) openRef.value = newVal;
   },
-  { deep: true },
+  { deep: true, immediate: true },
 );
 
 watch(
@@ -131,6 +134,7 @@ watch(
       }
     });
   },
+  { immediate: true },
 );
 
 // Cancel event

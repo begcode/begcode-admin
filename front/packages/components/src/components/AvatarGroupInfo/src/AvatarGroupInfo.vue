@@ -38,7 +38,7 @@ import { Icon } from '@/components/Icon';
 import { Button } from '@/components/Button';
 
 defineOptions({
-  name: 'SelectModal',
+  name: 'AvatarGroupInfo',
   inheritAttrs: false,
 });
 

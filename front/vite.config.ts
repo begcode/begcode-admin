@@ -27,7 +27,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
   // The boolean type read by loadEnv is a string. This function can be converted to boolean type
   const viteEnv = wrapperEnv(env);
 
-  const { VITE_PORT, VITE_PUBLIC_PATH, VITE_PROXY, VITE_USE_MOCK } = viteEnv;
+  const { VITE_PORT, VITE_PUBLIC_PATH, VITE_PROXY, VITE_GLOB_MOCK } = viteEnv;
 
   const isBuild = command === 'build';
 
@@ -64,7 +64,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       host: true,
       port: VITE_PORT,
       // Load proxy configuration from .env
-      proxy: createProxy(VITE_USE_MOCK ? [] : VITE_PROXY),
+      proxy: createProxy(VITE_GLOB_MOCK ? [] : VITE_PROXY),
       open: true,
       warmup: {
         clientFiles: ['./index.html', './src/{views,components}/*'],

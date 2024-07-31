@@ -33,25 +33,31 @@ import { PageHeader, theme } from 'ant-design-vue';
 import PageFooter from './PageFooter.vue';
 
 import { useDesign } from '@/hooks/web/useDesign';
-import { propTypes } from '@/utils/propTypes';
 import { omit } from 'lodash-es';
 import { PageWrapperFixedHeightKey } from '../injectionKey';
 
+defineOptions({
+  name: 'PageWrapper',
+});
 const props = defineProps({
-  title: propTypes.string,
-  dense: propTypes.bool,
-  ghost: propTypes.bool,
-  headerSticky: propTypes.bool,
+  title: String,
+  dense: Boolean,
+  ghost: Boolean,
+  headerSticky: Boolean,
   headerStyle: Object as PropType<CSSProperties>,
-  content: propTypes.string,
-  contentStyle: {
-    type: Object as PropType<CSSProperties>,
+  content: String,
+  contentStyle: Object as PropType<CSSProperties>,
+  contentBackground: Boolean,
+  contentFullHeight: {
+    type: Boolean,
+    default: false,
   },
-  contentBackground: propTypes.bool,
-  contentFullHeight: propTypes.bool.def(false),
-  contentClass: propTypes.string,
-  fixedHeight: propTypes.bool,
-  upwardSpace: propTypes.oneOfType([propTypes.number, propTypes.string]).def(0),
+  contentClass: String,
+  fixedHeight: Boolean,
+  upwardSpace: {
+    type: [Number, String],
+    default: 0,
+  },
 });
 
 const attrs = useAttrs();

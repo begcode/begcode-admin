@@ -6,8 +6,7 @@
 
 <script>
 export default {
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: 'pane',
+  name: 'BPane',
   inject: ['requestUpdate', 'onPaneAdd', 'onPaneRemove', 'onPaneClick'],
 
   props: {
