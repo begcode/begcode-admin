@@ -72,7 +72,7 @@ export default {
       ...params,
     };
     const options = buildPaginationQueryOpts(paginationQuery);
-    return defHttp.get({ url: apiUrl + '/current-user/unread/' + category + `?${qs.stringify(options, { arrayFormat: 'repeat' })}` });
+    return defHttp.get({ url: apiUrl + '/current-user/unread/' + category, params: options });
   },
   release(id: number): Promise<IAnnouncement> {
     return defHttp.put({ url: `${apiUrl}/${id}/release` });
