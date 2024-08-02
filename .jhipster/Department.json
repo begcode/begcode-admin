@@ -43,22 +43,6 @@
       "documentation": "联系人",
       "fieldName": "contact",
       "fieldType": "String"
-    },
-    {
-      "documentation": "创建用户 Id",
-      "fieldName": "createUserId",
-      "fieldType": "Long",
-      "options": {
-        "createdBy": true
-      }
-    },
-    {
-      "documentation": "创建时间",
-      "fieldName": "createTime",
-      "fieldType": "Instant",
-      "options": {
-        "createdDate": true
-      }
     }
   ],
   "jpaMetamodelFiltering": true,

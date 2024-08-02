@@ -899,7 +899,8 @@ public class AnnouncementRecordResourceIT {
             .anntId(UPDATED_ANNT_ID)
             .hasRead(UPDATED_HAS_READ)
             .readTime(UPDATED_READ_TIME)
-            .createdDate(UPDATED_CREATED_DATE);
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY);
 
         restAnnouncementRecordMockMvc
             .perform(

@@ -17,8 +17,7 @@ public class DepartmentTestSamples {
             .address("address1")
             .phoneNum("phoneNum1")
             .logo("logo1")
-            .contact("contact1")
-            .createUserId(1L);
+            .contact("contact1");
     }
 
     public static Department getDepartmentSample2() {
@@ -29,8 +28,7 @@ public class DepartmentTestSamples {
             .address("address2")
             .phoneNum("phoneNum2")
             .logo("logo2")
-            .contact("contact2")
-            .createUserId(2L);
+            .contact("contact2");
     }
 
     public static Department getDepartmentRandomSampleGenerator() {
@@ -41,7 +39,6 @@ public class DepartmentTestSamples {
             .address(UUID.randomUUID().toString())
             .phoneNum(UUID.randomUUID().toString())
             .logo(UUID.randomUUID().toString())
-            .contact(UUID.randomUUID().toString())
-            .createUserId(longCount.incrementAndGet());
+            .contact(UUID.randomUUID().toString());
     }
 }

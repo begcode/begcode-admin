@@ -1,120 +1,148 @@
 <template>
   <div>
-    <Card
-      v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
-      title="高级搜索"
-      class="bc-list-search-form-card"
-      :body-style="{ 'padding-top': '12px', 'padding-bottom': '8px' }"
-      :head-style="{ 'min-height': '40px' }"
-    >
-      <template #extra>
-        <Space>
-          <Button type="default" @click="showSearchFormSetting" preIcon="ant-design:setting-outlined" shape="circle" size="small"></Button>
-        </Space>
-      </template>
-      <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" />
-    </Card>
-    <Card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
-      <template #title v-if="cardSlots?.includes('title')">
-        <Button type="text" preIcon="ant-design:unordered-list-outlined" shape="default" size="large" @click="formSearch">用户列表</Button>
-      </template>
-      <template #extra v-if="cardSlots?.includes('extra')">
-        <Space>
-          <Divider type="vertical" />
-          <Button
-            v-if="cardExtra?.includes('import')"
-            type="default"
-            @click="xGrid.openImport()"
-            preIcon="ant-design:cloud-upload-outlined"
-            shape="circle"
-            size="small"
-          ></Button>
-          <Button
-            v-if="cardExtra?.includes('export')"
-            type="default"
-            @click="xGrid.openExport()"
-            preIcon="ant-design:download-outlined"
-            shape="circle"
-            size="small"
-          ></Button>
-          <Button
-            v-if="cardExtra?.includes('print')"
-            type="default"
-            @click="xGrid.openPrint()"
-            preIcon="ant-design:printer-outlined"
-            shape="circle"
-            size="small"
-          ></Button>
-          <!--          <Button type="default" preIcon="ant-design:setting-outlined" shape="circle" size="small"></Button>-->
-        </Space>
-      </template>
-      <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
-        <template #toolbar_buttons>
-          <Row :gutter="16">
-            <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
-              <Space>
-                <Input
-                  v-model:value="searchFormConfig.jhiCommonSearchKeywords"
-                  placeholder="请输入关键字"
-                  allow-clear
-                  @change="inputSearch"
-                  @pressEnter="formSearch"
-                  style="width: 280px"
-                  data-cy="listSearchInput"
-                >
-                  <template #prefix>
-                    <Icon icon="ant-design:search-outlined" />
-                  </template>
-                  <template #addonAfter>
-                    <Button type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
-                      >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch" data-cy="listSearchMore"></Icon>
-                    </Button>
-                  </template>
-                </Input>
-                <template v-for="button of gridOptions?.toolbarConfig?.buttons">
-                  <Button v-if="!button.dropdowns">{{ button.name }}</Button>
-                  <Dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
-                    <template #overlay>
-                      <Menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
-                        <MenuItem :key="subButton.name + 's'">
-                          <Icon :icon="subButton.icon"></Icon>
-                          {{ subButton.name }}
-                        </MenuItem>
-                      </Menu>
+    <SplitPanes class="default-theme">
+      <Pane size="20">
+        <Card
+          title="高级搜索"
+          class="bc-list-result-card"
+          :body-style="{ padding: '12px 12px 8px 12px' }"
+          :head-style="{ 'min-height': '40px', padding: '12px' }"
+        >
+          <BasicTree
+            :expandedKeys="filterTreeConfig.expandedKeys"
+            :autoExpandParent="filterTreeConfig.autoExpandParent"
+            :selectedKeys="filterTreeConfig.selectedKeys"
+            :treeData="filterTreeConfig.treeFilterData"
+            @select="onSelect"
+          />
+        </Card>
+      </Pane>
+      <Pane>
+        <Card
+          v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
+          title="高级搜索"
+          class="bc-list-search-form-card"
+          :body-style="{ 'padding-top': '12px', 'padding-bottom': '8px' }"
+          :head-style="{ 'min-height': '40px' }"
+        >
+          <template #extra>
+            <Space>
+              <Button
+                type="default"
+                @click="showSearchFormSetting"
+                preIcon="ant-design:setting-outlined"
+                shape="circle"
+                size="small"
+              ></Button>
+            </Space>
+          </template>
+          <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" />
+        </Card>
+        <Card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
+          <template #title v-if="cardSlots?.includes('title')">
+            <Button type="text" preIcon="ant-design:unordered-list-outlined" shape="default" size="large" @click="formSearch"
+              >用户列表</Button
+            >
+          </template>
+          <template #extra v-if="cardSlots?.includes('extra')">
+            <Space>
+              <Divider type="vertical" />
+              <Button
+                v-if="cardExtra?.includes('import')"
+                type="default"
+                @click="xGrid.openImport()"
+                preIcon="ant-design:cloud-upload-outlined"
+                shape="circle"
+                size="small"
+              ></Button>
+              <Button
+                v-if="cardExtra?.includes('export')"
+                type="default"
+                @click="xGrid.openExport()"
+                preIcon="ant-design:download-outlined"
+                shape="circle"
+                size="small"
+              ></Button>
+              <Button
+                v-if="cardExtra?.includes('print')"
+                type="default"
+                @click="xGrid.openPrint()"
+                preIcon="ant-design:printer-outlined"
+                shape="circle"
+                size="small"
+              ></Button>
+              <!--          <Button type="default" preIcon="ant-design:setting-outlined" shape="circle" size="small"></Button>-->
+            </Space>
+          </template>
+          <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
+            <template #toolbar_buttons>
+              <Row :gutter="16">
+                <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
+                  <Space>
+                    <Input
+                      v-model:value="searchFormConfig.jhiCommonSearchKeywords"
+                      placeholder="请输入关键字"
+                      allow-clear
+                      @change="inputSearch"
+                      @pressEnter="formSearch"
+                      style="width: 280px"
+                      data-cy="listSearchInput"
+                    >
+                      <template #prefix>
+                        <Icon icon="ant-design:search-outlined" />
+                      </template>
+                      <template #addonAfter>
+                        <Button type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
+                          >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch" data-cy="listSearchMore"></Icon>
+                        </Button>
+                      </template>
+                    </Input>
+                    <template v-for="button of gridOptions?.toolbarConfig?.buttons">
+                      <Button v-if="!button.dropdowns">{{ button.name }}</Button>
+                      <Dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
+                        <template #overlay>
+                          <Menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
+                            <MenuItem :key="subButton.name + 's'">
+                              <Icon :icon="subButton.icon"></Icon>
+                              {{ subButton.name }}
+                            </MenuItem>
+                          </Menu>
+                        </template>
+                        <Button>
+                          {{ button.name }}
+                          <Icon icon="ant-design:down-outlined" />
+                        </Button>
+                      </Dropdown>
                     </template>
-                    <Button>
-                      {{ button.name }}
-                      <Icon icon="ant-design:down-outlined" />
-                    </Button>
-                  </Dropdown>
-                </template>
-              </Space>
-            </Col>
-          </Row>
-        </template>
-        <template #recordAction="{ row }">
-          <ButtonGroup :row="row" :buttons="rowOperations" @click="rowClick" />
-        </template>
-      </Grid>
-      <BasicModal v-bind="modalConfig" @register="registerModal" @cancel="closeModal" @ok="okModal">
-        <component
-          :is="modalConfig.componentName"
-          @cancel="closeModal"
-          @refresh="formSearch"
-          v-bind="modalConfig"
-          ref="modalComponentRef"
-        />
-      </BasicModal>
-      <BasicDrawer v-bind="drawerConfig" @register="registerDrawer" @close="closeDrawer" @ok="okDrawer">
-        <component
-          :is="drawerConfig.componentName"
-          @cancel="closeDrawer"
-          @refresh="formSearch"
-          v-bind="drawerConfig"
-          ref="drawerComponentRef"
-        />
-      </BasicDrawer>
-    </Card>
+                  </Space>
+                </Col>
+              </Row>
+            </template>
+            <template #recordAction="{ row }">
+              <ButtonGroup :row="row" :buttons="rowOperations" @click="rowClick" />
+            </template>
+          </Grid>
+          <BasicModal v-bind="modalConfig" @register="registerModal" @cancel="closeModal" @ok="okModal">
+            <component
+              :is="modalConfig.componentName"
+              @cancel="closeModal"
+              @refresh="formSearch"
+              v-bind="modalConfig"
+              ref="modalComponentRef"
+            />
+          </BasicModal>
+          <BasicDrawer v-bind="drawerConfig" @register="registerDrawer" @close="closeDrawer" @ok="okDrawer">
+            <component
+              :is="drawerConfig.componentName"
+              @cancel="closeDrawer"
+              @refresh="formSearch"
+              v-bind="drawerConfig"
+              ref="drawerComponentRef"
+            />
+          </BasicDrawer>
+        </Card>
+      </Pane>
+    </SplitPanes>
   </div>
 </template>
 
@@ -126,10 +154,23 @@ import type { VxeGridPropTypes, VxeGridInstance, VxeGridListeners, VxeGridProps 
 import { mergeWith, isArray, isObject, isString, merge, debounce, pickBy, isEmpty } from 'lodash-es';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { transVxeSorts } from '@/utils/jhipster/sorts';
-import { Button, ButtonGroup, BasicModal, BasicDrawer, Icon, SearchForm, useModalInner, useDrawerInner } from '@begcode/components';
+import {
+  Button,
+  ButtonGroup,
+  BasicModal,
+  BasicDrawer,
+  Icon,
+  SearchForm,
+  useModalInner,
+  useDrawerInner,
+  BasicTree,
+  SplitPanes,
+  Pane,
+} from '@begcode/components';
 import ServerProvider from '@/api-service/index';
 import UserDetail from '../user-detail.vue';
 import UserList from '../user-list.vue';
+import { transformToFilterTree } from '@/components/VxeTable/src/helper';
 import AuthorityRelation from '@/views/system/authority/components/authority-relation.vue';
 import { AvatarGroupInfo } from '@begcode/components';
 
@@ -581,6 +622,7 @@ const apis = {
   userService: apiService.system.userService,
   find: apiService.system.userService.retrieve,
   updateRelations: apiService.system.userService.updateRelations,
+  departmentList: apiService.settings.departmentService.tree,
 };
 const columns = config.columns();
 if (props.gridCustomConfig?.hideColumns?.length > 0) {
@@ -638,6 +680,19 @@ if (rowOperations.length > 4 || (saveOperation && rowOperations.length > 3)) {
 const selectedRows = reactive<any>([]);
 const searchFormRef = ref<any>(null);
 const searchValue = ref('');
+const mapOfFilter = ref({});
+const filterTreeConfig = reactive({
+  treeFilterData: [] as any[],
+  expandedKeys: [],
+  checkedKeys: [],
+  selectedKeys: [],
+  autoExpandParent: true,
+});
+apis.departmentList().then(data => {
+  filterTreeConfig.treeFilterData.push(
+    transformToFilterTree(data.records, { key: 'id', title: 'name', children: 'children' }, { filterName: 'departmentId', title: '部门' }),
+  );
+});
 const modalConfig = reactive<any>({
   componentName: '',
   entityId: '',
@@ -694,6 +749,11 @@ const gridOptions = reactive<VxeGridProps>({
         } else {
           delete queryParams['jhiCommonSearchKeywords'];
           Object.assign(queryParams, getSearchQueryData(searchFormConfig));
+        }
+        if (Object.keys(mapOfFilter.value).length) {
+          queryParams.and = mapOfFilter.value;
+        } else {
+          delete queryParams.and;
         }
         return await apis.find(queryParams);
       },
@@ -950,6 +1010,22 @@ const showSearchFormSetting = () => {
   if (searchFormRef.value) {
     searchFormRef.value.showSettingModal();
   }
+};
+
+const onCheck = checkedKeys => {
+  filterTreeConfig.checkedKeys = checkedKeys;
+};
+
+const onSelect = (selectedKeys, info) => {
+  const filterData = info.node.dataRef;
+  mapOfFilter.value = {};
+  if (selectedKeys && selectedKeys.length > 0) {
+    if (filterData.type === 'filterItem') {
+      mapOfFilter.value[info.node.dataRef.filterName] = info.node.dataRef.filterValue;
+      filterTreeConfig.selectedKeys = selectedKeys;
+    }
+  }
+  formSearch();
 };
 
 const rowClick = ({ name, data }) => {

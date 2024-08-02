@@ -32,7 +32,10 @@
       "documentation": "表单配置",
       "fieldName": "formJson",
       "fieldType": "byte[]",
-      "fieldTypeBlobContent": "text"
+      "fieldTypeBlobContent": "text",
+      "options": {
+        "endUsed": "codeEditor"
+      }
     }
   ],
   "jpaMetamodelFiltering": true,

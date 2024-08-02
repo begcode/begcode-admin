@@ -1149,11 +1149,12 @@ public class SmsMessageResourceIT {
         partialUpdatedSmsMessage.setId(smsMessage.getId());
 
         partialUpdatedSmsMessage
-            .sendType(UPDATED_SEND_TYPE)
-            .receiver(UPDATED_RECEIVER)
             .params(UPDATED_PARAMS)
-            .retryNum(UPDATED_RETRY_NUM)
+            .content(UPDATED_CONTENT)
+            .sendTime(UPDATED_SEND_TIME)
+            .sendStatus(UPDATED_SEND_STATUS)
             .failResult(UPDATED_FAIL_RESULT)
+            .remark(UPDATED_REMARK)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
             .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);

@@ -32,12 +32,6 @@
             <column name="contact" type="varchar(255)" remarks="联系人">
                 <constraints nullable="true" />
             </column>
-            <column name="create_user_id" type="bigint" remarks="创建用户 Id">
-                <constraints nullable="true" />
-            </column>
-            <column name="create_time" type="${datetimeType}" remarks="创建时间">
-                <constraints nullable="true" />
-            </column>
             <column name="parent_id" type="bigint" remarks="部门">
                 <constraints nullable="true" />
             </column>
@@ -46,7 +40,6 @@
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
-        <dropDefaultValue tableName="department" columnName="create_time" columnDataType="${datetimeType}"/>
     </changeSet>
     
     

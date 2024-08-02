@@ -1,5 +1,4 @@
 import type { VxeGridPropTypes, VxeGridProps } from 'vxe-table/types/grid';
-import dayjs from 'dayjs';
 import apiService from '@/api-service/index';
 
 const relationshipApis: any = {
@@ -72,25 +71,6 @@ const searchForm = (): any[] => {
       operator: '',
       span: 8,
       componentProps: {},
-    },
-    {
-      title: '创建用户 Id',
-      field: 'createUserId',
-      componentType: 'Text',
-      value: '',
-      type: 'Long',
-      operator: '',
-      span: 8,
-      componentProps: {},
-    },
-    {
-      title: '创建时间',
-      field: 'createTime',
-      componentType: 'DateTimeRange',
-      operator: '',
-      span: 8,
-      type: 'Instant',
-      componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
     },
     {
       title: '下级部门',
@@ -199,23 +179,6 @@ const columns = (): VxeGridPropTypes.Columns => {
       treeNode: false,
       params: { type: 'STRING' },
       editRender: { name: 'AInput', enabled: false },
-    },
-    {
-      title: '创建用户 Id',
-      field: 'createUserId',
-      minWidth: 80,
-      visible: true,
-      treeNode: false,
-      params: { type: 'LONG' },
-    },
-    {
-      title: '创建时间',
-      field: 'createTime',
-      minWidth: 100,
-      visible: true,
-      treeNode: false,
-      params: { type: 'Instant' },
-      formatter: ({ cellValue }) => (cellValue ? dayjs(cellValue).format('YYYY-MM-DD hh:mm:ss') : ''),
     },
     {
       title: '角色列表',

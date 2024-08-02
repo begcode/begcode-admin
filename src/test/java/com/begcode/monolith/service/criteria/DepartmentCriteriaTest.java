@@ -81,8 +81,6 @@ class DepartmentCriteriaTest {
         departmentCriteria.phoneNum();
         departmentCriteria.logo();
         departmentCriteria.contact();
-        departmentCriteria.createUserId();
-        departmentCriteria.createTime();
         departmentCriteria.childrenId();
         departmentCriteria.authoritiesId();
         departmentCriteria.parentId();
@@ -100,8 +98,6 @@ class DepartmentCriteriaTest {
                 condition.apply(criteria.getPhoneNum()) &&
                 condition.apply(criteria.getLogo()) &&
                 condition.apply(criteria.getContact()) &&
-                condition.apply(criteria.getCreateUserId()) &&
-                condition.apply(criteria.getCreateTime()) &&
                 condition.apply(criteria.getChildrenId()) &&
                 condition.apply(criteria.getAuthoritiesId()) &&
                 condition.apply(criteria.getParentId()) &&
@@ -121,8 +117,6 @@ class DepartmentCriteriaTest {
                 condition.apply(criteria.getPhoneNum(), copy.getPhoneNum()) &&
                 condition.apply(criteria.getLogo(), copy.getLogo()) &&
                 condition.apply(criteria.getContact(), copy.getContact()) &&
-                condition.apply(criteria.getCreateUserId(), copy.getCreateUserId()) &&
-                condition.apply(criteria.getCreateTime(), copy.getCreateTime()) &&
                 condition.apply(criteria.getChildrenId(), copy.getChildrenId()) &&
                 condition.apply(criteria.getAuthoritiesId(), copy.getAuthoritiesId()) &&
                 condition.apply(criteria.getParentId(), copy.getParentId()) &&

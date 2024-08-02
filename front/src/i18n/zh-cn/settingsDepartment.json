@@ -24,8 +24,6 @@
       "phoneNum": "Phone Num",
       "logo": "Logo",
       "contact": "Contact",
-      "createUserId": "Create User Id",
-      "createTime": "Create Time",
       "children": "Children",
       "authorities": "Authorities",
       "parent": "Parent",
@@ -36,9 +34,7 @@
         "address": "地址",
         "phoneNum": "联系电话",
         "logo": "logo地址",
-        "contact": "联系人",
-        "createUserId": "创建用户 Id",
-        "createTime": "创建时间"
+        "contact": "联系人"
       }
     }
   }

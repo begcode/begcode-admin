@@ -67,20 +67,6 @@ const fields = (): FormSchema[] => {
       rules: [],
     },
     {
-      label: '创建用户 Id',
-      field: 'createUserId',
-      component: 'InputNumber',
-      componentProps: { placeholder: '请输入创建用户 Id', controls: false, style: 'width: 100%' },
-      rules: [],
-    },
-    {
-      label: '创建时间',
-      field: 'createTime',
-      component: 'DatePicker',
-      componentProps: { valueFormat: 'YYYY-MM-DD hh:mm:ss', placeholder: '请选择创建时间', style: 'width: 100%' },
-      rules: [],
-    },
-    {
       label: '角色列表',
       field: 'authorities',
       component: 'ApiTreeSelect',

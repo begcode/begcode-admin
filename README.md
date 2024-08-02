@@ -22,7 +22,7 @@
 
 ### 用户列表
 
-![用户列表](./doc/images/user.png)
+![用户列表](./doc/images/user-list.png)
 
 ### 短信配置
 

@@ -20,8 +20,6 @@ import com.begcode.monolith.service.DepartmentService;
 import com.begcode.monolith.service.dto.DepartmentDTO;
 import com.begcode.monolith.service.mapper.DepartmentMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterEach;
@@ -62,13 +60,6 @@ public class DepartmentResourceIT {
 
     private static final String DEFAULT_CONTACT = "AAAAAAAAAA";
     private static final String UPDATED_CONTACT = "BBBBBBBBBB";
-
-    private static final Long DEFAULT_CREATE_USER_ID = 1L;
-    private static final Long UPDATED_CREATE_USER_ID = 2L;
-    private static final Long SMALLER_CREATE_USER_ID = 1L - 1L;
-
-    private static final Instant DEFAULT_CREATE_TIME = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_CREATE_TIME = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/departments";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -111,9 +102,7 @@ public class DepartmentResourceIT {
             .address(DEFAULT_ADDRESS)
             .phoneNum(DEFAULT_PHONE_NUM)
             .logo(DEFAULT_LOGO)
-            .contact(DEFAULT_CONTACT)
-            .createUserId(DEFAULT_CREATE_USER_ID)
-            .createTime(DEFAULT_CREATE_TIME);
+            .contact(DEFAULT_CONTACT);
         return department;
     }
 
@@ -130,9 +119,7 @@ public class DepartmentResourceIT {
             .address(UPDATED_ADDRESS)
             .phoneNum(UPDATED_PHONE_NUM)
             .logo(UPDATED_LOGO)
-            .contact(UPDATED_CONTACT)
-            .createUserId(UPDATED_CREATE_USER_ID)
-            .createTime(UPDATED_CREATE_TIME);
+            .contact(UPDATED_CONTACT);
         return department;
     }
 
@@ -208,9 +195,7 @@ public class DepartmentResourceIT {
             .andExpect(jsonPath("$.[*].address").value(hasItem(DEFAULT_ADDRESS)))
             .andExpect(jsonPath("$.[*].phoneNum").value(hasItem(DEFAULT_PHONE_NUM)))
             .andExpect(jsonPath("$.[*].logo").value(hasItem(DEFAULT_LOGO)))
-            .andExpect(jsonPath("$.[*].contact").value(hasItem(DEFAULT_CONTACT)))
-            .andExpect(jsonPath("$.[*].createUserId").value(hasItem(DEFAULT_CREATE_USER_ID.intValue())))
-            .andExpect(jsonPath("$.[*].createTime").value(hasItem(DEFAULT_CREATE_TIME.toString())));
+            .andExpect(jsonPath("$.[*].contact").value(hasItem(DEFAULT_CONTACT)));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -247,9 +232,7 @@ public class DepartmentResourceIT {
             .andExpect(jsonPath("$.address").value(DEFAULT_ADDRESS))
             .andExpect(jsonPath("$.phoneNum").value(DEFAULT_PHONE_NUM))
             .andExpect(jsonPath("$.logo").value(DEFAULT_LOGO))
-            .andExpect(jsonPath("$.contact").value(DEFAULT_CONTACT))
-            .andExpect(jsonPath("$.createUserId").value(DEFAULT_CREATE_USER_ID.intValue()))
-            .andExpect(jsonPath("$.createTime").value(DEFAULT_CREATE_TIME.toString()));
+            .andExpect(jsonPath("$.contact").value(DEFAULT_CONTACT));
     }
 
     @Test
@@ -569,121 +552,6 @@ public class DepartmentResourceIT {
 
     @Test
     @Transactional
-    void getAllDepartmentsByCreateUserIdIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedDepartment = departmentRepository.saveAndGet(department);
-
-        // Get all the departmentList where createUserId equals to
-        defaultDepartmentFiltering("createUserId.equals=" + DEFAULT_CREATE_USER_ID, "createUserId.equals=" + UPDATED_CREATE_USER_ID);
-    }
-
-    @Test
-    @Transactional
-    void getAllDepartmentsByCreateUserIdIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedDepartment = departmentRepository.saveAndGet(department);
-
-        // Get all the departmentList where createUserId in
-        defaultDepartmentFiltering(
-            "createUserId.in=" + DEFAULT_CREATE_USER_ID + "," + UPDATED_CREATE_USER_ID,
-            "createUserId.in=" + UPDATED_CREATE_USER_ID
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllDepartmentsByCreateUserIdIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedDepartment = departmentRepository.saveAndGet(department);
-
-        // Get all the departmentList where createUserId is not null
-        defaultDepartmentFiltering("createUserId.specified=true", "createUserId.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllDepartmentsByCreateUserIdIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedDepartment = departmentRepository.saveAndGet(department);
-
-        // Get all the departmentList where createUserId is greater than or equal to
-        defaultDepartmentFiltering(
-            "createUserId.greaterThanOrEqual=" + DEFAULT_CREATE_USER_ID,
-            "createUserId.greaterThanOrEqual=" + UPDATED_CREATE_USER_ID
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllDepartmentsByCreateUserIdIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedDepartment = departmentRepository.saveAndGet(department);
-
-        // Get all the departmentList where createUserId is less than or equal to
-        defaultDepartmentFiltering(
-            "createUserId.lessThanOrEqual=" + DEFAULT_CREATE_USER_ID,
-            "createUserId.lessThanOrEqual=" + SMALLER_CREATE_USER_ID
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllDepartmentsByCreateUserIdIsLessThanSomething() throws Exception {
-        // Initialize the database
-        insertedDepartment = departmentRepository.saveAndGet(department);
-
-        // Get all the departmentList where createUserId is less than
-        defaultDepartmentFiltering("createUserId.lessThan=" + UPDATED_CREATE_USER_ID, "createUserId.lessThan=" + DEFAULT_CREATE_USER_ID);
-    }
-
-    @Test
-    @Transactional
-    void getAllDepartmentsByCreateUserIdIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        insertedDepartment = departmentRepository.saveAndGet(department);
-
-        // Get all the departmentList where createUserId is greater than
-        defaultDepartmentFiltering(
-            "createUserId.greaterThan=" + SMALLER_CREATE_USER_ID,
-            "createUserId.greaterThan=" + DEFAULT_CREATE_USER_ID
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllDepartmentsByCreateTimeIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedDepartment = departmentRepository.saveAndGet(department);
-
-        // Get all the departmentList where createTime equals to
-        defaultDepartmentFiltering("createTime.equals=" + DEFAULT_CREATE_TIME, "createTime.equals=" + UPDATED_CREATE_TIME);
-    }
-
-    @Test
-    @Transactional
-    void getAllDepartmentsByCreateTimeIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedDepartment = departmentRepository.saveAndGet(department);
-
-        // Get all the departmentList where createTime in
-        defaultDepartmentFiltering(
-            "createTime.in=" + DEFAULT_CREATE_TIME + "," + UPDATED_CREATE_TIME,
-            "createTime.in=" + UPDATED_CREATE_TIME
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllDepartmentsByCreateTimeIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedDepartment = departmentRepository.saveAndGet(department);
-
-        // Get all the departmentList where createTime is not null
-        defaultDepartmentFiltering("createTime.specified=true", "createTime.specified=false");
-    }
-
-    @Test
-    @Transactional
     void getAllDepartmentsByAuthoritiesIsEqualToSomething() throws Exception {
         Authority authorities = AuthorityResourceIT.createEntity();
         // department.addAuthorities(authorities);
@@ -729,9 +597,7 @@ public class DepartmentResourceIT {
             .andExpect(jsonPath("$.[*].address").value(hasItem(DEFAULT_ADDRESS)))
             .andExpect(jsonPath("$.[*].phoneNum").value(hasItem(DEFAULT_PHONE_NUM)))
             .andExpect(jsonPath("$.[*].logo").value(hasItem(DEFAULT_LOGO)))
-            .andExpect(jsonPath("$.[*].contact").value(hasItem(DEFAULT_CONTACT)))
-            .andExpect(jsonPath("$.[*].createUserId").value(hasItem(DEFAULT_CREATE_USER_ID.intValue())))
-            .andExpect(jsonPath("$.[*].createTime").value(hasItem(DEFAULT_CREATE_TIME.toString())));
+            .andExpect(jsonPath("$.[*].contact").value(hasItem(DEFAULT_CONTACT)));
 
         // Check, that the count call also returns 1
         restDepartmentMockMvc
@@ -783,9 +649,7 @@ public class DepartmentResourceIT {
             .address(UPDATED_ADDRESS)
             .phoneNum(UPDATED_PHONE_NUM)
             .logo(UPDATED_LOGO)
-            .contact(UPDATED_CONTACT)
-            .createUserId(UPDATED_CREATE_USER_ID)
-            .createTime(UPDATED_CREATE_TIME);
+            .contact(UPDATED_CONTACT);
         DepartmentDTO departmentDTO = departmentMapper.toDto(updatedDepartment);
 
         restDepartmentMockMvc
@@ -875,7 +739,7 @@ public class DepartmentResourceIT {
         Department partialUpdatedDepartment = new Department();
         partialUpdatedDepartment.setId(department.getId());
 
-        partialUpdatedDepartment.name(UPDATED_NAME).address(UPDATED_ADDRESS).contact(UPDATED_CONTACT).createTime(UPDATED_CREATE_TIME);
+        partialUpdatedDepartment.contact(UPDATED_CONTACT);
 
         restDepartmentMockMvc
             .perform(
@@ -912,9 +776,7 @@ public class DepartmentResourceIT {
             .address(UPDATED_ADDRESS)
             .phoneNum(UPDATED_PHONE_NUM)
             .logo(UPDATED_LOGO)
-            .contact(UPDATED_CONTACT)
-            .createUserId(UPDATED_CREATE_USER_ID)
-            .createTime(UPDATED_CREATE_TIME);
+            .contact(UPDATED_CONTACT);
 
         restDepartmentMockMvc
             .perform(

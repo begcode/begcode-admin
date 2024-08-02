@@ -1173,13 +1173,13 @@ public class SysLogResourceIT {
         partialUpdatedSysLog.setId(sysLog.getId());
 
         partialUpdatedSysLog
+            .logType(UPDATED_LOG_TYPE)
             .logContent(UPDATED_LOG_CONTENT)
-            .operateType(UPDATED_OPERATE_TYPE)
-            .userid(UPDATED_USERID)
-            .requestUrl(UPDATED_REQUEST_URL)
+            .username(UPDATED_USERNAME)
+            .ip(UPDATED_IP)
+            .method(UPDATED_METHOD)
             .requestParam(UPDATED_REQUEST_PARAM)
-            .createdBy(UPDATED_CREATED_BY)
-            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY);
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restSysLogMockMvc
             .perform(

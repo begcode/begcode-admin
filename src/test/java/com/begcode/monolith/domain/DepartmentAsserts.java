@@ -52,9 +52,7 @@ public class DepartmentAsserts {
             .satisfies(e -> assertThat(e.getAddress()).as("check address").isEqualTo(actual.getAddress()))
             .satisfies(e -> assertThat(e.getPhoneNum()).as("check phoneNum").isEqualTo(actual.getPhoneNum()))
             .satisfies(e -> assertThat(e.getLogo()).as("check logo").isEqualTo(actual.getLogo()))
-            .satisfies(e -> assertThat(e.getContact()).as("check contact").isEqualTo(actual.getContact()))
-            .satisfies(e -> assertThat(e.getCreateUserId()).as("check createUserId").isEqualTo(actual.getCreateUserId()))
-            .satisfies(e -> assertThat(e.getCreateTime()).as("check createTime").isEqualTo(actual.getCreateTime()));
+            .satisfies(e -> assertThat(e.getContact()).as("check contact").isEqualTo(actual.getContact()));
     }
 
     /**

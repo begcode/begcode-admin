@@ -48,12 +48,6 @@ public class DepartmentCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.contact")
     private StringFilter contact;
 
-    @BindQuery(column = "self.create_user_id")
-    private LongFilter createUserId;
-
-    @BindQuery(column = "self.create_time")
-    private InstantFilter createTime;
-
     @BindQuery(entity = Department.class, column = "id", condition = "id=parent_id")
     private LongFilter childrenId;
 
@@ -110,8 +104,6 @@ public class DepartmentCriteria implements Serializable, Criteria {
         this.phoneNum = other.optionalPhoneNum().map(StringFilter::copy).orElse(null);
         this.logo = other.optionalLogo().map(StringFilter::copy).orElse(null);
         this.contact = other.optionalContact().map(StringFilter::copy).orElse(null);
-        this.createUserId = other.optionalCreateUserId().map(LongFilter::copy).orElse(null);
-        this.createTime = other.optionalCreateTime().map(InstantFilter::copy).orElse(null);
         this.childrenId = other.optionalChildrenId().map(LongFilter::copy).orElse(null);
         this.childrenName = other.optionalChildrenName().map(StringFilter::copy).orElse(null);
         this.authoritiesId = other.optionalAuthoritiesId().map(LongFilter::copy).orElse(null);
@@ -259,44 +251,6 @@ public class DepartmentCriteria implements Serializable, Criteria {
 
     public void setContact(StringFilter contact) {
         this.contact = contact;
-    }
-
-    public LongFilter getCreateUserId() {
-        return createUserId;
-    }
-
-    public Optional<LongFilter> optionalCreateUserId() {
-        return Optional.ofNullable(createUserId);
-    }
-
-    public LongFilter createUserId() {
-        if (createUserId == null) {
-            setCreateUserId(new LongFilter());
-        }
-        return createUserId;
-    }
-
-    public void setCreateUserId(LongFilter createUserId) {
-        this.createUserId = createUserId;
-    }
-
-    public InstantFilter getCreateTime() {
-        return createTime;
-    }
-
-    public Optional<InstantFilter> optionalCreateTime() {
-        return Optional.ofNullable(createTime);
-    }
-
-    public InstantFilter createTime() {
-        if (createTime == null) {
-            setCreateTime(new InstantFilter());
-        }
-        return createTime;
-    }
-
-    public void setCreateTime(InstantFilter createTime) {
-        this.createTime = createTime;
     }
 
     public LongFilter getChildrenId() {
@@ -533,8 +487,6 @@ public class DepartmentCriteria implements Serializable, Criteria {
             Objects.equals(phoneNum, that.phoneNum) &&
             Objects.equals(logo, that.logo) &&
             Objects.equals(contact, that.contact) &&
-            Objects.equals(createUserId, that.createUserId) &&
-            Objects.equals(createTime, that.createTime) &&
             Objects.equals(childrenId, that.childrenId) &&
             Objects.equals(authoritiesId, that.authoritiesId) &&
             Objects.equals(parentId, that.parentId) &&
@@ -545,22 +497,7 @@ public class DepartmentCriteria implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-            id,
-            name,
-            code,
-            address,
-            phoneNum,
-            logo,
-            contact,
-            createUserId,
-            createTime,
-            childrenId,
-            authoritiesId,
-            parentId,
-            usersId,
-            distinct
-        );
+        return Objects.hash(id, name, code, address, phoneNum, logo, contact, childrenId, authoritiesId, parentId, usersId, distinct);
     }
 
     // prettier-ignore
@@ -574,8 +511,6 @@ public class DepartmentCriteria implements Serializable, Criteria {
             optionalPhoneNum().map(f -> "phoneNum=" + f + ", ").orElse("") +
             optionalLogo().map(f -> "logo=" + f + ", ").orElse("") +
             optionalContact().map(f -> "contact=" + f + ", ").orElse("") +
-            optionalCreateUserId().map(f -> "createUserId=" + f + ", ").orElse("") +
-            optionalCreateTime().map(f -> "createTime=" + f + ", ").orElse("") +
             optionalChildrenId().map(f -> "childrenId=" + f + ", ").orElse("") +
             optionalChildrenName().map(f -> "childrenName=" + f + ", ").orElse("") +
             optionalAuthoritiesId().map(f -> "authoritiesId=" + f + ", ").orElse("") +

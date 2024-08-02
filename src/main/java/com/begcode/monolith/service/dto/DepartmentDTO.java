@@ -2,7 +2,6 @@ package com.begcode.monolith.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -58,18 +57,6 @@ public class DepartmentDTO implements Serializable {
      */
     @Schema(description = "联系人")
     private String contact;
-
-    /**
-     * 创建用户 Id
-     */
-    @Schema(description = "创建用户 Id")
-    private Long createUserId;
-
-    /**
-     * 创建时间
-     */
-    @Schema(description = "创建时间")
-    private Instant createTime;
 
     /**
      * 下级部门
@@ -128,16 +115,6 @@ public class DepartmentDTO implements Serializable {
         return this;
     }
 
-    public DepartmentDTO createUserId(Long createUserId) {
-        this.createUserId = createUserId;
-        return this;
-    }
-
-    public DepartmentDTO createTime(Instant createTime) {
-        this.createTime = createTime;
-        return this;
-    }
-
     public DepartmentDTO children(List<DepartmentDTO> children) {
         this.children = children;
         return this;
@@ -192,8 +169,6 @@ public class DepartmentDTO implements Serializable {
             ", phoneNum='" + getPhoneNum() + "'" +
             ", logo='" + getLogo() + "'" +
             ", contact='" + getContact() + "'" +
-            ", createUserId=" + getCreateUserId() +
-            ", createTime='" + getCreateTime() + "'" +
             ", children=" + getChildren() +
             ", authorities=" + getAuthorities() +
             ", parent=" + getParent() +

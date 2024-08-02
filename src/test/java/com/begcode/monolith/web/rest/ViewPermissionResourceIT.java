@@ -1486,15 +1486,10 @@ public class ViewPermissionResourceIT {
 
         partialUpdatedViewPermission
             .text(UPDATED_TEXT)
-            .i18n(UPDATED_I_18_N)
-            .externalLink(UPDATED_EXTERNAL_LINK)
-            .icon(UPDATED_ICON)
+            .group(UPDATED_GROUP)
             .disabled(UPDATED_DISABLED)
-            .hide(UPDATED_HIDE)
-            .shortcutRoot(UPDATED_SHORTCUT_ROOT)
-            .reuse(UPDATED_REUSE)
-            .code(UPDATED_CODE)
-            .order(UPDATED_ORDER);
+            .hideInBreadcrumb(UPDATED_HIDE_IN_BREADCRUMB)
+            .shortcutRoot(UPDATED_SHORTCUT_ROOT);
 
         restViewPermissionMockMvc
             .perform(

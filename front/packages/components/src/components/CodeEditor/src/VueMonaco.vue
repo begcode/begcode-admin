@@ -2,7 +2,7 @@
   <div ref="monacoRef"></div>
 </template>
 <script lang="ts" setup>
-import * as monacoEditor from 'monaco-editor';
+import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
 import { watch, onMounted, nextTick, onBeforeUnmount, ref } from 'vue';
 
 defineOptions({

@@ -1,3 +1,4 @@
+import { h } from 'vue';
 import { DescItem } from '@begcode/components';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
@@ -21,6 +22,14 @@ const fields: DescItem[] = [
   {
     label: '表单配置',
     field: 'formJson',
+    render: (value, _data) =>
+      h(Codemirror, {
+        value,
+        options: { mode: 'text/html', lineNumbers: true },
+        onInput: value => {
+          data.formJson = value;
+        },
+      }),
   },
   {
     label: '创建者Id',

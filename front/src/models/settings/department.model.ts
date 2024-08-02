@@ -8,8 +8,6 @@ export interface IDepartment {
   phoneNum?: string | null; //联系电话
   logo?: string | null; //logo地址
   contact?: string | null; //联系人
-  createUserId?: number | null; //创建用户 Id
-  createTime?: Date | null; //创建时间
   authorities?: IAuthority[] | null; //角色列表
   parentId?: number | null;
   parent?: IDepartment | null; //上级
@@ -26,8 +24,6 @@ export class Department implements IDepartment {
     public phoneNum?: string | null,
     public logo?: string | null,
     public contact?: string | null,
-    public createUserId?: number | null,
-    public createTime?: Date | null,
     public authorities?: IAuthority[] | null,
     public parentId?: number | null,
     public parent?: IDepartment | null,

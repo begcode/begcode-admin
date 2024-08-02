@@ -1,115 +1,148 @@
 <template>
   <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
   <div>
-    <Card
-      v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
-      title="高级搜索"
-      class="bc-list-search-form-card"
-      :body-style="{ 'padding-top': '12px', 'padding-bottom': '8px' }"
-      :head-style="{ 'min-height': '40px' }"
-    >
-      <template #extra>
-        <Space>
-          <Button type="default" @click="showSearchFormSetting" preIcon="ant-design:setting-outlined" shape="circle" size="small"></Button>
-        </Space>
-      </template>
-      <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" />
-    </Card>
-    <Card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
-      <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents" data-cy="entityTable">
-        <template #toolbar_buttons>
-          <Row :gutter="16">
-            <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
-              <Space>
-                <Input
-                  v-model:value="searchFormConfig.jhiCommonSearchKeywords"
-                  placeholder="请输入关键字"
-                  allow-clear
-                  @change="inputSearch"
-                  @pressEnter="formSearch"
-                  style="width: 280px"
-                  data-cy="listSearchInput"
-                >
-                  <template #prefix>
-                    <Icon icon="ant-design:search-outlined" />
-                  </template>
-                  <template #addonAfter>
-                    <Button type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
-                      >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch" data-cy="listSearchMore"></Icon>
-                    </Button>
-                  </template>
-                </Input>
-                <template v-for="button of gridOptions?.toolbarConfig?.buttons">
-                  <Button v-if="!button.dropdowns">{{ button.name }}</Button>
-                  <Dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
-                    <template #overlay>
-                      <Menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
-                        <MenuItem :key="subButton.name + 's'">
-                          <Icon :icon="subButton.icon"></Icon>
-                          {{ subButton.name }}
-                        </MenuItem>
-                      </Menu>
-                    </template>
-                    <Button>
-                      {{ button.name }}
-                      <Icon icon="ant-design:down-outlined" />
-                    </Button>
-                  </Dropdown>
-                </template>
-              </Space>
-            </Col>
-          </Row>
-        </template>
-        <template #recordAction="{ row }">
-          <ButtonGroup :row="row" :buttons="rowOperations" @click="rowClick" :ref="el => rowOperationRef('row_operation_' + row.id, el)" />
-        </template>
-
-        <template #authorities_default="{ row, column, $grid }">
-          <AvatarGroupInfo
-            :value="row.authorities"
-            :disabled="!$grid?.isEditByRow(row)"
-            avatar-slot-name="default"
-            avatar-slot-field="name"
-            avatar-tip-field="name"
-            @click="buttonType => rowClick({ name: column.field + 'Column' + upperFirst(buttonType), data: row, params: column.params })"
+    <SplitPanes class="default-theme">
+      <Pane size="20">
+        <Card
+          title="过滤列表"
+          class="bc-list-result-card"
+          :body-style="{ padding: '12px 12px 8px 12px' }"
+          :head-style="{ 'min-height': '40px', padding: '12px' }"
+        >
+          <BasicTree
+            :expandedKeys="filterTreeConfig.expandedKeys"
+            :autoExpandParent="filterTreeConfig.autoExpandParent"
+            :selectedKeys="filterTreeConfig.selectedKeys"
+            :treeData="filterTreeConfig.treeFilterData"
+            @select="filterTreeSelect"
           />
-        </template>
-      </Grid>
-      <BasicModal
-        v-bind="popupConfig.containerProps"
-        @register="registerModal"
-        @cancel="closeModal"
-        @ok="okModal"
-        v-on="popupConfig.containerEvents"
-      >
-        <component
-          v-if="popupConfig.componentProps.is"
-          v-bind="popupConfig.componentProps"
-          :is="popupConfig.componentProps.is"
-          @cancel="closeModal"
-          @refresh="formSearch"
-          v-on="popupConfig.componentEvents"
-          ref="modalComponentRef"
-        />
-      </BasicModal>
-      <BasicDrawer
-        v-bind="popupConfig.containerProps"
-        @register="registerDrawer"
-        @close="closeDrawer"
-        @ok="okDrawer"
-        v-on="popupConfig.containerEvents"
-      >
-        <component
-          v-if="popupConfig.componentProps.is"
-          v-bind="popupConfig.componentProps"
-          :is="popupConfig.componentProps.is"
-          @cancel="closeDrawer"
-          @refresh="formSearch"
-          v-on="popupConfig.componentEvents"
-          ref="drawerComponentRef"
-        />
-      </BasicDrawer>
-    </Card>
+        </Card>
+      </Pane>
+      <Pane>
+        <Card
+          v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
+          title="高级搜索"
+          class="bc-list-search-form-card"
+          :body-style="{ 'padding-top': '12px', 'padding-bottom': '8px' }"
+          :head-style="{ 'min-height': '40px' }"
+        >
+          <template #extra>
+            <Space>
+              <Button
+                type="default"
+                @click="showSearchFormSetting"
+                preIcon="ant-design:setting-outlined"
+                shape="circle"
+                size="small"
+              ></Button>
+            </Space>
+          </template>
+          <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" />
+        </Card>
+        <Card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
+          <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents" data-cy="entityTable">
+            <template #toolbar_buttons>
+              <Row :gutter="16">
+                <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
+                  <Space>
+                    <Input
+                      v-model:value="searchFormConfig.jhiCommonSearchKeywords"
+                      placeholder="请输入关键字"
+                      allow-clear
+                      @change="inputSearch"
+                      @pressEnter="formSearch"
+                      style="width: 280px"
+                      data-cy="listSearchInput"
+                    >
+                      <template #prefix>
+                        <Icon icon="ant-design:search-outlined" />
+                      </template>
+                      <template #addonAfter>
+                        <Button type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
+                          >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch" data-cy="listSearchMore"></Icon>
+                        </Button>
+                      </template>
+                    </Input>
+                    <template v-for="button of gridOptions?.toolbarConfig?.buttons">
+                      <Button v-if="!button.dropdowns">{{ button.name }}</Button>
+                      <Dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
+                        <template #overlay>
+                          <Menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
+                            <MenuItem :key="subButton.name + 's'">
+                              <Icon :icon="subButton.icon"></Icon>
+                              {{ subButton.name }}
+                            </MenuItem>
+                          </Menu>
+                        </template>
+                        <Button>
+                          {{ button.name }}
+                          <Icon icon="ant-design:down-outlined" />
+                        </Button>
+                      </Dropdown>
+                    </template>
+                  </Space>
+                </Col>
+              </Row>
+            </template>
+            <template #recordAction="{ row }">
+              <ButtonGroup
+                :row="row"
+                :buttons="rowOperations"
+                @click="rowClick"
+                :ref="el => rowOperationRef('row_operation_' + row.id, el)"
+              />
+            </template>
+
+            <template #authorities_default="{ row, column, $grid }">
+              <AvatarGroupInfo
+                :value="row.authorities"
+                :disabled="!$grid?.isEditByRow(row)"
+                avatar-slot-name="default"
+                avatar-slot-field="name"
+                avatar-tip-field="name"
+                @click="
+                  buttonType => rowClick({ name: column.field + 'Column' + upperFirst(buttonType), data: row, params: column.params })
+                "
+              />
+            </template>
+          </Grid>
+          <BasicModal
+            v-bind="popupConfig.containerProps"
+            @register="registerModal"
+            @cancel="closeModal"
+            @ok="okModal"
+            v-on="popupConfig.containerEvents"
+          >
+            <component
+              v-if="popupConfig.componentProps.is"
+              v-bind="popupConfig.componentProps"
+              :is="popupConfig.componentProps.is"
+              @cancel="closeModal"
+              @refresh="formSearch"
+              v-on="popupConfig.componentEvents"
+              ref="modalComponentRef"
+            />
+          </BasicModal>
+          <BasicDrawer
+            v-bind="popupConfig.containerProps"
+            @register="registerDrawer"
+            @close="closeDrawer"
+            @ok="okDrawer"
+            v-on="popupConfig.containerEvents"
+          >
+            <component
+              v-if="popupConfig.componentProps.is"
+              v-bind="popupConfig.componentProps"
+              :is="popupConfig.componentProps.is"
+              @cancel="closeDrawer"
+              @refresh="formSearch"
+              v-on="popupConfig.componentEvents"
+              ref="drawerComponentRef"
+            />
+          </BasicDrawer>
+        </Card>
+      </Pane>
+    </SplitPanes>
   </div>
 </template>
 
@@ -120,13 +153,26 @@ import { VxeGridInstance, VxeGridListeners, VxeGridProps, Grid } from 'vxe-table
 import { debounce, upperFirst } from 'lodash-es';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { transVxeSorts } from '@/utils/jhipster/sorts';
-import { Button, ButtonGroup, Icon, BasicModal, BasicDrawer, SearchForm, useModalInner, useDrawerInner } from '@begcode/components';
+import {
+  Button,
+  ButtonGroup,
+  Icon,
+  BasicModal,
+  BasicDrawer,
+  SearchForm,
+  useModalInner,
+  useDrawerInner,
+  BasicTree,
+  SplitPanes,
+  Pane,
+} from '@begcode/components';
 import { useGo } from '@/hooks/web/usePage';
 import ServerProvider from '@/api-service/index';
 import { useMergeGridProps, useColumnsConfig, useSetOperationColumn, useSetShortcutButtons } from '@/components/VxeTable/src/helper';
 import UserForm from './components/form-component.vue';
 import UserDetail from './components/detail-component.vue';
 import config from './config/list-config';
+import { transformToFilterTree } from '@/components/VxeTable/src/helper';
 import AuthorityRelation from '@/views/system/authority/components/authority-relation.vue';
 import { AvatarGroupInfo } from '@begcode/components';
 
@@ -156,6 +202,7 @@ const apis = {
   deleteById: apiService.system.userService.delete,
   deleteByIds: apiService.system.userService.deleteByIds,
   update: apiService.system.userService.update,
+  departmentList: apiService.settings.departmentService.tree,
 };
 const pageConfig = {
   title: '用户列表',
@@ -235,6 +282,19 @@ useSetShortcutButtons('SystemUserList', extraButtons);
 
 const selectedRows = reactive<any>([]);
 const searchFormRef = ref<any>(null);
+const mapOfFilter = ref({});
+const filterTreeConfig = reactive({
+  treeFilterData: [] as any[],
+  expandedKeys: [],
+  checkedKeys: [],
+  selectedKeys: [],
+  autoExpandParent: true,
+});
+apis.departmentList().then(data => {
+  filterTreeConfig.treeFilterData.push(
+    transformToFilterTree(data.records, { key: 'id', title: 'name', children: 'children' }, { filterName: 'departmentId', title: '部门' }),
+  );
+});
 const popupConfig = reactive<any>({
   needSubmit: false,
   containerProps: {
@@ -267,6 +327,11 @@ const ajax = {
     } else {
       delete queryParams.value['jhiCommonSearchKeywords'];
       Object.assign(queryParams.value, getSearchQueryData(searchFormConfig));
+    }
+    if (Object.keys(mapOfFilter.value).length) {
+      queryParams.value.and = mapOfFilter.value;
+    } else {
+      delete queryParams.value.and;
     }
     return await apis.find(queryParams.value);
   },
@@ -397,6 +462,22 @@ const showSearchFormSetting = () => {
   if (searchFormRef.value) {
     searchFormRef.value.showSettingModal();
   }
+};
+
+const onCheck = checkedKeys => {
+  filterTreeConfig.checkedKeys = checkedKeys;
+};
+
+const filterTreeSelect = (selectedKeys, info) => {
+  const filterData = info.node.dataRef;
+  mapOfFilter.value = {};
+  if (selectedKeys && selectedKeys.length > 0) {
+    if (filterData.type === 'filterItem') {
+      mapOfFilter.value[info.node.dataRef.filterName] = info.node.dataRef.filterValue;
+      filterTreeConfig.selectedKeys = selectedKeys;
+    }
+  }
+  formSearch();
 };
 
 const rowClick = ({ name, data, params }) => {

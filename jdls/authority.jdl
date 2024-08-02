@@ -113,6 +113,7 @@ entity Authority (jhi_authority) {
 @publicDtoFile
 @skipWebsite
 @hasImageField
+@filterByTree(department)
 entity User (jhi_user) {
   @importDataField
   @id

@@ -135,7 +135,6 @@ public class DepartmentQueryService implements QueryService<Department> {
             keywordsCriteria.setUseOr(true);
             if (StringUtils.isNumeric(keywords)) {
                 keywordsCriteria.id().setEquals(Long.valueOf(keywords));
-                keywordsCriteria.createUserId().setEquals(Long.valueOf(keywords));
             }
             keywordsCriteria.name().setContains(keywords);
             keywordsCriteria.code().setContains(keywords);
@@ -186,8 +185,6 @@ public class DepartmentQueryService implements QueryService<Department> {
         fieldNameMap.put("self.phone_num", criteria.getPhoneNum());
         fieldNameMap.put("self.logo", criteria.getLogo());
         fieldNameMap.put("self.contact", criteria.getContact());
-        fieldNameMap.put("self.create_user_id", criteria.getCreateUserId());
-        fieldNameMap.put("self.create_time", criteria.getCreateTime());
         fieldNameMap
             .entrySet()
             .stream()

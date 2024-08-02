@@ -160,24 +160,6 @@ const searchFormConfig = reactive<any>({
 });
 const rowOperations = ref<any[]>([
   {
-    title: '保存',
-    hide: row => !xGrid.value.isEditByRow(row) || !xGrid.value.props.editConfig?.mode === 'row',
-    name: 'save',
-    type: 'link',
-  },
-  {
-    title: '编辑',
-    hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig?.mode === 'row',
-    name: 'edit',
-    type: 'link',
-  },
-  {
-    title: '删除',
-    hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig?.mode === 'row',
-    name: 'delete',
-    type: 'link',
-  },
-  {
     title: '详情',
     name: 'detail',
     hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig?.mode === 'row',
@@ -259,20 +241,9 @@ const ajax = {
   delete: async records => await apis.deleteByIds(records.body.removeRecords.map(record => record.id)),
 };
 // 表格左上角自定义按钮
-const toolbarButtons = [
-  {
-    name: '批量操作',
-    circle: false,
-    icon: 'vxe-icon-add',
-    status: 'primary',
-    dropdowns: [{ code: 'batchDelete', name: '删除', circle: false, icon: 'ant-design:delete-filled', status: 'primary' }],
-  },
-];
+const toolbarButtons = [{ name: '批量操作', circle: false, icon: 'vxe-icon-add', status: 'primary', dropdowns: [] }];
 // 表格右上角自定义按钮
-const toolbarTools = [
-  { code: 'new', name: '新增', circle: false, icon: 'vxe-icon-add' },
-  { code: 'custom-column', name: '列配置', circle: false, icon: 'vxe-icon-custom-column' },
-];
+const toolbarTools = [{ code: 'custom-column', name: '列配置', circle: false, icon: 'vxe-icon-custom-column' }];
 const pagerLeft = () => {
   return h(Alert, { type: 'warning', banner: true, message: `已选择 ${selectedRows.length} 项`, style: 'height: 30px' });
 };
@@ -284,43 +255,8 @@ useMergeGridProps(gridOptions, props.gridOptions);
 const toolbarClick = ({ code }) => {
   const $grid = xGrid.value;
   switch (code) {
-    case 'batchDelete': {
-      const records = $grid.getCheckboxRecords(true);
-      if (records?.length > 0) {
-        const ids = records.map(record => record.id);
-        Modal.confirm({
-          title: `操作提示`,
-          content: `是否删除ID为【${ids.join(',')}】的${records.length}项数据？`,
-          onOk() {
-            apis.deleteByIds(ids).then(() => {
-              formSearch();
-            });
-          },
-        });
-      }
-      break;
-    }
     case 'custom-column':
       xGrid.value.openCustom();
-      break;
-    case 'new':
-      popupConfig.needSubmit = true;
-      popupConfig.containerProps.title = '新建';
-      popupConfig.containerProps.okText = '保存';
-      popupConfig.containerProps.cancelText = '取消';
-      popupConfig.containerProps.showOkBtn = true;
-      popupConfig.containerProps.showCancelBtn = true;
-      popupConfig.componentProps.is = shallowRefs.AnnouncementRecordEdit;
-      popupConfig.componentProps.entityId = '';
-      if (props.editIn === 'modal') {
-        popupConfig.componentProps.containerType = 'modal';
-        setModalProps({ open: true });
-      } else if (props.editIn === 'drawer') {
-        popupConfig.componentProps.containerType = 'drawer';
-        setDrawerProps({ open: true });
-      } else {
-        console.log('未定义方法');
-      }
       break;
   }
 };
@@ -389,33 +325,6 @@ const rowClick = ({ name, data, params }) => {
     switch (name) {
       case 'save':
         break;
-      case 'edit':
-        popupConfig.needSubmit = true;
-        popupConfig.containerProps.title = '编辑通告阅读记录';
-        popupConfig.containerProps.okText = '更新';
-        popupConfig.containerProps.cancelText = '取消';
-        popupConfig.containerProps.showOkBtn = true;
-        popupConfig.containerProps.showCancelBtn = true;
-        popupConfig.componentProps.is = shallowRefs.AnnouncementRecordEdit;
-        popupConfig.componentProps.entityId = row.id;
-        switch (operation?.containerType || props.editIn) {
-          case 'modal':
-            popupConfig.componentProps.containerType = 'modal';
-            setModalProps({ open: true });
-            break;
-          case 'drawer':
-            popupConfig.componentProps.containerType = 'drawer';
-            setDrawerProps({ open: true });
-            break;
-          case 'route':
-          default:
-            if (pageConfig.baseRouteName) {
-              go({ name: `${pageConfig.baseRouteName}Edit`, params: { entityId: row.id } });
-            } else {
-              console.log('未定义方法');
-            }
-        }
-        break;
       case 'detail':
         popupConfig.containerProps.title = '详情';
         popupConfig.containerProps.cancelText = '关闭';
@@ -441,17 +350,6 @@ const rowClick = ({ name, data, params }) => {
               console.log('未定义方法');
             }
         }
-        break;
-      case 'delete':
-        Modal.confirm({
-          title: `操作提示`,
-          content: `是否确认删除ID为${row.id}的记录？`,
-          onOk() {
-            apis.deleteById(row.id).then(() => {
-              formSearch();
-            });
-          },
-        });
         break;
       default:
         console.log('error', `${name}未定义`);

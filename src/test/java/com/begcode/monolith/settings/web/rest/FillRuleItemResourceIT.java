@@ -905,12 +905,9 @@ public class FillRuleItemResourceIT {
         partialUpdatedFillRuleItem.setId(fillRuleItem.getId());
 
         partialUpdatedFillRuleItem
-            .sortValue(UPDATED_SORT_VALUE)
             .fieldParamType(UPDATED_FIELD_PARAM_TYPE)
-            .fieldParamValue(UPDATED_FIELD_PARAM_VALUE)
             .datePattern(UPDATED_DATE_PATTERN)
-            .seqLength(UPDATED_SEQ_LENGTH)
-            .seqStartValue(UPDATED_SEQ_START_VALUE);
+            .seqIncrement(UPDATED_SEQ_INCREMENT);
 
         restFillRuleItemMockMvc
             .perform(

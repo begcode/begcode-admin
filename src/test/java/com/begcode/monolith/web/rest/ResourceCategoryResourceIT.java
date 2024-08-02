@@ -577,7 +577,7 @@ public class ResourceCategoryResourceIT {
         ResourceCategory partialUpdatedResourceCategory = new ResourceCategory();
         partialUpdatedResourceCategory.setId(resourceCategory.getId());
 
-        partialUpdatedResourceCategory.title(UPDATED_TITLE).code(UPDATED_CODE);
+        partialUpdatedResourceCategory.code(UPDATED_CODE).orderNumber(UPDATED_ORDER_NUMBER);
 
         restResourceCategoryMockMvc
             .perform(

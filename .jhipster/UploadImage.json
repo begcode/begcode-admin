@@ -10,7 +10,7 @@
     "replaceServiceMethod": "save",
     "skipFakeData": true,
     "skipRestApi": "create",
-    "skipWebButton": "listAdd-listEdit-listModalEdit"
+    "skipWebButton": "listAdd-listEdit"
   },
   "applications": "*",
   "clientRootFolder": "files",

@@ -38,14 +38,6 @@ const fields: DescItem[] = [
     field: 'contact',
   },
   {
-    label: '创建用户 Id',
-    field: 'createUserId',
-  },
-  {
-    label: '创建时间',
-    field: 'createTime',
-  },
-  {
     label: '角色列表',
     field: 'authorities',
     render: value =>
