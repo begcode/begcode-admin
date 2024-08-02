@@ -36,7 +36,7 @@ export function useSetOperationColumn(gridCustomConfig, rowOperations, xGrid) {
   }
   const setOperationColumnWidth = debounce(
     () => {
-      let maxButtonCount = Math.max(...Object.values(rowOperationRefs).map(operationRef => operationRef?.getElementCount() || 0));
+      let maxButtonCount = Math.max(...Object.values(rowOperationRefs).map(operationRef => (operationRef as any)?.getElementCount() || 0));
       if (maxButtonCount === 0) {
         maxButtonCount = 1;
       }
@@ -122,4 +122,54 @@ export function useMergeGridProps(gridOptions, componentGridOptions) {
       }
     }
   });
+}
+
+export function useSlider(min = 6, max = 12) {
+  // 每行显示个数滑动条
+  const getMarks = () => {
+    const l = {};
+    for (let i = min; i < max + 1; i++) {
+      l[i] = {
+        style: {
+          color: '#fff',
+        },
+        label: i,
+      };
+    }
+    return l;
+  };
+  return {
+    min,
+    max,
+    marks: getMarks(),
+    step: 1,
+  };
+}
+
+export function transformToFilterTree(data: any[], fieldNames = { children: 'children', title: 'title', key: 'key' }, dataType: any) {
+  const filterItem: any = {};
+  filterItem.title = dataType.title;
+  filterItem.key = dataType.filterName;
+  filterItem.value = dataType.filterName;
+  filterItem.type = 'filterGroup';
+  const generateFilterItem = (data: any[]) => {
+    const result: any[] = [];
+    data.forEach(recordItem => {
+      const filterSubItem: any = {};
+      filterSubItem.filterName = dataType.filterName;
+      filterSubItem.filterValue = recordItem[fieldNames.key];
+      filterSubItem.title = recordItem[fieldNames.title];
+      filterSubItem.type = 'filterItem';
+      filterSubItem.key = dataType.filterName + recordItem[fieldNames.key];
+      filterSubItem.value = dataType.filterName + recordItem[fieldNames.key];
+      filterSubItem.record = recordItem;
+      if (fieldNames.children && recordItem[fieldNames.children]) {
+        filterSubItem.children = generateFilterItem(recordItem[fieldNames.children]);
+      }
+      result.push(filterSubItem);
+    });
+    return result;
+  };
+  filterItem.children = generateFilterItem(data);
+  return filterItem;
 }
