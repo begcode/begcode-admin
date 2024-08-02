@@ -22,8 +22,7 @@
             <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
               <Space>
                 <Input
-                  v-model:value="searchValue"
-                  ref="searchInputRef"
+                  v-model:value="searchFormConfig.jhiCommonSearchKeywords"
                   placeholder="请输入关键字"
                   allow-clear
                   @change="inputSearch"
@@ -120,7 +119,7 @@
       <BasicDrawer
         v-bind="popupConfig.containerProps"
         @register="registerDrawer"
-        @cancel="closeDrawer"
+        @close="closeDrawer"
         @ok="okDrawer"
         v-on="popupConfig.containerEvents"
       >
@@ -149,7 +148,7 @@ import { Button, ButtonGroup, Icon, BasicModal, BasicDrawer, SearchForm, useModa
 import { useGo } from '@/hooks/web/usePage';
 import ServerProvider from '@/api-service/index';
 import { useMergeGridProps, useColumnsConfig, useSetOperationColumn, useSetShortcutButtons } from '@/components/VxeTable/src/helper';
-import AuthorityEdit from './components/form-component.vue';
+import AuthorityForm from './components/form-component.vue';
 import AuthorityDetail from './components/detail-component.vue';
 import config from './config/list-config';
 import { ApiTree, AvatarGroupInfo } from '@begcode/components';
@@ -165,7 +164,7 @@ const [registerDrawer, { closeDrawer, setDrawerProps }] = useDrawerInner(data =>
   console.log(data);
 });
 const shallowRefs = {
-  AuthorityEdit: shallowRef(AuthorityEdit),
+  AuthorityEdit: shallowRef(AuthorityForm),
   AuthorityDetail: shallowRef(AuthorityDetail),
   ApiTree: shallowRef(ApiTree),
   UserRelation: shallowRef(UserRelation),
@@ -191,22 +190,17 @@ const pageConfig = {
   baseRouteName: 'systemAuthority',
 };
 const { columns } = useColumnsConfig(config.columns(), props.selectType, props.gridCustomConfig);
-const searchFormFields = config.searchForm();
 const xGrid = ref({} as VxeGridInstance);
-const searchInputRef = ref(null);
-const searchFormConfig = reactive(
-  Object.assign(
-    {
-      fieldList: searchFormFields,
-      toggleSearchStatus: false,
-      useOr: false,
-      disabled: false,
-      allowSwitch: true,
-      compact: true,
-    },
-    props.searchFormOptions,
-  ),
-);
+const searchFormConfig = reactive<any>({
+  fieldList: config.searchForm(),
+  toggleSearchStatus: false,
+  useOr: false,
+  disabled: false,
+  allowSwitch: true,
+  compact: true,
+  jhiCommonSearchKeywords: '',
+  ...props.searchFormOptions,
+});
 const rowOperations = ref<any[]>([
   {
     title: '保存',
@@ -276,7 +270,6 @@ useSetShortcutButtons('SystemAuthorityList', extraButtons);
 
 const selectedRows = reactive<any>([]);
 const searchFormRef = ref<any>(null);
-const searchValue = ref('');
 const popupConfig = reactive<any>({
   needSubmit: false,
   containerProps: {
@@ -284,7 +277,6 @@ const popupConfig = reactive<any>({
     destroyOnClose: true,
     okText: '确定',
     cancelText: '取消',
-    needSubmit: false,
   },
   containerEvents: {},
   componentProps: {
@@ -305,8 +297,8 @@ const ajax = {
     sort && allSort.push(sort);
     queryParams.value = { ...props.query };
     queryParams.value.sort = transVxeSorts(allSort);
-    if (searchValue.value) {
-      queryParams.value['jhiCommonSearchKeywords'] = searchValue.value;
+    if (searchFormConfig.jhiCommonSearchKeywords) {
+      queryParams.value['jhiCommonSearchKeywords'] = searchFormConfig.jhiCommonSearchKeywords;
     } else {
       delete queryParams.value['jhiCommonSearchKeywords'];
       Object.assign(queryParams.value, getSearchQueryData(searchFormConfig));
@@ -362,10 +354,10 @@ const toolbarClick = ({ code }) => {
       xGrid.value.openCustom();
       break;
     case 'new':
+      popupConfig.needSubmit = true;
       popupConfig.containerProps.title = '新建';
       popupConfig.containerProps.okText = '保存';
       popupConfig.containerProps.cancelText = '取消';
-      popupConfig.needSubmit = true;
       popupConfig.containerProps.showOkBtn = true;
       popupConfig.containerProps.showCancelBtn = true;
       popupConfig.componentProps.is = shallowRefs.AuthorityEdit;
@@ -452,10 +444,10 @@ const rowClick = ({ name, data, params }) => {
       case 'save':
         break;
       case 'edit':
+        popupConfig.needSubmit = true;
         popupConfig.containerProps.title = '编辑角色';
         popupConfig.containerProps.okText = '更新';
         popupConfig.containerProps.cancelText = '取消';
-        popupConfig.needSubmit = true;
         popupConfig.containerProps.showOkBtn = true;
         popupConfig.containerProps.showCancelBtn = true;
         popupConfig.componentProps.is = shallowRefs.AuthorityEdit;
@@ -479,37 +471,29 @@ const rowClick = ({ name, data, params }) => {
         }
         break;
       case 'detail':
-        if (operation?.containerType) {
-          popupConfig.containerProps.title = '详情';
-          popupConfig.containerProps.cancelText = '关闭';
-          popupConfig.needSubmit = false;
-          popupConfig.containerProps.showOkBtn = false;
-          popupConfig.containerProps.showCancelBtn = true;
-          popupConfig.componentProps.is = shallowRefs.AuthorityDetail;
-          popupConfig.componentProps.entityId = row.id;
-          switch (operation.containerType) {
-            case 'modal':
-              popupConfig.componentProps.containerType = 'modal';
-              setModalProps({ open: true });
-              break;
-            case 'drawer':
-              popupConfig.componentProps.containerType = 'drawer';
-              setDrawerProps({ open: true });
-              break;
-            case 'route':
-            default:
-              if (pageConfig.baseRouteName) {
-                go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
-              } else {
-                console.log('未定义方法');
-              }
-          }
-        } else {
-          if (pageConfig.baseRouteName) {
-            go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
-          } else {
-            console.log('未定义方法');
-          }
+        popupConfig.containerProps.title = '详情';
+        popupConfig.containerProps.cancelText = '关闭';
+        popupConfig.needSubmit = false;
+        popupConfig.containerProps.showOkBtn = false;
+        popupConfig.containerProps.showCancelBtn = true;
+        popupConfig.componentProps.is = shallowRefs.AuthorityDetail;
+        popupConfig.componentProps.entityId = row.id;
+        switch (operation?.containerType || 'page') {
+          case 'modal':
+            popupConfig.componentProps.containerType = 'modal';
+            setModalProps({ open: true });
+            break;
+          case 'drawer':
+            popupConfig.componentProps.containerType = 'drawer';
+            setDrawerProps({ open: true });
+            break;
+          case 'page':
+          default:
+            if (pageConfig.baseRouteName) {
+              go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
+            } else {
+              console.log('未定义方法');
+            }
         }
         break;
       case 'addChildren':
@@ -522,7 +506,7 @@ const rowClick = ({ name, data, params }) => {
         popupConfig.componentProps.is = shallowRefs.AuthorityEdit;
         popupConfig.componentProps.entityId = '';
         popupConfig.componentProps.baseData = { parentId: row.id, parent: row };
-        switch (operation?.containerType || props.editIn) {
+        switch (operation?.containerType || props.editIn || 'page') {
           case 'modal':
             popupConfig.componentProps.containerType = 'modal';
             setModalProps({ open: true });
@@ -531,7 +515,7 @@ const rowClick = ({ name, data, params }) => {
             popupConfig.componentProps.containerType = 'drawer';
             setDrawerProps({ open: true });
             break;
-          case 'route':
+          case 'page':
           default:
             if (pageConfig.baseRouteName) {
               go({ name: `${pageConfig.baseRouteName}New`, query: { parentId: row.id, parent: row } });

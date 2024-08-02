@@ -40,14 +40,14 @@ const tabStore = useMultipleTabStore();
 
 const uReportFileDescriptionsRef = ref(null);
 const descriptionProps = reactive({
-  entityId: route.params?.entityId || props.entityId || '',
+  entityId: (route.params?.entityId || props.entityId || '') as string,
 });
 
 const pageProps = reactive({
   title: '详情',
 });
 
-const operations = ref([
+const operations = ref<any>([
   {
     title: '关闭',
     name: 'close',

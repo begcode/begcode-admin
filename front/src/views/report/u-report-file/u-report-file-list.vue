@@ -25,11 +25,10 @@
                   <Space>
                     <Input
                       placeholder="请输入关键字"
-                      v-model:value="searchValue"
+                      v-model:value="searchFormConfig.jhiCommonSearchKeywords"
                       allow-clear
                       @search="formSearch"
                       enterButton
-                      ref="searchInputRef"
                     >
                       <template #prefix>
                         <Icon icon="ant-design:search-outlined" />
@@ -63,9 +62,7 @@
                 <template v-for="button in cardListOptions.toolButtons">
                   <Tooltip v-if="!button.hidden">
                     <template #title>{{ button.title }}</template>
-                    <ImageUpload v-if="button.name === 'uploadImg'">{{ button.title }}</ImageUpload>
-                    <Upload v-else-if="button.name === 'uploadFile'">{{ button.title }}</Upload>
-                    <Button :disabled="button.disabled" @click="button.click" v-else>
+                    <Button :disabled="button.disabled" @click="button.click">
                       <Icon :icon="button.icon" v-if="button.icon"></Icon>
                       {{ button.title }}
                     </Button>
@@ -83,45 +80,46 @@
           </div>
         </template>
         <template #renderItem="{ item }">
-          <div style="margin-bottom: 24px"></div>
-          <List.Item>
-            <Badge>
-              <template #count>
-                <Checkbox :checked="getItemSelected(item)" @change="selectChange($event, item)" />
-              </template>
-              <Card :body-style="{ padding: '12px 4px' }">
-                <template #title></template>
-                <template #cover>
-                  <Badge.Ribbon :text="metaConfig.titleValue(item)" placement="start" class="cover-ribbon">
-                    <div class="cover-height">
-                      <Image
-                        v-if="coverConfig.showImage"
-                        :src="item[coverConfig.coverFieldName] || '/resource/img/filetype/other.png'"
-                        v-bind="coverConfig.props"
-                        @click="coverConfig.click"
-                        fallback="/resource/img/filetype/other.png"
-                      />
-                    </div>
-                  </Badge.Ribbon>
+          <div style="margin-top: 24px">
+            <List.Item>
+              <Badge>
+                <template #count>
+                  <Checkbox :checked="getItemSelected(item)" @change="selectChange($event, item)" />
                 </template>
-                <template class="ant-card-actions" #actions>
-                  <ButtonGroup :row="item" :buttons="rowOperations" @click="rowClick" />
-                </template>
-                <Card.Meta>
-                  <template #avatar>
-                    <Avatar :src="item.avatar" v-if="metaConfig.showAvatar" />
+                <Card :body-style="{ padding: '12px 4px' }">
+                  <template #title></template>
+                  <template #cover>
+                    <Badge.Ribbon :text="metaConfig.titleValue(item)" placement="start" class="cover-ribbon">
+                      <div class="cover-height">
+                        <Image
+                          v-if="coverConfig.showImage"
+                          :src="item[coverConfig.coverFieldName] || '/resource/img/filetype/other.png'"
+                          v-bind="coverConfig.props"
+                          @click="coverConfig.click"
+                          fallback="/resource/img/filetype/other.png"
+                        />
+                      </div>
+                    </Badge.Ribbon>
                   </template>
-                  <template #description v-if="metaConfig.showDesc">{{ metaConfig.descValue(item) }}</template>
-                </Card.Meta>
-              </Card>
-            </Badge>
-          </List.Item>
+                  <template class="ant-card-actions" #actions>
+                    <ButtonGroup :row="item" :buttons="rowOperations" @click="rowClick" />
+                  </template>
+                  <Card.Meta>
+                    <template #avatar>
+                      <Avatar :src="item.avatar" v-if="metaConfig.showAvatar" />
+                    </template>
+                    <template #description v-if="metaConfig.showDesc">{{ metaConfig.descValue(item) }}</template>
+                  </Card.Meta>
+                </Card>
+              </Badge>
+            </List.Item>
+          </div>
         </template>
       </List>
       <Affix :offset-bottom="0">
         <Row justify="space-between" style="background: #fff; padding: 10px 0">
           <Col :span="12" style="display: flex; justify-content: flex-start">
-            <Alert type="warning" :banner="true" style="height: 30px" :message="alertMessage"></Alert>
+            <Alert type="warning" :banner="true" style="height: 30px" :message="`已选${selectedRows.length}条记录。`"></Alert>
           </Col>
           <Col :span="12" style="display: flex; justify-content: flex-end">
             <Pagination
@@ -144,7 +142,7 @@
           ref="modalComponentRef"
         />
       </BasicModal>
-      <BasicDrawer v-bind="drawerConfig" @register="registerDrawer" @cancel="closeDrawer" @ok="okDrawer">
+      <BasicDrawer v-bind="drawerConfig" @register="registerDrawer" @close="closeDrawer" @ok="okDrawer">
         <component
           :is="drawerConfig.componentName"
           @cancel="closeModalOrDrawer"
@@ -158,17 +156,15 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, getCurrentInstance, shallowRef, onMounted, computed, onUnmounted } from 'vue';
+import { reactive, ref, getCurrentInstance, shallowRef, onMounted, computed, toRaw } from 'vue';
 import {
   Modal,
   Card,
   Space,
-  Divider,
   Row,
   Col,
   Input,
   message,
-  TypographyParagraph,
   List,
   Tooltip,
   Upload,
@@ -203,7 +199,7 @@ import UReportFileEdit from './components/form-component.vue';
 import UReportFileDetail from './components/detail-component.vue';
 import { IUReportFile } from '@/models/report/u-report-file.model';
 import config from './config/list-config';
-import { useSetShortcutButtons } from '@/components/VxeTable/src/helper';
+import { useSetShortcutButtons, useSlider } from '@/components/VxeTable/src/helper';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
@@ -211,6 +207,20 @@ const props = defineProps({
   baseData: {
     type: Object,
     default: () => ({}),
+  },
+  editIn: {
+    ype: String,
+    default: 'modal',
+  },
+  selectType: {
+    type: String,
+    default: 'checkbox', // checkbox/radio/none/seq
+  },
+  searchFormOptions: {
+    type: Object,
+    default: () => ({
+      disabled: false,
+    }),
   },
   cardExtra: {
     type: Array,
@@ -230,28 +240,6 @@ const listColumns = computed(() => {
   const breakpoint = breakpoints.current().value.pop();
   return listGrid[breakpoint!];
 });
-
-const useSlider = (min = 6, max = 12) => {
-  // 每行显示个数滑动条
-  const getMarks = () => {
-    const l = {};
-    for (let i = min; i < max + 1; i++) {
-      l[i] = {
-        style: {
-          color: '#fff',
-        },
-        label: i,
-      };
-    }
-    return l;
-  };
-  return {
-    min,
-    max,
-    marks: getMarks(),
-    step: 1,
-  };
-};
 const sliderProp = computed(() => useSlider(3));
 
 function sliderChange(n) {
@@ -267,7 +255,7 @@ const metaConfig = reactive({
   showAvatar: false,
   showDesc: true,
   descValue: item => {
-    return item.createdDate;
+    return item.createAt;
   },
 });
 const coverConfig = reactive({
@@ -299,16 +287,15 @@ const pageConfig = {
   title: '报表存储列表',
   baseRouteName: 'reportUReportFile',
 };
-const searchFormFields = config.searchForm();
-const searchInputRef = ref(null);
 const searchFormRef = ref<any>(null);
 const searchFormConfig = reactive<any>({
-  fieldList: searchFormFields,
+  fieldList: config.searchForm(),
   toggleSearchStatus: false,
-  matchType: 'and',
+  useOr: false,
   disabled: false,
   allowSwitch: true,
   compact: true,
+  jhiCommonSearchKeywords: '',
 });
 const rowOperations: any[] = [
   {
@@ -344,7 +331,7 @@ const rowOperations: any[] = [
 ];
 const selectedRows = ref<any[]>([]);
 const getItemSelected = computed(() => {
-  return item => {
+  return (item: any) => {
     return selectedRows.value.some(row => row.id === item.id);
   };
 });
@@ -390,30 +377,24 @@ const batchOperationClick = ({ key }) => {
   }
 };
 
-const searchValue = ref('');
+const popupConfig = reactive<any>({
+  needSubmit: false,
+  containerProps: {
+    width: '80%',
+    destroyOnClose: true,
+    okText: '确定',
+    cancelText: '取消',
+  },
+  containerEvents: {},
+  componentProps: {
+    containerType: 'modal',
+    baseData: props.baseData,
+    is: '',
+    entityId: '',
+  },
+  componentEvents: {},
+});
 
-const modalConfig = reactive<any>({
-  componentName: '',
-  entityId: '',
-  containerType: 'modal',
-  baseData: props.baseData,
-  width: '80%',
-  destroyOnClose: true,
-  okText: '确定',
-  cancelText: '取消',
-  needSubmit: false,
-});
-const drawerConfig = reactive<any>({
-  componentName: '',
-  containerType: 'drawer',
-  entityId: '',
-  baseData: props.baseData,
-  width: '30%',
-  destroyOnClose: true,
-  okText: '确定',
-  cancelText: '取消',
-  needSubmit: false,
-});
 const cardListOptions = reactive<any>({
   params: {},
   metaDesc: 'createAt',
@@ -422,16 +403,27 @@ const cardListOptions = reactive<any>({
       title: '新增',
       icon: 'ant-design:upload-outlined',
       click: () => {
-        modalConfig.componentName = shallowRef(UReportFileEdit);
-        modalConfig.entityId = '';
-        modalConfig.containerType = 'modal';
-        modalConfig.okText = '保存';
-        modalConfig.cancelText = '取消';
-        modalConfig.needSubmit = true;
-        modalConfig.showOkBtn = true;
-        modalConfig.showCancelBtn = true;
-        modalConfig.title = '新增报表存储';
-        setModalProps({ open: true });
+        popupConfig.needSubmit = true;
+        popupConfig.containerProps.title = '新增报表存储';
+        popupConfig.containerProps.okText = '保存';
+        popupConfig.containerProps.cancelText = '取消';
+        popupConfig.containerProps.showOkBtn = true;
+        popupConfig.containerProps.showCancelBtn = true;
+        popupConfig.componentProps.is = shallowRefs.UReportFileEdit;
+        popupConfig.componentProps.entityId = '';
+        if (props.editIn === 'modal') {
+          popupConfig.componentProps.containerType = 'modal';
+          setModalProps({ open: true });
+        } else if (props.editIn === 'drawer') {
+          popupConfig.componentProps.containerType = 'drawer';
+          setDrawerProps({ open: true });
+        } else {
+          if (pageConfig.baseRouteName) {
+            go({ name: `${pageConfig.baseRouteName}New` });
+          } else {
+            console.log('未定义方法');
+          }
+        }
       },
       hidden: false,
       disabled: false,
@@ -477,8 +469,8 @@ const okDrawer = async () => {
 const formSearch = () => {
   selectedRows.value = [];
   let params: any = {};
-  if (searchValue.value) {
-    params['jhiCommonSearchKeywords'] = searchValue.value;
+  if (searchFormConfig.jhiCommonSearchKeywords) {
+    params['jhiCommonSearchKeywords'] = searchFormConfig.jhiCommonSearchKeywords;
   } else {
     params = Object.assign({}, cardListOptions.params, getSearchQueryData(searchFormConfig));
   }
@@ -518,7 +510,7 @@ const paginationProps = reactive({
   pageSize: 36,
   current: 0,
   total: 0,
-  showTotal: (total: number) => `总 ${total} 条`,
+  showTotal: (total: number) => `共 ${total} 条`,
 });
 
 function pageChange(page: number, pageSize: number) {
@@ -535,30 +527,24 @@ const rowClick = ({ name, data }) => {
   } else {
     switch (name) {
       case 'edit':
-        switch (operation?.containerType || 'route') {
+        popupConfig.needSubmit = true;
+        popupConfig.containerProps.title = '编辑报表存储';
+        popupConfig.containerProps.okText = '更新';
+        popupConfig.containerProps.cancelText = '取消';
+        popupConfig.containerProps.showOkBtn = true;
+        popupConfig.containerProps.showCancelBtn = true;
+        popupConfig.componentProps.is = shallowRefs.UReportFileEdit;
+        popupConfig.componentProps.entityId = row.id;
+        switch (operation?.containerType || props.editIn) {
           case 'modal':
-            modalConfig.title = '编辑报表存储';
-            modalConfig.componentName = shallowRef(UReportFileEdit);
-            modalConfig.entityId = row.id;
-            modalConfig.okText = '更新';
-            modalConfig.cancelText = '取消';
-            modalConfig.showCancelBtn = true;
-            modalConfig.showOkBtn = true;
-            modalConfig.needSubmit = true;
+            popupConfig.componentProps.containerType = 'modal';
             setModalProps({ open: true });
             break;
           case 'drawer':
-            drawerConfig.title = '编辑报表存储';
-            drawerConfig.componentName = shallowRef(UReportFileEdit);
-            drawerConfig.entityId = row.id;
-            drawerConfig.okText = '更新';
-            drawerConfig.cancelText = '取消';
-            drawerConfig.showCancelBtn = true;
-            drawerConfig.showOkBtn = true;
-            drawerConfig.needSubmit = true;
+            popupConfig.componentProps.containerType = 'drawer';
             setDrawerProps({ open: true });
             break;
-          case 'route':
+          case 'page':
           default:
             if (pageConfig.baseRouteName) {
               go({ name: `${pageConfig.baseRouteName}Edit`, params: { entityId: row.id } });
@@ -568,25 +554,20 @@ const rowClick = ({ name, data }) => {
         }
         break;
       case 'detail':
-        switch (operation?.containerType || 'route') {
+        popupConfig.containerProps.title = '详情';
+        popupConfig.containerProps.cancelText = '关闭';
+        popupConfig.needSubmit = false;
+        popupConfig.containerProps.showOkBtn = false;
+        popupConfig.containerProps.showCancelBtn = true;
+        popupConfig.componentProps.is = shallowRefs.UReportFileDetail;
+        popupConfig.componentProps.entityId = row.id;
+        switch (operation?.containerType || 'page') {
           case 'modal':
-            modalConfig.title = '报表存储详情';
-            modalConfig.componentName = shallowRef(UReportFileDetail);
-            modalConfig.entityId = row.id;
-            modalConfig.showCancelBtn = true;
-            modalConfig.showOkBtn = false;
-            modalConfig.cancelText = '关闭';
-            modalConfig.needSubmit = false;
+            popupConfig.componentProps.containerType = 'modal';
             setModalProps({ open: true });
             break;
           case 'drawer':
-            drawerConfig.title = '报表存储详情';
-            drawerConfig.componentName = shallowRef(UReportFileDetail);
-            drawerConfig.entityId = row.id;
-            drawerConfig.showCancelBtn = true;
-            drawerConfig.showOkBtn = false;
-            drawerConfig.cancelText = '关闭';
-            drawerConfig.needSubmit = false;
+            popupConfig.componentProps.containerType = 'drawer';
             setDrawerProps({ open: true });
             break;
           case 'route':
@@ -667,9 +648,15 @@ const rowClick = ({ name, data }) => {
   }
 };
 
+const getSelectRows = () => {
+  return toRaw(selectedRows);
+};
+
 onMounted(() => {
   formSearch();
 });
+
+defineExpose({ getSelectRows });
 </script>
 <style scoped>
 .toolbar_buttons_xgrid {

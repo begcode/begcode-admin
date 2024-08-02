@@ -30,10 +30,6 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
-  savedOpen: {
-    type: Boolean,
-    default: false,
-  },
 });
 const ctx = getCurrentInstance()?.proxy;
 const formRef = ref<any>(null);
@@ -60,7 +56,7 @@ const submit = async () => {
   const result = await validate().catch(() => ({ success: false, data: {} }));
   if (result.success) {
     Object.assign(sysLog, result.data);
-    const saveData = saveOrUpdateApi(sysLog).catch(() => false);
+    const saveData = await saveOrUpdateApi(sysLog).catch(() => false);
     if (saveData) {
       Object.assign(sysLog, saveData);
       message.success(submitButtonTitlePrefix + '成功！');
@@ -91,19 +87,18 @@ const validate = async () => {
 };
 
 const formProps = reactive({
-  modelName: 'BASE_ENTITY',
-  model: sysLog,
   labelWidth: '120px',
-  fieldMapToTime: [],
   compact: true,
   alwaysShowLines: 1,
-  schemas: formItemsConfig,
+  fieldMapToTime: [],
   size: 'default',
-  disabled: !isEdit.value,
   showAdvancedButton: false,
   showResetButton: false,
   showSubmitButton: false,
   showActionButtonGroup: false,
+  model: sysLog,
+  schemas: formItemsConfig,
+  disabled: !isEdit.value,
   resetButtonOptions: {
     type: 'default',
     size: 'default',

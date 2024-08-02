@@ -1,7 +1,7 @@
 <template>
   <PageWrapper v-bind="pageProps">
     <template #default>
-      <UReportFileForm ref="uReportFileFormRef" v-bind="formProps"> </UReportFileForm>
+      <UReportFileForm ref="uReportFileFormRef" v-bind="formProps"></UReportFileForm>
     </template>
     <template #rightFooter>
       <Space>
@@ -16,7 +16,7 @@
 <script lang="ts" setup>
 import { computed, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { message, Space } from 'ant-design-vue';
+import { Space } from 'ant-design-vue';
 import UReportFileForm from './components/form-component.vue';
 import { Button, Icon, PageWrapper } from '@begcode/components';
 import { useGo } from '@/hooks/web/usePage';
@@ -76,20 +76,10 @@ const operationsConfig = ref<any>([
     hide: () => {
       return !!uReportFileId.value;
     },
-    title: '保存',
+    title: uReportFileId.value ? '更新' : '保存',
     icon: '',
     type: 'primary',
     name: 'save',
-    click: saveOrUpdate,
-  },
-  {
-    hide: () => {
-      return !uReportFileId.value;
-    },
-    title: '更新',
-    icon: '',
-    name: 'update',
-    type: 'primary',
     click: saveOrUpdate,
   },
 ]);

@@ -1,7 +1,7 @@
 <template>
   <PageWrapper v-bind="pageProps">
     <template #default>
-      <ResourceCategoryForm ref="resourceCategoryFormRef" v-bind="formProps"> </ResourceCategoryForm>
+      <ResourceCategoryForm ref="resourceCategoryFormRef" v-bind="formProps"></ResourceCategoryForm>
     </template>
     <template #rightFooter>
       <Space>
@@ -16,7 +16,7 @@
 <script lang="ts" setup>
 import { computed, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { message, Space } from 'ant-design-vue';
+import { Space } from 'ant-design-vue';
 import ResourceCategoryForm from './components/form-component.vue';
 import { Button, Icon, PageWrapper } from '@begcode/components';
 import { useGo } from '@/hooks/web/usePage';
@@ -76,20 +76,10 @@ const operationsConfig = ref<any>([
     hide: () => {
       return !!resourceCategoryId.value;
     },
-    title: '保存',
+    title: resourceCategoryId.value ? '更新' : '保存',
     icon: '',
     type: 'primary',
     name: 'save',
-    click: saveOrUpdate,
-  },
-  {
-    hide: () => {
-      return !resourceCategoryId.value;
-    },
-    title: '更新',
-    icon: '',
-    name: 'update',
-    type: 'primary',
     click: saveOrUpdate,
   },
 ]);

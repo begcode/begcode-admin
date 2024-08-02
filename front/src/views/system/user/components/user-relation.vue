@@ -48,59 +48,54 @@
           <!--          <Button type="default" preIcon="ant-design:setting-outlined" shape="circle" size="small"></Button>-->
         </Space>
       </template>
-      <Row :gutter="16">
-        <Col :span="24">
-          <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
-            <template #toolbar_buttons>
-              <Row :gutter="16">
-                <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
-                  <Space>
-                    <Input
-                      v-model:value="searchValue"
-                      placeholder="请输入关键字"
-                      allow-clear
-                      @change="inputSearch"
-                      @pressEnter="formSearch"
-                      style="width: 280px"
-                      ref="searchInputRef"
-                      data-cy="listSearchInput"
-                    >
-                      <template #prefix>
-                        <Icon icon="ant-design:search-outlined" />
-                      </template>
-                      <template #addonAfter>
-                        <Button type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
-                          >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch" data-cy="listSearchMore"></Icon>
-                        </Button>
-                      </template>
-                    </Input>
-                    <template v-for="button of gridOptions?.toolbarConfig?.buttons">
-                      <Button v-if="!button.dropdowns">{{ button.name }}</Button>
-                      <Dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
-                        <template #overlay>
-                          <Menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
-                            <MenuItem :key="subButton.name + 's'">
-                              <Icon :icon="subButton.icon"></Icon>
-                              {{ subButton.name }}
-                            </MenuItem>
-                          </Menu>
-                        </template>
-                        <Button>
-                          {{ button.name }}
-                          <Icon icon="ant-design:down-outlined" />
-                        </Button>
-                      </Dropdown>
+      <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
+        <template #toolbar_buttons>
+          <Row :gutter="16">
+            <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
+              <Space>
+                <Input
+                  v-model:value="searchFormConfig.jhiCommonSearchKeywords"
+                  placeholder="请输入关键字"
+                  allow-clear
+                  @change="inputSearch"
+                  @pressEnter="formSearch"
+                  style="width: 280px"
+                  data-cy="listSearchInput"
+                >
+                  <template #prefix>
+                    <Icon icon="ant-design:search-outlined" />
+                  </template>
+                  <template #addonAfter>
+                    <Button type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
+                      >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch" data-cy="listSearchMore"></Icon>
+                    </Button>
+                  </template>
+                </Input>
+                <template v-for="button of gridOptions?.toolbarConfig?.buttons">
+                  <Button v-if="!button.dropdowns">{{ button.name }}</Button>
+                  <Dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
+                    <template #overlay>
+                      <Menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
+                        <MenuItem :key="subButton.name + 's'">
+                          <Icon :icon="subButton.icon"></Icon>
+                          {{ subButton.name }}
+                        </MenuItem>
+                      </Menu>
                     </template>
-                  </Space>
-                </Col>
-              </Row>
-            </template>
-            <template #recordAction="{ row }">
-              <ButtonGroup :row="row" :buttons="rowOperations" @click="rowClick" />
-            </template>
-          </Grid>
-        </Col>
-      </Row>
+                    <Button>
+                      {{ button.name }}
+                      <Icon icon="ant-design:down-outlined" />
+                    </Button>
+                  </Dropdown>
+                </template>
+              </Space>
+            </Col>
+          </Row>
+        </template>
+        <template #recordAction="{ row }">
+          <ButtonGroup :row="row" :buttons="rowOperations" @click="rowClick" />
+        </template>
+      </Grid>
       <BasicModal v-bind="modalConfig" @register="registerModal" @cancel="closeModal" @ok="okModal">
         <component
           :is="modalConfig.componentName"
@@ -110,7 +105,7 @@
           ref="modalComponentRef"
         />
       </BasicModal>
-      <BasicDrawer v-bind="drawerConfig" @register="registerDrawer" @cancel="closeDrawer" @ok="okDrawer">
+      <BasicDrawer v-bind="drawerConfig" @register="registerDrawer" @close="closeDrawer" @ok="okDrawer">
         <component
           :is="drawerConfig.componentName"
           @cancel="closeDrawer"
@@ -135,6 +130,8 @@ import { Button, ButtonGroup, BasicModal, BasicDrawer, Icon, SearchForm, useModa
 import ServerProvider from '@/api-service/index';
 import UserDetail from '../user-detail.vue';
 import UserList from '../user-list.vue';
+import AuthorityRelation from '@/views/system/authority/components/authority-relation.vue';
+import { AvatarGroupInfo } from '@begcode/components';
 
 import dayjs from 'dayjs';
 
@@ -586,27 +583,22 @@ const apis = {
   updateRelations: apiService.system.userService.updateRelations,
 };
 const columns = config.columns();
-const searchFormFields = config.searchForm();
 if (props.gridCustomConfig?.hideColumns?.length > 0) {
   const filterColumns = columns.filter(column => !props.gridCustomConfig.hideColumns.includes(column.field));
   columns.length = 0;
   columns.push(...filterColumns);
 }
 const xGrid = ref({} as VxeGridInstance);
-const searchInputRef = ref(null);
-const searchFormConfig = reactive(
-  Object.assign(
-    {
-      fieldList: searchFormFields,
-      toggleSearchStatus: false,
-      useOr: false,
-      disabled: false,
-      allowSwitch: true,
-      compact: true,
-    },
-    props.searchFormOptions,
-  ),
-);
+const searchFormConfig = reactive<any>({
+  fieldList: config.searchForm(),
+  toggleSearchStatus: false,
+  useOr: false,
+  disabled: false,
+  allowSwitch: true,
+  compact: true,
+  jhiCommonSearchKeywords: '',
+  ...props.searchFormOptions,
+});
 let rowOperations = [
   {
     title: '取消关联',
@@ -697,8 +689,8 @@ const gridOptions = reactive<VxeGridProps>({
         const allSort = sorts || [];
         sort && allSort.push(sort);
         queryParams.sort = transVxeSorts(allSort);
-        if (searchValue.value) {
-          queryParams['jhiCommonSearchKeywords'] = searchValue.value;
+        if (searchFormConfig.jhiCommonSearchKeywords) {
+          queryParams['jhiCommonSearchKeywords'] = searchFormConfig.jhiCommonSearchKeywords;
         } else {
           delete queryParams['jhiCommonSearchKeywords'];
           Object.assign(queryParams, getSearchQueryData(searchFormConfig));

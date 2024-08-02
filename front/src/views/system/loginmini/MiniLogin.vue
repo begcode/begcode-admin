@@ -566,19 +566,20 @@ html[data-theme='dark'] {
     .aui-success h3 {
       border-color: #c9d1d9;
     }
-  }
 
-  &-sign-in-way {
-    .anticon {
-      font-size: 22px !important;
-      color: #888 !important;
-      cursor: pointer !important;
+    &-sign-in-way {
+      .anticon {
+        font-size: 22px !important;
+        color: #888 !important;
+        cursor: pointer !important;
 
-      &:hover {
-        color: @primary-color !important;
+        &:hover {
+          color: @primary-color !important;
+        }
       }
     }
   }
+
   input.fix-auto-fill,
   .fix-auto-fill input {
     -webkit-text-fill-color: #c9d1d9 !important;

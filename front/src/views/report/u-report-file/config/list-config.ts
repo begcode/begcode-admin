@@ -203,7 +203,7 @@ const ListProps = {
   },
   editIn: {
     ype: String,
-    default: 'page',
+    default: 'modal',
   },
   baseData: {
     type: Object,
