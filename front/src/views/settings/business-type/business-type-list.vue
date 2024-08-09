@@ -147,7 +147,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref, getCurrentInstance, toRaw, shallowRef, h, computed } from 'vue';
-import { message, Alert, Modal, Empty, Space, Card, Row, Col, Input, Dropdown, Menu, MenuItem } from 'ant-design-vue';
+import { Alert, message, Modal, Empty, Space, Card, Row, Col, Input, Dropdown, Menu, MenuItem } from 'ant-design-vue';
 import { VxeGridInstance, VxeGridListeners, VxeGridProps, Grid } from 'vxe-table';
 import { debounce, isArray, upperFirst } from 'lodash-es';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';

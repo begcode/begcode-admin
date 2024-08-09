@@ -1,6 +1,6 @@
 # monolithMybatis
 
-本应用程序由BegCode8.6.2生成, 你可以在 [https://www.begcode.com](https://www.begcode.com) 找到文档和帮助。
+本应用程序由BegCode8.6.3生成, 你可以在 [https://www.begcode.com](https://www.begcode.com) 找到文档和帮助。
 
 ## 截图展示
 
