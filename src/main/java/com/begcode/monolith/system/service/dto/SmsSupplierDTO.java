@@ -1,5 +1,6 @@
 package com.begcode.monolith.system.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.enumeration.SmsProvider;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
@@ -25,30 +26,35 @@ public class SmsSupplierDTO implements Serializable {
      * 提供商
      */
     @Schema(description = "提供商")
+    @Excel(name = "提供商")
     private SmsProvider provider;
 
     /**
      * 配置数据
      */
     @Schema(description = "配置数据")
+    @Excel(name = "配置数据")
     private String configData;
 
     /**
      * 短信签名
      */
     @Schema(description = "短信签名")
+    @Excel(name = "短信签名")
     private String signName;
 
     /**
      * 备注
      */
     @Schema(description = "备注")
+    @Excel(name = "备注")
     private String remark;
 
     /**
      * 启用
      */
     @Schema(description = "启用")
+    @Excel(name = "启用")
     private Boolean enabled;
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove

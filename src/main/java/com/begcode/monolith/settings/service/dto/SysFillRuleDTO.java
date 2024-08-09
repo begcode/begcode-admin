@@ -1,5 +1,6 @@
 package com.begcode.monolith.settings.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.enumeration.ResetFrequency;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
@@ -28,78 +29,91 @@ public class SysFillRuleDTO implements Serializable {
      * 规则名称
      */
     @Schema(description = "规则名称")
+    @Excel(name = "规则名称")
     private String name;
 
     /**
      * 规则Code
      */
     @Schema(description = "规则Code")
+    @Excel(name = "规则Code")
     private String code;
 
     /**
      * 规则描述
      */
     @Schema(description = "规则描述")
+    @Excel(name = "规则描述")
     private String desc;
 
     /**
      * 是否启用
      */
     @Schema(description = "是否启用")
+    @Excel(name = "是否启用")
     private Boolean enabled;
 
     /**
      * 重置频率
      */
     @Schema(description = "重置频率")
+    @Excel(name = "重置频率")
     private ResetFrequency resetFrequency;
 
     /**
      * 序列值
      */
     @Schema(description = "序列值")
+    @Excel(name = "序列值")
     private Long seqValue;
 
     /**
      * 生成值
      */
     @Schema(description = "生成值")
+    @Excel(name = "生成值")
     private String fillValue;
 
     /**
      * 规则实现类
      */
     @Schema(description = "规则实现类")
+    @Excel(name = "规则实现类")
     private String implClass;
 
     /**
      * 规则参数
      */
     @Schema(description = "规则参数")
+    @Excel(name = "规则参数")
     private String params;
 
     /**
      * 重置开始日期
      */
     @Schema(description = "重置开始日期")
+    @Excel(name = "重置开始日期")
     private ZonedDateTime resetStartTime;
 
     /**
      * 重置结束日期
      */
     @Schema(description = "重置结束日期")
+    @Excel(name = "重置结束日期")
     private ZonedDateTime resetEndTime;
 
     /**
      * 重置时间
      */
     @Schema(description = "重置时间")
+    @Excel(name = "重置时间")
     private ZonedDateTime resetTime;
 
     /**
      * 配置项列表
      */
     @Schema(description = "配置项列表")
+    @Excel(name = "配置项列表")
     private List<FillRuleItemDTO> ruleItems = new ArrayList<>();
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove

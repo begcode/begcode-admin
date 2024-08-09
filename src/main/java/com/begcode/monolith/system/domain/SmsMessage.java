@@ -67,7 +67,8 @@ public class SmsMessage extends AbstractAuditingEntity<Long, SmsMessage> impleme
     private SendStatus sendStatus;
 
     /**
-     * 发送次数 超过5次不再发送
+     * 发送次数
+     * 超过5次不再发送
      */
     @TableField(value = "retry_num")
     private Integer retryNum;

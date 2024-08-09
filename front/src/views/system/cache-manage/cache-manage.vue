@@ -42,7 +42,6 @@ function getAll() {
 
 function clear(cacheName) {
   apiService.system.cacheManagerService.clear(cacheName).then(res => {
-    console.log('res', res);
     message.success('清除缓存成功。');
   });
 }

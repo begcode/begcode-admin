@@ -1,5 +1,6 @@
 package com.begcode.monolith.system.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.AbstractAuditingEntity;
 import com.begcode.monolith.domain.enumeration.MessageSendType;
 import com.begcode.monolith.domain.enumeration.SendStatus;
@@ -28,18 +29,21 @@ public class SmsMessageDTO extends AbstractAuditingEntity<Long, SmsMessageDTO> {
      * 消息标题
      */
     @Schema(description = "消息标题")
+    @Excel(name = "消息标题")
     private String title;
 
     /**
      * 发送方式
      */
     @Schema(description = "发送方式")
+    @Excel(name = "发送方式")
     private MessageSendType sendType;
 
     /**
      * 接收人
      */
     @Schema(description = "接收人")
+    @Excel(name = "接收人")
     private String receiver;
 
     /**
@@ -47,66 +51,78 @@ public class SmsMessageDTO extends AbstractAuditingEntity<Long, SmsMessageDTO> {
      * Json格式
      */
     @Schema(description = "发送所需参数\nJson格式")
+    @Excel(name = "发送所需参数\nJson格式")
     private String params;
 
     /**
      * 推送内容
      */
     @Schema(description = "推送内容")
+    @Excel(name = "推送内容")
     private String content;
 
     /**
      * 推送时间
      */
     @Schema(description = "推送时间")
+    @Excel(name = "推送时间")
     private ZonedDateTime sendTime;
 
     /**
      * 推送状态
      */
     @Schema(description = "推送状态")
+    @Excel(name = "推送状态")
     private SendStatus sendStatus;
 
     /**
-     * 发送次数 超过5次不再发送
+     * 发送次数
+     * 超过5次不再发送
      */
-    @Schema(description = "发送次数 超过5次不再发送")
+    @Schema(description = "发送次数\n超过5次不再发送")
+    @Excel(name = "发送次数\n超过5次不再发送")
     private Integer retryNum;
 
     /**
      * 推送失败原因
      */
     @Schema(description = "推送失败原因")
+    @Excel(name = "推送失败原因")
     private String failResult;
 
     /**
      * 备注
      */
     @Schema(description = "备注")
+    @Excel(name = "备注")
     private String remark;
 
     /**
      * 创建者Id
      */
     @Schema(description = "创建者Id")
+    @Excel(name = "创建者Id")
     private Long createdBy;
 
     /**
      * 创建时间
      */
     @Schema(description = "创建时间")
+    @Excel(name = "创建时间")
     private Instant createdDate;
 
     /**
      * 修改者Id
      */
     @Schema(description = "修改者Id")
+    @Excel(name = "修改者Id")
     private Long lastModifiedBy;
 
     /**
      * 修改时间
      */
     @Schema(description = "修改时间")
+    @Excel(name = "修改时间")
     private Instant lastModifiedDate;
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove

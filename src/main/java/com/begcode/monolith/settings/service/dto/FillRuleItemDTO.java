@@ -1,5 +1,6 @@
 package com.begcode.monolith.settings.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.enumeration.FieldParamType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
@@ -25,48 +26,56 @@ public class FillRuleItemDTO implements Serializable {
      * 排序值
      */
     @Schema(description = "排序值")
+    @Excel(name = "排序值")
     private Integer sortValue;
 
     /**
      * 字段参数类型
      */
     @Schema(description = "字段参数类型")
+    @Excel(name = "字段参数类型")
     private FieldParamType fieldParamType;
 
     /**
      * 字段参数值
      */
     @Schema(description = "字段参数值")
+    @Excel(name = "字段参数值")
     private String fieldParamValue;
 
     /**
      * 日期格式
      */
     @Schema(description = "日期格式")
+    @Excel(name = "日期格式")
     private String datePattern;
 
     /**
      * 序列长度
      */
     @Schema(description = "序列长度")
+    @Excel(name = "序列长度")
     private Integer seqLength;
 
     /**
      * 序列增量
      */
     @Schema(description = "序列增量")
+    @Excel(name = "序列增量")
     private Integer seqIncrement;
 
     /**
      * 序列起始值
      */
     @Schema(description = "序列起始值")
+    @Excel(name = "序列起始值")
     private Integer seqStartValue;
 
     /**
      * 填充规则
      */
     @Schema(description = "填充规则")
+    @Excel(name = "填充规则")
     private SysFillRuleDTO fillRule;
 
     private Long fillRuleId;

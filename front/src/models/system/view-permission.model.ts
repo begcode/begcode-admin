@@ -6,7 +6,7 @@ export interface IViewPermission {
   id?: number; //ID
   text?: string; //权限名称
   type?: keyof typeof ViewPermissionType | null; //权限类型
-  i18n?: string | null; //i18n主键
+  localeKey?: string | null; //多语言Key
   group?: boolean | null; //显示分组名
   link?: string | null; //路由
   externalLink?: string | null; //外部链接
@@ -36,7 +36,7 @@ export class ViewPermission implements IViewPermission {
     public id?: number,
     public text?: string,
     public type?: keyof typeof ViewPermissionType | null,
-    public i18n?: string | null,
+    public localeKey?: string | null,
     public group?: boolean | null,
     public link?: string | null,
     public externalLink?: string | null,

@@ -1,5 +1,6 @@
 package com.begcode.monolith.system.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.AbstractAuditingEntity;
 import com.begcode.monolith.domain.enumeration.MessageSendType;
 import com.begcode.monolith.domain.enumeration.SmsTemplateType;
@@ -27,78 +28,91 @@ public class SmsTemplateDTO extends AbstractAuditingEntity<Long, SmsTemplateDTO>
      * 模板标题
      */
     @Schema(description = "模板标题")
+    @Excel(name = "模板标题")
     private String name;
 
     /**
      * 模板CODE
      */
     @Schema(description = "模板CODE")
+    @Excel(name = "模板CODE")
     private String code;
 
     /**
      * 通知类型
      */
     @Schema(description = "通知类型")
+    @Excel(name = "通知类型")
     private MessageSendType sendType;
 
     /**
      * 模板内容
      */
     @Schema(description = "模板内容")
+    @Excel(name = "模板内容")
     private String content;
 
     /**
      * 模板测试json
      */
     @Schema(description = "模板测试json")
+    @Excel(name = "模板测试json")
     private String testJson;
 
     /**
      * 模板类型
      */
     @Schema(description = "模板类型")
+    @Excel(name = "模板类型")
     private SmsTemplateType type;
 
     /**
      * 备注
      */
     @Schema(description = "备注")
+    @Excel(name = "备注")
     private String remark;
 
     /**
      * 启用
      */
     @Schema(description = "启用")
+    @Excel(name = "启用")
     private Boolean enabled;
 
     /**
      * 创建者Id
      */
     @Schema(description = "创建者Id")
+    @Excel(name = "创建者Id")
     private Long createdBy;
 
     /**
      * 创建时间
      */
     @Schema(description = "创建时间")
+    @Excel(name = "创建时间")
     private Instant createdDate;
 
     /**
      * 修改者Id
      */
     @Schema(description = "修改者Id")
+    @Excel(name = "修改者Id")
     private Long lastModifiedBy;
 
     /**
      * 修改时间
      */
     @Schema(description = "修改时间")
+    @Excel(name = "修改时间")
     private Instant lastModifiedDate;
 
     /**
      * 短信服务商
      */
     @Schema(description = "短信服务商")
+    @Excel(name = "短信服务商")
     private SmsSupplierDTO supplier;
 
     private Long supplierId;

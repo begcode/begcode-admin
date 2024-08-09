@@ -1,6 +1,7 @@
 /** 资源分类 */
 @skipFakeData
 @moduleName(oss)
+@listBy(tableEdit)
 entity ResourceCategory {
     title String maxlength(40) /** 标题 */
     code String maxlength(20) /** 代码 */

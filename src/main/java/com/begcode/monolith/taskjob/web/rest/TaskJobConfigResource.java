@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/task-job-configs")
-@Tag(name = "task-job-configs", description = "定时任务API接口")
+@Tag(name = "task-job-configs", description = "任务配置API接口")
 public class TaskJobConfigResource extends TaskJobConfigBaseResource {
 
     private final Logger log = LoggerFactory.getLogger(TaskJobConfigResource.class);

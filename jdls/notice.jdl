@@ -16,7 +16,8 @@ entity SmsMessage {
   sendTime ZonedDateTime /** 推送时间 */
   sendStatus SendStatus /** 推送状态 */
   /**
-   * 发送次数 超过5次不再发送
+   * 发送次数
+   * 超过5次不再发送
    */
   retryNum Integer
   failResult String /** 推送失败原因 */
@@ -170,7 +171,7 @@ entity AnnouncementRecord {
 }
 
 /**
- * 定时任务
+ * 任务配置
  */
 @extendAbstractAuditingEntity
 @skipFakeData
@@ -217,5 +218,5 @@ filter *
 dto all with mapstruct
 paginate all with pagination
 clientRootFolder SmsMessage, Announcement, AnnouncementRecord, TaskJobConfig with system
-clientRootFolder TaskJobConfig with taskjob
+clientRootFolder TaskJobConfig with taskjob @I18nValue("定时任务")
 //

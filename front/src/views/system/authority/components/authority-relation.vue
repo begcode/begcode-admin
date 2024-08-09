@@ -460,6 +460,8 @@ const relationshipApis: any = {
 const apis = {
   authorityService: apiService.system.authorityService,
   find: apiService.system.authorityService.tree,
+  import: apiService.system.authorityService.importExcel,
+  export: apiService.system.authorityService.exportExcel,
   updateRelations: apiService.system.authorityService.updateRelations,
   viewPermissionsList: apiService.system.viewPermissionService.tree,
   apiPermissionsList: apiService.system.apiPermissionService.tree,
@@ -551,7 +553,7 @@ const gridOptions = reactive<VxeGridProps>({
     seq: true,
     sort: true,
     filter: true,
-    props: {
+    response: {
       result: 'records',
       total: 'total',
     },
@@ -581,6 +583,11 @@ const gridOptions = reactive<VxeGridProps>({
         return await apis.find(queryParams);
       },
       queryAll: async () => await apis.find({ size: -1 }),
+      import: async ({ file, options }) => {
+        apis.import(file).then(() => {
+          formSearch();
+        });
+      },
     },
   },
   toolbarConfig: {

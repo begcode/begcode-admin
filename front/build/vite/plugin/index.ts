@@ -31,15 +31,15 @@ export function createVitePlugins(viteEnv: ViteEnv, isBuild: boolean) {
         targets: [
           {
             src: 'node_modules/swagger-ui-dist/*.{html,css,png,js}',
-            dest: 'swagger-ui',
+            dest: 'static/swagger-ui',
           },
           {
             src: 'node_modules/axios/dist/axios.min.js',
-            dest: 'swagger-ui',
+            dest: 'static/swagger-ui',
           },
           {
             src: 'dev/swagger-ui/index.html',
-            dest: 'swagger-ui',
+            dest: 'static/swagger-ui',
           },
           {
             src: 'mock/data/*.csv',

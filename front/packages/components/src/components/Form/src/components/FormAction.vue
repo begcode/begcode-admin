@@ -1,7 +1,7 @@
 <template>
   <Col v-bind="actionColOpt" v-if="showActionButtonGroup">
     <div style="width: 100%" :style="{ textAlign: actionColOpt.style.textAlign }">
-      <Form.Item>
+      <Form.Item :wrapperCol="{ span: 24 }">
         <slot name="resetBefore"></slot>
         <Button type="default" class="mr-2" v-bind="getResetBtnOptions" @click="resetAction" v-if="showResetButton">
           {{ getResetBtnOptions.text }}
@@ -73,9 +73,6 @@ const actionColOpt = computed(() => {
     ...advancedSpanObj,
     ...actionColOptions,
   };
-  if (props.layout !== 'inline') {
-    actionColOpt['span'] = showAdvancedButton ? 10 : 8;
-  }
   return actionColOpt;
 });
 const getResetBtnOptions = computed((): ButtonProps => {

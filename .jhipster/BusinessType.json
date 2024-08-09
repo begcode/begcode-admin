@@ -3,6 +3,7 @@
   "annotations": {
     "changelogDate": "20240101061906",
     "importData": true,
+    "listBy": "tableEdit",
     "moduleName": "system",
     "skipFakeData": true,
     "skipWebsite": true
@@ -30,7 +31,10 @@
     {
       "documentation": "图标",
       "fieldName": "icon",
-      "fieldType": "String"
+      "fieldType": "String",
+      "options": {
+        "endUsed": "iconPicker"
+      }
     }
   ],
   "jpaMetamodelFiltering": true,

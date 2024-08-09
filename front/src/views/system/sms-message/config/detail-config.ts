@@ -52,7 +52,7 @@ const fields: DescItem[] = [
     },
   },
   {
-    label: '发送次数 超过5次不再发送',
+    label: '发送次数',
     field: 'retryNum',
   },
   {

@@ -1,5 +1,6 @@
 package com.begcode.monolith.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.enumeration.ApiPermissionState;
 import com.begcode.monolith.domain.enumeration.ApiPermissionType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,12 +29,14 @@ public class ApiPermissionDTO implements Serializable {
      * 服务名称
      */
     @Schema(description = "服务名称")
+    @Excel(name = "服务名称")
     private String serviceName;
 
     /**
      * 权限名称
      */
     @Schema(description = "权限名称")
+    @Excel(name = "权限名称")
     private String name;
 
     private String code;
@@ -42,42 +45,49 @@ public class ApiPermissionDTO implements Serializable {
      * 权限描述
      */
     @Schema(description = "权限描述")
+    @Excel(name = "权限描述")
     private String description;
 
     /**
      * 类型
      */
     @Schema(description = "类型")
+    @Excel(name = "类型")
     private ApiPermissionType type;
 
     /**
      * 请求类型
      */
     @Schema(description = "请求类型")
+    @Excel(name = "请求类型")
     private String method;
 
     /**
      * url 地址
      */
     @Schema(description = "url 地址")
+    @Excel(name = "url 地址")
     private String url;
 
     /**
      * 状态
      */
     @Schema(description = "状态")
+    @Excel(name = "状态")
     private ApiPermissionState status;
 
     /**
      * 子节点
      */
     @Schema(description = "子节点")
+    @Excel(name = "子节点")
     private List<ApiPermissionDTO> children = new ArrayList<>();
 
     /**
      * 上级
      */
     @Schema(description = "上级")
+    @Excel(name = "上级")
     private ApiPermissionDTO parent;
 
     private Long parentId;

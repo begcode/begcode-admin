@@ -7,7 +7,7 @@ import java.io.Serializable;
 import lombok.*;
 
 /**
- * 定时任务
+ * 任务配置
  */
 @TableName(value = "task_job_config")
 @Getter

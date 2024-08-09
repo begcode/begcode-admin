@@ -32,6 +32,10 @@ const props = defineProps({
     type: String,
     default: 'page',
   },
+  formButtons: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+  },
   baseData: {
     type: Object,
     default: () => ({}),
@@ -42,15 +46,20 @@ const formRef = ref<any>(null);
 const itemsGridRef = ref<any>(null);
 const apiService = ctx?.$apiService as typeof ServerProvider;
 const dictionary = reactive<IDictionary>(new Dictionary());
-if (props.entityId) {
-  apiService.settings.dictionaryService.find(Number(props.entityId)).then(data => {
-    if (data) {
-      Object.assign(dictionary, data);
+watch(
+  () => props.entityId,
+  async val => {
+    if (val) {
+      const data = await apiService.settings.dictionaryService.find(Number(val)).catch(() => null);
+      if (data) {
+        Object.assign(dictionary, data);
+      }
+    } else {
+      Object.assign(dictionary, props.baseData);
     }
-  });
-} else {
-  Object.assign(dictionary, props.baseData);
-}
+  },
+  { immediate: true },
+);
 const formItemsConfig = config.fields();
 
 const isEdit = computed(() => {
@@ -114,20 +123,25 @@ const formProps = reactive({
   fieldMapToTime: [],
   size: 'default',
   showAdvancedButton: false,
-  showResetButton: false,
-  showSubmitButton: false,
-  showActionButtonGroup: false,
+  showResetButton: props.formButtons.includes('reset'),
+  showSubmitButton: props.formButtons.includes('submit'),
+  showActionButtonGroup: props.formButtons.length > 0,
   model: dictionary,
   schemas: formItemsConfig,
   disabled: !isEdit.value,
   resetButtonOptions: {
     type: 'default',
     size: 'default',
-    text: '关闭',
+    text: '重置',
     preIcon: null,
   },
   actionColOptions: {
-    span: 18,
+    span: 24,
+    style: {
+      textAlign: 'right',
+      borderTop: '1px solid #e8e8e8',
+      paddingTop: '10px',
+    },
   },
   submitButtonOptions: {
     type: 'primary',

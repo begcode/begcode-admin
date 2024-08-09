@@ -15,6 +15,19 @@
       </template>
       <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" />
     </Card>
+    <Row
+      v-if="fieldSearchValues && fieldSearchValues.length && !searchFormConfig.toggleSearchStatus"
+      style="background-color: #ffffff; padding: 4px; margin: 8px; border-radius: 4px"
+    >
+      <Col :span="24" style="padding-left: 20px">
+        <span>搜索条件：</span>
+        <Space>
+          <Tag closable v-for="fieldVale of fieldSearchValues" @close="closeSearchFieldTag(fieldVale)">
+            {{ fieldVale.title }}: {{ fieldVale.value }}
+          </Tag>
+        </Space>
+      </Col>
+    </Row>
     <Card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
       <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents" data-cy="entityTable">
         <template #toolbar_buttons>
@@ -103,13 +116,23 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, getCurrentInstance, h, onMounted, toRaw, shallowRef, onUnmounted, watch } from 'vue';
-import { Alert, message, Modal, Space, Card, Divider, Row, Col, Input, Dropdown, Menu, MenuItem } from 'ant-design-vue';
+import { reactive, ref, getCurrentInstance, h, toRaw, shallowRef, computed } from 'vue';
+import { Alert, message, Modal, Space, Card, Divider, Row, Col, Input, Dropdown, Menu, MenuItem, Tag } from 'ant-design-vue';
 import { VxeGridInstance, VxeGridListeners, VxeGridProps, Grid } from 'vxe-table';
-import { debounce, upperFirst } from 'lodash-es';
+import { debounce, isArray, upperFirst } from 'lodash-es';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { transVxeSorts } from '@/utils/jhipster/sorts';
-import { Button, ButtonGroup, Icon, BasicModal, BasicDrawer, SearchForm, useModalInner, useDrawerInner } from '@begcode/components';
+import {
+  Button,
+  ButtonGroup,
+  Icon,
+  BasicModal,
+  BasicDrawer,
+  SearchForm,
+  clearSearchFieldValue,
+  useModalInner,
+  useDrawerInner,
+} from '@begcode/components';
 import { useGo } from '@/hooks/web/usePage';
 import ServerProvider from '@/api-service/index';
 import { useMergeGridProps, useColumnsConfig, useSetOperationColumn, useSetShortcutButtons } from '@/components/VxeTable/src/helper';
@@ -141,6 +164,8 @@ const apis = {
   deleteById: apiService.system.smsMessageService.delete,
   deleteByIds: apiService.system.smsMessageService.deleteByIds,
   update: apiService.system.smsMessageService.update,
+  import: apiService.system.smsMessageService.importExcel,
+  export: apiService.system.smsMessageService.exportExcel,
 };
 const pageConfig = {
   title: '短信消息列表',
@@ -157,6 +182,13 @@ const searchFormConfig = reactive<any>({
   compact: true,
   jhiCommonSearchKeywords: '',
   ...props.searchFormOptions,
+});
+const fieldSearchValues = computed(() => {
+  return searchFormConfig.fieldList
+    .filter(field => !field.hidden)
+    .filter(field => {
+      return field.value !== null && field.value !== undefined && field.value !== '' && !(isArray(field.value) && field.value.length === 0);
+    });
 });
 const rowOperations = ref<any[]>([
   {
@@ -256,6 +288,11 @@ const ajax = {
     return await apis.find(queryParams.value);
   },
   queryAll: async () => await apis.find({ size: -1 }),
+  import: async ({ file, options }) => {
+    apis.import(file).then(() => {
+      formSearch();
+    });
+  },
   delete: async records => await apis.deleteByIds(records.body.removeRecords.map(record => record.id)),
 };
 // 表格左上角自定义按钮
@@ -374,6 +411,10 @@ const okDrawer = async () => {
 const formSearch = () => {
   xGrid.value.commitProxy('reload');
 };
+const closeSearchFieldTag = field => {
+  clearSearchFieldValue(field);
+  formSearch();
+};
 const inputSearch = debounce(formSearch, 700);
 const handleToggleSearch = () => {
   searchFormConfig.toggleSearchStatus = !searchFormConfig.toggleSearchStatus;
@@ -411,7 +452,7 @@ const rowClick = ({ name, data, params }) => {
             popupConfig.componentProps.containerType = 'drawer';
             setDrawerProps({ open: true });
             break;
-          case 'route':
+          case 'page':
           default:
             if (pageConfig.baseRouteName) {
               go({ name: `${pageConfig.baseRouteName}Edit`, params: { entityId: row.id } });

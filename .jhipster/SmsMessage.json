@@ -64,7 +64,7 @@
       }
     },
     {
-      "documentation": "发送次数 超过5次不再发送",
+      "documentation": "发送次数\\n超过5次不再发送",
       "fieldName": "retryNum",
       "fieldType": "Integer"
     },

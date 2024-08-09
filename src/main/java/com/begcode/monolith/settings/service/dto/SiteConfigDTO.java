@@ -1,5 +1,6 @@
 package com.begcode.monolith.settings.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.AbstractAuditingEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
@@ -29,6 +30,7 @@ public class SiteConfigDTO extends AbstractAuditingEntity<Long, SiteConfigDTO> {
      */
     @NotNull
     @Schema(description = "分类名称", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "分类名称")
     private String categoryName;
 
     /**
@@ -36,54 +38,63 @@ public class SiteConfigDTO extends AbstractAuditingEntity<Long, SiteConfigDTO> {
      */
     @NotNull
     @Schema(description = "分类Key", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "分类Key")
     private String categoryKey;
 
     /**
      * 是否禁用
      */
     @Schema(description = "是否禁用")
+    @Excel(name = "是否禁用")
     private Boolean disabled;
 
     /**
      * 排序
      */
     @Schema(description = "排序")
+    @Excel(name = "排序")
     private Integer sortValue;
 
     /**
      * 是否内置
      */
     @Schema(description = "是否内置")
+    @Excel(name = "是否内置")
     private Boolean builtIn;
 
     /**
      * 创建者Id
      */
     @Schema(description = "创建者Id")
+    @Excel(name = "创建者Id")
     private Long createdBy;
 
     /**
      * 创建时间
      */
     @Schema(description = "创建时间")
+    @Excel(name = "创建时间")
     private Instant createdDate;
 
     /**
      * 修改者Id
      */
     @Schema(description = "修改者Id")
+    @Excel(name = "修改者Id")
     private Long lastModifiedBy;
 
     /**
      * 修改时间
      */
     @Schema(description = "修改时间")
+    @Excel(name = "修改时间")
     private Instant lastModifiedDate;
 
     /**
      * 配置项列表
      */
     @Schema(description = "配置项列表")
+    @Excel(name = "配置项列表")
     private List<CommonFieldDataDTO> items = new ArrayList<>();
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove

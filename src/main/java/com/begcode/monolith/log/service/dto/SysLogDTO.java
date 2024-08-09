@@ -1,5 +1,6 @@
 package com.begcode.monolith.log.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.AbstractAuditingEntity;
 import com.begcode.monolith.domain.enumeration.LogType;
 import com.begcode.monolith.domain.enumeration.OperateType;
@@ -27,90 +28,105 @@ public class SysLogDTO extends AbstractAuditingEntity<Long, SysLogDTO> {
      * 日志类型
      */
     @Schema(description = "日志类型")
+    @Excel(name = "日志类型")
     private LogType logType;
 
     /**
      * 日志内容
      */
     @Schema(description = "日志内容")
+    @Excel(name = "日志内容")
     private String logContent;
 
     /**
      * 操作类型
      */
     @Schema(description = "操作类型")
+    @Excel(name = "操作类型")
     private OperateType operateType;
 
     /**
      * 操作用户账号
      */
     @Schema(description = "操作用户账号")
+    @Excel(name = "操作用户账号")
     private String userid;
 
     /**
      * 操作用户名称
      */
     @Schema(description = "操作用户名称")
+    @Excel(name = "操作用户名称")
     private String username;
 
     /**
      * IP
      */
     @Schema(description = "IP")
+    @Excel(name = "IP")
     private String ip;
 
     /**
      * 请求java方法
      */
     @Schema(description = "请求java方法")
+    @Excel(name = "请求java方法")
     private String method;
 
     /**
      * 请求路径
      */
     @Schema(description = "请求路径")
+    @Excel(name = "请求路径")
     private String requestUrl;
 
     /**
      * 请求参数
      */
     @Schema(description = "请求参数")
+    @Excel(name = "请求参数")
     private String requestParam;
 
     /**
      * 请求类型
      */
     @Schema(description = "请求类型")
+    @Excel(name = "请求类型")
     private String requestType;
 
     /**
      * 耗时
      */
     @Schema(description = "耗时")
+    @Excel(name = "耗时")
     private Long costTime;
 
     /**
      * 创建者Id
      */
     @Schema(description = "创建者Id")
+    @Excel(name = "创建者Id")
     private Long createdBy;
 
     /**
      * 创建时间
      */
     @Schema(description = "创建时间")
+    @Excel(name = "创建时间")
     private Instant createdDate;
 
     /**
      * 修改者Id
      */
     @Schema(description = "修改者Id")
+    @Excel(name = "修改者Id")
     private Long lastModifiedBy;
 
     /**
      * 修改时间
      */
     @Schema(description = "修改时间")
+    @Excel(name = "修改时间")
     private Instant lastModifiedDate;
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove

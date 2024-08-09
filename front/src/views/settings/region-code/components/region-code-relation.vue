@@ -493,6 +493,8 @@ const relationshipApis: any = {
 const apis = {
   regionCodeService: apiService.settings.regionCodeService,
   find: apiService.settings.regionCodeService.tree,
+  import: apiService.settings.regionCodeService.importExcel,
+  export: apiService.settings.regionCodeService.exportExcel,
   updateRelations: apiService.settings.regionCodeService.updateRelations,
 };
 const columns = config.columns();
@@ -581,7 +583,7 @@ const gridOptions = reactive<VxeGridProps>({
     seq: true,
     sort: true,
     filter: true,
-    props: {
+    response: {
       result: 'records',
       total: 'total',
     },
@@ -611,6 +613,11 @@ const gridOptions = reactive<VxeGridProps>({
         return await apis.find(queryParams);
       },
       queryAll: async () => await apis.find({ size: -1 }),
+      import: async ({ file, options }) => {
+        apis.import(file).then(() => {
+          formSearch();
+        });
+      },
     },
   },
   toolbarConfig: {

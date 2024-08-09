@@ -20,7 +20,7 @@
       "id": "ID",
       "text": "Text",
       "type": "Type",
-      "i18n": "I 18 N",
+      "localeKey": "Locale Key",
       "group": "Group",
       "link": "Link",
       "externalLink": "External Link",
@@ -43,7 +43,7 @@
       "help": {
         "text": "权限名称",
         "type": "权限类型",
-        "i18n": "i18n主键",
+        "localeKey": "多语言Key",
         "group": "显示分组名",
         "link": "路由",
         "externalLink": "外部链接",

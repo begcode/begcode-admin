@@ -1,5 +1,6 @@
 package com.begcode.monolith.oss.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.enumeration.OssProvider;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
@@ -27,6 +28,7 @@ public class OssConfigDTO implements Serializable {
      */
     @NotNull
     @Schema(description = "提供商", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "提供商")
     private OssProvider provider;
 
     /**
@@ -35,24 +37,28 @@ public class OssConfigDTO implements Serializable {
     @NotNull
     @Size(max = 40)
     @Schema(description = "平台", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "平台")
     private String platform;
 
     /**
      * 启用
      */
     @Schema(description = "启用")
+    @Excel(name = "启用")
     private Boolean enabled;
 
     /**
      * 备注
      */
     @Schema(description = "备注")
+    @Excel(name = "备注")
     private String remark;
 
     /**
      * 配置数据
      */
     @Schema(description = "配置数据")
+    @Excel(name = "配置数据")
     private String configData;
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove

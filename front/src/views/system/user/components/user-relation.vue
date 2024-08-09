@@ -621,6 +621,8 @@ const relationshipApis: any = {
 const apis = {
   userService: apiService.system.userService,
   find: apiService.system.userService.retrieve,
+  import: apiService.system.userService.importExcel,
+  export: apiService.system.userService.exportExcel,
   updateRelations: apiService.system.userService.updateRelations,
   departmentList: apiService.settings.departmentService.tree,
 };
@@ -723,7 +725,7 @@ const gridOptions = reactive<VxeGridProps>({
     seq: true,
     sort: true,
     filter: true,
-    props: {
+    response: {
       result: 'records',
       total: 'total',
     },
@@ -758,6 +760,11 @@ const gridOptions = reactive<VxeGridProps>({
         return await apis.find(queryParams);
       },
       queryAll: async () => await apis.find({ size: -1 }),
+      import: async ({ file, options }) => {
+        apis.import(file).then(() => {
+          formSearch();
+        });
+      },
     },
   },
   toolbarConfig: {

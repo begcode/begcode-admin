@@ -1,5 +1,6 @@
 package com.begcode.monolith.taskjob.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.AbstractAuditingEntity;
 import com.begcode.monolith.domain.enumeration.JobStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,7 +15,7 @@ import lombok.Setter;
 
  * {@link com.begcode.monolith.taskjob.domain.TaskJobConfig}的DTO。
  */
-@Schema(description = "定时任务")
+@Schema(description = "任务配置")
 @Setter
 @Getter
 @SuppressWarnings("common-java:DuplicatedBlocks")
@@ -26,60 +27,70 @@ public class TaskJobConfigDTO extends AbstractAuditingEntity<Long, TaskJobConfig
      * 任务名称
      */
     @Schema(description = "任务名称")
+    @Excel(name = "任务名称")
     private String name;
 
     /**
      * 任务类名
      */
     @Schema(description = "任务类名")
+    @Excel(name = "任务类名")
     private String jobClassName;
 
     /**
      * cron表达式
      */
     @Schema(description = "cron表达式")
+    @Excel(name = "cron表达式")
     private String cronExpression;
 
     /**
      * 参数
      */
     @Schema(description = "参数")
+    @Excel(name = "参数")
     private String parameter;
 
     /**
      * 描述
      */
     @Schema(description = "描述")
+    @Excel(name = "描述")
     private String description;
 
     /**
      * 任务状态
      */
     @Schema(description = "任务状态")
+    @Excel(name = "任务状态")
     private JobStatus jobStatus;
 
     /**
      * 创建者Id
      */
     @Schema(description = "创建者Id")
+    @Excel(name = "创建者Id")
     private Long createdBy;
 
     /**
      * 创建时间
      */
     @Schema(description = "创建时间")
+    @Excel(name = "创建时间")
     private Instant createdDate;
 
     /**
      * 修改者Id
      */
     @Schema(description = "修改者Id")
+    @Excel(name = "修改者Id")
     private Long lastModifiedBy;
 
     /**
      * 修改时间
      */
     @Schema(description = "修改时间")
+    @Excel(name = "修改时间")
     private Instant lastModifiedDate;
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove

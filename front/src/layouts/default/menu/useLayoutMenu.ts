@@ -94,9 +94,7 @@ export function useSplitMenu(splitType: Ref<MenuSplitTyeEnum>) {
 
     // split-top
     if (unref(getSpiltTop)) {
-      const shallowMenus = await getShallowMenus();
-
-      menusRef.value = shallowMenus;
+      menusRef.value = await getShallowMenus();
       return;
     }
   }

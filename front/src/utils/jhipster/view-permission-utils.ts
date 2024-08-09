@@ -9,16 +9,19 @@ export function toRouteRecords(viewsPermissions: IViewPermission[]): AppRouteRec
     if (permission.group) {
       result.push(...toRouteRecords(permission.children || []));
     } else {
-      const route: AppRouteRecordRaw = { meta: { icon: '' }, name: '', path: '', redirect: undefined };
-      route.meta = { icon: permission.icon };
-      route.meta.title = permission.text;
-      route.meta.hideMenu = !!permission.hide;
-      route.meta.hideBreadcrumb = !!permission.hideInBreadcrumb;
-      route.meta.orderNo = permission.order || 0;
-      route.component = permission.componentFile;
-      route.name = permission.code || '';
-      route.path = permission.link || '';
-      route.redirect = permission.redirect || '';
+      const route: AppRouteRecordRaw = {
+        meta: {
+          icon: permission.icon || '',
+          title: permission.text || '',
+          hideMenu: !!permission.hide,
+          hideBreadcrumb: !!permission.hideInBreadcrumb,
+          orderNo: permission.order || 0,
+        },
+        component: permission.componentFile,
+        name: permission.code || '',
+        path: permission.link || '',
+        redirect: permission.redirect || undefined,
+      };
       if (permission.children) {
         route.children = toRouteRecords(permission.children);
       }

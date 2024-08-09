@@ -1,5 +1,6 @@
 package com.begcode.monolith.system.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.AbstractAuditingEntity;
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
 
@@ -28,6 +29,7 @@ public class FormConfigDTO extends AbstractAuditingEntity<Long, FormConfigDTO> {
      */
     @Size(max = 100)
     @Schema(description = "表单Key")
+    @Excel(name = "表单Key")
     private String formKey;
 
     /**
@@ -35,42 +37,49 @@ public class FormConfigDTO extends AbstractAuditingEntity<Long, FormConfigDTO> {
      */
     @Size(max = 100)
     @Schema(description = "名称")
+    @Excel(name = "名称")
     private String formName;
 
     /**
      * 表单配置
      */
     @Schema(description = "表单配置")
+    @Excel(name = "表单配置")
     private String formJson;
 
     /**
      * 创建者Id
      */
     @Schema(description = "创建者Id")
+    @Excel(name = "创建者Id")
     private Long createdBy;
 
     /**
      * 创建时间
      */
     @Schema(description = "创建时间")
+    @Excel(name = "创建时间")
     private Instant createdDate;
 
     /**
      * 修改者Id
      */
     @Schema(description = "修改者Id")
+    @Excel(name = "修改者Id")
     private Long lastModifiedBy;
 
     /**
      * 修改时间
      */
     @Schema(description = "修改时间")
+    @Excel(name = "修改时间")
     private Instant lastModifiedDate;
 
     /**
      * 业务类别
      */
     @Schema(description = "业务类别")
+    @Excel(name = "业务类别")
     private BusinessTypeDTO businessType;
 
     private Long businessTypeId;

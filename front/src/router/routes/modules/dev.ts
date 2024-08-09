@@ -21,7 +21,7 @@ const dev: AppRouteModule = {
       name: 'Doc',
       component: IFrame,
       meta: {
-        frameSrc: '/swagger-ui/index.html',
+        frameSrc: '/static/swagger-ui/index.html',
         title: t('routes.dev.doc'),
       },
     },

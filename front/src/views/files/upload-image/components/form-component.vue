@@ -26,6 +26,10 @@ const props = defineProps({
     type: String,
     default: 'page',
   },
+  formButtons: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+  },
   baseData: {
     type: Object,
     default: () => ({}),
@@ -35,15 +39,20 @@ const ctx = getCurrentInstance()?.proxy;
 const formRef = ref<any>(null);
 const apiService = ctx?.$apiService as typeof ServerProvider;
 const uploadImage = reactive<IUploadImage>(new UploadImage());
-if (props.entityId) {
-  apiService.files.uploadImageService.find(Number(props.entityId)).then(data => {
-    if (data) {
-      Object.assign(uploadImage, data);
+watch(
+  () => props.entityId,
+  async val => {
+    if (val) {
+      const data = await apiService.files.uploadImageService.find(Number(val)).catch(() => null);
+      if (data) {
+        Object.assign(uploadImage, data);
+      }
+    } else {
+      Object.assign(uploadImage, props.baseData);
     }
-  });
-} else {
-  Object.assign(uploadImage, props.baseData);
-}
+  },
+  { immediate: true },
+);
 const formItemsConfig = config.fields();
 formItemsConfig.unshift({
   label: '选择文件',
@@ -99,20 +108,25 @@ const formProps = reactive({
   fieldMapToTime: [],
   size: 'default',
   showAdvancedButton: false,
-  showResetButton: false,
-  showSubmitButton: false,
-  showActionButtonGroup: false,
+  showResetButton: props.formButtons.includes('reset'),
+  showSubmitButton: props.formButtons.includes('submit'),
+  showActionButtonGroup: props.formButtons.length > 0,
   model: uploadImage,
   schemas: formItemsConfig,
   disabled: !isEdit.value,
   resetButtonOptions: {
     type: 'default',
     size: 'default',
-    text: '关闭',
+    text: '重置',
     preIcon: null,
   },
   actionColOptions: {
-    span: 18,
+    span: 24,
+    style: {
+      textAlign: 'right',
+      borderTop: '1px solid #e8e8e8',
+      paddingTop: '10px',
+    },
   },
   submitButtonOptions: {
     type: 'primary',

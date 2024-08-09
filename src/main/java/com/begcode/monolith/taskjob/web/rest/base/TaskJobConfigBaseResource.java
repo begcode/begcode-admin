@@ -79,8 +79,8 @@ public class TaskJobConfigBaseResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    @Operation(tags = "新建定时任务", description = "创建并返回一个新的定时任务")
-    @AutoLog(value = "新建定时任务", logType = LogType.OPERATE, operateType = OperateType.ADD)
+    @Operation(tags = "新建任务配置", description = "创建并返回一个新的任务配置")
+    @AutoLog(value = "新建任务配置", logType = LogType.OPERATE, operateType = OperateType.ADD)
     public ResponseEntity<TaskJobConfigDTO> createTaskJobConfig(@RequestBody TaskJobConfigDTO taskJobConfigDTO) throws URISyntaxException {
         log.debug("REST request to save TaskJobConfig : {}", taskJobConfigDTO);
         if (taskJobConfigDTO.getId() != null) {
@@ -103,8 +103,8 @@ public class TaskJobConfigBaseResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
-    @Operation(tags = "更新定时任务", description = "根据主键更新并返回一个更新后的定时任务")
-    @AutoLog(value = "更新定时任务", logType = LogType.OPERATE, operateType = OperateType.EDIT)
+    @Operation(tags = "更新任务配置", description = "根据主键更新并返回一个更新后的任务配置")
+    @AutoLog(value = "更新任务配置", logType = LogType.OPERATE, operateType = OperateType.EDIT)
     public ResponseEntity<TaskJobConfigDTO> updateTaskJobConfig(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody TaskJobConfigDTO taskJobConfigDTO,
@@ -150,8 +150,8 @@ public class TaskJobConfigBaseResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    @Operation(tags = "部分更新定时任务", description = "根据主键及实体信息实现部分更新，值为null的属性将忽略，并返回一个更新后的定时任务")
-    @AutoLog(value = "部分更新定时任务", logType = LogType.OPERATE, operateType = OperateType.EDIT)
+    @Operation(tags = "部分更新任务配置", description = "根据主键及实体信息实现部分更新，值为null的属性将忽略，并返回一个更新后的任务配置")
+    @AutoLog(value = "部分更新任务配置", logType = LogType.OPERATE, operateType = OperateType.EDIT)
     public ResponseEntity<TaskJobConfigDTO> partialUpdateTaskJobConfig(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody TaskJobConfigDTO taskJobConfigDTO
@@ -184,8 +184,8 @@ public class TaskJobConfigBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of taskJobConfigs in body.
      */
     @GetMapping("")
-    @Operation(tags = "获取定时任务分页列表", description = "获取定时任务的分页列表数据")
-    @AutoLog(value = "获取定时任务分页列表", logType = LogType.OPERATE, operateType = OperateType.LIST)
+    @Operation(tags = "获取任务配置分页列表", description = "获取任务配置的分页列表数据")
+    @AutoLog(value = "获取任务配置分页列表", logType = LogType.OPERATE, operateType = OperateType.LIST)
     public ResponseEntity<PageRecord<TaskJobConfigDTO>> getAllTaskJobConfigs(
         TaskJobConfigCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -219,8 +219,8 @@ public class TaskJobConfigBaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the taskJobConfigDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    @Operation(tags = "获取指定主键的定时任务", description = "获取指定主键的定时任务信息")
-    @AutoLog(value = "获取指定主键的定时任务", logType = LogType.OPERATE, operateType = OperateType.VIEW)
+    @Operation(tags = "获取指定主键的任务配置", description = "获取指定主键的任务配置信息")
+    @AutoLog(value = "获取指定主键的任务配置", logType = LogType.OPERATE, operateType = OperateType.VIEW)
     public ResponseEntity<TaskJobConfigDTO> getTaskJobConfig(@PathVariable("id") Long id) {
         log.debug("REST request to get TaskJobConfig : {}", id);
         Optional<TaskJobConfigDTO> taskJobConfigDTO = taskJobConfigService.findOne(id);
@@ -234,8 +234,8 @@ public class TaskJobConfigBaseResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
-    @Operation(tags = "删除指定主键的定时任务", description = "删除指定主键的定时任务信息")
-    @AutoLog(value = "删除指定主键的定时任务", logType = LogType.OPERATE, operateType = OperateType.DELETE)
+    @Operation(tags = "删除指定主键的任务配置", description = "删除指定主键的任务配置信息")
+    @AutoLog(value = "删除指定主键的任务配置", logType = LogType.OPERATE, operateType = OperateType.DELETE)
     public ResponseEntity<Void> deleteTaskJobConfig(@PathVariable("id") Long id) {
         log.debug("REST request to delete TaskJobConfig : {}", id);
 
@@ -250,13 +250,13 @@ public class TaskJobConfigBaseResource {
      *
      */
     @GetMapping("/export")
-    @Operation(tags = "定时任务EXCEL导出", description = "导出全部定时任务为EXCEL文件")
-    @AutoLog(value = "定时任务EXCEL导出", logType = LogType.OPERATE, operateType = OperateType.EXPORT)
+    @Operation(tags = "任务配置EXCEL导出", description = "导出全部任务配置为EXCEL文件")
+    @AutoLog(value = "任务配置EXCEL导出", logType = LogType.OPERATE, operateType = OperateType.EXPORT)
     public void exportToExcel(HttpServletResponse response) {
         List<TaskJobConfigDTO> data = taskJobConfigService.findAll(new Page<>(1, Integer.MAX_VALUE)).getRecords();
-        Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams("定时任务一览表", "定时任务"), TaskJobConfigDTO.class, data);
+        Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams("任务配置一览表", "任务配置"), TaskJobConfigDTO.class, data);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-        String filename = "定时任务_" + sdf.format(new Date()) + ".xlsx";
+        String filename = "任务配置_" + sdf.format(new Date()) + ".xlsx";
         try {
             ExportUtil.excel(workbook, filename, response);
         } catch (IOException e) {
@@ -270,8 +270,8 @@ public class TaskJobConfigBaseResource {
      * @return the ResponseEntity with status 200 (OK) and with body the taskJobConfigDTO, or with status 404 (Not Found)
      */
     @PostMapping("/import")
-    @Operation(tags = "定时任务EXCEL导入", description = "根据定时任务EXCEL文件导入全部数据")
-    @AutoLog(value = "定时任务EXCEL导入", logType = LogType.OPERATE, operateType = OperateType.IMPORT)
+    @Operation(tags = "任务配置EXCEL导入", description = "根据任务配置EXCEL文件导入全部数据")
+    @AutoLog(value = "任务配置EXCEL导入", logType = LogType.OPERATE, operateType = OperateType.IMPORT)
     public ResponseEntity<Void> exportToExcel(MultipartFile file) throws Exception {
         ImportParams params = new ImportParams();
         params.setTitleRows(1);
@@ -288,8 +288,8 @@ public class TaskJobConfigBaseResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("")
-    @Operation(tags = "删除多个定时任务", description = "根据主键删除多个定时任务")
-    @AutoLog(value = "删除多个定时任务", logType = LogType.OPERATE, operateType = OperateType.DELETE)
+    @Operation(tags = "删除多个任务配置", description = "根据主键删除多个任务配置")
+    @AutoLog(value = "删除多个任务配置", logType = LogType.OPERATE, operateType = OperateType.DELETE)
     public ResponseEntity<Void> deleteTaskJobConfigsByIds(@RequestParam("ids") ArrayList<Long> ids) {
         log.debug("REST request to delete TaskJobConfigs : {}", ids);
         if (ids != null) {
@@ -301,8 +301,8 @@ public class TaskJobConfigBaseResource {
     }
 
     @GetMapping("/stats")
-    @Operation(tags = "根据条件对定时任务进行统计", description = "条件和统计的配置通过定时任务的Criteria类来实现")
-    @AutoLog(value = "根据条件对定时任务进行统计", logType = LogType.OPERATE, operateType = OperateType.STATS)
+    @Operation(tags = "根据条件对任务配置进行统计", description = "条件和统计的配置通过任务配置的Criteria类来实现")
+    @AutoLog(value = "根据条件对任务配置进行统计", logType = LogType.OPERATE, operateType = OperateType.STATS)
     public ResponseEntity<List<Map<String, Object>>> stats(TaskJobConfigCriteria criteria) {
         log.debug("REST request to get stats by criteria: {}", criteria);
         List<Map<String, Object>> statsMapList = taskJobConfigQueryService.statsByAggregateCriteria(criteria);

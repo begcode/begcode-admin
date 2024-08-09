@@ -1,5 +1,6 @@
 package com.begcode.monolith.settings.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -28,6 +29,7 @@ public class DictionaryDTO implements Serializable {
      */
     @NotNull
     @Schema(description = "字典名称", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "字典名称")
     private String dictName;
 
     /**
@@ -35,36 +37,42 @@ public class DictionaryDTO implements Serializable {
      */
     @NotNull
     @Schema(description = "字典Key", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "字典Key")
     private String dictKey;
 
     /**
      * 是否禁用
      */
     @Schema(description = "是否禁用")
+    @Excel(name = "是否禁用")
     private Boolean disabled;
 
     /**
      * 排序
      */
     @Schema(description = "排序")
+    @Excel(name = "排序")
     private Integer sortValue;
 
     /**
      * 是否内置
      */
     @Schema(description = "是否内置")
+    @Excel(name = "是否内置")
     private Boolean builtIn;
 
     /**
      * 更新枚举
      */
     @Schema(description = "更新枚举")
+    @Excel(name = "更新枚举")
     private Boolean syncEnum;
 
     /**
      * 字典项列表
      */
     @Schema(description = "字典项列表")
+    @Excel(name = "字典项列表")
     private List<CommonFieldDataDTO> items = new ArrayList<>();
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove

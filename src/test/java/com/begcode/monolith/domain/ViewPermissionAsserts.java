@@ -49,7 +49,7 @@ public class ViewPermissionAsserts {
             .as("Verify ViewPermission relevant properties")
             .satisfies(e -> assertThat(e.getText()).as("check text").isEqualTo(actual.getText()))
             .satisfies(e -> assertThat(e.getType()).as("check type").isEqualTo(actual.getType()))
-            .satisfies(e -> assertThat(e.getI18n()).as("check i18n").isEqualTo(actual.getI18n()))
+            .satisfies(e -> assertThat(e.getLocaleKey()).as("check localeKey").isEqualTo(actual.getLocaleKey()))
             .satisfies(e -> assertThat(e.getGroup()).as("check group").isEqualTo(actual.getGroup()))
             .satisfies(e -> assertThat(e.getLink()).as("check link").isEqualTo(actual.getLink()))
             .satisfies(e -> assertThat(e.getExternalLink()).as("check externalLink").isEqualTo(actual.getExternalLink()))

@@ -1,5 +1,6 @@
 package com.begcode.monolith.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.Objects;
@@ -24,24 +25,28 @@ public class BusinessTypeDTO implements Serializable {
      * 名称
      */
     @Schema(description = "名称")
+    @Excel(name = "名称")
     private String name;
 
     /**
      * 代码
      */
     @Schema(description = "代码")
+    @Excel(name = "代码")
     private String code;
 
     /**
      * 描述
      */
     @Schema(description = "描述")
+    @Excel(name = "描述")
     private String description;
 
     /**
      * 图标
      */
     @Schema(description = "图标")
+    @Excel(name = "图标")
     private String icon;
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove

@@ -15,6 +15,19 @@
       </template>
       <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" />
     </Card>
+    <Row
+      v-if="fieldSearchValues && fieldSearchValues.length && !searchFormConfig.toggleSearchStatus"
+      style="background-color: #ffffff; padding: 4px; margin: 8px; border-radius: 4px"
+    >
+      <Col :span="24" style="padding-left: 20px">
+        <span>搜索条件：</span>
+        <Space>
+          <Tag closable v-for="fieldVale of fieldSearchValues" @close="closeSearchFieldTag(fieldVale)">
+            {{ fieldVale.title }}: {{ fieldVale.value }}
+          </Tag>
+        </Space>
+      </Col>
+    </Row>
     <Card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
       <List :grid="listGrid" item-layout="vertical" :data-source="listData" :pagination="false">
         <template #header>
@@ -27,6 +40,7 @@
                       placeholder="请输入关键字"
                       v-model:value="searchFormConfig.jhiCommonSearchKeywords"
                       allow-clear
+                      @change="inputSearch"
                       @search="formSearch"
                       enterButton
                     >
@@ -133,21 +147,25 @@
           </Col>
         </Row>
       </Affix>
-      <BasicModal v-bind="modalConfig" @register="registerModal" @cancel="closeModal" @ok="okModal">
+      <BasicModal v-bind="popupConfig.containerProps" @register="registerModal" @cancel="closeModal" @ok="okModal">
         <component
-          :is="modalConfig.componentName"
-          @cancel="closeModalOrDrawer"
+          v-if="popupConfig.componentProps.is"
+          v-bind="popupConfig.componentProps"
+          :is="popupConfig.componentProps.is"
+          @cancel="closeModal"
           @refresh="formSearch"
-          v-bind="modalConfig"
+          v-on="popupConfig.componentEvents"
           ref="modalComponentRef"
         />
       </BasicModal>
-      <BasicDrawer v-bind="drawerConfig" @register="registerDrawer" @close="closeDrawer" @ok="okDrawer">
+      <BasicDrawer v-bind="popupConfig.containerProps" @register="registerDrawer" @close="closeDrawer" @ok="okDrawer">
         <component
-          :is="drawerConfig.componentName"
-          @cancel="closeModalOrDrawer"
+          v-if="popupConfig.componentProps.is"
+          v-bind="popupConfig.componentProps"
+          :is="popupConfig.componentProps.is"
+          @cancel="closeDrawer"
           @refresh="formSearch"
-          v-bind="drawerConfig"
+          v-on="popupConfig.componentEvents"
           ref="drawerComponentRef"
         />
       </BasicDrawer>
@@ -179,8 +197,10 @@ import {
   Dropdown,
   MenuItem,
   Menu,
+  Tag,
 } from 'ant-design-vue';
 import { breakpointsAntDesign, useBreakpoints } from '@vueuse/core';
+import { debounce, isArray, upperFirst } from 'lodash-es';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import {
   useModalInner,
@@ -192,10 +212,11 @@ import {
   SearchForm,
   ButtonGroup,
   ImageUpload,
+  clearSearchFieldValue,
 } from '@begcode/components';
 import { useGo } from '@/hooks/web/usePage';
 import ServerProvider from '@/api-service/index';
-import UReportFileEdit from './components/form-component.vue';
+import UReportFileForm from './components/form-component.vue';
 import UReportFileDetail from './components/detail-component.vue';
 import { IUReportFile } from '@/models/report/u-report-file.model';
 import config from './config/list-config';
@@ -234,6 +255,10 @@ const [registerModal, { closeModal, setModalProps }] = useModalInner(data => {
 const [registerDrawer, { closeDrawer, setDrawerProps }] = useDrawerInner(data => {
   console.log(data);
 });
+const shallowRefs = {
+  UReportFileEdit: shallowRef(UReportFileForm),
+  UReportFileDetail: shallowRef(UReportFileDetail),
+};
 const breakpoints = useBreakpoints(breakpointsAntDesign);
 const listGrid = reactive({ gutter: 5, xs: 1, sm: 2, md: 3, lg: 4, xl: 5, xxl: 6, xxxl: 8 });
 const listColumns = computed(() => {
@@ -297,6 +322,13 @@ const searchFormConfig = reactive<any>({
   compact: true,
   jhiCommonSearchKeywords: '',
 });
+const fieldSearchValues = computed(() => {
+  return searchFormConfig.fieldList
+    .filter(field => !field.hidden)
+    .filter(field => {
+      return field.value !== null && field.value !== undefined && field.value !== '' && !(isArray(field.value) && field.value.length === 0);
+    });
+});
 const rowOperations: any[] = [
   {
     title: '编辑',
@@ -344,9 +376,6 @@ const selectChange = (e, item) => {
     selectedRows.value = selectedRows.value.filter(row => row.id !== item.id);
   }
 };
-const alertMessage = computed(() => {
-  return `已选${selectedRows.value.length}条记录。`;
-});
 
 const batchOperations = ref<any[]>([
   {
@@ -449,7 +478,7 @@ const extraButtons = ref([
 useSetShortcutButtons('ReportUReportFileList', extraButtons);
 
 const okModal = async () => {
-  if (modalConfig.needSubmit && modalComponentRef.value) {
+  if (popupConfig.needSubmit && modalComponentRef.value) {
     const result = await modalComponentRef.value.submit();
     if (result) {
       formSearch();
@@ -458,7 +487,7 @@ const okModal = async () => {
   }
 };
 const okDrawer = async () => {
-  if (drawerConfig.needSubmit && drawerComponentRef.value) {
+  if (popupConfig.needSubmit && drawerComponentRef.value) {
     const result = await drawerComponentRef.value.submit();
     if (result) {
       formSearch();
@@ -480,6 +509,13 @@ const formSearch = () => {
     listData.value = data.records;
     paginationProps.total = data.total;
   });
+};
+
+const inputSearch = debounce(formSearch, 700);
+
+const closeSearchFieldTag = field => {
+  clearSearchFieldValue(field);
+  formSearch();
 };
 
 const handleToggleSearch = () => {
@@ -570,7 +606,7 @@ const rowClick = ({ name, data }) => {
             popupConfig.componentProps.containerType = 'drawer';
             setDrawerProps({ open: true });
             break;
-          case 'route':
+          case 'page':
           default:
             if (pageConfig.baseRouteName) {
               go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
@@ -603,16 +639,16 @@ const rowClick = ({ name, data }) => {
       case 'design':
         switch (operation.containerType) {
           case 'modal':
-            modalConfig.componentName = 'a-iframe';
-            modalConfig.iframeUrl = '/ureport/designer?_u=db:' + row.name;
+            popupConfig.componentProps.is = 'a-iframe';
+            popupConfig.componentProps.iframeUrl = '/ureport/designer?_u=db:' + row.name;
             setModalProps({ open: true });
             break;
           case 'drawer':
-            drawerConfig.componentName = 'a-iframe';
-            modalConfig.iframeUrl = '/ureport/designer?_u=db:' + row.name;
+            popupConfig.componentProps.is = 'a-iframe';
+            popupConfig.componentProps.iframeUrl = '/ureport/designer?_u=db:' + row.name;
             setDrawerProps({ open: true });
             break;
-          case 'route':
+          case 'page':
           default:
             if (pageConfig.baseRouteName) {
               go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
@@ -624,16 +660,16 @@ const rowClick = ({ name, data }) => {
       case 'preview':
         switch (operation.containerType) {
           case 'modal':
-            modalConfig.componentName = 'a-iframe';
-            modalConfig.iframeUrl = '/ureport/preview?_u=db:' + row.name;
+            popupConfig.componentProps.is = 'a-iframe';
+            popupConfig.componentProps.iframeUrl = '/ureport/preview?_u=db:' + row.name;
             setModalProps({ open: true });
             break;
           case 'drawer':
-            drawerConfig.componentName = 'a-iframe';
-            modalConfig.iframeUrl = '/ureport/preview?_u=db:' + row.name;
+            popupConfig.componentProps.is = 'a-iframe';
+            popupConfig.componentProps.iframeUrl = '/ureport/preview?_u=db:' + row.name;
             setDrawerProps({ open: true });
             break;
-          case 'route':
+          case 'page':
           default:
             if (pageConfig.baseRouteName) {
               go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });

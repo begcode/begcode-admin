@@ -70,8 +70,8 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.type")
     private ViewPermissionTypeFilter type;
 
-    @BindQuery(column = "self.i_18_n")
-    private StringFilter i18n;
+    @BindQuery(column = "self.locale_key")
+    private StringFilter localeKey;
 
     @BindQuery(column = "self.`group`")
     private BooleanFilter group;
@@ -160,7 +160,7 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
         this.text = other.optionalText().map(StringFilter::copy).orElse(null);
         this.type = other.optionalType().map(ViewPermissionTypeFilter::copy).orElse(null);
-        this.i18n = other.optionalI18n().map(StringFilter::copy).orElse(null);
+        this.localeKey = other.optionalLocaleKey().map(StringFilter::copy).orElse(null);
         this.group = other.optionalGroup().map(BooleanFilter::copy).orElse(null);
         this.link = other.optionalLink().map(StringFilter::copy).orElse(null);
         this.externalLink = other.optionalExternalLink().map(StringFilter::copy).orElse(null);
@@ -249,23 +249,23 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
         this.type = type;
     }
 
-    public StringFilter getI18n() {
-        return i18n;
+    public StringFilter getLocaleKey() {
+        return localeKey;
     }
 
-    public Optional<StringFilter> optionalI18n() {
-        return Optional.ofNullable(i18n);
+    public Optional<StringFilter> optionalLocaleKey() {
+        return Optional.ofNullable(localeKey);
     }
 
-    public StringFilter i18n() {
-        if (i18n == null) {
-            setI18n(new StringFilter());
+    public StringFilter localeKey() {
+        if (localeKey == null) {
+            setLocaleKey(new StringFilter());
         }
-        return i18n;
+        return localeKey;
     }
 
-    public void setI18n(StringFilter i18n) {
-        this.i18n = i18n;
+    public void setLocaleKey(StringFilter localeKey) {
+        this.localeKey = localeKey;
     }
 
     public BooleanFilter getGroup() {
@@ -783,7 +783,7 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
             Objects.equals(id, that.id) &&
             Objects.equals(text, that.text) &&
             Objects.equals(type, that.type) &&
-            Objects.equals(i18n, that.i18n) &&
+            Objects.equals(localeKey, that.localeKey) &&
             Objects.equals(group, that.group) &&
             Objects.equals(link, that.link) &&
             Objects.equals(externalLink, that.externalLink) &&
@@ -814,7 +814,7 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
             id,
             text,
             type,
-            i18n,
+            localeKey,
             group,
             link,
             externalLink,
@@ -846,7 +846,7 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
             optionalText().map(f -> "text=" + f + ", ").orElse("") +
             optionalType().map(f -> "type=" + f + ", ").orElse("") +
-            optionalI18n().map(f -> "i18n=" + f + ", ").orElse("") +
+            optionalLocaleKey().map(f -> "localeKey=" + f + ", ").orElse("") +
             optionalGroup().map(f -> "group=" + f + ", ").orElse("") +
             optionalLink().map(f -> "link=" + f + ", ").orElse("") +
             optionalExternalLink().map(f -> "externalLink=" + f + ", ").orElse("") +

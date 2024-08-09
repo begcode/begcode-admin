@@ -443,6 +443,8 @@ const relationshipApis: any = {
 const apis = {
   dictionaryService: apiService.settings.dictionaryService,
   find: apiService.settings.dictionaryService.retrieve,
+  import: apiService.settings.dictionaryService.importExcel,
+  export: apiService.settings.dictionaryService.exportExcel,
   updateRelations: apiService.settings.dictionaryService.updateRelations,
 };
 const columns = config.columns();
@@ -531,7 +533,7 @@ const gridOptions = reactive<VxeGridProps>({
     seq: true,
     sort: true,
     filter: true,
-    props: {
+    response: {
       result: 'records',
       total: 'total',
     },
@@ -561,6 +563,11 @@ const gridOptions = reactive<VxeGridProps>({
         return await apis.find(queryParams);
       },
       queryAll: async () => await apis.find({ size: -1 }),
+      import: async ({ file, options }) => {
+        apis.import(file).then(() => {
+          formSearch();
+        });
+      },
     },
   },
   toolbarConfig: {

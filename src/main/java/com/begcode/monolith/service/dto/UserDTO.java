@@ -1,5 +1,6 @@
 package com.begcode.monolith.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.AbstractAuditingEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
@@ -27,6 +28,7 @@ public class UserDTO extends AbstractAuditingEntity<Long, UserDTO> {
      */
     @NotNull
     @Schema(description = "用户ID", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "用户ID")
     private Long id;
 
     /**
@@ -34,18 +36,21 @@ public class UserDTO extends AbstractAuditingEntity<Long, UserDTO> {
      */
     @NotNull
     @Schema(description = "账户名", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "账户名")
     private String login;
 
     /**
      * 名字
      */
     @Schema(description = "名字")
+    @Excel(name = "名字")
     private String firstName;
 
     /**
      * 姓氏
      */
     @Schema(description = "姓氏")
+    @Excel(name = "姓氏")
     private String lastName;
 
     /**
@@ -53,42 +58,49 @@ public class UserDTO extends AbstractAuditingEntity<Long, UserDTO> {
      */
     @NotNull
     @Schema(description = "电子邮箱", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "电子邮箱")
     private String email;
 
     /**
      * 手机号码
      */
     @Schema(description = "手机号码")
+    @Excel(name = "手机号码")
     private String mobile;
 
     /**
      * 出生日期
      */
     @Schema(description = "出生日期")
+    @Excel(name = "出生日期")
     private ZonedDateTime birthday;
 
     /**
      * 激活状态
      */
     @Schema(description = "激活状态")
+    @Excel(name = "激活状态")
     private Boolean activated;
 
     /**
      * 语言Key
      */
     @Schema(description = "语言Key")
+    @Excel(name = "语言Key")
     private String langKey;
 
     /**
      * 头像地址
      */
     @Schema(description = "头像地址")
+    @Excel(name = "头像地址")
     private String imageUrl;
 
     /**
      * 部门
      */
     @Schema(description = "部门")
+    @Excel(name = "部门")
     private DepartmentDTO department;
 
     private Long departmentId;
@@ -97,6 +109,7 @@ public class UserDTO extends AbstractAuditingEntity<Long, UserDTO> {
      * 岗位
      */
     @Schema(description = "岗位")
+    @Excel(name = "岗位")
     private PositionDTO position;
 
     private Long positionId;
@@ -105,6 +118,7 @@ public class UserDTO extends AbstractAuditingEntity<Long, UserDTO> {
      * 角色列表
      */
     @Schema(description = "角色列表")
+    @Excel(name = "角色列表")
     private List<AuthorityDTO> authorities = new ArrayList<>();
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove

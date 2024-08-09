@@ -41,10 +41,10 @@ public class ViewPermission implements Serializable {
     private ViewPermissionType type;
 
     /**
-     * i18n主键
+     * 多语言Key
      */
-    @TableField(value = "i_18_n")
-    private String i18n;
+    @TableField(value = "locale_key")
+    private String localeKey;
 
     /**
      * 显示分组名
@@ -200,8 +200,8 @@ public class ViewPermission implements Serializable {
         return this;
     }
 
-    public ViewPermission i18n(String i18n) {
-        this.i18n = i18n;
+    public ViewPermission localeKey(String localeKey) {
+        this.localeKey = localeKey;
         return this;
     }
 
@@ -336,7 +336,7 @@ public class ViewPermission implements Serializable {
             "id=" + getId() +
             ", text='" + getText() + "'" +
             ", type='" + getType() + "'" +
-            ", i18n='" + getI18n() + "'" +
+            ", localeKey='" + getLocaleKey() + "'" +
             ", group='" + getGroup() + "'" +
             ", link='" + getLink() + "'" +
             ", externalLink='" + getExternalLink() + "'" +

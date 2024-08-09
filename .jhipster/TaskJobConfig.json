@@ -11,7 +11,8 @@
   },
   "applications": "*",
   "clientRootFolder": "taskjob",
-  "documentation": "定时任务",
+  "clientRootFolder@I18nValue": "定时任务",
+  "documentation": "任务配置",
   "dto": "mapstruct",
   "fields": [
     {

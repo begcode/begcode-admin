@@ -38,8 +38,8 @@
       }
     },
     {
-      "documentation": "i18n主键",
-      "fieldName": "i18n",
+      "documentation": "多语言Key",
+      "fieldName": "localeKey",
       "fieldType": "String",
       "options": {
         "fieldConfig": "hideInList",

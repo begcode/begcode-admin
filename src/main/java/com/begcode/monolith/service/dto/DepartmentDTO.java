@@ -1,5 +1,6 @@
 package com.begcode.monolith.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,54 +27,63 @@ public class DepartmentDTO implements Serializable {
      * 名称
      */
     @Schema(description = "名称")
+    @Excel(name = "名称")
     private String name;
 
     /**
      * 代码
      */
     @Schema(description = "代码")
+    @Excel(name = "代码")
     private String code;
 
     /**
      * 地址
      */
     @Schema(description = "地址")
+    @Excel(name = "地址")
     private String address;
 
     /**
      * 联系电话
      */
     @Schema(description = "联系电话")
+    @Excel(name = "联系电话")
     private String phoneNum;
 
     /**
      * logo地址
      */
     @Schema(description = "logo地址")
+    @Excel(name = "logo地址")
     private String logo;
 
     /**
      * 联系人
      */
     @Schema(description = "联系人")
+    @Excel(name = "联系人")
     private String contact;
 
     /**
      * 下级部门
      */
     @Schema(description = "下级部门")
+    @Excel(name = "下级部门")
     private List<DepartmentDTO> children = new ArrayList<>();
 
     /**
      * 角色列表
      */
     @Schema(description = "角色列表")
+    @Excel(name = "角色列表")
     private List<AuthorityDTO> authorities = new ArrayList<>();
 
     /**
      * 上级
      */
     @Schema(description = "上级")
+    @Excel(name = "上级")
     private DepartmentDTO parent;
 
     private Long parentId;

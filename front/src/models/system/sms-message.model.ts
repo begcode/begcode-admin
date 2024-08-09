@@ -9,7 +9,7 @@ export interface ISmsMessage {
   content?: string | null; //推送内容
   sendTime?: Date | null; //推送时间
   sendStatus?: keyof typeof SendStatus | null; //推送状态
-  retryNum?: number | null; //发送次数 超过5次不再发送
+  retryNum?: number | null; //发送次数
   failResult?: string | null; //推送失败原因
   remark?: string | null; //备注
   createdBy?: number | null; //创建者Id

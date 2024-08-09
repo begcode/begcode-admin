@@ -35,7 +35,7 @@
             <column name="send_status" type="varchar(255)" remarks="推送状态">
                 <constraints nullable="true" />
             </column>
-            <column name="retry_num" type="integer" remarks="发送次数 超过5次不再发送">
+            <column name="retry_num" type="integer" remarks="发送次数\n超过5次不再发送">
                 <constraints nullable="true" />
             </column>
             <column name="fail_result" type="varchar(255)" remarks="推送失败原因">

@@ -1,5 +1,6 @@
 package com.begcode.monolith.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.AbstractAuditingEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
@@ -29,6 +30,7 @@ public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
      */
     @NotNull
     @Schema(description = "Url地址", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "Url地址")
     private String url;
 
     /**
@@ -36,6 +38,7 @@ public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
      * 不含路径
      */
     @Schema(description = "完整文件名\n不含路径")
+    @Excel(name = "完整文件名\n不含路径")
     private String fullName;
 
     /**
@@ -43,114 +46,133 @@ public class UploadFileDTO extends AbstractAuditingEntity<Long, UploadFileDTO> {
      * 不含扩展名
      */
     @Schema(description = "文件名\n不含扩展名")
+    @Excel(name = "文件名\n不含扩展名")
     private String name;
 
     /**
      * 缩略图Url地址
      */
     @Schema(description = "缩略图Url地址")
+    @Excel(name = "缩略图Url地址")
     private String thumb;
 
     /**
      * 扩展名
      */
     @Schema(description = "扩展名")
+    @Excel(name = "扩展名")
     private String ext;
 
     /**
      * 文件类型
      */
     @Schema(description = "文件类型")
+    @Excel(name = "文件类型")
     private String type;
 
     /**
      * 本地路径
      */
     @Schema(description = "本地路径")
+    @Excel(name = "本地路径")
     private String path;
 
     /**
      * 存储目录
      */
     @Schema(description = "存储目录")
+    @Excel(name = "存储目录")
     private String folder;
 
     /**
      * 实体名称
      */
     @Schema(description = "实体名称")
+    @Excel(name = "实体名称")
     private String ownerEntityName;
 
     /**
      * 使用实体ID
      */
     @Schema(description = "使用实体ID")
+    @Excel(name = "使用实体ID")
     private Long ownerEntityId;
 
     /**
      * 业务标题
      */
     @Schema(description = "业务标题")
+    @Excel(name = "业务标题")
     private String businessTitle;
 
     /**
      * 业务自定义描述内容
      */
     @Schema(description = "业务自定义描述内容")
+    @Excel(name = "业务自定义描述内容")
     private String businessDesc;
 
     /**
      * 业务状态
      */
     @Schema(description = "业务状态")
+    @Excel(name = "业务状态")
     private String businessStatus;
 
     /**
      * 创建时间
      */
     @Schema(description = "创建时间")
+    @Excel(name = "创建时间")
     private ZonedDateTime createAt;
 
     /**
      * 文件大小
      */
     @Schema(description = "文件大小")
+    @Excel(name = "文件大小")
     private Long fileSize;
 
     /**
      * 被引次数
      */
     @Schema(description = "被引次数")
+    @Excel(name = "被引次数")
     private Long referenceCount;
 
     /**
      * 创建者Id
      */
     @Schema(description = "创建者Id")
+    @Excel(name = "创建者Id")
     private Long createdBy;
 
     /**
      * 创建时间
      */
     @Schema(description = "创建时间")
+    @Excel(name = "创建时间")
     private Instant createdDate;
 
     /**
      * 修改者Id
      */
     @Schema(description = "修改者Id")
+    @Excel(name = "修改者Id")
     private Long lastModifiedBy;
 
     /**
      * 修改时间
      */
     @Schema(description = "修改时间")
+    @Excel(name = "修改时间")
     private Instant lastModifiedDate;
 
     /**
      * 所属分类
      */
     @Schema(description = "所属分类")
+    @Excel(name = "所属分类")
     private ResourceCategoryDTO category;
 
     private Long categoryId;

@@ -17,7 +17,7 @@ entity ViewPermission {
     type ViewPermissionType /** 权限类型 */
     @importDataField
     @fieldConfig(hideInList)
-	i18n String /** i18n主键 */
+	localeKey String /** 多语言Key */
     @importDataField
 	group Boolean /** 显示分组名 */
     @importDataField
@@ -267,6 +267,7 @@ relationship OneToMany {
 @skipFakeData
 @moduleName(system)
 @skipWebsite
+@listBy(tableEdit)
 entity Department {
     name String /** 名称 */
     code String /** 代码 */
@@ -298,10 +299,12 @@ entity Position {
 @skipFakeData
 @moduleName(system)
 @skipWebsite
+@listBy(tableEdit)
 entity BusinessType {
     name String /** 名称 */
     code String /** 代码 */
     description String /** 描述 */
+    @endUsed(iconPicker)
     icon String /** 图标 */
 }
 

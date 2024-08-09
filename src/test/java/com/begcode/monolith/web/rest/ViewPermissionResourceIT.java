@@ -51,8 +51,8 @@ public class ViewPermissionResourceIT {
     private static final ViewPermissionType DEFAULT_TYPE = ViewPermissionType.MENU;
     private static final ViewPermissionType UPDATED_TYPE = ViewPermissionType.BUTTON;
 
-    private static final String DEFAULT_I_18_N = "AAAAAAAAAA";
-    private static final String UPDATED_I_18_N = "BBBBBBBBBB";
+    private static final String DEFAULT_LOCALE_KEY = "AAAAAAAAAA";
+    private static final String UPDATED_LOCALE_KEY = "BBBBBBBBBB";
 
     private static final Boolean DEFAULT_GROUP = false;
     private static final Boolean UPDATED_GROUP = true;
@@ -144,7 +144,7 @@ public class ViewPermissionResourceIT {
         ViewPermission viewPermission = new ViewPermission()
             .text(DEFAULT_TEXT)
             .type(DEFAULT_TYPE)
-            .i18n(DEFAULT_I_18_N)
+            .localeKey(DEFAULT_LOCALE_KEY)
             .group(DEFAULT_GROUP)
             .link(DEFAULT_LINK)
             .externalLink(DEFAULT_EXTERNAL_LINK)
@@ -175,7 +175,7 @@ public class ViewPermissionResourceIT {
         ViewPermission viewPermission = new ViewPermission()
             .text(UPDATED_TEXT)
             .type(UPDATED_TYPE)
-            .i18n(UPDATED_I_18_N)
+            .localeKey(UPDATED_LOCALE_KEY)
             .group(UPDATED_GROUP)
             .link(UPDATED_LINK)
             .externalLink(UPDATED_EXTERNAL_LINK)
@@ -299,7 +299,7 @@ public class ViewPermissionResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(viewPermission.getId().intValue())))
             .andExpect(jsonPath("$.[*].text").value(hasItem(DEFAULT_TEXT)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].i18n").value(hasItem(DEFAULT_I_18_N)))
+            .andExpect(jsonPath("$.[*].localeKey").value(hasItem(DEFAULT_LOCALE_KEY)))
             .andExpect(jsonPath("$.[*].group").value(hasItem(DEFAULT_GROUP.booleanValue())))
             .andExpect(jsonPath("$.[*].link").value(hasItem(DEFAULT_LINK)))
             .andExpect(jsonPath("$.[*].externalLink").value(hasItem(DEFAULT_EXTERNAL_LINK)))
@@ -350,7 +350,7 @@ public class ViewPermissionResourceIT {
             .andExpect(jsonPath("$.id").value(viewPermission.getId().intValue()))
             .andExpect(jsonPath("$.text").value(DEFAULT_TEXT))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
-            .andExpect(jsonPath("$.i18n").value(DEFAULT_I_18_N))
+            .andExpect(jsonPath("$.localeKey").value(DEFAULT_LOCALE_KEY))
             .andExpect(jsonPath("$.group").value(DEFAULT_GROUP.booleanValue()))
             .andExpect(jsonPath("$.link").value(DEFAULT_LINK))
             .andExpect(jsonPath("$.externalLink").value(DEFAULT_EXTERNAL_LINK))
@@ -467,52 +467,55 @@ public class ViewPermissionResourceIT {
 
     @Test
     @Transactional
-    void getAllViewPermissionsByI18nIsEqualToSomething() throws Exception {
+    void getAllViewPermissionsByLocaleKeyIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
-        // Get all the viewPermissionList where i18n equals to
-        defaultViewPermissionFiltering("i18n.equals=" + DEFAULT_I_18_N, "i18n.equals=" + UPDATED_I_18_N);
+        // Get all the viewPermissionList where localeKey equals to
+        defaultViewPermissionFiltering("localeKey.equals=" + DEFAULT_LOCALE_KEY, "localeKey.equals=" + UPDATED_LOCALE_KEY);
     }
 
     @Test
     @Transactional
-    void getAllViewPermissionsByI18nIsInShouldWork() throws Exception {
+    void getAllViewPermissionsByLocaleKeyIsInShouldWork() throws Exception {
         // Initialize the database
         insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
-        // Get all the viewPermissionList where i18n in
-        defaultViewPermissionFiltering("i18n.in=" + DEFAULT_I_18_N + "," + UPDATED_I_18_N, "i18n.in=" + UPDATED_I_18_N);
+        // Get all the viewPermissionList where localeKey in
+        defaultViewPermissionFiltering(
+            "localeKey.in=" + DEFAULT_LOCALE_KEY + "," + UPDATED_LOCALE_KEY,
+            "localeKey.in=" + UPDATED_LOCALE_KEY
+        );
     }
 
     @Test
     @Transactional
-    void getAllViewPermissionsByI18nIsNullOrNotNull() throws Exception {
+    void getAllViewPermissionsByLocaleKeyIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
-        // Get all the viewPermissionList where i18n is not null
-        defaultViewPermissionFiltering("i18n.specified=true", "i18n.specified=false");
+        // Get all the viewPermissionList where localeKey is not null
+        defaultViewPermissionFiltering("localeKey.specified=true", "localeKey.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllViewPermissionsByI18nContainsSomething() throws Exception {
+    void getAllViewPermissionsByLocaleKeyContainsSomething() throws Exception {
         // Initialize the database
         insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
-        // Get all the viewPermissionList where i18n contains
-        defaultViewPermissionFiltering("i18n.contains=" + DEFAULT_I_18_N, "i18n.contains=" + UPDATED_I_18_N);
+        // Get all the viewPermissionList where localeKey contains
+        defaultViewPermissionFiltering("localeKey.contains=" + DEFAULT_LOCALE_KEY, "localeKey.contains=" + UPDATED_LOCALE_KEY);
     }
 
     @Test
     @Transactional
-    void getAllViewPermissionsByI18nNotContainsSomething() throws Exception {
+    void getAllViewPermissionsByLocaleKeyNotContainsSomething() throws Exception {
         // Initialize the database
         insertedViewPermission = viewPermissionRepository.saveAndGet(viewPermission);
 
-        // Get all the viewPermissionList where i18n does not contain
-        defaultViewPermissionFiltering("i18n.doesNotContain=" + UPDATED_I_18_N, "i18n.doesNotContain=" + DEFAULT_I_18_N);
+        // Get all the viewPermissionList where localeKey does not contain
+        defaultViewPermissionFiltering("localeKey.doesNotContain=" + UPDATED_LOCALE_KEY, "localeKey.doesNotContain=" + DEFAULT_LOCALE_KEY);
     }
 
     @Test
@@ -1311,7 +1314,7 @@ public class ViewPermissionResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(viewPermission.getId().intValue())))
             .andExpect(jsonPath("$.[*].text").value(hasItem(DEFAULT_TEXT)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].i18n").value(hasItem(DEFAULT_I_18_N)))
+            .andExpect(jsonPath("$.[*].localeKey").value(hasItem(DEFAULT_LOCALE_KEY)))
             .andExpect(jsonPath("$.[*].group").value(hasItem(DEFAULT_GROUP.booleanValue())))
             .andExpect(jsonPath("$.[*].link").value(hasItem(DEFAULT_LINK)))
             .andExpect(jsonPath("$.[*].externalLink").value(hasItem(DEFAULT_EXTERNAL_LINK)))
@@ -1377,7 +1380,7 @@ public class ViewPermissionResourceIT {
         updatedViewPermission
             .text(UPDATED_TEXT)
             .type(UPDATED_TYPE)
-            .i18n(UPDATED_I_18_N)
+            .localeKey(UPDATED_LOCALE_KEY)
             .group(UPDATED_GROUP)
             .link(UPDATED_LINK)
             .externalLink(UPDATED_EXTERNAL_LINK)
@@ -1523,7 +1526,7 @@ public class ViewPermissionResourceIT {
         partialUpdatedViewPermission
             .text(UPDATED_TEXT)
             .type(UPDATED_TYPE)
-            .i18n(UPDATED_I_18_N)
+            .localeKey(UPDATED_LOCALE_KEY)
             .group(UPDATED_GROUP)
             .link(UPDATED_LINK)
             .externalLink(UPDATED_EXTERNAL_LINK)

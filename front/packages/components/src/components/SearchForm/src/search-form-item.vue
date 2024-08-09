@@ -180,7 +180,7 @@ import {
   CheckboxGroup,
   message,
 } from 'ant-design-vue';
-import { TypeOperator } from './filter-operator';
+import { TypeOperator } from './search-form-helper';
 import Icon from '@/components/Icon/Icon.vue';
 import { ApiSelect } from '@/components/Form/index';
 import { ApiTreeSelect } from '@/components/Form/index';

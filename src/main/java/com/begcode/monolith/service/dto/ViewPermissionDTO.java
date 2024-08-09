@@ -1,5 +1,6 @@
 package com.begcode.monolith.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.enumeration.TargetType;
 import com.begcode.monolith.domain.enumeration.ViewPermissionType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,84 +31,98 @@ public class ViewPermissionDTO implements Serializable {
      */
     @NotNull
     @Schema(description = "权限名称", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "权限名称")
     private String text;
 
     /**
      * 权限类型
      */
     @Schema(description = "权限类型")
+    @Excel(name = "权限类型")
     private ViewPermissionType type;
 
     /**
-     * i18n主键
+     * 多语言Key
      */
-    @Schema(description = "i18n主键")
-    private String i18n;
+    @Schema(description = "多语言Key")
+    @Excel(name = "多语言Key")
+    private String localeKey;
 
     /**
      * 显示分组名
      */
     @Schema(description = "显示分组名")
+    @Excel(name = "显示分组名")
     private Boolean group;
 
     /**
      * 路由
      */
     @Schema(description = "路由")
+    @Excel(name = "路由")
     private String link;
 
     /**
      * 外部链接
      */
     @Schema(description = "外部链接")
+    @Excel(name = "外部链接")
     private String externalLink;
 
     /**
      * 链接目标
      */
     @Schema(description = "链接目标")
+    @Excel(name = "链接目标")
     private TargetType target;
 
     /**
      * 图标
      */
     @Schema(description = "图标")
+    @Excel(name = "图标")
     private String icon;
 
     /**
      * 禁用菜单
      */
     @Schema(description = "禁用菜单")
+    @Excel(name = "禁用菜单")
     private Boolean disabled;
 
     /**
      * 隐藏菜单
      */
     @Schema(description = "隐藏菜单")
+    @Excel(name = "隐藏菜单")
     private Boolean hide;
 
     /**
      * 隐藏面包屑
      */
     @Schema(description = "隐藏面包屑")
+    @Excel(name = "隐藏面包屑")
     private Boolean hideInBreadcrumb;
 
     /**
      * 快捷菜单项
      */
     @Schema(description = "快捷菜单项")
+    @Excel(name = "快捷菜单项")
     private Boolean shortcut;
 
     /**
      * 菜单根节点
      */
     @Schema(description = "菜单根节点")
+    @Excel(name = "菜单根节点")
     private Boolean shortcutRoot;
 
     /**
      * 允许复用
      */
     @Schema(description = "允许复用")
+    @Excel(name = "允许复用")
     private Boolean reuse;
 
     /**
@@ -116,48 +131,56 @@ public class ViewPermissionDTO implements Serializable {
      */
     @NotNull
     @Schema(description = "权限代码\n(ROLE_开头)", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "权限代码\n(ROLE_开头)")
     private String code;
 
     /**
      * 权限描述
      */
     @Schema(description = "权限描述")
+    @Excel(name = "权限描述")
     private String description;
 
     /**
      * 排序
      */
     @Schema(description = "排序")
+    @Excel(name = "排序")
     private Integer order;
 
     /**
      * api权限标识串
      */
     @Schema(description = "api权限标识串")
+    @Excel(name = "api权限标识串")
     private String apiPermissionCodes;
 
     /**
      * 组件名称
      */
     @Schema(description = "组件名称")
+    @Excel(name = "组件名称")
     private String componentFile;
 
     /**
      * 重定向路径
      */
     @Schema(description = "重定向路径")
+    @Excel(name = "重定向路径")
     private String redirect;
 
     /**
      * 子节点
      */
     @Schema(description = "子节点")
+    @Excel(name = "子节点")
     private List<ViewPermissionDTO> children = new ArrayList<>();
 
     /**
      * 上级
      */
     @Schema(description = "上级")
+    @Excel(name = "上级")
     private ViewPermissionDTO parent;
 
     private Long parentId;
@@ -179,8 +202,8 @@ public class ViewPermissionDTO implements Serializable {
         return this;
     }
 
-    public ViewPermissionDTO i18n(String i18n) {
-        this.i18n = i18n;
+    public ViewPermissionDTO localeKey(String localeKey) {
+        this.localeKey = localeKey;
         return this;
     }
 
@@ -314,7 +337,7 @@ public class ViewPermissionDTO implements Serializable {
             "id=" + getId() +
             ", text='" + getText() + "'" +
             ", type='" + getType() + "'" +
-            ", i18n='" + getI18n() + "'" +
+            ", localeKey='" + getLocaleKey() + "'" +
             ", group='" + getGroup() + "'" +
             ", link='" + getLink() + "'" +
             ", externalLink='" + getExternalLink() + "'" +

@@ -288,3 +288,15 @@ id;text;i_18_n;group;link;external_link;target;icon;disabled;hide;hide_in_breadc
 387;编辑可视权限;;false;/system/view-permission/:entityId/edit;;SELF;;false;true;false;false;false;false;systemViewPermissionEdit;;MENU;1;;106;system/view-permission/view-permission-edit;
 388;新建可视权限;;false;/system/view-permission/new;;SELF;;false;true;false;false;false;false;systemViewPermissionNew;;MENU;1;;106;system/view-permission/view-permission-edit;
 389;查看可视权限;;false;/system/view-permission/detail;;SELF;;false;true;false;false;false;false;systemViewPermissionDetail;;MENU;1;;106;system/view-permission/view-permission-detail;
+390;任务配置;;false;/taskjob/task-job-config;;SELF;;false;false;false;false;false;false;taskjobTaskJobConfigList;;MENU;1;;340;taskjob/task-job-config/task-job-config-list;
+391;新建任务配置;;false;;;SELF;;false;true;false;false;false;false;taskjob:taskJobConfig:new;;BUTTON;1;;390;;
+392;编辑任务配置;;false;;;SELF;;false;true;false;false;false;false;taskjob:taskJobConfig:edit;;BUTTON;1;;390;;
+393;查看任务配置;;false;;;SELF;;false;true;false;false;false;false;taskjob:taskJobConfig:detail;;BUTTON;1;;390;;
+394;删除任务配置;;false;;;SELF;;false;true;false;false;false;false;taskjob:taskJobConfig:delete;;BUTTON;1;;390;;
+395;导入任务配置;;false;;;SELF;;false;true;false;false;false;false;taskjob:taskJobConfig:import;;BUTTON;1;;390;;
+396;导出任务配置;;false;;;SELF;;false;true;false;false;false;false;taskjob:taskJobConfig:export;;BUTTON;1;;390;;
+397;打印任务配置;;false;;;SELF;;false;true;false;false;false;false;taskjob:taskJobConfig:print;;BUTTON;1;;390;;
+398;列配置任务配置;;false;;;SELF;;false;true;false;false;false;false;taskjob:taskJobConfig:customColumn;;BUTTON;1;;390;;
+399;编辑任务配置;;false;/taskjob/task-job-config/:entityId/edit;;SELF;;false;true;false;false;false;false;taskjobTaskJobConfigEdit;;MENU;1;;340;taskjob/task-job-config/task-job-config-edit;
+400;新建任务配置;;false;/taskjob/task-job-config/new;;SELF;;false;true;false;false;false;false;taskjobTaskJobConfigNew;;MENU;1;;340;taskjob/task-job-config/task-job-config-edit;
+401;查看任务配置;;false;/taskjob/task-job-config/:entityId/detail;;SELF;;false;true;false;false;false;false;taskjobTaskJobConfigDetail;;MENU;1;;340;taskjob/task-job-config/task-job-config-detail;

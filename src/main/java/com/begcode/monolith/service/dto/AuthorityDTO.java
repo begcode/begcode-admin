@@ -1,5 +1,6 @@
 package com.begcode.monolith.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,54 +27,63 @@ public class AuthorityDTO implements Serializable {
      * 角色名称
      */
     @Schema(description = "角色名称")
+    @Excel(name = "角色名称")
     private String name;
 
     /**
      * 角色代号
      */
     @Schema(description = "角色代号")
+    @Excel(name = "角色代号")
     private String code;
 
     /**
      * 信息
      */
     @Schema(description = "信息")
+    @Excel(name = "信息")
     private String info;
 
     /**
      * 排序
      */
     @Schema(description = "排序")
+    @Excel(name = "排序")
     private Integer order;
 
     /**
      * 展示
      */
     @Schema(description = "展示")
+    @Excel(name = "展示")
     private Boolean display;
 
     /**
      * 子节点
      */
     @Schema(description = "子节点")
+    @Excel(name = "子节点")
     private List<AuthorityDTO> children = new ArrayList<>();
 
     /**
      * 菜单列表
      */
     @Schema(description = "菜单列表")
+    @Excel(name = "菜单列表")
     private List<ViewPermissionDTO> viewPermissions = new ArrayList<>();
 
     /**
      * Api权限列表
      */
     @Schema(description = "Api权限列表")
+    @Excel(name = "Api权限列表")
     private List<ApiPermissionDTO> apiPermissions = new ArrayList<>();
 
     /**
      * 上级
      */
     @Schema(description = "上级")
+    @Excel(name = "上级")
     private AuthorityDTO parent;
 
     private Long parentId;

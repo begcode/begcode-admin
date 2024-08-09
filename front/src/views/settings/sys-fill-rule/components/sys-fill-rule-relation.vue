@@ -560,6 +560,8 @@ const relationshipApis: any = {
 const apis = {
   sysFillRuleService: apiService.settings.sysFillRuleService,
   find: apiService.settings.sysFillRuleService.retrieve,
+  import: apiService.settings.sysFillRuleService.importExcel,
+  export: apiService.settings.sysFillRuleService.exportExcel,
   updateRelations: apiService.settings.sysFillRuleService.updateRelations,
 };
 const columns = config.columns();
@@ -648,7 +650,7 @@ const gridOptions = reactive<VxeGridProps>({
     seq: true,
     sort: true,
     filter: true,
-    props: {
+    response: {
       result: 'records',
       total: 'total',
     },
@@ -678,6 +680,11 @@ const gridOptions = reactive<VxeGridProps>({
         return await apis.find(queryParams);
       },
       queryAll: async () => await apis.find({ size: -1 }),
+      import: async ({ file, options }) => {
+        apis.import(file).then(() => {
+          formSearch();
+        });
+      },
     },
   },
   toolbarConfig: {

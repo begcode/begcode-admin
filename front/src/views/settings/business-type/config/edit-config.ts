@@ -43,8 +43,8 @@ const fields = (): FormSchema[] => {
     {
       label: '图标',
       field: 'icon',
-      component: 'Input',
-      componentProps: { type: 'text', clearable: true, placeholder: '请输入图标', style: 'width: 100%' },
+      component: 'IconPicker',
+      componentProps: { placeholder: '请选择图标', style: 'width: 100%' },
       rules: [],
     },
   ];

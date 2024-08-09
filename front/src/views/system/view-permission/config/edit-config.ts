@@ -42,10 +42,10 @@ const fields = (): FormSchema[] => {
       rules: [],
     },
     {
-      label: 'i18n主键',
-      field: 'i18n',
+      label: '多语言Key',
+      field: 'localeKey',
       component: 'Input',
-      componentProps: { type: 'text', clearable: true, placeholder: '请输入i18n主键', style: 'width: 100%' },
+      componentProps: { type: 'text', clearable: true, placeholder: '请输入多语言Key', style: 'width: 100%' },
       rules: [],
     },
     {

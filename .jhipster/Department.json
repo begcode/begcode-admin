@@ -2,6 +2,7 @@
   "aigcs": [],
   "annotations": {
     "changelogDate": "20240101061706",
+    "listBy": "tableEdit",
     "moduleName": "system",
     "skipFakeData": true,
     "skipWebsite": true

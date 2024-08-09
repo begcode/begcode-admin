@@ -1,5 +1,6 @@
 package com.begcode.monolith.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -27,24 +28,28 @@ public class UReportFileDTO implements Serializable {
      */
     @NotNull
     @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "名称")
     private String name;
 
     /**
      * 内容
      */
     @Schema(description = "内容")
+    @Excel(name = "内容")
     private String content;
 
     /**
      * 创建时间
      */
     @Schema(description = "创建时间")
+    @Excel(name = "创建时间")
     private ZonedDateTime createAt;
 
     /**
      * 更新时间
      */
     @Schema(description = "更新时间")
+    @Excel(name = "更新时间")
     private ZonedDateTime updateAt;
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove

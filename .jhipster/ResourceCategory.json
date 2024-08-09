@@ -2,6 +2,7 @@
   "aigcs": [],
   "annotations": {
     "changelogDate": "20240101062206",
+    "listBy": "tableEdit",
     "moduleName": "oss",
     "skipFakeData": true
   },

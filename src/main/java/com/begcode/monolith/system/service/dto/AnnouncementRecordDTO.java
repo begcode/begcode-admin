@@ -1,5 +1,6 @@
 package com.begcode.monolith.system.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.AbstractAuditingEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
@@ -26,48 +27,56 @@ public class AnnouncementRecordDTO extends AbstractAuditingEntity<Long, Announce
      * 通告ID
      */
     @Schema(description = "通告ID")
+    @Excel(name = "通告ID")
     private Long anntId;
 
     /**
      * 用户id
      */
     @Schema(description = "用户id")
+    @Excel(name = "用户id")
     private Long userId;
 
     /**
      * 是否已读
      */
     @Schema(description = "是否已读")
+    @Excel(name = "是否已读")
     private Boolean hasRead;
 
     /**
      * 阅读时间
      */
     @Schema(description = "阅读时间")
+    @Excel(name = "阅读时间")
     private ZonedDateTime readTime;
 
     /**
      * 创建者Id
      */
     @Schema(description = "创建者Id")
+    @Excel(name = "创建者Id")
     private Long createdBy;
 
     /**
      * 创建时间
      */
     @Schema(description = "创建时间")
+    @Excel(name = "创建时间")
     private Instant createdDate;
 
     /**
      * 修改者Id
      */
     @Schema(description = "修改者Id")
+    @Excel(name = "修改者Id")
     private Long lastModifiedBy;
 
     /**
      * 修改时间
      */
     @Schema(description = "修改时间")
+    @Excel(name = "修改时间")
     private Instant lastModifiedDate;
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove

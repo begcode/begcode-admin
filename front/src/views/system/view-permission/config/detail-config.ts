@@ -26,8 +26,8 @@ const fields: DescItem[] = [
     },
   },
   {
-    label: 'i18n主键',
-    field: 'i18n',
+    label: '多语言Key',
+    field: 'localeKey',
   },
   {
     label: '显示分组名',

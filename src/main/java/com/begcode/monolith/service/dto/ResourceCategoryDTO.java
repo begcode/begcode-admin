@@ -1,5 +1,6 @@
 package com.begcode.monolith.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -28,6 +29,7 @@ public class ResourceCategoryDTO implements Serializable {
      */
     @Size(max = 40)
     @Schema(description = "标题")
+    @Excel(name = "标题")
     private String title;
 
     /**
@@ -35,24 +37,28 @@ public class ResourceCategoryDTO implements Serializable {
      */
     @Size(max = 20)
     @Schema(description = "代码")
+    @Excel(name = "代码")
     private String code;
 
     /**
      * 排序
      */
     @Schema(description = "排序")
+    @Excel(name = "排序")
     private Integer orderNumber;
 
     /**
      * 下级列表
      */
     @Schema(description = "下级列表")
+    @Excel(name = "下级列表")
     private List<ResourceCategoryDTO> children = new ArrayList<>();
 
     /**
      * 上级
      */
     @Schema(description = "上级")
+    @Excel(name = "上级")
     private ResourceCategoryDTO parent;
 
     private Long parentId;

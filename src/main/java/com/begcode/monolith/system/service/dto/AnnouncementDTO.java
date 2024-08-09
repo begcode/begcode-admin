@@ -1,5 +1,6 @@
 package com.begcode.monolith.system.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.AbstractAuditingEntity;
 import com.begcode.monolith.domain.enumeration.AnnoBusinessType;
 import com.begcode.monolith.domain.enumeration.AnnoCategory;
@@ -34,36 +35,42 @@ public class AnnouncementDTO extends AbstractAuditingEntity<Long, AnnouncementDT
      */
     @NotNull
     @Schema(description = "标题", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "标题")
     private String title;
 
     /**
      * 摘要
      */
     @Schema(description = "摘要")
+    @Excel(name = "摘要")
     private String summary;
 
     /**
      * 内容
      */
     @Schema(description = "内容")
+    @Excel(name = "内容")
     private String content;
 
     /**
      * 开始时间
      */
     @Schema(description = "开始时间")
+    @Excel(name = "开始时间")
     private ZonedDateTime startTime;
 
     /**
      * 结束时间
      */
     @Schema(description = "结束时间")
+    @Excel(name = "结束时间")
     private ZonedDateTime endTime;
 
     /**
      * 发布人Id
      */
     @Schema(description = "发布人Id")
+    @Excel(name = "发布人Id")
     private Long senderId;
 
     /**
@@ -71,6 +78,7 @@ public class AnnouncementDTO extends AbstractAuditingEntity<Long, AnnouncementDT
      * （L低，M中，H高）
      */
     @Schema(description = "优先级\n（L低，M中，H高）")
+    @Excel(name = "优先级\n（L低，M中，H高）")
     private PriorityLevel priority;
 
     /**
@@ -78,6 +86,7 @@ public class AnnouncementDTO extends AbstractAuditingEntity<Long, AnnouncementDT
      * 通知公告,系统消息
      */
     @Schema(description = "消息类型\n通知公告,系统消息")
+    @Excel(name = "消息类型\n通知公告,系统消息")
     private AnnoCategory category;
 
     /**
@@ -86,6 +95,7 @@ public class AnnouncementDTO extends AbstractAuditingEntity<Long, AnnouncementDT
      */
     @NotNull
     @Schema(description = "通告对象类型\n（USER:指定用户，ALL:全体用户）", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "通告对象类型\n（USER:指定用户，ALL:全体用户）")
     private ReceiverType receiverType;
 
     /**
@@ -93,18 +103,21 @@ public class AnnouncementDTO extends AbstractAuditingEntity<Long, AnnouncementDT
      *
      */
     @Schema(description = "发布状态\n")
+    @Excel(name = "发布状态\n")
     private AnnoSendStatus sendStatus;
 
     /**
      * 发布时间
      */
     @Schema(description = "发布时间")
+    @Excel(name = "发布时间")
     private ZonedDateTime sendTime;
 
     /**
      * 撤销时间
      */
     @Schema(description = "撤销时间")
+    @Excel(name = "撤销时间")
     private ZonedDateTime cancelTime;
 
     /**
@@ -112,54 +125,63 @@ public class AnnouncementDTO extends AbstractAuditingEntity<Long, AnnouncementDT
      * (email:邮件 bpm:流程)
      */
     @Schema(description = "业务类型\n(email:邮件 bpm:流程)")
+    @Excel(name = "业务类型\n(email:邮件 bpm:流程)")
     private AnnoBusinessType businessType;
 
     /**
      * 业务id
      */
     @Schema(description = "业务id")
+    @Excel(name = "业务id")
     private Long businessId;
 
     /**
      * 打开方式
      */
     @Schema(description = "打开方式")
+    @Excel(name = "打开方式")
     private AnnoOpenType openType;
 
     /**
      * 组件/路由 地址
      */
     @Schema(description = "组件/路由 地址")
+    @Excel(name = "组件/路由 地址")
     private String openPage;
 
     /**
      * 指定接收者id
      */
     @Schema(description = "指定接收者id")
+    @Excel(name = "指定接收者id")
     private String receiverIds;
 
     /**
      * 创建者Id
      */
     @Schema(description = "创建者Id")
+    @Excel(name = "创建者Id")
     private Long createdBy;
 
     /**
      * 创建时间
      */
     @Schema(description = "创建时间")
+    @Excel(name = "创建时间")
     private Instant createdDate;
 
     /**
      * 修改者Id
      */
     @Schema(description = "修改者Id")
+    @Excel(name = "修改者Id")
     private Long lastModifiedBy;
 
     /**
      * 修改时间
      */
     @Schema(description = "修改时间")
+    @Excel(name = "修改时间")
     private Instant lastModifiedDate;
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove

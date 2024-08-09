@@ -138,7 +138,7 @@ public class ViewPermissionQueryService implements QueryService<ViewPermission> 
                 keywordsCriteria.order().setEquals(Integer.valueOf(keywords));
             }
             keywordsCriteria.text().setContains(keywords);
-            keywordsCriteria.i18n().setContains(keywords);
+            keywordsCriteria.localeKey().setContains(keywords);
             keywordsCriteria.link().setContains(keywords);
             keywordsCriteria.externalLink().setContains(keywords);
             keywordsCriteria.icon().setContains(keywords);
@@ -186,7 +186,7 @@ public class ViewPermissionQueryService implements QueryService<ViewPermission> 
         fieldNameMap.put("self.id", criteria.getId());
         fieldNameMap.put("self.text", criteria.getText());
         fieldNameMap.put("self.type", criteria.getType());
-        fieldNameMap.put("self.i_18_n", criteria.getI18n());
+        fieldNameMap.put("self.locale_key", criteria.getLocaleKey());
         fieldNameMap.put("self.group", criteria.getGroup());
         fieldNameMap.put("self.link", criteria.getLink());
         fieldNameMap.put("self.external_link", criteria.getExternalLink());

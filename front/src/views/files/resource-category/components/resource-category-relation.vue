@@ -404,6 +404,8 @@ const relationshipApis: any = {
 const apis = {
   resourceCategoryService: apiService.files.resourceCategoryService,
   find: apiService.files.resourceCategoryService.tree,
+  import: apiService.files.resourceCategoryService.importExcel,
+  export: apiService.files.resourceCategoryService.exportExcel,
   updateRelations: apiService.files.resourceCategoryService.updateRelations,
   imagesStats: apiService.files.uploadImageService.stats,
   filesStats: apiService.files.uploadFileService.stats,
@@ -494,7 +496,7 @@ const gridOptions = reactive<VxeGridProps>({
     seq: true,
     sort: true,
     filter: true,
-    props: {
+    response: {
       result: 'records',
       total: 'total',
     },
@@ -524,6 +526,11 @@ const gridOptions = reactive<VxeGridProps>({
         return await apis.find(queryParams);
       },
       queryAll: async () => await apis.find({ size: -1 }),
+      import: async ({ file, options }) => {
+        apis.import(file).then(() => {
+          formSearch();
+        });
+      },
     },
   },
   toolbarConfig: {

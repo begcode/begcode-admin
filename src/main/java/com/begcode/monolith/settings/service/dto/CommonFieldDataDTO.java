@@ -1,5 +1,6 @@
 package com.begcode.monolith.settings.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.enumeration.CommonFieldType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
@@ -25,54 +26,63 @@ public class CommonFieldDataDTO implements Serializable {
      * 名称
      */
     @Schema(description = "名称")
+    @Excel(name = "名称")
     private String name;
 
     /**
      * 字段值
      */
     @Schema(description = "字段值")
+    @Excel(name = "字段值")
     private String value;
 
     /**
      * 字段标题
      */
     @Schema(description = "字段标题")
+    @Excel(name = "字段标题")
     private String label;
 
     /**
      * 字段类型
      */
     @Schema(description = "字段类型")
+    @Excel(name = "字段类型")
     private CommonFieldType valueType;
 
     /**
      * 说明
      */
     @Schema(description = "说明")
+    @Excel(name = "说明")
     private String remark;
 
     /**
      * 排序
      */
     @Schema(description = "排序")
+    @Excel(name = "排序")
     private Integer sortValue;
 
     /**
      * 是否禁用
      */
     @Schema(description = "是否禁用")
+    @Excel(name = "是否禁用")
     private Boolean disabled;
 
     /**
      * 实体名称
      */
     @Schema(description = "实体名称")
+    @Excel(name = "实体名称")
     private String ownerEntityName;
 
     /**
      * 使用实体ID
      */
     @Schema(description = "使用实体ID")
+    @Excel(name = "使用实体ID")
     private Long ownerEntityId;
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove

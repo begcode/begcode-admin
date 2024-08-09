@@ -137,7 +137,6 @@ const statsValue = ref(0);
 
 if (props.statsApi && Object.keys(props.query).length > 0) {
   props.statsApi(props.query).then(res => {
-    console.log('res', res);
     statsValue.value = res;
   });
 }

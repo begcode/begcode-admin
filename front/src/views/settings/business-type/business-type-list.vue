@@ -1,119 +1,174 @@
 <template>
   <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
-  <div>
-    <Card
-      v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
-      title="高级搜索"
-      class="bc-list-search-form-card"
-      :body-style="{ 'padding-top': '12px', 'padding-bottom': '8px' }"
-      :head-style="{ 'min-height': '40px' }"
-    >
-      <template #extra>
-        <Space>
-          <Button type="default" @click="showSearchFormSetting" preIcon="ant-design:setting-outlined" shape="circle" size="small"></Button>
-        </Space>
-      </template>
-      <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" />
-    </Card>
-    <Card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
-      <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents" data-cy="entityTable">
-        <template #toolbar_buttons>
-          <Row :gutter="16">
-            <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
-              <Space>
-                <Input
-                  v-model:value="searchFormConfig.jhiCommonSearchKeywords"
-                  placeholder="请输入关键字"
-                  allow-clear
-                  @change="inputSearch"
-                  @pressEnter="formSearch"
-                  style="width: 280px"
-                  data-cy="listSearchInput"
-                >
-                  <template #prefix>
-                    <Icon icon="ant-design:search-outlined" />
-                  </template>
-                  <template #addonAfter>
-                    <Button type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
-                      >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch" data-cy="listSearchMore"></Icon>
-                    </Button>
-                  </template>
-                </Input>
-                <template v-for="button of gridOptions?.toolbarConfig?.buttons">
-                  <Button v-if="!button.dropdowns">{{ button.name }}</Button>
-                  <Dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
-                    <template #overlay>
-                      <Menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
-                        <MenuItem :key="subButton.name + 's'">
-                          <Icon :icon="subButton.icon"></Icon>
-                          {{ subButton.name }}
-                        </MenuItem>
-                      </Menu>
+  <div style="height: 100%; padding-bottom: 10px">
+    <SplitPanes class="default-theme">
+      <Pane size="50">
+        <Card
+          v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
+          title="高级搜索"
+          class="bc-list-search-form-card"
+          :body-style="{ 'padding-top': '12px', 'padding-bottom': '8px' }"
+          :head-style="{ 'min-height': '40px' }"
+        >
+          <template #extra>
+            <Space>
+              <Button
+                type="default"
+                @click="showSearchFormSetting"
+                preIcon="ant-design:setting-outlined"
+                shape="circle"
+                size="small"
+              ></Button>
+            </Space>
+          </template>
+          <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" />
+        </Card>
+        <Row
+          v-if="fieldSearchValues && fieldSearchValues.length && !searchFormConfig.toggleSearchStatus"
+          style="background-color: #ffffff; padding: 4px; margin: 8px; border-radius: 4px"
+        >
+          <Col :span="24" style="padding-left: 20px">
+            <span>搜索条件：</span>
+            <Space>
+              <Tag closable v-for="fieldVale of fieldSearchValues" @close="closeSearchFieldTag(fieldVale)">
+                {{ fieldVale.title }}: {{ fieldVale.value }}
+              </Tag>
+            </Space>
+          </Col>
+        </Row>
+        <Card :bordered="false" class="bc-list-result-card">
+          <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents" data-cy="entityTable">
+            <template #toolbar_buttons>
+              <Row :gutter="16">
+                <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
+                  <Space>
+                    <Input
+                      v-model:value="searchFormConfig.jhiCommonSearchKeywords"
+                      placeholder="请输入关键字"
+                      allow-clear
+                      @change="inputSearch"
+                      @pressEnter="formSearch"
+                      style="width: 280px"
+                      data-cy="listSearchInput"
+                    >
+                      <template #prefix>
+                        <Icon icon="ant-design:search-outlined" />
+                      </template>
+                      <template #addonAfter>
+                        <Button type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
+                          >查询<Icon
+                            icon="ant-design:filter-outlined"
+                            @click="handleToggleSearch"
+                            data-cy="listSearchMore"
+                            v-if="searchFormConfig.allowSwitch"
+                          ></Icon>
+                        </Button>
+                      </template>
+                    </Input>
+                    <template v-for="button of gridOptions?.toolbarConfig?.buttons">
+                      <Button v-if="!button.dropdowns">{{ button.name }}</Button>
+                      <Dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
+                        <template #overlay>
+                          <Menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
+                            <MenuItem :key="subButton.name + 's'">
+                              <Icon :icon="subButton.icon"></Icon>
+                              {{ subButton.name }}
+                            </MenuItem>
+                          </Menu>
+                        </template>
+                        <Button>
+                          {{ button.name }}
+                          <Icon icon="ant-design:down-outlined" />
+                        </Button>
+                      </Dropdown>
                     </template>
-                    <Button>
-                      {{ button.name }}
-                      <Icon icon="ant-design:down-outlined" />
-                    </Button>
-                  </Dropdown>
-                </template>
-              </Space>
-            </Col>
-          </Row>
-        </template>
-        <template #recordAction="{ row }">
-          <ButtonGroup :row="row" :buttons="rowOperations" @click="rowClick" :ref="el => rowOperationRef('row_operation_' + row.id, el)" />
-        </template>
-      </Grid>
-      <BasicModal
-        v-bind="popupConfig.containerProps"
-        @register="registerModal"
-        @cancel="closeModal"
-        @ok="okModal"
-        v-on="popupConfig.containerEvents"
-      >
-        <component
-          v-if="popupConfig.componentProps.is"
-          v-bind="popupConfig.componentProps"
-          :is="popupConfig.componentProps.is"
-          @cancel="closeModal"
-          @refresh="formSearch"
-          v-on="popupConfig.componentEvents"
-          ref="modalComponentRef"
-        />
-      </BasicModal>
-      <BasicDrawer
-        v-bind="popupConfig.containerProps"
-        @register="registerDrawer"
-        @close="closeDrawer"
-        @ok="okDrawer"
-        v-on="popupConfig.containerEvents"
-      >
-        <component
-          v-if="popupConfig.componentProps.is"
-          v-bind="popupConfig.componentProps"
-          :is="popupConfig.componentProps.is"
-          @cancel="closeDrawer"
-          @refresh="formSearch"
-          v-on="popupConfig.componentEvents"
-          ref="drawerComponentRef"
-        />
-      </BasicDrawer>
-    </Card>
+                  </Space>
+                </Col>
+              </Row>
+            </template>
+            <template #recordAction="{ row }">
+              <ButtonGroup
+                :row="row"
+                :buttons="rowOperations"
+                @click="rowClick"
+                :ref="el => rowOperationRef('row_operation_' + row.id, el)"
+              />
+            </template>
+          </Grid>
+          <BasicModal
+            v-bind="popupConfig.containerProps"
+            @register="registerModal"
+            @cancel="closeModal"
+            @ok="okModal"
+            v-on="popupConfig.containerEvents"
+          >
+            <component
+              v-if="popupConfig.componentProps.is"
+              v-bind="popupConfig.componentProps"
+              :is="popupConfig.componentProps.is"
+              @cancel="closeModal"
+              @refresh="formSearch"
+              v-on="popupConfig.componentEvents"
+              ref="modalComponentRef"
+            />
+          </BasicModal>
+          <BasicDrawer
+            v-bind="popupConfig.containerProps"
+            @register="registerDrawer"
+            @close="closeDrawer"
+            @ok="okDrawer"
+            v-on="popupConfig.containerEvents"
+          >
+            <component
+              v-if="popupConfig.componentProps.is"
+              v-bind="popupConfig.componentProps"
+              :is="popupConfig.componentProps.is"
+              @cancel="closeDrawer"
+              @refresh="formSearch"
+              v-on="popupConfig.componentEvents"
+              ref="drawerComponentRef"
+            />
+          </BasicDrawer>
+        </Card>
+      </Pane>
+      <Pane>
+        <Card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '8px' }">
+          <Tabs defaultActiveKey="baseInfo" type="card" v-if="currentRow">
+            <TabPane key="baseInfo" tab="基本信息">
+              <BusinessTypeEdit :entity-id="currentRow?.id || ''" :form-buttons="['submit', 'reset']" />
+            </TabPane>
+          </Tabs>
+          <Empty description="尚未选择业务类型" v-else />
+        </Card>
+      </Pane>
+    </SplitPanes>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, getCurrentInstance, h, onMounted, toRaw, shallowRef, onUnmounted, watch } from 'vue';
-import { Alert, message, Modal, Space, Card, Divider, Row, Col, Input, Dropdown, Menu, MenuItem } from 'ant-design-vue';
+import { reactive, ref, getCurrentInstance, toRaw, shallowRef, h, computed } from 'vue';
+import { message, Modal, Empty, Space, Card, Row, Col, Input, Dropdown, Menu, MenuItem } from 'ant-design-vue';
 import { VxeGridInstance, VxeGridListeners, VxeGridProps, Grid } from 'vxe-table';
-import { debounce, upperFirst } from 'lodash-es';
+import { debounce, isArray, upperFirst } from 'lodash-es';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { transVxeSorts } from '@/utils/jhipster/sorts';
-import { Button, ButtonGroup, Icon, BasicModal, BasicDrawer, SearchForm, useModalInner, useDrawerInner } from '@begcode/components';
+import {
+  Button,
+  BasicModal,
+  BasicDrawer,
+  Icon,
+  SearchForm,
+  useModalInner,
+  useDrawerInner,
+  ButtonGroup,
+  clearSearchFieldValue,
+  SplitPanes,
+  Pane,
+} from '@begcode/components';
 import { useGo } from '@/hooks/web/usePage';
 import ServerProvider from '@/api-service/index';
 import { useMergeGridProps, useColumnsConfig, useSetOperationColumn, useSetShortcutButtons } from '@/components/VxeTable/src/helper';
-import BusinessTypeForm from './components/form-component.vue';
+import BusinessTypeEdit from './components/form-component.vue';
 import BusinessTypeDetail from './components/detail-component.vue';
 import config from './config/list-config';
 
@@ -127,7 +182,7 @@ const [registerDrawer, { closeDrawer, setDrawerProps }] = useDrawerInner(data =>
   console.log(data);
 });
 const shallowRefs = {
-  BusinessTypeEdit: shallowRef(BusinessTypeForm),
+  BusinessTypeEdit: shallowRef(BusinessTypeEdit),
   BusinessTypeDetail: shallowRef(BusinessTypeDetail),
 };
 const modalComponentRef = ref<any>(null);
@@ -140,6 +195,8 @@ const apis = {
   find: apiService.settings.businessTypeService.retrieve,
   deleteById: apiService.settings.businessTypeService.delete,
   deleteByIds: apiService.settings.businessTypeService.deleteByIds,
+  import: apiService.settings.businessTypeService.importExcel,
+  export: apiService.settings.businessTypeService.exportExcel,
   update: apiService.settings.businessTypeService.update,
 };
 const pageConfig = {
@@ -147,7 +204,8 @@ const pageConfig = {
   baseRouteName: 'systemBusinessType',
 };
 const { columns } = useColumnsConfig(config.columns(), props.selectType, props.gridCustomConfig);
-const xGrid = ref({} as VxeGridInstance);
+const xGrid = ref<VxeGridInstance>();
+const currentRow = computed(() => xGrid.value?.getCurrentRecord() || null);
 const searchFormConfig = reactive<any>({
   fieldList: config.searchForm(),
   toggleSearchStatus: false,
@@ -158,30 +216,17 @@ const searchFormConfig = reactive<any>({
   jhiCommonSearchKeywords: '',
   ...props.searchFormOptions,
 });
+const fieldSearchValues = computed(() => {
+  return searchFormConfig.fieldList
+    .filter(field => !field.hidden)
+    .filter(field => {
+      return field.value !== null && field.value !== undefined && field.value !== '' && !(isArray(field.value) && field.value.length === 0);
+    });
+});
 const rowOperations = ref<any[]>([
   {
-    title: '保存',
-    hide: row => !xGrid.value.isEditByRow(row) || !xGrid.value.props.editConfig?.mode === 'row',
-    name: 'save',
-    type: 'link',
-  },
-  {
-    title: '编辑',
-    hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig?.mode === 'row',
-    name: 'edit',
-    type: 'link',
-  },
-  {
     title: '删除',
-    hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig?.mode === 'row',
     name: 'delete',
-    type: 'link',
-  },
-  {
-    title: '详情',
-    name: 'detail',
-    hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig?.mode === 'row',
-    containerType: 'drawer',
     type: 'link',
   },
 ]);
@@ -256,6 +301,11 @@ const ajax = {
     return await apis.find(queryParams.value);
   },
   queryAll: async () => await apis.find({ size: -1 }),
+  import: async ({ file, options }) => {
+    apis.import(file).then(() => {
+      formSearch();
+    });
+  },
   delete: async records => await apis.deleteByIds(records.body.removeRecords.map(record => record.id)),
 };
 // 表格左上角自定义按钮
@@ -269,7 +319,7 @@ const toolbarButtons = [
   },
 ];
 // 表格右上角自定义按钮
-const toolbarTools = [
+const toolbarTools: any[] = [
   { code: 'new', name: '新增', circle: false, icon: 'vxe-icon-add' },
   { code: 'custom-column', name: '列配置', circle: false, icon: 'vxe-icon-custom-column' },
 ];
@@ -304,10 +354,10 @@ const toolbarClick = ({ code }) => {
       xGrid.value.openCustom();
       break;
     case 'new':
-      popupConfig.needSubmit = true;
       popupConfig.containerProps.title = '新建';
       popupConfig.containerProps.okText = '保存';
       popupConfig.containerProps.cancelText = '取消';
+      popupConfig.needSubmit = true;
       popupConfig.containerProps.showOkBtn = true;
       popupConfig.containerProps.showCancelBtn = true;
       popupConfig.componentProps.is = shallowRefs.BusinessTypeEdit;
@@ -352,6 +402,13 @@ const gridEvents = reactive<VxeGridListeners>({
   toolbarButtonClick: toolbarClick,
   // 表格右上角自定义按钮事件
   toolbarToolClick: toolbarClick,
+  proxyQuery: () => {
+    const $grid = xGrid.value;
+    const rows = $grid.getData();
+    if (rows?.length) {
+      $grid.setCurrentRow(rows[0]);
+    }
+  },
 });
 const okModal = async () => {
   if (popupConfig.needSubmit && modalComponentRef.value) {
@@ -374,9 +431,15 @@ const okDrawer = async () => {
 const formSearch = () => {
   xGrid.value.commitProxy('reload');
 };
+const closeSearchFieldTag = field => {
+  clearSearchFieldValue(field);
+  formSearch();
+};
 const inputSearch = debounce(formSearch, 700);
 const handleToggleSearch = () => {
-  searchFormConfig.toggleSearchStatus = !searchFormConfig.toggleSearchStatus;
+  if (searchFormConfig.allowSwitch) {
+    searchFormConfig.toggleSearchStatus = !searchFormConfig.toggleSearchStatus;
+  }
 };
 const showSearchFormSetting = () => {
   if (searchFormRef.value) {
@@ -391,61 +454,6 @@ const rowClick = ({ name, data, params }) => {
     operation.click(row);
   } else {
     switch (name) {
-      case 'save':
-        break;
-      case 'edit':
-        popupConfig.needSubmit = true;
-        popupConfig.containerProps.title = '编辑业务类型';
-        popupConfig.containerProps.okText = '更新';
-        popupConfig.containerProps.cancelText = '取消';
-        popupConfig.containerProps.showOkBtn = true;
-        popupConfig.containerProps.showCancelBtn = true;
-        popupConfig.componentProps.is = shallowRefs.BusinessTypeEdit;
-        popupConfig.componentProps.entityId = row.id;
-        switch (operation?.containerType || props.editIn) {
-          case 'modal':
-            popupConfig.componentProps.containerType = 'modal';
-            setModalProps({ open: true });
-            break;
-          case 'drawer':
-            popupConfig.componentProps.containerType = 'drawer';
-            setDrawerProps({ open: true });
-            break;
-          case 'route':
-          default:
-            if (pageConfig.baseRouteName) {
-              go({ name: `${pageConfig.baseRouteName}Edit`, params: { entityId: row.id } });
-            } else {
-              console.log('未定义方法');
-            }
-        }
-        break;
-      case 'detail':
-        popupConfig.containerProps.title = '详情';
-        popupConfig.containerProps.cancelText = '关闭';
-        popupConfig.needSubmit = false;
-        popupConfig.containerProps.showOkBtn = false;
-        popupConfig.containerProps.showCancelBtn = true;
-        popupConfig.componentProps.is = shallowRefs.BusinessTypeDetail;
-        popupConfig.componentProps.entityId = row.id;
-        switch (operation?.containerType || 'page') {
-          case 'modal':
-            popupConfig.componentProps.containerType = 'modal';
-            setModalProps({ open: true });
-            break;
-          case 'drawer':
-            popupConfig.componentProps.containerType = 'drawer';
-            setDrawerProps({ open: true });
-            break;
-          case 'page':
-          default:
-            if (pageConfig.baseRouteName) {
-              go({ name: `${pageConfig.baseRouteName}Detail`, params: { entityId: row.id } });
-            } else {
-              console.log('未定义方法');
-            }
-        }
-        break;
       case 'delete':
         Modal.confirm({
           title: `操作提示`,
@@ -466,6 +474,5 @@ const rowClick = ({ name, data, params }) => {
 const getSelectRows = () => {
   return toRaw(selectedRows);
 };
-
 defineExpose({ getSelectRows });
 </script>

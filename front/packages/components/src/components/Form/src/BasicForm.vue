@@ -281,7 +281,7 @@ const formActionType = {
   scrollToField: scrollToField,
 };
 
-const getFormActionBindProps = computed(() => ({ ...getProps.value, ...advanceState }) as InstanceType<typeof FormAction>['$props']);
+const getFormActionBindProps = computed(() => ({ ...advanceState, ...getProps.value }) as InstanceType<typeof FormAction>['$props']);
 
 defineExpose({
   ...formActionType,

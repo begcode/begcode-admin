@@ -40,7 +40,7 @@
         "content": "推送内容",
         "sendTime": "推送时间",
         "sendStatus": "推送状态",
-        "retryNum": "发送次数 超过5次不再发送",
+        "retryNum": "发送次数\n超过5次不再发送",
         "failResult": "推送失败原因",
         "remark": "备注",
         "createdBy": "创建者Id",

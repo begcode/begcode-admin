@@ -75,10 +75,10 @@ const fields = (): FormSchema[] => {
       rules: [],
     },
     {
-      label: '发送次数 超过5次不再发送',
+      label: '发送次数',
       field: 'retryNum',
       component: 'InputNumber',
-      componentProps: { placeholder: '请输入发送次数 超过5次不再发送', controls: false, style: 'width: 100%' },
+      componentProps: { placeholder: '请输入发送次数', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {

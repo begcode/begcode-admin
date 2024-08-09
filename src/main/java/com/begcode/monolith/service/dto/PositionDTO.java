@@ -1,5 +1,6 @@
 package com.begcode.monolith.service.dto;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -27,6 +28,7 @@ public class PositionDTO implements Serializable {
     @NotNull
     @Size(max = 50)
     @Schema(description = "岗位代码", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "岗位代码")
     private String code;
 
     /**
@@ -35,12 +37,14 @@ public class PositionDTO implements Serializable {
     @NotNull
     @Size(max = 50)
     @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "名称")
     private String name;
 
     /**
      * 排序
      */
     @Schema(description = "排序")
+    @Excel(name = "排序")
     private Integer sortNo;
 
     /**
@@ -48,6 +52,7 @@ public class PositionDTO implements Serializable {
      */
     @Size(max = 200)
     @Schema(description = "描述")
+    @Excel(name = "描述")
     private String description;
 
     // jhipster-needle-dto-add-field - JHipster will add fields here, do not remove

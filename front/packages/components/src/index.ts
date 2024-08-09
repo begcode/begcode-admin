@@ -44,7 +44,7 @@ export * from '@/components/InFilter';
 export * from '@/components/Modal';
 export * from '@/components/Page';
 export * from '@/components/Preview';
-export * from '@/components/search-form';
+export * from '@/components/SearchForm';
 export * from '@/components/SelectModal';
 export * from '@/components/SplitPanes';
 export * from '@/components/StrengthMeter';

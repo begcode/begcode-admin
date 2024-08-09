@@ -77,7 +77,7 @@ class ViewPermissionCriteriaTest {
         viewPermissionCriteria.id();
         viewPermissionCriteria.text();
         viewPermissionCriteria.type();
-        viewPermissionCriteria.i18n();
+        viewPermissionCriteria.localeKey();
         viewPermissionCriteria.group();
         viewPermissionCriteria.link();
         viewPermissionCriteria.externalLink();
@@ -107,7 +107,7 @@ class ViewPermissionCriteriaTest {
                 condition.apply(criteria.getId()) &&
                 condition.apply(criteria.getText()) &&
                 condition.apply(criteria.getType()) &&
-                condition.apply(criteria.getI18n()) &&
+                condition.apply(criteria.getLocaleKey()) &&
                 condition.apply(criteria.getGroup()) &&
                 condition.apply(criteria.getLink()) &&
                 condition.apply(criteria.getExternalLink()) &&
@@ -142,7 +142,7 @@ class ViewPermissionCriteriaTest {
                 condition.apply(criteria.getId(), copy.getId()) &&
                 condition.apply(criteria.getText(), copy.getText()) &&
                 condition.apply(criteria.getType(), copy.getType()) &&
-                condition.apply(criteria.getI18n(), copy.getI18n()) &&
+                condition.apply(criteria.getLocaleKey(), copy.getLocaleKey()) &&
                 condition.apply(criteria.getGroup(), copy.getGroup()) &&
                 condition.apply(criteria.getLink(), copy.getLink()) &&
                 condition.apply(criteria.getExternalLink(), copy.getExternalLink()) &&

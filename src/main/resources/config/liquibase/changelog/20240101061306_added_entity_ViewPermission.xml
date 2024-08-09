@@ -20,7 +20,7 @@
             <column name="type" type="varchar(255)" remarks="权限类型">
                 <constraints nullable="true" />
             </column>
-            <column name="i_18_n" type="varchar(255)" remarks="i18n主键">
+            <column name="locale_key" type="varchar(255)" remarks="多语言Key">
                 <constraints nullable="true" />
             </column>
             <column name="group" type="boolean" remarks="显示分组名">
@@ -105,7 +105,7 @@
             <column name="id" type="numeric"/>
             <column name="text" type="string"/>
             <column name="type" type="string"/>
-            <column name="i_18_n" type="string"/>
+            <column name="locale_key" type="string"/>
             <column name="group" type="boolean"/>
             <column name="link" type="string"/>
             <column name="external_link" type="string"/>

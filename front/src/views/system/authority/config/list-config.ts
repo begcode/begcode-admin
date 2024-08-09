@@ -220,6 +220,7 @@ const baseGridOptions = (ajax, toolbarButtons, toolbarTools, pagerLeft): VxeGrid
       keyField: 'id',
       isHover: true,
     },
+    loading: undefined,
     border: true,
     showHeaderOverflow: true,
     showOverflow: true,
@@ -260,8 +261,13 @@ const baseGridOptions = (ajax, toolbarButtons, toolbarTools, pagerLeft): VxeGrid
         left: pagerLeft,
       },
     },
-    importConfig: {},
-    exportConfig: {},
+    importConfig: {
+      remote: true,
+      importMethod: ajax.import,
+    },
+    exportConfig: {
+      columnFilterMethod: ({ column }) => ['radio', 'checkbox'].includes(column.type),
+    },
     checkboxConfig: {
       // labelField: 'id',
       reserve: true,
@@ -287,7 +293,7 @@ const baseGridOptions = (ajax, toolbarButtons, toolbarTools, pagerLeft): VxeGrid
       seq: true,
       sort: true,
       filter: true,
-      props: {
+      response: {
         result: 'records',
         total: 'total',
       },
