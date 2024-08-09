@@ -51,7 +51,7 @@ const saveOrUpdate = async () => {
     if (!formConfigId.value) {
       const { fullPath } = route;
       tabStore.closeTabByKey(fullPath, router).then(() => {
-        go('/system/form-config/' + result.id + '/edit', true);
+        go('/settings/form-config/' + result.id + '/edit', true);
       });
     }
   }

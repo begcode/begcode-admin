@@ -51,7 +51,7 @@ const saveOrUpdate = async () => {
     if (!ossConfigId.value) {
       const { fullPath } = route;
       tabStore.closeTabByKey(fullPath, router).then(() => {
-        go('/oss/oss-config/' + result.id + '/edit', true);
+        go('/files/oss-config/' + result.id + '/edit', true);
       });
     }
   }

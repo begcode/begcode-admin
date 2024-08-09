@@ -11,5 +11,4 @@ id;name;code;description;icon
 10;数据可视;report;数据可视;bar-chart-outline
 11;未分类;;未分类;anticon-file-text
 12;日志管理;log;日志管理;profile-outlined
-13;oss;oss;oss;ant-design:project-outline
-14;taskjob;taskjob;taskjob;ant-design:project-outline
+13;定时任务;taskjob;定时任务;ant-design:project-outline

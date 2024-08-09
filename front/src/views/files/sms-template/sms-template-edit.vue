@@ -51,7 +51,7 @@ const saveOrUpdate = async () => {
     if (!smsTemplateId.value) {
       const { fullPath } = route;
       tabStore.closeTabByKey(fullPath, router).then(() => {
-        go('/system/sms-template/' + result.id + '/edit', true);
+        go('/files/sms-template/' + result.id + '/edit', true);
       });
     }
   }
