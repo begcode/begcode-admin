@@ -739,7 +739,7 @@ public class DepartmentResourceIT {
         Department partialUpdatedDepartment = new Department();
         partialUpdatedDepartment.setId(department.getId());
 
-        partialUpdatedDepartment.contact(UPDATED_CONTACT);
+        partialUpdatedDepartment.name(UPDATED_NAME).address(UPDATED_ADDRESS).contact(UPDATED_CONTACT);
 
         restDepartmentMockMvc
             .perform(

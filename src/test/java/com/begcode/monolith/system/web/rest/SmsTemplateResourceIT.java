@@ -1053,12 +1053,7 @@ public class SmsTemplateResourceIT {
         SmsTemplate partialUpdatedSmsTemplate = new SmsTemplate();
         partialUpdatedSmsTemplate.setId(smsTemplate.getId());
 
-        partialUpdatedSmsTemplate
-            .name(UPDATED_NAME)
-            .sendType(UPDATED_SEND_TYPE)
-            .content(UPDATED_CONTENT)
-            .testJson(UPDATED_TEST_JSON)
-            .type(UPDATED_TYPE);
+        partialUpdatedSmsTemplate.type(UPDATED_TYPE).lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restSmsTemplateMockMvc
             .perform(

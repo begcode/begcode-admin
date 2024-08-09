@@ -606,7 +606,7 @@ public class PositionResourceIT {
         Position partialUpdatedPosition = new Position();
         partialUpdatedPosition.setId(position.getId());
 
-        partialUpdatedPosition.code(UPDATED_CODE).name(UPDATED_NAME);
+        partialUpdatedPosition.sortNo(UPDATED_SORT_NO);
 
         restPositionMockMvc
             .perform(

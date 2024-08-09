@@ -1811,16 +1811,12 @@ public class UploadImageResourceIT {
         partialUpdatedUploadImage.setId(uploadImage.getId());
 
         partialUpdatedUploadImage
-            .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
             .path(UPDATED_PATH)
-            .folder(UPDATED_FOLDER)
-            .businessDesc(UPDATED_BUSINESS_DESC)
-            .businessStatus(UPDATED_BUSINESS_STATUS)
-            .fileSize(UPDATED_FILE_SIZE)
-            .mediumUrl(UPDATED_MEDIUM_URL)
-            .createdDate(UPDATED_CREATED_DATE)
-            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
+            .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
+            .businessTitle(UPDATED_BUSINESS_TITLE)
+            .createAt(UPDATED_CREATE_AT)
+            .referenceCount(UPDATED_REFERENCE_COUNT);
 
         restUploadImageMockMvc
             .perform(

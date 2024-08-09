@@ -927,7 +927,12 @@ public class RegionCodeResourceIT {
         RegionCode partialUpdatedRegionCode = new RegionCode();
         partialUpdatedRegionCode.setId(regionCode.getId());
 
-        partialUpdatedRegionCode.areaCode(UPDATED_AREA_CODE).shortName(UPDATED_SHORT_NAME).lng(UPDATED_LNG).lat(UPDATED_LAT);
+        partialUpdatedRegionCode
+            .name(UPDATED_NAME)
+            .areaCode(UPDATED_AREA_CODE)
+            .mergerName(UPDATED_MERGER_NAME)
+            .lng(UPDATED_LNG)
+            .lat(UPDATED_LAT);
 
         restRegionCodeMockMvc
             .perform(

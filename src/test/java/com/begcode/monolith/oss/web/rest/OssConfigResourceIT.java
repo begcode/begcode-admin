@@ -617,7 +617,7 @@ public class OssConfigResourceIT {
         OssConfig partialUpdatedOssConfig = new OssConfig();
         partialUpdatedOssConfig.setId(ossConfig.getId());
 
-        partialUpdatedOssConfig.provider(UPDATED_PROVIDER).enabled(UPDATED_ENABLED).configData(UPDATED_CONFIG_DATA);
+        partialUpdatedOssConfig.provider(UPDATED_PROVIDER);
 
         restOssConfigMockMvc
             .perform(

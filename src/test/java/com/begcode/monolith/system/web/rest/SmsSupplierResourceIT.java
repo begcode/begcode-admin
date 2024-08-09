@@ -583,7 +583,11 @@ public class SmsSupplierResourceIT {
         SmsSupplier partialUpdatedSmsSupplier = new SmsSupplier();
         partialUpdatedSmsSupplier.setId(smsSupplier.getId());
 
-        partialUpdatedSmsSupplier.configData(UPDATED_CONFIG_DATA).signName(UPDATED_SIGN_NAME);
+        partialUpdatedSmsSupplier
+            .provider(UPDATED_PROVIDER)
+            .configData(UPDATED_CONFIG_DATA)
+            .signName(UPDATED_SIGN_NAME)
+            .remark(UPDATED_REMARK);
 
         restSmsSupplierMockMvc
             .perform(

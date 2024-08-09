@@ -900,7 +900,15 @@ public class CommonFieldDataResourceIT {
         CommonFieldData partialUpdatedCommonFieldData = new CommonFieldData();
         partialUpdatedCommonFieldData.setId(commonFieldData.getId());
 
-        partialUpdatedCommonFieldData.value(UPDATED_VALUE).sortValue(UPDATED_SORT_VALUE).ownerEntityId(UPDATED_OWNER_ENTITY_ID);
+        partialUpdatedCommonFieldData
+            .name(UPDATED_NAME)
+            .value(UPDATED_VALUE)
+            .label(UPDATED_LABEL)
+            .valueType(UPDATED_VALUE_TYPE)
+            .remark(UPDATED_REMARK)
+            .disabled(UPDATED_DISABLED)
+            .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
+            .ownerEntityId(UPDATED_OWNER_ENTITY_ID);
 
         restCommonFieldDataMockMvc
             .perform(

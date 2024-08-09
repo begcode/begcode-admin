@@ -676,7 +676,7 @@ public class DictionaryResourceIT {
         Dictionary partialUpdatedDictionary = new Dictionary();
         partialUpdatedDictionary.setId(dictionary.getId());
 
-        partialUpdatedDictionary.dictName(UPDATED_DICT_NAME).dictKey(UPDATED_DICT_KEY).sortValue(UPDATED_SORT_VALUE);
+        partialUpdatedDictionary.disabled(UPDATED_DISABLED).sortValue(UPDATED_SORT_VALUE).syncEnum(UPDATED_SYNC_ENUM);
 
         restDictionaryMockMvc
             .perform(
