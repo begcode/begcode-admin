@@ -1,4 +1,3 @@
-import { isObject } from 'lodash-es';
 import { HandlerEnum, tabsThemeOptions } from './enum';
 import { MenuTypeEnum, MenuModeEnum } from '@/enums/menuEnum';
 import { updateHeaderBgColor, updateSidebarBgColor } from '@/logics/theme/updateBackground';
@@ -17,9 +16,9 @@ import { ThemeEnum } from '@/enums/appEnum';
 import { APP__THEME__COLOR } from '@/enums/cacheEnum';
 
 export function layoutHandler(event: HandlerEnum, value: any) {
-  const isHTopMenu = isObject(value) && value.type == MenuTypeEnum.TOP_MENU && value.mode == MenuModeEnum.HORIZONTAL;
-  const isMixMenu = isObject(value) && value.type == MenuTypeEnum.MIX && value.mode == MenuModeEnum.INLINE;
-  const isMixSidebarMenu = isObject(value) && value.type == MenuTypeEnum.MIX_SIDEBAR && value.mode == MenuModeEnum.INLINE;
+  const isHTopMenu = _isObject(value) && value.type == MenuTypeEnum.TOP_MENU && value.mode == MenuModeEnum.HORIZONTAL;
+  const isMixMenu = _isObject(value) && value.type == MenuTypeEnum.MIX && value.mode == MenuModeEnum.INLINE;
+  const isMixSidebarMenu = _isObject(value) && value.type == MenuTypeEnum.MIX_SIDEBAR && value.mode == MenuModeEnum.INLINE;
   const appStore = useAppStore();
   const darkMode = appStore.getDarkMode === ThemeEnum.DARK;
   if (isHTopMenu) {

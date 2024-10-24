@@ -1,6 +1,4 @@
-import { toRaw } from 'vue';
 import { defineStore } from 'pinia';
-import { filter } from '@begcode/components';
 import { useUserStore } from './user';
 import { useAppStoreWithOut } from './app';
 import type { AppRouteRecordRaw, Menu } from '@/router/types';
@@ -20,6 +18,7 @@ import DevRoute from '@/router/routes/modules/dev';
 import AccountRoute from '@/router/routes/modules/account';
 import { PAGE_NOT_FOUND_ROUTE } from '@/router/routes/basic';
 
+import { filter } from '@/utils/helper/treeHelper';
 import { toRouteRecords } from '@/utils/jhipster/view-permission-utils';
 import accountService from '@/api-service/account/account.service';
 

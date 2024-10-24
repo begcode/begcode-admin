@@ -9,9 +9,9 @@
       <div class="lg:w-3/10 w-full enter-y">
         <QuickNav :loading="loading" class="enter-y" />
 
-        <Card class="!my-4 enter-y" :loading="loading">
+        <a-card class="!my-4 enter-y" :loading="loading">
           <img class="xl:h-50 h-30 mx-auto" :src="illustratioSvg" />
-        </Card>
+        </a-card>
 
         <SaleRadar :loading="loading" class="enter-y" />
       </div>
@@ -19,9 +19,7 @@
   </PageWrapper>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { Card } from 'ant-design-vue';
-import { PageWrapper } from '@begcode/components';
+import { PageWrapper } from '@/components/Page';
 import WorkbenchHeader from './components/WorkbenchHeader.vue';
 import ProjectCard from './components/ProjectCard.vue';
 import QuickNav from './components/QuickNav.vue';

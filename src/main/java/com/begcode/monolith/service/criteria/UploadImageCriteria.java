@@ -27,11 +27,20 @@ public class UploadImageCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.id")
     private LongFilter id;
 
-    @BindQuery(column = "self.url")
-    private StringFilter url;
-
     @BindQuery(column = "self.full_name")
     private StringFilter fullName;
+
+    @BindQuery(column = "self.business_title")
+    private StringFilter businessTitle;
+
+    @BindQuery(column = "self.business_desc")
+    private StringFilter businessDesc;
+
+    @BindQuery(column = "self.business_status")
+    private StringFilter businessStatus;
+
+    @BindQuery(column = "self.url")
+    private StringFilter url;
 
     @BindQuery(column = "self.name")
     private StringFilter name;
@@ -48,26 +57,17 @@ public class UploadImageCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.folder")
     private StringFilter folder;
 
+    @BindQuery(column = "self.file_size")
+    private LongFilter fileSize;
+
     @BindQuery(column = "self.owner_entity_name")
     private StringFilter ownerEntityName;
 
     @BindQuery(column = "self.owner_entity_id")
     private LongFilter ownerEntityId;
 
-    @BindQuery(column = "self.business_title")
-    private StringFilter businessTitle;
-
-    @BindQuery(column = "self.business_desc")
-    private StringFilter businessDesc;
-
-    @BindQuery(column = "self.business_status")
-    private StringFilter businessStatus;
-
     @BindQuery(column = "self.create_at")
     private ZonedDateTimeFilter createAt;
-
-    @BindQuery(column = "self.file_size")
-    private LongFilter fileSize;
 
     @BindQuery(column = "self.smart_url")
     private StringFilter smartUrl;
@@ -114,20 +114,20 @@ public class UploadImageCriteria implements Serializable, Criteria {
 
     public UploadImageCriteria(UploadImageCriteria other) {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
-        this.url = other.optionalUrl().map(StringFilter::copy).orElse(null);
         this.fullName = other.optionalFullName().map(StringFilter::copy).orElse(null);
+        this.businessTitle = other.optionalBusinessTitle().map(StringFilter::copy).orElse(null);
+        this.businessDesc = other.optionalBusinessDesc().map(StringFilter::copy).orElse(null);
+        this.businessStatus = other.optionalBusinessStatus().map(StringFilter::copy).orElse(null);
+        this.url = other.optionalUrl().map(StringFilter::copy).orElse(null);
         this.name = other.optionalName().map(StringFilter::copy).orElse(null);
         this.ext = other.optionalExt().map(StringFilter::copy).orElse(null);
         this.type = other.optionalType().map(StringFilter::copy).orElse(null);
         this.path = other.optionalPath().map(StringFilter::copy).orElse(null);
         this.folder = other.optionalFolder().map(StringFilter::copy).orElse(null);
+        this.fileSize = other.optionalFileSize().map(LongFilter::copy).orElse(null);
         this.ownerEntityName = other.optionalOwnerEntityName().map(StringFilter::copy).orElse(null);
         this.ownerEntityId = other.optionalOwnerEntityId().map(LongFilter::copy).orElse(null);
-        this.businessTitle = other.optionalBusinessTitle().map(StringFilter::copy).orElse(null);
-        this.businessDesc = other.optionalBusinessDesc().map(StringFilter::copy).orElse(null);
-        this.businessStatus = other.optionalBusinessStatus().map(StringFilter::copy).orElse(null);
         this.createAt = other.optionalCreateAt().map(ZonedDateTimeFilter::copy).orElse(null);
-        this.fileSize = other.optionalFileSize().map(LongFilter::copy).orElse(null);
         this.smartUrl = other.optionalSmartUrl().map(StringFilter::copy).orElse(null);
         this.mediumUrl = other.optionalMediumUrl().map(StringFilter::copy).orElse(null);
         this.referenceCount = other.optionalReferenceCount().map(LongFilter::copy).orElse(null);
@@ -164,25 +164,6 @@ public class UploadImageCriteria implements Serializable, Criteria {
         this.id = id;
     }
 
-    public StringFilter getUrl() {
-        return url;
-    }
-
-    public Optional<StringFilter> optionalUrl() {
-        return Optional.ofNullable(url);
-    }
-
-    public StringFilter url() {
-        if (url == null) {
-            setUrl(new StringFilter());
-        }
-        return url;
-    }
-
-    public void setUrl(StringFilter url) {
-        this.url = url;
-    }
-
     public StringFilter getFullName() {
         return fullName;
     }
@@ -200,6 +181,82 @@ public class UploadImageCriteria implements Serializable, Criteria {
 
     public void setFullName(StringFilter fullName) {
         this.fullName = fullName;
+    }
+
+    public StringFilter getBusinessTitle() {
+        return businessTitle;
+    }
+
+    public Optional<StringFilter> optionalBusinessTitle() {
+        return Optional.ofNullable(businessTitle);
+    }
+
+    public StringFilter businessTitle() {
+        if (businessTitle == null) {
+            setBusinessTitle(new StringFilter());
+        }
+        return businessTitle;
+    }
+
+    public void setBusinessTitle(StringFilter businessTitle) {
+        this.businessTitle = businessTitle;
+    }
+
+    public StringFilter getBusinessDesc() {
+        return businessDesc;
+    }
+
+    public Optional<StringFilter> optionalBusinessDesc() {
+        return Optional.ofNullable(businessDesc);
+    }
+
+    public StringFilter businessDesc() {
+        if (businessDesc == null) {
+            setBusinessDesc(new StringFilter());
+        }
+        return businessDesc;
+    }
+
+    public void setBusinessDesc(StringFilter businessDesc) {
+        this.businessDesc = businessDesc;
+    }
+
+    public StringFilter getBusinessStatus() {
+        return businessStatus;
+    }
+
+    public Optional<StringFilter> optionalBusinessStatus() {
+        return Optional.ofNullable(businessStatus);
+    }
+
+    public StringFilter businessStatus() {
+        if (businessStatus == null) {
+            setBusinessStatus(new StringFilter());
+        }
+        return businessStatus;
+    }
+
+    public void setBusinessStatus(StringFilter businessStatus) {
+        this.businessStatus = businessStatus;
+    }
+
+    public StringFilter getUrl() {
+        return url;
+    }
+
+    public Optional<StringFilter> optionalUrl() {
+        return Optional.ofNullable(url);
+    }
+
+    public StringFilter url() {
+        if (url == null) {
+            setUrl(new StringFilter());
+        }
+        return url;
+    }
+
+    public void setUrl(StringFilter url) {
+        this.url = url;
     }
 
     public StringFilter getName() {
@@ -297,6 +354,25 @@ public class UploadImageCriteria implements Serializable, Criteria {
         this.folder = folder;
     }
 
+    public LongFilter getFileSize() {
+        return fileSize;
+    }
+
+    public Optional<LongFilter> optionalFileSize() {
+        return Optional.ofNullable(fileSize);
+    }
+
+    public LongFilter fileSize() {
+        if (fileSize == null) {
+            setFileSize(new LongFilter());
+        }
+        return fileSize;
+    }
+
+    public void setFileSize(LongFilter fileSize) {
+        this.fileSize = fileSize;
+    }
+
     public StringFilter getOwnerEntityName() {
         return ownerEntityName;
     }
@@ -335,63 +411,6 @@ public class UploadImageCriteria implements Serializable, Criteria {
         this.ownerEntityId = ownerEntityId;
     }
 
-    public StringFilter getBusinessTitle() {
-        return businessTitle;
-    }
-
-    public Optional<StringFilter> optionalBusinessTitle() {
-        return Optional.ofNullable(businessTitle);
-    }
-
-    public StringFilter businessTitle() {
-        if (businessTitle == null) {
-            setBusinessTitle(new StringFilter());
-        }
-        return businessTitle;
-    }
-
-    public void setBusinessTitle(StringFilter businessTitle) {
-        this.businessTitle = businessTitle;
-    }
-
-    public StringFilter getBusinessDesc() {
-        return businessDesc;
-    }
-
-    public Optional<StringFilter> optionalBusinessDesc() {
-        return Optional.ofNullable(businessDesc);
-    }
-
-    public StringFilter businessDesc() {
-        if (businessDesc == null) {
-            setBusinessDesc(new StringFilter());
-        }
-        return businessDesc;
-    }
-
-    public void setBusinessDesc(StringFilter businessDesc) {
-        this.businessDesc = businessDesc;
-    }
-
-    public StringFilter getBusinessStatus() {
-        return businessStatus;
-    }
-
-    public Optional<StringFilter> optionalBusinessStatus() {
-        return Optional.ofNullable(businessStatus);
-    }
-
-    public StringFilter businessStatus() {
-        if (businessStatus == null) {
-            setBusinessStatus(new StringFilter());
-        }
-        return businessStatus;
-    }
-
-    public void setBusinessStatus(StringFilter businessStatus) {
-        this.businessStatus = businessStatus;
-    }
-
     public ZonedDateTimeFilter getCreateAt() {
         return createAt;
     }
@@ -409,25 +428,6 @@ public class UploadImageCriteria implements Serializable, Criteria {
 
     public void setCreateAt(ZonedDateTimeFilter createAt) {
         this.createAt = createAt;
-    }
-
-    public LongFilter getFileSize() {
-        return fileSize;
-    }
-
-    public Optional<LongFilter> optionalFileSize() {
-        return Optional.ofNullable(fileSize);
-    }
-
-    public LongFilter fileSize() {
-        if (fileSize == null) {
-            setFileSize(new LongFilter());
-        }
-        return fileSize;
-    }
-
-    public void setFileSize(LongFilter fileSize) {
-        this.fileSize = fileSize;
     }
 
     public StringFilter getSmartUrl() {
@@ -677,20 +677,20 @@ public class UploadImageCriteria implements Serializable, Criteria {
         final UploadImageCriteria that = (UploadImageCriteria) o;
         return (
             Objects.equals(id, that.id) &&
-            Objects.equals(url, that.url) &&
             Objects.equals(fullName, that.fullName) &&
+            Objects.equals(businessTitle, that.businessTitle) &&
+            Objects.equals(businessDesc, that.businessDesc) &&
+            Objects.equals(businessStatus, that.businessStatus) &&
+            Objects.equals(url, that.url) &&
             Objects.equals(name, that.name) &&
             Objects.equals(ext, that.ext) &&
             Objects.equals(type, that.type) &&
             Objects.equals(path, that.path) &&
             Objects.equals(folder, that.folder) &&
+            Objects.equals(fileSize, that.fileSize) &&
             Objects.equals(ownerEntityName, that.ownerEntityName) &&
             Objects.equals(ownerEntityId, that.ownerEntityId) &&
-            Objects.equals(businessTitle, that.businessTitle) &&
-            Objects.equals(businessDesc, that.businessDesc) &&
-            Objects.equals(businessStatus, that.businessStatus) &&
             Objects.equals(createAt, that.createAt) &&
-            Objects.equals(fileSize, that.fileSize) &&
             Objects.equals(smartUrl, that.smartUrl) &&
             Objects.equals(mediumUrl, that.mediumUrl) &&
             Objects.equals(referenceCount, that.referenceCount) &&
@@ -707,20 +707,20 @@ public class UploadImageCriteria implements Serializable, Criteria {
     public int hashCode() {
         return Objects.hash(
             id,
-            url,
             fullName,
+            businessTitle,
+            businessDesc,
+            businessStatus,
+            url,
             name,
             ext,
             type,
             path,
             folder,
+            fileSize,
             ownerEntityName,
             ownerEntityId,
-            businessTitle,
-            businessDesc,
-            businessStatus,
             createAt,
-            fileSize,
             smartUrl,
             mediumUrl,
             referenceCount,
@@ -738,20 +738,20 @@ public class UploadImageCriteria implements Serializable, Criteria {
     public String toString() {
         return "UploadImageCriteria{" +
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
-            optionalUrl().map(f -> "url=" + f + ", ").orElse("") +
             optionalFullName().map(f -> "fullName=" + f + ", ").orElse("") +
+            optionalBusinessTitle().map(f -> "businessTitle=" + f + ", ").orElse("") +
+            optionalBusinessDesc().map(f -> "businessDesc=" + f + ", ").orElse("") +
+            optionalBusinessStatus().map(f -> "businessStatus=" + f + ", ").orElse("") +
+            optionalUrl().map(f -> "url=" + f + ", ").orElse("") +
             optionalName().map(f -> "name=" + f + ", ").orElse("") +
             optionalExt().map(f -> "ext=" + f + ", ").orElse("") +
             optionalType().map(f -> "type=" + f + ", ").orElse("") +
             optionalPath().map(f -> "path=" + f + ", ").orElse("") +
             optionalFolder().map(f -> "folder=" + f + ", ").orElse("") +
+            optionalFileSize().map(f -> "fileSize=" + f + ", ").orElse("") +
             optionalOwnerEntityName().map(f -> "ownerEntityName=" + f + ", ").orElse("") +
             optionalOwnerEntityId().map(f -> "ownerEntityId=" + f + ", ").orElse("") +
-            optionalBusinessTitle().map(f -> "businessTitle=" + f + ", ").orElse("") +
-            optionalBusinessDesc().map(f -> "businessDesc=" + f + ", ").orElse("") +
-            optionalBusinessStatus().map(f -> "businessStatus=" + f + ", ").orElse("") +
             optionalCreateAt().map(f -> "createAt=" + f + ", ").orElse("") +
-            optionalFileSize().map(f -> "fileSize=" + f + ", ").orElse("") +
             optionalSmartUrl().map(f -> "smartUrl=" + f + ", ").orElse("") +
             optionalMediumUrl().map(f -> "mediumUrl=" + f + ", ").orElse("") +
             optionalReferenceCount().map(f -> "referenceCount=" + f + ", ").orElse("") +

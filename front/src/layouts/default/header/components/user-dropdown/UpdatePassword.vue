@@ -4,9 +4,9 @@
   </BasicModal>
 </template>
 <script lang="ts" setup>
-import { ref, unref } from 'vue';
 import { rules } from '@/utils/helper/validator';
-import { BasicModal, useModalInner, useForm, BasicForm } from '@begcode/components';
+import { BasicModal, useModalInner } from '@/components/Modal';
+import { useForm, BasicForm } from '@/components/Form';
 import { useMessage } from '@/hooks/web/useMessage';
 import accountService from '@/api-service/account/account.service';
 import { useLocaleStore } from '@/store/modules/locale';

@@ -1,4 +1,3 @@
-import { h } from 'vue';
 import { VxeGlobalRendererHandles } from 'vxe-table';
 import { getComponent } from './common';
 

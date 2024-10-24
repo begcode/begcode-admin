@@ -6,6 +6,7 @@
     "listBy": "tableEdit",
     "moduleName": "system",
     "skipFakeData": true,
+    "skipMobile": true,
     "skipWebsite": true
   },
   "applications": "*",

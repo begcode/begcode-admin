@@ -1,5 +1,3 @@
-import { computed, toRaw, unref } from 'vue';
-import { uniqBy } from 'lodash-es';
 import { useRouter } from 'vue-router';
 import type { AppRouteRecordRaw } from '@/router/types';
 
@@ -36,7 +34,7 @@ export function useFrameKeepAlive() {
         res.push(...getAllFramePages(children));
       }
     }
-    res = uniqBy(res, 'name');
+    res = _uniqBy(res, 'name');
     return res;
   }
 

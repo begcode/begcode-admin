@@ -18,19 +18,18 @@
       <BasicForm @register="registerForm" />
 
       <div :class="`${prefixCls}__footer`">
-        <Button type="primary" block class="mt-2" @click="handleLock">
+        <a-button type="primary" block class="mt-2" @click="handleLock">
           {{ t('layout.header.lockScreenBtn') }}
-        </Button>
+        </a-button>
       </div>
     </div>
   </BasicModal>
 </template>
 <script lang="ts" setup>
-import { computed } from 'vue';
-import { Button } from 'ant-design-vue';
 import { useI18n } from '@/hooks/web/useI18n';
-import { useDesign } from '@begcode/components';
-import { BasicModal, useModalInner, BasicForm, useForm } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
+import { BasicModal, useModalInner } from '@/components/Modal';
+import { BasicForm, useForm } from '@/components/Form';
 
 import { useUserStore } from '@/store/modules/user';
 import { useLockStore } from '@/store/modules/lock';

@@ -1,4 +1,3 @@
-import { omit } from 'lodash-es';
 import { TOKEN_KEY, ROLES_KEY, USER_INFO_KEY, DB_DICT_DATA_KEY, TENANT_ID, LOGIN_INFO_KEY, PROJ_CFG_KEY } from '@/enums/cacheEnum';
 
 export interface Cache<V = any> {
@@ -101,7 +100,7 @@ export class Memory<T = any, V = any> {
       item.timeoutId && clearTimeout(item.timeoutId);
     });
     this.cache = {
-      ...omit(this.cache, [TOKEN_KEY, USER_INFO_KEY, ROLES_KEY, DB_DICT_DATA_KEY, TENANT_ID, LOGIN_INFO_KEY, PROJ_CFG_KEY]),
+      ..._omit(this.cache, [TOKEN_KEY, USER_INFO_KEY, ROLES_KEY, DB_DICT_DATA_KEY, TENANT_ID, LOGIN_INFO_KEY, PROJ_CFG_KEY]),
     };
   }
 }

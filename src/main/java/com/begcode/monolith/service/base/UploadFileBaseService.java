@@ -71,7 +71,9 @@ public class UploadFileBaseService<R extends UploadFileRepository, E extends Upl
         log.debug("Request to update UploadFile : {}", uploadFileDTO);
         UploadFile uploadFile = uploadFileMapper.toEntity(uploadFileDTO);
         uploadFile.setCategoryId(
-            Optional.ofNullable(uploadFileDTO.getCategory()).map(resourceCategoryDTO -> resourceCategoryDTO.getId()).orElse(null)
+            Optional.ofNullable(uploadFileDTO.getCategory())
+                .map(categoryResourceCategoryDTO -> categoryResourceCategoryDTO.getId())
+                .orElse(null)
         );
         this.saveOrUpdate(uploadFile);
         return findOne(uploadFile.getId()).orElseThrow();
@@ -92,6 +94,30 @@ public class UploadFileBaseService<R extends UploadFileRepository, E extends Upl
             .map(existingUploadFile -> {
                 uploadFileMapper.partialUpdate(existingUploadFile, uploadFileDTO);
 
+                return existingUploadFile;
+            })
+            .map(tempUploadFile -> {
+                uploadFileRepository.save(tempUploadFile);
+                return uploadFileMapper.toDto(uploadFileRepository.selectById(tempUploadFile.getId()));
+            });
+    }
+
+    /**
+     * copy a uploadFile.
+     *
+     * @param uploadFileDTO the entity to copy.
+     * @return the persisted entity.
+     */
+    @Transactional
+    public Optional<UploadFileDTO> copy(UploadFileDTO uploadFileDTO) {
+        log.debug("Request to partially update UploadFile : {}", uploadFileDTO);
+
+        return uploadFileRepository
+            .findById(uploadFileDTO.getId())
+            .map(existingUploadFile -> {
+                uploadFileMapper.partialUpdate(existingUploadFile, uploadFileDTO);
+
+                existingUploadFile.setId(null);
                 return existingUploadFile;
             })
             .map(tempUploadFile -> {
@@ -162,6 +188,7 @@ public class UploadFileBaseService<R extends UploadFileRepository, E extends Upl
             uploadFileDTO.setPath(upload.getBasePath() + upload.getPath() + upload.getFilename());
             uploadFileDTO.setUrl(upload.getUrl());
             uploadFileDTO.setFileSize(fileSize);
+            uploadFileDTO.setThumb(upload.getUrl());
         } else {
             throw new BadRequestAlertException("Invalid file", "UploadFile", "imagesnull");
         }

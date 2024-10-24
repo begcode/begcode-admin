@@ -65,7 +65,6 @@ public class AuthorityAsserts {
             .as("Verify Authority relationships")
             .satisfies(e -> assertThat(e.getViewPermissions()).as("check viewPermissions").isEqualTo(actual.getViewPermissions()))
             .satisfies(e -> assertThat(e.getApiPermissions()).as("check apiPermissions").isEqualTo(actual.getApiPermissions()))
-            .satisfies(e -> assertThat(e.getParent()).as("check parent").isEqualTo(actual.getParent()))
-            .satisfies(e -> assertThat(e.getDepartments()).as("check departments").isEqualTo(actual.getDepartments()));
+            .satisfies(e -> assertThat(e.getParent()).as("check parent").isEqualTo(actual.getParent()));
     }
 }

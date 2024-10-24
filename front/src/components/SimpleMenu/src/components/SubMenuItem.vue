@@ -12,7 +12,7 @@
       </CollapseTransition>
     </template>
 
-    <Popover
+    <a-popover
       placement="right"
       :overlayClassName="`${prefixCls}-menu-popover`"
       v-else
@@ -43,20 +43,16 @@
           </ul>
         </div>
       </template>
-    </Popover>
+    </a-popover>
   </li>
 </template>
 <script lang="ts" setup>
 import { type TimeoutHandle, type Recordable } from '#/utils.d';
-import type { CSSProperties, PropType } from 'vue';
 import type { SubMenuProvider } from './types';
-import { computed, unref, getCurrentInstance, reactive, provide, onBeforeMount, inject } from 'vue';
-import { useDesign, propTypes } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 import { useMenuItem } from './useMenu';
 import { useSimpleRootMenuContext } from './useSimpleMenuContext';
-import { CollapseTransition, Icon } from '@begcode/components';
-import { Popover } from 'ant-design-vue';
-import { isBoolean, isObject } from 'lodash-es';
+import { CollapseTransition } from '@/components/Transition';
 import { mitt } from '@/utils/mitt';
 
 defineOptions({ name: 'SubMenu' });
@@ -66,8 +62,12 @@ const props = defineProps({
     type: [String, Number] as PropType<string | number>,
     required: true,
   },
-  disabled: propTypes.bool,
-  collapsedShowTitle: propTypes.bool,
+  disabled: {
+    type: Boolean,
+  },
+  collapsedShowTitle: {
+    type: Boolean,
+  },
   isThemeBright: {
     type: Boolean,
     default: false,
@@ -236,11 +236,11 @@ onBeforeMount(() => {
   });
   rootMenuEmitter.on('on-update-opened', (data: boolean | (string | number)[] | Recordable<any>) => {
     if (unref(getCollapse)) return;
-    if (isBoolean(data)) {
+    if (_isBoolean(data)) {
       state.opened = data;
       return;
     }
-    if (isObject(data) && rootProps.accordion) {
+    if (_isObject(data) && rootProps.accordion) {
       const { opened, parent, uidList } = data as Recordable<any>;
       if (parent === instance?.parent) {
         state.opened = opened;

@@ -1,7 +1,4 @@
 <script lang="tsx">
-import type { PropType, CSSProperties } from 'vue';
-
-import { computed, defineComponent, unref, toRef } from 'vue';
 import { BasicMenu } from '@/components/Menu';
 import { SimpleMenu } from '@/components/SimpleMenu';
 import { AppLogo } from '@/components/Application';
@@ -9,27 +6,31 @@ import { AppLogo } from '@/components/Application';
 import { MenuModeEnum, MenuSplitTyeEnum } from '@/enums/menuEnum';
 
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
-import { ScrollContainer } from '@begcode/components';
+import { ScrollContainer } from '@/components/Container';
 
 import { useGo } from '@/hooks/web/usePage';
 import { useSplitMenu } from './useLayoutMenu';
-import { isHttpUrl, openWindow, propTypes } from '@begcode/components';
+import { openWindow } from '@/utils/util';
+import { isHttpUrl } from '@/utils/is';
 import { useRootSetting } from '@/hooks/setting/useRootSetting';
-import { useAppInject } from '@begcode/components';
-import { useDesign } from '@begcode/components';
+import { useAppInject } from '@/hooks/useAppInject';
+import { useDesign } from '@/hooks/web/useDesign';
 import { useLocaleStore } from '@/store/modules/locale';
 
 export default defineComponent({
   name: 'LayoutMenu',
   props: {
-    theme: propTypes.oneOf(['light', 'dark']),
-
+    theme: {
+      type: String as PropType<'light' | 'dark'>,
+    },
     splitType: {
       type: Number as PropType<MenuSplitTyeEnum>,
       default: MenuSplitTyeEnum.NONE,
     },
 
-    isHorizontal: propTypes.bool,
+    isHorizontal: {
+      type: Boolean,
+    },
     // menu Mode
     menuMode: {
       type: [String] as PropType<MenuModeEnum | null>,

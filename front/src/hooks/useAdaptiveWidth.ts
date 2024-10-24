@@ -1,12 +1,9 @@
 /**
  * 自适应宽度构造器
  *
- * @time 2022-4-8
- * @author sunjianlei
  */
-import { ref } from 'vue';
 import { useDebounceFn, tryOnUnmounted } from '@vueuse/core';
-import { useEventListener } from '@begcode/components';
+import { useEventListener } from '@/hooks/event';
 
 // key = js运算符+数字
 const defWidthConfig: configType = {

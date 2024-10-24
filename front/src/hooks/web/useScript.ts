@@ -1,5 +1,3 @@
-import { onMounted, onUnmounted, ref } from 'vue';
-
 interface ScriptOptions {
   src: string;
 }

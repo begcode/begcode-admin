@@ -1,5 +1,5 @@
 <template>
-  <Menu
+  <a-menu
     :selectedKeys="menuState.selectedKeys"
     :defaultSelectedKeys="menuState.defaultSelectedKeys"
     :mode="mode"
@@ -15,21 +15,20 @@
     <template v-for="item in items" :key="item.path">
       <BasicSubMenuItem :item="item" :theme="theme" :isHorizontal="isHorizontal" />
     </template>
-  </Menu>
+  </a-menu>
 </template>
 <script lang="ts" setup>
 import type { MenuState } from './types';
-import { computed, reactive, ref, toRefs, unref, watch } from 'vue';
-import { Menu, MenuProps } from 'ant-design-vue';
+import { MenuProps } from 'ant-design-vue';
 import BasicSubMenuItem from './components/BasicSubMenuItem.vue';
 import { MenuModeEnum, MenuTypeEnum } from '@/enums/menuEnum';
 import { useOpenKeys } from './useOpenKeys';
 import { RouteLocationNormalizedLoaded, useRouter } from 'vue-router';
-import { isFunction } from 'lodash-es';
 import { basicProps } from './props';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
 import { REDIRECT_NAME } from '@/router/constant';
-import { useDesign, isUrl } from '@begcode/components';
+import { isUrl, isFunction } from '@/utils/is';
+import { useDesign } from '@/hooks/web/useDesign';
 import { getCurrentParentPath } from '@/router/menus';
 import { listenerRouteChange } from '@/logics/mitt/routeChange';
 import { getAllParentPath } from '@/router/helper/menuHelper';
@@ -113,7 +112,7 @@ const handleMenuClick: MenuProps['onClick'] = async ({ item, key }) => {
     window.open(key);
     return;
   }
-  if (beforeClickFn && isFunction(beforeClickFn)) {
+  if (beforeClickFn && _isFunction(beforeClickFn)) {
     const flag = await beforeClickFn(key);
     if (!flag) return;
   }

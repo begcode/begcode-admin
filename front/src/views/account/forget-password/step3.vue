@@ -1,16 +1,14 @@
 <template>
-  <Result status="success" title="更改密码成功" :sub-title="getSubTitle">
+  <a-result status="success" title="更改密码成功" :sub-title="getSubTitle">
     <template #extra>
-      <Button key="console" type="primary" @click="finish"> 返回登录 </Button>
+      <a-button key="console" type="primary" @click="finish"> 返回登录 </a-button>
     </template>
-  </Result>
+  </a-result>
 </template>
 <script lang="ts" setup>
-import { computed, unref, onMounted, watchEffect } from 'vue';
-import { Button, Result } from 'ant-design-vue';
 import { useI18n } from '@/hooks/web/useI18n';
 import { useLoginState } from '../login/useLogin';
-import { propTypes, useCountdown } from '@begcode/components';
+import { useCountdown } from '@/components/CountDown';
 import { useUserStore } from '@/store/modules/user';
 
 defineOptions({
@@ -22,7 +20,10 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
-  count: propTypes.number.def(5),
+  count: {
+    type: Number,
+    default: 5,
+  },
 });
 
 const emit = defineEmits(['finish']);

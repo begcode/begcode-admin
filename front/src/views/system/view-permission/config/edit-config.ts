@@ -1,5 +1,5 @@
-import { FormSchema } from '@begcode/components';
 import { useI18n } from '@/hooks/web/useI18n';
+import { FormSchema } from '@/components/Form';
 import apiService from '@/api-service/index';
 
 const viewPermissionService = apiService.system.viewPermissionService;
@@ -200,7 +200,7 @@ const fields = (): FormSchema[] => {
         api: relationshipApis.parent,
         style: 'width: 100%',
         labelInValue: true,
-        fieldNames: { children: 'children', value: 'id', label: 'text' },
+        fieldNames: { children: 'children', key: 'id', title: 'text' },
         resultField: 'records',
         placeholder: '请选择上级',
       },

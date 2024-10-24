@@ -1,7 +1,7 @@
 <template>
-  <Card :loading="loading" :bordered="false" :body-style="{ padding: '0' }">
+  <a-card :loading="loading" :bordered="false" :body-style="{ padding: '0' }">
     <div class="salesCard">
-      <Tabs default-active-key="1" size="large" :tab-bar-style="{ marginBottom: '24px', paddingLeft: '16px' }">
+      <a-tabs default-active-key="1" size="large" :tab-bar-style="{ marginBottom: '24px', paddingLeft: '16px' }">
         <template #rightExtra>
           <div class="extra-wrapper">
             <div class="extra-item">
@@ -10,47 +10,45 @@
               <a>本月</a>
               <a>本年</a>
             </div>
-            <RangePicker :style="{ width: '256px' }" />
+            <a-range-picker :style="{ width: '256px' }" />
           </div>
         </template>
-        <TabPane loading="true" tab="销售额" key="1">
-          <Row>
-            <Col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
+        <a-tab-pane loading="true" tab="销售额" key="1">
+          <a-row>
+            <a-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
               <Bar
                 :chartData="barData"
                 :option="{ title: { text: '', textStyle: { fontWeight: 'lighter' } } }"
                 :seriesColor="seriesColor"
                 height="40vh"
               />
-            </Col>
-            <Col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
+            </a-col>
+            <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
               <RankList title="门店销售排行榜" :list="rankList" />
-            </Col>
-          </Row>
-        </TabPane>
-        <TabPane tab="销售趋势" key="2">
-          <Row>
-            <Col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
+            </a-col>
+          </a-row>
+        </a-tab-pane>
+        <a-tab-pane tab="销售趋势" key="2">
+          <a-row>
+            <a-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
               <Bar
                 :chartData="barData.reverse()"
                 :option="{ title: { text: '', textStyle: { fontWeight: 'lighter' } } }"
                 :seriesColor="seriesColor"
                 height="40vh"
               />
-            </Col>
-            <Col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
+            </a-col>
+            <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
               <RankList title="门店销售排行榜" :list="rankList" />
-            </Col>
-          </Row>
-        </TabPane>
-      </Tabs>
+            </a-col>
+          </a-row>
+        </a-tab-pane>
+      </a-tabs>
     </div>
-  </Card>
+  </a-card>
 </template>
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
-import { Card, Tabs, TabPane, Row, Col, RangePicker } from 'ant-design-vue';
-import { Bar, RankList } from '@begcode/components';
+import { Bar, RankList } from '@/components/chart';
 import { useRootSetting } from '@/hooks/setting/useRootSetting';
 
 defineProps({

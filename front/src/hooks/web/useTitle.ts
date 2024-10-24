@@ -1,4 +1,3 @@
-import { ref, watch, unref } from 'vue';
 import { useTitle as usePageTitle } from '@vueuse/core';
 import { useRouter } from 'vue-router';
 import type { Menu } from '@/router/types';

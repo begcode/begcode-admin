@@ -3,7 +3,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
 import { isOAuth2AppEnv, sysOAuth2Login } from '@/views/account/login/useLogin';
 import { useRouter } from 'vue-router';
 import { PageEnum } from '@/enums/pageEnum';

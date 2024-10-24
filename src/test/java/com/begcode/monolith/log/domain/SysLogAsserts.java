@@ -47,6 +47,7 @@ public class SysLogAsserts {
     public static void assertSysLogUpdatableFieldsEquals(SysLog expected, SysLog actual) {
         assertThat(expected)
             .as("Verify SysLog relevant properties")
+            .satisfies(e -> assertThat(e.getRequestUrl()).as("check requestUrl").isEqualTo(actual.getRequestUrl()))
             .satisfies(e -> assertThat(e.getLogType()).as("check logType").isEqualTo(actual.getLogType()))
             .satisfies(e -> assertThat(e.getLogContent()).as("check logContent").isEqualTo(actual.getLogContent()))
             .satisfies(e -> assertThat(e.getOperateType()).as("check operateType").isEqualTo(actual.getOperateType()))
@@ -54,7 +55,6 @@ public class SysLogAsserts {
             .satisfies(e -> assertThat(e.getUsername()).as("check username").isEqualTo(actual.getUsername()))
             .satisfies(e -> assertThat(e.getIp()).as("check ip").isEqualTo(actual.getIp()))
             .satisfies(e -> assertThat(e.getMethod()).as("check method").isEqualTo(actual.getMethod()))
-            .satisfies(e -> assertThat(e.getRequestUrl()).as("check requestUrl").isEqualTo(actual.getRequestUrl()))
             .satisfies(e -> assertThat(e.getRequestParam()).as("check requestParam").isEqualTo(actual.getRequestParam()))
             .satisfies(e -> assertThat(e.getRequestType()).as("check requestType").isEqualTo(actual.getRequestType()))
             .satisfies(e -> assertThat(e.getCostTime()).as("check costTime").isEqualTo(actual.getCostTime()))

@@ -13,7 +13,7 @@
     "moduleName": "system",
     "publicDto": "id-login-firstName-lastName-email-mobile-birthday-langKey-imageUrl-activated",
     "publicDtoFile": true,
-    "skipComponent": "domain-mapper-controllerTest-serviceClass-restController",
+    "skipComponent": "domain-mapper-controllerTest-serviceClass-restController-appListPage-appEditPage-appDetailPage",
     "skipFakeData": true,
     "skipWebsite": true
   },
@@ -171,7 +171,7 @@
           "annotationOnDestination": "editInList-editByTableModal"
         },
         "source": {
-          "annotationOnSource": "importData"
+          "annotationOnSource": "importData-editInList-editBySelectDrawer"
         }
       },
       "otherEntityField": "name",

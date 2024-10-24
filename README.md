@@ -71,14 +71,14 @@
 - `.jhipster/*.json` - JHipster实体配置文件
 
 - `npmw` - 用于本地安装的npm的包装器
-  JHipster默认使用构建工具在本地安装Node和npm。此包装器确保本地安装npm并使用它，避免了不同版本可能引起的一些差异。通过使用./npmw而不是传统的npm，您可以配置一个无需Node的环境来开发或测试您的应用程序。
+  BegCode默认使用构建工具在本地安装Node和pnpm。此包装器确保本地安装pnpm并使用它，避免了不同版本可能引起的一些差异。通过使用./npmw而不是传统的npm，您可以配置一个无需Node的环境来开发或测试您的应用程序。
 - `/src/main/docker` - 应用程序及其依赖的服务的Docker配置
 
 ## 开发
 
-The build system will install automatically the recommended version of Node and pnpm.
+    构建系统将自动安装推荐的Node和pnpm版本。
+    我们提供了一个包装器来启动 pnpm。
 
-We provide a wrapper to launch pnpm.
 仅当 [package.json](package.json) 中的依赖项发生更改时，您才需要再次运行此命令。
 
 ```
@@ -139,9 +139,9 @@ docker compose -f src/main/docker/jhipster-control-center.yml up
 
 ## 测试
 
-### Spring Boot tests
+### 运行Spring Boot 测试
 
-To launch your application's tests, run:
+要启动应用程序的测试，请运行：
 
 ```
 ./mvnw verify

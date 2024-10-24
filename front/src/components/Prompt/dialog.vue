@@ -1,5 +1,5 @@
 <template>
-  <Modal
+  <a-modal
     v-model:open="open"
     :title="title"
     @ok="handleSubmit"
@@ -11,13 +11,11 @@
     <div class="pt-5 pr-3px">
       <BasicForm @register="register" />
     </div>
-  </Modal>
+  </a-modal>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { Modal } from 'ant-design-vue';
-import { BasicForm, FormSchema, useForm } from '@begcode/components';
+import { BasicForm, FormSchema, useForm } from '@/components/Form';
 
 const props = defineProps<{
   title: string;

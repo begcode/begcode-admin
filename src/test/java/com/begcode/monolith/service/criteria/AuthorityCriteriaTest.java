@@ -85,7 +85,6 @@ class AuthorityCriteriaTest {
         authorityCriteria.apiPermissionsId();
         authorityCriteria.parentId();
         authorityCriteria.usersId();
-        authorityCriteria.departmentId();
         authorityCriteria.distinct();
     }
 
@@ -103,7 +102,6 @@ class AuthorityCriteriaTest {
                 condition.apply(criteria.getApiPermissionsId()) &&
                 condition.apply(criteria.getParentId()) &&
                 condition.apply(criteria.getUsersId()) &&
-                condition.apply(criteria.getDepartmentId()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
         );
@@ -123,7 +121,6 @@ class AuthorityCriteriaTest {
                 condition.apply(criteria.getApiPermissionsId(), copy.getApiPermissionsId()) &&
                 condition.apply(criteria.getParentId(), copy.getParentId()) &&
                 condition.apply(criteria.getUsersId(), copy.getUsersId()) &&
-                condition.apply(criteria.getDepartmentId(), copy.getDepartmentId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"
         );

@@ -1,5 +1,5 @@
-import { colorIsDark, lighten, darken } from '@begcode/components';
 import { setCssVar } from './util';
+import { colorIsDark, lighten, darken } from '@/utils/color';
 import { useAppStore } from '@/store/modules/app';
 import { ThemeEnum } from '@/enums/appEnum';
 import { SIDE_BAR_BG_COLOR_LIST, SIDER_LOGO_BG_COLOR_LIST } from '@/settings/designSetting';

@@ -1,5 +1,5 @@
 <template>
-  <Dropdown placement="bottomLeft" :overlayClassName="`${prefixCls}-dropdown-overlay`">
+  <a-dropdown placement="bottomLeft" :overlayClassName="`${prefixCls}-dropdown-overlay`">
     <span :class="[prefixCls, `${prefixCls}--${theme}`]" class="flex">
       <img :class="`${prefixCls}__header`" :src="getAvatarUrl" />
       <span :class="`${prefixCls}__info hidden md:block`">
@@ -10,9 +10,9 @@
     </span>
 
     <template #overlay>
-      <Menu @click="handleMenuClick">
+      <a-menu @click="handleMenuClick">
         <MenuItem key="doc" :text="t('layout.header.dropdownItemDoc')" icon="ion:document-text-outline" v-if="getShowDoc" />
-        <Menu.Divider v-if="getShowDoc" />
+        <a-menu-divider v-if="getShowDoc" />
         <MenuItem v-if="getShowApi" key="api" :text="t('layout.header.dropdownChangeApi')" icon="ant-design:swap-outlined" />
         <MenuItem key="account" :text="t('layout.header.dropdownItemSwitchAccount')" icon="ant-design:setting-outlined" />
         <MenuItem
@@ -24,16 +24,14 @@
         <!--        <MenuItem key="depart" :text="t('layout.header.dropdownItemSwitchDepart')" icon="ant-design:cluster-outlined" />-->
         <MenuItem v-if="getUseLockPage" key="lock" :text="t('layout.header.tooltipLock')" icon="ion:lock-closed-outline" />
         <MenuItem key="logout" :text="t('layout.header.dropdownItemLoginOut')" icon="ion:power-outline" />
-      </Menu>
+      </a-menu>
     </template>
-  </Dropdown>
+  </a-dropdown>
   <LockAction ref="lockActionRef" @register="register" />
   <ChangeApi @register="registerApi" />
   <UpdatePassword v-if="passwordVisible" ref="updatePasswordRef" />
 </template>
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
-import { Dropdown, Menu } from 'ant-design-vue';
 import type { MenuInfo } from 'ant-design-vue/lib/menu/src/interface';
 
 import { SITE_URL } from '@/settings/siteSetting';
@@ -45,9 +43,10 @@ import { useMessage } from '@/hooks/web/useMessage';
 import { useGo } from '@/hooks/web/usePage';
 
 import headerImg from '@/assets/images/header.jpg';
-import { propTypes, openWindow, useDesign, useModal, createAsyncComponent } from '@begcode/components';
-
-import { getFileAccessHttpUrl, getRefPromise } from '@begcode/components';
+import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
+import { useDesign } from '@/hooks/web/useDesign';
+import { useModal } from '@/components/Modal';
+import { getFileAccessHttpUrl, getRefPromise, openWindow } from '@/utils/util';
 
 type MenuEvent = 'logout' | 'doc' | 'lock' | 'cache' | 'depart' | 'account' | 'password' | 'api';
 
@@ -59,7 +58,9 @@ const ChangeApi = createAsyncComponent(() => import('../ChangeApi/index.vue'));
 defineOptions({ name: 'UserDropdown' });
 
 defineProps({
-  theme: propTypes.oneOf(['dark', 'light']),
+  theme: {
+    type: String as PropType<'light' | 'dark'>,
+  },
 });
 
 const { t } = useI18n();

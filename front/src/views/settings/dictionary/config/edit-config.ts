@@ -1,4 +1,4 @@
-import { FormSchema } from '@begcode/components';
+import { FormSchema } from '@/components/Form';
 import apiService from '@/api-service/index';
 import { useI18n } from '@/hooks/web/useI18n';
 

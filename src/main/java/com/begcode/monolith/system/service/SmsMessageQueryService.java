@@ -162,9 +162,7 @@ public class SmsMessageQueryService implements QueryService<SmsMessage> {
             .entrySet()
             .stream()
             .filter(entry -> entry.getValue() != null)
-            .forEach(entry -> {
-                getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields);
-            });
+            .forEach(entry -> getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields));
         if (CollectionUtils.isNotEmpty(selectFields)) {
             queryWrapper.select(selectFields.toArray(new String[0])).groupBy(CollectionUtils.isNotEmpty(groupByFields), groupByFields);
             return Binder.joinQueryMapsPage(queryWrapper, SmsMessage.class, null).getRecords();

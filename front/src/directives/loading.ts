@@ -1,4 +1,3 @@
-import type { Directive, App } from 'vue';
 import { createLoading } from '@/components/Loading';
 
 const loadingDirective: Directive = {

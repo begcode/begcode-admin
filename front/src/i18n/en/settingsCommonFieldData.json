@@ -27,7 +27,7 @@
       "disabled": "Disabled",
       "ownerEntityName": "Owner Entity Name",
       "ownerEntityId": "Owner Entity Id",
-      "siteConfig": "Site Config",
+      "systemConfig": "System Config",
       "dictionary": "Dictionary",
       "help": {
         "name": "名称",

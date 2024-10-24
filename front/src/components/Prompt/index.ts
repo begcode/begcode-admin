@@ -1,4 +1,3 @@
-import { createVNode, VNode, defineComponent, h, render, reactive } from 'vue';
 import { PromptProps, genFormSchemas } from './state';
 import Dialog from './dialog.vue';
 

@@ -1,5 +1,5 @@
-import { isServer, on } from '@begcode/components';
-import type { ComponentPublicInstance, DirectiveBinding, ObjectDirective } from 'vue';
+import { isServer } from '@/utils/is';
+import { on } from '@/utils/domUtils';
 
 type DocumentHandler = <T extends MouseEvent>(mouseup: T, mousedown: T) => void;
 

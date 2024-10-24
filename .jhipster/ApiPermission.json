@@ -6,6 +6,7 @@
     "microServiceCore": true,
     "moduleName": "system",
     "skipFakeData": true,
+    "skipMobile": true,
     "skipWebsite": true
   },
   "applications": "*",

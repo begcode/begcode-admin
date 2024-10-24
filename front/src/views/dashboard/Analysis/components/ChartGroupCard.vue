@@ -9,22 +9,22 @@
         :class="[index + 1 < 4 && '!md:mr-4']"
       >
         <template #action>
-          <Tooltip title="指标说明">
+          <a-tooltip title="指标说明">
             <Icon :icon="item.icon" :size="20" />
-          </Tooltip>
+          </a-tooltip>
         </template>
         <div v-if="type === 'chart'">
           <Trend term="周同比" :percentage="12" v-if="index === 0" />
           <Trend term="日同比" :percentage="11" v-if="index === 0" :type="false" />
           <Line v-if="index === 1" :option="option" :chartData="chartData" :seriesColor="seriesColor" height="50px" />
           <Bar v-if="index === 2" :option="option" :chartData="chartData" height="50px" :seriesColor="seriesColor" />
-          <Progress v-if="index === 3" :percent="78" :show-info="false"></Progress>
+          <a-progress v-if="index === 3" :percent="78" :show-info="false"></a-progress>
         </div>
         <div v-else>
           <Line v-if="index === 0" :option="option" :chartData="chartData" :seriesColor="seriesColor" height="50px" />
           <Line v-if="index === 1" :option="option" :chartData="chartData" :seriesColor="seriesColor" height="50px" />
           <Bar v-if="index === 2" :option="option" :chartData="chartData" height="50px" :seriesColor="seriesColor" />
-          <Progress v-if="index === 3" :percent="78" :show-info="false"></Progress>
+          <a-progress v-if="index === 3" :percent="78" :show-info="false"></a-progress>
         </div>
         <template #footer v-if="type === 'chart'">
           <span v-if="index !== 3"
@@ -43,9 +43,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
-import { Progress, Tooltip } from 'ant-design-vue';
-import { Icon, ChartCard, Trend, Bar, Line } from '@begcode/components';
+import { ChartCard, Trend, Bar, Line } from '@/components/chart';
 import { chartCardList, bdcCardList } from '../data';
 import { useRootSetting } from '@/hooks/setting/useRootSetting';
 

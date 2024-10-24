@@ -5,9 +5,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.begcode.monolith.domain.ApiPermission;
 import com.begcode.monolith.domain.Authority;
-import com.begcode.monolith.domain.Department;
-import com.begcode.monolith.domain.User;
+import com.begcode.monolith.domain.ViewPermission;
 import com.begcode.monolith.domain.enumeration.SortValueOperateType;
 import com.begcode.monolith.repository.AuthorityRepository;
 import com.begcode.monolith.service.dto.AuthorityDTO;
@@ -69,7 +69,7 @@ public class AuthorityBaseService<R extends AuthorityRepository, E extends Autho
         log.debug("Request to save Authority : {}", authorityDTO);
         Authority authority = authorityMapper.toEntity(authorityDTO);
         clearChildrenCache();
-        this.createOrUpdateAndRelatedRelations(authority, Arrays.asList("viewPermissions", "apiPermissions"));
+        this.createOrUpdateAndRelatedRelations(authority, List.of("viewPermissions", "apiPermissions"));
         return findOne(authority.getId()).orElseThrow();
     }
 
@@ -84,7 +84,7 @@ public class AuthorityBaseService<R extends AuthorityRepository, E extends Autho
         log.debug("Request to update Authority : {}", authorityDTO);
         Authority authority = authorityMapper.toEntity(authorityDTO);
         clearChildrenCache();
-        this.createOrUpdateAndRelatedRelations(authority, Arrays.asList("viewPermissions", "apiPermissions"));
+        this.createOrUpdateAndRelatedRelations(authority, List.of("viewPermissions", "apiPermissions"));
         return findOne(authority.getId()).orElseThrow();
     }
 
@@ -219,30 +219,64 @@ public class AuthorityBaseService<R extends AuthorityRepository, E extends Autho
         relatedIds.forEach(id -> {
             Authority byId = getById(id);
             Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-            if (relationshipName.equals("users")) {
+            if (relationshipName.equals("viewPermissions")) {
                 if (CollectionUtils.isNotEmpty(otherEntityIds)) {
                     List<Long> ids = otherEntityIds.stream().map(Long::valueOf).toList();
-                    List<User> userExist = byId.getUsers();
+                    List<ViewPermission> viewPermissionExist = byId.getViewPermissions();
                     if (operateType.equals("add")) {
                         List<Long> collect = ids
                             .stream()
-                            .filter(relId -> userExist.stream().noneMatch(vp -> vp.getId().equals(relId)))
+                            .filter(relId -> viewPermissionExist.stream().noneMatch(vp -> vp.getId().equals(relId)))
                             .toList();
                         if (CollectionUtils.isNotEmpty(collect)) {
-                            collect.forEach(addId -> userExist.add(new User().id(addId)));
+                            collect.forEach(addId -> viewPermissionExist.add(new ViewPermission().id(addId)));
                             // 更新
-                            this.createOrUpdateAndRelatedRelations(byId, List.of("users"));
+                            this.createOrUpdateAndRelatedRelations(byId, List.of("viewPermissions"));
                         }
                     } else if (operateType.equals("delete")) {
                         List<Long> collect = ids
                             .stream()
-                            .filter(relId -> userExist.stream().anyMatch(vp -> vp.getId().equals(relId)))
+                            .filter(relId -> viewPermissionExist.stream().anyMatch(vp -> vp.getId().equals(relId)))
                             .toList();
                         if (CollectionUtils.isNotEmpty(collect)) {
-                            List<User> userAdd = userExist.stream().filter(vp -> !collect.contains(vp.getId())).toList();
-                            byId.setUsers(userAdd);
+                            List<ViewPermission> viewPermissionAdd = viewPermissionExist
+                                .stream()
+                                .filter(vp -> !collect.contains(vp.getId()))
+                                .toList();
+                            byId.setViewPermissions(viewPermissionAdd);
                             // 更新
-                            this.createOrUpdateAndRelatedRelations(byId, List.of("users"));
+                            this.createOrUpdateAndRelatedRelations(byId, List.of("viewPermissions"));
+                        }
+                    }
+                }
+            }
+            if (relationshipName.equals("apiPermissions")) {
+                if (CollectionUtils.isNotEmpty(otherEntityIds)) {
+                    List<Long> ids = otherEntityIds.stream().map(Long::valueOf).toList();
+                    List<ApiPermission> apiPermissionExist = byId.getApiPermissions();
+                    if (operateType.equals("add")) {
+                        List<Long> collect = ids
+                            .stream()
+                            .filter(relId -> apiPermissionExist.stream().noneMatch(vp -> vp.getId().equals(relId)))
+                            .toList();
+                        if (CollectionUtils.isNotEmpty(collect)) {
+                            collect.forEach(addId -> apiPermissionExist.add(new ApiPermission().id(addId)));
+                            // 更新
+                            this.createOrUpdateAndRelatedRelations(byId, List.of("apiPermissions"));
+                        }
+                    } else if (operateType.equals("delete")) {
+                        List<Long> collect = ids
+                            .stream()
+                            .filter(relId -> apiPermissionExist.stream().anyMatch(vp -> vp.getId().equals(relId)))
+                            .toList();
+                        if (CollectionUtils.isNotEmpty(collect)) {
+                            List<ApiPermission> apiPermissionAdd = apiPermissionExist
+                                .stream()
+                                .filter(vp -> !collect.contains(vp.getId()))
+                                .toList();
+                            byId.setApiPermissions(apiPermissionAdd);
+                            // 更新
+                            this.createOrUpdateAndRelatedRelations(byId, List.of("apiPermissions"));
                         }
                     }
                 }

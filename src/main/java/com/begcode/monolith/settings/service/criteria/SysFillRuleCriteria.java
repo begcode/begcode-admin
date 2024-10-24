@@ -81,10 +81,10 @@ public class SysFillRuleCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.reset_time")
     private ZonedDateTimeFilter resetTime;
 
-    @BindQuery(entity = FillRuleItem.class, column = "id", condition = "id=fill_rule_id")
+    @BindQuery(entity = FillRuleItem.class, column = "id", condition = "fill_rule_id=this.id")
     private LongFilter ruleItemsId;
 
-    @BindQuery(entity = FillRuleItem.class, column = "date_pattern", condition = "id=fill_rule_id")
+    @BindQuery(entity = FillRuleItem.class, column = "date_pattern", condition = "fill_rule_id=this.id")
     private StringFilter ruleItemsDatePattern;
 
     @BindQuery(ignore = true)

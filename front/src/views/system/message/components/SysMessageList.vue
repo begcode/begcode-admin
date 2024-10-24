@@ -1,11 +1,11 @@
 <template>
-  <List item-layout="horizontal" :data-source="messageList">
+  <a-list item-layout="horizontal" :data-source="messageList">
     <template #loadMore>
       <div
         v-if="messageList && messageList.length > 0 && !loadEndStatus && !loadingMoreStatus"
         :style="{ textAlign: 'center', marginTop: '12px', height: '32px', lineHeight: '32px' }"
       >
-        <Button @click="onLoadMore">加载更多</Button>
+        <a-button @click="onLoadMore">加载更多</a-button>
       </div>
       <div
         v-if="messageList && messageList.length > 0 && loadEndStatus"
@@ -16,12 +16,12 @@
     </template>
 
     <template #renderItem="{ item }">
-      <List.Item>
+      <a-list-item>
         <template #actions>
-          <Rate :value="item.starFlag == '1' ? 1 : 0" :count="1" @click="clickStar(item)" style="cursor: pointer" disabled />
+          <a-rate :value="item.starFlag == '1' ? 1 : 0" :count="1" @click="clickStar(item)" style="cursor: pointer" disabled />
         </template>
 
-        <List.Item.Meta :description="item.createTime">
+        <a-list-item-meta :description="item.createTime">
           <template #title>
             <div style="position: relative">
               <span style="display: inline-block; position: absolute; left: -16px">
@@ -29,49 +29,49 @@
               </span>
               <span>{{ getMsgCategory(item) }}</span>
               <span v-if="item.busType == 'bpm'" class="bpm-cuiban-content" v-html="item.content"> </span>
-              <Tooltip v-else>
+              <a-tooltip v-else>
                 <template #title>
                   <div v-html="item.content"></div>
                 </template>
                 {{ item.title }}
-              </Tooltip>
+              </a-tooltip>
 
               <a @click="showMessageDetail(item)" style="margin-left: 16px">查看详情</a>
             </div>
           </template>
           <template #avatar>
             <template v-if="item.busType == 'email'">
-              <Badge dot v-if="noRead(item)" class="msg-no-read">
-                <Avatar style="background: #79919d"><MailOutlined style="font-size: 16px" title="未读消息" /></Avatar>
-              </Badge>
-              <Avatar v-else style="background: #79919d"><MailOutlined style="font-size: 16px" /></Avatar>
+              <a-badge dot v-if="noRead(item)" class="msg-no-read">
+                <a-avatar style="background: #79919d"><MailOutlined style="font-size: 16px" title="未读消息" /></a-avatar>
+              </a-badge>
+              <a-avatar v-else style="background: #79919d"><MailOutlined style="font-size: 16px" /></a-avatar>
             </template>
 
             <template v-else-if="item.busType == 'bpm_task'">
-              <Badge dot v-if="noRead(item)" class="msg-no-read">
-                <Avatar style="background: #79919d"><InteractionOutlined style="font-size: 16px" title="未读消息" /></Avatar>
-              </Badge>
-              <Avatar v-else style="background: #79919d"><InteractionOutlined style="font-size: 16px" /></Avatar>
+              <a-badge dot v-if="noRead(item)" class="msg-no-read">
+                <a-avatar style="background: #79919d"><InteractionOutlined style="font-size: 16px" title="未读消息" /></a-avatar>
+              </a-badge>
+              <a-avatar v-else style="background: #79919d"><InteractionOutlined style="font-size: 16px" /></a-avatar>
             </template>
 
             <template v-else-if="item.busType == 'bpm'">
-              <Badge dot v-if="noRead(item)" class="msg-no-read">
-                <Avatar style="background: #79919d"><AlertOutlined style="font-size: 16px" title="未读消息" /></Avatar>
-              </Badge>
-              <Avatar v-else style="background: #79919d"><AlertOutlined style="font-size: 16px" /></Avatar>
+              <a-badge dot v-if="noRead(item)" class="msg-no-read">
+                <a-avatar style="background: #79919d"><AlertOutlined style="font-size: 16px" title="未读消息" /></a-avatar>
+              </a-badge>
+              <a-avatar v-else style="background: #79919d"><AlertOutlined style="font-size: 16px" /></a-avatar>
             </template>
 
             <template v-else>
-              <Badge dot v-if="noRead(item)" class="msg-no-read">
-                <Avatar style="background: #79919d"><BellFilled style="font-size: 16px" title="未读消息" /></Avatar>
-              </Badge>
-              <Avatar v-else style="background: #79919d"><BellFilled style="font-size: 16px" /></Avatar>
+              <a-badge dot v-if="noRead(item)" class="msg-no-read">
+                <a-avatar style="background: #79919d"><BellFilled style="font-size: 16px" title="未读消息" /></a-avatar>
+              </a-badge>
+              <a-avatar v-else style="background: #79919d"><BellFilled style="font-size: 16px" /></a-avatar>
             </template>
           </template>
-        </List.Item.Meta>
-      </List.Item>
+        </a-list-item-meta>
+      </a-list-item>
     </template>
-  </List>
+  </a-list>
 </template>
 
 <script lang="ts" setup>
@@ -85,7 +85,6 @@ import {
   AlertOutlined,
 } from '@ant-design/icons-vue';
 import { useSysMessage, useMessageHref } from './useSysMessage';
-import { List, Rate, Badge, Avatar, Button, Tooltip } from 'ant-design-vue';
 
 defineOptions({ name: 'SysMessageList' });
 

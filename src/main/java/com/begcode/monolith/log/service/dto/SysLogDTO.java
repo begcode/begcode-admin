@@ -25,6 +25,13 @@ public class SysLogDTO extends AbstractAuditingEntity<Long, SysLogDTO> {
     private Long id;
 
     /**
+     * 请求路径
+     */
+    @Schema(description = "请求路径")
+    @Excel(name = "请求路径")
+    private String requestUrl;
+
+    /**
      * 日志类型
      */
     @Schema(description = "日志类型")
@@ -72,13 +79,6 @@ public class SysLogDTO extends AbstractAuditingEntity<Long, SysLogDTO> {
     @Schema(description = "请求java方法")
     @Excel(name = "请求java方法")
     private String method;
-
-    /**
-     * 请求路径
-     */
-    @Schema(description = "请求路径")
-    @Excel(name = "请求路径")
-    private String requestUrl;
 
     /**
      * 请求参数
@@ -136,6 +136,11 @@ public class SysLogDTO extends AbstractAuditingEntity<Long, SysLogDTO> {
         return this;
     }
 
+    public SysLogDTO requestUrl(String requestUrl) {
+        this.requestUrl = requestUrl;
+        return this;
+    }
+
     public SysLogDTO logType(LogType logType) {
         this.logType = logType;
         return this;
@@ -168,11 +173,6 @@ public class SysLogDTO extends AbstractAuditingEntity<Long, SysLogDTO> {
 
     public SysLogDTO method(String method) {
         this.method = method;
-        return this;
-    }
-
-    public SysLogDTO requestUrl(String requestUrl) {
-        this.requestUrl = requestUrl;
         return this;
     }
 
@@ -239,6 +239,7 @@ public class SysLogDTO extends AbstractAuditingEntity<Long, SysLogDTO> {
     public String toString() {
         return "SysLogDTO{" +
             "id=" + getId() +
+            ", requestUrl='" + getRequestUrl() + "'" +
             ", logType='" + getLogType() + "'" +
             ", logContent='" + getLogContent() + "'" +
             ", operateType='" + getOperateType() + "'" +
@@ -246,7 +247,6 @@ public class SysLogDTO extends AbstractAuditingEntity<Long, SysLogDTO> {
             ", username='" + getUsername() + "'" +
             ", ip='" + getIp() + "'" +
             ", method='" + getMethod() + "'" +
-            ", requestUrl='" + getRequestUrl() + "'" +
             ", requestParam='" + getRequestParam() + "'" +
             ", requestType='" + getRequestType() + "'" +
             ", costTime=" + getCostTime() +

@@ -1,15 +1,12 @@
 <template>
   <span :class="`${prefixCls}__extra-fold`" @click="button.click" v-for="button in shortcutButtons">
-    <Tooltip :title="button.title" placement="bottomRight" color="#108ee9">
+    <a-tooltip :title="button.title" placement="bottomRight" color="#108ee9">
       <Icon :icon="button.icon" :size="18" />
-    </Tooltip>
+    </a-tooltip>
   </span>
 </template>
 <script lang="ts" setup>
-import { Icon } from '@begcode/components';
-import { Tooltip } from 'ant-design-vue';
-
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 
 defineOptions({ name: 'ShortcutButton' });
 const props = defineProps({

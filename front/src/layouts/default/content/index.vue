@@ -4,9 +4,8 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { onMounted, provide } from 'vue';
 import PageLayout from '@/layouts/page/index.vue';
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 import { useRootSetting } from '@/hooks/setting/useRootSetting';
 import { useTransitionSetting } from '@/hooks/setting/useTransitionSetting';
 import { useLayoutHeight } from './useContentViewHeight';

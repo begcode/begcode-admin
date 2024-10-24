@@ -1,22 +1,19 @@
 <template>
-  <Layout :class="prefixCls" v-bind="lockEvents">
+  <a-layout :class="prefixCls" v-bind="lockEvents">
     <LayoutFeatures />
     <LayoutHeader fixed v-if="getShowFullHeaderRef" />
-    <Layout :class="[layoutClass, `${prefixCls}-out`]">
+    <a-layout :class="[layoutClass, `${prefixCls}-out`]">
       <LayoutSideBar v-if="getShowSidebar || getIsMobile" />
-      <Layout :class="`${prefixCls}-main`">
+      <a-layout :class="`${prefixCls}-main`">
         <Suspense><LayoutMultipleHeader /></Suspense>
         <LayoutContent />
         <LayoutFooter />
-      </Layout>
-    </Layout>
-  </Layout>
+      </a-layout>
+    </a-layout>
+  </a-layout>
 </template>
 
 <script lang="ts" setup>
-import { computed, unref } from 'vue';
-import { Layout } from 'ant-design-vue';
-
 import LayoutHeader from './header/index.vue';
 import LayoutContent from './content/index.vue';
 import LayoutSideBar from './sider/index.vue';
@@ -24,7 +21,9 @@ import LayoutMultipleHeader from './header/MultipleHeader.vue';
 
 import { useHeaderSetting } from '@/hooks/setting/useHeaderSetting';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
-import { useDesign, createAsyncComponent, useAppInject } from '@begcode/components';
+import { useAppInject } from '@/hooks/useAppInject';
+import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
+import { useDesign } from '@/hooks/web/useDesign';
 import { useLockPage } from '@/hooks/web/useLockPage';
 
 import { useMultipleTabSetting } from '@/hooks/setting/useMultipleTabSetting';

@@ -1,21 +1,28 @@
 <template>
   <div :class="containerType === 'page' ? ['pb-44px'] : []">
-    <BasicForm ref="formRef" v-bind="formProps"></BasicForm>
-    <Tabs>
-      <TabPane :tab="relationTables.itemsGrid.title" :key="relationTables.itemsGrid.name">
-        <Grid ref="itemsGridRef" v-bind="relationTables.itemsGrid.props"></Grid>
-      </TabPane>
-    </Tabs>
+    <BasicForm ref="formRef" v-bind="formProps" />
+    <a-tabs v-model:active-key="relationTables.activeKey" @change="changeActiveKey">
+      <a-tab-pane
+        :tab="relationTables.itemsRelation.title"
+        :key="relationTables.itemsRelation.name"
+        :disabled="relationTables.itemsRelation.disabled()"
+      >
+        <CommonFieldDataRelation
+          ref="itemsRelationRef"
+          v-bind="relationTables.itemsRelation.props()"
+          v-on="relationTables.itemsRelation.events"
+        >
+        </CommonFieldDataRelation>
+      </a-tab-pane>
+    </a-tabs>
   </div>
 </template>
 <script lang="ts" setup>
-import { getCurrentInstance, reactive, computed, h, ref, watch } from 'vue';
-import { message, Tabs, TabPane } from 'ant-design-vue';
-import { BasicForm } from '@begcode/components';
+import { message } from 'ant-design-vue';
 import config from '../config/edit-config';
 import { Dictionary, IDictionary } from '@/models/settings/dictionary.model';
 import ServerProvider from '@/api-service/index';
-import { Grid, VxeGridProps } from 'vxe-table';
+import CommonFieldDataRelation from '@/views/settings/common-field-data/components/common-field-data-relation.vue';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 defineOptions({
@@ -41,25 +48,27 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+
+const emit = defineEmits(['cancel', 'update-save-button']);
+
 const ctx = getCurrentInstance()?.proxy;
 const formRef = ref<any>(null);
-const itemsGridRef = ref<any>(null);
+const itemsRelationRef = ref<any>(null);
 const apiService = ctx?.$apiService as typeof ServerProvider;
+const dictionaryId = ref<any>(null);
 const dictionary = reactive<IDictionary>(new Dictionary());
-watch(
-  () => props.entityId,
-  async val => {
-    if (val) {
-      const data = await apiService.settings.dictionaryService.find(Number(val)).catch(() => null);
-      if (data) {
-        Object.assign(dictionary, data);
-      }
-    } else {
-      Object.assign(dictionary, props.baseData);
+const getEntityData = async (entityId: string | number) => {
+  if (entityId) {
+    dictionaryId.value = entityId;
+    const data = await apiService.settings.dictionaryService.find(Number(entityId)).catch(() => null);
+    if (data) {
+      Object.assign(dictionary, data);
     }
-  },
-  { immediate: true },
-);
+  } else {
+    Object.assign(dictionary, props.baseData);
+  }
+};
+watch(() => props.entityId, getEntityData, { immediate: true });
 const formItemsConfig = config.fields();
 
 const isEdit = computed(() => {
@@ -68,10 +77,16 @@ const isEdit = computed(() => {
 
 const submitButtonTitlePrefix = props.entityId ? '更新' : '保存';
 const saveOrUpdateApi = props.entityId ? apiService.settings.dictionaryService.update : apiService.settings.dictionaryService.create;
-const submit = async () => {
-  const result = await validate().catch(() => ({ success: false, data: {} }));
+const submit = async (config = { submitToServer: true }) => {
+  const result = await validate().catch(err => {
+    console.log('validate.error:', err);
+    return { success: false, data: {} };
+  });
   if (result.success) {
     Object.assign(dictionary, result.data);
+    if (!config.submitToServer) {
+      return dictionary;
+    }
     const saveData = await saveOrUpdateApi(dictionary).catch(() => false);
     if (saveData) {
       Object.assign(dictionary, saveData);
@@ -92,26 +107,21 @@ const validate = async () => {
     data: {},
     errors: [] as any[],
   };
-  const formValidResult = await formRef.value.validate();
+  const formValidResult = await formRef.value?.validate();
   if (!formValidResult) {
     result.success = false;
     result.errors.push('表单校验未通过！');
   } else {
     result.data = { ...result.data, ...formValidResult };
   }
-
-  const itemsvalidateErrors = await itemsGridRef.value.validate(true);
-  if (!itemsvalidateErrors) {
-    const { fullData } = itemsGridRef.value.getTableData();
-    fullData.forEach(row => {
-      if (typeof row.id === 'string' && row.id.startsWith('row_')) {
-        row.id = null;
-      }
-    });
-    result.data['items'] = fullData;
-  } else {
-    result.errors.push(itemsvalidateErrors);
-    result.success = false;
+  if (itemsRelationRef.value) {
+    const itemsRelationResult = await itemsRelationRef.value?.validate();
+    if (!itemsRelationResult) {
+      result.success = false;
+      result.errors.push('字典项列表校验未通过！');
+    } else {
+      result.data = { ...result.data, ...{ items: itemsRelationResult } };
+    }
   }
   return result;
 };
@@ -150,20 +160,23 @@ const formProps = reactive({
     preIcon: null,
   },
   resetFunc: () => {
-    ctx?.$emit('cancel', { update: false, containerType: props.containerType });
+    emit('cancel', { update: false, containerType: props.containerType });
   },
   submitFunc: submit,
 });
 const relationTables = reactive({
-  itemsGrid: {
-    name: 'itemsGrid',
-    title: '字典项列表列表',
-    props: {
+  activeKey: 'itemsRelation',
+  itemsRelation: {
+    name: 'itemsRelation',
+    title: '字典项列表',
+    props: () => ({
+      cardSlots: [''],
       modelName: 'items',
-      data: dictionary['items'],
+      relationData: toRaw(dictionary['items']),
+      deleteRelationType: 'delete',
       columns: config.itemsColumns(),
-      border: true,
-      showOverflow: true,
+      query: { ownerEntityName: 'Dictionary', ownerEntityId: dictionaryId.value },
+      baseData: { ownerEntityName: 'Dictionary', ownerEntityId: dictionaryId.value },
       editConfig: {
         trigger: 'click',
         mode: 'row',
@@ -188,27 +201,38 @@ const relationTables = reactive({
         }
       },
       fieldMapToTime: [],
-      compact: true,
       size: 'default',
       disabled: !isEdit.value,
-      toolbarConfig: {
-        buttons: [
-          { code: 'insert_actived', name: '新增', icon: 'fa fa-plus' },
-          { code: 'remove', name: '删除', icon: 'fa fa-trash-o' },
-        ],
-        // 表格右上角自定义按钮
-        tools: [
-          // { code: 'myPrint', name: '自定义打印' }
-        ],
-        import: false,
-        export: false,
-        print: false,
-        custom: false,
+      updateType: 'emitSelected',
+      gridOptions: {
+        toolbarConfig: {
+          // buttons未配置表示使用组件原有的，如果配置了，以配置为主。通过code进行比较
+          // buttons: [],
+
+          import: false,
+          export: false,
+          print: false,
+          custom: false,
+          // 表格右上角自定义按钮, tools未配置表示使用组件原有的，如果配置了，以配置为主。通过code进行比较
+          tools: ['new'],
+        },
       },
-    } as VxeGridProps,
+    }),
     slots: {},
+    events: {
+      updateRelationData: data => {
+        dictionary.items = data;
+      },
+    },
+    disabled: () => {
+      return !dictionary.id;
+    },
   },
 });
+function changeActiveKey(activeKey: string) {
+  relationTables.activeKey = activeKey;
+  emit('update-save-button', true);
+}
 watch(dictionary, val => {
   formRef.value?.setFieldsValue(val);
 });

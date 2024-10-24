@@ -6,7 +6,9 @@
 </template>
 <script lang="ts" setup>
 import SettingDrawer from '@/layouts/default/setting/SettingDrawer';
-import { Icon, useDrawer, useDesign } from '@begcode/components';
+import { Icon } from '@/components/Icon';
+import { useDrawer } from '@/components/Drawer';
+import { useDesign } from '@/hooks/web/useDesign';
 
 defineOptions({ name: 'SettingButton' });
 

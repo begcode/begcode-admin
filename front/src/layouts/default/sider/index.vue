@@ -1,5 +1,5 @@
 <template>
-  <Drawer
+  <a-drawer
     v-if="getIsMobile"
     placement="left"
     :class="prefixCls"
@@ -9,7 +9,7 @@
     @close="handleClose"
   >
     <Sider />
-  </Drawer>
+  </a-drawer>
   <MixSider v-else-if="getIsMixSidebar" />
   <Sider v-else />
 </template>
@@ -17,11 +17,10 @@
 <script lang="ts" setup>
 import Sider from './LayoutSider.vue';
 import MixSider from './MixSider.vue';
-import { Drawer } from 'ant-design-vue';
 
-import { useAppInject } from '@begcode/components';
+import { useAppInject } from '@/hooks/useAppInject';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 
 defineOptions({ name: 'SiderWrapper' });
 

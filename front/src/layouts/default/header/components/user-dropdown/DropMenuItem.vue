@@ -1,21 +1,21 @@
 <template>
-  <Menu.Item :key="itemKey">
+  <a-menu-item :key="itemKey">
     <span class="flex items-center">
       <Icon :icon="icon" class="mr-1" />
       <span>{{ text }}</span>
     </span>
-  </Menu.Item>
+  </a-menu-item>
 </template>
 <script lang="ts" setup>
-import { computed, getCurrentInstance } from 'vue';
-import { Menu } from 'ant-design-vue';
-import { Icon, propTypes } from '@begcode/components';
-
 defineOptions({ name: 'DropdownMenuItem' });
 
 const props = defineProps({
-  text: propTypes.string,
-  icon: propTypes.string,
+  text: {
+    type: String,
+  },
+  icon: {
+    type: String,
+  },
 });
 
 const instance = getCurrentInstance();

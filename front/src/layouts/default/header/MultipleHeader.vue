@@ -6,8 +6,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { unref, computed, CSSProperties } from 'vue';
-
 import LayoutHeader from './index.vue';
 import MultipleTabs from '../tabs/index.vue';
 
@@ -15,7 +13,8 @@ import { useHeaderSetting } from '@/hooks/setting/useHeaderSetting';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
 import { useFullContent } from '@/hooks/web/useFullContent';
 import { useMultipleTabSetting } from '@/hooks/setting/useMultipleTabSetting';
-import { useAppInject, useDesign } from '@begcode/components';
+import { useAppInject } from '@/hooks/useAppInject';
+import { useDesign } from '@/hooks/web/useDesign';
 import { useLayoutHeight } from '../content/useContentViewHeight';
 import { TabsThemeEnum } from '@/enums/appEnum';
 import { useMultipleTabStore } from '@/store/modules/multipleTab';

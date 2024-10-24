@@ -1,10 +1,10 @@
 <template>
-  <List :class="prefixCls">
-    <Row :gutter="16">
+  <a-list :class="prefixCls">
+    <a-row :gutter="16">
       <template v-for="item in applicationList" :key="item.title">
-        <Col :span="6">
-          <ListItem>
-            <Card :hoverable="true" :class="`${prefixCls}__card`">
+        <a-col :span="6">
+          <a-list-item>
+            <a-card :hoverable="true" :class="`${prefixCls}__card`">
               <div :class="`${prefixCls}__card-title`">
                 <Icon class="icon" v-if="item.icon" :icon="item.icon" :color="item.color" />
                 {{ item.title }}
@@ -16,19 +16,16 @@
                 新增用户：<span>{{ item.new }}</span>
               </div>
               <Icon :class="`${prefixCls}__card-download`" v-if="item.download" :icon="item.download" />
-            </Card>
-          </ListItem>
-        </Col>
+            </a-card>
+          </a-list-item>
+        </a-col>
       </template>
-    </Row>
-  </List>
+    </a-row>
+  </a-list>
 </template>
 <script lang="ts" setup>
-import { List, Card, Row, Col } from 'ant-design-vue';
-import { Icon } from '@begcode/components';
 import { applicationList } from './data';
 
-const ListItem = List.Item;
 const prefixCls = 'account-center-application';
 </script>
 <style lang="less">

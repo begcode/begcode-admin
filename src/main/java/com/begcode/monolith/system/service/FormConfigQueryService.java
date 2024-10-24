@@ -143,6 +143,8 @@ public class FormConfigQueryService implements QueryService<FormConfig> {
         fieldNameMap.put("self.id", criteria.getId());
         fieldNameMap.put("self.form_key", criteria.getFormKey());
         fieldNameMap.put("self.form_name", criteria.getFormName());
+        fieldNameMap.put("self.form_type", criteria.getFormType());
+        fieldNameMap.put("self.multi_items", criteria.getMultiItems());
         fieldNameMap.put("self.created_by", criteria.getCreatedBy());
         fieldNameMap.put("self.created_date", criteria.getCreatedDate());
         fieldNameMap.put("self.last_modified_by", criteria.getLastModifiedBy());
@@ -151,9 +153,7 @@ public class FormConfigQueryService implements QueryService<FormConfig> {
             .entrySet()
             .stream()
             .filter(entry -> entry.getValue() != null)
-            .forEach(entry -> {
-                getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields);
-            });
+            .forEach(entry -> getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields));
         if (CollectionUtils.isNotEmpty(selectFields)) {
             queryWrapper.select(selectFields.toArray(new String[0])).groupBy(CollectionUtils.isNotEmpty(groupByFields), groupByFields);
             return Binder.joinQueryMapsPage(queryWrapper, FormConfig.class, null).getRecords();

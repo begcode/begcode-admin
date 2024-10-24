@@ -1,26 +1,5 @@
-import {
-  AsyncComponentLoader,
-  Component,
-  ComponentPublicInstance,
-  defineAsyncComponent,
-  // FunctionalComponent, CSSProperties
-} from 'vue';
 import { Spin } from 'ant-design-vue';
-import { noop } from '@begcode/components';
-
-// const Loading: FunctionalComponent<{ size: 'small' | 'default' | 'large' }> = (props) => {
-//   const style: CSSProperties = {
-//     position: 'absolute',
-//     display: 'flex',
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//   };
-//   return (
-//     <div style={style}>
-//       <Spin spinning={true} size={props.size} />
-//     </div>
-//   );
-// };
+import { noop } from '@/utils/util';
 
 interface Options {
   size?: 'default' | 'small' | 'large';

@@ -2,6 +2,7 @@
 @skipFakeData
 @moduleName(oss)
 @listBy(tableEdit)
+@skipComponent(appEditPage-appListPage-appDetailPage)
 entity ResourceCategory {
     title String maxlength(40) /** 标题 */
     code String maxlength(20) /** 代码 */
@@ -14,18 +15,25 @@ entity ResourceCategory {
 @skipRestApi(create)
 @moduleName(oss)
 @extendAbstractAuditingEntity
-@skipWebButton(listAdd-listEdit)
+@skipWebButton(listEdit)
 @replaceListComponentMethod(newEntity)
 @listBy(list)
+@skipComponent(appEditPage)
+@mobileConfig(addToHomeMenu-addToHomeRecommend-addToUserMenu-addToHomeRank-detailWithRecommend)
+@filterByTree(category)
+@Features(copy-createBySelf)
 entity UploadFile {
-    @endUsed(selectFile)
-    url String required /** Url地址 */
     /**
      * 完整文件名
      * 不含路径
      */
     @fieldConfig(hideInForm)
     fullName String
+    businessTitle String /** 业务标题 */
+    businessDesc String /** 业务自定义描述内容 */
+    businessStatus String /** 业务状态 */
+    @endUsed(selectFile)
+    url String required /** Url地址 */
     /**
      * 文件名
      * 不含扩展名
@@ -33,7 +41,10 @@ entity UploadFile {
     @fieldConfig(hideInForm)
     name String
     @fieldConfig(hideInForm)
+    @displayAs(thumb)
     thumb String /** 缩略图Url地址 */
+    @fieldConfig(hideInForm)
+    fileSize Long /** 文件大小 */
     @fieldConfig(hideInForm)
     ext String /** 扩展名 */
     @fieldConfig(hideInForm)
@@ -48,13 +59,8 @@ entity UploadFile {
     @ownerEntityId
     @fieldConfig(hideInList-hideInForm)
     ownerEntityId Long /** 使用实体ID */
-    businessTitle String /** 业务标题 */
-    businessDesc String /** 业务自定义描述内容 */
-    businessStatus String /** 业务状态 */
     @fieldConfig(hideInForm)
     createAt ZonedDateTime /** 创建时间 */
-    @fieldConfig(hideInForm)
-    fileSize Long /** 文件大小 */
     @fieldConfig(hideInForm)
     referenceCount Long /** 被引次数 */
 }
@@ -65,18 +71,26 @@ entity UploadFile {
 @skipRestApi(create)
 @moduleName(oss)
 @extendAbstractAuditingEntity
-@skipWebButton(listAdd-listEdit)
+@skipWebButton(listEdit)
 @replaceListComponentMethod(newEntity)
 @listBy(list)
+@skipComponent(appEditPage)
+@mobileConfig(addToHomeMenu-addToUserMenu-addToHomeRecommend-detailWithRecommend)
+@filterByTree(category)
+@Features(copy-createBySelf)
 entity UploadImage {
-    @endUsed(selectFile)
-    url String required /** Url地址 */
     /**
      * 完整文件名
      * 不含路径
      */
     @fieldConfig(hideInForm)
     fullName String
+    businessTitle String /** 业务标题 */
+    businessDesc String /** 业务自定义描述内容 */
+    businessStatus String /** 业务状态 */
+    @endUsed(selectFile)
+    @displayAs(cover)
+    url String required /** Url地址 */
     /**
      * 文件名
      * 不含扩展名
@@ -92,16 +106,13 @@ entity UploadImage {
     @fieldConfig(hideInForm)
     folder String /** 本地存储目录 */
     @fieldConfig(hideInForm)
+    fileSize Long /** 文件大小 */
+    @fieldConfig(hideInForm)
     ownerEntityName String /** 使用实体名称 */
     @fieldConfig(hideInForm)
     ownerEntityId Long /** 使用实体ID */
-    businessTitle String /** 业务标题 */
-    businessDesc String /** 业务自定义描述内容 */
-    businessStatus String /** 业务状态 */
     @fieldConfig(hideInForm)
     createAt ZonedDateTime /** 创建时间 */
-    @fieldConfig(hideInForm)
-    fileSize Long /** 文件大小 */
     @fieldConfig(hideInForm)
     smartUrl String /** 小图Url */
     @fieldConfig(hideInForm)
@@ -145,6 +156,7 @@ relationship ManyToOne {
 @entityPackage(oss)
 @addCustomMethod(service)
 @skipWebsite
+@skipMobile
 entity OssConfig {
     provider OssProvider required /** 提供商 */
     platform String required maxlength(40) unique /** 平台 */

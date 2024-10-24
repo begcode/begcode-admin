@@ -1,7 +1,7 @@
 <template>
   <div class="md:flex">
     <template v-for="(item, index) in growCardList" :key="item.title">
-      <Card
+      <a-card
         size="small"
         :loading="loading"
         :title="item.title"
@@ -10,7 +10,7 @@
         :canExpand="false"
       >
         <template #extra>
-          <Tag :color="item.color">{{ item.action }}</Tag>
+          <a-tag :color="item.color">{{ item.action }}</a-tag>
         </template>
 
         <div class="py-4 px-4 flex justify-between">
@@ -22,13 +22,11 @@
           <span>总{{ item.title }}</span>
           <CountTo prefix="$" :startVal="1" :endVal="item.total" />
         </div>
-      </Card>
+      </a-card>
     </template>
   </div>
 </template>
 <script lang="ts" setup>
-import { CountTo, Icon } from '@begcode/components';
-import { Tag, Card } from 'ant-design-vue';
 import { growCardList } from '../data';
 
 defineProps({

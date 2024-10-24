@@ -5,8 +5,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, unref } from 'vue';
-import { BasicModal, useModalInner, BasicForm, useForm } from '@begcode/components';
+import { BasicModal, useModalInner } from '@/components/Modal';
+import { BasicForm, useForm } from '@/components/Form';
 import { formSchema } from '../UserSetting.data';
 import { userEdit } from '../UserSetting.api';
 import { useUserStore } from '@/store/modules/user';

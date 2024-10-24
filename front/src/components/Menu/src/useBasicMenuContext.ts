@@ -1,5 +1,4 @@
-import type { InjectionKey } from 'vue';
-import { createContext, useContext } from '@begcode/components';
+import { createContext, useContext } from '@/hooks/core/useContext';
 
 export interface BasicRootMenuContextProps {
   menuState: any;

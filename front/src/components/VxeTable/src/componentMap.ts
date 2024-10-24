@@ -1,5 +1,3 @@
-import type { Component } from 'vue';
-
 import {
   Input,
   Select,
@@ -17,8 +15,12 @@ import {
   Avatar,
   Image,
 } from 'ant-design-vue';
-import { Button, IconPicker, Icon, SelectModal, DragSort, ApiSelect, ApiTreeSelect } from '@begcode/components';
 import type { ComponentType } from './componentType';
+import { Button } from '@/components/Button';
+import { IconPicker, Icon } from '@/components/Icon';
+import { SelectModal } from '@/components/SelectModal';
+import { DragSort } from '@/components/DragSort';
+import { ApiSelect, ApiTreeSelect } from '@/components/Form';
 
 const componentMap = new Map<ComponentType, Component>();
 

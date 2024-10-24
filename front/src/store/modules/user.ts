@@ -1,7 +1,5 @@
 import { defineStore } from 'pinia';
 import { RouteRecordRaw } from 'vue-router';
-import { isArray } from 'lodash-es';
-import { h } from 'vue';
 import type { LoginInfo } from '#/store';
 import type { ErrorMessageMode } from '#/axios';
 import { store } from '@/store';
@@ -230,7 +228,7 @@ export const useUserStore = defineStore({
       if (!this.getToken) return null;
       const userInfo = await accountService.getAccount();
       const roles = userInfo.authorities || [];
-      if (isArray(roles)) {
+      if (_isArray(roles)) {
         const roleList = roles.map(item => item.code) as RoleEnum[];
         this.setRoleList(roleList);
       } else {

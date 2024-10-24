@@ -1,6 +1,6 @@
 import antdLocale from 'ant-design-vue/es/locale/zh_CN';
-import { deepMerge } from '@begcode/components';
 import { genMessage } from '../helper';
+import { deepMerge } from '@/utils/util';
 
 const modules = import.meta.glob('./*.json', { eager: true });
 export default {

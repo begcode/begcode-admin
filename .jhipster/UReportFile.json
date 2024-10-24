@@ -6,6 +6,7 @@
     "listBy": "list",
     "moduleName": "report",
     "skipFakeData": true,
+    "skipMobile": true,
     "skipWebButton": "listAdd"
   },
   "applications": "*",

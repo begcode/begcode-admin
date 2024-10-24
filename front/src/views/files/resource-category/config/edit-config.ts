@@ -1,4 +1,4 @@
-import { FormSchema } from '@begcode/components';
+import { FormSchema } from '@/components/Form';
 import apiService from '@/api-service/index';
 
 const resourceCategoryService = apiService.files.resourceCategoryService;
@@ -53,7 +53,7 @@ const fields = (): FormSchema[] => {
         api: relationshipApis.parent,
         style: 'width: 100%',
         labelInValue: true,
-        fieldNames: { children: 'children', value: 'id', label: 'title' },
+        fieldNames: { children: 'children', key: 'id', title: 'title' },
         resultField: 'records',
         placeholder: '请选择上级',
       },

@@ -65,6 +65,9 @@ public class FillRuleItemBaseService<R extends FillRuleItemRepository, E extends
     public FillRuleItemDTO save(FillRuleItemDTO fillRuleItemDTO) {
         log.debug("Request to save FillRuleItem : {}", fillRuleItemDTO);
         FillRuleItem fillRuleItem = fillRuleItemMapper.toEntity(fillRuleItemDTO);
+        fillRuleItem.setFillRuleId(
+            Optional.ofNullable(fillRuleItemDTO.getFillRule()).map(fillRuleSysFillRuleDTO -> fillRuleSysFillRuleDTO.getId()).orElse(null)
+        );
         this.saveOrUpdate(fillRuleItem);
         return findOne(fillRuleItem.getId()).orElseThrow();
     }
@@ -79,6 +82,9 @@ public class FillRuleItemBaseService<R extends FillRuleItemRepository, E extends
     public FillRuleItemDTO update(FillRuleItemDTO fillRuleItemDTO) {
         log.debug("Request to update FillRuleItem : {}", fillRuleItemDTO);
         FillRuleItem fillRuleItem = fillRuleItemMapper.toEntity(fillRuleItemDTO);
+        fillRuleItem.setFillRuleId(
+            Optional.ofNullable(fillRuleItemDTO.getFillRule()).map(fillRuleSysFillRuleDTO -> fillRuleSysFillRuleDTO.getId()).orElse(null)
+        );
         this.saveOrUpdate(fillRuleItem);
         return findOne(fillRuleItem.getId()).orElseThrow();
     }

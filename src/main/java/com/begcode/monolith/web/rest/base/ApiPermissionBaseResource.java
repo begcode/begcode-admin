@@ -139,34 +139,6 @@ public class ApiPermissionBaseResource {
     }
 
     /**
-     * {@code PUT  /api-permissions/relations/:operateType} : Updates relationships an existing apiPermission.
-     *
-     * @param operateType the operateType of the apiPermissionDTO to update.
-     * @param otherEntityIds the otherEntityIds to update.
-     * @param relationshipName the relationshipName to update.
-     * @param relatedIds the relation relatedIds.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated apiPermissionDTO,
-     * or with status {@code 400 (Bad Request)} if the apiPermissionDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the apiPermissionDTO couldn't be updated.
-     */
-    @PutMapping("/relations/{operateType}")
-    @Operation(tags = "更新API权限关联关系", description = "根据主键更新API权限关联关系")
-    @AutoLog(value = "更新API权限关联关系", logType = LogType.OPERATE, operateType = OperateType.EDIT)
-    public ResponseEntity<Boolean> updateRelationships(
-        @PathVariable(value = "operateType") final String operateType,
-        @RequestParam(value = "otherEntityIds") ArrayList<String> otherEntityIds,
-        @RequestParam(value = "relationshipName") String relationshipName,
-        @RequestParam(value = "relatedIds") ArrayList<Long> relatedIds
-    ) {
-        log.debug("REST request to update ApiPermission : {}, {}", otherEntityIds, operateType);
-        if (CollectionUtils.isEmpty(relatedIds)) {
-            return ResponseEntity.ok(true);
-        }
-        apiPermissionService.updateRelationships(otherEntityIds, relationshipName, relatedIds, operateType);
-        return ResponseEntity.ok(true);
-    }
-
-    /**
      * {@code PATCH  /api-permissions/:id} : Partial updates given fields of an existing apiPermission, field will ignore if it is null
      *
      * @param id the id of the apiPermissionDTO to save.

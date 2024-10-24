@@ -1,5 +1,5 @@
-import { ref, computed, unref } from 'vue';
-import { useWindowSizeFn, createPageContext } from '@begcode/components';
+import { useWindowSizeFn } from '@/hooks/vben';
+import { createPageContext } from '@/hooks/component';
 
 const headerHeightRef = ref(0);
 const footerHeightRef = ref(0);

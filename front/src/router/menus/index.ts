@@ -1,11 +1,12 @@
 import type { RouteRecordNormalized } from 'vue-router';
-import { filter, isHttpUrl } from '@begcode/components';
 import { pathToRegexp } from 'path-to-regexp';
 import type { Menu, MenuModule } from '@/router/types';
 
 import { useAppStoreWithOut } from '@/store/modules/app';
 import { usePermissionStore } from '@/store/modules/permission';
 import { transformMenuModule, getAllParentPath } from '@/router/helper/menuHelper';
+import { filter } from '@/utils/helper/treeHelper';
+import { isHttpUrl } from '@/utils/is';
 import { router } from '@/router';
 import { PermissionModeEnum } from '@/enums/appEnum';
 

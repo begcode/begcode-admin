@@ -234,6 +234,51 @@ public class AnnouncementBaseResource {
     }
 
     /**
+     * {@code GET  /announcements/public} : get all public announcements.
+     *
+     * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of announcements in body.
+     */
+    @GetMapping("/public")
+    @Operation(tags = "获取系统通告分页列表", description = "获取系统通告的分页列表数据")
+    @AutoLog(value = "获取系统通告分页列表", logType = LogType.OPERATE, operateType = OperateType.LIST)
+    public ResponseEntity<PageRecord<AnnouncementDTO>> getPublicAnnouncements(
+        AnnouncementCriteria criteria,
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable
+    ) {
+        log.debug("REST request to get Announcements by criteria: {}", criteria);
+        AnnouncementCriteria baseCriteria = new AnnouncementCriteria();
+        baseCriteria.category().setEquals(com.begcode.monolith.domain.enumeration.AnnoCategory.NOTICE);
+        // todo
+        baseCriteria.receiverType().setEquals(com.begcode.monolith.domain.enumeration.ReceiverType.ALL);
+        // todo
+        baseCriteria.setAnd(criteria);
+
+        IPage<AnnouncementDTO> page;
+        page = announcementQueryService.findByCriteria(baseCriteria, PageableUtils.toPage(pageable));
+        PageRecord<AnnouncementDTO> result = new PageRecord<>();
+        result.records(page.getRecords()).size(page.getSize()).total(page.getTotal()).page(page.getCurrent());
+        HttpHeaders headers = IPageUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(result);
+    }
+
+    /**
+     * {@code GET  /announcements/public/:id} : get the "id" announcement.
+     *
+     * @param id the id of the announcementDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the announcementDTO, or with status {@code 404 (Not Found)}.
+     */
+    @GetMapping("/public/{id}")
+    @Operation(tags = "获取指定主键的系统通告", description = "获取指定主键的系统通告信息")
+    @AutoLog(value = "获取指定主键的系统通告", logType = LogType.OPERATE, operateType = OperateType.VIEW)
+    public ResponseEntity<AnnouncementDTO> getPublicAnnouncement(@PathVariable Long id) {
+        log.debug("REST request to get Announcement : {}", id);
+        Optional<AnnouncementDTO> announcementDTO = announcementService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(announcementDTO);
+    }
+
+    /**
      * {@code GET  /announcements/:id} : get the "id" announcement.
      *
      * @param id the id of the announcementDTO to retrieve.

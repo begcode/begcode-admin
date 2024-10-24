@@ -1,5 +1,5 @@
 <template>
-  <Layout.Header :class="getHeaderClass">
+  <a-layout-header :class="getHeaderClass">
     <!-- left start -->
     <div :class="`${prefixCls}-left`">
       <!-- logo -->
@@ -44,20 +44,19 @@
 
       <SettingDrawer v-if="getShowSetting" :class="`${prefixCls}-action__item`" />
     </div>
-  </Layout.Header>
+  </a-layout-header>
   <LoginSelect ref="loginSelectRef" @success="loginSelectOk"></LoginSelect>
 </template>
 <script lang="ts" setup>
-import { Layout } from 'ant-design-vue';
-import { computed, onMounted, ref, toRaw, unref } from 'vue';
-
 import { AppLocalePicker, AppLogo, AppSearch } from '@/components/Application';
 import { SettingButtonPositionEnum } from '@/enums/appEnum';
 import { MenuModeEnum, MenuSplitTyeEnum } from '@/enums/menuEnum';
 import { useHeaderSetting } from '@/hooks/setting/useHeaderSetting';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
 import { useRootSetting } from '@/hooks/setting/useRootSetting';
-import { useDesign, createAsyncComponent, useAppInject, propTypes } from '@begcode/components';
+import { useAppInject } from '@/hooks/useAppInject';
+import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
+import { useDesign } from '@/hooks/web/useDesign';
 import { useLocale } from '@/i18n/useLocale';
 import { useGlobSetting } from '@/hooks/setting';
 import { useI18n } from '@/hooks/web/useI18n';
@@ -79,7 +78,9 @@ const SettingDrawer = createAsyncComponent(() => import('@/layouts/default/setti
 });
 
 const props = defineProps({
-  fixed: propTypes.bool,
+  fixed: {
+    type: Boolean,
+  },
 });
 
 const { prefixCls } = useDesign('layout-header');

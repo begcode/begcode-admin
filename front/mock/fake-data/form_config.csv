@@ -1,11 +1,11 @@
-id;form_key;form_name;form_json;created_by;created_date;last_modified_by;last_modified_date
-1;phew 全部 比较;捉 until minus;../fake-data/blob/hipster.txt;27451;2024-04-05T14:40:25;21097;2024-04-04T22:08:42
-2;like;握 incidentally wrapping;../fake-data/blob/hipster.txt;850;2024-04-05T11:04:01;14346;2024-04-05T04:50:25
-3;wherever;逐渐 yowza;../fake-data/blob/hipster.txt;6594;2024-04-05T07:51:08;17396;2024-04-05T16:52:53
-4;一同 攥 挥;er;../fake-data/blob/hipster.txt;4039;2024-04-04T18:45:18;10425;2024-04-04T21:03:23
-5;cradle;in;../fake-data/blob/hipster.txt;3144;2024-04-04T18:21:50;15072;2024-04-04T19:50:41
-6;document;transport prison who;../fake-data/blob/hipster.txt;18249;2024-04-05T05:14:45;871;2024-04-04T22:17:53
-7;finally 大方 carport;冷;../fake-data/blob/hipster.txt;8843;2024-04-05T08:30:52;12303;2024-04-05T12:29:22
-8;cafe brr 驾驶;yum 别 咀;../fake-data/blob/hipster.txt;25859;2024-04-05T03:16:17;24857;2024-04-05T12:33:24
-9;handlebar phew ew;vestment brr;../fake-data/blob/hipster.txt;11264;2024-04-05T06:35:04;16264;2024-04-04T21:37:04
-10;abaft 搂;fen;../fake-data/blob/hipster.txt;6788;2024-04-05T00:33:18;6371;2024-04-05T04:25:02
+id;form_key;form_name;form_json;form_type;multi_items;created_by;created_date;last_modified_by;last_modified_date
+1;phew 全部 比较;捉 until minus;../fake-data/blob/hipster.txt;DATA_FORM;true;21097;2024-04-04T22:08:42;4061;2024-04-04T23:59:04
+2;pro off;alongside 抱;../fake-data/blob/hipster.txt;MODEL_FORM;false;10703;2024-04-04T18:05:31;23159;2024-04-04T18:09:26
+3;做 一共 敢情;fooey;../fake-data/blob/hipster.txt;MODEL_FORM;true;13432;2024-04-04T21:48:37;31734;2024-04-05T13:03:36
+4;argument;聪明 hm across;../fake-data/blob/hipster.txt;MODEL_FORM;false;18446;2024-04-05T11:29:15;5852;2024-04-04T20:54:13
+5;仅 yuck;索性;../fake-data/blob/hipster.txt;DATA_FORM;true;2146;2024-04-04T17:45:08;22707;2024-04-05T16:36:52
+6;kindness;尽;../fake-data/blob/hipster.txt;DATA_FORM;true;14250;2024-04-05T12:17:22;10430;2024-04-05T06:22:06
+7;as though finally;cafe brr 驾驶;../fake-data/blob/hipster.txt;DATA_FORM;false;13937;2024-04-05T15:32:35;17056;2024-04-05T08:09:19
+8;伟大 比较;仅仅;../fake-data/blob/hipster.txt;MODEL_FORM;false;6178;2024-04-05T11:44:30;13467;2024-04-04T21:28:02
+9;抽 toward 摊;meanwhile 仍然 光;../fake-data/blob/hipster.txt;DATA_FORM;false;8231;2024-04-05T12:28:52;29650;2024-04-05T12:03:44
+10;finally meanwhile;yahoo about phooey;../fake-data/blob/hipster.txt;DATA_FORM;true;5015;2024-04-05T15:31:32;910;2024-04-05T15:36:57

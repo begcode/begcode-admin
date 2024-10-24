@@ -45,10 +45,10 @@ public class AuthorityCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.display")
     private BooleanFilter display;
 
-    @BindQuery(entity = Authority.class, column = "id", condition = "id=parent_id")
+    @BindQuery(entity = Authority.class, column = "id", condition = "parent_id=this.id")
     private LongFilter childrenId;
 
-    @BindQuery(entity = Authority.class, column = "name", condition = "id=parent_id")
+    @BindQuery(entity = Authority.class, column = "name", condition = "parent_id=this.id")
     private StringFilter childrenName;
 
     @BindQuery(
@@ -89,8 +89,6 @@ public class AuthorityCriteria implements Serializable, Criteria {
 
     private StringFilter usersFirstName;
 
-    private LongFilter departmentId;
-
     @BindQuery(ignore = true)
     private String jhiCommonSearchKeywords;
 
@@ -124,7 +122,6 @@ public class AuthorityCriteria implements Serializable, Criteria {
         this.parentName = other.optionalParentName().map(StringFilter::copy).orElse(null);
         this.usersId = other.optionalUsersId().map(LongFilter::copy).orElse(null);
         this.usersFirstName = other.optionalUsersFirstName().map(StringFilter::copy).orElse(null);
-        this.departmentId = other.optionalDepartmentId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -437,25 +434,6 @@ public class AuthorityCriteria implements Serializable, Criteria {
         this.usersFirstName = usersFirstName;
     }
 
-    public LongFilter getDepartmentId() {
-        return departmentId;
-    }
-
-    public Optional<LongFilter> optionalDepartmentId() {
-        return Optional.ofNullable(departmentId);
-    }
-
-    public LongFilter departmentId() {
-        if (departmentId == null) {
-            setDepartmentId(new LongFilter());
-        }
-        return departmentId;
-    }
-
-    public void setDepartmentId(LongFilter departmentId) {
-        this.departmentId = departmentId;
-    }
-
     public void setAnd(AuthorityCriteria and) {
         this.and = and;
     }
@@ -542,7 +520,6 @@ public class AuthorityCriteria implements Serializable, Criteria {
             Objects.equals(apiPermissionsId, that.apiPermissionsId) &&
             Objects.equals(parentId, that.parentId) &&
             Objects.equals(usersId, that.usersId) &&
-            Objects.equals(departmentId, that.departmentId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -561,7 +538,6 @@ public class AuthorityCriteria implements Serializable, Criteria {
             apiPermissionsId,
             parentId,
             usersId,
-            departmentId,
             distinct
         );
     }
@@ -586,7 +562,6 @@ public class AuthorityCriteria implements Serializable, Criteria {
             optionalParentName().map(f -> "parentName=" + f + ", ").orElse("") +
             optionalUsersId().map(f -> "usersId=" + f + ", ").orElse("") +
             optionalUsersFirstName().map(f -> "usersFirstName=" + f + ", ").orElse("") +
-            optionalDepartmentId().map(f -> "departmentId=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +

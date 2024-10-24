@@ -73,7 +73,7 @@ public class SysFillRuleBaseService<R extends SysFillRuleRepository, E extends S
     public SysFillRuleDTO update(SysFillRuleDTO sysFillRuleDTO) {
         log.debug("Request to update SysFillRule : {}", sysFillRuleDTO);
         SysFillRule sysFillRule = sysFillRuleMapper.toEntity(sysFillRuleDTO);
-        this.createEntityAndRelatedEntities(sysFillRule, sysFillRule.getRuleItems(), FillRuleItem::setFillRuleId);
+        this.updateEntityAndRelatedEntities(sysFillRule, sysFillRule.getRuleItems(), FillRuleItem::setFillRuleId);
         return findOne(sysFillRule.getId()).orElseThrow();
     }
 

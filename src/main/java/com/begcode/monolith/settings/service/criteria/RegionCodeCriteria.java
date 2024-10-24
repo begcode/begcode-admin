@@ -73,10 +73,10 @@ public class RegionCodeCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.lat")
     private DoubleFilter lat;
 
-    @BindQuery(entity = RegionCode.class, column = "id", condition = "id=parent_id")
+    @BindQuery(entity = RegionCode.class, column = "id", condition = "parent_id=this.id")
     private LongFilter childrenId;
 
-    @BindQuery(entity = RegionCode.class, column = "name", condition = "id=parent_id")
+    @BindQuery(entity = RegionCode.class, column = "name", condition = "parent_id=this.id")
     private StringFilter childrenName;
 
     @BindQuery(entity = RegionCode.class, column = "id", condition = "this.parent_id=id")

@@ -7,7 +7,8 @@
 <script lang="ts" setup>
 import SettingDrawer from './SettingDrawer';
 
-import { useDrawer, Icon } from '@begcode/components';
+import { Icon } from '@/components/Icon';
+import { useDrawer } from '@/components/Drawer';
 
 defineOptions({ name: 'SettingButton' });
 

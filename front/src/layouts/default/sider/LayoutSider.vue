@@ -1,6 +1,6 @@
 <template>
   <div v-if="getMenuFixed && !getIsMobile" v-show="showClassSideBarRef" :style="getHiddenDomStyle"></div>
-  <Layout.Sider
+  <a-layout-sider
     v-show="showClassSideBarRef"
     ref="sideRef"
     :breakpoint="getTrigger === TriggerEnum.FOOTER ? 'md' : 'lg'"
@@ -19,16 +19,15 @@
     </template>
     <LayoutMenu :theme="getMenuTheme" :menuMode="getMode" :splitType="getSplitType" />
     <DragBar ref="dragBarRef" />
-  </Layout.Sider>
+  </a-layout-sider>
 </template>
 <script lang="ts" setup>
-import { Layout, theme } from 'ant-design-vue';
-import { computed, ref, unref, CSSProperties, h } from 'vue';
+import { theme } from 'ant-design-vue';
 
 import { MenuModeEnum, MenuSplitTyeEnum, TriggerEnum } from '@/enums/menuEnum';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
-import { useAppInject } from '@begcode/components';
-import { useDesign } from '@begcode/components';
+import { useAppInject } from '@/hooks/useAppInject';
+import { useDesign } from '@/hooks/web/useDesign';
 import LayoutTrigger from '@/layouts/default/trigger/index.vue';
 
 import LayoutMenu from '../menu/index.vue';

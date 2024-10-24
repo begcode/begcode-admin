@@ -3,8 +3,11 @@
   "annotations": {
     "changelogDate": "20240101062906",
     "entityPackage": "settings",
+    "importData": true,
     "microServiceCore": true,
     "moduleName": "system",
+    "publicApiBy": "none",
+    "skipComponent": "appEditPage-appDetailPage-appListPage",
     "skipFakeData": true,
     "skipWebsite": true
   },

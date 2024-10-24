@@ -15,9 +15,8 @@
   </PageWrapper>
 </template>
 <script lang="ts" setup>
-import { h } from 'vue';
 import { Tag } from 'ant-design-vue';
-import { PageWrapper, Descriptions, DescItem, useDescription } from '@begcode/components';
+import { DescItem, useDescriptions } from '@/components/Descriptions';
 import { GITHUB_URL, SITE_URL, DOC_URL } from '@/settings/siteSetting';
 
 const { pkg, lastBuildTime } = __APP_INFO__;
@@ -78,27 +77,27 @@ Object.keys(devDependencies).forEach(key => {
   devSchema.push({ field: key, label: key });
 });
 
-const [register] = useDescription({
+const [register] = useDescriptions({
   title: '生产环境依赖',
   data: dependencies,
   schema: schema,
   column: 3,
 });
 
-const [registerDev] = useDescription({
+const [registerDev] = useDescriptions({
   title: '开发环境依赖',
   data: devDependencies,
   schema: devSchema,
   column: 3,
 });
 
-const [infoRegister] = useDescription({
+const [infoRegister] = useDescriptions({
   title: '项目信息',
   data: infoData,
   schema: infoSchema,
   column: 2,
 });
-const [backendRegister] = useDescription({
+const [backendRegister] = useDescriptions({
   title: '后端技术栈',
   data: backendData,
   schema: backendSchema,

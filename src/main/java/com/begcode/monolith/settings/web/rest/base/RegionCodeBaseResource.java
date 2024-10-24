@@ -216,6 +216,46 @@ public class RegionCodeBaseResource {
     }
 
     /**
+     * {@code GET  /region-codes/public} : get all public regionCodes.
+     *
+     * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of regionCodes in body.
+     */
+    @GetMapping("/public")
+    @Operation(tags = "获取行政区划码分页列表", description = "获取行政区划码的分页列表数据")
+    @AutoLog(value = "获取行政区划码分页列表", logType = LogType.OPERATE, operateType = OperateType.LIST)
+    public ResponseEntity<PageRecord<RegionCodeDTO>> getPublicRegionCodes(
+        RegionCodeCriteria criteria,
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable
+    ) {
+        log.debug("REST request to get RegionCodes by criteria: {}", criteria);
+        RegionCodeCriteria baseCriteria = criteria;
+
+        IPage<RegionCodeDTO> page;
+        page = regionCodeQueryService.findByCriteria(baseCriteria, PageableUtils.toPage(pageable));
+        PageRecord<RegionCodeDTO> result = new PageRecord<>();
+        result.records(page.getRecords()).size(page.getSize()).total(page.getTotal()).page(page.getCurrent());
+        HttpHeaders headers = IPageUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(result);
+    }
+
+    /**
+     * {@code GET  /region-codes/public/:id} : get the "id" regionCode.
+     *
+     * @param id the id of the regionCodeDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the regionCodeDTO, or with status {@code 404 (Not Found)}.
+     */
+    @GetMapping("/public/{id}")
+    @Operation(tags = "获取指定主键的行政区划码", description = "获取指定主键的行政区划码信息")
+    @AutoLog(value = "获取指定主键的行政区划码", logType = LogType.OPERATE, operateType = OperateType.VIEW)
+    public ResponseEntity<RegionCodeDTO> getPublicRegionCode(@PathVariable Long id) {
+        log.debug("REST request to get RegionCode : {}", id);
+        Optional<RegionCodeDTO> regionCodeDTO = regionCodeService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(regionCodeDTO);
+    }
+
+    /**
      * {@code GET  /region-codes/:id} : get the "id" regionCode.
      *
      * @param id the id of the regionCodeDTO to retrieve.

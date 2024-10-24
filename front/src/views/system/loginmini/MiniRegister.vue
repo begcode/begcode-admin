@@ -9,7 +9,7 @@
         </div>
         <div class="aui-formBox">
           <div class="aui-formWell">
-            <Form ref="formRef" :model="formData">
+            <a-form ref="formRef" :model="formData">
               <div class="aui-flex aui-form-nav aui-clear-left" style="padding-bottom: 21px">
                 <div class="aui-flex-box activeNav on">
                   {{ t('sys.login.signUpFormTitle') }}
@@ -17,30 +17,30 @@
               </div>
               <div class="aui-form-box">
                 <div class="aui-account aui-account-line">
-                  <FormItem>
+                  <a-form-item>
                     <div class="aui-input-line">
                       <Icon class="aui-icon" icon="ant-design:user-outlined" />
-                      <Input class="fix-auto-fill" type="text" :placeholder="t('sys.login.userName')" v-model:value="formData.username" />
+                      <a-input class="fix-auto-fill" type="text" :placeholder="t('sys.login.userName')" v-model:value="formData.username" />
                     </div>
-                  </FormItem>
-                  <FormItem>
+                  </a-form-item>
+                  <a-form-item>
                     <div class="aui-input-line">
                       <Icon class="aui-icon" icon="ant-design:mobile-outlined" />
-                      <Input class="fix-auto-fill" type="text" :placeholder="t('sys.login.mobile')" v-model:value="formData.mobile" />
+                      <a-input class="fix-auto-fill" type="text" :placeholder="t('sys.login.mobile')" v-model:value="formData.mobile" />
                     </div>
-                  </FormItem>
-                  <FormItem>
+                  </a-form-item>
+                  <a-form-item>
                     <div class="aui-input-line">
                       <Icon class="aui-icon" icon="ant-design:mail-outlined" />
-                      <Input class="fix-auto-fill" type="text" :placeholder="t('sys.login.smsCode')" v-model:value="formData.smscode" />
+                      <a-input class="fix-auto-fill" type="text" :placeholder="t('sys.login.smsCode')" v-model:value="formData.smscode" />
                       <div v-if="showInterval" class="aui-code-line" @click="getLoginCode">{{ t('component.countdown.normalText') }}</div>
                       <div v-else class="aui-code-line">{{ t('component.countdown.sendText', [unref(timeRuning)]) }}</div>
                     </div>
-                  </FormItem>
-                  <FormItem>
+                  </a-form-item>
+                  <a-form-item>
                     <div class="aui-input-line">
                       <Icon class="aui-icon" icon="ant-design:lock-outlined" />
-                      <Input
+                      <a-input
                         class="fix-auto-fill"
                         :type="pwdIndex === 'close' ? 'password' : 'text'"
                         :placeholder="t('sys.login.password')"
@@ -51,11 +51,11 @@
                         <img :src="eyeGImg" alt="关闭" v-else-if="pwdIndex === 'close'" @click="pwdClick('open')" />
                       </div>
                     </div>
-                  </FormItem>
-                  <FormItem>
+                  </a-form-item>
+                  <a-form-item>
                     <div class="aui-input-line">
                       <Icon class="aui-icon" icon="ant-design:lock-outlined" />
-                      <Input
+                      <a-input
                         class="fix-auto-fill"
                         :type="confirmPwdIndex === 'close' ? 'password' : 'text'"
                         :placeholder="t('sys.login.confirmPassword')"
@@ -66,17 +66,17 @@
                         <img :src="eyeGImg" alt="关闭" v-else-if="confirmPwdIndex === 'close'" @click="confirmPwdClick('open')" />
                       </div>
                     </div>
-                  </FormItem>
-                  <FormItem name="policy">
+                  </a-form-item>
+                  <a-form-item name="policy">
                     <div class="aui-flex">
                       <div class="aui-flex-box">
                         <div class="aui-choice">
-                          <Checkbox v-model:checked="formData.policy" />
+                          <a-checkbox v-model:checked="formData.policy" />
                           <span style="color: #1b90ff; margin-left: 4px">{{ t('sys.login.policy') }}</span>
                         </div>
                       </div>
                     </div>
-                  </FormItem>
+                  </a-form-item>
                 </div>
               </div>
               <div class="aui-formButton">
@@ -87,7 +87,7 @@
                   <a class="aui-linek-code aui-flex-box" @click="goBackHandleClick">{{ t('sys.login.backSignIn') }}</a>
                 </div>
               </div>
-            </Form>
+            </a-form>
           </div>
         </div>
       </div>
@@ -98,9 +98,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, unref, toRaw } from 'vue';
-import { Form, FormItem, Input, Checkbox } from 'ant-design-vue';
-import { Icon, useModal, CaptchaModal } from '@begcode/components';
+import { useModal } from '@/components/Modal';
+import { CaptchaModal } from '@/components/Captcha';
+
 import { getSmsCaptcha, register } from '@/api-service/sys/user';
 import { SmsEnum } from '@/views/account/login/useLogin';
 import { useMessage } from '@/hooks/web/useMessage';

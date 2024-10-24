@@ -1,4 +1,3 @@
-import { h } from 'vue';
 import XEUtils from 'xe-utils';
 import {
   createEditRender,
@@ -40,7 +39,7 @@ export default {
               () => {
                 // 处理 change 事件相关逻辑
                 const { $panel } = params;
-                $panel.changeOption(null, XEUtils.isBoolean(option.data), option);
+                $panel.changeOption(null, XEUtils._isBoolean(option.data), option);
               },
             ),
           });

@@ -119,26 +119,4 @@ class AuthorityTest {
         assertThat(authority.getUsers()).doesNotContain(userBack);
         assertThat(userBack.getAuthorities()).doesNotContain(authority);
     }
-
-    @Test
-    void departmentTest() {
-        Authority authority = getAuthorityRandomSampleGenerator();
-        Department departmentBack = getDepartmentRandomSampleGenerator();
-
-        // todo authority.addDepartment(departmentBack);
-        // assertThat(authority.getDepartments()).containsOnly(departmentBack);
-        assertThat(departmentBack.getAuthorities()).containsOnly(authority);
-
-        // authority.removeDepartment(departmentBack);
-        // assertThat(authority.getDepartments()).doesNotContain(departmentBack);
-        assertThat(departmentBack.getAuthorities()).doesNotContain(authority);
-
-        authority.departments(new ArrayList<>(Set.of(departmentBack)));
-        assertThat(authority.getDepartments()).containsOnly(departmentBack);
-        assertThat(departmentBack.getAuthorities()).containsOnly(authority);
-
-        authority.setDepartments(new ArrayList<>());
-        assertThat(authority.getDepartments()).doesNotContain(departmentBack);
-        assertThat(departmentBack.getAuthorities()).doesNotContain(authority);
-    }
 }

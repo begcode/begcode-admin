@@ -1,36 +1,30 @@
 <template>
-  <ConfigProvider :locale="getAntdLocale">
-    <Modal v-bind="getProps">
-      <Spin :spinning="loading">
+  <a-config-provider :locale="getAntdLocale">
+    <a-modal v-bind="getProps">
+      <a-spin :spinning="loading">
         <div style="padding: 20px">
           <div v-html="options.content" style="margin-bottom: 8px"></div>
           <BasicForm @register="registerForm">
             <template #customInput="{ model, field }">
-              <Input ref="inputRef" v-model:value="model[field]" :placeholder="placeholder" @pressEnter="onSubmit" @input="onChange" />
+              <a-input ref="inputRef" v-model:value="model[field]" :placeholder="placeholder" @pressEnter="onSubmit" @input="onChange" />
             </template>
           </BasicForm>
         </div>
-      </Spin>
-    </Modal>
-  </ConfigProvider>
+      </a-spin>
+    </a-modal>
+  </a-config-provider>
 </template>
 
 <script lang="ts">
 import type { PromptFormProps } from './typing';
-import type { ModalProps } from '@begcode/components';
-import { ref, defineComponent, computed, unref, onMounted, nextTick } from 'vue';
-import { BasicForm, useForm } from '@begcode/components';
-import { Modal, Spin, Input, ConfigProvider } from 'ant-design-vue';
+import type { ModalProps } from '@/components/Modal';
+import { BasicForm, useForm } from '@/components/Form';
 import { useLocale } from '@/i18n/useLocale';
 
 export default defineComponent({
   name: 'PromptForm',
   components: {
-    Modal,
-    Spin,
-    Input,
     BasicForm,
-    ConfigProvider,
   },
   emits: ['register'],
   setup(props, { emit }) {

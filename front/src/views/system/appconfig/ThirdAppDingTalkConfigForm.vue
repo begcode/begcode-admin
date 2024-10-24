@@ -1,8 +1,8 @@
 <template>
   <div class="base-collapse">
     <div class="header">钉钉集成</div>
-    <Collapse expand-icon-position="right" :bordered="false">
-      <CollapsePanel key="1">
+    <a-collapse expand-icon-position="right" :bordered="false">
+      <a-collapse-panel key="1">
         <template #header>
           <div style="font-size: 16px">1.获取对接信息</div>
         </template>
@@ -10,11 +10,11 @@
         <div style="margin-top: 5px">
           <a href="https://help.qiaoqiaoyun.com/expand/dingding.html" target="_blank">如何获取对接信息?</a>
         </div>
-      </CollapsePanel>
-    </Collapse>
+      </a-collapse-panel>
+    </a-collapse>
     <div class="sync-padding">
-      <Collapse expand-icon-position="right" :bordered="false">
-        <CollapsePanel key="2">
+      <a-collapse expand-icon-position="right" :bordered="false">
+        <a-collapse-panel key="2">
           <template #header>
             <div style="width: 100%; justify-content: space-between; display: flex">
               <div style="font-size: 16px">2.对接信息录入</div>
@@ -24,26 +24,26 @@
           <div class="flex-flow">
             <div class="base-title">Agentld</div>
             <div class="base-message">
-              <Input v-model:value="appConfigData.agentId" readonly />
+              <a-input v-model:value="appConfigData.agentId" readonly />
             </div>
           </div>
           <div class="flex-flow">
             <div class="base-title">AppKey</div>
             <div class="base-message">
-              <Input v-model:value="appConfigData.clientId" readonly />
+              <a-input v-model:value="appConfigData.clientId" readonly />
             </div>
           </div>
           <div class="flex-flow">
             <div class="base-title">AppSecret</div>
             <div class="base-message">
-              <Input v-model:value="appConfigData.clientSecret" readonly />
+              <a-input v-model:value="appConfigData.clientSecret" readonly />
             </div>
           </div>
           <div style="margin-top: 20px; width: 100%; text-align: right">
-            <Button @click="dingEditClick">编辑</Button>
+            <a-button @click="dingEditClick">编辑</a-button>
           </div>
-        </CollapsePanel>
-      </Collapse>
+        </a-collapse-panel>
+      </a-collapse>
       <div class="sync-padding">
         <div style="font-size: 16px; width: 100%">3.数据同步</div>
         <div style="margin-top: 20px" class="base-desc">
@@ -52,13 +52,13 @@
             <li>同步部门到本地</li>
             <li>
               同步部门下的用户到本地
-              <Tooltip title="同步用户与部门文档">
+              <a-tooltip title="同步用户与部门文档">
                 <Icon @click="handleIconClick" type="question-circle" class="sync-text" />
-              </Tooltip>
+              </a-tooltip>
             </li>
           </ul>
           <div style="float: right">
-            <Button :loading="btnLoading" @click="syncDingTalk">{{ !btnLoading ? '同步' : '同步中' }}</Button>
+            <a-button :loading="btnLoading" @click="syncDingTalk">{{ !btnLoading ? '同步' : '同步中' }}</a-button>
           </div>
         </div>
       </div>
@@ -69,9 +69,8 @@
 </template>
 
 <script lang="ts" setup>
-import { h, inject, onMounted, reactive, ref, watch } from 'vue';
-import { Modal, Button, Input, Tooltip, Collapse, CollapsePanel } from 'ant-design-vue';
-import { useModal, Icon } from '@begcode/components';
+import { Modal } from 'ant-design-vue';
+import { useModal } from '@/components/Modal';
 import { getTenantId } from '@/utils/auth';
 import { useMessage } from '@/hooks/web/useMessage';
 import { getThirdConfigByTenantId, syncDingTalkDepartUserToLocal } from './ThirdApp.api';

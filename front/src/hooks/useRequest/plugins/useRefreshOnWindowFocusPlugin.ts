@@ -1,5 +1,3 @@
-import { onUnmounted, ref, watchEffect } from 'vue';
-
 import type { UseRequestPlugin } from '../types';
 import { limit } from '../utils/limit';
 import subscribeFocus from '../utils/subscribeFocus';

@@ -99,14 +99,17 @@ public class UploadFileQueryService implements QueryService<UploadFile> {
             keywordsCriteria.setUseOr(true);
             if (StringUtils.isNumeric(keywords)) {
                 keywordsCriteria.id().setEquals(Long.valueOf(keywords));
-                keywordsCriteria.ownerEntityId().setEquals(Long.valueOf(keywords));
                 keywordsCriteria.fileSize().setEquals(Long.valueOf(keywords));
+                keywordsCriteria.ownerEntityId().setEquals(Long.valueOf(keywords));
                 keywordsCriteria.referenceCount().setEquals(Long.valueOf(keywords));
                 keywordsCriteria.createdBy().setEquals(Long.valueOf(keywords));
                 keywordsCriteria.lastModifiedBy().setEquals(Long.valueOf(keywords));
             }
-            keywordsCriteria.url().setContains(keywords);
             keywordsCriteria.fullName().setContains(keywords);
+            keywordsCriteria.businessTitle().setContains(keywords);
+            keywordsCriteria.businessDesc().setContains(keywords);
+            keywordsCriteria.businessStatus().setContains(keywords);
+            keywordsCriteria.url().setContains(keywords);
             keywordsCriteria.name().setContains(keywords);
             keywordsCriteria.thumb().setContains(keywords);
             keywordsCriteria.ext().setContains(keywords);
@@ -114,9 +117,6 @@ public class UploadFileQueryService implements QueryService<UploadFile> {
             keywordsCriteria.path().setContains(keywords);
             keywordsCriteria.folder().setContains(keywords);
             keywordsCriteria.ownerEntityName().setContains(keywords);
-            keywordsCriteria.businessTitle().setContains(keywords);
-            keywordsCriteria.businessDesc().setContains(keywords);
-            keywordsCriteria.businessStatus().setContains(keywords);
             UploadFileCriteria tempCriteria = criteria;
             while (tempCriteria.getAnd() != null) {
                 tempCriteria = tempCriteria.getAnd();
@@ -154,21 +154,21 @@ public class UploadFileQueryService implements QueryService<UploadFile> {
         List<String> groupByFields = new ArrayList<>();
         Map<String, Filter<?>> fieldNameMap = new HashMap<>();
         fieldNameMap.put("self.id", criteria.getId());
-        fieldNameMap.put("self.url", criteria.getUrl());
         fieldNameMap.put("self.full_name", criteria.getFullName());
+        fieldNameMap.put("self.business_title", criteria.getBusinessTitle());
+        fieldNameMap.put("self.business_desc", criteria.getBusinessDesc());
+        fieldNameMap.put("self.business_status", criteria.getBusinessStatus());
+        fieldNameMap.put("self.url", criteria.getUrl());
         fieldNameMap.put("self.name", criteria.getName());
         fieldNameMap.put("self.thumb", criteria.getThumb());
+        fieldNameMap.put("self.file_size", criteria.getFileSize());
         fieldNameMap.put("self.ext", criteria.getExt());
         fieldNameMap.put("self.type", criteria.getType());
         fieldNameMap.put("self.path", criteria.getPath());
         fieldNameMap.put("self.folder", criteria.getFolder());
         fieldNameMap.put("self.owner_entity_name", criteria.getOwnerEntityName());
         fieldNameMap.put("self.owner_entity_id", criteria.getOwnerEntityId());
-        fieldNameMap.put("self.business_title", criteria.getBusinessTitle());
-        fieldNameMap.put("self.business_desc", criteria.getBusinessDesc());
-        fieldNameMap.put("self.business_status", criteria.getBusinessStatus());
         fieldNameMap.put("self.create_at", criteria.getCreateAt());
-        fieldNameMap.put("self.file_size", criteria.getFileSize());
         fieldNameMap.put("self.reference_count", criteria.getReferenceCount());
         fieldNameMap.put("self.created_by", criteria.getCreatedBy());
         fieldNameMap.put("self.created_date", criteria.getCreatedDate());
@@ -178,9 +178,7 @@ public class UploadFileQueryService implements QueryService<UploadFile> {
             .entrySet()
             .stream()
             .filter(entry -> entry.getValue() != null)
-            .forEach(entry -> {
-                getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields);
-            });
+            .forEach(entry -> getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields));
         if (CollectionUtils.isNotEmpty(selectFields)) {
             queryWrapper.select(selectFields.toArray(new String[0])).groupBy(CollectionUtils.isNotEmpty(groupByFields), groupByFields);
             return Binder.joinQueryMapsPage(queryWrapper, UploadFile.class, null).getRecords();

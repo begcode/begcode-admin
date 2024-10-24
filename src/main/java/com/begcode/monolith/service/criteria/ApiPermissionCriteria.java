@@ -88,10 +88,10 @@ public class ApiPermissionCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.status")
     private ApiPermissionStateFilter status;
 
-    @BindQuery(entity = ApiPermission.class, column = "id", condition = "id=parent_id")
+    @BindQuery(entity = ApiPermission.class, column = "id", condition = "parent_id=this.id")
     private LongFilter childrenId;
 
-    @BindQuery(entity = ApiPermission.class, column = "name", condition = "id=parent_id")
+    @BindQuery(entity = ApiPermission.class, column = "name", condition = "parent_id=this.id")
     private StringFilter childrenName;
 
     @BindQuery(entity = ApiPermission.class, column = "id", condition = "this.parent_id=id")

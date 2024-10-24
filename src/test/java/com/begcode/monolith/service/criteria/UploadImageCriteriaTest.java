@@ -75,20 +75,20 @@ class UploadImageCriteriaTest {
 
     private static void setAllFilters(UploadImageCriteria uploadImageCriteria) {
         uploadImageCriteria.id();
-        uploadImageCriteria.url();
         uploadImageCriteria.fullName();
+        uploadImageCriteria.businessTitle();
+        uploadImageCriteria.businessDesc();
+        uploadImageCriteria.businessStatus();
+        uploadImageCriteria.url();
         uploadImageCriteria.name();
         uploadImageCriteria.ext();
         uploadImageCriteria.type();
         uploadImageCriteria.path();
         uploadImageCriteria.folder();
+        uploadImageCriteria.fileSize();
         uploadImageCriteria.ownerEntityName();
         uploadImageCriteria.ownerEntityId();
-        uploadImageCriteria.businessTitle();
-        uploadImageCriteria.businessDesc();
-        uploadImageCriteria.businessStatus();
         uploadImageCriteria.createAt();
-        uploadImageCriteria.fileSize();
         uploadImageCriteria.smartUrl();
         uploadImageCriteria.mediumUrl();
         uploadImageCriteria.referenceCount();
@@ -104,20 +104,20 @@ class UploadImageCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId()) &&
-                condition.apply(criteria.getUrl()) &&
                 condition.apply(criteria.getFullName()) &&
+                condition.apply(criteria.getBusinessTitle()) &&
+                condition.apply(criteria.getBusinessDesc()) &&
+                condition.apply(criteria.getBusinessStatus()) &&
+                condition.apply(criteria.getUrl()) &&
                 condition.apply(criteria.getName()) &&
                 condition.apply(criteria.getExt()) &&
                 condition.apply(criteria.getType()) &&
                 condition.apply(criteria.getPath()) &&
                 condition.apply(criteria.getFolder()) &&
+                condition.apply(criteria.getFileSize()) &&
                 condition.apply(criteria.getOwnerEntityName()) &&
                 condition.apply(criteria.getOwnerEntityId()) &&
-                condition.apply(criteria.getBusinessTitle()) &&
-                condition.apply(criteria.getBusinessDesc()) &&
-                condition.apply(criteria.getBusinessStatus()) &&
                 condition.apply(criteria.getCreateAt()) &&
-                condition.apply(criteria.getFileSize()) &&
                 condition.apply(criteria.getSmartUrl()) &&
                 condition.apply(criteria.getMediumUrl()) &&
                 condition.apply(criteria.getReferenceCount()) &&
@@ -135,20 +135,20 @@ class UploadImageCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId(), copy.getId()) &&
-                condition.apply(criteria.getUrl(), copy.getUrl()) &&
                 condition.apply(criteria.getFullName(), copy.getFullName()) &&
+                condition.apply(criteria.getBusinessTitle(), copy.getBusinessTitle()) &&
+                condition.apply(criteria.getBusinessDesc(), copy.getBusinessDesc()) &&
+                condition.apply(criteria.getBusinessStatus(), copy.getBusinessStatus()) &&
+                condition.apply(criteria.getUrl(), copy.getUrl()) &&
                 condition.apply(criteria.getName(), copy.getName()) &&
                 condition.apply(criteria.getExt(), copy.getExt()) &&
                 condition.apply(criteria.getType(), copy.getType()) &&
                 condition.apply(criteria.getPath(), copy.getPath()) &&
                 condition.apply(criteria.getFolder(), copy.getFolder()) &&
+                condition.apply(criteria.getFileSize(), copy.getFileSize()) &&
                 condition.apply(criteria.getOwnerEntityName(), copy.getOwnerEntityName()) &&
                 condition.apply(criteria.getOwnerEntityId(), copy.getOwnerEntityId()) &&
-                condition.apply(criteria.getBusinessTitle(), copy.getBusinessTitle()) &&
-                condition.apply(criteria.getBusinessDesc(), copy.getBusinessDesc()) &&
-                condition.apply(criteria.getBusinessStatus(), copy.getBusinessStatus()) &&
                 condition.apply(criteria.getCreateAt(), copy.getCreateAt()) &&
-                condition.apply(criteria.getFileSize(), copy.getFileSize()) &&
                 condition.apply(criteria.getSmartUrl(), copy.getSmartUrl()) &&
                 condition.apply(criteria.getMediumUrl(), copy.getMediumUrl()) &&
                 condition.apply(criteria.getReferenceCount(), copy.getReferenceCount()) &&

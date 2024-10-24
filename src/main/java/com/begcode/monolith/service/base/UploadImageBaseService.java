@@ -71,7 +71,9 @@ public class UploadImageBaseService<R extends UploadImageRepository, E extends U
         log.debug("Request to update UploadImage : {}", uploadImageDTO);
         UploadImage uploadImage = uploadImageMapper.toEntity(uploadImageDTO);
         uploadImage.setCategoryId(
-            Optional.ofNullable(uploadImageDTO.getCategory()).map(resourceCategoryDTO -> resourceCategoryDTO.getId()).orElse(null)
+            Optional.ofNullable(uploadImageDTO.getCategory())
+                .map(categoryResourceCategoryDTO -> categoryResourceCategoryDTO.getId())
+                .orElse(null)
         );
         this.saveOrUpdate(uploadImage);
         return findOne(uploadImage.getId()).orElseThrow();
@@ -92,6 +94,30 @@ public class UploadImageBaseService<R extends UploadImageRepository, E extends U
             .map(existingUploadImage -> {
                 uploadImageMapper.partialUpdate(existingUploadImage, uploadImageDTO);
 
+                return existingUploadImage;
+            })
+            .map(tempUploadImage -> {
+                uploadImageRepository.save(tempUploadImage);
+                return uploadImageMapper.toDto(uploadImageRepository.selectById(tempUploadImage.getId()));
+            });
+    }
+
+    /**
+     * copy a uploadImage.
+     *
+     * @param uploadImageDTO the entity to copy.
+     * @return the persisted entity.
+     */
+    @Transactional
+    public Optional<UploadImageDTO> copy(UploadImageDTO uploadImageDTO) {
+        log.debug("Request to partially update UploadImage : {}", uploadImageDTO);
+
+        return uploadImageRepository
+            .findById(uploadImageDTO.getId())
+            .map(existingUploadImage -> {
+                uploadImageMapper.partialUpdate(existingUploadImage, uploadImageDTO);
+
+                existingUploadImage.setId(null);
                 return existingUploadImage;
             })
             .map(tempUploadImage -> {

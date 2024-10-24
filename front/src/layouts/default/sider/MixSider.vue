@@ -68,17 +68,16 @@
 </template>
 <script lang="ts" setup>
 import type { Menu } from '@/router/types';
-import type { CSSProperties } from 'vue';
-import { computed, onMounted, ref, unref, watch } from 'vue';
 import type { RouteLocationNormalized } from 'vue-router';
-import { Icon, ScrollContainer } from '@begcode/components';
+import { ScrollContainer } from '@/components/Container';
 import { SimpleMenu } from '@/components/SimpleMenu';
 import { AppLogo } from '@/components/Application';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
 import { usePermissionStore } from '@/store/modules/permission';
 import { useDragLine } from './useLayoutSider';
 import { useGlobSetting } from '@/hooks/setting';
-import { useDesign, createAsyncComponent } from '@begcode/components';
+import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
+import { useDesign } from '@/hooks/web/useDesign';
 import { useI18n } from '@/hooks/web/useI18n';
 import { useGo } from '@/hooks/web/usePage';
 import { SIDE_BAR_MINI_WIDTH, SIDE_BAR_SHOW_TIT_MINI_WIDTH } from '@/enums/appEnum';

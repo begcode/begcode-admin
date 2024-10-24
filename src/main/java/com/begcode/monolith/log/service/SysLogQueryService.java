@@ -108,12 +108,12 @@ public class SysLogQueryService implements QueryService<SysLog> {
                 keywordsCriteria.createdBy().setEquals(Long.valueOf(keywords));
                 keywordsCriteria.lastModifiedBy().setEquals(Long.valueOf(keywords));
             }
+            keywordsCriteria.requestUrl().setContains(keywords);
             keywordsCriteria.logContent().setContains(keywords);
             keywordsCriteria.userid().setContains(keywords);
             keywordsCriteria.username().setContains(keywords);
             keywordsCriteria.ip().setContains(keywords);
             keywordsCriteria.method().setContains(keywords);
-            keywordsCriteria.requestUrl().setContains(keywords);
             keywordsCriteria.requestType().setContains(keywords);
             SysLogCriteria tempCriteria = criteria;
             while (tempCriteria.getAnd() != null) {
@@ -152,6 +152,7 @@ public class SysLogQueryService implements QueryService<SysLog> {
         List<String> groupByFields = new ArrayList<>();
         Map<String, Filter<?>> fieldNameMap = new HashMap<>();
         fieldNameMap.put("self.id", criteria.getId());
+        fieldNameMap.put("self.request_url", criteria.getRequestUrl());
         fieldNameMap.put("self.log_type", criteria.getLogType());
         fieldNameMap.put("self.log_content", criteria.getLogContent());
         fieldNameMap.put("self.operate_type", criteria.getOperateType());
@@ -159,7 +160,6 @@ public class SysLogQueryService implements QueryService<SysLog> {
         fieldNameMap.put("self.username", criteria.getUsername());
         fieldNameMap.put("self.ip", criteria.getIp());
         fieldNameMap.put("self.method", criteria.getMethod());
-        fieldNameMap.put("self.request_url", criteria.getRequestUrl());
         fieldNameMap.put("self.request_type", criteria.getRequestType());
         fieldNameMap.put("self.cost_time", criteria.getCostTime());
         fieldNameMap.put("self.created_by", criteria.getCreatedBy());
@@ -170,9 +170,7 @@ public class SysLogQueryService implements QueryService<SysLog> {
             .entrySet()
             .stream()
             .filter(entry -> entry.getValue() != null)
-            .forEach(entry -> {
-                getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields);
-            });
+            .forEach(entry -> getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields));
         if (CollectionUtils.isNotEmpty(selectFields)) {
             queryWrapper.select(selectFields.toArray(new String[0])).groupBy(CollectionUtils.isNotEmpty(groupByFields), groupByFields);
             return Binder.joinQueryMapsPage(queryWrapper, SysLog.class, null).getRecords();

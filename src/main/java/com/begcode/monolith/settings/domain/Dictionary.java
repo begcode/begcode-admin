@@ -71,7 +71,7 @@ public class Dictionary implements Serializable {
         condition = "id=owner_entity_id AND owner_entity_name = 'Dictionary' ",
         orderBy = "sortValue:ASC"
     )
-    @JsonIgnoreProperties(value = { "siteConfig", "dictionary" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "systemConfig", "dictionary" }, allowSetters = true)
     private List<CommonFieldData> items = new ArrayList<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

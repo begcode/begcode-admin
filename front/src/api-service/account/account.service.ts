@@ -9,10 +9,10 @@ const baseApiUrl = '/api';
 
 export default {
   authenticateWithoutCaptcha(params: LoginParams, mode: ErrorMessageMode = 'modal'): Promise<Object> {
-    return defHttp.post({ url: `${baseApiUrl}/authenticate/withoutCaptcha`, params }, { errorMessageMode: mode });
+    return defHttp.post({ url: `${baseApiUrl}/authenticate/withoutCaptcha`, data: params }, { errorMessageMode: mode });
   },
   authenticate(params: LoginParams, mode: ErrorMessageMode = 'modal'): Promise<Object> {
-    return defHttp.post({ url: `${baseApiUrl}/authenticate`, params }, { errorMessageMode: mode });
+    return defHttp.post({ url: `${baseApiUrl}/authenticate`, data: params }, { errorMessageMode: mode });
   },
   getAccount(mode: ErrorMessageMode = 'none'): Promise<User> {
     return defHttp.get({ url: `${baseApiUrl}/account` }, { errorMessageMode: mode });
@@ -21,19 +21,19 @@ export default {
     return defHttp.put({ url: `${baseApiUrl}/account/imageUrl`, params: `?imageUrl=${url}` }, { errorMessageMode: 'none' });
   },
   updateAccount(userInfo: any): Promise<User> {
-    return defHttp.post({ url: `${baseApiUrl}/account`, params: userInfo }, { errorMessageMode: 'none' });
+    return defHttp.post({ url: `${baseApiUrl}/account`, data: userInfo }, { errorMessageMode: 'none' });
   },
-  changePassword(param: any): Promise<Object> {
-    return defHttp.post({ url: `${baseApiUrl}/account/change-password`, params: param }, { errorMessageMode: 'none' });
+  changePassword(params: any): Promise<Object> {
+    return defHttp.post({ url: `${baseApiUrl}/account/change-password`, data: params }, { errorMessageMode: 'none' });
   },
-  resetPasswordSmsCode(param: any): Promise<string> {
-    return defHttp.get({ url: `${baseApiUrl}/mobile/reset-password/smscode`, params: param }, { errorMessageMode: 'none' });
+  resetPasswordSmsCode(params: any): Promise<string> {
+    return defHttp.get({ url: `${baseApiUrl}/mobile/reset-password/smscode`, params }, { errorMessageMode: 'none' });
   },
-  resetPasswordFinish(param: any): Promise<boolean> {
-    return defHttp.post({ url: `${baseApiUrl}/mobile/reset-password/finish`, params: param }, { errorMessageMode: 'none' });
+  resetPasswordFinish(params: any): Promise<boolean> {
+    return defHttp.post({ url: `${baseApiUrl}/mobile/reset-password/finish`, params }, { errorMessageMode: 'none' });
   },
-  checkExistUser(param: any): Promise<boolean> {
-    return defHttp.get({ url: `${baseApiUrl}/users/check`, params: param }, { errorMessageMode: 'none' });
+  checkExistUser(params: any): Promise<boolean> {
+    return defHttp.get({ url: `${baseApiUrl}/users/check`, paramss }, { errorMessageMode: 'none' });
   },
 
   // jhipster-needle-service-add-method - BegCode will add getters and setters here, do not remove

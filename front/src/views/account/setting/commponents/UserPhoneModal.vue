@@ -50,28 +50,28 @@
         </a-form-item>
       </div>
     </a-form>
-    <Form v-else-if="type === 'bindPhone'" class="antd-modal-form" ref="formRef" :model="formState" :rules="validatorRules">
-      <FormItem name="mobile">
-        <Input size="large" v-model:value="formState.mobile" placeholder="请输入手机号" />
-      </FormItem>
-      <FormItem name="code">
+    <a-form v-else-if="type === 'bindPhone'" class="antd-modal-form" ref="formRef" :model="formState" :rules="validatorRules">
+      <a-form-item name="mobile">
+        <a-input size="large" v-model:value="formState.mobile" placeholder="请输入手机号" />
+      </a-form-item>
+      <a-form-item name="code">
         <CountdownInput size="large" v-model:value="formState.code" placeholder="输入6位验证码" :sendCodeApi="sendCodeApi" />
-      </FormItem>
-      <FormItem>
-        <Button size="large" type="primary" block @click="updatePhone"> 确认 </Button>
-      </FormItem>
-    </Form>
+      </a-form-item>
+      <a-form-item>
+        <a-button size="large" type="primary" block @click="updatePhone"> 确认 </a-button>
+      </a-form-item>
+    </a-form>
   </BasicModal>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
-import { Form, FormItem, Button, Input } from 'ant-design-vue';
-import { BasicModal, CountdownInput, useModalInner } from '@begcode/components';
+import { Form } from 'ant-design-vue';
+import { BasicModal, useModalInner } from '@/components/Modal';
+import { CountdownInput } from '@/components/CountDown';
 import { useUserStore } from '@/store/modules/user';
 import { useMessage } from '@/hooks/web/useMessage';
 import { getSmsCaptcha } from '@/api-service/sys/user';
-import { Rule } from '@begcode/components';
+import { Rule } from '@/components/Form';
 import { updateMobile, changePhone } from '../UserSetting.api';
 import accountService from '@/api-service/account/account.service';
 import { defHttp } from '@/utils/http/axios';

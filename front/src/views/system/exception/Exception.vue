@@ -1,12 +1,9 @@
 <script lang="tsx">
-import type { PropType } from 'vue';
-import { Result, Button } from 'ant-design-vue';
-import { defineComponent, ref, computed, unref } from 'vue';
 import { ExceptionEnum } from '@/enums/exceptionEnum';
 import notDataSvg from '@/assets/svg/no-data.svg';
 import netWorkSvg from '@/assets/svg/net-error.svg';
 import { useRoute } from 'vue-router';
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 import { useI18n } from '@/hooks/web/useI18n';
 import { useGo, useRedo } from '@/hooks/web/usePage';
 import { PageEnum } from '@/enums/pageEnum';
@@ -109,17 +106,17 @@ export default defineComponent({
     return () => {
       const { title, subTitle, btnText, icon, handler, status } = unref(getMapValue) || {};
       return (
-        <Result class={prefixCls} status={status as any} title={props.title || title} sub-title={props.subTitle || subTitle}>
+        <a-result class={prefixCls} status={status as any} title={props.title || title} sub-title={props.subTitle || subTitle}>
           {{
             extra: () =>
               btnText && (
-                <Button type="primary" onClick={handler}>
+                <a-button type="primary" onClick={handler}>
                   {() => btnText}
-                </Button>
+                </a-button>
               ),
             icon: status && ExceptionEnum[status] === void 0 ? () => (icon ? <img src={icon} /> : null) : undefined,
           }}
-        </Result>
+        </a-result>
       );
     };
   },

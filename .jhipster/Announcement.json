@@ -5,7 +5,10 @@
     "changelogDate": "20240101063406",
     "entityPackage": "system",
     "extendAbstractAuditingEntity": true,
+    "mobileConfig": "addToBottomNav-addToHomeMenu-addToHomeRecommend",
     "moduleName": "system",
+    "publicApiBy": "category=NOTICE,receiverType=ALL",
+    "skipComponent": "appEditPage",
     "skipFakeData": true,
     "useTemplate": "edit"
   },

@@ -8,7 +8,11 @@
 @skipWebButton(listAdd-listEdit)
 @addCustomMethod(rest-queryService)
 @skipWebsite
+@skipComponent(appEditPage)
+@mobileConfig(addToHomeMenu-addToUserMenu-listWithHeader-listWithStat-detailByData)
+@filterByTree(logType)
 entity SysLog {
+  requestUrl String /** 请求路径 */
   logType LogType /** 日志类型 */
   logContent String /** 日志内容 */
   operateType OperateType /** 操作类型 */
@@ -16,7 +20,6 @@ entity SysLog {
   username String /** 操作用户名称 */
   ip String /** IP */
   method String /** 请求java方法 */
-  requestUrl String /** 请求路径 */
   @endUsed(textArea)
   requestParam TextBlob /** 请求参数 */
   requestType String /** 请求类型 */

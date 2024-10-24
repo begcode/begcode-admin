@@ -1,10 +1,9 @@
-import { ref, onBeforeMount, unref, Ref, nextTick } from 'vue';
-import { cloneDeep } from 'lodash-es';
-import { filter, forEach, useScrollTo } from '@begcode/components';
 import { onKeyStroke, useDebounceFn } from '@vueuse/core';
-import { useGo } from '@/hooks/web/usePage';
-import { getMenus } from '@/router/menus';
 import type { Menu } from '@/router/types';
+import { getMenus } from '@/router/menus';
+import { filter, forEach } from '@/utils/helper/treeHelper';
+import { useScrollTo } from '@/hooks/vben';
+import { useGo } from '@/hooks/web/usePage';
 import { useI18n } from '@/hooks/web/useI18n';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
@@ -41,7 +40,7 @@ export function useMenuSearch(refs: Ref<HTMLElement[]>, scrollWrap: Ref<ElRef>, 
 
   onBeforeMount(async () => {
     const list = await getMenus();
-    menuList = cloneDeep(list);
+    menuList = _cloneDeep(list);
     forEach(menuList, item => {
       item.name = t(item.name);
     });

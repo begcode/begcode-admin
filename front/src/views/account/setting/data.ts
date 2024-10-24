@@ -1,4 +1,4 @@
-import { FormSchema } from '@begcode/components';
+import type { FormSchema } from '@/components/Form';
 import { rules } from '@/utils/helper/validator';
 
 export interface ListItem {

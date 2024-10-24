@@ -47,17 +47,30 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockMyUser
 public class UploadFileResourceIT {
 
-    private static final String DEFAULT_URL = "AAAAAAAAAA";
-    private static final String UPDATED_URL = "BBBBBBBBBB";
-
     private static final String DEFAULT_FULL_NAME = "AAAAAAAAAA";
     private static final String UPDATED_FULL_NAME = "BBBBBBBBBB";
+
+    private static final String DEFAULT_BUSINESS_TITLE = "AAAAAAAAAA";
+    private static final String UPDATED_BUSINESS_TITLE = "BBBBBBBBBB";
+
+    private static final String DEFAULT_BUSINESS_DESC = "AAAAAAAAAA";
+    private static final String UPDATED_BUSINESS_DESC = "BBBBBBBBBB";
+
+    private static final String DEFAULT_BUSINESS_STATUS = "AAAAAAAAAA";
+    private static final String UPDATED_BUSINESS_STATUS = "BBBBBBBBBB";
+
+    private static final String DEFAULT_URL = "AAAAAAAAAA";
+    private static final String UPDATED_URL = "BBBBBBBBBB";
 
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
     private static final String DEFAULT_THUMB = "AAAAAAAAAA";
     private static final String UPDATED_THUMB = "BBBBBBBBBB";
+
+    private static final Long DEFAULT_FILE_SIZE = 1L;
+    private static final Long UPDATED_FILE_SIZE = 2L;
+    private static final Long SMALLER_FILE_SIZE = 1L - 1L;
 
     private static final String DEFAULT_EXT = "AAAAAAAAAA";
     private static final String UPDATED_EXT = "BBBBBBBBBB";
@@ -78,22 +91,9 @@ public class UploadFileResourceIT {
     private static final Long UPDATED_OWNER_ENTITY_ID = 2L;
     private static final Long SMALLER_OWNER_ENTITY_ID = 1L - 1L;
 
-    private static final String DEFAULT_BUSINESS_TITLE = "AAAAAAAAAA";
-    private static final String UPDATED_BUSINESS_TITLE = "BBBBBBBBBB";
-
-    private static final String DEFAULT_BUSINESS_DESC = "AAAAAAAAAA";
-    private static final String UPDATED_BUSINESS_DESC = "BBBBBBBBBB";
-
-    private static final String DEFAULT_BUSINESS_STATUS = "AAAAAAAAAA";
-    private static final String UPDATED_BUSINESS_STATUS = "BBBBBBBBBB";
-
     private static final ZonedDateTime DEFAULT_CREATE_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
     private static final ZonedDateTime UPDATED_CREATE_AT = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
     private static final ZonedDateTime SMALLER_CREATE_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
-
-    private static final Long DEFAULT_FILE_SIZE = 1L;
-    private static final Long UPDATED_FILE_SIZE = 2L;
-    private static final Long SMALLER_FILE_SIZE = 1L - 1L;
 
     private static final Long DEFAULT_REFERENCE_COUNT = 1L;
     private static final Long UPDATED_REFERENCE_COUNT = 2L;
@@ -149,21 +149,21 @@ public class UploadFileResourceIT {
      */
     public static UploadFile createEntity() {
         UploadFile uploadFile = new UploadFile()
-            .url(DEFAULT_URL)
             .fullName(DEFAULT_FULL_NAME)
+            .businessTitle(DEFAULT_BUSINESS_TITLE)
+            .businessDesc(DEFAULT_BUSINESS_DESC)
+            .businessStatus(DEFAULT_BUSINESS_STATUS)
+            .url(DEFAULT_URL)
             .name(DEFAULT_NAME)
             .thumb(DEFAULT_THUMB)
+            .fileSize(DEFAULT_FILE_SIZE)
             .ext(DEFAULT_EXT)
             .type(DEFAULT_TYPE)
             .path(DEFAULT_PATH)
             .folder(DEFAULT_FOLDER)
             .ownerEntityName(DEFAULT_OWNER_ENTITY_NAME)
             .ownerEntityId(DEFAULT_OWNER_ENTITY_ID)
-            .businessTitle(DEFAULT_BUSINESS_TITLE)
-            .businessDesc(DEFAULT_BUSINESS_DESC)
-            .businessStatus(DEFAULT_BUSINESS_STATUS)
             .createAt(DEFAULT_CREATE_AT)
-            .fileSize(DEFAULT_FILE_SIZE)
             .referenceCount(DEFAULT_REFERENCE_COUNT)
             .createdBy(DEFAULT_CREATED_BY)
             .createdDate(DEFAULT_CREATED_DATE)
@@ -180,21 +180,21 @@ public class UploadFileResourceIT {
      */
     public static UploadFile createUpdatedEntity() {
         UploadFile uploadFile = new UploadFile()
-            .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
+            .businessTitle(UPDATED_BUSINESS_TITLE)
+            .businessDesc(UPDATED_BUSINESS_DESC)
+            .businessStatus(UPDATED_BUSINESS_STATUS)
+            .url(UPDATED_URL)
             .name(UPDATED_NAME)
             .thumb(UPDATED_THUMB)
+            .fileSize(UPDATED_FILE_SIZE)
             .ext(UPDATED_EXT)
             .type(UPDATED_TYPE)
             .path(UPDATED_PATH)
             .folder(UPDATED_FOLDER)
             .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
             .ownerEntityId(UPDATED_OWNER_ENTITY_ID)
-            .businessTitle(UPDATED_BUSINESS_TITLE)
-            .businessDesc(UPDATED_BUSINESS_DESC)
-            .businessStatus(UPDATED_BUSINESS_STATUS)
             .createAt(UPDATED_CREATE_AT)
-            .fileSize(UPDATED_FILE_SIZE)
             .referenceCount(UPDATED_REFERENCE_COUNT)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
@@ -287,21 +287,21 @@ public class UploadFileResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(uploadFile.getId().intValue())))
-            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)))
             .andExpect(jsonPath("$.[*].fullName").value(hasItem(DEFAULT_FULL_NAME)))
+            .andExpect(jsonPath("$.[*].businessTitle").value(hasItem(DEFAULT_BUSINESS_TITLE)))
+            .andExpect(jsonPath("$.[*].businessDesc").value(hasItem(DEFAULT_BUSINESS_DESC)))
+            .andExpect(jsonPath("$.[*].businessStatus").value(hasItem(DEFAULT_BUSINESS_STATUS)))
+            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].thumb").value(hasItem(DEFAULT_THUMB)))
+            .andExpect(jsonPath("$.[*].fileSize").value(hasItem(DEFAULT_FILE_SIZE.intValue())))
             .andExpect(jsonPath("$.[*].ext").value(hasItem(DEFAULT_EXT)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE)))
             .andExpect(jsonPath("$.[*].path").value(hasItem(DEFAULT_PATH)))
             .andExpect(jsonPath("$.[*].folder").value(hasItem(DEFAULT_FOLDER)))
             .andExpect(jsonPath("$.[*].ownerEntityName").value(hasItem(DEFAULT_OWNER_ENTITY_NAME)))
             .andExpect(jsonPath("$.[*].ownerEntityId").value(hasItem(DEFAULT_OWNER_ENTITY_ID.intValue())))
-            .andExpect(jsonPath("$.[*].businessTitle").value(hasItem(DEFAULT_BUSINESS_TITLE)))
-            .andExpect(jsonPath("$.[*].businessDesc").value(hasItem(DEFAULT_BUSINESS_DESC)))
-            .andExpect(jsonPath("$.[*].businessStatus").value(hasItem(DEFAULT_BUSINESS_STATUS)))
             .andExpect(jsonPath("$.[*].createAt").value(hasItem(sameInstant(DEFAULT_CREATE_AT))))
-            .andExpect(jsonPath("$.[*].fileSize").value(hasItem(DEFAULT_FILE_SIZE.intValue())))
             .andExpect(jsonPath("$.[*].referenceCount").value(hasItem(DEFAULT_REFERENCE_COUNT.intValue())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
@@ -338,21 +338,21 @@ public class UploadFileResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(uploadFile.getId().intValue()))
-            .andExpect(jsonPath("$.url").value(DEFAULT_URL))
             .andExpect(jsonPath("$.fullName").value(DEFAULT_FULL_NAME))
+            .andExpect(jsonPath("$.businessTitle").value(DEFAULT_BUSINESS_TITLE))
+            .andExpect(jsonPath("$.businessDesc").value(DEFAULT_BUSINESS_DESC))
+            .andExpect(jsonPath("$.businessStatus").value(DEFAULT_BUSINESS_STATUS))
+            .andExpect(jsonPath("$.url").value(DEFAULT_URL))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.thumb").value(DEFAULT_THUMB))
+            .andExpect(jsonPath("$.fileSize").value(DEFAULT_FILE_SIZE.intValue()))
             .andExpect(jsonPath("$.ext").value(DEFAULT_EXT))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE))
             .andExpect(jsonPath("$.path").value(DEFAULT_PATH))
             .andExpect(jsonPath("$.folder").value(DEFAULT_FOLDER))
             .andExpect(jsonPath("$.ownerEntityName").value(DEFAULT_OWNER_ENTITY_NAME))
             .andExpect(jsonPath("$.ownerEntityId").value(DEFAULT_OWNER_ENTITY_ID.intValue()))
-            .andExpect(jsonPath("$.businessTitle").value(DEFAULT_BUSINESS_TITLE))
-            .andExpect(jsonPath("$.businessDesc").value(DEFAULT_BUSINESS_DESC))
-            .andExpect(jsonPath("$.businessStatus").value(DEFAULT_BUSINESS_STATUS))
             .andExpect(jsonPath("$.createAt").value(sameInstant(DEFAULT_CREATE_AT)))
-            .andExpect(jsonPath("$.fileSize").value(DEFAULT_FILE_SIZE.intValue()))
             .andExpect(jsonPath("$.referenceCount").value(DEFAULT_REFERENCE_COUNT.intValue()))
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.intValue()))
             .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()))
@@ -373,56 +373,6 @@ public class UploadFileResourceIT {
         defaultUploadFileFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
         defaultUploadFileFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByUrlIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where url equals to
-        defaultUploadFileFiltering("url.equals=" + DEFAULT_URL, "url.equals=" + UPDATED_URL);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByUrlIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where url in
-        defaultUploadFileFiltering("url.in=" + DEFAULT_URL + "," + UPDATED_URL, "url.in=" + UPDATED_URL);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByUrlIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where url is not null
-        defaultUploadFileFiltering("url.specified=true", "url.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByUrlContainsSomething() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where url contains
-        defaultUploadFileFiltering("url.contains=" + DEFAULT_URL, "url.contains=" + UPDATED_URL);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByUrlNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where url does not contain
-        defaultUploadFileFiltering("url.doesNotContain=" + UPDATED_URL, "url.doesNotContain=" + DEFAULT_URL);
     }
 
     @Test
@@ -473,6 +423,227 @@ public class UploadFileResourceIT {
 
         // Get all the uploadFileList where fullName does not contain
         defaultUploadFileFiltering("fullName.doesNotContain=" + UPDATED_FULL_NAME, "fullName.doesNotContain=" + DEFAULT_FULL_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByBusinessTitleIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where businessTitle equals to
+        defaultUploadFileFiltering("businessTitle.equals=" + DEFAULT_BUSINESS_TITLE, "businessTitle.equals=" + UPDATED_BUSINESS_TITLE);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByBusinessTitleIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where businessTitle in
+        defaultUploadFileFiltering(
+            "businessTitle.in=" + DEFAULT_BUSINESS_TITLE + "," + UPDATED_BUSINESS_TITLE,
+            "businessTitle.in=" + UPDATED_BUSINESS_TITLE
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByBusinessTitleIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where businessTitle is not null
+        defaultUploadFileFiltering("businessTitle.specified=true", "businessTitle.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByBusinessTitleContainsSomething() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where businessTitle contains
+        defaultUploadFileFiltering("businessTitle.contains=" + DEFAULT_BUSINESS_TITLE, "businessTitle.contains=" + UPDATED_BUSINESS_TITLE);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByBusinessTitleNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where businessTitle does not contain
+        defaultUploadFileFiltering(
+            "businessTitle.doesNotContain=" + UPDATED_BUSINESS_TITLE,
+            "businessTitle.doesNotContain=" + DEFAULT_BUSINESS_TITLE
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByBusinessDescIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where businessDesc equals to
+        defaultUploadFileFiltering("businessDesc.equals=" + DEFAULT_BUSINESS_DESC, "businessDesc.equals=" + UPDATED_BUSINESS_DESC);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByBusinessDescIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where businessDesc in
+        defaultUploadFileFiltering(
+            "businessDesc.in=" + DEFAULT_BUSINESS_DESC + "," + UPDATED_BUSINESS_DESC,
+            "businessDesc.in=" + UPDATED_BUSINESS_DESC
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByBusinessDescIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where businessDesc is not null
+        defaultUploadFileFiltering("businessDesc.specified=true", "businessDesc.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByBusinessDescContainsSomething() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where businessDesc contains
+        defaultUploadFileFiltering("businessDesc.contains=" + DEFAULT_BUSINESS_DESC, "businessDesc.contains=" + UPDATED_BUSINESS_DESC);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByBusinessDescNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where businessDesc does not contain
+        defaultUploadFileFiltering(
+            "businessDesc.doesNotContain=" + UPDATED_BUSINESS_DESC,
+            "businessDesc.doesNotContain=" + DEFAULT_BUSINESS_DESC
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByBusinessStatusIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where businessStatus equals to
+        defaultUploadFileFiltering("businessStatus.equals=" + DEFAULT_BUSINESS_STATUS, "businessStatus.equals=" + UPDATED_BUSINESS_STATUS);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByBusinessStatusIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where businessStatus in
+        defaultUploadFileFiltering(
+            "businessStatus.in=" + DEFAULT_BUSINESS_STATUS + "," + UPDATED_BUSINESS_STATUS,
+            "businessStatus.in=" + UPDATED_BUSINESS_STATUS
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByBusinessStatusIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where businessStatus is not null
+        defaultUploadFileFiltering("businessStatus.specified=true", "businessStatus.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByBusinessStatusContainsSomething() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where businessStatus contains
+        defaultUploadFileFiltering(
+            "businessStatus.contains=" + DEFAULT_BUSINESS_STATUS,
+            "businessStatus.contains=" + UPDATED_BUSINESS_STATUS
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByBusinessStatusNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where businessStatus does not contain
+        defaultUploadFileFiltering(
+            "businessStatus.doesNotContain=" + UPDATED_BUSINESS_STATUS,
+            "businessStatus.doesNotContain=" + DEFAULT_BUSINESS_STATUS
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByUrlIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where url equals to
+        defaultUploadFileFiltering("url.equals=" + DEFAULT_URL, "url.equals=" + UPDATED_URL);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByUrlIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where url in
+        defaultUploadFileFiltering("url.in=" + DEFAULT_URL + "," + UPDATED_URL, "url.in=" + UPDATED_URL);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByUrlIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where url is not null
+        defaultUploadFileFiltering("url.specified=true", "url.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByUrlContainsSomething() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where url contains
+        defaultUploadFileFiltering("url.contains=" + DEFAULT_URL, "url.contains=" + UPDATED_URL);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByUrlNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where url does not contain
+        defaultUploadFileFiltering("url.doesNotContain=" + UPDATED_URL, "url.doesNotContain=" + DEFAULT_URL);
     }
 
     @Test
@@ -573,6 +744,76 @@ public class UploadFileResourceIT {
 
         // Get all the uploadFileList where thumb does not contain
         defaultUploadFileFiltering("thumb.doesNotContain=" + UPDATED_THUMB, "thumb.doesNotContain=" + DEFAULT_THUMB);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByFileSizeIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where fileSize equals to
+        defaultUploadFileFiltering("fileSize.equals=" + DEFAULT_FILE_SIZE, "fileSize.equals=" + UPDATED_FILE_SIZE);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByFileSizeIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where fileSize in
+        defaultUploadFileFiltering("fileSize.in=" + DEFAULT_FILE_SIZE + "," + UPDATED_FILE_SIZE, "fileSize.in=" + UPDATED_FILE_SIZE);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByFileSizeIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where fileSize is not null
+        defaultUploadFileFiltering("fileSize.specified=true", "fileSize.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByFileSizeIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where fileSize is greater than or equal to
+        defaultUploadFileFiltering("fileSize.greaterThanOrEqual=" + DEFAULT_FILE_SIZE, "fileSize.greaterThanOrEqual=" + UPDATED_FILE_SIZE);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByFileSizeIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where fileSize is less than or equal to
+        defaultUploadFileFiltering("fileSize.lessThanOrEqual=" + DEFAULT_FILE_SIZE, "fileSize.lessThanOrEqual=" + SMALLER_FILE_SIZE);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByFileSizeIsLessThanSomething() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where fileSize is less than
+        defaultUploadFileFiltering("fileSize.lessThan=" + UPDATED_FILE_SIZE, "fileSize.lessThan=" + DEFAULT_FILE_SIZE);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadFilesByFileSizeIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
+
+        // Get all the uploadFileList where fileSize is greater than
+        defaultUploadFileFiltering("fileSize.greaterThan=" + SMALLER_FILE_SIZE, "fileSize.greaterThan=" + DEFAULT_FILE_SIZE);
     }
 
     @Test
@@ -924,177 +1165,6 @@ public class UploadFileResourceIT {
 
     @Test
     @Transactional
-    void getAllUploadFilesByBusinessTitleIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where businessTitle equals to
-        defaultUploadFileFiltering("businessTitle.equals=" + DEFAULT_BUSINESS_TITLE, "businessTitle.equals=" + UPDATED_BUSINESS_TITLE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByBusinessTitleIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where businessTitle in
-        defaultUploadFileFiltering(
-            "businessTitle.in=" + DEFAULT_BUSINESS_TITLE + "," + UPDATED_BUSINESS_TITLE,
-            "businessTitle.in=" + UPDATED_BUSINESS_TITLE
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByBusinessTitleIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where businessTitle is not null
-        defaultUploadFileFiltering("businessTitle.specified=true", "businessTitle.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByBusinessTitleContainsSomething() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where businessTitle contains
-        defaultUploadFileFiltering("businessTitle.contains=" + DEFAULT_BUSINESS_TITLE, "businessTitle.contains=" + UPDATED_BUSINESS_TITLE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByBusinessTitleNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where businessTitle does not contain
-        defaultUploadFileFiltering(
-            "businessTitle.doesNotContain=" + UPDATED_BUSINESS_TITLE,
-            "businessTitle.doesNotContain=" + DEFAULT_BUSINESS_TITLE
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByBusinessDescIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where businessDesc equals to
-        defaultUploadFileFiltering("businessDesc.equals=" + DEFAULT_BUSINESS_DESC, "businessDesc.equals=" + UPDATED_BUSINESS_DESC);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByBusinessDescIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where businessDesc in
-        defaultUploadFileFiltering(
-            "businessDesc.in=" + DEFAULT_BUSINESS_DESC + "," + UPDATED_BUSINESS_DESC,
-            "businessDesc.in=" + UPDATED_BUSINESS_DESC
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByBusinessDescIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where businessDesc is not null
-        defaultUploadFileFiltering("businessDesc.specified=true", "businessDesc.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByBusinessDescContainsSomething() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where businessDesc contains
-        defaultUploadFileFiltering("businessDesc.contains=" + DEFAULT_BUSINESS_DESC, "businessDesc.contains=" + UPDATED_BUSINESS_DESC);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByBusinessDescNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where businessDesc does not contain
-        defaultUploadFileFiltering(
-            "businessDesc.doesNotContain=" + UPDATED_BUSINESS_DESC,
-            "businessDesc.doesNotContain=" + DEFAULT_BUSINESS_DESC
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByBusinessStatusIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where businessStatus equals to
-        defaultUploadFileFiltering("businessStatus.equals=" + DEFAULT_BUSINESS_STATUS, "businessStatus.equals=" + UPDATED_BUSINESS_STATUS);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByBusinessStatusIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where businessStatus in
-        defaultUploadFileFiltering(
-            "businessStatus.in=" + DEFAULT_BUSINESS_STATUS + "," + UPDATED_BUSINESS_STATUS,
-            "businessStatus.in=" + UPDATED_BUSINESS_STATUS
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByBusinessStatusIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where businessStatus is not null
-        defaultUploadFileFiltering("businessStatus.specified=true", "businessStatus.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByBusinessStatusContainsSomething() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where businessStatus contains
-        defaultUploadFileFiltering(
-            "businessStatus.contains=" + DEFAULT_BUSINESS_STATUS,
-            "businessStatus.contains=" + UPDATED_BUSINESS_STATUS
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByBusinessStatusNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where businessStatus does not contain
-        defaultUploadFileFiltering(
-            "businessStatus.doesNotContain=" + UPDATED_BUSINESS_STATUS,
-            "businessStatus.doesNotContain=" + DEFAULT_BUSINESS_STATUS
-        );
-    }
-
-    @Test
-    @Transactional
     void getAllUploadFilesByCreateAtIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
@@ -1161,76 +1231,6 @@ public class UploadFileResourceIT {
 
         // Get all the uploadFileList where createAt is greater than
         defaultUploadFileFiltering("createAt.greaterThan=" + SMALLER_CREATE_AT, "createAt.greaterThan=" + DEFAULT_CREATE_AT);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByFileSizeIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where fileSize equals to
-        defaultUploadFileFiltering("fileSize.equals=" + DEFAULT_FILE_SIZE, "fileSize.equals=" + UPDATED_FILE_SIZE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByFileSizeIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where fileSize in
-        defaultUploadFileFiltering("fileSize.in=" + DEFAULT_FILE_SIZE + "," + UPDATED_FILE_SIZE, "fileSize.in=" + UPDATED_FILE_SIZE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByFileSizeIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where fileSize is not null
-        defaultUploadFileFiltering("fileSize.specified=true", "fileSize.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByFileSizeIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where fileSize is greater than or equal to
-        defaultUploadFileFiltering("fileSize.greaterThanOrEqual=" + DEFAULT_FILE_SIZE, "fileSize.greaterThanOrEqual=" + UPDATED_FILE_SIZE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByFileSizeIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where fileSize is less than or equal to
-        defaultUploadFileFiltering("fileSize.lessThanOrEqual=" + DEFAULT_FILE_SIZE, "fileSize.lessThanOrEqual=" + SMALLER_FILE_SIZE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByFileSizeIsLessThanSomething() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where fileSize is less than
-        defaultUploadFileFiltering("fileSize.lessThan=" + UPDATED_FILE_SIZE, "fileSize.lessThan=" + DEFAULT_FILE_SIZE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadFilesByFileSizeIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        insertedUploadFile = uploadFileRepository.saveAndGet(uploadFile);
-
-        // Get all the uploadFileList where fileSize is greater than
-        defaultUploadFileFiltering("fileSize.greaterThan=" + SMALLER_FILE_SIZE, "fileSize.greaterThan=" + DEFAULT_FILE_SIZE);
     }
 
     @Test
@@ -1576,21 +1576,21 @@ public class UploadFileResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(uploadFile.getId().intValue())))
-            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)))
             .andExpect(jsonPath("$.[*].fullName").value(hasItem(DEFAULT_FULL_NAME)))
+            .andExpect(jsonPath("$.[*].businessTitle").value(hasItem(DEFAULT_BUSINESS_TITLE)))
+            .andExpect(jsonPath("$.[*].businessDesc").value(hasItem(DEFAULT_BUSINESS_DESC)))
+            .andExpect(jsonPath("$.[*].businessStatus").value(hasItem(DEFAULT_BUSINESS_STATUS)))
+            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].thumb").value(hasItem(DEFAULT_THUMB)))
+            .andExpect(jsonPath("$.[*].fileSize").value(hasItem(DEFAULT_FILE_SIZE.intValue())))
             .andExpect(jsonPath("$.[*].ext").value(hasItem(DEFAULT_EXT)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE)))
             .andExpect(jsonPath("$.[*].path").value(hasItem(DEFAULT_PATH)))
             .andExpect(jsonPath("$.[*].folder").value(hasItem(DEFAULT_FOLDER)))
             .andExpect(jsonPath("$.[*].ownerEntityName").value(hasItem(DEFAULT_OWNER_ENTITY_NAME)))
             .andExpect(jsonPath("$.[*].ownerEntityId").value(hasItem(DEFAULT_OWNER_ENTITY_ID.intValue())))
-            .andExpect(jsonPath("$.[*].businessTitle").value(hasItem(DEFAULT_BUSINESS_TITLE)))
-            .andExpect(jsonPath("$.[*].businessDesc").value(hasItem(DEFAULT_BUSINESS_DESC)))
-            .andExpect(jsonPath("$.[*].businessStatus").value(hasItem(DEFAULT_BUSINESS_STATUS)))
             .andExpect(jsonPath("$.[*].createAt").value(hasItem(sameInstant(DEFAULT_CREATE_AT))))
-            .andExpect(jsonPath("$.[*].fileSize").value(hasItem(DEFAULT_FILE_SIZE.intValue())))
             .andExpect(jsonPath("$.[*].referenceCount").value(hasItem(DEFAULT_REFERENCE_COUNT.intValue())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
@@ -1642,21 +1642,21 @@ public class UploadFileResourceIT {
         // Update the uploadFile
         UploadFile updatedUploadFile = uploadFileRepository.findById(uploadFile.getId()).orElseThrow();
         updatedUploadFile
-            .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
+            .businessTitle(UPDATED_BUSINESS_TITLE)
+            .businessDesc(UPDATED_BUSINESS_DESC)
+            .businessStatus(UPDATED_BUSINESS_STATUS)
+            .url(UPDATED_URL)
             .name(UPDATED_NAME)
             .thumb(UPDATED_THUMB)
+            .fileSize(UPDATED_FILE_SIZE)
             .ext(UPDATED_EXT)
             .type(UPDATED_TYPE)
             .path(UPDATED_PATH)
             .folder(UPDATED_FOLDER)
             .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
             .ownerEntityId(UPDATED_OWNER_ENTITY_ID)
-            .businessTitle(UPDATED_BUSINESS_TITLE)
-            .businessDesc(UPDATED_BUSINESS_DESC)
-            .businessStatus(UPDATED_BUSINESS_STATUS)
             .createAt(UPDATED_CREATE_AT)
-            .fileSize(UPDATED_FILE_SIZE)
             .referenceCount(UPDATED_REFERENCE_COUNT)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
@@ -1752,13 +1752,13 @@ public class UploadFileResourceIT {
         partialUpdatedUploadFile.setId(uploadFile.getId());
 
         partialUpdatedUploadFile
-            .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
-            .ext(UPDATED_EXT)
-            .type(UPDATED_TYPE)
-            .ownerEntityId(UPDATED_OWNER_ENTITY_ID)
             .businessTitle(UPDATED_BUSINESS_TITLE)
-            .fileSize(UPDATED_FILE_SIZE)
+            .url(UPDATED_URL)
+            .name(UPDATED_NAME)
+            .type(UPDATED_TYPE)
+            .path(UPDATED_PATH)
+            .createAt(UPDATED_CREATE_AT)
             .referenceCount(UPDATED_REFERENCE_COUNT)
             .createdBy(UPDATED_CREATED_BY);
 
@@ -1792,21 +1792,21 @@ public class UploadFileResourceIT {
         partialUpdatedUploadFile.setId(uploadFile.getId());
 
         partialUpdatedUploadFile
-            .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
+            .businessTitle(UPDATED_BUSINESS_TITLE)
+            .businessDesc(UPDATED_BUSINESS_DESC)
+            .businessStatus(UPDATED_BUSINESS_STATUS)
+            .url(UPDATED_URL)
             .name(UPDATED_NAME)
             .thumb(UPDATED_THUMB)
+            .fileSize(UPDATED_FILE_SIZE)
             .ext(UPDATED_EXT)
             .type(UPDATED_TYPE)
             .path(UPDATED_PATH)
             .folder(UPDATED_FOLDER)
             .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
             .ownerEntityId(UPDATED_OWNER_ENTITY_ID)
-            .businessTitle(UPDATED_BUSINESS_TITLE)
-            .businessDesc(UPDATED_BUSINESS_DESC)
-            .businessStatus(UPDATED_BUSINESS_STATUS)
             .createAt(UPDATED_CREATE_AT)
-            .fileSize(UPDATED_FILE_SIZE)
             .referenceCount(UPDATED_REFERENCE_COUNT)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)

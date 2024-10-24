@@ -1,5 +1,4 @@
 import qs from 'qs';
-import { get, pickBy } from 'lodash-es';
 import { defHttp } from '@/utils/http/axios';
 import buildPaginationQueryOpts from '@/utils/jhipster/sorts';
 import { PageRecord } from '@/models/baseModel';
@@ -27,7 +26,7 @@ export default {
   },
 
   exist(queryParams?: any): Promise<Boolean> {
-    if (!queryParams.hasOwnProperty('id.aggregate.count') || !get(queryParams, 'id.aggregate.count')) {
+    if (!queryParams.hasOwnProperty('id.aggregate.count') || !_get(queryParams, 'id.aggregate.count')) {
       queryParams['id.aggregate.count'] = true;
     }
     const options = buildPaginationQueryOpts(queryParams);
@@ -56,10 +55,12 @@ export default {
     }
     return defHttp.put({ url: `${apiUrl}/${uploadFile.id}?${queryParams}`, data: uploadFile });
   },
-
-  updateRelations(otherEntityIds: String[], relationshipName: String, relatedIds: number[], operateType: String): Promise<Boolean> {
-    const queryParams = qs.stringify({ otherEntityIds, relatedIds, relationshipName }, { arrayFormat: 'repeat' });
-    return defHttp.put({ url: `${apiUrl}/relations/${operateType}`, params: queryParams });
+  copy(uploadFile: IUploadFile, batchIds?: number[], batchFields?: String[]): Promise<IUploadFile> {
+    let queryParams = '';
+    if (batchIds && batchFields) {
+      queryParams = qs.stringify({ batchIds, batchFields }, { arrayFormat: 'repeat' });
+    }
+    return defHttp.patch({ url: `${apiUrl}/copy/${uploadFile.id}?${queryParams}`, data: uploadFile });
   },
   create(uploadFile: IUploadFile, onUploadProgress?: (progressEvent: ProgressEvent) => void, success?) {
     const params: UploadFileParams = <UploadFileParams>{};
@@ -68,7 +69,7 @@ export default {
     params.filename = uploadFile!.file!.name;
     const newUploadFile = { ...uploadFile };
     delete newUploadFile.file;
-    params.data = { uploadFileDTO: pickBy(newUploadFile, value => !!value) };
+    params.data = { uploadFileDTO: _pickBy(newUploadFile, value => !!value) };
     return defHttp.uploadFile<IUploadFile>(
       {
         url: `${apiUrl}`,

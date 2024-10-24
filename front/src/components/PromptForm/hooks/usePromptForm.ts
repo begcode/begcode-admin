@@ -1,6 +1,5 @@
-import { render, createVNode, nextTick } from 'vue';
 import type { PromptFormProps } from '../typing';
-import { error } from '@/utils/log';
+import { error } from '@/utils/Log';
 
 export function usePromptForm() {
   function createPromptForm(options: PromptFormProps) {

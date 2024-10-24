@@ -26,20 +26,41 @@ public class UploadImageDTO extends AbstractAuditingEntity<Long, UploadImageDTO>
     private Long id;
 
     /**
-     * Url地址
-     */
-    @NotNull
-    @Schema(description = "Url地址", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Excel(name = "Url地址")
-    private String url;
-
-    /**
      * 完整文件名
      * 不含路径
      */
     @Schema(description = "完整文件名\n不含路径")
     @Excel(name = "完整文件名\n不含路径")
     private String fullName;
+
+    /**
+     * 业务标题
+     */
+    @Schema(description = "业务标题")
+    @Excel(name = "业务标题")
+    private String businessTitle;
+
+    /**
+     * 业务自定义描述内容
+     */
+    @Schema(description = "业务自定义描述内容")
+    @Excel(name = "业务自定义描述内容")
+    private String businessDesc;
+
+    /**
+     * 业务状态
+     */
+    @Schema(description = "业务状态")
+    @Excel(name = "业务状态")
+    private String businessStatus;
+
+    /**
+     * Url地址
+     */
+    @NotNull
+    @Schema(description = "Url地址", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Excel(name = "Url地址")
+    private String url;
 
     /**
      * 文件名
@@ -78,6 +99,13 @@ public class UploadImageDTO extends AbstractAuditingEntity<Long, UploadImageDTO>
     private String folder;
 
     /**
+     * 文件大小
+     */
+    @Schema(description = "文件大小")
+    @Excel(name = "文件大小")
+    private Long fileSize;
+
+    /**
      * 使用实体名称
      */
     @Schema(description = "使用实体名称")
@@ -92,39 +120,11 @@ public class UploadImageDTO extends AbstractAuditingEntity<Long, UploadImageDTO>
     private Long ownerEntityId;
 
     /**
-     * 业务标题
-     */
-    @Schema(description = "业务标题")
-    @Excel(name = "业务标题")
-    private String businessTitle;
-
-    /**
-     * 业务自定义描述内容
-     */
-    @Schema(description = "业务自定义描述内容")
-    @Excel(name = "业务自定义描述内容")
-    private String businessDesc;
-
-    /**
-     * 业务状态
-     */
-    @Schema(description = "业务状态")
-    @Excel(name = "业务状态")
-    private String businessStatus;
-
-    /**
      * 创建时间
      */
     @Schema(description = "创建时间")
     @Excel(name = "创建时间")
     private ZonedDateTime createAt;
-
-    /**
-     * 文件大小
-     */
-    @Schema(description = "文件大小")
-    @Excel(name = "文件大小")
-    private Long fileSize;
 
     /**
      * 小图Url
@@ -193,13 +193,28 @@ public class UploadImageDTO extends AbstractAuditingEntity<Long, UploadImageDTO>
         return this;
     }
 
-    public UploadImageDTO url(String url) {
-        this.url = url;
+    public UploadImageDTO fullName(String fullName) {
+        this.fullName = fullName;
         return this;
     }
 
-    public UploadImageDTO fullName(String fullName) {
-        this.fullName = fullName;
+    public UploadImageDTO businessTitle(String businessTitle) {
+        this.businessTitle = businessTitle;
+        return this;
+    }
+
+    public UploadImageDTO businessDesc(String businessDesc) {
+        this.businessDesc = businessDesc;
+        return this;
+    }
+
+    public UploadImageDTO businessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
+        return this;
+    }
+
+    public UploadImageDTO url(String url) {
+        this.url = url;
         return this;
     }
 
@@ -228,6 +243,11 @@ public class UploadImageDTO extends AbstractAuditingEntity<Long, UploadImageDTO>
         return this;
     }
 
+    public UploadImageDTO fileSize(Long fileSize) {
+        this.fileSize = fileSize;
+        return this;
+    }
+
     public UploadImageDTO ownerEntityName(String ownerEntityName) {
         this.ownerEntityName = ownerEntityName;
         return this;
@@ -238,28 +258,8 @@ public class UploadImageDTO extends AbstractAuditingEntity<Long, UploadImageDTO>
         return this;
     }
 
-    public UploadImageDTO businessTitle(String businessTitle) {
-        this.businessTitle = businessTitle;
-        return this;
-    }
-
-    public UploadImageDTO businessDesc(String businessDesc) {
-        this.businessDesc = businessDesc;
-        return this;
-    }
-
-    public UploadImageDTO businessStatus(String businessStatus) {
-        this.businessStatus = businessStatus;
-        return this;
-    }
-
     public UploadImageDTO createAt(ZonedDateTime createAt) {
         this.createAt = createAt;
-        return this;
-    }
-
-    public UploadImageDTO fileSize(Long fileSize) {
-        this.fileSize = fileSize;
         return this;
     }
 
@@ -344,20 +344,20 @@ public class UploadImageDTO extends AbstractAuditingEntity<Long, UploadImageDTO>
     public String toString() {
         return "UploadImageDTO{" +
             "id=" + getId() +
-            ", url='" + getUrl() + "'" +
             ", fullName='" + getFullName() + "'" +
+            ", businessTitle='" + getBusinessTitle() + "'" +
+            ", businessDesc='" + getBusinessDesc() + "'" +
+            ", businessStatus='" + getBusinessStatus() + "'" +
+            ", url='" + getUrl() + "'" +
             ", name='" + getName() + "'" +
             ", ext='" + getExt() + "'" +
             ", type='" + getType() + "'" +
             ", path='" + getPath() + "'" +
             ", folder='" + getFolder() + "'" +
+            ", fileSize=" + getFileSize() +
             ", ownerEntityName='" + getOwnerEntityName() + "'" +
             ", ownerEntityId=" + getOwnerEntityId() +
-            ", businessTitle='" + getBusinessTitle() + "'" +
-            ", businessDesc='" + getBusinessDesc() + "'" +
-            ", businessStatus='" + getBusinessStatus() + "'" +
             ", createAt='" + getCreateAt() + "'" +
-            ", fileSize=" + getFileSize() +
             ", smartUrl='" + getSmartUrl() + "'" +
             ", mediumUrl='" + getMediumUrl() + "'" +
             ", referenceCount=" + getReferenceCount() +

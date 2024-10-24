@@ -1,12 +1,10 @@
 <template>
-  <Card title="访问来源" :loading="loading">
+  <a-card title="访问来源" :loading="loading">
     <div ref="chartRef" :style="{ width, height }"></div>
-  </Card>
+  </a-card>
 </template>
 <script lang="ts" setup>
-import { Ref, ref, watch } from 'vue';
-import { Card } from 'ant-design-vue';
-import { useECharts } from '@begcode/components';
+import { useECharts } from '@/hooks/web/useECharts';
 const props = defineProps({
   loading: Boolean,
   width: {

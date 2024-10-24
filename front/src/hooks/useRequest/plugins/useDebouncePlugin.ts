@@ -1,6 +1,4 @@
 import type { DebouncedFunc, DebounceSettings } from 'lodash-es';
-import { debounce } from 'lodash-es';
-import { computed, ref, watchEffect } from 'vue';
 
 import type { UseRequestPlugin } from '../types';
 
@@ -30,7 +28,7 @@ const useDebouncePlugin: UseRequestPlugin<any, any[]> = (
     if (debounceWait) {
       const _originRunAsync = fetchInstance.runAsync.bind(fetchInstance);
 
-      debouncedRef.value = debounce(
+      debouncedRef.value = _debounce(
         callback => {
           callback();
         },

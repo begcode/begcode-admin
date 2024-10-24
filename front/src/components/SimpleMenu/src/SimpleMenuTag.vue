@@ -3,8 +3,7 @@
 </template>
 <script lang="ts" setup>
 import type { Menu } from '@/router/types';
-import { computed } from 'vue';
-import { useDesign, propTypes } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 
 defineOptions({ name: 'SimpleMenuTag' });
 
@@ -13,8 +12,12 @@ const props = defineProps({
     type: Object as PropType<Menu>,
     default: () => ({}),
   },
-  dot: propTypes.bool,
-  collapseParent: propTypes.bool,
+  dot: {
+    type: Boolean,
+  },
+  collapseParent: {
+    type: Boolean,
+  },
 });
 
 const { prefixCls } = useDesign('simple-menu');

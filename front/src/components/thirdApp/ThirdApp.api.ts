@@ -1,5 +1,5 @@
-import { cloneObject } from '@begcode/components';
 import { defHttp } from '@/utils/http/axios';
+import { cloneObject } from '@/utils/util';
 
 export const backEndUrl = {
   // 获取启用的第三方App

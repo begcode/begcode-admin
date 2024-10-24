@@ -1,24 +1,20 @@
 <template>
   <PageWrapper v-bind="pageProps">
     <template #default>
-      <SmsMessageForm ref="smsMessageFormRef" v-bind="formProps"></SmsMessageForm>
+      <SmsMessageForm ref="smsMessageFormRef" v-bind="formProps" @updateSaveButton="updateSaveButton"></SmsMessageForm>
     </template>
     <template #rightFooter>
-      <Space>
-        <Button v-for="operation in operations" :type="operation.type" @click="operation.click">
-          <Icon icon="operation.icon" v-if="operation.icon" />
+      <a-space>
+        <BasicButton v-for="operation in operations" :type="operation.type" @click="operation.click">
+          <Icon :icon="operation.icon" v-if="operation.icon" />
           {{ operation.title }}
-        </Button>
-      </Space>
+        </BasicButton>
+      </a-space>
     </template>
   </PageWrapper>
 </template>
 <script lang="ts" setup>
-import { computed, reactive, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { Space } from 'ant-design-vue';
 import SmsMessageForm from './components/form-component.vue';
-import { Button, Icon, PageWrapper } from '@begcode/components';
 import { useGo } from '@/hooks/web/usePage';
 import { useMultipleTabStore } from '@/store/modules/multipleTab';
 
@@ -73,24 +69,32 @@ const operationsConfig = ref<any>([
     },
   },
   {
-    hide: () => {
-      return !!smsMessageId.value;
-    },
     title: smsMessageId.value ? '更新' : '保存',
     icon: '',
     type: 'primary',
     name: 'save',
     click: saveOrUpdate,
+    hide: () => !showSaveButton.value,
   },
 ]);
-const operations = computed(() => {
-  return operationsConfig.value
-    .map((operation: any) => {
-      return {
-        ...operation,
-        hide: operation.hide ? operation.hide() : false,
-      };
-    })
-    .filter((operation: any) => !operation.hide);
-});
+const showSaveButton = ref<boolean>(true);
+function updateSaveButton(show: boolean) {
+  showSaveButton.value = show;
+}
+const operations = ref<any[]>([]);
+watch(
+  () => showSaveButton.value,
+  () => {
+    operations.value = operationsConfig.value.filter((operation: any) => {
+      if (operation.hide === undefined) {
+        return true;
+      }
+      if (typeof operation.hide === 'function') {
+        return !operation.hide();
+      }
+      return !operation.hide;
+    });
+  },
+  { immediate: true, deep: true },
+);
 </script>

@@ -1,7 +1,6 @@
 /**
  * Application configuration
  */
-import { deepMerge } from '@begcode/components';
 import { primaryColor } from '../../build/config/themeConfig';
 import type { ProjectConfig } from '#/config';
 
@@ -19,6 +18,7 @@ import { useLocaleStore } from '@/store/modules/locale';
 import { getCommonStoragePrefix, getStorageShortName } from '@/utils/env';
 
 import { Persistent } from '@/utils/cache/persistent';
+import { deepMerge } from '@/utils/util';
 import { ThemeEnum } from '@/enums/appEnum';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！

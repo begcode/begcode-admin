@@ -1,7 +1,7 @@
 <template>
   <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
   <div>
-    <Card
+    <a-card
       v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
       title="高级搜索"
       class="bc-list-search-form-card"
@@ -9,32 +9,38 @@
       :head-style="{ 'min-height': '40px' }"
     >
       <template #extra>
-        <Space>
-          <Button type="default" @click="showSearchFormSetting" preIcon="ant-design:setting-outlined" shape="circle" size="small"></Button>
-        </Space>
+        <a-space>
+          <BasicButton
+            type="default"
+            @click="showSearchFormSetting"
+            pre-icon="ant-design:setting-outlined"
+            shape="circle"
+            size="small"
+          ></BasicButton>
+        </a-space>
       </template>
-      <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" />
-    </Card>
-    <Row
+      <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" ref="searchFormRef" />
+    </a-card>
+    <a-row
       v-if="fieldSearchValues && fieldSearchValues.length && !searchFormConfig.toggleSearchStatus"
       style="background-color: #ffffff; padding: 4px; margin: 8px; border-radius: 4px"
     >
-      <Col :span="24" style="padding-left: 20px">
+      <a-col :span="24" style="padding-left: 20px">
         <span>搜索条件：</span>
-        <Space>
-          <Tag closable v-for="fieldVale of fieldSearchValues" @close="closeSearchFieldTag(fieldVale)">
+        <a-space>
+          <a-tag closable v-for="fieldVale of fieldSearchValues" @close="closeSearchFieldTag(fieldVale)">
             {{ fieldVale.title }}: {{ fieldVale.value }}
-          </Tag>
-        </Space>
-      </Col>
-    </Row>
-    <Card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
+          </a-tag>
+        </a-space>
+      </a-col>
+    </a-row>
+    <a-card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
       <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents" data-cy="entityTable">
         <template #toolbar_buttons>
-          <Row :gutter="16">
-            <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
-              <Space>
-                <Input
+          <a-row :gutter="16">
+            <a-col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
+              <a-space>
+                <a-input
                   v-model:value="searchFormConfig.jhiCommonSearchKeywords"
                   placeholder="请输入关键字"
                   allow-clear
@@ -47,31 +53,31 @@
                     <Icon icon="ant-design:search-outlined" />
                   </template>
                   <template #addonAfter>
-                    <Button type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
-                      >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch" data-cy="listSearchMore"></Icon>
-                    </Button>
+                    <BasicButton type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
+                      >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch" data-cy="listSearchMore" />
+                    </BasicButton>
                   </template>
-                </Input>
+                </a-input>
                 <template v-for="button of gridOptions?.toolbarConfig?.buttons">
-                  <Button v-if="!button.dropdowns">{{ button.name }}</Button>
-                  <Dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
+                  <BasicButton v-if="!button.dropdowns">{{ button.name }}</BasicButton>
+                  <a-dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
                     <template #overlay>
-                      <Menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
-                        <MenuItem :key="subButton.name + 's'">
-                          <Icon :icon="subButton.icon"></Icon>
+                      <a-menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
+                        <a-menu-item :key="subButton.name + 's'">
+                          <Icon :icon="subButton.icon" />
                           {{ subButton.name }}
-                        </MenuItem>
-                      </Menu>
+                        </a-menu-item>
+                      </a-menu>
                     </template>
-                    <Button>
+                    <BasicButton>
                       {{ button.name }}
                       <Icon icon="ant-design:down-outlined" />
-                    </Button>
-                  </Dropdown>
+                    </BasicButton>
+                  </a-dropdown>
                 </template>
-              </Space>
-            </Col>
-          </Row>
+              </a-space>
+            </a-col>
+          </a-row>
         </template>
         <template #recordAction="{ row }">
           <ButtonGroup :row="row" :buttons="rowOperations" @click="rowClick" :ref="el => rowOperationRef('row_operation_' + row.id, el)" />
@@ -79,14 +85,17 @@
 
         <template #authorities_default="{ row, column, $grid }">
           <AvatarGroupInfo
-            :value="row.authorities"
             :disabled="!$grid?.isEditByRow(row)"
-            :query="{ 'id.in': row.authorities }"
+            :query="{ apiPermissionsId: row.id, 'id.aggregate.count': true }"
+            :stats-api="async params => (await apis.authoritiesStats(params).catch(() => [{ id_count: null }]))[0]"
             avatar-slot-name="default"
             avatar-slot-field="name"
-            avatar-tip-field="name"
-            @click="buttonType => rowClick({ name: column.field + 'Column' + upperFirst(buttonType), data: row, params: column.params })"
+            avatar-tip-field="id_count"
+            @click="buttonType => rowClick({ name: column.field + 'Column' + _upperFirst(buttonType), data: row, params: column.params })"
           />
+        </template>
+        <template #pagerLeft>
+          <a-alert type="warning" banner :message="'已选择 ' + selectedRows.length + ' 项'" style="height: 30px" />
         </template>
       </Grid>
       <BasicModal
@@ -123,49 +132,39 @@
           ref="drawerComponentRef"
         />
       </BasicDrawer>
-    </Card>
+    </a-card>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, getCurrentInstance, h, toRaw, shallowRef, computed } from 'vue';
-import { Alert, message, Modal, Space, Card, Divider, Row, Col, Input, Dropdown, Menu, MenuItem, Tag } from 'ant-design-vue';
+import { Modal, message } from 'ant-design-vue';
 import { VxeGridInstance, VxeGridListeners, VxeGridProps, Grid } from 'vxe-table';
-import { debounce, isArray, upperFirst } from 'lodash-es';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { transVxeSorts } from '@/utils/jhipster/sorts';
-import {
-  Button,
-  ButtonGroup,
-  Icon,
-  BasicModal,
-  BasicDrawer,
-  SearchForm,
-  clearSearchFieldValue,
-  useModalInner,
-  useDrawerInner,
-} from '@begcode/components';
+import { useDrawer } from '@/components/Drawer';
+import { useModal } from '@/components/Modal';
+import { ButtonGroup } from '@/components/Button';
+import { clearSearchFieldValue } from '@/components/SearchForm';
 import { useGo } from '@/hooks/web/usePage';
 import ServerProvider from '@/api-service/index';
 import { useMergeGridProps, useColumnsConfig, useSetOperationColumn, useSetShortcutButtons } from '@/components/VxeTable/src/helper';
 import ApiPermissionForm from './components/form-component.vue';
 import ApiPermissionDetail from './components/detail-component.vue';
 import config from './config/list-config';
-import { ApiTree } from '@begcode/components';
+import { ApiTree } from '@/components/Form';
+import { upperFirst as _upperFirst } from 'lodash-es';
+import { AvatarGroupInfo } from '@/components/AvatarGroupInfo';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 const props = defineProps(config.ListProps);
 
-const [registerModal, { closeModal, setModalProps }] = useModalInner(data => {
-  console.log(data);
-});
-const [registerDrawer, { closeDrawer, setDrawerProps }] = useDrawerInner(data => {
-  console.log(data);
-});
+const [registerModal, { closeModal, setModalProps }] = useModal();
+const [registerDrawer, { closeDrawer, setDrawerProps }] = useDrawer();
 const shallowRefs = {
   ApiPermissionEdit: shallowRef(ApiPermissionForm),
   ApiPermissionDetail: shallowRef(ApiPermissionDetail),
   ApiTree: shallowRef(ApiTree),
+  AvatarGroupInfo: shallowRef(AvatarGroupInfo),
 };
 const modalComponentRef = ref<any>(null);
 const drawerComponentRef = ref<any>(null);
@@ -180,7 +179,11 @@ const apis = {
   update: apiService.system.apiPermissionService.update,
   import: apiService.system.apiPermissionService.importExcel,
   export: apiService.system.apiPermissionService.exportExcel,
+  authoritiesStats: apiService.system.authorityService.stats,
   authoritiesList: apiService.system.authorityService.tree,
+  children: apiService.system.apiPermissionService.tree,
+  parent: apiService.system.apiPermissionService.tree,
+  authorities: apiService.system.authorityService.tree,
 };
 const pageConfig = {
   title: 'API权限列表',
@@ -188,8 +191,8 @@ const pageConfig = {
 };
 const { columns } = useColumnsConfig(config.columns(), props.selectType, props.gridCustomConfig);
 const xGrid = ref({} as VxeGridInstance);
-const searchFormConfig = reactive<any>({
-  fieldList: config.searchForm(),
+const searchFormConfig = reactive<Record<string, any>>({
+  fieldList: config.searchForm(apis),
   toggleSearchStatus: false,
   useOr: false,
   disabled: false,
@@ -202,7 +205,9 @@ const fieldSearchValues = computed(() => {
   return searchFormConfig.fieldList
     .filter(field => !field.hidden)
     .filter(field => {
-      return field.value !== null && field.value !== undefined && field.value !== '' && !(isArray(field.value) && field.value.length === 0);
+      return (
+        field.value !== null && field.value !== undefined && field.value !== '' && !(_isArray(field.value) && field.value.length === 0)
+      );
     });
 });
 const rowOperations = ref<any[]>([
@@ -331,15 +336,12 @@ const toolbarButtons = [
 const toolbarTools = [
   { code: 'new', name: '新增', circle: false, icon: 'vxe-icon-add' },
   { code: 'generate', name: '更新', circle: false, icon: 'vxe-icon-refresh' },
-  { code: 'open-tree', name: '展开全部', circle: false, icon: 'vxe-icon-square-plus' },
-  { code: 'close-tree', name: '折叠全部', circle: false, icon: 'vxe-icon-square-minus' },
+  { code: 'open-tree', name: '展开', circle: false, icon: 'vxe-icon-square-plus' },
+  { code: 'close-tree', name: '折叠', circle: false, icon: 'vxe-icon-square-minus' },
   { code: 'custom-column', name: '列配置', circle: false, icon: 'vxe-icon-custom-column' },
 ];
-const pagerLeft = () => {
-  return h(Alert, { type: 'warning', banner: true, message: `已选择 ${selectedRows.length} 项`, style: 'height: 30px' });
-};
 const gridOptions = reactive<VxeGridProps>({
-  ...config.baseGridOptions(ajax, toolbarButtons, toolbarTools, pagerLeft),
+  ...config.baseGridOptions(ajax, toolbarButtons, toolbarTools),
   columns,
 });
 useMergeGridProps(gridOptions, props.gridOptions);
@@ -467,7 +469,7 @@ const closeSearchFieldTag = field => {
   clearSearchFieldValue(field);
   formSearch();
 };
-const inputSearch = debounce(formSearch, 700);
+const inputSearch = _debounce(formSearch, 700);
 const handleToggleSearch = () => {
   searchFormConfig.toggleSearchStatus = !searchFormConfig.toggleSearchStatus;
 };
@@ -615,7 +617,7 @@ const rowClick = ({ name, data, params }) => {
         popupConfig.containerProps.okText = '保存';
         popupConfig.containerProps.cancelText = '关闭';
         popupConfig.needSubmit = false;
-        popupConfig.containerProps.showOkBtn = true;
+        popupConfig.containerProps.showOkBtn = false;
         popupConfig.containerProps.showCancelBtn = true;
         popupConfig.componentProps.is = shallowRefs.ApiTree;
         const rowParams = {
@@ -640,7 +642,7 @@ const rowClick = ({ name, data, params }) => {
         popupConfig.containerEvents = {
           ok: async () => {
             const authorities = popupConfig.componentProps.checkedKeys.map(id => ({ id: id }));
-            const data = await apis.update({ id: row.id, authorities }, [row.id], ['authorities']).catch(err => {
+            const data = await apis.update({ ...row, authorities }, [row.id], ['authorities']).catch(err => {
               console.log(err);
               message.error('保存失败！');
             });

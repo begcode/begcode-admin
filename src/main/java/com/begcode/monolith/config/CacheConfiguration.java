@@ -73,8 +73,6 @@ public class CacheConfiguration {
             createCache(cm, com.begcode.monolith.oss.domain.OssConfig.class.getName());
             createCache(cm, com.begcode.monolith.settings.domain.Dictionary.class.getName());
             createCache(cm, com.begcode.monolith.settings.domain.Dictionary.class.getName() + ".items");
-            createCache(cm, com.begcode.monolith.settings.domain.SiteConfig.class.getName());
-            createCache(cm, com.begcode.monolith.settings.domain.SiteConfig.class.getName() + ".items");
             createCache(cm, com.begcode.monolith.settings.domain.CommonFieldData.class.getName());
             createCache(cm, com.begcode.monolith.settings.domain.RegionCode.class.getName());
             createCache(cm, com.begcode.monolith.settings.domain.RegionCode.class.getName() + ".children");
@@ -88,6 +86,9 @@ public class CacheConfiguration {
             createCache(cm, com.begcode.monolith.taskjob.domain.TaskJobConfig.class.getName());
             createCache(cm, com.begcode.monolith.log.domain.SysLog.class.getName());
             createCache(cm, com.begcode.monolith.system.domain.FormConfig.class.getName());
+            createCache(cm, com.begcode.monolith.settings.domain.SystemConfig.class.getName());
+            createCache(cm, com.begcode.monolith.settings.domain.SystemConfig.class.getName() + ".items");
+            createCache(cm, com.begcode.monolith.system.domain.FormSaveData.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

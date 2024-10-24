@@ -1,4 +1,4 @@
-import accountService from '@/api-service/account/account-service-provider';
+import accountService from '@/api-service/account/index';
 import systemServices from '@/api-service/system/index';
 import settingsServices from '@/api-service/settings/index';
 import filesServices from '@/api-service/files/index';

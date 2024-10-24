@@ -4,19 +4,17 @@
       <SysLogDescriptions ref="sysLogDescriptionsRef" v-bind="descriptionProps"> </SysLogDescriptions>
     </template>
     <template #rightFooter>
-      <Space>
-        <Button v-for="operation in operations" :type="operation.type" @click="operation.click">
-          <Icon icon="operation.icon" v-if="operation.icon" />{{ operation.title }}</Button
+      <a-space>
+        <a-button v-for="operation in operations" :type="operation.type" @click="operation.click">
+          <Icon :icon="operation.icon" v-if="operation.icon" />{{ operation.title }}</a-button
         >
-      </Space>
+      </a-space>
     </template>
   </PageWrapper>
 </template>
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
-import { Space, Button } from 'ant-design-vue';
 import { useRoute, useRouter } from 'vue-router';
-import { PageWrapper, Icon } from '@begcode/components';
+import { PageWrapper } from '@/components/Page';
 import { useMultipleTabStore } from '@/store/modules/multipleTab';
 import SysLogDescriptions from './components/detail-component.vue';
 

@@ -1,5 +1,3 @@
-import { ref, watch } from 'vue';
-
 import type { UseRequestPlugin, UseRequestTimeout } from '../types';
 import { isDocumentVisible } from '../utils/isDocumentVisible';
 import subscribeReVisible from '../utils/subscribeReVisible';

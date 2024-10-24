@@ -1,10 +1,8 @@
-import type { DropMenu } from '@begcode/components';
-import type { ComputedRef } from 'vue';
-
-import { computed, unref, reactive } from 'vue';
 import { RouteLocationNormalized, useRouter } from 'vue-router';
-import { MenuEventEnum } from './types';
 import type { TabContentProps } from './types';
+import { MenuEventEnum } from './types';
+import type { DropMenu } from '@/components/Dropdown';
+
 import { useMultipleTabStore } from '@/store/modules/multipleTab';
 import { useTabs } from '@/hooks/web/useTabs';
 import { useI18n } from '@/hooks/web/useI18n';

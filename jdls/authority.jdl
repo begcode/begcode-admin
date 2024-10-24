@@ -9,6 +9,7 @@
 @moduleName(system)
 @addCustomMethod(repository-service-rest-clientService)
 @skipWebsite
+@skipMobile
 entity ViewPermission {
     @importDataField
     text String required /** 权限名称 */
@@ -84,6 +85,7 @@ entity ViewPermission {
 @addCustomMethod(repository-service-queryService-updateComponent)
 @moduleName(system)
 @skipWebsite
+@skipMobile
 entity Authority (jhi_authority) {
   @importDataField
   name String /** 角色名称 */
@@ -100,7 +102,7 @@ entity Authority (jhi_authority) {
 /**
  * 用户
  */
-@skipComponent(domain-mapper-controllerTest-serviceClass-restController)
+@skipComponent(domain-mapper-controllerTest-serviceClass-restController-appListPage-appEditPage-appDetailPage)
 @skipFakeData
 @importData
 @importDataFile(jhi_user-rel_jhi_user__authorities)
@@ -200,7 +202,7 @@ relationship ManyToMany {
     /** 角色列表 */
     ApiPermission{authorities(name)}
 
-    @annotationOnSource(importData)
+    @annotationOnSource(importData-editInList-editBySelectDrawer)
     /** 角色列表 */
     User{authorities(name)}
     to
@@ -238,6 +240,7 @@ enum TargetType {
 @moduleName(system)
 @addCustomMethod(repository-service-rest-clientService-listComponent)
 @skipWebsite
+@skipMobile
 entity ApiPermission {
     serviceName String /** 服务名称 */
     name String /** 权限名称 */
@@ -268,6 +271,7 @@ relationship OneToMany {
 @moduleName(system)
 @skipWebsite
 @listBy(tableEdit)
+@skipComponent(appEditPage)
 entity Department {
     name String /** 名称 */
     code String /** 代码 */
@@ -285,6 +289,7 @@ entity Department {
 @skipFakeData
 @moduleName(system)
 @skipWebsite
+@skipMobile
 entity Position {
     code String maxlength(50) unique required /** 岗位代码 */
     name String maxlength(50) unique required /** 名称 */
@@ -299,6 +304,7 @@ entity Position {
 @skipFakeData
 @moduleName(system)
 @skipWebsite
+@skipMobile
 @listBy(tableEdit)
 entity BusinessType {
     name String /** 名称 */
@@ -348,6 +354,7 @@ relationship ManyToMany {
 @entityPackage(system)
 @moduleName(system)
 @skipWebsite
+@skipMobile
 @addCustomMethod(service-clientService-rest)
 entity SmsTemplate {
   name String /** 模板标题 */
@@ -394,6 +401,7 @@ enum SmsTemplateType {
 @entityPackage(system)
 @addCustomMethod(service-listComponent)
 @skipWebsite
+@skipMobile
 entity SmsSupplier {
     provider SmsProvider /** 提供商 */
     @endUsed(codeEditor)

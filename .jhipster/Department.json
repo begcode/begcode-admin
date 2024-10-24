@@ -4,6 +4,7 @@
     "changelogDate": "20240101061706",
     "listBy": "tableEdit",
     "moduleName": "system",
+    "skipComponent": "appEditPage",
     "skipFakeData": true,
     "skipWebsite": true
   },

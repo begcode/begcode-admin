@@ -1,13 +1,11 @@
-import type { Ref } from 'vue';
-import { watch, unref, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useThrottleFn } from '@vueuse/core';
-import { useAppInject } from '@begcode/components';
 import type { Menu } from '@/router/types';
 import { MenuSplitTyeEnum } from '@/enums/menuEnum';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
 import { getChildrenMenus, getCurrentParentPath, getMenus, getShallowMenus } from '@/router/menus';
 import { usePermissionStore } from '@/store/modules/permission';
+import { useAppInject } from '@/hooks/useAppInject';
 
 export function useSplitMenu(splitType: Ref<MenuSplitTyeEnum>) {
   // Menu array

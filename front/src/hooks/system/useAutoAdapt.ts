@@ -1,6 +1,5 @@
-import { ref } from 'vue';
-import { useWindowSizeFn } from '@begcode/components';
 import { ScreenSizeEnum } from '@/enums/sizeEnum';
+import { useWindowSizeFn } from '@/hooks/vben';
 // 定义 useAdapt 方法参数
 interface AdaptOptions {
   // xl>1200

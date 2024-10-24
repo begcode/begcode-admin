@@ -7,6 +7,7 @@
     "moduleName": "system",
     "skipFakeData": true,
     "skipMenu": true,
+    "skipMobile": true,
     "skipWebsite": true
   },
   "applications": "*",
@@ -107,9 +108,9 @@
           "annotationOnSource": "editInForm-editByTable-unidirectional-relateByIdEntity"
         }
       },
-      "otherEntityName": "siteConfig",
+      "otherEntityName": "systemConfig",
       "otherEntityRelationshipName": "items",
-      "relationshipName": "siteConfig",
+      "relationshipName": "systemConfig",
       "relationshipSide": "right",
       "relationshipType": "many-to-one"
     },

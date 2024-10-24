@@ -110,3 +110,5 @@ id;name;value;label;value_type;remark;sort_value;disabled;owner_entity_name;owne
 109;查看;VIEW;查看;String;查看;109;0;Dictionary;22
 110;审核;AUDIT;审核;String;审核;110;0;Dictionary;22
 111;工作流;WORK_FLOW;工作流;String;工作流;111;0;Dictionary;22
+112;模型表单;MODEL_FORM;模型表单;String;模型表单;112;0;Dictionary;23
+113;数据表单;DATA_FORM;数据表单;String;数据表单;113;0;Dictionary;23

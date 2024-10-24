@@ -1,7 +1,6 @@
 /**
  * Multi-language related operations
  */
-import { unref, computed, getCurrentInstance } from 'vue';
 import { Locale } from 'ant-design-vue/es/locale';
 import { i18n } from './setupI18n';
 import { loadLocalePool, setHtmlPageLang } from './helper';

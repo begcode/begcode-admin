@@ -3,6 +3,7 @@
   "annotations": {
     "changelogDate": "20240101061206",
     "skipClient": true,
+    "skipMobile": true,
     "skipServer": true,
     "skipSoftDelete": true
   },

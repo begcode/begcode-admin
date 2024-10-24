@@ -6,6 +6,7 @@
     "entityPackage": "oss",
     "moduleName": "oss",
     "skipFakeData": true,
+    "skipMobile": true,
     "skipWebsite": true
   },
   "applications": "*",

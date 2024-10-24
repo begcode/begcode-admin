@@ -50,6 +50,8 @@ public class FormConfigAsserts {
             .satisfies(e -> assertThat(e.getFormKey()).as("check formKey").isEqualTo(actual.getFormKey()))
             .satisfies(e -> assertThat(e.getFormName()).as("check formName").isEqualTo(actual.getFormName()))
             .satisfies(e -> assertThat(e.getFormJson()).as("check formJson").isEqualTo(actual.getFormJson()))
+            .satisfies(e -> assertThat(e.getFormType()).as("check formType").isEqualTo(actual.getFormType()))
+            .satisfies(e -> assertThat(e.getMultiItems()).as("check multiItems").isEqualTo(actual.getMultiItems()))
             .satisfies(e -> assertThat(e.getCreatedBy()).as("check createdBy").isEqualTo(actual.getCreatedBy()))
             .satisfies(e -> assertThat(e.getCreatedDate()).as("check createdDate").isEqualTo(actual.getCreatedDate()))
             .satisfies(e -> assertThat(e.getLastModifiedBy()).as("check lastModifiedBy").isEqualTo(actual.getLastModifiedBy()))

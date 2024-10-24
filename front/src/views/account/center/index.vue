@@ -1,16 +1,16 @@
 <template>
   <div :class="prefixCls">
-    <Row :class="`${prefixCls}-top`">
-      <Col :span="9" :class="`${prefixCls}-col`">
-        <Row>
-          <Col :span="8">
+    <a-row :class="`${prefixCls}-top`">
+      <a-col :span="9" :class="`${prefixCls}-col`">
+        <a-row>
+          <a-col :span="8">
             <div :class="`${prefixCls}-top__avatar`">
               <img width="70" :src="avatar" />
               <span>BegCode</span>
               <div>海纳百川，有容乃大</div>
             </div>
-          </Col>
-          <Col :span="16">
+          </a-col>
+          <a-col :span="16">
             <div :class="`${prefixCls}-top__detail`">
               <template v-for="detail in details" :key="detail.title">
                 <p>
@@ -19,43 +19,41 @@
                 </p>
               </template>
             </div>
-          </Col>
-        </Row>
-      </Col>
-      <Col :span="7" :class="`${prefixCls}-col`">
+          </a-col>
+        </a-row>
+      </a-col>
+      <a-col :span="7" :class="`${prefixCls}-col`">
         <CollapseContainer title="标签" :canExpand="false">
           <template v-for="tag in tags" :key="tag">
-            <Tag class="mb-2">
+            <a-tag class="mb-2">
               {{ tag }}
-            </Tag>
+            </a-tag>
           </template>
         </CollapseContainer>
-      </Col>
-      <Col :span="8" :class="`${prefixCls}-col`">
+      </a-col>
+      <a-col :span="8" :class="`${prefixCls}-col`">
         <CollapseContainer :class="`${prefixCls}-top__team`" title="团队" :canExpand="false">
           <div v-for="(team, index) in teams" :key="index" :class="`${prefixCls}-top__team-item`">
             <Icon :icon="team.icon" :color="team.color" />
             <span>{{ team.title }}</span>
           </div>
         </CollapseContainer>
-      </Col>
-    </Row>
+      </a-col>
+    </a-row>
     <div :class="`${prefixCls}-bottom`">
-      <Tabs>
+      <a-tabs>
         <template v-for="item in achieveList" :key="item.key">
-          <TabPane :tab="item.name">
+          <a-tab-pane :tab="item.name">
             <component :is="tabs[item.component]" />
-          </TabPane>
+          </a-tab-pane>
         </template>
-      </Tabs>
+      </a-tabs>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
-import { Tag, Tabs, Row, Col } from 'ant-design-vue';
-import { CollapseContainer, Icon } from '@begcode/components';
+import { CollapseContainer } from '@/components/Container';
 import Article from './Article.vue';
 import Application from './Application.vue';
 import Project from './Project.vue';
@@ -65,8 +63,6 @@ import { tags, teams, details, achieveList } from './data';
 import { useUserStore } from '@/store/modules/user';
 
 const userStore = useUserStore();
-
-const TabPane = Tabs.TabPane;
 
 const tabs = {
   Article,

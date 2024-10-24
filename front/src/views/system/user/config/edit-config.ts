@@ -1,4 +1,4 @@
-import { FormSchema } from '@begcode/components';
+import { FormSchema } from '@/components/Form';
 import apiService from '@/api-service/index';
 
 const userService = apiService.system.userService;
@@ -156,7 +156,7 @@ const fields = (): FormSchema[] => {
         api: relationshipApis.department,
         style: 'width: 100%',
         labelInValue: true,
-        fieldNames: { children: 'children', value: 'id', label: 'name' },
+        fieldNames: { children: 'children', key: 'id', title: 'name' },
         resultField: 'records',
         placeholder: '请选择部门',
       },
@@ -170,8 +170,7 @@ const fields = (): FormSchema[] => {
         api: relationshipApis.position,
         style: 'width: 100%',
         labelInValue: true,
-        valueField: 'id',
-        labelField: 'name',
+        fieldNames: { options: 'optionsField', value: 'id', label: 'name' },
         resultField: 'records',
         placeholder: '请选择岗位',
       },
@@ -188,7 +187,7 @@ const fields = (): FormSchema[] => {
         treeCheckable: true,
         treeCheckStrictly: true,
         showCheckedStrategy: 'SHOW_PARENT',
-        fieldNames: { children: 'children', value: 'id', label: 'name' },
+        fieldNames: { children: 'children', key: 'id', title: 'name' },
         resultField: 'records',
         placeholder: '请选择角色列表',
       },

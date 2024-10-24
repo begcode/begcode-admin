@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.begcode.monolith.IntegrationTest;
 import com.begcode.monolith.config.WithMockMyUser;
 import com.begcode.monolith.domain.BusinessType;
+import com.begcode.monolith.domain.enumeration.FormConfigType;
 import com.begcode.monolith.system.domain.FormConfig;
 import com.begcode.monolith.system.repository.FormConfigRepository;
 import com.begcode.monolith.system.service.FormConfigService;
@@ -52,6 +53,12 @@ public class FormConfigResourceIT {
 
     private static final String DEFAULT_FORM_JSON = "AAAAAAAAAA";
     private static final String UPDATED_FORM_JSON = "BBBBBBBBBB";
+
+    private static final FormConfigType DEFAULT_FORM_TYPE = FormConfigType.MODEL_FORM;
+    private static final FormConfigType UPDATED_FORM_TYPE = FormConfigType.DATA_FORM;
+
+    private static final Boolean DEFAULT_MULTI_ITEMS = false;
+    private static final Boolean UPDATED_MULTI_ITEMS = true;
 
     private static final Long DEFAULT_CREATED_BY = 1L;
     private static final Long UPDATED_CREATED_BY = 2L;
@@ -106,6 +113,8 @@ public class FormConfigResourceIT {
             .formKey(DEFAULT_FORM_KEY)
             .formName(DEFAULT_FORM_NAME)
             .formJson(DEFAULT_FORM_JSON)
+            .formType(DEFAULT_FORM_TYPE)
+            .multiItems(DEFAULT_MULTI_ITEMS)
             .createdBy(DEFAULT_CREATED_BY)
             .createdDate(DEFAULT_CREATED_DATE)
             .lastModifiedBy(DEFAULT_LAST_MODIFIED_BY)
@@ -124,6 +133,8 @@ public class FormConfigResourceIT {
             .formKey(UPDATED_FORM_KEY)
             .formName(UPDATED_FORM_NAME)
             .formJson(UPDATED_FORM_JSON)
+            .formType(UPDATED_FORM_TYPE)
+            .multiItems(UPDATED_MULTI_ITEMS)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
@@ -188,6 +199,40 @@ public class FormConfigResourceIT {
 
     @Test
     @Transactional
+    void checkFormKeyIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        formConfig.setFormKey(null);
+
+        // Create the FormConfig, which fails.
+        FormConfigDTO formConfigDTO = formConfigMapper.toDto(formConfig);
+
+        restFormConfigMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(formConfigDTO)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkFormNameIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        formConfig.setFormName(null);
+
+        // Create the FormConfig, which fails.
+        FormConfigDTO formConfigDTO = formConfigMapper.toDto(formConfig);
+
+        restFormConfigMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(formConfigDTO)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     void getAllFormConfigs() throws Exception {
         // Initialize the database
         insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
@@ -201,6 +246,8 @@ public class FormConfigResourceIT {
             .andExpect(jsonPath("$.[*].formKey").value(hasItem(DEFAULT_FORM_KEY)))
             .andExpect(jsonPath("$.[*].formName").value(hasItem(DEFAULT_FORM_NAME)))
             .andExpect(jsonPath("$.[*].formJson").value(hasItem(DEFAULT_FORM_JSON.toString())))
+            .andExpect(jsonPath("$.[*].formType").value(hasItem(DEFAULT_FORM_TYPE.toString())))
+            .andExpect(jsonPath("$.[*].multiItems").value(hasItem(DEFAULT_MULTI_ITEMS.booleanValue())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
@@ -239,6 +286,8 @@ public class FormConfigResourceIT {
             .andExpect(jsonPath("$.formKey").value(DEFAULT_FORM_KEY))
             .andExpect(jsonPath("$.formName").value(DEFAULT_FORM_NAME))
             .andExpect(jsonPath("$.formJson").value(DEFAULT_FORM_JSON.toString()))
+            .andExpect(jsonPath("$.formType").value(DEFAULT_FORM_TYPE.toString()))
+            .andExpect(jsonPath("$.multiItems").value(DEFAULT_MULTI_ITEMS.booleanValue()))
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.intValue()))
             .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()))
             .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY.intValue()))
@@ -358,6 +407,69 @@ public class FormConfigResourceIT {
 
         // Get all the formConfigList where formName does not contain
         defaultFormConfigFiltering("formName.doesNotContain=" + UPDATED_FORM_NAME, "formName.doesNotContain=" + DEFAULT_FORM_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllFormConfigsByFormTypeIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
+
+        // Get all the formConfigList where formType equals to
+        defaultFormConfigFiltering("formType.equals=" + DEFAULT_FORM_TYPE, "formType.equals=" + UPDATED_FORM_TYPE);
+    }
+
+    @Test
+    @Transactional
+    void getAllFormConfigsByFormTypeIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
+
+        // Get all the formConfigList where formType in
+        defaultFormConfigFiltering("formType.in=" + DEFAULT_FORM_TYPE + "," + UPDATED_FORM_TYPE, "formType.in=" + UPDATED_FORM_TYPE);
+    }
+
+    @Test
+    @Transactional
+    void getAllFormConfigsByFormTypeIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
+
+        // Get all the formConfigList where formType is not null
+        defaultFormConfigFiltering("formType.specified=true", "formType.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllFormConfigsByMultiItemsIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
+
+        // Get all the formConfigList where multiItems equals to
+        defaultFormConfigFiltering("multiItems.equals=" + DEFAULT_MULTI_ITEMS, "multiItems.equals=" + UPDATED_MULTI_ITEMS);
+    }
+
+    @Test
+    @Transactional
+    void getAllFormConfigsByMultiItemsIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
+
+        // Get all the formConfigList where multiItems in
+        defaultFormConfigFiltering(
+            "multiItems.in=" + DEFAULT_MULTI_ITEMS + "," + UPDATED_MULTI_ITEMS,
+            "multiItems.in=" + UPDATED_MULTI_ITEMS
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllFormConfigsByMultiItemsIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedFormConfig = formConfigRepository.saveAndGet(formConfig);
+
+        // Get all the formConfigList where multiItems is not null
+        defaultFormConfigFiltering("multiItems.specified=true", "multiItems.specified=false");
     }
 
     @Test
@@ -621,6 +733,8 @@ public class FormConfigResourceIT {
             .andExpect(jsonPath("$.[*].formKey").value(hasItem(DEFAULT_FORM_KEY)))
             .andExpect(jsonPath("$.[*].formName").value(hasItem(DEFAULT_FORM_NAME)))
             .andExpect(jsonPath("$.[*].formJson").value(hasItem(DEFAULT_FORM_JSON.toString())))
+            .andExpect(jsonPath("$.[*].formType").value(hasItem(DEFAULT_FORM_TYPE.toString())))
+            .andExpect(jsonPath("$.[*].multiItems").value(hasItem(DEFAULT_MULTI_ITEMS.booleanValue())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
@@ -674,6 +788,8 @@ public class FormConfigResourceIT {
             .formKey(UPDATED_FORM_KEY)
             .formName(UPDATED_FORM_NAME)
             .formJson(UPDATED_FORM_JSON)
+            .formType(UPDATED_FORM_TYPE)
+            .multiItems(UPDATED_MULTI_ITEMS)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
@@ -769,9 +885,11 @@ public class FormConfigResourceIT {
 
         partialUpdatedFormConfig
             .formJson(UPDATED_FORM_JSON)
+            .formType(UPDATED_FORM_TYPE)
+            .multiItems(UPDATED_MULTI_ITEMS)
             .createdBy(UPDATED_CREATED_BY)
-            .createdDate(UPDATED_CREATED_DATE)
-            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY);
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restFormConfigMockMvc
             .perform(
@@ -806,6 +924,8 @@ public class FormConfigResourceIT {
             .formKey(UPDATED_FORM_KEY)
             .formName(UPDATED_FORM_NAME)
             .formJson(UPDATED_FORM_JSON)
+            .formType(UPDATED_FORM_TYPE)
+            .multiItems(UPDATED_MULTI_ITEMS)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)

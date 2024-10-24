@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.begcode.monolith.domain.Authority;
 import com.begcode.monolith.domain.ViewPermission;
 import com.begcode.monolith.domain.enumeration.SortValueOperateType;
 import com.begcode.monolith.repository.ViewPermissionRepository;

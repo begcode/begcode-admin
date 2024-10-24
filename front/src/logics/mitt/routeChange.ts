@@ -3,8 +3,8 @@
  */
 
 import type { RouteLocationNormalized } from 'vue-router';
-import { getRawRoute } from '@begcode/components';
 import { mitt } from '@/utils/mitt';
+import { getRawRoute } from '@/utils/util';
 
 const emitter = mitt();
 

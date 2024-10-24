@@ -4,11 +4,9 @@
   </div>
 </template>
 <script lang="ts" setup>
-import type { CSSProperties } from 'vue';
-import { onMounted, ref, unref, computed, onUnmounted, useAttrs } from 'vue';
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 import { useDebounceFn } from '@vueuse/core';
 
 type Options = Cropper.Options;

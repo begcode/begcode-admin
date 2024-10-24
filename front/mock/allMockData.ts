@@ -1,5 +1,4 @@
 import Papa from 'papaparse';
-import { camelCase } from 'lodash-es';
 import { useGlobSetting } from '@/hooks/setting';
 
 const allDataModules = useGlobSetting().useMock ? import.meta.glob('./data/*.csv') : {};
@@ -19,7 +18,7 @@ for (const path in allFakeDataModules) {
           delimiter: ';',
           dynamicTyping: true,
           header: true,
-          transformHeader: header => camelCase(header),
+          transformHeader: header => _camelCase(header),
           skipEmptyLines: true,
           complete: function (results: any) {
             allData[name].push(...(results.data as any[]));
@@ -43,7 +42,7 @@ for (const path in allDataModules) {
         delimiter: ';',
         dynamicTyping: true,
         header: true,
-        transformHeader: header => camelCase(header),
+        transformHeader: header => _camelCase(header),
         skipEmptyLines: true,
         complete: function (results: any) {
           allData[name].push(...(results.data as any[]));

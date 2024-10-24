@@ -35,10 +35,10 @@ public class CommonFieldDataBaseService<R extends CommonFieldDataRepository, E e
     private static final Logger log = LoggerFactory.getLogger(CommonFieldDataBaseService.class);
 
     private final List<String> relationCacheNames = List.of(
-        com.begcode.monolith.settings.domain.SiteConfig.class.getName() + ".items",
+        com.begcode.monolith.settings.domain.SystemConfig.class.getName() + ".items",
         com.begcode.monolith.settings.domain.Dictionary.class.getName() + ".items"
     );
-    private final List<String> relationNames = List.of("siteConfig", "dictionary");
+    private final List<String> relationNames = List.of("systemConfig", "dictionary");
 
     protected final CommonFieldDataRepository commonFieldDataRepository;
 

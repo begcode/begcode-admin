@@ -10,14 +10,14 @@
     destroyOnClose
   >
     <template #title>
-      <Tabs v-model:activeKey="activeKey" @change="handleChangeTab" :tabBarStyle="{ margin: 0 }">
-        <TabPane key="all" tab="全部消息"></TabPane>
-        <TabPane key="star" tab="标星消息" force-render></TabPane>
+      <a-tabs v-model:activeKey="activeKey" @change="handleChangeTab" :tabBarStyle="{ margin: 0 }">
+        <a-tab-pane key="all" tab="全部消息"></a-tab-pane>
+        <a-tab-pane key="star" tab="标星消息" force-render></a-tab-pane>
         <template #rightExtra>
           <div class="sys-msg-modal-title">
             <div class="icon-right">
               <div class="icons">
-                <Popover placement="bottomRight" :overlayStyle="{ width: '400px' }" trigger="click" v-model:open="showSearch">
+                <a-popover placement="bottomRight" :overlayStyle="{ width: '400px' }" trigger="click" v-model:open="showSearch">
                   <template #content>
                     <div>
                       <span class="search-label">回复、提到我的人?：</span>
@@ -27,9 +27,9 @@
                           <span>{{ searchParams.realname }}</span>
                           <span class="clear-user-icon"><close-outlined style="font-size: 12px" @click="clearSearchParamsUser" /></span>
                         </div>
-                        <Button v-else type="dashed" shape="circle" @click="openSelectPerson">
+                        <a-button v-else type="dashed" shape="circle" @click="openSelectPerson">
                           <PlusOutlined />
-                        </Button>
+                        </a-button>
                       </span>
                     </div>
                     <div class="search-date">
@@ -45,7 +45,7 @@
                           </div>
                         </div>
                         <div class="cust-range-date" v-if="showRangeDate">
-                          <RangePicker v-model:value="searchRangeDate" @change="handleChangeSearchDate" />
+                          <a-range-picker v-model:value="searchRangeDate" @change="handleChangeSearchDate" />
                         </div>
                       </div>
                     </div>
@@ -57,41 +57,40 @@
                     <span style="display: flex; margin: 0 5px"><close-outlined style="font-size: 12px" @click="clearAll" /></span>
                   </span>
                   <FilterOutlined v-else />
-                </Popover>
+                </a-popover>
                 <CloseOutlined @click="closeModal" />
               </div>
             </div>
           </div>
         </template>
-      </Tabs>
+      </a-tabs>
     </template>
     <div>
-      <Tabs :activeKey="activeKey" center @tabClick="handleChangePanel" animated>
+      <a-tabs :activeKey="activeKey" center @tabClick="handleChangePanel" animated>
         <template #renderTabBar>
           <div></div>
         </template>
 
-        <TabPane tab="全部消息" key="all" forceRender>
+        <a-tab-pane tab="全部消息" key="all" forceRender>
           <sys-message-list ref="allMessageRef" @close="hrefThenClose" @detail="showDetailModal" />
-        </TabPane>
+        </a-tab-pane>
 
         <!-- 标星 -->
-        <TabPane tab="标星消息" key="star" forceRender>
+        <a-tab-pane tab="标星消息" key="star" forceRender>
           <sys-message-list ref="starMessageRef" star @close="hrefThenClose" @detail="showDetailModal" />
-        </TabPane>
-      </Tabs>
+        </a-tab-pane>
+      </a-tabs>
     </div>
   </BasicModal>
   <DetailModal @register="registerDetail" />
 </template>
 
 <script lang="ts" setup>
-import { ref, unref, reactive, computed } from 'vue';
-import { Tabs, TabPane, RangePicker, Button, Popover } from 'ant-design-vue';
-import { BasicModal, useModalInner, useModal, createAsyncComponent } from '@begcode/components';
+import { BasicModal, useModalInner, useModal } from '@/components/Modal';
+import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
 import { FilterOutlined, CloseOutlined, BellFilled, ExclamationOutlined, PlusOutlined } from '@ant-design/icons-vue';
 // import SysMessageList from './SysMessageList.vue';
-import { SelectModal } from '@begcode/components';
+import { SelectModal } from '@/components/SelectModal';
 import DetailModal from '@/views/monitor/mynews/DetailModal.vue';
 
 defineOptions({ name: 'SysMessageModal' });

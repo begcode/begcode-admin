@@ -2,19 +2,16 @@
   <div v-if="getShow">
     <LoginFormTitle class="enter-x" />
     <div class="enter-x min-w-64 min-h-64">
-      <QRCode :value="qrCodeUrl" class="enter-x flex justify-center xl:justify-start" :width="280" />
-      <Divider class="enter-x">{{ scanContent }}</Divider>
-      <Button size="large" block class="mt-4 enter-x" @click="handleBackLogin">
+      <a-qrcode :value="qrCodeUrl" class="enter-x flex justify-center xl:justify-start" :width="280" />
+      <a-divider class="enter-x">{{ scanContent }}</a-divider>
+      <a-button size="large" block class="mt-4 enter-x" @click="handleBackLogin">
         {{ t('sys.login.backSignIn') }}
-      </Button>
+      </a-button>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import { computed, onMounted, unref, ref, watch } from 'vue';
 import LoginFormTitle from './LoginFormTitle.vue';
-import { Button, Divider } from 'ant-design-vue';
-import { QRCode } from 'ant-design-vue';
 import { useUserStore } from '@/store/modules/user'; // todo 可能不存在
 import { useI18n } from '@/hooks/web/useI18n';
 import { useLoginState, LoginStateEnum } from './useLogin';

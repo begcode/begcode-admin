@@ -38,14 +38,12 @@
   </SubMenu>
 </template>
 <script lang="ts" setup>
-import type { PropType } from 'vue';
 import type { Menu } from '@/router/types';
-import { computed } from 'vue';
-import { Icon, useDesign, createAsyncComponent } from '@begcode/components';
+import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
+import { useDesign } from '@/hooks/web/useDesign';
 import { checkChildrenHidden } from '@/utils/common/compUtils';
 import MenuItem from './components/MenuItem.vue';
 import SubMenu from './components/SubMenuItem.vue';
-import { propTypes } from '@begcode/components';
 import { useI18n } from '@/hooks/web/useI18n';
 
 const SimpleMenuTag = createAsyncComponent(() => import('./SimpleMenuTag.vue'));
@@ -71,7 +69,9 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  theme: propTypes.oneOf(['dark', 'light']),
+  theme: {
+    type: String as PropType<'light' | 'dark'>,
+  },
   isThemeBright: {
     type: Boolean,
     default: false,

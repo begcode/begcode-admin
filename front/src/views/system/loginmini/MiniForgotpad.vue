@@ -30,40 +30,40 @@
               </div>
             </div>
             <div class="" style="height: 230px; position: relative">
-              <Form ref="formRef" :model="formData" v-if="activeKey === 1">
+              <a-form ref="formRef" :model="formData" v-if="activeKey === 1">
                 <!-- 身份验证 begin -->
                 <div class="aui-account aui-account-line aui-forgot">
-                  <FormItem>
+                  <a-form-item>
                     <div class="aui-input-line">
-                      <Input type="text" :placeholder="t('sys.login.mobile')" v-model:value="formData.mobile" />
+                      <a-input type="text" :placeholder="t('sys.login.mobile')" v-model:value="formData.mobile" />
                     </div>
-                  </FormItem>
+                  </a-form-item>
                   <div class="aui-input-line">
-                    <FormItem>
-                      <Input type="text" :placeholder="t('sys.login.smsCode')" v-model:value="formData.smscode" />
-                    </FormItem>
+                    <a-form-item>
+                      <a-input type="text" :placeholder="t('sys.login.smsCode')" v-model:value="formData.smscode" />
+                    </a-form-item>
                     <div v-if="showInterval" class="aui-code-line" @click="getLoginCode">{{ t('component.countdown.normalText') }}</div>
                     <div v-else class="aui-code-line">{{ t('component.countdown.sendText', [unref(timeRuning)]) }}</div>
                   </div>
                 </div>
                 <!-- 身份验证 end -->
-              </Form>
-              <Form ref="pwdFormRef" :model="pwdFormData" v-else-if="activeKey === 2">
+              </a-form>
+              <a-form ref="pwdFormRef" :model="pwdFormData" v-else-if="activeKey === 2">
                 <!-- 重置密码 begin -->
                 <div class="aui-account aui-account-line aui-forgot">
-                  <FormItem>
+                  <a-form-item>
                     <div class="aui-input-line">
-                      <Input type="password" :placeholder="t('sys.login.passwordPlaceholder')" v-model:value="pwdFormData.password" />
+                      <a-input type="password" :placeholder="t('sys.login.passwordPlaceholder')" v-model:value="pwdFormData.password" />
                     </div>
-                  </FormItem>
-                  <FormItem>
+                  </a-form-item>
+                  <a-form-item>
                     <div class="aui-input-line">
-                      <Input type="password" :placeholder="t('sys.login.confirmPassword')" v-model:value="pwdFormData.confirmPassword" />
+                      <a-input type="password" :placeholder="t('sys.login.confirmPassword')" v-model:value="pwdFormData.confirmPassword" />
                     </div>
-                  </FormItem>
+                  </a-form-item>
                 </div>
                 <!-- 重置密码 end -->
-              </Form>
+              </a-form>
               <!-- 重置成功 begin -->
               <div class="aui-success" v-else>
                 <div class="aui-success-icon">
@@ -93,15 +93,14 @@
   <CaptchaModal @register="captchaRegisterModal" @ok="getLoginCode" />
 </template>
 <script lang="ts" setup>
-import { reactive, ref, toRaw, unref } from 'vue';
-import { Form, FormItem, Button } from 'ant-design-vue';
 import { useI18n } from '@/hooks/web/useI18n';
 import { SmsEnum, useFormRules, useFormValid, useLoginState } from '@/views/account/login/useLogin';
 import { useMessage } from '@/hooks/web/useMessage';
 import { getImageCaptcha, passwordChange, phoneVerify } from '@/api-service/sys/user';
 import adTextImg from '@/assets/loginmini/icon/jeecg_ad_text.png';
 import successImg from '@/assets/loginmini/icon/icon-success.png';
-import { useModal, CaptchaModal } from '@begcode/components';
+import { useModal } from '@/components/Modal';
+import { CaptchaModal } from '@/components/Captcha';
 import { ExceptionEnum } from '@/enums/exceptionEnum';
 const [captchaRegisterModal, { openModal: openCaptchaModal }] = useModal();
 

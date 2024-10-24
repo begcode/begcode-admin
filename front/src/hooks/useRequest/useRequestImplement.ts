@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { onMounted, onUnmounted, toRefs } from 'vue';
 
 import Fetch from './Fetch';
 import type { Service, UseRequestOptions, UseRequestPlugin, UseRequestResult } from './types';

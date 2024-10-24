@@ -20,6 +20,7 @@ import { AnnoOpenType } from './anno-open-type.model';
 import { JobStatus } from './job-status.model';
 import { LogType } from './log-type.model';
 import { OperateType } from './operate-type.model';
+import { FormConfigType } from './form-config-type.model';
 // jhipster-needle-add-enum-to-all-import - BegCode will import enum here
 
 export const allEnums = {
@@ -45,6 +46,7 @@ export const allEnums = {
   JobStatus, //
   LogType, //
   OperateType, //
+  FormConfigType, //
   // jhipster-needle-add-enum-to-all-enums - BegCode will add enum here
 };
 

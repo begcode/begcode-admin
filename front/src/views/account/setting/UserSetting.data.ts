@@ -1,10 +1,10 @@
-import { FormSchema } from '@begcode/components';
 import anquan1 from './icons/anquan1.png';
 import anquan2 from './icons/anquan2.png';
 import app1 from './icons/app1.png';
 import app2 from './icons/app2.png';
 import geren1 from './icons/geren1.png';
 import geren2 from './icons/geren2.png';
+import { FormSchema } from '@/components/Form';
 import { rules } from '@/utils/helper/validator';
 
 export interface ListItem {

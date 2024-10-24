@@ -160,6 +160,38 @@ public class UploadFileBaseResource {
     }
 
     /**
+     * {@code PATCH  /upload-files/copy/:id} : Partial updates given fields of an existing uploadFile, field will ignore if it is null
+     *
+     * @param id the id of the uploadFileDTO to save.
+     * @param uploadFileDTO the uploadFileDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated uploadFileDTO,
+     * or with status {@code 400 (Bad Request)} if the uploadFileDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the uploadFileDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the uploadFileDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PatchMapping(value = "/copy/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @Operation(tags = "部分更新上传文件", description = "根据主键及实体信息复制新的实体，值为null的属性将忽略，并返回一个复制后的上传文件")
+    @AutoLog(value = "复制上传文件", logType = LogType.OPERATE, operateType = OperateType.EDIT)
+    public ResponseEntity<UploadFileDTO> copyUploadFile(
+        @PathVariable(value = "id", required = false) final Long id,
+        @NotNull @RequestBody UploadFileDTO uploadFileDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to copy UploadFile partially : {}, {}", id, uploadFileDTO);
+
+        if (uploadFileRepository.findById(id).isEmpty()) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        Optional<UploadFileDTO> result = uploadFileService.copy(uploadFileDTO);
+
+        return ResponseUtil.wrapOrNotFound(
+            result,
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, uploadFileDTO.getId().toString())
+        );
+    }
+
+    /**
      * {@code GET  /upload-files} : get all the uploadFiles.
      *
      * @param pageable the pagination information.

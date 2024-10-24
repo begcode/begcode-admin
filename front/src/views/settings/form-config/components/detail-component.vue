@@ -1,11 +1,9 @@
 <template>
-  <div>
+  <div class="w-100%">
     <Descriptions ref="formConfigDetailRef" v-bind="descriptionsProps"></Descriptions>
   </div>
 </template>
 <script lang="ts" setup>
-import { getCurrentInstance, ref, reactive, h } from 'vue';
-import { Descriptions } from '@begcode/components';
 import ServerProvider from '@/api-service/index';
 import config from '../config/detail-config';
 import { IFormConfig } from '@/models/settings/form-config.model';
@@ -22,28 +20,36 @@ const props = defineProps({
     default: '',
     required: true,
   },
+  columns: {
+    type: Number,
+    default: 1,
+  },
+  hideColumns: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+  },
 });
 
 const formConfigDetailRef = ref(null);
 const ctx = getCurrentInstance()?.proxy;
 const apiService = ctx?.$apiService as typeof ServerProvider;
 const formConfig = reactive<IFormConfig>({});
-if (props.entityId) {
-  apiService.settings.formConfigService.find(Number(props.entityId)).then(data => {
-    if (data) {
-      Object.assign(formConfig, data);
-    }
-  });
-}
-const formItemsConfig = reactive(config.fields);
-//获得关联表属性。
-
+const getEntityData = async () => {
+  if (props.entityId) {
+    apiService.settings.formConfigService.find(Number(props.entityId)).then(data => {
+      if (data) {
+        Object.assign(formConfig, data);
+      }
+    });
+  }
+};
+watch(() => props.entityId, getEntityData, { immediate: true });
 const descriptionsProps = reactive({
-  schema: formItemsConfig,
+  schema: config.fields(props.hideColumns),
   isEdit: () => false,
   // formConfig,
   labelWidth: '120px',
   data: formConfig,
-  column: 1,
+  column: props.columns || 1,
 });
 </script>

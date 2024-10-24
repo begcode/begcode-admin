@@ -21,7 +21,6 @@
         "filesUploadImage": "Upload Image",
         "filesOssConfig": "Oss Config",
         "settingsDictionary": "Dictionary",
-        "settingsSiteConfig": "Site Config",
         "settingsCommonFieldData": "Common Field Data",
         "settingsRegionCode": "Region Code",
         "settingsSysFillRule": "Sys Fill Rule",
@@ -32,7 +31,9 @@
         "systemAnnouncementRecord": "Announcement Record",
         "taskjobTaskJobConfig": "Task Job Config",
         "logSysLog": "Sys Log",
-        "settingsFormConfig": "Form Config"
+        "settingsFormConfig": "Form Config",
+        "settingsSystemConfig": "System Config",
+        "settingsFormSaveData": "Form Save Data"
       },
       "account": {
         "main": "账号",

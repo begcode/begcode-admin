@@ -12,7 +12,6 @@ import { setUploadFileMock } from 'mock/api/files/upload-file.mock';
 import { setUploadImageMock } from 'mock/api/files/upload-image.mock';
 import { setOssConfigMock } from 'mock/api/files/oss-config.mock';
 import { setDictionaryMock } from 'mock/api/settings/dictionary.mock';
-import { setSiteConfigMock } from 'mock/api/settings/site-config.mock';
 import { setCommonFieldDataMock } from 'mock/api/settings/common-field-data.mock';
 import { setRegionCodeMock } from 'mock/api/settings/region-code.mock';
 import { setSysFillRuleMock } from 'mock/api/settings/sys-fill-rule.mock';
@@ -24,6 +23,8 @@ import { setAnnouncementRecordMock } from 'mock/api/system/announcement-record.m
 import { setTaskJobConfigMock } from 'mock/api/taskjob/task-job-config.mock';
 import { setSysLogMock } from 'mock/api/log/sys-log.mock';
 import { setFormConfigMock } from 'mock/api/settings/form-config.mock';
+import { setSystemConfigMock } from 'mock/api/settings/system-config.mock';
+import { setFormSaveDataMock } from 'mock/api/settings/form-save-data.mock';
 import { setAuthMock } from './authenticate.mock';
 // jhipster-needle-add-import-mock JHipster will add import statement, do not remove
 
@@ -43,7 +44,6 @@ export function setupMockServer(mock) {
   setUploadImageMock(mock);
   setOssConfigMock(mock);
   setDictionaryMock(mock);
-  setSiteConfigMock(mock);
   setCommonFieldDataMock(mock);
   setRegionCodeMock(mock);
   setSysFillRuleMock(mock);
@@ -55,5 +55,7 @@ export function setupMockServer(mock) {
   setTaskJobConfigMock(mock);
   setSysLogMock(mock);
   setFormConfigMock(mock);
+  setSystemConfigMock(mock);
+  setFormSaveDataMock(mock);
   // jhipster-needle-add-set-mock JHipster will add import statement, do not remove
 }

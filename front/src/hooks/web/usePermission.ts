@@ -1,6 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router';
 
-import { intersection, isArray } from 'lodash-es';
 import { useTabs } from './useTabs';
 import { useAppStore } from '@/store/modules/app';
 import { usePermissionStore } from '@/store/modules/permission';
@@ -83,23 +82,23 @@ export function usePermission() {
 
     if ([PermissionModeEnum.ROUTE_MAPPING, PermissionModeEnum.ROLE].includes(permMode)) {
       const allCodeList = permissionStore.getPermCodeList as string[];
-      if (!isArray(value)) {
+      if (!_isArray(value)) {
         const splits = ['||', '&&'];
         const splitName = splits.find(item => value.includes(item));
         if (splitName) {
           const splitCodes = value.split(splitName);
           return splitName === splits[0]
-            ? intersection(splitCodes, allCodeList).length > 0
-            : intersection(splitCodes, allCodeList).length === splitCodes.length;
+            ? _intersection(splitCodes, allCodeList).length > 0
+            : _intersection(splitCodes, allCodeList).length === splitCodes.length;
         }
         return userStore.getRoleList?.includes(value as RoleEnum);
       }
-      return (intersection(value, userStore.getRoleList) as RoleEnum[]).length > 0;
+      return (_intersection(value, userStore.getRoleList) as RoleEnum[]).length > 0;
     }
 
     if (PermissionModeEnum.BACK === permMode) {
       const allCodeList = permissionStore.getPermCodeList as string[];
-      if (!isArray(value) && allCodeList && allCodeList.length > 0) {
+      if (!_isArray(value) && allCodeList && allCodeList.length > 0) {
         if (formData) {
           let code = value as string;
           if (hasBpmPermission(code, '1')) {
@@ -108,7 +107,7 @@ export function usePermission() {
         }
         return allCodeList.includes(value);
       }
-      return (intersection(value, allCodeList) as string[]).length > 0;
+      return (_intersection(value, allCodeList) as string[]).length > 0;
     }
     return true;
   }
@@ -156,7 +155,7 @@ export function usePermission() {
       throw new Error('Please switch PermissionModeEnum to ROUTE_MAPPING mode in the configuration to operate!');
     }
 
-    if (!isArray(roles)) {
+    if (!_isArray(roles)) {
       roles = [roles];
     }
     userStore.setRoleList(roles);

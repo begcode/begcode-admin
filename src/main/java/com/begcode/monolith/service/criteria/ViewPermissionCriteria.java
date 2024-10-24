@@ -124,10 +124,10 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.redirect")
     private StringFilter redirect;
 
-    @BindQuery(entity = ViewPermission.class, column = "id", condition = "id=parent_id")
+    @BindQuery(entity = ViewPermission.class, column = "id", condition = "parent_id=this.id")
     private LongFilter childrenId;
 
-    @BindQuery(entity = ViewPermission.class, column = "text", condition = "id=parent_id")
+    @BindQuery(entity = ViewPermission.class, column = "text", condition = "parent_id=this.id")
     private StringFilter childrenText;
 
     @BindQuery(entity = ViewPermission.class, column = "id", condition = "this.parent_id=id")
@@ -135,10 +135,6 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
 
     @BindQuery(entity = ViewPermission.class, column = "text", condition = "this.parent_id=id")
     private StringFilter parentText;
-
-    private LongFilter authoritiesId;
-
-    private StringFilter authoritiesName;
 
     @BindQuery(ignore = true)
     private String jhiCommonSearchKeywords;
@@ -182,8 +178,6 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
         this.childrenText = other.optionalChildrenText().map(StringFilter::copy).orElse(null);
         this.parentId = other.optionalParentId().map(LongFilter::copy).orElse(null);
         this.parentText = other.optionalParentText().map(StringFilter::copy).orElse(null);
-        this.authoritiesId = other.optionalAuthoritiesId().map(LongFilter::copy).orElse(null);
-        this.authoritiesName = other.optionalAuthoritiesName().map(StringFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -667,44 +661,6 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
         this.parentText = parentText;
     }
 
-    public LongFilter getAuthoritiesId() {
-        return authoritiesId;
-    }
-
-    public Optional<LongFilter> optionalAuthoritiesId() {
-        return Optional.ofNullable(authoritiesId);
-    }
-
-    public LongFilter authoritiesId() {
-        if (authoritiesId == null) {
-            setAuthoritiesId(new LongFilter());
-        }
-        return authoritiesId;
-    }
-
-    public void setAuthoritiesId(LongFilter authoritiesId) {
-        this.authoritiesId = authoritiesId;
-    }
-
-    public StringFilter getAuthoritiesName() {
-        return authoritiesName;
-    }
-
-    public Optional<StringFilter> optionalAuthoritiesName() {
-        return Optional.ofNullable(authoritiesName);
-    }
-
-    public StringFilter authoritiesName() {
-        if (authoritiesName == null) {
-            setAuthoritiesName(new StringFilter());
-        }
-        return authoritiesName;
-    }
-
-    public void setAuthoritiesName(StringFilter authoritiesName) {
-        this.authoritiesName = authoritiesName;
-    }
-
     public void setAnd(ViewPermissionCriteria and) {
         this.and = and;
     }
@@ -803,7 +759,6 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
             Objects.equals(redirect, that.redirect) &&
             Objects.equals(childrenId, that.childrenId) &&
             Objects.equals(parentId, that.parentId) &&
-            Objects.equals(authoritiesId, that.authoritiesId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -834,7 +789,6 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
             redirect,
             childrenId,
             parentId,
-            authoritiesId,
             distinct
         );
     }
@@ -868,8 +822,6 @@ public class ViewPermissionCriteria implements Serializable, Criteria {
             optionalChildrenText().map(f -> "childrenText=" + f + ", ").orElse("") +
             optionalParentId().map(f -> "parentId=" + f + ", ").orElse("") +
             optionalParentText().map(f -> "parentText=" + f + ", ").orElse("") +
-            optionalAuthoritiesId().map(f -> "authoritiesId=" + f + ", ").orElse("") +
-            optionalAuthoritiesName().map(f -> "authoritiesName=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +

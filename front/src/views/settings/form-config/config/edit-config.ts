@@ -1,4 +1,5 @@
-import { FormSchema } from '@begcode/components';
+import { useI18n } from '@/hooks/web/useI18n';
+import { FormSchema } from '@/components/Form';
 import apiService from '@/api-service/index';
 
 const formConfigService = apiService.settings.formConfigService;
@@ -9,6 +10,7 @@ const relationshipApis: any = {
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
 const fields = (): FormSchema[] => {
+  const { getEnumDict } = useI18n();
   return [
     {
       label: 'ID',
@@ -26,20 +28,45 @@ const fields = (): FormSchema[] => {
       field: 'formKey',
       component: 'Input',
       componentProps: { type: 'text', clearable: true, placeholder: '请输入表单Key', style: 'width: 100%' },
-      rules: [{ type: 'string', max: 100 }],
+      rules: [
+        { type: 'string', max: 100 },
+        { required: true, message: '必填项' },
+      ],
     },
     {
       label: '名称',
       field: 'formName',
       component: 'Input',
       componentProps: { type: 'text', clearable: true, placeholder: '请输入名称', style: 'width: 100%' },
-      rules: [{ type: 'string', max: 100 }],
+      rules: [
+        { type: 'string', max: 100 },
+        { required: true, message: '必填项' },
+      ],
     },
     {
       label: '表单配置',
       field: 'formJson',
+      show: false,
       component: 'CodeEditor',
       componentProps: { language: 'json' },
+      rules: [],
+    },
+    {
+      label: '表单类型',
+      field: 'formType',
+      component: 'Select',
+      componentProps: () => {
+        return { placeholder: '请选择表单类型', options: getEnumDict('FormConfigType'), showSearch: true, style: 'width: 100%' };
+      },
+      rules: [],
+    },
+    {
+      label: '多条数据',
+      field: 'multiItems',
+      show: ({ values }) => {
+        return values && values.formType === 'DATA_FORM';
+      },
+      component: 'Switch',
       rules: [],
     },
     {
@@ -82,8 +109,7 @@ const fields = (): FormSchema[] => {
         api: relationshipApis.businessType,
         style: 'width: 100%',
         labelInValue: true,
-        valueField: 'id',
-        labelField: 'name',
+        fieldNames: { options: 'optionsField', value: 'id', label: 'name' },
         resultField: 'records',
         placeholder: '请选择业务类别',
       },

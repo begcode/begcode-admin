@@ -2,7 +2,6 @@
  * Prevent repeated clicks
  * @Example v-repeat-click="()=>{}"
  */
-import type { Directive, DirectiveBinding } from 'vue';
 import { on, once } from '@/utils/domUtils';
 
 const repeatDirective: Directive = {

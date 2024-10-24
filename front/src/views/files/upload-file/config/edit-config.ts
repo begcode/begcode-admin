@@ -1,4 +1,4 @@
-import { FormSchema } from '@begcode/components';
+import { FormSchema } from '@/components/Form';
 import apiService from '@/api-service/index';
 
 const uploadFileService = apiService.files.uploadFileService;
@@ -22,6 +22,35 @@ const fields = (): FormSchema[] => {
       rules: [],
     },
     {
+      label: '完整文件名',
+      field: 'fullName',
+      show: false,
+      component: 'Input',
+      componentProps: { type: 'text', clearable: true, placeholder: '请输入完整文件名', style: 'width: 100%' },
+      rules: [],
+    },
+    {
+      label: '业务标题',
+      field: 'businessTitle',
+      component: 'Input',
+      componentProps: { type: 'text', clearable: true, placeholder: '请输入业务标题', style: 'width: 100%' },
+      rules: [],
+    },
+    {
+      label: '业务自定义描述内容',
+      field: 'businessDesc',
+      component: 'Input',
+      componentProps: { type: 'text', clearable: true, placeholder: '请输入业务自定义描述内容', style: 'width: 100%' },
+      rules: [],
+    },
+    {
+      label: '业务状态',
+      field: 'businessStatus',
+      component: 'Input',
+      componentProps: { type: 'text', clearable: true, placeholder: '请输入业务状态', style: 'width: 100%' },
+      rules: [],
+    },
+    {
       label: 'Url地址',
       field: 'url',
       component: 'SelectFile',
@@ -39,14 +68,6 @@ const fields = (): FormSchema[] => {
       rules: [{ required: true, message: '必填项' }],
     },
     {
-      label: '完整文件名',
-      field: 'fullName',
-      show: false,
-      component: 'Input',
-      componentProps: { type: 'text', clearable: true, placeholder: '请输入完整文件名', style: 'width: 100%' },
-      rules: [],
-    },
-    {
       label: '文件名',
       field: 'name',
       show: false,
@@ -60,6 +81,14 @@ const fields = (): FormSchema[] => {
       show: false,
       component: 'Input',
       componentProps: { type: 'text', clearable: true, placeholder: '请输入缩略图Url地址', style: 'width: 100%' },
+      rules: [],
+    },
+    {
+      label: '文件大小',
+      field: 'fileSize',
+      show: false,
+      component: 'InputNumber',
+      componentProps: { placeholder: '请输入文件大小', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {
@@ -111,40 +140,11 @@ const fields = (): FormSchema[] => {
       rules: [],
     },
     {
-      label: '业务标题',
-      field: 'businessTitle',
-      component: 'Input',
-      componentProps: { type: 'text', clearable: true, placeholder: '请输入业务标题', style: 'width: 100%' },
-      rules: [],
-    },
-    {
-      label: '业务自定义描述内容',
-      field: 'businessDesc',
-      component: 'Input',
-      componentProps: { type: 'text', clearable: true, placeholder: '请输入业务自定义描述内容', style: 'width: 100%' },
-      rules: [],
-    },
-    {
-      label: '业务状态',
-      field: 'businessStatus',
-      component: 'Input',
-      componentProps: { type: 'text', clearable: true, placeholder: '请输入业务状态', style: 'width: 100%' },
-      rules: [],
-    },
-    {
       label: '创建时间',
       field: 'createAt',
       show: false,
       component: 'DatePicker',
       componentProps: { valueFormat: 'YYYY-MM-DD hh:mm:ss', placeholder: '请选择创建时间', style: 'width: 100%' },
-      rules: [],
-    },
-    {
-      label: '文件大小',
-      field: 'fileSize',
-      show: false,
-      component: 'InputNumber',
-      componentProps: { placeholder: '请输入文件大小', controls: false, style: 'width: 100%' },
       rules: [],
     },
     {
@@ -195,7 +195,7 @@ const fields = (): FormSchema[] => {
         api: relationshipApis.category,
         style: 'width: 100%',
         labelInValue: true,
-        fieldNames: { children: 'children', value: 'id', label: 'title' },
+        fieldNames: { children: 'children', key: 'id', title: 'title' },
         resultField: 'records',
         placeholder: '请选择所属分类',
       },

@@ -71,12 +71,6 @@ public class CommonFieldDataCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.owner_entity_id")
     private LongFilter ownerEntityId;
 
-    @BindQuery(column = "self.site_config_id", condition = "this.site_config_id=id AND owner_entity_name='SiteConfig'")
-    private LongFilter siteConfigId;
-
-    @BindQuery(column = "self.dictionary_id", condition = "this.dictionary_id=id AND owner_entity_name='Dictionary'")
-    private LongFilter dictionaryId;
-
     @BindQuery(ignore = true)
     private String jhiCommonSearchKeywords;
 
@@ -104,8 +98,6 @@ public class CommonFieldDataCriteria implements Serializable, Criteria {
         this.disabled = other.optionalDisabled().map(BooleanFilter::copy).orElse(null);
         this.ownerEntityName = other.optionalOwnerEntityName().map(StringFilter::copy).orElse(null);
         this.ownerEntityId = other.optionalOwnerEntityId().map(LongFilter::copy).orElse(null);
-        this.siteConfigId = other.optionalSiteConfigId().map(LongFilter::copy).orElse(null);
-        this.dictionaryId = other.optionalDictionaryId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -304,44 +296,6 @@ public class CommonFieldDataCriteria implements Serializable, Criteria {
         this.ownerEntityId = ownerEntityId;
     }
 
-    public LongFilter getSiteConfigId() {
-        return siteConfigId;
-    }
-
-    public Optional<LongFilter> optionalSiteConfigId() {
-        return Optional.ofNullable(siteConfigId);
-    }
-
-    public LongFilter siteConfigId() {
-        if (siteConfigId == null) {
-            setSiteConfigId(new LongFilter());
-        }
-        return siteConfigId;
-    }
-
-    public void setSiteConfigId(LongFilter siteConfigId) {
-        this.siteConfigId = siteConfigId;
-    }
-
-    public LongFilter getDictionaryId() {
-        return dictionaryId;
-    }
-
-    public Optional<LongFilter> optionalDictionaryId() {
-        return Optional.ofNullable(dictionaryId);
-    }
-
-    public LongFilter dictionaryId() {
-        if (dictionaryId == null) {
-            setDictionaryId(new LongFilter());
-        }
-        return dictionaryId;
-    }
-
-    public void setDictionaryId(LongFilter dictionaryId) {
-        this.dictionaryId = dictionaryId;
-    }
-
     public void setAnd(CommonFieldDataCriteria and) {
         this.and = and;
     }
@@ -427,29 +381,13 @@ public class CommonFieldDataCriteria implements Serializable, Criteria {
             Objects.equals(disabled, that.disabled) &&
             Objects.equals(ownerEntityName, that.ownerEntityName) &&
             Objects.equals(ownerEntityId, that.ownerEntityId) &&
-            Objects.equals(siteConfigId, that.siteConfigId) &&
-            Objects.equals(dictionaryId, that.dictionaryId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-            id,
-            name,
-            value,
-            label,
-            valueType,
-            remark,
-            sortValue,
-            disabled,
-            ownerEntityName,
-            ownerEntityId,
-            siteConfigId,
-            dictionaryId,
-            distinct
-        );
+        return Objects.hash(id, name, value, label, valueType, remark, sortValue, disabled, ownerEntityName, ownerEntityId, distinct);
     }
 
     // prettier-ignore
@@ -466,8 +404,6 @@ public class CommonFieldDataCriteria implements Serializable, Criteria {
             optionalDisabled().map(f -> "disabled=" + f + ", ").orElse("") +
             optionalOwnerEntityName().map(f -> "ownerEntityName=" + f + ", ").orElse("") +
             optionalOwnerEntityId().map(f -> "ownerEntityId=" + f + ", ").orElse("") +
-            optionalSiteConfigId().map(f -> "siteConfigId=" + f + ", ").orElse("") +
-            optionalDictionaryId().map(f -> "dictionaryId=" + f + ", ").orElse("") +
             (jhiCommonSearchKeywords != null ? "jhiCommonSearchKeywords=" + jhiCommonSearchKeywords + ", " : "") +
             "useOr=" + useOr +
             (and != null ? "and=" + and + ", " : "") +

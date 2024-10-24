@@ -1,4 +1,4 @@
-import { dateUtil } from '@begcode/components';
+import { dateUtil } from '@/utils/dateUtil';
 import userService from '@/api-service/system/user.service';
 
 export const rules = {

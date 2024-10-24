@@ -1,6 +1,5 @@
-import { dateUtil } from '@begcode/components';
-import { reactive, toRefs } from 'vue';
 import { tryOnMounted, tryOnUnmounted } from '@vueuse/core';
+import { dateUtil } from '@/utils/dateUtil';
 import { useLocaleStore } from '@/store/modules/locale';
 
 export function useNow(immediate = true) {

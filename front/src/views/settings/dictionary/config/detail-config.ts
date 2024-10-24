@@ -1,68 +1,69 @@
-import { h } from 'vue';
-import { DescItem } from '@begcode/components';
 import { Switch } from 'ant-design-vue';
+import type { DescItem } from '@/components/Descriptions';
 import { useI18n } from '@/hooks/web/useI18n';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
-const fields: DescItem[] = [
-  {
-    label: 'ID',
-    field: 'id',
-    show: values => {
-      return values && values.id;
+const fields = (hideColumns: string[] = []): DescItem[] => {
+  return [
+    {
+      label: 'ID',
+      field: 'id',
+      show: values => {
+        return values && values.id;
+      },
     },
-  },
-  {
-    label: '字典名称',
-    field: 'dictName',
-  },
-  {
-    label: '字典Key',
-    field: 'dictKey',
-  },
-  {
-    label: '是否禁用',
-    field: 'disabled',
-    render: (value, data) =>
-      h(Switch, {
-        disabled: true,
-        checked: value,
-        onChange: checked => {
-          data.disabled = checked;
-        },
-      }),
-  },
-  {
-    label: '排序',
-    field: 'sortValue',
-  },
-  {
-    label: '是否内置',
-    field: 'builtIn',
-    render: (value, data) =>
-      h(Switch, {
-        disabled: true,
-        checked: value,
-        onChange: checked => {
-          data.builtIn = checked;
-        },
-      }),
-  },
-  {
-    label: '更新枚举',
-    field: 'syncEnum',
-    render: (value, data) =>
-      h(Switch, {
-        disabled: true,
-        checked: value,
-        onChange: checked => {
-          data.syncEnum = checked;
-        },
-      }),
-  },
-];
-const itemsColumns = () => {
+    {
+      label: '字典名称',
+      field: 'dictName',
+    },
+    {
+      label: '字典Key',
+      field: 'dictKey',
+    },
+    {
+      label: '是否禁用',
+      field: 'disabled',
+      render: (value, data) =>
+        h(Switch, {
+          disabled: true,
+          checked: value,
+          onChange: checked => {
+            data.disabled = checked;
+          },
+        }),
+    },
+    {
+      label: '排序',
+      field: 'sortValue',
+    },
+    {
+      label: '是否内置',
+      field: 'builtIn',
+      render: (value, data) =>
+        h(Switch, {
+          disabled: true,
+          checked: value,
+          onChange: checked => {
+            data.builtIn = checked;
+          },
+        }),
+    },
+    {
+      label: '更新枚举',
+      field: 'syncEnum',
+      render: (value, data) =>
+        h(Switch, {
+          disabled: true,
+          checked: value,
+          onChange: checked => {
+            data.syncEnum = checked;
+          },
+        }),
+    },
+  ].filter(item => !hideColumns.includes(item.field));
+};
+const itemsColumns = (hideColumns: string[] = []) => {
   const { getEnumDict } = useI18n();
   return [
     {
@@ -170,7 +171,7 @@ const itemsColumns = () => {
       width: 120,
       slots: { default: 'recordAction' },
     },
-  ];
+  ].filter(item => !hideColumns.includes(item.field));
 };
 
 export default {

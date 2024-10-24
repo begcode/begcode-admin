@@ -1,5 +1,3 @@
-import { onMounted, onUnmounted, reactive, watch } from 'vue';
-import { debounce, isArray, isObject, isString, mergeWith } from 'lodash-es';
 import { ComponentType } from './componentType';
 import { useI18n } from '@/hooks/web/useI18n';
 import { useMultipleTabStore } from '@/store/modules/multipleTab';
@@ -25,16 +23,16 @@ export function useSetOperationColumn(gridCustomConfig, rowOperations, xGrid) {
   const rowOperationRef = (name, operationRef) => {
     rowOperationRefs[name] = operationRef;
   };
-  if (gridCustomConfig?.rowOperations && isArray(gridCustomConfig.rowOperations)) {
+  if (gridCustomConfig?.rowOperations && _isArray(gridCustomConfig.rowOperations)) {
     if (gridCustomConfig.rowOperations.length === 0) {
       rowOperations.value = [];
     } else {
       rowOperations.value = rowOperations.value.filter(item =>
-        gridCustomConfig.rowOperations.some(rowItem => (isObject(rowItem) ? item.name === rowItem['name'] : item.name === rowItem)),
+        gridCustomConfig.rowOperations.some(rowItem => (_isObject(rowItem) ? item.name === rowItem['name'] : item.name === rowItem)),
       );
     }
   }
-  const setOperationColumnWidth = debounce(
+  const setOperationColumnWidth = _debounce(
     () => {
       let maxButtonCount = Math.max(...Object.values(rowOperationRefs).map(operationRef => (operationRef as any)?.getElementCount() || 0));
       if (maxButtonCount === 0) {
@@ -101,24 +99,28 @@ export function useColumnsConfig(columns, selectType, gridCustomConfig) {
 }
 
 export function useMergeGridProps(gridOptions, componentGridOptions) {
-  mergeWith(gridOptions, componentGridOptions, (objValue: any, srcValue: any, key: any) => {
-    if (isArray(objValue) && ['buttons', 'tools'].includes(key)) {
+  _mergeWith(gridOptions, componentGridOptions, (objValue: any, srcValue: any, key: any) => {
+    if (_isArray(objValue) && ['buttons', 'tools'].includes(key)) {
       if (!srcValue) {
         return objValue;
-      } else if (isArray(srcValue) && srcValue.length === 0) {
+      } else if (_isArray(srcValue) && srcValue.length === 0) {
         return srcValue;
-      } else if (isArray(srcValue) && srcValue.length > 0) {
+      } else if (_isArray(srcValue) && srcValue.length > 0) {
         const newObjValue: any[] = [];
         srcValue.forEach((srcItem: any) => {
-          if (isObject(srcItem)) {
+          if (_isObject(srcItem)) {
             const objItem = objValue.find(item => item.code === srcItem['code']) || {};
             newObjValue.push(Object.assign(objItem, srcItem));
-          } else if (isString(srcItem)) {
+          } else if (_isString(srcItem)) {
             const objItem = objValue.find(item => item.code === srcItem);
             objItem && newObjValue.push(objItem);
           }
         });
         return newObjValue;
+      }
+    } else {
+      if (['height'].includes(key)) {
+        return srcValue;
       }
     }
   });
@@ -146,7 +148,7 @@ export function useSlider(min = 6, max = 12) {
   };
 }
 
-export function transformToFilterTree(data: any[], fieldNames = { children: 'children', title: 'title', key: 'key' }, dataType: any) {
+export function transformToFilterTree(data: any[], fieldNames = { children: 'children', title: 'title', key: 'key' }, dataType: any): any {
   const filterItem: any = {};
   filterItem.title = dataType.title;
   filterItem.key = dataType.filterName;
@@ -158,7 +160,7 @@ export function transformToFilterTree(data: any[], fieldNames = { children: 'chi
       const filterSubItem: any = {};
       filterSubItem.filterName = dataType.filterName;
       filterSubItem.filterValue = recordItem[fieldNames.key];
-      filterSubItem.title = recordItem[fieldNames.title];
+      filterSubItem.title = recordItem[fieldNames.title] || recordItem[fieldNames.key];
       filterSubItem.type = 'filterItem';
       filterSubItem.key = dataType.filterName + recordItem[fieldNames.key];
       filterSubItem.value = dataType.filterName + recordItem[fieldNames.key];

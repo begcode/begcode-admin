@@ -1,4 +1,4 @@
-import { FormSchema } from '@begcode/components';
+import { FormSchema } from '@/components/Form';
 
 type InputType = 'InputTextArea' | 'InputNumber' | 'Input';
 export interface PromptProps {

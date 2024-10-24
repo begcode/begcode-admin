@@ -1,19 +1,20 @@
 <template>
   <div :class="prefixCls" :style="getWrapStyle">
-    <Spin :spinning="loading" size="large" :style="getWrapStyle">
+    <a-spin :spinning="loading" size="large" :style="getWrapStyle">
       <iframe :src="frameSrc" :class="`${prefixCls}__main`" ref="frameRef" @load="hideLoading"></iframe>
-    </Spin>
+    </a-spin>
   </div>
 </template>
 <script lang="ts" setup>
-import type { CSSProperties } from 'vue';
-import { ref, unref, computed, onMounted, onUnmounted } from 'vue';
-import { Spin } from 'ant-design-vue';
-import { propTypes, useDesign, useWindowSizeFn } from '@begcode/components';
+import { useWindowSizeFn } from '@/hooks/vben';
+import { useDesign } from '@/hooks/web/useDesign';
 import { useLayoutHeight } from '@/layouts/default/content/useContentViewHeight';
 
 defineProps({
-  frameSrc: propTypes.string.def(''),
+  frameSrc: {
+    type: String,
+    default: '',
+  },
 });
 
 const emit = defineEmits(['message']);

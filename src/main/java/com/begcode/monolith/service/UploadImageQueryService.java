@@ -99,23 +99,23 @@ public class UploadImageQueryService implements QueryService<UploadImage> {
             keywordsCriteria.setUseOr(true);
             if (StringUtils.isNumeric(keywords)) {
                 keywordsCriteria.id().setEquals(Long.valueOf(keywords));
-                keywordsCriteria.ownerEntityId().setEquals(Long.valueOf(keywords));
                 keywordsCriteria.fileSize().setEquals(Long.valueOf(keywords));
+                keywordsCriteria.ownerEntityId().setEquals(Long.valueOf(keywords));
                 keywordsCriteria.referenceCount().setEquals(Long.valueOf(keywords));
                 keywordsCriteria.createdBy().setEquals(Long.valueOf(keywords));
                 keywordsCriteria.lastModifiedBy().setEquals(Long.valueOf(keywords));
             }
-            keywordsCriteria.url().setContains(keywords);
             keywordsCriteria.fullName().setContains(keywords);
+            keywordsCriteria.businessTitle().setContains(keywords);
+            keywordsCriteria.businessDesc().setContains(keywords);
+            keywordsCriteria.businessStatus().setContains(keywords);
+            keywordsCriteria.url().setContains(keywords);
             keywordsCriteria.name().setContains(keywords);
             keywordsCriteria.ext().setContains(keywords);
             keywordsCriteria.type().setContains(keywords);
             keywordsCriteria.path().setContains(keywords);
             keywordsCriteria.folder().setContains(keywords);
             keywordsCriteria.ownerEntityName().setContains(keywords);
-            keywordsCriteria.businessTitle().setContains(keywords);
-            keywordsCriteria.businessDesc().setContains(keywords);
-            keywordsCriteria.businessStatus().setContains(keywords);
             keywordsCriteria.smartUrl().setContains(keywords);
             keywordsCriteria.mediumUrl().setContains(keywords);
             UploadImageCriteria tempCriteria = criteria;
@@ -155,20 +155,20 @@ public class UploadImageQueryService implements QueryService<UploadImage> {
         List<String> groupByFields = new ArrayList<>();
         Map<String, Filter<?>> fieldNameMap = new HashMap<>();
         fieldNameMap.put("self.id", criteria.getId());
-        fieldNameMap.put("self.url", criteria.getUrl());
         fieldNameMap.put("self.full_name", criteria.getFullName());
+        fieldNameMap.put("self.business_title", criteria.getBusinessTitle());
+        fieldNameMap.put("self.business_desc", criteria.getBusinessDesc());
+        fieldNameMap.put("self.business_status", criteria.getBusinessStatus());
+        fieldNameMap.put("self.url", criteria.getUrl());
         fieldNameMap.put("self.name", criteria.getName());
         fieldNameMap.put("self.ext", criteria.getExt());
         fieldNameMap.put("self.type", criteria.getType());
         fieldNameMap.put("self.path", criteria.getPath());
         fieldNameMap.put("self.folder", criteria.getFolder());
+        fieldNameMap.put("self.file_size", criteria.getFileSize());
         fieldNameMap.put("self.owner_entity_name", criteria.getOwnerEntityName());
         fieldNameMap.put("self.owner_entity_id", criteria.getOwnerEntityId());
-        fieldNameMap.put("self.business_title", criteria.getBusinessTitle());
-        fieldNameMap.put("self.business_desc", criteria.getBusinessDesc());
-        fieldNameMap.put("self.business_status", criteria.getBusinessStatus());
         fieldNameMap.put("self.create_at", criteria.getCreateAt());
-        fieldNameMap.put("self.file_size", criteria.getFileSize());
         fieldNameMap.put("self.smart_url", criteria.getSmartUrl());
         fieldNameMap.put("self.medium_url", criteria.getMediumUrl());
         fieldNameMap.put("self.reference_count", criteria.getReferenceCount());
@@ -180,9 +180,7 @@ public class UploadImageQueryService implements QueryService<UploadImage> {
             .entrySet()
             .stream()
             .filter(entry -> entry.getValue() != null)
-            .forEach(entry -> {
-                getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields);
-            });
+            .forEach(entry -> getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields));
         if (CollectionUtils.isNotEmpty(selectFields)) {
             queryWrapper.select(selectFields.toArray(new String[0])).groupBy(CollectionUtils.isNotEmpty(groupByFields), groupByFields);
             return Binder.joinQueryMapsPage(queryWrapper, UploadImage.class, null).getRecords();

@@ -23,6 +23,12 @@ public class SysLog extends AbstractAuditingEntity<Long, SysLog> implements Seri
     private Long id;
 
     /**
+     * 请求路径
+     */
+    @TableField(value = "request_url")
+    private String requestUrl;
+
+    /**
      * 日志类型
      */
     @TableField(value = "log_type")
@@ -65,12 +71,6 @@ public class SysLog extends AbstractAuditingEntity<Long, SysLog> implements Seri
     private String method;
 
     /**
-     * 请求路径
-     */
-    @TableField(value = "request_url")
-    private String requestUrl;
-
-    /**
      * 请求参数
      */
     @TableField(value = "request_param")
@@ -92,6 +92,11 @@ public class SysLog extends AbstractAuditingEntity<Long, SysLog> implements Seri
 
     public SysLog id(Long id) {
         this.id = id;
+        return this;
+    }
+
+    public SysLog requestUrl(String requestUrl) {
+        this.requestUrl = requestUrl;
         return this;
     }
 
@@ -127,11 +132,6 @@ public class SysLog extends AbstractAuditingEntity<Long, SysLog> implements Seri
 
     public SysLog method(String method) {
         this.method = method;
-        return this;
-    }
-
-    public SysLog requestUrl(String requestUrl) {
-        this.requestUrl = requestUrl;
         return this;
     }
 
@@ -174,6 +174,7 @@ public class SysLog extends AbstractAuditingEntity<Long, SysLog> implements Seri
     public String toString() {
         return "SysLog{" +
             "id=" + getId() +
+            ", requestUrl='" + getRequestUrl() + "'" +
             ", logType='" + getLogType() + "'" +
             ", logContent='" + getLogContent() + "'" +
             ", operateType='" + getOperateType() + "'" +
@@ -181,7 +182,6 @@ public class SysLog extends AbstractAuditingEntity<Long, SysLog> implements Seri
             ", username='" + getUsername() + "'" +
             ", ip='" + getIp() + "'" +
             ", method='" + getMethod() + "'" +
-            ", requestUrl='" + getRequestUrl() + "'" +
             ", requestParam='" + getRequestParam() + "'" +
             ", requestType='" + getRequestType() + "'" +
             ", costTime=" + getCostTime() +

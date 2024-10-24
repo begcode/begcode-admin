@@ -5,8 +5,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import { BasicModal, useModalInner, useForm, BasicForm } from '@begcode/components';
+import { useForm, BasicForm } from '@/components/Form';
+import { BasicModal, useModalInner } from '@/components/Modal';
 import { thirdAppFormSchema } from './ThirdApp.data';
 import { getThirdConfigByTenantId, saveOrUpdateThirdConfig } from './ThirdApp.api';
 export default defineComponent({

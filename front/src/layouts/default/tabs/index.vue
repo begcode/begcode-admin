@@ -1,6 +1,6 @@
 <template>
   <div :class="getWrapClass">
-    <Tabs
+    <a-tabs
       type="editable-card"
       size="small"
       :animated="false"
@@ -11,11 +11,11 @@
       @edit="e => handleEdit(`${e}`)"
     >
       <template v-for="item in getTabsState" :key="item.query ? item.fullPath : item.path">
-        <Tabs.TabPane :closable="!(item && item.meta && item.meta.affix)">
+        <a-tab-pane :closable="!(item && item.meta && item.meta.affix)">
           <template #tab>
             <TabContent :tabItem="item" />
           </template>
-        </Tabs.TabPane>
+        </a-tab-pane>
       </template>
 
       <template #rightExtra v-if="getShowRedo || getShowQuick">
@@ -25,11 +25,10 @@
         <ShortcutButton :shortcut-buttons="shortcutButtons"></ShortcutButton>
         <FoldButton v-if="getShowFold" />
       </template>
-    </Tabs>
+    </a-tabs>
   </div>
 </template>
 <script lang="ts" setup>
-import { computed, unref, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import type { RouteLocationNormalized, RouteMeta } from 'vue-router';
 
@@ -40,7 +39,6 @@ import SettingButton from './components/SettingButton.vue';
 import { useHeaderSetting } from '@/hooks/setting/useHeaderSetting';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
 
-import { Tabs } from 'ant-design-vue';
 import TabContent from './components/TabContent.vue';
 import FoldButton from './components/FoldButton.vue';
 import TabRedo from './components/TabRedo.vue';
@@ -51,7 +49,7 @@ import { useMultipleTabStore } from '@/store/modules/multipleTab';
 import { useUserStore } from '@/store/modules/user';
 
 import { initAffixTabs, useTabsDrag } from './useMultipleTabs';
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 import { useMultipleTabSetting } from '@/hooks/setting/useMultipleTabSetting';
 
 import { REDIRECT_NAME } from '@/router/constant';

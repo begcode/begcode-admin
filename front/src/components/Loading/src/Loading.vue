@@ -5,12 +5,10 @@
     :style="[background ? `background-color: ${background}` : '']"
     v-show="loading"
   >
-    <Spin v-bind="$attrs" :tip="tip" :size="size" :spinning="loading" />
+    <a-spin v-bind="$attrs" :tip="tip" :size="size" :spinning="loading" />
   </section>
 </template>
 <script lang="ts" setup>
-import type { PropType } from 'vue';
-import { Spin } from 'ant-design-vue';
 import { SizeEnum } from '@/enums/sizeEnum';
 
 defineOptions({ name: 'Loading' });

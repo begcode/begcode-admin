@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia';
-import { formatToDateTime } from '@begcode/components';
 import type { ErrorLogInfo } from '#/store';
 
 import { store } from '@/store';
 
+import { formatToDateTime } from '@/utils/dateUtil';
 import projectSetting from '@/settings/projectSetting';
 
 import { ErrorTypeEnum } from '@/enums/exceptionEnum';

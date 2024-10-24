@@ -1,5 +1,4 @@
 import type { RuleObject, Rule as ValidationRule } from 'ant-design-vue/lib/form/interface';
-import { ref, computed, unref, Ref } from 'vue';
 import { useI18n } from '@/hooks/web/useI18n';
 import { OAUTH2_THIRD_LOGIN_TENANT_ID } from '@/enums/cacheEnum';
 import { getAuthCache } from '@/utils/auth';

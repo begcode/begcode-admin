@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.update.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.begcode.monolith.domain.ApiPermission;
-import com.begcode.monolith.domain.Authority;
 import com.begcode.monolith.domain.enumeration.ApiPermissionType;
 import com.begcode.monolith.repository.ApiPermissionRepository;
 import com.begcode.monolith.security.SecurityUtils;
@@ -329,41 +328,6 @@ public class ApiPermissionBaseService<R extends ApiPermissionRepository, E exten
 
     protected void clearRelationsCache() {
         this.relationCacheNames.forEach(cacheName -> Optional.ofNullable(cacheManager.getCache(cacheName)).ifPresent(Cache::clear));
-    }
-
-    public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {
-        relatedIds.forEach(id -> {
-            ApiPermission byId = getById(id);
-            Binder.bindRelations(byId, relationNames.stream().filter(rel -> !rel.equals(relationshipName)).toArray(String[]::new));
-            if (relationshipName.equals("authorities")) {
-                if (CollectionUtils.isNotEmpty(otherEntityIds)) {
-                    List<Long> ids = otherEntityIds.stream().map(Long::valueOf).toList();
-                    List<Authority> authorityExist = byId.getAuthorities();
-                    if (operateType.equals("add")) {
-                        List<Long> collect = ids
-                            .stream()
-                            .filter(relId -> authorityExist.stream().noneMatch(vp -> vp.getId().equals(relId)))
-                            .toList();
-                        if (CollectionUtils.isNotEmpty(collect)) {
-                            collect.forEach(addId -> authorityExist.add(new Authority().id(addId)));
-                            // 更新
-                            this.createOrUpdateAndRelatedRelations(byId, List.of("authorities"));
-                        }
-                    } else if (operateType.equals("delete")) {
-                        List<Long> collect = ids
-                            .stream()
-                            .filter(relId -> authorityExist.stream().anyMatch(vp -> vp.getId().equals(relId)))
-                            .toList();
-                        if (CollectionUtils.isNotEmpty(collect)) {
-                            List<Authority> authorityAdd = authorityExist.stream().filter(vp -> !collect.contains(vp.getId())).toList();
-                            byId.setAuthorities(authorityAdd);
-                            // 更新
-                            this.createOrUpdateAndRelatedRelations(byId, List.of("authorities"));
-                        }
-                    }
-                }
-            }
-        });
     }
     // jhipster-needle-service-add-method - JHipster will add getters and setters here, do not remove
 

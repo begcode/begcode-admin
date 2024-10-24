@@ -1,70 +1,68 @@
 <template>
   <BasicModal v-bind="config" @register="registerModal" :title="currTitle" wrapClassName="loginSelectModal" v-model:open="open">
-    <Form ref="formRef" :model="formState" :rules="rules" v-bind="layout" :colon="false" class="loginSelectForm">
+    <a-form ref="formRef" :model="formState" :rules="rules" v-bind="layout" :colon="false" class="loginSelectForm">
       <!--多租户选择-->
-      <FormItem v-if="isMultiTenant" name="tenantId" :validate-status="validate_status">
+      <a-form-item v-if="isMultiTenant" name="tenantId" :validate-status="validate_status">
         <!--label内容-->
         <template #label>
-          <Tooltip placement="topLeft">
+          <a-tooltip placement="topLeft">
             <template #title>
               <span>您隶属于多租户，请选择登录租户</span>
             </template>
-            <Avatar style="background-color: #87d068" :size="30"> 租户 </Avatar>
-          </Tooltip>
+            <a-avatar style="background-color: #87d068" :size="30"> 租户 </a-avatar>
+          </a-tooltip>
         </template>
         <template #extra v-if="validate_status == 'error'">
           <span style="color: #ed6f6f">请选择登录租户</span>
         </template>
         <!--租户下拉内容-->
-        <Select
+        <a-select
           v-model:value="formState.tenantId"
           @change="handleTenantChange"
           placeholder="请选择登录租户"
           :class="{ 'valid-error': validate_status == 'error' }"
         >
           <template v-for="tenant in tenantList" :key="tenant.id">
-            <SelectOption :value="tenant.id">{{ tenant.name }}</SelectOption>
+            <a-select-option :value="tenant.id">{{ tenant.name }}</a-select-option>
           </template>
-        </Select>
-      </FormItem>
+        </a-select>
+      </a-form-item>
       <!--多部门选择-->
-      <FormItem v-if="isMultiDepart" :validate-status="validate_status1" :colon="false">
+      <a-form-item v-if="isMultiDepart" :validate-status="validate_status1" :colon="false">
         <!--label内容-->
         <template #label>
-          <Tooltip placement="topLeft">
+          <a-tooltip placement="topLeft">
             <template #title>
               <span>您隶属于多部门，请选择登录部门</span>
             </template>
-            <Avatar style="background-color: rgb(104, 208, 203)" :size="30"> 部门 </Avatar>
-          </Tooltip>
+            <a-avatar style="background-color: rgb(104, 208, 203)" :size="30"> 部门 </a-avatar>
+          </a-tooltip>
         </template>
         <template #extra v-if="validate_status1 == 'error'">
           <span style="color: #ed6f6f">请选择登录部门</span>
         </template>
         <!--部门下拉内容-->
-        <Select
+        <a-select
           v-model:value="formState.orgCode"
           @change="handleDepartChange"
           placeholder="请选择登录部门"
           :class="{ 'valid-error': validate_status1 == 'error' }"
         >
           <template v-for="depart in departList" :key="depart.orgCode">
-            <SelectOption :value="depart.orgCode">{{ depart.departName }}</SelectOption>
+            <a-select-option :value="depart.orgCode">{{ depart.departName }}</a-select-option>
           </template>
-        </Select>
-      </FormItem>
-    </Form>
+        </a-select>
+      </a-form-item>
+    </a-form>
 
     <template #footer>
-      <Button @click="handleSubmit" type="primary">确认</Button>
+      <a-button @click="handleSubmit" type="primary">确认</a-button>
     </template>
   </BasicModal>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, unref, reactive, UnwrapRef } from 'vue';
-import { Avatar, Form, FormItem, Button, Tooltip, Select, SelectOption } from 'ant-design-vue';
-import { BasicModal, useModalInner } from '@begcode/components';
+import { BasicModal, useModalInner } from '@/components/Modal';
 import { useMessage } from '@/hooks/web/useMessage';
 import { useUserStore } from '@/store/modules/user';
 import { defHttp } from '@/utils/http/axios';

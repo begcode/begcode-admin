@@ -1,24 +1,22 @@
 <template>
   <div :class="prefixCls">
-    <Button v-if="isDev" type="primary" block @click="handleCopy">
+    <a-button v-if="isDev" type="primary" block @click="handleCopy">
       <CopyOutlined class="mr-2" />
       {{ t('layout.setting.copyBtn') }}
-    </Button>
+    </a-button>
 
-    <Button color="warning" block @click="handleResetSetting" class="my-3">
+    <a-button color="warning" block @click="handleResetSetting" class="my-3">
       <RedoOutlined class="mr-2" />
       {{ t('common.resetText') }}
-    </Button>
+    </a-button>
 
-    <Button color="error" block @click="handleClearAndRedo">
+    <a-button color="error" block @click="handleClearAndRedo">
       <RedoOutlined class="mr-2" />
       {{ t('layout.setting.clearBtn') }}
-    </Button>
+    </a-button>
   </div>
 </template>
 <script lang="ts" setup>
-import { unref } from 'vue';
-import { Button } from 'ant-design-vue';
 import { CopyOutlined, RedoOutlined } from '@ant-design/icons-vue';
 
 import { useAppStore } from '@/store/modules/app';
@@ -26,10 +24,10 @@ import { usePermissionStore } from '@/store/modules/permission';
 import { useMultipleTabStore } from '@/store/modules/multipleTab';
 import { useUserStore } from '@/store/modules/user';
 
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 import { useI18n } from '@/hooks/web/useI18n';
 import { useMessage } from '@/hooks/web/useMessage';
-import { copyText } from '@begcode/components';
+import { copyText } from '@/utils/copyTextToClipboard';
 
 import { updateColorWeak } from '@/logics/theme/updateColorWeak';
 import { updateGrayMode } from '@/logics/theme/updateGrayMode';

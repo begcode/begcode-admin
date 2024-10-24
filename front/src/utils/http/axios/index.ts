@@ -2,8 +2,6 @@
 // The axios configuration can be changed according to the project, just change the file, other files can be left unchanged
 
 import type { AxiosInstance, AxiosResponse } from 'axios';
-import { clone, isString, isNull, isEmpty, cloneDeep } from 'lodash-es';
-import { setObjToUrlParams, deepMerge, isUndefined } from '@begcode/components';
 import axios from 'axios';
 import qs from 'qs';
 import type { AxiosTransform, CreateAxiosOptions } from './axiosTransform';
@@ -15,6 +13,8 @@ import { useGlobSetting } from '@/hooks/setting';
 import { useMessage } from '@/hooks/web/useMessage';
 import { RequestEnum, ResultEnum, ContentTypeEnum, ConfigEnum } from '@/enums/httpEnum';
 import { getToken, getTenantId } from '@/utils/auth';
+import { isUndefined } from '@/utils/is';
+import { setObjToUrlParams, deepMerge } from '@/utils/util';
 import signMd5Utils from '@/utils/encryption/signMd5Utils';
 import { useErrorLogStoreWithOut } from '@/store/modules/errorLog';
 import { useI18n } from '@/hooks/web/useI18n';
@@ -62,7 +62,7 @@ const transform: AxiosTransform = {
     if (hasSuccess) {
       let successMsg = message;
 
-      if (isNull(successMsg) || isUndefined(successMsg) || isEmpty(successMsg)) {
+      if (_isNull(successMsg) || isUndefined(successMsg) || _isEmpty(successMsg)) {
         successMsg = t('sys.api.operationSuccess');
       }
 
@@ -112,14 +112,14 @@ const transform: AxiosTransform = {
       config.url = `${urlPrefix}${config.url}`;
     }
 
-    if (!isStartWithHttp && apiUrl && isString(apiUrl)) {
+    if (!isStartWithHttp && apiUrl && _isString(apiUrl)) {
       config.url = `${apiUrl}${config.url}`;
     }
     const params = config.params || {};
     const data = config.data || false;
-    formatDate && data && !isString(data) && formatRequestDate(data);
+    formatDate && data && !_isString(data) && formatRequestDate(data);
     if (config.method?.toUpperCase() === RequestEnum.GET) {
-      if (!isString(params)) {
+      if (!_isString(params)) {
         // 给 get 请求加上时间戳参数，避免从缓存中拿数据。
         config.params = Object.assign(params || {}, joinTimestamp(joinTime, false));
       } else {
@@ -134,7 +134,7 @@ const transform: AxiosTransform = {
         config.params = undefined;
       }
     } else {
-      if (!isString(params)) {
+      if (!_isString(params)) {
         formatDate && formatRequestDate(params);
         if (Reflect.has(config, 'data') && config.data && (Object.keys(config.data).length > 0 || config.data instanceof FormData)) {
           config.data = data;
@@ -164,7 +164,7 @@ const transform: AxiosTransform = {
     const token = getToken();
     let tenantId: string | number = getTenantId();
     config.headers[ConfigEnum.TIMESTAMP] = signMd5Utils.getTimestamp();
-    config.headers[ConfigEnum.Sign] = signMd5Utils.getSign(config.url, cloneDeep(config.params), cloneDeep(config.data));
+    config.headers[ConfigEnum.Sign] = signMd5Utils.getSign(config.url, _cloneDeep(config.params), _cloneDeep(config.data));
     if (token && (config as Recordable)?.requestOptions?.withToken !== false) {
       // jwt token
       (config as Recordable).headers.Authorization = options.authenticationScheme ? `${options.authenticationScheme} ${token}` : token;
@@ -261,7 +261,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
         // 如果是form-data格式
         // headers: { 'Content-Type': ContentTypeEnum.FORM_URLENCODED },
         // 数据处理方式
-        transform: clone(transform),
+        transform: _clone(transform),
         // 配置项，下面的选项都可以在独立的接口请求中覆盖
         requestOptions: {
           // 默认将prefix 添加到url

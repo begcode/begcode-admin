@@ -4,13 +4,17 @@
     "addCustomMethod": "service-rest-dto-listComponent-clientService-editComponent",
     "changelogDate": "20240101062406",
     "extendAbstractAuditingEntity": true,
+    "features": "copy-createBySelf",
+    "filterByTree": "category",
     "listBy": "list",
+    "mobileConfig": "addToHomeMenu-addToUserMenu-addToHomeRecommend-detailWithRecommend",
     "moduleName": "oss",
     "replaceListComponentMethod": "newEntity",
     "replaceServiceMethod": "save",
+    "skipComponent": "appEditPage",
     "skipFakeData": true,
     "skipRestApi": "create",
-    "skipWebButton": "listAdd-listEdit"
+    "skipWebButton": "listEdit"
   },
   "applications": "*",
   "clientRootFolder": "files",
@@ -18,20 +22,36 @@
   "dto": "mapstruct",
   "fields": [
     {
-      "documentation": "Url地址",
-      "fieldName": "url",
-      "fieldType": "String",
-      "fieldValidateRules": ["required"],
-      "options": {
-        "endUsed": "selectFile"
-      }
-    },
-    {
       "documentation": "完整文件名\\n不含路径",
       "fieldName": "fullName",
       "fieldType": "String",
       "options": {
         "fieldConfig": "hideInForm"
+      }
+    },
+    {
+      "documentation": "业务标题",
+      "fieldName": "businessTitle",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "业务自定义描述内容",
+      "fieldName": "businessDesc",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "业务状态",
+      "fieldName": "businessStatus",
+      "fieldType": "String"
+    },
+    {
+      "documentation": "Url地址",
+      "fieldName": "url",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"],
+      "options": {
+        "displayAs": "cover",
+        "endUsed": "selectFile"
       }
     },
     {
@@ -75,6 +95,14 @@
       }
     },
     {
+      "documentation": "文件大小",
+      "fieldName": "fileSize",
+      "fieldType": "Long",
+      "options": {
+        "fieldConfig": "hideInForm"
+      }
+    },
+    {
       "documentation": "使用实体名称",
       "fieldName": "ownerEntityName",
       "fieldType": "String",
@@ -91,32 +119,9 @@
       }
     },
     {
-      "documentation": "业务标题",
-      "fieldName": "businessTitle",
-      "fieldType": "String"
-    },
-    {
-      "documentation": "业务自定义描述内容",
-      "fieldName": "businessDesc",
-      "fieldType": "String"
-    },
-    {
-      "documentation": "业务状态",
-      "fieldName": "businessStatus",
-      "fieldType": "String"
-    },
-    {
       "documentation": "创建时间",
       "fieldName": "createAt",
       "fieldType": "ZonedDateTime",
-      "options": {
-        "fieldConfig": "hideInForm"
-      }
-    },
-    {
-      "documentation": "文件大小",
-      "fieldName": "fileSize",
-      "fieldType": "Long",
       "options": {
         "fieldConfig": "hideInForm"
       }

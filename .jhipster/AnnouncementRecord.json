@@ -6,6 +6,7 @@
     "entityPackage": "system",
     "extendAbstractAuditingEntity": true,
     "moduleName": "system",
+    "skipComponent": "appEditPage",
     "skipFakeData": true,
     "skipMenu": true,
     "skipWebButton": "listEdit-listDelete-listAdd"

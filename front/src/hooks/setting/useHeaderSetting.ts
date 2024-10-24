@@ -1,4 +1,3 @@
-import { computed, unref } from 'vue';
 import type { HeaderSetting } from '#/config';
 
 import { useAppStore } from '@/store/modules/app';

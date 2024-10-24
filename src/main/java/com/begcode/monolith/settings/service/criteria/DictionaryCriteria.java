@@ -45,10 +45,10 @@ public class DictionaryCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.sync_enum")
     private BooleanFilter syncEnum;
 
-    @BindQuery(entity = CommonFieldData.class, column = "id", condition = "owner_entity_name = 'Dictionary' AND owner_entity_id=id")
+    @BindQuery(entity = CommonFieldData.class, column = "id", condition = "owner_entity_name = 'Dictionary' AND owner_entity_id=this.id")
     private LongFilter itemsId;
 
-    @BindQuery(entity = CommonFieldData.class, column = "name", condition = "owner_entity_name = 'Dictionary' AND owner_entity_id=id")
+    @BindQuery(entity = CommonFieldData.class, column = "name", condition = "owner_entity_name = 'Dictionary' AND owner_entity_id=this.id")
     private StringFilter itemsName;
 
     @BindQuery(ignore = true)

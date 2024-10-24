@@ -1,5 +1,3 @@
-import { pick } from 'lodash-es';
-
 export function getSearchQueryData(searchFormConfig: any) {
   const result: any = {};
   if (searchFormConfig.matchType === 'or') {
@@ -70,7 +68,7 @@ export function getDataByFormField(formFields: any[], data) {
   const fields = formFields.map(field => {
     return field.key;
   });
-  return pick(data, fields);
+  return _pick(data, fields);
 }
 
 export function idsToIdObjectArray(ids: any): any[] {

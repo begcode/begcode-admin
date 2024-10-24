@@ -48,10 +48,10 @@ public class DepartmentCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.contact")
     private StringFilter contact;
 
-    @BindQuery(entity = Department.class, column = "id", condition = "id=parent_id")
+    @BindQuery(entity = Department.class, column = "id", condition = "parent_id=this.id")
     private LongFilter childrenId;
 
-    @BindQuery(entity = Department.class, column = "name", condition = "id=parent_id")
+    @BindQuery(entity = Department.class, column = "name", condition = "parent_id=this.id")
     private StringFilter childrenName;
 
     @BindQuery(
@@ -74,10 +74,10 @@ public class DepartmentCriteria implements Serializable, Criteria {
     @BindQuery(entity = Department.class, column = "name", condition = "this.parent_id=id")
     private StringFilter parentName;
 
-    @BindQuery(entity = User.class, column = "id", condition = "id=department_id")
+    @BindQuery(entity = User.class, column = "id", condition = "department_id=this.id")
     private LongFilter usersId;
 
-    @BindQuery(entity = User.class, column = "first_name", condition = "id=department_id")
+    @BindQuery(entity = User.class, column = "first_name", condition = "department_id=this.id")
     private StringFilter usersFirstName;
 
     @BindQuery(ignore = true)

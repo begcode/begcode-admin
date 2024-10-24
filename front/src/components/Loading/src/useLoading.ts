@@ -1,5 +1,3 @@
-import { unref } from 'vue';
-import type { Ref } from 'vue';
 import { createLoading } from './createLoading';
 import type { LoadingProps } from './typing';
 

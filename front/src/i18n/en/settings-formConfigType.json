@@ -1,0 +1,9 @@
+{
+  "monolithMybatisApp": {
+    "FormConfigType": {
+      "null": "",
+      "MODEL_FORM": "MODEL_FORM",
+      "DATA_FORM": "DATA_FORM"
+    }
+  }
+}

@@ -2,75 +2,68 @@
   <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
   <div style="height: 100%; padding-bottom: 10px">
     <SplitPanes class="default-theme">
-      <Pane size="50">
-        <Card :bordered="false" class="bc-list-result-card">
-          <Row :gutter="16" style="margin-bottom: 10px">
-            <Col :span="12" v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
-              <Space>
-                <Input
+      <SplitPane size="40">
+        <a-card :bordered="false" class="bc-list-result-card">
+          <a-row :gutter="16" style="margin-bottom: 10px">
+            <a-col :span="12" v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
+              <a-space>
+                <a-input
                   v-model:value="searchFormConfig.jhiCommonSearchKeywords"
                   placeholder="请输入关键字"
                   allow-clear
                   @change="inputSearch"
                   @pressEnter="formSearch"
-                  style="width: 280px"
+                  class="search-input"
+                  style="width: 200px"
                   data-cy="listSearchInput"
                 >
-                  <template #prefix>
-                    <Icon icon="ant-design:search-outlined" />
-                  </template>
                   <template #addonAfter>
-                    <Button type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
-                      >查询<Icon
-                        icon="ant-design:filter-outlined"
-                        @click="handleToggleSearch"
-                        data-cy="listSearchMore"
-                        v-if="searchFormConfig.allowSwitch"
-                      ></Icon>
-                    </Button>
+                    <BasicButton type="link" @click="formSearch" style="height: 30px; padding: 4px 8px" data-cy="listSearchButton"
+                      ><Icon icon="ant-design:search-outlined" />查询</BasicButton
+                    >
                   </template>
-                </Input>
+                </a-input>
                 <template v-for="button of toolbarButtons">
-                  <Button v-if="!button.dropdowns">{{ button.name }}</Button>
-                  <Dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
+                  <a-button v-if="!button.dropdowns">{{ button.name }}</a-button>
+                  <a-dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
                     <template #overlay>
-                      <Menu v-for="subButton of button.dropdowns">
-                        <MenuItem :key="subButton.name + 's'">
+                      <a-menu v-for="subButton of button.dropdowns">
+                        <a-menu-item :key="subButton.name + 's'">
                           <Icon :icon="subButton.icon"></Icon>
                           {{ subButton.name }}
-                        </MenuItem>
-                      </Menu>
+                        </a-menu-item>
+                      </a-menu>
                     </template>
-                    <Button>
+                    <BasicButton>
                       {{ button.name }}
                       <Icon icon="ant-design:down-outlined" />
-                    </Button>
-                  </Dropdown>
+                    </BasicButton>
+                  </a-dropdown>
                 </template>
-              </Space>
-            </Col>
-            <Col :span="12" style="display: flex; justify-content: flex-end">
-              <Space align="end">
+              </a-space>
+            </a-col>
+            <a-col :span="12" style="display: flex; justify-content: flex-end">
+              <a-space align="end">
                 <template v-for="button of toolbarTools">
-                  <Button v-if="!button.dropdowns" @click="toolbarClick({ code: button.code })">{{ button.name }}</Button>
-                  <Dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
+                  <BasicButton v-if="!button.dropdowns" @click="toolbarClick({ code: button.code })">{{ button.name }}</BasicButton>
+                  <a-dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
                     <template #overlay>
-                      <Menu v-for="subButton of button.dropdowns">
-                        <MenuItem :key="subButton.name + 's'">
+                      <a-menu v-for="subButton of button.dropdowns">
+                        <a-menu-item :key="subButton.name + 's'">
                           <Icon :icon="subButton.icon"></Icon>
                           {{ subButton.name }}
-                        </MenuItem>
-                      </Menu>
+                        </a-menu-item>
+                      </a-menu>
                     </template>
-                    <Button>
+                    <BasicButton>
                       {{ button.name }}
                       <Icon icon="ant-design:down-outlined" />
-                    </Button>
-                  </Dropdown>
+                    </BasicButton>
+                  </a-dropdown>
                 </template>
-              </Space>
-            </Col>
-          </Row>
+              </a-space>
+            </a-col>
+          </a-row>
           <BasicTree
             ref="treeRef"
             :expandedKeys="treeConfig.expandedKeys"
@@ -82,31 +75,31 @@
             @select="treeSelect"
             @check="treeCheck"
           >
-            <template #title="{ id, title, dataRef }">
-              <Dropdown :trigger="['contextmenu']">
-                <Popconfirm
-                  :open="treeConfig.visibleTreeKey === id"
+            <template #title="item">
+              <a-dropdown :trigger="['contextmenu']">
+                <a-popconfirm
+                  :open="treeConfig.visibleTreeKey === item.id"
                   title="确定要删除吗？"
                   ok-text="确定"
                   cancel-text="取消"
                   placement="rightTop"
-                  @confirm="deleteById(dataRef.id)"
+                  @confirm="deleteById(item.id)"
                   @openChange="onVisibleChange"
                 >
-                  <span>{{ title }}</span>
-                </Popconfirm>
+                  <span>{{ item.title }}</span>
+                </a-popconfirm>
 
                 <template #overlay>
-                  <Menu @click="">
-                    <MenuItem key="1" @click="rowClick({ name: 'addChildren', data: dataRef, params: {} })"
-                      ><Icon icon="ant-design:file-add-outlined" style="margin-right: 4px" />添加子级</MenuItem
+                  <a-menu @click="">
+                    <a-menu-item key="1" @click="rowClick({ name: 'addChildren', data: item, params: {} })">
+                      <Icon icon="ant-design:file-add-outlined" style="margin-right: 4px" />添加子级</a-menu-item
                     >
-                    <MenuItem key="2" @click="treeConfig.visibleTreeKey = id">
+                    <a-menu-item key="2" @click="treeConfig.visibleTreeKey = item.id">
                       <span style="color: red"><Icon icon="ant-design:delete-outlined" style="margin-right: 4px" />删除</span>
-                    </MenuItem>
-                  </Menu>
+                    </a-menu-item>
+                  </a-menu>
                 </template>
-              </Dropdown>
+              </a-dropdown>
             </template>
           </BasicTree>
 
@@ -144,56 +137,27 @@
               ref="drawerComponentRef"
             />
           </BasicDrawer>
-        </Card>
-      </Pane>
-      <Pane>
-        <Card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '8px' }">
-          <Tabs defaultActiveKey="baseInfo" type="card" v-if="currentRow">
-            <TabPane key="baseInfo" tab="基本信息">
+        </a-card>
+      </SplitPane>
+      <SplitPane>
+        <a-card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '8px' }">
+          <a-tabs defaultActiveKey="baseInfo" type="card" v-if="currentRow">
+            <a-tab-pane key="baseInfo" tab="基本信息">
               <ResourceCategoryEdit :entity-id="currentRow?.id || ''" :form-buttons="['submit', 'reset']" />
-            </TabPane>
-          </Tabs>
-          <Empty description="尚未选择资源分类" v-else />
-        </Card>
-      </Pane>
+            </a-tab-pane>
+          </a-tabs>
+          <a-empty description="尚未选择资源分类" v-else />
+        </a-card>
+      </SplitPane>
     </SplitPanes>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, getCurrentInstance, toRaw, shallowRef } from 'vue';
-import {
-  Alert,
-  message,
-  Modal,
-  Empty,
-  Space,
-  Card,
-  Row,
-  Col,
-  Input,
-  Dropdown,
-  Menu,
-  MenuItem,
-  Tabs,
-  TabPane,
-  Popconfirm,
-  Tag,
-} from 'ant-design-vue';
-import { debounce, isArray, upperFirst } from 'lodash-es';
+import { Modal, message } from 'ant-design-vue';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
-import {
-  Button,
-  BasicModal,
-  BasicDrawer,
-  Icon,
-  SearchForm,
-  useModalInner,
-  useDrawerInner,
-  BasicTree,
-  SplitPanes,
-  Pane,
-} from '@begcode/components';
+import { useDrawer } from '@/components/Drawer';
+import { useModal } from '@/components/Modal';
 import { useGo } from '@/hooks/web/usePage';
 import ServerProvider from '@/api-service/index';
 import { useSetShortcutButtons } from '@/components/VxeTable/src/helper';
@@ -201,18 +165,15 @@ import ResourceCategoryEdit from './components/form-component.vue';
 import ResourceCategoryDetail from './components/detail-component.vue';
 import config from './config/list-config';
 import UploadImageList from '@/views/files/upload-image/upload-image-list.vue';
-import { AvatarGroupInfo } from '@begcode/components';
+import { upperFirst as _upperFirst } from 'lodash-es';
+import { AvatarGroupInfo } from '@/components/AvatarGroupInfo';
 import UploadFileList from '@/views/files/upload-file/upload-file-list.vue';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 const props = defineProps(config.ListProps);
 
-const [registerModal, { closeModal, setModalProps }] = useModalInner(data => {
-  console.log(data);
-});
-const [registerDrawer, { closeDrawer, setDrawerProps }] = useDrawerInner(data => {
-  console.log(data);
-});
+const [registerModal, { closeModal, setModalProps }] = useModal();
+const [registerDrawer, { closeDrawer, setDrawerProps }] = useDrawer();
 const shallowRefs = {
   ResourceCategoryEdit: shallowRef(ResourceCategoryEdit),
   ResourceCategoryDetail: shallowRef(ResourceCategoryDetail),
@@ -228,6 +189,7 @@ const apiService = ctx?.$apiService as typeof ServerProvider;
 const apis = {
   resourceCategoryService: apiService.files.resourceCategoryService,
   find: apiService.files.resourceCategoryService.tree,
+  findByParentId: apiService.files.resourceCategoryService.treeByParentId,
   deleteById: apiService.files.resourceCategoryService.delete,
   deleteByIds: apiService.files.resourceCategoryService.deleteByIds,
   import: apiService.files.resourceCategoryService.importExcel,
@@ -235,6 +197,10 @@ const apis = {
   update: apiService.files.resourceCategoryService.update,
   imagesStats: apiService.files.uploadImageService.stats,
   filesStats: apiService.files.uploadFileService.stats,
+  children: apiService.files.resourceCategoryService.tree,
+  parent: apiService.files.resourceCategoryService.tree,
+  images: apiService.files.uploadImageService.retrieve,
+  files: apiService.files.uploadFileService.retrieve,
 };
 const pageConfig = {
   title: '资源分类列表',
@@ -242,8 +208,8 @@ const pageConfig = {
 };
 const treeRef = ref<any>();
 const currentRow = ref<any>(null);
-const searchFormConfig = reactive<any>({
-  fieldList: config.searchForm(),
+const searchFormConfig = reactive<Record<string, any>>({
+  fieldList: config.searchForm(apis),
   toggleSearchStatus: false,
   useOr: false,
   disabled: false,
@@ -337,8 +303,8 @@ const toolbarButtons = [
 // 表格右上角自定义按钮
 const toolbarTools: any[] = [
   { code: 'new', name: '新增', circle: false, icon: 'vxe-icon-add' },
-  { code: 'open-tree', name: '展开全部', circle: false, icon: 'vxe-icon-square-plus' },
-  { code: 'close-tree', name: '折叠全部', circle: false, icon: 'vxe-icon-square-minus' },
+  { code: 'open-tree', name: '展开', circle: false, icon: 'vxe-icon-square-plus' },
+  { code: 'close-tree', name: '折叠', circle: false, icon: 'vxe-icon-square-minus' },
 ];
 const toolbarClick = ({ code }) => {
   switch (code) {
@@ -424,7 +390,7 @@ const okDrawer = async () => {
 const formSearch = () => {
   queryParams.value.page = 0;
   queryParams.value.size = -1;
-  queryParams.value = { ...props.query };
+  Object.assign(queryParams.value, props.query);
   if (searchFormConfig.jhiCommonSearchKeywords) {
     queryParams.value['jhiCommonSearchKeywords'] = searchFormConfig.jhiCommonSearchKeywords;
   } else {
@@ -437,10 +403,13 @@ const formSearch = () => {
 };
 const deleteById = id => {
   apis.deleteById(id).then(() => {
+    if (currentRow.value?.id === id) {
+      currentRow.value = null;
+    }
     formSearch();
   });
 };
-const inputSearch = debounce(formSearch, 700);
+const inputSearch = _debounce(formSearch, 700);
 const handleToggleSearch = () => {
   if (searchFormConfig.allowSwitch) {
     searchFormConfig.toggleSearchStatus = !searchFormConfig.toggleSearchStatus;
@@ -499,7 +468,7 @@ const rowClick = ({ name, data, params }) => {
         });
         break;
       case 'imagesColumnView': {
-        popupConfig.containerProps.title = '关联上传图片';
+        popupConfig.containerProps.title = '查看上传图片';
         popupConfig.containerProps.okText = '';
         popupConfig.containerProps.cancelText = '关闭';
         popupConfig.needSubmit = false;
@@ -521,6 +490,7 @@ const rowClick = ({ name, data, params }) => {
               tools: [],
               buttons: [],
             },
+            height: row.images?.length > 0 ? 50 * ((row.images || []).length + 3) : undefined,
           },
           source: 'ResourceCategory',
           gridCustomConfig: {
@@ -544,7 +514,7 @@ const rowClick = ({ name, data, params }) => {
         break;
       }
       case 'filesColumnView': {
-        popupConfig.containerProps.title = '关联上传文件';
+        popupConfig.containerProps.title = '查看上传文件';
         popupConfig.containerProps.okText = '';
         popupConfig.containerProps.cancelText = '关闭';
         popupConfig.needSubmit = false;
@@ -566,6 +536,7 @@ const rowClick = ({ name, data, params }) => {
               tools: [],
               buttons: [],
             },
+            height: row.files?.length > 0 ? 50 * ((row.files || []).length + 3) : undefined,
           },
           source: 'ResourceCategory',
           gridCustomConfig: {
@@ -600,3 +571,11 @@ const getSelectRows = () => {
 formSearch();
 defineExpose({ getSelectRows });
 </script>
+<style lang="less" scoped>
+.search-input :deep(.ant-input-group-addon) {
+  padding: 0;
+  .ant-btn > .anticon + span {
+    margin-inline-start: 2px;
+  }
+}
+</style>

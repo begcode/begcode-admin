@@ -283,3 +283,15 @@
 283;编辑表单配置;;false;/settings/form-config/:entityId/edit;;SELF;;false;true;false;false;false;false;systemFormConfigEdit;;MENU;1;;54;settings/form-config/form-config-edit;
 284;新建表单配置;;false;/settings/form-config/new;;SELF;;false;true;false;false;false;false;systemFormConfigNew;;MENU;1;;54;settings/form-config/form-config-edit;
 285;查看表单配置;;false;/settings/form-config/:entityId/detail;;SELF;;false;true;false;false;false;false;systemFormConfigDetail;;MENU;1;;54;settings/form-config/form-config-detail;
+286;网站配置;;false;/settings/system-config;;SELF;;false;false;false;false;false;false;systemSystemConfigList;;MENU;1;;54;settings/system-config/system-config-list;
+287;新建网站配置;;false;;;SELF;;false;true;false;false;false;false;system:systemConfig:new;;BUTTON;1;;286;;
+288;编辑网站配置;;false;;;SELF;;false;true;false;false;false;false;system:systemConfig:edit;;BUTTON;1;;286;;
+289;查看网站配置;;false;;;SELF;;false;true;false;false;false;false;system:systemConfig:detail;;BUTTON;1;;286;;
+290;删除网站配置;;false;;;SELF;;false;true;false;false;false;false;system:systemConfig:delete;;BUTTON;1;;286;;
+291;导入网站配置;;false;;;SELF;;false;true;false;false;false;false;system:systemConfig:import;;BUTTON;1;;286;;
+292;导出网站配置;;false;;;SELF;;false;true;false;false;false;false;system:systemConfig:export;;BUTTON;1;;286;;
+293;打印网站配置;;false;;;SELF;;false;true;false;false;false;false;system:systemConfig:print;;BUTTON;1;;286;;
+294;列配置网站配置;;false;;;SELF;;false;true;false;false;false;false;system:systemConfig:customColumn;;BUTTON;1;;286;;
+295;编辑网站配置;;false;/settings/system-config/:entityId/edit;;SELF;;false;true;false;false;false;false;systemSystemConfigEdit;;MENU;1;;54;settings/system-config/system-config-edit;
+296;新建网站配置;;false;/settings/system-config/new;;SELF;;false;true;false;false;false;false;systemSystemConfigNew;;MENU;1;;54;settings/system-config/system-config-edit;
+297;查看网站配置;;false;/settings/system-config/:entityId/detail;;SELF;;false;true;false;false;false;false;systemSystemConfigDetail;;MENU;1;;54;settings/system-config/system-config-detail;

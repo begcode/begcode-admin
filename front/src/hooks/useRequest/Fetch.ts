@@ -1,8 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { reactive } from 'vue';
-
 import type { FetchState, PluginReturn, Service, Subscribe, UseRequestOptions } from './types';
-import { isFunction } from './utils/isFunction';
 
 export default class Fetch<TData, TParams extends any[]> {
   pluginImpls: PluginReturn<TData, TParams>[] = [];
@@ -136,7 +133,7 @@ export default class Fetch<TData, TParams extends any[]> {
   }
 
   mutate(data?: TData | ((oldData?: TData) => TData | undefined)) {
-    const targetData = isFunction(data) ? data(this.state.data) : data;
+    const targetData = _isFunction(data) ? data(this.state.data) : data;
     this.runPluginHandler('onMutate', targetData);
     this.setState({ data: targetData });
   }

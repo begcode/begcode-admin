@@ -15,10 +15,9 @@
   </Dropdown>
 </template>
 <script lang="ts" setup>
-import type { PropType } from 'vue';
 import type { RouteLocationNormalized } from 'vue-router';
-import { computed, unref } from 'vue';
-import { Dropdown, Icon, useDesign } from '@begcode/components';
+import { Dropdown } from '@/components/Dropdown';
+import { useDesign } from '@/hooks/web/useDesign';
 import { TabContentProps } from '../types';
 import { TabsThemeEnum } from '@/enums/appEnum';
 import { useI18n } from '@/hooks/web/useI18n';

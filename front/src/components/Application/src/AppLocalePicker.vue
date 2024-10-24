@@ -1,7 +1,3 @@
-<!--
- * @Author: Vben
- * @Description: Multi-language switching component
--->
 <template>
   <Dropdown
     placement="bottom"
@@ -19,9 +15,7 @@
 </template>
 <script lang="ts" setup>
 import type { LocaleType } from '#/config';
-import type { DropMenu } from '@begcode/components';
-import { ref, watchEffect, unref, computed } from 'vue';
-import { Icon, Dropdown } from '@begcode/components';
+import type { DropMenu } from '@/components/Dropdown';
 import { useLocale } from '@/i18n/useLocale';
 import { localeList } from '@/settings/localeSetting';
 

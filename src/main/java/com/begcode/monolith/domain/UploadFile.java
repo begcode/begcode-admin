@@ -24,18 +24,36 @@ public class UploadFile extends AbstractAuditingEntity<Long, UploadFile> impleme
     private Long id;
 
     /**
-     * Url地址
-     */
-    @NotNull
-    @TableField(value = "url")
-    private String url;
-
-    /**
      * 完整文件名
      * 不含路径
      */
     @TableField(value = "full_name")
     private String fullName;
+
+    /**
+     * 业务标题
+     */
+    @TableField(value = "business_title")
+    private String businessTitle;
+
+    /**
+     * 业务自定义描述内容
+     */
+    @TableField(value = "business_desc")
+    private String businessDesc;
+
+    /**
+     * 业务状态
+     */
+    @TableField(value = "business_status")
+    private String businessStatus;
+
+    /**
+     * Url地址
+     */
+    @NotNull
+    @TableField(value = "url")
+    private String url;
 
     /**
      * 文件名
@@ -49,6 +67,12 @@ public class UploadFile extends AbstractAuditingEntity<Long, UploadFile> impleme
      */
     @TableField(value = "thumb")
     private String thumb;
+
+    /**
+     * 文件大小
+     */
+    @TableField(value = "file_size")
+    private Long fileSize;
 
     /**
      * 扩展名
@@ -87,34 +111,10 @@ public class UploadFile extends AbstractAuditingEntity<Long, UploadFile> impleme
     private Long ownerEntityId;
 
     /**
-     * 业务标题
-     */
-    @TableField(value = "business_title")
-    private String businessTitle;
-
-    /**
-     * 业务自定义描述内容
-     */
-    @TableField(value = "business_desc")
-    private String businessDesc;
-
-    /**
-     * 业务状态
-     */
-    @TableField(value = "business_status")
-    private String businessStatus;
-
-    /**
      * 创建时间
      */
     @TableField(value = "create_at")
     private ZonedDateTime createAt;
-
-    /**
-     * 文件大小
-     */
-    @TableField(value = "file_size")
-    private Long fileSize;
 
     /**
      * 被引次数
@@ -140,13 +140,28 @@ public class UploadFile extends AbstractAuditingEntity<Long, UploadFile> impleme
         return this;
     }
 
-    public UploadFile url(String url) {
-        this.url = url;
+    public UploadFile fullName(String fullName) {
+        this.fullName = fullName;
         return this;
     }
 
-    public UploadFile fullName(String fullName) {
-        this.fullName = fullName;
+    public UploadFile businessTitle(String businessTitle) {
+        this.businessTitle = businessTitle;
+        return this;
+    }
+
+    public UploadFile businessDesc(String businessDesc) {
+        this.businessDesc = businessDesc;
+        return this;
+    }
+
+    public UploadFile businessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
+        return this;
+    }
+
+    public UploadFile url(String url) {
+        this.url = url;
         return this;
     }
 
@@ -157,6 +172,11 @@ public class UploadFile extends AbstractAuditingEntity<Long, UploadFile> impleme
 
     public UploadFile thumb(String thumb) {
         this.thumb = thumb;
+        return this;
+    }
+
+    public UploadFile fileSize(Long fileSize) {
+        this.fileSize = fileSize;
         return this;
     }
 
@@ -190,28 +210,8 @@ public class UploadFile extends AbstractAuditingEntity<Long, UploadFile> impleme
         return this;
     }
 
-    public UploadFile businessTitle(String businessTitle) {
-        this.businessTitle = businessTitle;
-        return this;
-    }
-
-    public UploadFile businessDesc(String businessDesc) {
-        this.businessDesc = businessDesc;
-        return this;
-    }
-
-    public UploadFile businessStatus(String businessStatus) {
-        this.businessStatus = businessStatus;
-        return this;
-    }
-
     public UploadFile createAt(ZonedDateTime createAt) {
         this.createAt = createAt;
-        return this;
-    }
-
-    public UploadFile fileSize(Long fileSize) {
-        this.fileSize = fileSize;
         return this;
     }
 
@@ -254,21 +254,21 @@ public class UploadFile extends AbstractAuditingEntity<Long, UploadFile> impleme
     public String toString() {
         return "UploadFile{" +
             "id=" + getId() +
-            ", url='" + getUrl() + "'" +
             ", fullName='" + getFullName() + "'" +
+            ", businessTitle='" + getBusinessTitle() + "'" +
+            ", businessDesc='" + getBusinessDesc() + "'" +
+            ", businessStatus='" + getBusinessStatus() + "'" +
+            ", url='" + getUrl() + "'" +
             ", name='" + getName() + "'" +
             ", thumb='" + getThumb() + "'" +
+            ", fileSize=" + getFileSize() +
             ", ext='" + getExt() + "'" +
             ", type='" + getType() + "'" +
             ", path='" + getPath() + "'" +
             ", folder='" + getFolder() + "'" +
             ", ownerEntityName='" + getOwnerEntityName() + "'" +
             ", ownerEntityId=" + getOwnerEntityId() +
-            ", businessTitle='" + getBusinessTitle() + "'" +
-            ", businessDesc='" + getBusinessDesc() + "'" +
-            ", businessStatus='" + getBusinessStatus() + "'" +
             ", createAt='" + getCreateAt() + "'" +
-            ", fileSize=" + getFileSize() +
             ", referenceCount=" + getReferenceCount() +
             ", createdBy=" + getCreatedBy() +
             ", createdDate='" + getCreatedDate() + "'" +

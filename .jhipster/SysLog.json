@@ -5,7 +5,10 @@
     "changelogDate": "20240101063706",
     "entityPackage": "log",
     "extendAbstractAuditingEntity": true,
+    "filterByTree": "logType",
+    "mobileConfig": "addToHomeMenu-addToUserMenu-listWithHeader-listWithStat-detailByData",
     "moduleName": "log",
+    "skipComponent": "appEditPage",
     "skipFakeData": true,
     "skipWebButton": "listAdd-listEdit",
     "skipWebsite": true
@@ -15,6 +18,11 @@
   "documentation": "系统日志",
   "dto": "mapstruct",
   "fields": [
+    {
+      "documentation": "请求路径",
+      "fieldName": "requestUrl",
+      "fieldType": "String"
+    },
     {
       "documentation": "日志类型",
       "fieldName": "logType",
@@ -70,11 +78,6 @@
     {
       "documentation": "请求java方法",
       "fieldName": "method",
-      "fieldType": "String"
-    },
-    {
-      "documentation": "请求路径",
-      "fieldName": "requestUrl",
       "fieldType": "String"
     },
     {

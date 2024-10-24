@@ -4,6 +4,7 @@
 @addCustomMethod(repository-service-listComponent)
 @moduleName(report)
 @listBy(list)
+@skipMobile
 entity UReportFile {
     name String required /** 名称 */
     content TextBlob /** 内容 */

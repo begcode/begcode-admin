@@ -1,5 +1,3 @@
-import type { MaybeRef, Ref, WatchSource } from 'vue';
-
 import type Fetch from './Fetch';
 import type { CachedData } from './utils/cache';
 

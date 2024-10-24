@@ -6,6 +6,7 @@
     "moduleName": "system",
     "skipFakeData": true,
     "skipMenu": true,
+    "skipMobile": true,
     "skipWebsite": true
   },
   "applications": "*",

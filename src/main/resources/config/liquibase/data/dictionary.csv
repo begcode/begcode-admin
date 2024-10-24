@@ -21,3 +21,4 @@ id;dict_name;dict_key;disabled;sort_value;built_in;sync_enum
 20;任务状态;JobStatus;0;20;1;1
 21;日志类型;LogType;0;21;1;1
 22;操作类型;OperateType;0;22;1;1
+23;表单配置类型;FormConfigType;0;23;1;1

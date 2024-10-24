@@ -1,17 +1,16 @@
 <template>
-  <div>
+  <div class="w-100%">
     <Descriptions ref="dictionaryDetailRef" v-bind="descriptionsProps"></Descriptions>
-    <Tabs>
-      <TabPane :tab="relationTables.itemsGrid.title" :key="relationTables.itemsGrid.name">
-        <Grid ref="formRef" v-bind="relationTables.itemsGrid.props"></Grid>
-      </TabPane>
-    </Tabs>
+    <a-tabs>
+      <a-tab-pane :tab="relationTables.itemsGrid.title" :key="relationTables.itemsGrid.name">
+        <Grid ref="itemsGridRef" v-bind="relationTables.itemsGrid.props()" v-on="relationTables.itemsGrid.events">
+          <template #recordAction></template>
+        </Grid>
+      </a-tab-pane>
+    </a-tabs>
   </div>
 </template>
 <script lang="ts" setup>
-import { getCurrentInstance, ref, reactive, h } from 'vue';
-import { CollapsePanel, Collapse } from 'ant-design-vue';
-import { Descriptions } from '@begcode/components';
 import ServerProvider from '@/api-service/index';
 import config from '../config/detail-config';
 import { IDictionary } from '@/models/settings/dictionary.model';
@@ -29,51 +28,62 @@ const props = defineProps({
     default: '',
     required: true,
   },
+  columns: {
+    type: Number,
+    default: 1,
+  },
+  hideColumns: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+  },
 });
 
 const dictionaryDetailRef = ref(null);
 const ctx = getCurrentInstance()?.proxy;
 const apiService = ctx?.$apiService as typeof ServerProvider;
 const dictionary = reactive<IDictionary>({});
-if (props.entityId) {
-  apiService.settings.dictionaryService.find(Number(props.entityId)).then(data => {
-    if (data) {
-      Object.assign(dictionary, data);
-    }
-  });
-}
-const formItemsConfig = reactive(config.fields);
-//获得关联表属性。
-
+const getEntityData = async () => {
+  if (props.entityId) {
+    apiService.settings.dictionaryService.find(Number(props.entityId)).then(data => {
+      if (data) {
+        Object.assign(dictionary, data);
+      }
+    });
+  }
+};
+watch(() => props.entityId, getEntityData, { immediate: true });
+const relationTables = reactive({
+  activeKey: 'baseInfo',
+  itemsGrid: {
+    name: 'vxe-grid',
+    title: '字典项列表',
+    props: () => {
+      return {
+        data: dictionary['items'],
+        columns: config.itemsColumns(),
+        border: true,
+        showOverflow: true,
+        fieldMapToTime: [],
+        compact: true,
+        size: 'default',
+        toolbarConfig: {
+          buttons: [],
+          tools: [],
+          import: false,
+          export: false,
+          print: false,
+          custom: false,
+        },
+      } as VxeGridProps;
+    },
+  },
+});
 const descriptionsProps = reactive({
-  schema: formItemsConfig,
+  schema: config.fields(props.hideColumns.concat(['items'])),
   isEdit: () => false,
   // formConfig,
   labelWidth: '120px',
   data: dictionary,
-  column: 1,
-});
-const relationTables = reactive({
-  itemsGrid: {
-    name: 'vxe-grid',
-    title: '字典项列表列表',
-    props: {
-      data: dictionary['items'],
-      columns: config.itemsColumns(),
-      border: true,
-      showOverflow: true,
-      fieldMapToTime: [],
-      compact: true,
-      size: 'default',
-      toolbarConfig: {
-        buttons: [],
-        tools: [],
-        import: false,
-        export: false,
-        print: false,
-        custom: false,
-      },
-    } as VxeGridProps,
-  },
+  column: props.columns || 1,
 });
 </script>

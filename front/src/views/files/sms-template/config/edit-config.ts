@@ -1,5 +1,5 @@
-import { FormSchema } from '@begcode/components';
 import { useI18n } from '@/hooks/web/useI18n';
+import { FormSchema } from '@/components/Form';
 import apiService from '@/api-service/index';
 
 const smsTemplateService = apiService.files.smsTemplateService;
@@ -122,8 +122,7 @@ const fields = (): FormSchema[] => {
         api: relationshipApis.supplier,
         style: 'width: 100%',
         labelInValue: true,
-        valueField: 'id',
-        labelField: 'signName',
+        fieldNames: { options: 'optionsField', value: 'id', label: 'signName' },
         resultField: 'records',
         placeholder: '请选择短信服务商',
       },

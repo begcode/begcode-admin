@@ -1,6 +1,5 @@
-import type { InjectionKey, Ref, ComponentInternalInstance } from 'vue';
-import { createContext, useContext } from '@begcode/components';
 import type { Emitter } from '@/utils/mitt';
+import { createContext, useContext } from '@/hooks/core/useContext';
 
 export type MenuEmitterEvents = {
   'on-update-opened':

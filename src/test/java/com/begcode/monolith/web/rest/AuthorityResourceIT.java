@@ -19,8 +19,6 @@ import com.begcode.monolith.domain.User;
 import com.begcode.monolith.domain.ViewPermission;
 import com.begcode.monolith.repository.AuthorityRepository;
 import com.begcode.monolith.repository.AuthorityRepository;
-import com.begcode.monolith.repository.UserRepository;
-import com.begcode.monolith.repository.UserRepository;
 import com.begcode.monolith.service.AuthorityService;
 import com.begcode.monolith.service.dto.AuthorityDTO;
 import com.begcode.monolith.service.mapper.AuthorityMapper;
@@ -75,9 +73,6 @@ public class AuthorityResourceIT {
 
     @Autowired
     private AuthorityRepository authorityRepository;
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Mock
     private AuthorityRepository authorityRepositoryMock;

@@ -1,21 +1,30 @@
 <template>
   <div :class="containerType === 'page' ? ['pb-44px'] : []">
-    <BasicForm ref="formRef" v-bind="formProps"></BasicForm>
-    <Tabs>
-      <TabPane :tab="relationTables.ruleItemsGrid.title" :key="relationTables.ruleItemsGrid.name">
-        <Grid ref="ruleItemsGridRef" v-bind="relationTables.ruleItemsGrid.props"></Grid>
-      </TabPane>
-    </Tabs>
+    <a-tabs v-model:active-key="relationTables.activeKey" @change="changeActiveKey">
+      <a-tab-pane tab="基本信息" key="baseInfo">
+        <BasicForm ref="formRef" v-bind="formProps" />
+      </a-tab-pane>
+      <a-tab-pane
+        :tab="relationTables.ruleItemsRelation.title"
+        :key="relationTables.ruleItemsRelation.name"
+        :disabled="relationTables.ruleItemsRelation.disabled()"
+      >
+        <FillRuleItemRelation
+          ref="ruleItemsRelationRef"
+          v-bind="relationTables.ruleItemsRelation.props()"
+          v-on="relationTables.ruleItemsRelation.events"
+        >
+        </FillRuleItemRelation>
+      </a-tab-pane>
+    </a-tabs>
   </div>
 </template>
 <script lang="ts" setup>
-import { getCurrentInstance, reactive, computed, h, ref, watch } from 'vue';
-import { message, Tabs, TabPane } from 'ant-design-vue';
-import { BasicForm } from '@begcode/components';
+import { message } from 'ant-design-vue';
 import config from '../config/edit-config';
 import { SysFillRule, ISysFillRule } from '@/models/settings/sys-fill-rule.model';
 import ServerProvider from '@/api-service/index';
-import { Grid, VxeGridProps } from 'vxe-table';
+import FillRuleItemRelation from '@/views/settings/fill-rule-item/components/fill-rule-item-relation.vue';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 defineOptions({
@@ -41,25 +50,27 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+
+const emit = defineEmits(['cancel', 'update-save-button']);
+
 const ctx = getCurrentInstance()?.proxy;
 const formRef = ref<any>(null);
-const ruleItemsGridRef = ref<any>(null);
+const ruleItemsRelationRef = ref<any>(null);
 const apiService = ctx?.$apiService as typeof ServerProvider;
+const sysFillRuleId = ref<any>(null);
 const sysFillRule = reactive<ISysFillRule>(new SysFillRule());
-watch(
-  () => props.entityId,
-  async val => {
-    if (val) {
-      const data = await apiService.settings.sysFillRuleService.find(Number(val)).catch(() => null);
-      if (data) {
-        Object.assign(sysFillRule, data);
-      }
-    } else {
-      Object.assign(sysFillRule, props.baseData);
+const getEntityData = async (entityId: string | number) => {
+  if (entityId) {
+    sysFillRuleId.value = entityId;
+    const data = await apiService.settings.sysFillRuleService.find(Number(entityId)).catch(() => null);
+    if (data) {
+      Object.assign(sysFillRule, data);
     }
-  },
-  { immediate: true },
-);
+  } else {
+    Object.assign(sysFillRule, props.baseData);
+  }
+};
+watch(() => props.entityId, getEntityData, { immediate: true });
 const formItemsConfig = config.fields();
 
 const isEdit = computed(() => {
@@ -68,10 +79,16 @@ const isEdit = computed(() => {
 
 const submitButtonTitlePrefix = props.entityId ? '更新' : '保存';
 const saveOrUpdateApi = props.entityId ? apiService.settings.sysFillRuleService.update : apiService.settings.sysFillRuleService.create;
-const submit = async () => {
-  const result = await validate().catch(() => ({ success: false, data: {} }));
+const submit = async (config = { submitToServer: true }) => {
+  const result = await validate().catch(err => {
+    console.log('validate.error:', err);
+    return { success: false, data: {} };
+  });
   if (result.success) {
     Object.assign(sysFillRule, result.data);
+    if (!config.submitToServer) {
+      return sysFillRule;
+    }
     const saveData = await saveOrUpdateApi(sysFillRule).catch(() => false);
     if (saveData) {
       Object.assign(sysFillRule, saveData);
@@ -92,26 +109,21 @@ const validate = async () => {
     data: {},
     errors: [] as any[],
   };
-  const formValidResult = await formRef.value.validate();
+  const formValidResult = await formRef.value?.validate();
   if (!formValidResult) {
     result.success = false;
     result.errors.push('表单校验未通过！');
   } else {
     result.data = { ...result.data, ...formValidResult };
   }
-
-  const ruleItemsvalidateErrors = await ruleItemsGridRef.value.validate(true);
-  if (!ruleItemsvalidateErrors) {
-    const { fullData } = ruleItemsGridRef.value.getTableData();
-    fullData.forEach(row => {
-      if (typeof row.id === 'string' && row.id.startsWith('row_')) {
-        row.id = null;
-      }
-    });
-    result.data['ruleItems'] = fullData;
-  } else {
-    result.errors.push(ruleItemsvalidateErrors);
-    result.success = false;
+  if (ruleItemsRelationRef.value) {
+    const ruleItemsRelationResult = await ruleItemsRelationRef.value?.validate();
+    if (!ruleItemsRelationResult) {
+      result.success = false;
+      result.errors.push('配置项列表校验未通过！');
+    } else {
+      result.data = { ...result.data, ...{ ruleItems: ruleItemsRelationResult } };
+    }
   }
   return result;
 };
@@ -150,20 +162,23 @@ const formProps = reactive({
     preIcon: null,
   },
   resetFunc: () => {
-    ctx?.$emit('cancel', { update: false, containerType: props.containerType });
+    emit('cancel', { update: false, containerType: props.containerType });
   },
   submitFunc: submit,
 });
 const relationTables = reactive({
-  ruleItemsGrid: {
-    name: 'ruleItemsGrid',
-    title: '配置项列表列表',
-    props: {
+  activeKey: 'baseInfo',
+  ruleItemsRelation: {
+    name: 'ruleItemsRelation',
+    title: '配置项列表',
+    props: () => ({
+      cardSlots: [''],
       modelName: 'ruleItems',
-      data: sysFillRule['ruleItems'],
+      relationData: toRaw(sysFillRule['ruleItems']),
+      deleteRelationType: 'delete',
       columns: config.ruleItemsColumns(),
-      border: true,
-      showOverflow: true,
+      query: { fillRuleId: sysFillRuleId.value },
+      baseData: { fillRule: { id: sysFillRuleId.value } },
       editConfig: {
         trigger: 'click',
         mode: 'row',
@@ -188,27 +203,38 @@ const relationTables = reactive({
         }
       },
       fieldMapToTime: [],
-      compact: true,
       size: 'default',
       disabled: !isEdit.value,
-      toolbarConfig: {
-        buttons: [
-          { code: 'insert_actived', name: '新增', icon: 'fa fa-plus' },
-          { code: 'remove', name: '删除', icon: 'fa fa-trash-o' },
-        ],
-        // 表格右上角自定义按钮
-        tools: [
-          // { code: 'myPrint', name: '自定义打印' }
-        ],
-        import: false,
-        export: false,
-        print: false,
-        custom: false,
+      updateType: 'emitSelected',
+      gridOptions: {
+        toolbarConfig: {
+          // buttons未配置表示使用组件原有的，如果配置了，以配置为主。通过code进行比较
+          // buttons: [],
+
+          import: false,
+          export: false,
+          print: false,
+          custom: false,
+          // 表格右上角自定义按钮, tools未配置表示使用组件原有的，如果配置了，以配置为主。通过code进行比较
+          tools: ['new'],
+        },
       },
-    } as VxeGridProps,
+    }),
     slots: {},
+    events: {
+      updateRelationData: data => {
+        sysFillRule.ruleItems = data;
+      },
+    },
+    disabled: () => {
+      return !sysFillRule.id;
+    },
   },
 });
+function changeActiveKey(activeKey: string) {
+  relationTables.activeKey = activeKey;
+  emit('update-save-button', activeKey === 'baseInfo');
+}
 watch(sysFillRule, val => {
   formRef.value?.setFieldsValue(val);
 });

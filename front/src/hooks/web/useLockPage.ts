@@ -1,4 +1,3 @@
-import { computed, onUnmounted, unref, watchEffect } from 'vue';
 import { useThrottleFn } from '@vueuse/core';
 
 import { useRootSetting } from '../setting/useRootSetting';

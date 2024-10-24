@@ -1,10 +1,11 @@
 {
   "aigcs": [],
   "annotations": {
-    "addCustomMethod": "listComponent",
+    "addCustomMethod": "listComponent-service",
     "changelogDate": "20240405165934",
     "entityPackage": "system",
     "extendAbstractAuditingEntity": true,
+    "importData": true,
     "moduleName": "system",
     "skipFakeData": true,
     "skipMobile": true
@@ -18,14 +19,14 @@
       "documentation": "表单Key",
       "fieldName": "formKey",
       "fieldType": "String",
-      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRules": ["maxlength", "unique", "required"],
       "fieldValidateRulesMaxlength": "100"
     },
     {
       "documentation": "名称",
       "fieldName": "formName",
       "fieldType": "String",
-      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRules": ["maxlength", "unique", "required"],
       "fieldValidateRulesMaxlength": "100"
     },
     {
@@ -34,7 +35,27 @@
       "fieldType": "byte[]",
       "fieldTypeBlobContent": "text",
       "options": {
-        "endUsed": "codeEditor"
+        "endUsed": "codeEditor",
+        "fieldConfig": "hideInList-hideInForm"
+      }
+    },
+    {
+      "documentation": "表单类型",
+      "fieldName": "formType",
+      "fieldType": "FormConfigType",
+      "fieldTypeDocumentation": "表单配置类型",
+      "fieldValues": "MODEL_FORM,DATA_FORM",
+      "fieldValuesJavadocs": {
+        "DATA_FORM": "数据表单",
+        "MODEL_FORM": "模型表单"
+      }
+    },
+    {
+      "documentation": "多条数据",
+      "fieldName": "multiItems",
+      "fieldType": "Boolean",
+      "options": {
+        "showBy": "formType=DATA_FORM"
       }
     }
   ],

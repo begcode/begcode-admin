@@ -75,21 +75,21 @@ class UploadFileCriteriaTest {
 
     private static void setAllFilters(UploadFileCriteria uploadFileCriteria) {
         uploadFileCriteria.id();
-        uploadFileCriteria.url();
         uploadFileCriteria.fullName();
+        uploadFileCriteria.businessTitle();
+        uploadFileCriteria.businessDesc();
+        uploadFileCriteria.businessStatus();
+        uploadFileCriteria.url();
         uploadFileCriteria.name();
         uploadFileCriteria.thumb();
+        uploadFileCriteria.fileSize();
         uploadFileCriteria.ext();
         uploadFileCriteria.type();
         uploadFileCriteria.path();
         uploadFileCriteria.folder();
         uploadFileCriteria.ownerEntityName();
         uploadFileCriteria.ownerEntityId();
-        uploadFileCriteria.businessTitle();
-        uploadFileCriteria.businessDesc();
-        uploadFileCriteria.businessStatus();
         uploadFileCriteria.createAt();
-        uploadFileCriteria.fileSize();
         uploadFileCriteria.referenceCount();
         uploadFileCriteria.createdBy();
         uploadFileCriteria.createdDate();
@@ -103,21 +103,21 @@ class UploadFileCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId()) &&
-                condition.apply(criteria.getUrl()) &&
                 condition.apply(criteria.getFullName()) &&
+                condition.apply(criteria.getBusinessTitle()) &&
+                condition.apply(criteria.getBusinessDesc()) &&
+                condition.apply(criteria.getBusinessStatus()) &&
+                condition.apply(criteria.getUrl()) &&
                 condition.apply(criteria.getName()) &&
                 condition.apply(criteria.getThumb()) &&
+                condition.apply(criteria.getFileSize()) &&
                 condition.apply(criteria.getExt()) &&
                 condition.apply(criteria.getType()) &&
                 condition.apply(criteria.getPath()) &&
                 condition.apply(criteria.getFolder()) &&
                 condition.apply(criteria.getOwnerEntityName()) &&
                 condition.apply(criteria.getOwnerEntityId()) &&
-                condition.apply(criteria.getBusinessTitle()) &&
-                condition.apply(criteria.getBusinessDesc()) &&
-                condition.apply(criteria.getBusinessStatus()) &&
                 condition.apply(criteria.getCreateAt()) &&
-                condition.apply(criteria.getFileSize()) &&
                 condition.apply(criteria.getReferenceCount()) &&
                 condition.apply(criteria.getCreatedBy()) &&
                 condition.apply(criteria.getCreatedDate()) &&
@@ -133,21 +133,21 @@ class UploadFileCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId(), copy.getId()) &&
-                condition.apply(criteria.getUrl(), copy.getUrl()) &&
                 condition.apply(criteria.getFullName(), copy.getFullName()) &&
+                condition.apply(criteria.getBusinessTitle(), copy.getBusinessTitle()) &&
+                condition.apply(criteria.getBusinessDesc(), copy.getBusinessDesc()) &&
+                condition.apply(criteria.getBusinessStatus(), copy.getBusinessStatus()) &&
+                condition.apply(criteria.getUrl(), copy.getUrl()) &&
                 condition.apply(criteria.getName(), copy.getName()) &&
                 condition.apply(criteria.getThumb(), copy.getThumb()) &&
+                condition.apply(criteria.getFileSize(), copy.getFileSize()) &&
                 condition.apply(criteria.getExt(), copy.getExt()) &&
                 condition.apply(criteria.getType(), copy.getType()) &&
                 condition.apply(criteria.getPath(), copy.getPath()) &&
                 condition.apply(criteria.getFolder(), copy.getFolder()) &&
                 condition.apply(criteria.getOwnerEntityName(), copy.getOwnerEntityName()) &&
                 condition.apply(criteria.getOwnerEntityId(), copy.getOwnerEntityId()) &&
-                condition.apply(criteria.getBusinessTitle(), copy.getBusinessTitle()) &&
-                condition.apply(criteria.getBusinessDesc(), copy.getBusinessDesc()) &&
-                condition.apply(criteria.getBusinessStatus(), copy.getBusinessStatus()) &&
                 condition.apply(criteria.getCreateAt(), copy.getCreateAt()) &&
-                condition.apply(criteria.getFileSize(), copy.getFileSize()) &&
                 condition.apply(criteria.getReferenceCount(), copy.getReferenceCount()) &&
                 condition.apply(criteria.getCreatedBy(), copy.getCreatedBy()) &&
                 condition.apply(criteria.getCreatedDate(), copy.getCreatedDate()) &&

@@ -5,7 +5,8 @@
     "entityPackage": "system",
     "extendAbstractAuditingEntity": true,
     "moduleName": "system",
-    "skipFakeData": true
+    "skipFakeData": true,
+    "skipMobile": true
   },
   "applications": "*",
   "clientRootFolder": "system",

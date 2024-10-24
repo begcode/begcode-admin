@@ -1,6 +1,6 @@
 // 单点登录核心类
-import { getUrlParam } from '@begcode/components';
 import { getToken } from '@/utils/auth';
+import { getUrlParam } from '@/utils/util';
 import { useGlobSetting } from '@/hooks/setting';
 import { validateCasLogin } from '@/api-service/sys/user';
 import { useUserStore } from '@/store/modules/user';

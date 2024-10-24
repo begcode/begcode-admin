@@ -3,6 +3,7 @@ package com.begcode.monolith.system.domain;
 import com.baomidou.mybatisplus.annotation.*;
 import com.begcode.monolith.domain.AbstractAuditingEntity;
 import com.begcode.monolith.domain.BusinessType;
+import com.begcode.monolith.domain.enumeration.FormConfigType;
 import com.diboot.core.binding.annotation.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -26,6 +27,7 @@ public class FormConfig extends AbstractAuditingEntity<Long, FormConfig> impleme
     /**
      * 表单Key
      */
+    @NotNull
     @Size(max = 100)
     @TableField(value = "form_key")
     private String formKey;
@@ -33,6 +35,7 @@ public class FormConfig extends AbstractAuditingEntity<Long, FormConfig> impleme
     /**
      * 名称
      */
+    @NotNull
     @Size(max = 100)
     @TableField(value = "form_name")
     private String formName;
@@ -42,6 +45,18 @@ public class FormConfig extends AbstractAuditingEntity<Long, FormConfig> impleme
      */
     @TableField(value = "form_json")
     private String formJson;
+
+    /**
+     * 表单类型
+     */
+    @TableField(value = "form_type")
+    private FormConfigType formType;
+
+    /**
+     * 多条数据
+     */
+    @TableField(value = "multi_items")
+    private Boolean multiItems;
 
     /**
      * 业务类别
@@ -72,6 +87,16 @@ public class FormConfig extends AbstractAuditingEntity<Long, FormConfig> impleme
 
     public FormConfig formJson(String formJson) {
         this.formJson = formJson;
+        return this;
+    }
+
+    public FormConfig formType(FormConfigType formType) {
+        this.formType = formType;
+        return this;
+    }
+
+    public FormConfig multiItems(Boolean multiItems) {
+        this.multiItems = multiItems;
         return this;
     }
 
@@ -112,6 +137,8 @@ public class FormConfig extends AbstractAuditingEntity<Long, FormConfig> impleme
             ", formKey='" + getFormKey() + "'" +
             ", formName='" + getFormName() + "'" +
             ", formJson='" + getFormJson() + "'" +
+            ", formType='" + getFormType() + "'" +
+            ", multiItems='" + getMultiItems() + "'" +
             ", createdBy=" + getCreatedBy() +
             ", createdDate='" + getCreatedDate() + "'" +
             ", lastModifiedBy=" + getLastModifiedBy() +

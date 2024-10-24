@@ -1,5 +1,3 @@
-import { ref, unref } from 'vue';
-
 import type { UseRequestPlugin, UseRequestTimeout } from '../types';
 
 const useLoadingDelayPlugin: UseRequestPlugin<any, any[]> = (fetchInstance, { loadingDelay, ready }) => {

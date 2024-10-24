@@ -1,5 +1,4 @@
 import qs from 'qs';
-import { get } from 'lodash-es';
 import { defHttp } from '@/utils/http/axios';
 import buildPaginationQueryOpts from '@/utils/jhipster/sorts';
 import { PageRecord } from '@/models/baseModel';
@@ -26,7 +25,7 @@ export default {
   },
 
   exist(queryParams?: any): Promise<Boolean> {
-    if (!queryParams.hasOwnProperty('id.aggregate.count') || !get(queryParams, 'id.aggregate.count')) {
+    if (!queryParams.hasOwnProperty('id.aggregate.count') || !_get(queryParams, 'id.aggregate.count')) {
       queryParams['id.aggregate.count'] = true;
     }
     const options = buildPaginationQueryOpts(queryParams);

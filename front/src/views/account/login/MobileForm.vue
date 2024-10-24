@@ -1,11 +1,11 @@
 <template>
   <div v-if="getShow">
     <LoginFormTitle class="enter-x" />
-    <Form class="p-4 enter-x" :model="formData" :rules="getFormRules" ref="formRef">
-      <FormItem name="mobile" class="enter-x">
-        <Input size="large" v-model:value="formData.mobile" :placeholder="t('sys.login.mobile')" class="fix-auto-fill" />
-      </FormItem>
-      <FormItem name="code" class="enter-x">
+    <a-form class="p-4 enter-x" :model="formData" :rules="getFormRules" ref="formRef">
+      <a-form-item name="mobile" class="enter-x">
+        <a-input size="large" v-model:value="formData.mobile" :placeholder="t('sys.login.mobile')" class="fix-auto-fill" />
+      </a-form-item>
+      <a-form-item name="code" class="enter-x">
         <CountdownInput
           size="large"
           class="fix-auto-fill"
@@ -13,23 +13,20 @@
           :placeholder="t('sys.login.smsCode')"
           :sendCodeApi="sendCodeApi"
         />
-      </FormItem>
+      </a-form-item>
 
-      <FormItem class="enter-x">
-        <Button type="primary" size="large" block @click="handleLogin" :loading="loading">
+      <a-form-item class="enter-x">
+        <a-button type="primary" size="large" block @click="handleLogin" :loading="loading">
           {{ t('sys.login.loginButton') }}
-        </Button>
-        <Button size="large" block class="mt-4" @click="handleBackLogin">
+        </a-button>
+        <a-button size="large" block class="mt-4" @click="handleBackLogin">
           {{ t('sys.login.backSignIn') }}
-        </Button>
-      </FormItem>
-    </Form>
+        </a-button>
+      </a-form-item>
+    </a-form>
   </div>
 </template>
 <script lang="ts" setup>
-import { reactive, ref, computed, unref, toRaw } from 'vue';
-import { Form, Input, Button } from 'ant-design-vue';
-import { CountdownInput } from '@begcode/components';
 import LoginFormTitle from './LoginFormTitle.vue';
 import { useI18n } from '@/hooks/web/useI18n';
 import { useMessage } from '@/hooks/web/useMessage';
@@ -38,8 +35,6 @@ import { useUserStore } from '@/store/modules/user'; // todo 没有需要增加
 import { getSmsCaptcha } from '@/api-service/sys/user'; // todo 这个统一处理到apiService中。
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
-
-const FormItem = Form.Item;
 const { t } = useI18n();
 const { handleBackLogin, getLoginState } = useLoginState();
 const { getFormRules } = useFormRules();

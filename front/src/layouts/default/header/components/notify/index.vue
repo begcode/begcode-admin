@@ -1,18 +1,17 @@
 <template>
   <div :class="prefixCls">
-    <Badge :count="count" :overflowCount="9" :offset="[-6, -12]" dot @click="clickBadge">
+    <a-badge :count="count" :overflowCount="9" :offset="[-6, -12]" dot @click="clickBadge">
       <BellOutlined />
-    </Badge>
+    </a-badge>
     <DynamicNotice ref="dynamicNoticeRef" v-bind="dynamicNoticeProps" />
     <DetailModal @register="registerDetail" />
     <sys-message-modal @register="registerMessageModal" @refresh="reloadCount"></sys-message-modal>
   </div>
 </template>
 <script lang="ts" setup>
-import { computed, ref, reactive, onMounted, getCurrentInstance, onUnmounted } from 'vue';
-import { Badge } from 'ant-design-vue';
 import { BellOutlined } from '@ant-design/icons-vue';
-import { useDesign, useModal } from '@begcode/components';
+import { useModal } from '@/components/Modal';
+import { useDesign } from '@/hooks/web/useDesign';
 import { tabListData } from './data';
 import DetailModal from '@/views/monitor/mynews/DetailModal.vue';
 import DynamicNotice from '@/views/monitor/mynews/DynamicNotice.vue';

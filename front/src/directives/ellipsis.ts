@@ -1,5 +1,3 @@
-import type { CSSProperties, DirectiveBinding, ObjectDirective, App } from 'vue';
-
 interface IValue {
   width?: number;
   line?: number;

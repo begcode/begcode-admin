@@ -30,7 +30,7 @@
               {{ userInfo.realName }}
             </p>
           </div>
-          <InputPassword
+          <a-input-password
             :placeholder="t('sys.lock.placeholder')"
             @change="unLock('change')"
             @keyup.enter="unLock('enter')"
@@ -58,17 +58,13 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { Input, Button } from 'ant-design-vue';
 import { useUserStore } from '@/store/modules/user';
 import { useLockStore } from '@/store/modules/lock';
 import { useI18n } from '@/hooks/web/useI18n';
 import { useNow } from './useNow';
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 import { LockOutlined } from '@ant-design/icons-vue';
 import headerImg from '@/assets/images/header.jpg';
-
-const InputPassword = Input.Password;
 
 const password = ref('');
 const loading = ref(false);

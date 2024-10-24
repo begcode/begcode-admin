@@ -2,7 +2,7 @@ package com.begcode.monolith.settings.domain;
 
 import static com.begcode.monolith.settings.domain.CommonFieldDataTestSamples.*;
 import static com.begcode.monolith.settings.domain.DictionaryTestSamples.*;
-import static com.begcode.monolith.settings.domain.SiteConfigTestSamples.*;
+import static com.begcode.monolith.settings.domain.SystemConfigTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.begcode.monolith.web.rest.TestUtil;

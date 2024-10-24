@@ -6,9 +6,6 @@ import 'vxe-table/lib/style.css';
 // 注册图标
 import 'virtual:svg-icons-register';
 
-import { createApp } from 'vue';
-
-import { Log } from '@begcode/components';
 import { registerGlobComp } from './components/registerGlobComp';
 import { setupGlobDirectives } from './directives';
 import { setupI18n } from './i18n/setupI18n';
@@ -21,9 +18,9 @@ import { setupStore } from './store';
 import App from './App.vue';
 
 import { useSso } from './hooks/web/useSso';
+import Log from '@/utils/Log';
 // import { registerPackages } from '@/utils/monorepo/registerPackages';
 import apiService from '@/api-service/index';
-import './utils/useMonacoWork';
 import { useUserStore } from '@/store/modules/user';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！

@@ -75,6 +75,7 @@ class SysLogCriteriaTest {
 
     private static void setAllFilters(SysLogCriteria sysLogCriteria) {
         sysLogCriteria.id();
+        sysLogCriteria.requestUrl();
         sysLogCriteria.logType();
         sysLogCriteria.logContent();
         sysLogCriteria.operateType();
@@ -82,7 +83,6 @@ class SysLogCriteriaTest {
         sysLogCriteria.username();
         sysLogCriteria.ip();
         sysLogCriteria.method();
-        sysLogCriteria.requestUrl();
         sysLogCriteria.requestType();
         sysLogCriteria.costTime();
         sysLogCriteria.createdBy();
@@ -96,6 +96,7 @@ class SysLogCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId()) &&
+                condition.apply(criteria.getRequestUrl()) &&
                 condition.apply(criteria.getLogType()) &&
                 condition.apply(criteria.getLogContent()) &&
                 condition.apply(criteria.getOperateType()) &&
@@ -103,7 +104,6 @@ class SysLogCriteriaTest {
                 condition.apply(criteria.getUsername()) &&
                 condition.apply(criteria.getIp()) &&
                 condition.apply(criteria.getMethod()) &&
-                condition.apply(criteria.getRequestUrl()) &&
                 condition.apply(criteria.getRequestType()) &&
                 condition.apply(criteria.getCostTime()) &&
                 condition.apply(criteria.getCreatedBy()) &&
@@ -119,6 +119,7 @@ class SysLogCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId(), copy.getId()) &&
+                condition.apply(criteria.getRequestUrl(), copy.getRequestUrl()) &&
                 condition.apply(criteria.getLogType(), copy.getLogType()) &&
                 condition.apply(criteria.getLogContent(), copy.getLogContent()) &&
                 condition.apply(criteria.getOperateType(), copy.getOperateType()) &&
@@ -126,7 +127,6 @@ class SysLogCriteriaTest {
                 condition.apply(criteria.getUsername(), copy.getUsername()) &&
                 condition.apply(criteria.getIp(), copy.getIp()) &&
                 condition.apply(criteria.getMethod(), copy.getMethod()) &&
-                condition.apply(criteria.getRequestUrl(), copy.getRequestUrl()) &&
                 condition.apply(criteria.getRequestType(), copy.getRequestType()) &&
                 condition.apply(criteria.getCostTime(), copy.getCostTime()) &&
                 condition.apply(criteria.getCreatedBy(), copy.getCreatedBy()) &&

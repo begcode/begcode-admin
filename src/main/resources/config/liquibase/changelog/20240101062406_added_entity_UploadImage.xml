@@ -14,11 +14,20 @@
             <column name="id" type="bigint" autoIncrement="true" startWith="1500">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="url" type="varchar(255)" remarks="Url地址">
-                <constraints nullable="false" />
-            </column>
             <column name="full_name" type="varchar(255)" remarks="完整文件名\n不含路径">
                 <constraints nullable="true" />
+            </column>
+            <column name="business_title" type="varchar(255)" remarks="业务标题">
+                <constraints nullable="true" />
+            </column>
+            <column name="business_desc" type="varchar(255)" remarks="业务自定义描述内容">
+                <constraints nullable="true" />
+            </column>
+            <column name="business_status" type="varchar(255)" remarks="业务状态">
+                <constraints nullable="true" />
+            </column>
+            <column name="url" type="varchar(255)" remarks="Url地址">
+                <constraints nullable="false" />
             </column>
             <column name="name" type="varchar(255)" remarks="文件名\n不含扩展名">
                 <constraints nullable="true" />
@@ -35,25 +44,16 @@
             <column name="folder" type="varchar(255)" remarks="本地存储目录">
                 <constraints nullable="true" />
             </column>
+            <column name="file_size" type="bigint" remarks="文件大小">
+                <constraints nullable="true" />
+            </column>
             <column name="owner_entity_name" type="varchar(255)" remarks="使用实体名称">
                 <constraints nullable="true" />
             </column>
             <column name="owner_entity_id" type="bigint" remarks="使用实体ID">
                 <constraints nullable="true" />
             </column>
-            <column name="business_title" type="varchar(255)" remarks="业务标题">
-                <constraints nullable="true" />
-            </column>
-            <column name="business_desc" type="varchar(255)" remarks="业务自定义描述内容">
-                <constraints nullable="true" />
-            </column>
-            <column name="business_status" type="varchar(255)" remarks="业务状态">
-                <constraints nullable="true" />
-            </column>
             <column name="create_at" type="${datetimeType}" remarks="创建时间">
-                <constraints nullable="true" />
-            </column>
-            <column name="file_size" type="bigint" remarks="文件大小">
                 <constraints nullable="true" />
             </column>
             <column name="smart_url" type="varchar(255)" remarks="小图Url">

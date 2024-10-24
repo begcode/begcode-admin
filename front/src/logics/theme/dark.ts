@@ -1,4 +1,4 @@
-import { addClass, hasClass, removeClass } from '@begcode/components';
+import { addClass, hasClass, removeClass } from '@/utils/domUtils';
 
 export type CustomColorType = {
   name: string;

@@ -1,6 +1,6 @@
 <script lang="tsx">
-import { defineComponent, computed, ref, unref, reactive, onMounted, watch, nextTick, CSSProperties, PropType } from 'vue';
-import { useEventListener, getSlot } from '@begcode/components';
+import { useEventListener } from '@/hooks/event';
+import { getSlot } from '@/utils/helper/tsxHelper';
 
 type NumberOrNumberString = PropType<string | number | undefined>;
 

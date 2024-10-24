@@ -1,12 +1,10 @@
 <template>
   <div :class="containerType === 'page' ? ['pb-44px'] : []">
-    <BasicForm ref="formRef" v-bind="formProps"></BasicForm>
+    <BasicForm ref="formRef" v-bind="formProps" />
   </div>
 </template>
 <script lang="ts" setup>
-import { getCurrentInstance, reactive, computed, h, ref, watch } from 'vue';
 import { message } from 'ant-design-vue';
-import { BasicForm } from '@begcode/components';
 import config from '../config/edit-config';
 import { CommonFieldData, ICommonFieldData } from '@/models/settings/common-field-data.model';
 import ServerProvider from '@/api-service/index';
@@ -35,24 +33,26 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+
+const emit = defineEmits(['cancel', 'update-save-button']);
+
 const ctx = getCurrentInstance()?.proxy;
 const formRef = ref<any>(null);
 const apiService = ctx?.$apiService as typeof ServerProvider;
+const commonFieldDataId = ref<any>(null);
 const commonFieldData = reactive<ICommonFieldData>(new CommonFieldData());
-watch(
-  () => props.entityId,
-  async val => {
-    if (val) {
-      const data = await apiService.settings.commonFieldDataService.find(Number(val)).catch(() => null);
-      if (data) {
-        Object.assign(commonFieldData, data);
-      }
-    } else {
-      Object.assign(commonFieldData, props.baseData);
+const getEntityData = async (entityId: string | number) => {
+  if (entityId) {
+    commonFieldDataId.value = entityId;
+    const data = await apiService.settings.commonFieldDataService.find(Number(entityId)).catch(() => null);
+    if (data) {
+      Object.assign(commonFieldData, data);
     }
-  },
-  { immediate: true },
-);
+  } else {
+    Object.assign(commonFieldData, props.baseData);
+  }
+};
+watch(() => props.entityId, getEntityData, { immediate: true });
 const formItemsConfig = config.fields();
 
 const isEdit = computed(() => {
@@ -63,10 +63,16 @@ const submitButtonTitlePrefix = props.entityId ? '更新' : '保存';
 const saveOrUpdateApi = props.entityId
   ? apiService.settings.commonFieldDataService.update
   : apiService.settings.commonFieldDataService.create;
-const submit = async () => {
-  const result = await validate().catch(() => ({ success: false, data: {} }));
+const submit = async (config = { submitToServer: true }) => {
+  const result = await validate().catch(err => {
+    console.log('validate.error:', err);
+    return { success: false, data: {} };
+  });
   if (result.success) {
     Object.assign(commonFieldData, result.data);
+    if (!config.submitToServer) {
+      return commonFieldData;
+    }
     const saveData = await saveOrUpdateApi(commonFieldData).catch(() => false);
     if (saveData) {
       Object.assign(commonFieldData, saveData);
@@ -87,7 +93,7 @@ const validate = async () => {
     data: {},
     errors: [] as any[],
   };
-  const formValidResult = await formRef.value.validate();
+  const formValidResult = await formRef.value?.validate();
   if (!formValidResult) {
     result.success = false;
     result.errors.push('表单校验未通过！');
@@ -131,7 +137,7 @@ const formProps = reactive({
     preIcon: null,
   },
   resetFunc: () => {
-    ctx?.$emit('cancel', { update: false, containerType: props.containerType });
+    emit('cancel', { update: false, containerType: props.containerType });
   },
   submitFunc: submit,
 });

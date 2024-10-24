@@ -1,7 +1,7 @@
 <template>
   <ScrollContainer>
     <div ref="wrapperRef" class="user-account-setting" :class="[prefixCls, activeKey === '5' ? 'vip-background' : '']">
-      <Tabs
+      <a-tabs
         tab-position="left"
         :tabBarStyle="tabBarStyle"
         @tabClick="componentClick"
@@ -9,7 +9,7 @@
         :class="showVip ? 'vip-height' : ''"
       >
         <template v-for="item in componentList" :key="item.key">
-          <TabPane>
+          <a-tab-pane>
             <template #tab>
               <span style="display: flex; align-items: center; cursor: pointer">
                 <!--<Icon :icon="item.icon" class="icon-font-color"/>-->
@@ -22,17 +22,16 @@
             </template>
             <component :is="item.component" v-if="activeKey === item.key && !item.isSlot" />
             <slot name="component" v-if="activeKey === item.key && item.isSlot" />
-          </TabPane>
+          </a-tab-pane>
         </template>
-      </Tabs>
+      </a-tabs>
     </div>
   </ScrollContainer>
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, onMounted, provide, computed } from 'vue';
-import { Tabs } from 'ant-design-vue';
-import { ScrollContainer, useDesign } from '@begcode/components';
+import { ScrollContainer } from '@/components/Container';
+import { useDesign } from '@/hooks/web/useDesign';
 import { settingList } from './UserSetting.data';
 import BaseSetting from './BaseSetting.vue';
 import AccountSetting from './AccountSetting.vue';
@@ -44,8 +43,6 @@ import { ThemeEnum } from '@/enums/appEnum';
 export default defineComponent({
   components: {
     ScrollContainer,
-    Tabs,
-    TabPane: Tabs.TabPane,
     BaseSetting,
     AccountSetting,
     TenantSetting,

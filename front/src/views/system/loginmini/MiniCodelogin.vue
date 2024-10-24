@@ -16,7 +16,7 @@
               <div class="aui-form-box">
                 <div class="aui-account" style="padding: 30px 0">
                   <div class="aui-ewm">
-                    <QRCode :value="qrCodeUrl" class="enter-x flex justify-center xl:justify-start" :width="280" />
+                    <a-qrcode :value="qrCodeUrl" class="enter-x flex justify-center xl:justify-start" :width="280" />
                   </div>
                 </div>
               </div>
@@ -63,14 +63,12 @@
 </template>
 
 <script lang="ts" setup name="mini-code-login">
-import { ref, onUnmounted } from 'vue';
-import { QRCode } from 'ant-design-vue';
 import { getLoginQrcode, getQrcodeToken } from '@/api-service/sys/user';
 import { useUserStore } from '@/store/modules/user';
 import ThirdModal from '@/views/account/login/ThirdModal.vue';
 import adTextImg from '@/assets/loginmini/icon/jeecg_ad_text.png';
 import { useI18n } from '@/hooks/web/useI18n';
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 import { GithubFilled, WechatFilled, DingtalkCircleFilled, createFromIconfontCN } from '@ant-design/icons-vue';
 
 const IconFont = createFromIconfontCN({

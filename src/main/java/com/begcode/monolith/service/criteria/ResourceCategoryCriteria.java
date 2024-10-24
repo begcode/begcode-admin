@@ -39,10 +39,10 @@ public class ResourceCategoryCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.order_number")
     private IntegerFilter orderNumber;
 
-    @BindQuery(entity = ResourceCategory.class, column = "id", condition = "id=parent_id")
+    @BindQuery(entity = ResourceCategory.class, column = "id", condition = "parent_id=this.id")
     private LongFilter childrenId;
 
-    @BindQuery(entity = ResourceCategory.class, column = "title", condition = "id=parent_id")
+    @BindQuery(entity = ResourceCategory.class, column = "title", condition = "parent_id=this.id")
     private StringFilter childrenTitle;
 
     @BindQuery(entity = ResourceCategory.class, column = "id", condition = "this.parent_id=id")
@@ -51,16 +51,16 @@ public class ResourceCategoryCriteria implements Serializable, Criteria {
     @BindQuery(entity = ResourceCategory.class, column = "title", condition = "this.parent_id=id")
     private StringFilter parentTitle;
 
-    @BindQuery(entity = UploadImage.class, column = "id", condition = "id=category_id")
+    @BindQuery(entity = UploadImage.class, column = "id", condition = "category_id=this.id")
     private LongFilter imagesId;
 
-    @BindQuery(entity = UploadImage.class, column = "url", condition = "id=category_id")
+    @BindQuery(entity = UploadImage.class, column = "url", condition = "category_id=this.id")
     private StringFilter imagesUrl;
 
-    @BindQuery(entity = UploadFile.class, column = "id", condition = "id=category_id")
+    @BindQuery(entity = UploadFile.class, column = "id", condition = "category_id=this.id")
     private LongFilter filesId;
 
-    @BindQuery(entity = UploadFile.class, column = "url", condition = "id=category_id")
+    @BindQuery(entity = UploadFile.class, column = "url", condition = "category_id=this.id")
     private StringFilter filesUrl;
 
     @BindQuery(ignore = true)

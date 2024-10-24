@@ -1,4 +1,3 @@
-import { ComponentOptions, h, resolveComponent } from 'vue';
 import { VxeColumnPropTypes, VxeGlobalRendererHandles } from 'vxe-table';
 import { Select, SelectOption, SelectOptGroup } from 'ant-design-vue';
 import XEUtils from 'xe-utils';

@@ -117,14 +117,6 @@ public class Authority implements Serializable {
     @JsonIgnoreProperties(value = { "department", "position", "authorities" }, allowSetters = true)
     private List<User> users = new ArrayList<>();
 
-    @TableField(exist = false)
-    @BindEntityList(
-        entity = Department.class,
-        condition = "this.id=rel_department__authorities.authorities_id AND rel_department__authorities.department_id=id"
-    )
-    @JsonIgnoreProperties(value = { "children", "authorities", "parent", "users" }, allowSetters = true)
-    private List<Department> departments = new ArrayList<>();
-
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Authority id(Long id) {
@@ -184,11 +176,6 @@ public class Authority implements Serializable {
 
     public Authority users(List<User> users) {
         this.users = users;
-        return this;
-    }
-
-    public Authority departments(List<Department> departments) {
-        this.departments = departments;
         return this;
     }
 

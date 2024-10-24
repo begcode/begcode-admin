@@ -5,28 +5,46 @@
 </template>
 
 <script lang="ts" setup>
-import type { PropType } from 'vue';
 import type { SubMenuProvider } from './types';
-import { ref, computed, onMounted, watchEffect, watch, nextTick, getCurrentInstance, provide } from 'vue';
-
-import { useDesign, propTypes } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 import { createSimpleRootMenuContext, type MenuEmitterEvents } from './useSimpleMenuContext';
 import { mitt } from '@/utils/mitt';
 
 defineOptions({ name: 'Menu' });
 
 const props = defineProps({
-  theme: propTypes.oneOf(['light', 'dark']).def('light'),
-  activeName: propTypes.oneOfType([propTypes.string, propTypes.number]),
+  theme: {
+    type: String as PropType<'light' | 'dark'>,
+    default: 'light',
+  },
+  activeName: {
+    type: [String, Number],
+    default: '',
+  },
   openNames: {
     type: Array as PropType<string[]>,
     default: () => [],
   },
-  accordion: propTypes.bool.def(true),
-  width: propTypes.string.def('100%'),
-  collapsedWidth: propTypes.string.def('48px'),
-  indentSize: propTypes.number.def(16),
-  collapse: propTypes.bool.def(true),
+  accordion: {
+    type: Boolean,
+    default: true,
+  },
+  width: {
+    type: String as PropType<string>,
+    default: '100%',
+  },
+  collapsedWidth: {
+    type: String as PropType<string>,
+    default: '48px',
+  },
+  indentSize: {
+    type: Number as PropType<number>,
+    default: 16,
+  },
+  collapse: {
+    type: Boolean,
+    default: true,
+  },
   activeSubMenuNames: {
     type: Array as PropType<(string | number)[]>,
     default: () => [],

@@ -1,10 +1,10 @@
-import { FormSchema } from '@begcode/components';
 import { useI18n } from '@/hooks/web/useI18n';
+import { FormSchema } from '@/components/Form';
 import apiService from '@/api-service/index';
 
 const commonFieldDataService = apiService.settings.commonFieldDataService;
 const relationshipApis: any = {
-  siteConfig: apiService.settings.siteConfigService.retrieve,
+  systemConfig: apiService.settings.systemConfigService.retrieve,
   dictionary: apiService.settings.dictionaryService.retrieve,
 };
 

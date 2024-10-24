@@ -1,11 +1,11 @@
 <template>
   <!-- 第三方登录绑定账号密码输入弹框 -->
-  <Modal title="请输入密码" v-model:open="thirdPasswordShow" @ok="thirdLoginCheckPassword" @cancel="thirdLoginNoPassword">
-    <InputPassword placeholder="请输入密码" v-model:value="thirdLoginPassword" style="margin: 15px; width: 80%" />
-  </Modal>
+  <a-modal title="请输入密码" v-model:open="thirdPasswordShow" @ok="thirdLoginCheckPassword" @cancel="thirdLoginNoPassword">
+    <a-input-password placeholder="请输入密码" v-model:value="thirdLoginPassword" style="margin: 15px; width: 80%" />
+  </a-modal>
 
   <!-- 第三方登录提示是否绑定账号弹框 -->
-  <Modal :footer="null" :closable="false" v-model:open="thirdConfirmShow" :class="'ant-modal-confirm'">
+  <a-modal :footer="null" :closable="false" v-model:open="thirdConfirmShow" :class="'ant-modal-confirm'">
     <div class="ant-modal-confirm-body-wrapper">
       <div class="ant-modal-confirm-body">
         <QuestionCircleFilled style="color: #faad14" />
@@ -13,23 +13,23 @@
         <div class="ant-modal-confirm-content">已有同名账号存在,请确认是否绑定该账号？</div>
       </div>
       <div class="ant-modal-confirm-btns">
-        <Button @click="thirdLoginUserCreate" :loading="thirdCreateUserLoding">创建新账号</Button>
-        <Button @click="thirdLoginUserBind" type="primary">确认绑定</Button>
+        <a-button @click="thirdLoginUserCreate" :loading="thirdCreateUserLoding">创建新账号</a-button>
+        <a-button @click="thirdLoginUserBind" type="primary">确认绑定</a-button>
       </div>
     </div>
-  </Modal>
+  </a-modal>
 
   <!-- 第三方登录绑定手机号 -->
-  <Modal title="绑定手机号" v-model:open="bindingPhoneModal" :maskClosable="false">
-    <Form class="p-4 enter-x" style="margin: 15px 10px">
-      <FormItem class="enter-x">
-        <Input size="large" placeholder="请输入手机号" v-model:value="thirdPhone" class="fix-auto-fill">
+  <a-modal title="绑定手机号" v-model:open="bindingPhoneModal" :maskClosable="false">
+    <a-form class="p-4 enter-x" style="margin: 15px 10px">
+      <a-form-item class="enter-x">
+        <a-input size="large" placeholder="请输入手机号" v-model:value="thirdPhone" class="fix-auto-fill">
           <template #prefix>
             <Icon icon="ant-design:mobile-outlined" :style="{ color: 'rgba(0,0,0,.25)' }"></Icon>
           </template>
-        </Input>
-      </FormItem>
-      <FormItem name="sms" class="enter-x">
+        </a-input>
+      </a-form-item>
+      <a-form-item name="sms" class="enter-x">
         <CountdownInput
           size="large"
           class="fix-auto-fill"
@@ -41,18 +41,15 @@
             <Icon icon="ant-design:mail-outlined" :style="{ color: 'rgba(0,0,0,.25)' }"></Icon>
           </template>
         </CountdownInput>
-      </FormItem>
-    </Form>
+      </a-form-item>
+    </a-form>
     <template #footer>
-      <Button type="primary" @click="thirdHandleOk">确定</Button>
+      <a-button type="primary" @click="thirdHandleOk">确定</a-button>
     </template>
-  </Modal>
+  </a-modal>
 </template>
 <script lang="ts" setup>
-import { ref, unref } from 'vue';
-import { Form, Input, Button, InputPassword, FormItem, Modal } from 'ant-design-vue';
-import { CountdownInput } from '@begcode/components';
-import { useThirdLogin } from '@/hooks/system/useThirdLogin';
+import { CountdownInput } from '@/components/CountDown';
 import { QuestionCircleFilled } from '@ant-design/icons-vue';
 import { defHttp } from '@/utils/http/axios';
 import { useGlobSetting } from '@/hooks/setting';

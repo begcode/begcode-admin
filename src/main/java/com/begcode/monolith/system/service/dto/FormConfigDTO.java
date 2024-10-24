@@ -2,6 +2,7 @@ package com.begcode.monolith.system.service.dto;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.begcode.monolith.domain.AbstractAuditingEntity;
+import com.begcode.monolith.domain.enumeration.FormConfigType;
 // jhipster-needle-add-import - JHipster will add getters and setters here, do not remove
 
 import com.begcode.monolith.service.dto.BusinessTypeDTO;
@@ -27,16 +28,18 @@ public class FormConfigDTO extends AbstractAuditingEntity<Long, FormConfigDTO> {
     /**
      * 表单Key
      */
+    @NotNull
     @Size(max = 100)
-    @Schema(description = "表单Key")
+    @Schema(description = "表单Key", requiredMode = Schema.RequiredMode.REQUIRED)
     @Excel(name = "表单Key")
     private String formKey;
 
     /**
      * 名称
      */
+    @NotNull
     @Size(max = 100)
-    @Schema(description = "名称")
+    @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED)
     @Excel(name = "名称")
     private String formName;
 
@@ -46,6 +49,20 @@ public class FormConfigDTO extends AbstractAuditingEntity<Long, FormConfigDTO> {
     @Schema(description = "表单配置")
     @Excel(name = "表单配置")
     private String formJson;
+
+    /**
+     * 表单类型
+     */
+    @Schema(description = "表单类型")
+    @Excel(name = "表单类型")
+    private FormConfigType formType;
+
+    /**
+     * 多条数据
+     */
+    @Schema(description = "多条数据")
+    @Excel(name = "多条数据")
+    private Boolean multiItems;
 
     /**
      * 创建者Id
@@ -103,6 +120,16 @@ public class FormConfigDTO extends AbstractAuditingEntity<Long, FormConfigDTO> {
 
     public FormConfigDTO formJson(String formJson) {
         this.formJson = formJson;
+        return this;
+    }
+
+    public FormConfigDTO formType(FormConfigType formType) {
+        this.formType = formType;
+        return this;
+    }
+
+    public FormConfigDTO multiItems(Boolean multiItems) {
+        this.multiItems = multiItems;
         return this;
     }
 
@@ -167,6 +194,8 @@ public class FormConfigDTO extends AbstractAuditingEntity<Long, FormConfigDTO> {
             ", formKey='" + getFormKey() + "'" +
             ", formName='" + getFormName() + "'" +
             ", formJson='" + getFormJson() + "'" +
+            ", formType='" + getFormType() + "'" +
+            ", multiItems='" + getMultiItems() + "'" +
             ", createdBy=" + getCreatedBy() +
             ", createdDate='" + getCreatedDate() + "'" +
             ", lastModifiedBy=" + getLastModifiedBy() +

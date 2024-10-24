@@ -1,5 +1,5 @@
 //第三方app配置表单
-import { FormSchema } from '@begcode/components';
+import type { FormSchema } from '@/components/Form';
 
 //第三方app表单
 export const thirdAppFormSchema: FormSchema[] = [

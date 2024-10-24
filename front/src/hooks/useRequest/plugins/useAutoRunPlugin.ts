@@ -1,5 +1,3 @@
-import { ref, unref, watch } from 'vue';
-
 import type { UseRequestPlugin } from '../types';
 
 // support refreshDeps & ready

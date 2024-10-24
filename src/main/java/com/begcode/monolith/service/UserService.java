@@ -1,5 +1,7 @@
 package com.begcode.monolith.service;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.begcode.monolith.config.Constants;
 import com.begcode.monolith.domain.Authority;
@@ -14,6 +16,7 @@ import com.begcode.monolith.service.dto.UserDTO;
 import com.begcode.monolith.service.mapper.UserMapper;
 import com.diboot.core.binding.Binder;
 import com.diboot.core.service.impl.BaseServiceImpl;
+import com.google.common.base.CaseFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -385,6 +388,61 @@ public class UserService extends BaseServiceImpl<UserRepository, User> {
                 Binder.bindRelations(user);
                 return userMapper.userToAdminUserDTO(user);
             });
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public UserDTO update(UserDTO userDTO) {
+        log.debug("Request to update User : {}", userDTO);
+        User user = userMapper.toEntity(userDTO);
+        user.setDepartmentId(
+            Optional.ofNullable(userDTO.getDepartment()).map(departmentDepartmentDTO -> departmentDepartmentDTO.getId()).orElse(null)
+        );
+        user.setPositionId(Optional.ofNullable(userDTO.getPosition()).map(positionPositionDTO -> positionPositionDTO.getId()).orElse(null));
+        this.createOrUpdateAndRelatedRelations(user, List.of("authorities"));
+        return findOne(user.getId()).orElseThrow();
+    }
+
+    public Optional<UserDTO> findOne(Long id) {
+        log.debug("Request to get User : {}", id);
+        return Optional.ofNullable(userRepository.selectById(id))
+            .map(user -> {
+                Binder.bindRelations(user);
+                return user;
+            })
+            .map(userMapper::toDto);
+    }
+
+    @Transactional
+    public void updateBatch(UserDTO changeUserDTO, List<String> fieldNames, List<Long> ids) {
+        List<String> relationshipNames = CollectionUtils.intersection(fieldNames, relationNames).stream().toList();
+        fieldNames = CollectionUtils.subtract(fieldNames, relationshipNames).stream().toList();
+        if (CollectionUtils.isNotEmpty(fieldNames)) {
+            UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.in("id", ids);
+            fieldNames.forEach(
+                fieldName ->
+                    updateWrapper.set(
+                        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName),
+                        BeanUtil.getFieldValue(changeUserDTO, fieldName)
+                    )
+            );
+            this.update(updateWrapper);
+        } else if (CollectionUtils.isNotEmpty(relationshipNames)) {
+            List<User> userList = this.listByIds(ids);
+            if (CollectionUtils.isNotEmpty(userList)) {
+                userList.forEach(user -> {
+                    relationshipNames.forEach(
+                        relationName ->
+                            BeanUtil.setFieldValue(
+                                user,
+                                relationName,
+                                BeanUtil.getFieldValue(userMapper.toEntity(changeUserDTO), relationName)
+                            )
+                    );
+                    this.createOrUpdateAndRelatedRelations(user, relationshipNames);
+                });
+            }
+        }
     }
 
     public void updateRelationships(List<String> otherEntityIds, String relationshipName, List<Long> relatedIds, String operateType) {

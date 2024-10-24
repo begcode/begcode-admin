@@ -62,6 +62,9 @@ public class SysLogCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.id")
     private LongFilter id;
 
+    @BindQuery(column = "self.request_url")
+    private StringFilter requestUrl;
+
     @BindQuery(column = "self.log_type")
     private LogTypeFilter logType;
 
@@ -82,9 +85,6 @@ public class SysLogCriteria implements Serializable, Criteria {
 
     @BindQuery(column = "self.method")
     private StringFilter method;
-
-    @BindQuery(column = "self.request_url")
-    private StringFilter requestUrl;
 
     @BindQuery(column = "self.request_type")
     private StringFilter requestType;
@@ -122,6 +122,7 @@ public class SysLogCriteria implements Serializable, Criteria {
 
     public SysLogCriteria(SysLogCriteria other) {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.requestUrl = other.optionalRequestUrl().map(StringFilter::copy).orElse(null);
         this.logType = other.optionalLogType().map(LogTypeFilter::copy).orElse(null);
         this.logContent = other.optionalLogContent().map(StringFilter::copy).orElse(null);
         this.operateType = other.optionalOperateType().map(OperateTypeFilter::copy).orElse(null);
@@ -129,7 +130,6 @@ public class SysLogCriteria implements Serializable, Criteria {
         this.username = other.optionalUsername().map(StringFilter::copy).orElse(null);
         this.ip = other.optionalIp().map(StringFilter::copy).orElse(null);
         this.method = other.optionalMethod().map(StringFilter::copy).orElse(null);
-        this.requestUrl = other.optionalRequestUrl().map(StringFilter::copy).orElse(null);
         this.requestType = other.optionalRequestType().map(StringFilter::copy).orElse(null);
         this.costTime = other.optionalCostTime().map(LongFilter::copy).orElse(null);
         this.createdBy = other.optionalCreatedBy().map(LongFilter::copy).orElse(null);
@@ -161,6 +161,25 @@ public class SysLogCriteria implements Serializable, Criteria {
 
     public void setId(LongFilter id) {
         this.id = id;
+    }
+
+    public StringFilter getRequestUrl() {
+        return requestUrl;
+    }
+
+    public Optional<StringFilter> optionalRequestUrl() {
+        return Optional.ofNullable(requestUrl);
+    }
+
+    public StringFilter requestUrl() {
+        if (requestUrl == null) {
+            setRequestUrl(new StringFilter());
+        }
+        return requestUrl;
+    }
+
+    public void setRequestUrl(StringFilter requestUrl) {
+        this.requestUrl = requestUrl;
     }
 
     public LogTypeFilter getLogType() {
@@ -294,25 +313,6 @@ public class SysLogCriteria implements Serializable, Criteria {
 
     public void setMethod(StringFilter method) {
         this.method = method;
-    }
-
-    public StringFilter getRequestUrl() {
-        return requestUrl;
-    }
-
-    public Optional<StringFilter> optionalRequestUrl() {
-        return Optional.ofNullable(requestUrl);
-    }
-
-    public StringFilter requestUrl() {
-        if (requestUrl == null) {
-            setRequestUrl(new StringFilter());
-        }
-        return requestUrl;
-    }
-
-    public void setRequestUrl(StringFilter requestUrl) {
-        this.requestUrl = requestUrl;
     }
 
     public StringFilter getRequestType() {
@@ -505,6 +505,7 @@ public class SysLogCriteria implements Serializable, Criteria {
         final SysLogCriteria that = (SysLogCriteria) o;
         return (
             Objects.equals(id, that.id) &&
+            Objects.equals(requestUrl, that.requestUrl) &&
             Objects.equals(logType, that.logType) &&
             Objects.equals(logContent, that.logContent) &&
             Objects.equals(operateType, that.operateType) &&
@@ -512,7 +513,6 @@ public class SysLogCriteria implements Serializable, Criteria {
             Objects.equals(username, that.username) &&
             Objects.equals(ip, that.ip) &&
             Objects.equals(method, that.method) &&
-            Objects.equals(requestUrl, that.requestUrl) &&
             Objects.equals(requestType, that.requestType) &&
             Objects.equals(costTime, that.costTime) &&
             Objects.equals(createdBy, that.createdBy) &&
@@ -527,6 +527,7 @@ public class SysLogCriteria implements Serializable, Criteria {
     public int hashCode() {
         return Objects.hash(
             id,
+            requestUrl,
             logType,
             logContent,
             operateType,
@@ -534,7 +535,6 @@ public class SysLogCriteria implements Serializable, Criteria {
             username,
             ip,
             method,
-            requestUrl,
             requestType,
             costTime,
             createdBy,
@@ -550,6 +550,7 @@ public class SysLogCriteria implements Serializable, Criteria {
     public String toString() {
         return "SysLogCriteria{" +
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalRequestUrl().map(f -> "requestUrl=" + f + ", ").orElse("") +
             optionalLogType().map(f -> "logType=" + f + ", ").orElse("") +
             optionalLogContent().map(f -> "logContent=" + f + ", ").orElse("") +
             optionalOperateType().map(f -> "operateType=" + f + ", ").orElse("") +
@@ -557,7 +558,6 @@ public class SysLogCriteria implements Serializable, Criteria {
             optionalUsername().map(f -> "username=" + f + ", ").orElse("") +
             optionalIp().map(f -> "ip=" + f + ", ").orElse("") +
             optionalMethod().map(f -> "method=" + f + ", ").orElse("") +
-            optionalRequestUrl().map(f -> "requestUrl=" + f + ", ").orElse("") +
             optionalRequestType().map(f -> "requestType=" + f + ", ").orElse("") +
             optionalCostTime().map(f -> "costTime=" + f + ", ").orElse("") +
             optionalCreatedBy().map(f -> "createdBy=" + f + ", ").orElse("") +

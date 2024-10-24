@@ -1,14 +1,11 @@
 import type { VxeGridPropTypes, VxeGridProps } from 'vxe-table/types/grid';
 import dayjs from 'dayjs';
-import apiService from '@/api-service/index';
-
-const relationshipApis: any = {
-  businessType: apiService.settings.businessTypeService.retrieve,
-};
+import { useI18n } from '@/hooks/web/useI18n';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
 
-const searchForm = (): any[] => {
+const searchForm = (relationshipApis): any[] => {
+  const { getEnumDict } = useI18n();
   return [
     {
       title: 'ID',
@@ -39,6 +36,35 @@ const searchForm = (): any[] => {
       operator: '',
       span: 8,
       componentProps: {},
+    },
+    {
+      title: '表单类型',
+      field: 'formType',
+      componentType: 'Select',
+      value: '',
+      span: 8,
+      operator: '',
+      type: 'Enum',
+      componentProps: () => {
+        return { options: getEnumDict('FormConfigType'), style: 'width: 100%' };
+      },
+    },
+    {
+      title: '多条数据',
+      field: 'multiItems',
+      componentType: 'RadioGroup',
+      value: '',
+      operator: '',
+      span: 8,
+      type: 'Boolean',
+      componentProps: {
+        optionType: 'button',
+        buttonStyle: 'solid',
+        options: [
+          { label: '是', value: true },
+          { label: '否', value: false },
+        ],
+      },
     },
     {
       title: '创建者Id',
@@ -91,6 +117,7 @@ const searchForm = (): any[] => {
 };
 
 const columns = (): VxeGridPropTypes.Columns => {
+  const { getEnumDict } = useI18n();
   return [
     {
       fixed: 'left',
@@ -122,6 +149,27 @@ const columns = (): VxeGridPropTypes.Columns => {
       treeNode: false,
       params: { type: 'STRING' },
       editRender: { name: 'AInput', enabled: false },
+    },
+    {
+      title: '表单类型',
+      field: 'formType',
+      minWidth: 100,
+      visible: true,
+      treeNode: false,
+      params: { type: 'ENUM' },
+      formatter: ({ cellValue }) => {
+        return (getEnumDict('FormConfigType').find(item => item.value === cellValue) || { label: cellValue }).label;
+      },
+      editRender: { name: 'ASelect', props: { options: getEnumDict('FormConfigType') }, enabled: false },
+    },
+    {
+      title: '多条数据',
+      field: 'multiItems',
+      minWidth: 70,
+      visible: true,
+      treeNode: false,
+      params: { type: 'BOOLEAN' },
+      cellRender: { name: 'ASwitch', props: { disabled: true } },
     },
     {
       title: '创建者Id',
@@ -176,7 +224,7 @@ const columns = (): VxeGridPropTypes.Columns => {
   ];
 };
 
-const baseGridOptions = (ajax, toolbarButtons, toolbarTools, pagerLeft): VxeGridProps => {
+const baseGridOptions = (ajax, toolbarButtons, toolbarTools): VxeGridProps => {
   return {
     rowConfig: {
       keyField: 'id',
@@ -218,9 +266,9 @@ const baseGridOptions = (ajax, toolbarButtons, toolbarTools, pagerLeft): VxeGrid
       total: 0,
       pagerCount: 5,
       currentPage: 1,
-      autoHidden: true,
+      autoHidden: false,
       slots: {
-        left: pagerLeft,
+        left: 'pagerLeft',
       },
     },
     importConfig: {
@@ -288,6 +336,10 @@ const ListProps = {
     type: Object,
     default: () => ({}),
   },
+  cardSlots: {
+    type: Array,
+    default: ['title', 'rightExtra'],
+  },
   cardExtra: {
     type: Array,
     default: ['import', 'export', 'print'],
@@ -313,6 +365,10 @@ const ListProps = {
       hideSlots: [],
       hideColumns: [],
     }),
+  },
+  parentContainer: {
+    type: String,
+    default: '',
   },
 };
 

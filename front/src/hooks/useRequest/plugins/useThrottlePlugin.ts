@@ -1,7 +1,4 @@
 import type { DebouncedFunc, ThrottleSettings } from 'lodash-es';
-import { throttle } from 'lodash-es';
-import { ref, watchEffect } from 'vue';
-
 import type { UseRequestPlugin } from '../types';
 
 const useThrottlePlugin: UseRequestPlugin<any, any[]> = (fetchInstance, { throttleWait, throttleLeading, throttleTrailing }) => {
@@ -19,7 +16,7 @@ const useThrottlePlugin: UseRequestPlugin<any, any[]> = (fetchInstance, { thrott
     if (throttleWait) {
       const _originRunAsync = fetchInstance.runAsync.bind(fetchInstance);
 
-      throttledRef.value = throttle(
+      throttledRef.value = _throttle(
         callback => {
           callback();
         },

@@ -1,12 +1,10 @@
 <template>
   <div :class="containerType === 'page' ? ['pb-44px'] : []">
-    <BasicForm ref="formRef" v-bind="formProps"></BasicForm>
+    <BasicForm ref="formRef" v-bind="formProps" />
   </div>
 </template>
 <script lang="ts" setup>
-import { getCurrentInstance, reactive, computed, h, ref, watch } from 'vue';
 import { message } from 'ant-design-vue';
-import { BasicForm } from '@begcode/components';
 import config from '../config/edit-config';
 import { UploadImage, IUploadImage } from '@/models/files/upload-image.model';
 import ServerProvider from '@/api-service/index';
@@ -35,24 +33,26 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+
+const emit = defineEmits(['cancel', 'update-save-button']);
+
 const ctx = getCurrentInstance()?.proxy;
 const formRef = ref<any>(null);
 const apiService = ctx?.$apiService as typeof ServerProvider;
+const uploadImageId = ref<any>(null);
 const uploadImage = reactive<IUploadImage>(new UploadImage());
-watch(
-  () => props.entityId,
-  async val => {
-    if (val) {
-      const data = await apiService.files.uploadImageService.find(Number(val)).catch(() => null);
-      if (data) {
-        Object.assign(uploadImage, data);
-      }
-    } else {
-      Object.assign(uploadImage, props.baseData);
+const getEntityData = async (entityId: string | number) => {
+  if (entityId) {
+    uploadImageId.value = entityId;
+    const data = await apiService.files.uploadImageService.find(Number(entityId)).catch(() => null);
+    if (data) {
+      Object.assign(uploadImage, data);
     }
-  },
-  { immediate: true },
-);
+  } else {
+    Object.assign(uploadImage, props.baseData);
+  }
+};
+watch(() => props.entityId, getEntityData, { immediate: true });
 const formItemsConfig = config.fields();
 formItemsConfig.unshift({
   label: '选择文件',
@@ -67,10 +67,16 @@ const isEdit = computed(() => {
 
 const submitButtonTitlePrefix = props.entityId ? '更新' : '保存';
 const saveOrUpdateApi = props.entityId ? apiService.files.uploadImageService.update : apiService.files.uploadImageService.create;
-const submit = async () => {
-  const result = await validate().catch(() => ({ success: false, data: {} }));
+const submit = async (config = { submitToServer: true }) => {
+  const result = await validate().catch(err => {
+    console.log('validate.error:', err);
+    return { success: false, data: {} };
+  });
   if (result.success) {
     Object.assign(uploadImage, result.data);
+    if (!config.submitToServer) {
+      return uploadImage;
+    }
     const saveData = await saveOrUpdateApi(uploadImage).catch(() => false);
     if (saveData) {
       Object.assign(uploadImage, saveData);
@@ -91,7 +97,7 @@ const validate = async () => {
     data: {},
     errors: [] as any[],
   };
-  const formValidResult = await formRef.value.validate();
+  const formValidResult = await formRef.value?.validate();
   if (!formValidResult) {
     result.success = false;
     result.errors.push('表单校验未通过！');
@@ -135,7 +141,7 @@ const formProps = reactive({
     preIcon: null,
   },
   resetFunc: () => {
-    ctx?.$emit('cancel', { update: false, containerType: props.containerType });
+    emit('cancel', { update: false, containerType: props.containerType });
   },
   submitFunc: submit,
 });

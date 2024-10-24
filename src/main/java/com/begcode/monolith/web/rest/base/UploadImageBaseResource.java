@@ -160,6 +160,38 @@ public class UploadImageBaseResource {
     }
 
     /**
+     * {@code PATCH  /upload-images/copy/:id} : Partial updates given fields of an existing uploadImage, field will ignore if it is null
+     *
+     * @param id the id of the uploadImageDTO to save.
+     * @param uploadImageDTO the uploadImageDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated uploadImageDTO,
+     * or with status {@code 400 (Bad Request)} if the uploadImageDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the uploadImageDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the uploadImageDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PatchMapping(value = "/copy/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @Operation(tags = "部分更新上传图片", description = "根据主键及实体信息复制新的实体，值为null的属性将忽略，并返回一个复制后的上传图片")
+    @AutoLog(value = "复制上传图片", logType = LogType.OPERATE, operateType = OperateType.EDIT)
+    public ResponseEntity<UploadImageDTO> copyUploadImage(
+        @PathVariable(value = "id", required = false) final Long id,
+        @NotNull @RequestBody UploadImageDTO uploadImageDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to copy UploadImage partially : {}, {}", id, uploadImageDTO);
+
+        if (uploadImageRepository.findById(id).isEmpty()) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        Optional<UploadImageDTO> result = uploadImageService.copy(uploadImageDTO);
+
+        return ResponseUtil.wrapOrNotFound(
+            result,
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, uploadImageDTO.getId().toString())
+        );
+    }
+
+    /**
      * {@code GET  /upload-images} : get all the uploadImages.
      *
      * @param pageable the pagination information.

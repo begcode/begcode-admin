@@ -1,7 +1,8 @@
-import { toRaw, ref, nextTick } from 'vue';
 import type { RouteLocationNormalized } from 'vue-router';
-import { useDesign, isNil, useSortable } from '@begcode/components';
 import { useRouter } from 'vue-router';
+import { useSortable } from '@/hooks/web/useSortable';
+import { isNil } from '@/utils/is';
+import { useDesign } from '@/hooks/web/useDesign';
 import { useMultipleTabStore } from '@/store/modules/multipleTab';
 import projectSetting from '@/settings/projectSetting';
 import { useI18n } from '@/hooks/web/useI18n';

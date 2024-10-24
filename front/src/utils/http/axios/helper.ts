@@ -1,4 +1,3 @@
-import { isObject, isString } from 'lodash-es';
 import dayjs from 'dayjs';
 
 const DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
@@ -30,17 +29,17 @@ export function formatRequestDate(params: Recordable) {
     if (format && typeof format === 'function' && dayjs.isDayjs(params[key])) {
       params[key] = params[key].format(DATE_TIME_FORMAT);
     }
-    if (isString(key)) {
+    if (_isString(key)) {
       const value = params[key];
       if (value) {
         try {
-          params[key] = isString(value) ? value.trim() : value;
+          params[key] = _isString(value) ? value.trim() : value;
         } catch (error: any) {
           throw new Error(error);
         }
       }
     }
-    if (isObject(params[key])) {
+    if (_isObject(params[key])) {
       formatRequestDate(params[key]);
     }
   }

@@ -1,5 +1,5 @@
-import { FormSchema } from '@begcode/components';
 import { useI18n } from '@/hooks/web/useI18n';
+import { FormSchema } from '@/components/Form';
 import apiService from '@/api-service/index';
 
 const regionCodeService = apiService.settings.regionCodeService;
@@ -97,7 +97,7 @@ const fields = (): FormSchema[] => {
         api: relationshipApis.parent,
         style: 'width: 100%',
         labelInValue: true,
-        fieldNames: { children: 'children', value: 'id', label: 'name' },
+        fieldNames: { children: 'children', key: 'id', title: 'name' },
         resultField: 'records',
         placeholder: '请选择上级节点',
       },

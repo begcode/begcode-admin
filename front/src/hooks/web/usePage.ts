@@ -1,9 +1,8 @@
 import type { RouteLocationRaw, Router } from 'vue-router';
 
-import { unref } from 'vue';
-
 import { useRouter } from 'vue-router';
 import { PageEnum } from '@/enums/pageEnum';
+
 import { REDIRECT_NAME } from '@/router/constant';
 
 import { useMultipleTabStore } from '@/store/modules/multipleTab';

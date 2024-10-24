@@ -1,6 +1,5 @@
 // noinspection JSUnusedGlobalSymbols
 
-import { unref } from 'vue';
 import { useWebSocket, UseWebSocketReturn } from '@vueuse/core';
 import { getToken } from '@/utils/auth';
 

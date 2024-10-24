@@ -13,7 +13,7 @@
       <div style="margin: 0 5px 1px" v-if="online">
         <span style="display: inline-block; height: 32px; line-height: 32px; vertical-align: middle">是否开启校验:</span>
         <span style="margin-left: 6px">
-          <Switch
+          <a-switch
             :checked="validateStatus == 1"
             @change="handleChangeValidateStatus"
             checked-children="是"
@@ -23,29 +23,26 @@
         </span>
       </div>
       <!--上传-->
-      <Upload name="file" accept=".xls,.xlsx" :multiple="true" :fileList="fileList" :remove="handleRemove" :beforeUpload="beforeUpload">
-        <Button preIcon="ant-design:upload-outlined">选择导入文件</Button>
-      </Upload>
+      <a-upload name="file" accept=".xls,.xlsx" :multiple="true" :fileList="fileList" :remove="handleRemove" :beforeUpload="beforeUpload">
+        <BasicButton pre-icon="ant-design:upload-outlined">选择导入文件</BasicButton>
+      </a-upload>
       <!--页脚-->
       <template #footer>
-        <Button @click="handleClose">关闭</Button>
-        <Button type="primary" @click="handleImport" :disabled="uploadDisabled" :loading="uploading">{{
+        <BasicButton @click="handleClose">关闭</BasicButton>
+        <BasicButton type="primary" @click="handleImport" :disabled="uploadDisabled" :loading="uploading">{{
           uploading ? '上传中...' : '开始上传'
-        }}</Button>
+        }}</BasicButton>
       </template>
     </BasicModal>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, unref, watchEffect, computed } from 'vue';
-import { Upload, Switch } from 'ant-design-vue';
-import { BasicModal, useModalInner, Button } from '@begcode/components';
+import { BasicModal, useModalInner } from '@/components/Modal';
 import { useAttrs } from '@/hooks/vben/useAttrs';
 import { defHttp } from '@/utils/http/axios';
 import { useGlobSetting } from '@/hooks/setting';
 import { useMessage } from '@/hooks/web/useMessage';
-import { isObject } from 'lodash-es';
 
 defineOptions({
   name: 'ImportModal',
@@ -129,7 +126,7 @@ function handleImport() {
   if (unref(foreignKeys) && unref(foreignKeys).length > 0) {
     formData.append('foreignKeys', unref(foreignKeys));
   }
-  if (isObject(foreignKeys.value)) {
+  if (_isObject(foreignKeys.value)) {
     formData.append('foreignKeys', JSON.stringify(foreignKeys.value));
   }
   if (!!online) {

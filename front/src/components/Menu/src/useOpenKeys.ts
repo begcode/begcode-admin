@@ -1,9 +1,7 @@
-import { computed, Ref, toRaw, unref } from 'vue';
-import { useTimeoutFn } from '@begcode/components';
-import { uniq } from 'lodash-es';
+import { useTimeoutFn } from '@vueuse/core';
 import type { MenuState, Key } from './types';
-import type { Menu as MenuType } from '@/router/types';
 import { MenuModeEnum } from '@/enums/menuEnum';
+import type { Menu as MenuType } from '@/router/types';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
 import { getAllParentPath } from '@/router/helper/menuHelper';
 
@@ -22,7 +20,7 @@ export function useOpenKeys(menuState: MenuState, menus: Ref<MenuType[]>, mode: 
         return;
       }
       if (!unref(accordion)) {
-        menuState.openKeys = uniq([...menuState.openKeys, ...getAllParentPath(menuList, path)]);
+        menuState.openKeys = _uniq([...menuState.openKeys, ...getAllParentPath(menuList, path)]);
       } else {
         menuState.openKeys = getAllParentPath(menuList, path);
       }

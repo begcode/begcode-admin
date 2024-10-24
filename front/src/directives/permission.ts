@@ -3,8 +3,6 @@
  * Used for fine-grained control of component permissions
  * @Example v-auth="RoleEnum.TEST"
  */
-import type { App, Directive, DirectiveBinding } from 'vue';
-
 import { usePermission } from '@/hooks/web/usePermission';
 
 function isAuth(el: Element, binding: any) {

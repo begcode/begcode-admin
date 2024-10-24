@@ -4,13 +4,10 @@
   </span>
 </template>
 <script lang="ts" setup>
-import { unref, computed } from 'vue';
-import { Icon } from '@begcode/components';
-
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 import { useHeaderSetting } from '@/hooks/setting/useHeaderSetting';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
-import { triggerWindowResize } from '@begcode/components';
+import { triggerWindowResize } from '@/utils/event';
 
 defineOptions({ name: 'FoldButton' });
 

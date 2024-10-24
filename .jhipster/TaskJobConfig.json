@@ -7,7 +7,8 @@
     "extendAbstractAuditingEntity": true,
     "importData": true,
     "moduleName": "taskjob",
-    "skipFakeData": true
+    "skipFakeData": true,
+    "skipMobile": true
   },
   "applications": "*",
   "clientRootFolder": "taskjob",

@@ -1,24 +1,21 @@
 <template>
-  <Form class="p-4 enter-x" :model="formData" :rules="getFormRules" ref="formRef">
-    <FormItem name="mobile" class="enter-x">
-      <Input size="large" v-model:value="formData.mobile" :placeholder="t('sys.login.mobile')" />
-    </FormItem>
-    <FormItem name="code" class="enter-x">
+  <a-form class="p-4 enter-x" :model="formData" :rules="getFormRules" ref="formRef">
+    <a-form-item name="mobile" class="enter-x">
+      <a-input size="large" v-model:value="formData.mobile" :placeholder="t('sys.login.mobile')" />
+    </a-form-item>
+    <a-form-item name="code" class="enter-x">
       <CountdownInput size="large" v-model:value="formData.code" :placeholder="t('sys.login.smsCode')" :sendCodeApi="sendCodeApi" />
-    </FormItem>
-    <FormItem class="enter-x">
-      <Button type="primary" size="large" block @click="handleNext" :loading="loading"> 下一步 </Button>
-      <Button size="large" block class="mt-4" @click="handleBackLogin">
+    </a-form-item>
+    <a-form-item class="enter-x">
+      <a-button type="primary" size="large" block @click="handleNext" :loading="loading"> 下一步 </a-button>
+      <a-button size="large" block class="mt-4" @click="handleBackLogin">
         {{ t('sys.login.backSignIn') }}
-      </Button>
-    </FormItem>
-  </Form>
+      </a-button>
+    </a-form-item>
+  </a-form>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, ref, computed, unref, toRaw } from 'vue';
-
-import { Form, Input, Button } from 'ant-design-vue';
-import { CountdownInput } from '@begcode/components';
+import { CountdownInput } from '@/components/CountDown';
 
 import { useI18n } from '@/hooks/web/useI18n';
 import { useMessage } from '@/hooks/web/useMessage';
@@ -30,10 +27,6 @@ import accountService from '@/api-service/account/account.service';
 export default defineComponent({
   name: 'step1',
   components: {
-    Button,
-    Form,
-    FormItem: Form.Item,
-    Input,
     CountdownInput,
   },
   emits: ['nextStep'],

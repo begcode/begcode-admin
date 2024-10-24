@@ -1,22 +1,19 @@
 <template>
-  <Tooltip :title="t('layout.header.tooltipLock')" placement="bottom" :mouseEnterDelay="0.5" @click="handleLock">
-    <LockOutlined />
-  </Tooltip>
+  <a-tooltip :title="t('layout.header.tooltipLock')" placement="bottom" :mouseEnterDelay="0.5" @click="handleLock">
+    <Icon icon="ant-design:lock-outlined" />
+  </a-tooltip>
   <LockModal ref="modalRef" v-if="lockModalVisible" @register="register" />
 </template>
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import { Tooltip } from 'ant-design-vue';
-import { LockOutlined } from '@ant-design/icons-vue';
-import { Icon, useModal, createAsyncComponent, getRefPromise } from '@begcode/components';
+import { useModal } from '@/components/Modal';
+import { getRefPromise } from '@/utils/util';
+import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
 import { useI18n } from '@/hooks/web/useI18n';
 
 export default defineComponent({
   name: 'LockScreen',
   inheritAttrs: false,
   components: {
-    Icon,
-    Tooltip,
     LockOutlined,
     LockModal: createAsyncComponent(() => import('./lock/LockModal.vue')),
   },

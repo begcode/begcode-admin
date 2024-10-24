@@ -1,6 +1,7 @@
 package com.begcode.monolith.system.service.criteria;
 
 import com.begcode.monolith.domain.BusinessType;
+import com.begcode.monolith.domain.enumeration.FormConfigType;
 import com.diboot.core.binding.query.BindQuery;
 import java.io.Serializable;
 import java.util.Objects;
@@ -22,6 +23,23 @@ import tech.jhipster.service.filter.*;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class FormConfigCriteria implements Serializable, Criteria {
 
+    /**
+     * Class for filtering FormConfigType
+     */
+    public static class FormConfigTypeFilter extends Filter<FormConfigType> {
+
+        public FormConfigTypeFilter() {}
+
+        public FormConfigTypeFilter(FormConfigTypeFilter filter) {
+            super(filter);
+        }
+
+        @Override
+        public FormConfigTypeFilter copy() {
+            return new FormConfigTypeFilter(this);
+        }
+    }
+
     private static final long serialVersionUID = 1L;
 
     @BindQuery(column = "self.id")
@@ -32,6 +50,12 @@ public class FormConfigCriteria implements Serializable, Criteria {
 
     @BindQuery(column = "self.form_name")
     private StringFilter formName;
+
+    @BindQuery(column = "self.form_type")
+    private FormConfigTypeFilter formType;
+
+    @BindQuery(column = "self.multi_items")
+    private BooleanFilter multiItems;
 
     @BindQuery(column = "self.created_by")
     private LongFilter createdBy;
@@ -71,6 +95,8 @@ public class FormConfigCriteria implements Serializable, Criteria {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
         this.formKey = other.optionalFormKey().map(StringFilter::copy).orElse(null);
         this.formName = other.optionalFormName().map(StringFilter::copy).orElse(null);
+        this.formType = other.optionalFormType().map(FormConfigTypeFilter::copy).orElse(null);
+        this.multiItems = other.optionalMultiItems().map(BooleanFilter::copy).orElse(null);
         this.createdBy = other.optionalCreatedBy().map(LongFilter::copy).orElse(null);
         this.createdDate = other.optionalCreatedDate().map(InstantFilter::copy).orElse(null);
         this.lastModifiedBy = other.optionalLastModifiedBy().map(LongFilter::copy).orElse(null);
@@ -140,6 +166,44 @@ public class FormConfigCriteria implements Serializable, Criteria {
 
     public void setFormName(StringFilter formName) {
         this.formName = formName;
+    }
+
+    public FormConfigTypeFilter getFormType() {
+        return formType;
+    }
+
+    public Optional<FormConfigTypeFilter> optionalFormType() {
+        return Optional.ofNullable(formType);
+    }
+
+    public FormConfigTypeFilter formType() {
+        if (formType == null) {
+            setFormType(new FormConfigTypeFilter());
+        }
+        return formType;
+    }
+
+    public void setFormType(FormConfigTypeFilter formType) {
+        this.formType = formType;
+    }
+
+    public BooleanFilter getMultiItems() {
+        return multiItems;
+    }
+
+    public Optional<BooleanFilter> optionalMultiItems() {
+        return Optional.ofNullable(multiItems);
+    }
+
+    public BooleanFilter multiItems() {
+        if (multiItems == null) {
+            setMultiItems(new BooleanFilter());
+        }
+        return multiItems;
+    }
+
+    public void setMultiItems(BooleanFilter multiItems) {
+        this.multiItems = multiItems;
     }
 
     public LongFilter getCreatedBy() {
@@ -334,6 +398,8 @@ public class FormConfigCriteria implements Serializable, Criteria {
             Objects.equals(id, that.id) &&
             Objects.equals(formKey, that.formKey) &&
             Objects.equals(formName, that.formName) &&
+            Objects.equals(formType, that.formType) &&
+            Objects.equals(multiItems, that.multiItems) &&
             Objects.equals(createdBy, that.createdBy) &&
             Objects.equals(createdDate, that.createdDate) &&
             Objects.equals(lastModifiedBy, that.lastModifiedBy) &&
@@ -345,7 +411,19 @@ public class FormConfigCriteria implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, formKey, formName, createdBy, createdDate, lastModifiedBy, lastModifiedDate, businessTypeId, distinct);
+        return Objects.hash(
+            id,
+            formKey,
+            formName,
+            formType,
+            multiItems,
+            createdBy,
+            createdDate,
+            lastModifiedBy,
+            lastModifiedDate,
+            businessTypeId,
+            distinct
+        );
     }
 
     // prettier-ignore
@@ -355,6 +433,8 @@ public class FormConfigCriteria implements Serializable, Criteria {
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
             optionalFormKey().map(f -> "formKey=" + f + ", ").orElse("") +
             optionalFormName().map(f -> "formName=" + f + ", ").orElse("") +
+            optionalFormType().map(f -> "formType=" + f + ", ").orElse("") +
+            optionalMultiItems().map(f -> "multiItems=" + f + ", ").orElse("") +
             optionalCreatedBy().map(f -> "createdBy=" + f + ", ").orElse("") +
             optionalCreatedDate().map(f -> "createdDate=" + f + ", ").orElse("") +
             optionalLastModifiedBy().map(f -> "lastModifiedBy=" + f + ", ").orElse("") +

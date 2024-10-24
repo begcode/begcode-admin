@@ -39,10 +39,10 @@ public class PositionCriteria implements Serializable, Criteria {
     @BindQuery(column = "self.description")
     private StringFilter description;
 
-    @BindQuery(entity = User.class, column = "id", condition = "id=position_id")
+    @BindQuery(entity = User.class, column = "id", condition = "position_id=this.id")
     private LongFilter usersId;
 
-    @BindQuery(entity = User.class, column = "first_name", condition = "id=position_id")
+    @BindQuery(entity = User.class, column = "first_name", condition = "position_id=this.id")
     private StringFilter usersFirstName;
 
     @BindQuery(ignore = true)

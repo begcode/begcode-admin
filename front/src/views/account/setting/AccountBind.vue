@@ -1,35 +1,30 @@
 <template>
   <CollapseContainer title="账号绑定" :canExpand="false">
-    <List>
+    <a-list>
       <template v-for="item in accountBindList" :key="item.key">
-        <ListItem>
-          <ListItemMeta>
+        <a-list-item>
+          <a-list-item-meta>
             <template #avatar>
               <Icon v-if="item.avatar" class="avatar" :icon="item.avatar" :color="item.color" />
             </template>
             <template #title>
               {{ item.title }}
-              <Button type="link" size="small" v-if="item.extra" class="extra">
+              <a-button type="link" size="small" v-if="item.extra" class="extra">
                 {{ item.extra }}
-              </Button>
+              </a-button>
             </template>
             <template #description>
               <div>{{ item.description }}</div>
             </template>
-          </ListItemMeta>
-        </ListItem>
+          </a-list-item-meta>
+        </a-list-item>
       </template>
-    </List>
+    </a-list>
   </CollapseContainer>
 </template>
 <script lang="ts" setup>
-import { List, Button } from 'ant-design-vue';
-import { CollapseContainer, Icon } from '@begcode/components';
-
+import { CollapseContainer } from '@/components/Container';
 import { accountBindList } from './data';
-
-const ListItem = List.Item;
-const ListItemMeta = List.Item.Meta;
 </script>
 <style lang="less" scoped>
 .avatar {

@@ -13,12 +13,12 @@
         <div class="account-right">
           <div v-if="!isEdit">
             <span class="font-size-17 account-name">{{ userInfo.firstName }}</span>
-            <Tooltip content="编辑姓名">
+            <a-tooltip content="编辑姓名">
               <Icon class="pointer font-size-17 gray-bd account-icon" icon="ant-design:edit-outlined" @click="editHandleClick" />
-            </Tooltip>
+            </a-tooltip>
           </div>
           <div v-else>
-            <Input ref="accountNameEdit" :maxlength="100" v-model:value="userInfo.firstName" @blur="editRealName" />
+            <a-input ref="accountNameEdit" :maxlength="100" v-model:value="userInfo.firstName" @blur="editRealName" />
           </div>
           <div class="use-day">
             使用：<span>{{ userInfo.createTimeText }}</span>
@@ -64,19 +64,18 @@
   <UserAccountModal @register="registerModal" @success="getUserDetail"></UserAccountModal>
 </template>
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue';
-import { Tooltip, Input } from 'ant-design-vue';
 import { CropperAvatar } from '@/components/Cropper';
 import { useMessage } from '@/hooks/web/useMessage';
 import headerImg from '@/assets/images/header.jpg';
 import { useUserStore } from '@/store/modules/user';
 import { uploadImg } from '@/api-service/sys/upload';
-import { cloneDeep } from 'lodash-es';
 import dayjs from 'dayjs';
 import { getDictItemsByCode } from '@/utils/dict';
 import { userEdit } from './UserSetting.api';
 import UserAccountModal from './commponents/UserAccountModal.vue';
-import { getFileAccessHttpUrl, useDesign, useModal } from '@begcode/components';
+import { getFileAccessHttpUrl } from '@/utils/util';
+import { useDesign } from '@/hooks/web/useDesign';
+import { useModal } from '@/components/Modal';
 import accountService from '@/api-service/account/account.service';
 import uploadImageService from '@/api-service/files/upload-image.service';
 import { message } from 'ant-design-vue';
@@ -190,7 +189,7 @@ function getSex(val) {
  * 打开编辑弹窗
  */
 function openEditModal() {
-  let value = cloneDeep(userInfo.value);
+  let value = _cloneDeep(userInfo.value);
   openModal(true, {
     record: value,
   });

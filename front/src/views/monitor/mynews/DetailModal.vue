@@ -8,17 +8,15 @@
     :showOkBtn="false"
     :height="88"
   >
-    <Card class="daily-article">
-      <CardMeta :title="content.title" :description="'发布人：' + content.sender + ' 发布时间： ' + content.sendTime"> </CardMeta>
-      <Divider />
+    <a-card class="daily-article">
+      <a-card-meta :title="content.title" :description="'发布人：' + content.sender + ' 发布时间： ' + content.sendTime"> </a-card-meta>
+      <a-divider />
       <div v-html="content.content" class="article-content"></div>
-    </Card>
+    </a-card>
   </BasicModal>
 </template>
 <script lang="ts" setup>
-import { ref, unref } from 'vue';
-import { Card, Divider, CardMeta } from 'ant-design-vue';
-import { BasicModal, useModalInner } from '@begcode/components';
+import { BasicModal, useModalInner } from '@/components/Modal';
 const isUpdate = ref(true);
 const content = ref<any>({});
 //表单赋值

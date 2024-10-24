@@ -89,7 +89,7 @@ public class DictionaryBaseService<R extends DictionaryRepository, E extends Dic
     public DictionaryDTO update(DictionaryDTO dictionaryDTO) {
         log.debug("Request to update Dictionary : {}", dictionaryDTO);
         Dictionary dictionary = dictionaryMapper.toEntity(dictionaryDTO);
-        this.createEntityAndRelatedEntities(
+        this.updateEntityAndRelatedEntities(
                 dictionary,
                 dictionary.getItems(),
                 CommonFieldData::setOwnerEntityId,

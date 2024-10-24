@@ -77,6 +77,8 @@ class FormConfigCriteriaTest {
         formConfigCriteria.id();
         formConfigCriteria.formKey();
         formConfigCriteria.formName();
+        formConfigCriteria.formType();
+        formConfigCriteria.multiItems();
         formConfigCriteria.createdBy();
         formConfigCriteria.createdDate();
         formConfigCriteria.lastModifiedBy();
@@ -91,6 +93,8 @@ class FormConfigCriteriaTest {
                 condition.apply(criteria.getId()) &&
                 condition.apply(criteria.getFormKey()) &&
                 condition.apply(criteria.getFormName()) &&
+                condition.apply(criteria.getFormType()) &&
+                condition.apply(criteria.getMultiItems()) &&
                 condition.apply(criteria.getCreatedBy()) &&
                 condition.apply(criteria.getCreatedDate()) &&
                 condition.apply(criteria.getLastModifiedBy()) &&
@@ -107,6 +111,8 @@ class FormConfigCriteriaTest {
                 condition.apply(criteria.getId(), copy.getId()) &&
                 condition.apply(criteria.getFormKey(), copy.getFormKey()) &&
                 condition.apply(criteria.getFormName(), copy.getFormName()) &&
+                condition.apply(criteria.getFormType(), copy.getFormType()) &&
+                condition.apply(criteria.getMultiItems(), copy.getMultiItems()) &&
                 condition.apply(criteria.getCreatedBy(), copy.getCreatedBy()) &&
                 condition.apply(criteria.getCreatedDate(), copy.getCreatedDate()) &&
                 condition.apply(criteria.getLastModifiedBy(), copy.getLastModifiedBy()) &&

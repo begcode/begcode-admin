@@ -23,11 +23,11 @@
   <UserReplaceEmailModal @register="registerEmailModal" @success="initUserDetail" />
 </template>
 <script lang="ts" setup>
-import { onMounted, ref, reactive } from 'vue';
 import { useUserStore } from '@/store/modules/user';
 import UserReplacePhoneModal from './commponents/UserPhoneModal.vue';
 import UserReplaceEmailModal from './commponents/UserEmailModal.vue';
-import { useDesign, useModal } from '@begcode/components';
+import { useModal } from '@/components/Modal';
+import { useDesign } from '@/hooks/web/useDesign';
 import accountService from '@/api-service/account/account.service';
 const { prefixCls } = useDesign('j-user-account-setting-container');
 

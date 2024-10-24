@@ -22,15 +22,14 @@
 import type { MenuState } from './types';
 import type { Menu as MenuType } from '@/router/types';
 import type { RouteLocationNormalizedLoaded } from 'vue-router';
-import { computed, ref, unref, reactive, toRefs, watch, PropType, useAttrs } from 'vue';
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 import Menu from './components/Menu.vue';
 import SimpleSubMenu from './SimpleSubMenu.vue';
 import { listenerRouteChange } from '@/logics/mitt/routeChange';
-import { propTypes, isHttpUrl, openWindow } from '@begcode/components';
+import { isHttpUrl } from '@/utils/is';
+import { openWindow } from '@/utils/util';
 import { REDIRECT_NAME } from '@/router/constant';
 import { useRouter } from 'vue-router';
-import { isFunction } from 'lodash-es';
 import { useOpenKeys } from './useOpenKeys';
 import { useAppStore } from '@/store/modules/app';
 
@@ -41,15 +40,28 @@ const props = defineProps({
     type: Array as PropType<MenuType[]>,
     default: () => [],
   },
-  collapse: propTypes.bool,
-  mixSider: propTypes.bool,
-  theme: propTypes.string,
-  accordion: propTypes.bool.def(true),
-  collapsedShowTitle: propTypes.bool,
+  collapse: {
+    type: Boolean,
+  },
+  mixSider: {
+    type: Boolean,
+  },
+  theme: {
+    type: String,
+  },
+  accordion: {
+    type: Boolean,
+    default: true,
+  },
+  collapsedShowTitle: {
+    type: Boolean,
+  },
   beforeClickFn: {
     type: Function as PropType<(key: string) => Promise<boolean>>,
   },
-  isSplitMenu: propTypes.bool,
+  isSplitMenu: {
+    type: Boolean,
+  },
 });
 
 const emit = defineEmits(['menuClick']);
@@ -135,7 +147,7 @@ async function handleSelect(key: string) {
     return;
   }
   const { beforeClickFn } = props;
-  if (beforeClickFn && isFunction(beforeClickFn)) {
+  if (beforeClickFn && _isFunction(beforeClickFn)) {
     const flag = await beforeClickFn(key);
     if (!flag) return;
   }

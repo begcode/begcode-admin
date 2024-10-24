@@ -1,16 +1,14 @@
 <template>
   <LayoutLockPage />
-  <BackTop v-if="getUseOpenBackTop" :target="getTarget" />
+  <a-back-top v-if="getUseOpenBackTop" :target="getTarget" />
   <SettingDrawer v-if="getIsFixedSettingDrawer && (!getShowMultipleTab || getFullContent)" :class="prefixCls" />
   <SessionTimeoutLogin v-if="getIsSessionTimeout" />
 </template>
 <script lang="ts" setup>
-import { computed, unref } from 'vue';
-import { BackTop } from 'ant-design-vue';
-
 import { useRootSetting } from '@/hooks/setting/useRootSetting';
 import { useHeaderSetting } from '@/hooks/setting/useHeaderSetting';
-import { useDesign, createAsyncComponent } from '@begcode/components';
+import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
+import { useDesign } from '@/hooks/web/useDesign';
 import { useUserStoreWithOut } from '@/store/modules/user';
 
 import { SettingButtonPositionEnum } from '@/enums/appEnum';

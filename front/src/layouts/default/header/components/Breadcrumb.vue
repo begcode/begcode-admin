@@ -1,6 +1,6 @@
 <template>
   <div :class="[prefixCls, `${prefixCls}--${theme}`]">
-    <Breadcrumb :routes="routes">
+    <a-breadcrumb :routes="routes">
       <template #itemRender="{ route, routes: routesMatched, paths }">
         <Icon :icon="getIcon(route)" v-if="getShowBreadCrumbIcon && getIcon(route)" />
         <span v-if="!hasRedirect(routesMatched, route)">
@@ -10,23 +10,20 @@
           {{ t(route.name || route.meta.title) }}
         </router-link>
       </template>
-    </Breadcrumb>
+    </a-breadcrumb>
   </div>
 </template>
 <script lang="ts" setup>
 import type { RouteLocationMatched } from 'vue-router';
 import type { Menu } from '@/router/types';
-import { ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { Breadcrumb } from 'ant-design-vue';
-import { Icon, useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 import { useRootSetting } from '@/hooks/setting/useRootSetting';
 import { useGo } from '@/hooks/web/usePage';
 import { useI18n } from '@/hooks/web/useI18n';
 
-import { isString } from 'lodash-es';
-import { filter, propTypes } from '@begcode/components';
+import { filter } from '@/utils/helper/treeHelper';
 import { getMenus } from '@/router/menus';
 
 import { REDIRECT_NAME } from '@/router/constant';
@@ -39,7 +36,9 @@ defineOptions({
 });
 
 const props = defineProps({
-  theme: propTypes.oneOf(['dark', 'light']),
+  theme: {
+    type: String as PropType<'light' | 'dark'>,
+  },
 });
 
 const routes = ref<RouteLocationMatched[]>([]);
@@ -120,7 +119,7 @@ function handleClick(route: RouteLocationMatched, paths: string[], e: Event) {
     return;
   }
 
-  if (redirect && isString(redirect)) {
+  if (redirect && _isString(redirect)) {
     go(redirect);
   } else {
     let goPath = '';

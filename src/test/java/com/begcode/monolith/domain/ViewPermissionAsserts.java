@@ -78,7 +78,6 @@ public class ViewPermissionAsserts {
     public static void assertViewPermissionUpdatableRelationshipsEquals(ViewPermission expected, ViewPermission actual) {
         assertThat(expected)
             .as("Verify ViewPermission relationships")
-            .satisfies(e -> assertThat(e.getParent()).as("check parent").isEqualTo(actual.getParent()))
-            .satisfies(e -> assertThat(e.getAuthorities()).as("check authorities").isEqualTo(actual.getAuthorities()));
+            .satisfies(e -> assertThat(e.getParent()).as("check parent").isEqualTo(actual.getParent()));
     }
 }

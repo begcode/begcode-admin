@@ -1,0 +1,36 @@
+{
+  "monolithMybatisApp": {
+    "settingsFormSaveData": {
+      "home": {
+        "title": "Form Save Data",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Form Save Data",
+        "createOrEditLabel": "Create or edit a Form Save Data",
+        "notFound": "No Form Save Data found"
+      },
+      "created": "A new Form Save Data is created with identifier { param }",
+      "updated": "A Form Save Data is updated with identifier { param }",
+      "deleted": "A Form Save Data is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Form Save Data { id }?"
+      },
+      "detail": {
+        "title": "Form Save Data"
+      },
+      "id": "ID",
+      "formData": "Form Data",
+      "createdBy": "Created By",
+      "createdDate": "Created Date",
+      "lastModifiedBy": "Last Modified By",
+      "lastModifiedDate": "Last Modified Date",
+      "formConfig": "Form Config",
+      "help": {
+        "formData": "表单数据",
+        "createdBy": "创建者Id",
+        "createdDate": "创建时间",
+        "lastModifiedBy": "修改者Id",
+        "lastModifiedDate": "修改时间"
+      }
+    }
+  }
+}

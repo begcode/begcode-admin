@@ -1,9 +1,8 @@
-import { findPath, treeMap, isHttpUrl } from '@begcode/components';
-import { cloneDeep } from 'lodash-es';
 import { RouteParams } from 'vue-router';
-import { toRaw } from 'vue';
-import type { MenuModule, Menu, AppRouteRecordRaw } from '@/router/types';
 import { AppRouteModule } from '@/router/types';
+import type { MenuModule, Menu, AppRouteRecordRaw } from '@/router/types';
+import { findPath, treeMap } from '@/utils/helper/treeHelper';
+import { isHttpUrl } from '@/utils/is';
 
 export function getAllParentPath<T = Recordable>(treeData: T[], path: string) {
   // 先匹配不包含隐藏菜单的路径
@@ -63,7 +62,7 @@ export function transformMenuModule(menuModule: MenuModule): Menu {
 // 将路由转换成菜单
 export function transformRouteToMenu(routeModList: AppRouteModule[], routerMapping = false) {
   // 借助 lodash 深拷贝
-  const cloneRouteModList = cloneDeep(routeModList);
+  const cloneRouteModList = _cloneDeep(routeModList);
   const routeList: AppRouteRecordRaw[] = [];
 
   // 对路由项进行修改
@@ -96,7 +95,7 @@ export function transformRouteToMenu(routeModList: AppRouteModule[], routerMappi
   });
   // 路径处理
   joinParentPath(list);
-  return cloneDeep(list);
+  return _cloneDeep(list);
 }
 
 /**

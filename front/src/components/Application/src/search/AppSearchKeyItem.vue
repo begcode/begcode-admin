@@ -4,7 +4,7 @@
   </span>
 </template>
 <script lang="ts" setup>
-import { Icon } from '@begcode/components';
+import { Icon } from '@/components/Icon';
 defineProps({
   icon: String,
 });

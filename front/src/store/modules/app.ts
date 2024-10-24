@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import { deepMerge } from '@begcode/components';
 import type { ProjectConfig, HeaderSetting, MenuSetting, TransitionSetting, MultiTabsSetting } from '#/config';
 import type { BeforeMiniState, ApiAddress } from '#/store';
 
@@ -10,6 +9,7 @@ import { APP_DARK_MODE_KEY, PROJ_CFG_KEY, API_ADDRESS } from '@/enums/cacheEnum'
 import { Persistent } from '@/utils/cache/persistent';
 import { darkMode } from '@/settings/designSetting';
 import { resetRouter } from '@/router';
+import { deepMerge } from '@/utils/util';
 
 interface AppState {
   darkMode?: ThemeEnum;

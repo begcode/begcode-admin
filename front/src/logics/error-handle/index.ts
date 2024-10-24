@@ -2,7 +2,6 @@
  * Used to configure the global error handling function, which can monitor vue errors, script errors, static resource errors and Promise errors
  */
 
-import { App } from 'vue';
 import type { ErrorLogInfo } from '#/store';
 
 import { useErrorLogStoreWithOut } from '@/store/modules/errorLog';

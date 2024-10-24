@@ -1,9 +1,5 @@
-import type { Ref } from 'vue';
-
-import { ref, onMounted, watch, onUnmounted } from 'vue';
-import { isObject } from 'lodash-es';
-import { isWindow } from '@begcode/components';
 import { useThrottleFn } from '@vueuse/core';
+import { isWindow } from '@/utils/is';
 
 export function useScroll(
   refEl: Ref<Element | Window | null>,
@@ -25,7 +21,7 @@ export function useScroll(
     }
   };
 
-  if (isObject(options)) {
+  if (_isObject(options)) {
     let wait = 0;
     if (options.wait && options.wait > 0) {
       wait = options.wait;

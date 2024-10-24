@@ -165,7 +165,7 @@ public class OssConfigBaseService<R extends OssConfigRepository, E extends OssCo
         if (CollectionUtils.isEmpty(ossConfigs)) {
             LocalPlusFileStorage storage = new LocalPlusFileStorage();
             String storagePath = "data/";
-            String domain = "";
+            String domain = "http://127.0.0.1:8080";
             String basePath = "/upload/";
             storagePath = SpringBootUtil.getApplicationPathEndWithSeparator() + storagePath;
             storage.setStoragePath(storagePath);

@@ -169,20 +169,6 @@ public class ViewPermission implements Serializable {
     @TableField(value = "parent_id")
     private Long parentId;
 
-    /**
-     * 角色列表
-     */
-    @TableField(exist = false)
-    @BindEntityList(
-        entity = Authority.class,
-        condition = "this.id=rel_jhi_authority__view_permissions.view_permissions_id AND rel_jhi_authority__view_permissions.jhi_authority_id=id"
-    )
-    @JsonIgnoreProperties(
-        value = { "children", "viewPermissions", "apiPermissions", "parent", "users", "departments" },
-        allowSetters = true
-    )
-    private List<Authority> authorities = new ArrayList<>();
-
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public ViewPermission id(Long id) {
@@ -302,11 +288,6 @@ public class ViewPermission implements Serializable {
 
     public ViewPermission parentId(Long parentId) {
         this.parentId = parentId;
-        return this;
-    }
-
-    public ViewPermission authorities(List<Authority> authorities) {
-        this.authorities = authorities;
         return this;
     }
 

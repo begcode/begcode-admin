@@ -3,6 +3,7 @@
 @skipFakeData
 @entityPackage(system)
 @moduleName(system)
+@skipMobile
 entity SmsMessage {
   title String /** 消息标题 */
   sendType MessageSendType /** 发送方式 */
@@ -33,6 +34,9 @@ entity SmsMessage {
 @useTemplate(edit)
 @moduleName(system)
 @addCustomMethod(repository-clientService-service-listComponent-rest)
+@publicApiBy("category=NOTICE,receiverType=ALL")
+@skipComponent(appEditPage)
+@mobileConfig(addToBottomNav-addToHomeMenu-addToHomeRecommend)
 entity Announcement {
   title String required /** 标题 */
   @endUsed(textArea)
@@ -163,6 +167,7 @@ enum PriorityLevel {
 @skipMenu
 @skipWebButton(listEdit-listDelete-listAdd)
 @moduleName(system)
+@skipComponent(appEditPage)
 entity AnnouncementRecord {
   anntId Long /** 通告ID */
   userId Long /** 用户id */
@@ -179,6 +184,7 @@ entity AnnouncementRecord {
 @moduleName(taskjob)
 @addCustomMethod(service)
 @importData
+@skipMobile
 entity TaskJobConfig {
     name String /** 任务名称 */
     jobClassName String /** 任务类名 */

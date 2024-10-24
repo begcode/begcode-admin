@@ -1,4 +1,3 @@
-import type { FunctionalComponent } from 'vue';
 import type { RouteLocation } from 'vue-router';
 
 export interface DefaultContext {

@@ -1,4 +1,3 @@
-import { merge, random, isArray } from 'lodash-es';
 import { reactive } from 'vue';
 import { Modal } from 'ant-design-vue';
 import { useGlobSetting } from '@/hooks/setting';
@@ -65,7 +64,7 @@ export function randomString(length: number, chats?: string) {
   }
   let str = '';
   for (let i = 0; i < length; i++) {
-    let num = random(0, chats.length - 1);
+    let num = _random(0, chats.length - 1);
     str += chats[num];
   }
   return str;
@@ -301,7 +300,7 @@ export function findTree(treeList: any[], fn: Fn, childrenKey = 'children') {
       return item;
     }
     let children = item[childrenKey];
-    if (isArray(children)) {
+    if (_isArray(children)) {
       let findResult = findTree(children, fn, childrenKey);
       if (findResult) {
         return findResult;
@@ -314,7 +313,7 @@ export function findTree(treeList: any[], fn: Fn, childrenKey = 'children') {
 /** 获取 mapFormSchema 方法 */
 export function bindMapFormSchema<T>(spanMap, spanTypeDef: T) {
   return function (s: FormSchema, spanType: T = spanTypeDef) {
-    return merge(
+    return _merge(
       {
         disabledLabelWidth: true,
       } as FormSchema,

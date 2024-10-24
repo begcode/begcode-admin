@@ -1,219 +1,212 @@
 <template>
   <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
   <div>
-    <Card
-      v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
-      title="高级搜索"
-      class="bc-list-search-form-card"
-      :body-style="{ 'padding-top': '12px', 'padding-bottom': '8px' }"
-      :head-style="{ 'min-height': '40px' }"
-    >
-      <template #extra>
-        <Space>
-          <Button type="default" @click="showSearchFormSetting" preIcon="ant-design:setting-outlined" shape="circle" size="small"></Button>
-        </Space>
-      </template>
-      <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" />
-    </Card>
-    <Row
-      v-if="fieldSearchValues && fieldSearchValues.length && !searchFormConfig.toggleSearchStatus"
-      style="background-color: #ffffff; padding: 4px; margin: 8px; border-radius: 4px"
-    >
-      <Col :span="24" style="padding-left: 20px">
-        <span>搜索条件：</span>
-        <Space>
-          <Tag closable v-for="fieldVale of fieldSearchValues" @close="closeSearchFieldTag(fieldVale)">
-            {{ fieldVale.title }}: {{ fieldVale.value }}
-          </Tag>
-        </Space>
-      </Col>
-    </Row>
-    <Card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
-      <List :grid="listGrid" item-layout="vertical" :data-source="listData" :pagination="false">
-        <template #header>
-          <div class="flex justify-between space-x-2">
-            <div>
-              <Row class="toolbar_buttons_xgrid" :gutter="16">
-                <Col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
-                  <Space>
-                    <Input
-                      placeholder="请输入关键字"
-                      v-model:value="searchFormConfig.jhiCommonSearchKeywords"
-                      allow-clear
-                      @change="inputSearch"
-                      @search="formSearch"
-                      enterButton
-                    >
-                      <template #prefix>
-                        <Icon icon="ant-design:search-outlined" />
-                      </template>
-                      <template #addonAfter v-if="searchFormConfig.allowSwitch">
-                        <Button type="link" @click="formSearch" style="height: 30px"
-                          >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch"></Icon
-                        ></Button>
-                      </template>
-                    </Input>
-                    <Dropdown v-if="selectedRows.length && batchOperations.length">
-                      <template #overlay>
-                        <Menu @click="batchOperationClick">
-                          <MenuItem :key="batchOperation.name" v-for="batchOperation of batchOperations">
-                            <Icon :icon="batchOperation.icon" v-if="batchOperation.icon"></Icon>
-                            {{ batchOperation.title }}
-                          </MenuItem>
-                        </Menu>
-                      </template>
-                      <Button>
-                        批量处理
-                        <Icon icon="ant-design:down-outlined" />
-                      </Button>
-                    </Dropdown>
-                  </Space>
-                </Col>
-              </Row>
-            </div>
-            <div>
-              <Space>
-                <template v-for="button in cardListOptions.toolButtons">
-                  <Tooltip v-if="!button.hidden">
-                    <template #title>{{ button.title }}</template>
-                    <Button :disabled="button.disabled" @click="button.click">
-                      <Icon :icon="button.icon" v-if="button.icon"></Icon>
-                      {{ button.title }}
-                    </Button>
-                  </Tooltip>
-                </template>
-                <Tooltip>
-                  <template #title>
-                    <div class="w-50">每行显示数量</div>
-                    <Slider id="slider" v-bind="sliderProp" :value="listColumns" @change="sliderChange" />
-                  </template>
-                  <Button><Icon icon="ant-design:table-outlined" />列数</Button>
-                </Tooltip>
-              </Space>
-            </div>
-          </div>
-        </template>
-        <template #renderItem="{ item }">
-          <div style="margin-top: 24px">
-            <List.Item>
-              <Badge>
-                <template #count>
-                  <Checkbox :checked="getItemSelected(item)" @change="selectChange($event, item)" />
-                </template>
-                <Card :body-style="{ padding: '12px 4px' }">
-                  <template #title></template>
-                  <template #cover>
-                    <Badge.Ribbon :text="metaConfig.titleValue(item)" placement="start" class="cover-ribbon">
-                      <div class="cover-height">
-                        <Image
-                          v-if="coverConfig.showImage"
-                          :src="item[coverConfig.coverFieldName] || '/resource/img/filetype/other.png'"
-                          v-bind="coverConfig.props"
-                          @click="coverConfig.click"
-                          fallback="/resource/img/filetype/other.png"
-                        />
-                      </div>
-                    </Badge.Ribbon>
-                  </template>
-                  <template class="ant-card-actions" #actions>
-                    <ButtonGroup :row="item" :buttons="rowOperations" @click="rowClick" />
-                  </template>
-                  <Card.Meta>
-                    <template #avatar>
-                      <Avatar :src="item.avatar" v-if="metaConfig.showAvatar" />
+    <SplitPanes class="default-theme">
+      <SplitPane size="20">
+        <a-card
+          title="高级搜索"
+          class="bc-list-result-card"
+          :body-style="{ padding: '12px 12px 8px 12px' }"
+          :head-style="{ 'min-height': '40px', padding: '12px' }"
+        >
+          <BasicTree
+            :expandedKeys="filterTreeConfig.expandedKeys"
+            :autoExpandParent="filterTreeConfig.autoExpandParent"
+            :selectedKeys="filterTreeConfig.selectedKeys"
+            :treeData="filterTreeConfig.treeFilterData"
+            @select="filterTreeSelect"
+          />
+        </a-card>
+      </SplitPane>
+      <SplitPane>
+        <a-card
+          v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
+          title="高级搜索"
+          class="bc-list-search-form-card"
+          :body-style="{ 'padding-top': '12px', 'padding-bottom': '8px' }"
+          :head-style="{ 'min-height': '40px' }"
+        >
+          <template #extra>
+            <a-space>
+              <BasicButton
+                type="default"
+                @click="showSearchFormSetting"
+                pre-icon="ant-design:setting-outlined"
+                shape="circle"
+                size="small"
+              ></BasicButton>
+            </a-space>
+          </template>
+          <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" ref="searchFormRef" />
+        </a-card>
+        <a-row
+          v-if="fieldSearchValues && fieldSearchValues.length && !searchFormConfig.toggleSearchStatus"
+          style="background-color: #ffffff; padding: 4px; margin: 8px; border-radius: 4px"
+        >
+          <a-col :span="24" style="padding-left: 20px">
+            <span>搜索条件：</span>
+            <a-space>
+              <a-tag closable v-for="fieldVale of fieldSearchValues" @close="closeSearchFieldTag(fieldVale)">
+                {{ fieldVale.title }}: {{ fieldVale.value }}
+              </a-tag>
+            </a-space>
+          </a-col>
+        </a-row>
+        <a-card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
+          <a-list :grid="listGrid" item-layout="vertical" :data-source="listData" :pagination="false">
+            <template #header>
+              <div class="flex justify-between space-x-2">
+                <div>
+                  <a-row class="toolbar_buttons_xgrid" :gutter="16">
+                    <a-col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
+                      <a-space>
+                        <a-input
+                          placeholder="请输入关键字"
+                          v-model:value="searchFormConfig.jhiCommonSearchKeywords"
+                          allow-clear
+                          @change="inputSearch"
+                          @search="formSearch"
+                          enterButton
+                        >
+                          <template #prefix>
+                            <Icon icon="ant-design:search-outlined" />
+                          </template>
+                          <template #addonAfter v-if="searchFormConfig.allowSwitch">
+                            <BasicButton type="link" @click="formSearch" style="height: 30px"
+                              >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch"></Icon
+                            ></BasicButton>
+                          </template>
+                        </a-input>
+                        <a-dropdown v-if="selectedRows.length && batchOperations.length">
+                          <template #overlay>
+                            <a-menu @click="batchOperationClick">
+                              <a-menu-item :key="batchOperation.name" v-for="batchOperation of batchOperations">
+                                <Icon :icon="batchOperation.icon" v-if="batchOperation.icon"></Icon>
+                                {{ batchOperation.title }}
+                              </a-menu-item>
+                            </a-menu>
+                          </template>
+                          <BasicButton>
+                            批量处理
+                            <Icon icon="ant-design:down-outlined" />
+                          </BasicButton>
+                        </a-dropdown>
+                      </a-space>
+                    </a-col>
+                  </a-row>
+                </div>
+                <div>
+                  <a-space>
+                    <template v-for="button in cardListOptions.toolButtons">
+                      <a-tooltip v-if="!button.hidden">
+                        <template #title>{{ button.title }}</template>
+                        <BasicButton :disabled="button.disabled" @click="button.click">
+                          <Icon :icon="button.icon" v-if="button.icon"></Icon>
+                          {{ button.title }}
+                        </BasicButton>
+                      </a-tooltip>
                     </template>
-                    <template #description v-if="metaConfig.showDesc">{{ metaConfig.descValue(item) }}</template>
-                  </Card.Meta>
-                </Card>
-              </Badge>
-            </List.Item>
-          </div>
-        </template>
-      </List>
-      <Affix :offset-bottom="0">
-        <Row justify="space-between" style="background: #fff; padding: 10px 0">
-          <Col :span="12" style="display: flex; justify-content: flex-start">
-            <Alert type="warning" :banner="true" style="height: 30px" :message="`已选${selectedRows.length}条记录。`"></Alert>
-          </Col>
-          <Col :span="12" style="display: flex; justify-content: flex-end">
-            <Pagination
-              v-model:current="paginationProps.current"
-              :page-size="paginationProps.pageSize"
-              :total="paginationProps.total"
-              :show-size-changer="false"
-              :show-quick-jumper="false"
-              @change="pageChange"
+                    <a-tooltip>
+                      <template #title>
+                        <div class="w-50">每行显示数量</div>
+                        <a-slider id="slider" v-bind="sliderProp" :value="listColumns" @change="sliderChange" />
+                      </template>
+                      <BasicButton><Icon icon="ant-design:table-outlined" />列数</BasicButton>
+                    </a-tooltip>
+                  </a-space>
+                </div>
+              </div>
+            </template>
+            <template #renderItem="{ item }">
+              <div style="margin-top: 24px">
+                <a-list-item>
+                  <a-badge>
+                    <template #count>
+                      <a-checkbox :checked="getItemSelected(item)" @change="selectChange($event, item)" />
+                    </template>
+                    <a-card :body-style="{ padding: '12px 4px' }">
+                      <template #title></template>
+                      <template #cover>
+                        <a-badge-ribbon :text="metaConfig.titleValue(item)" placement="start" class="cover-ribbon">
+                          <div class="cover-height">
+                            <a-image
+                              v-if="coverConfig.showImage"
+                              :src="item[coverConfig.coverFieldName] || '/resource/img/filetype/other.png'"
+                              v-bind="coverConfig.props"
+                              @click="coverConfig.click"
+                              fallback="/resource/img/filetype/other.png"
+                            />
+                          </div>
+                        </a-badge-ribbon>
+                      </template>
+                      <template class="ant-card-actions" #actions>
+                        <ButtonGroup :row="item" :buttons="rowOperations" @click="rowClick" />
+                      </template>
+                      <a-card-meta>
+                        <template #avatar>
+                          <a-avatar :src="item.avatar" v-if="metaConfig.showAvatar" />
+                        </template>
+                        <template #description v-if="metaConfig.showDesc">{{ metaConfig.descValue(item) }}</template>
+                      </a-card-meta>
+                    </a-card>
+                  </a-badge>
+                </a-list-item>
+              </div>
+            </template>
+          </a-list>
+          <a-affix :offset-bottom="0">
+            <a-row justify="space-between" style="background: #fff; padding: 10px 0">
+              <a-col :span="12" style="display: flex; justify-content: flex-start">
+                <a-alert type="warning" :banner="true" style="height: 30px" :message="`已选${selectedRows.length}条记录。`"></a-alert>
+              </a-col>
+              <a-col :span="12" style="display: flex; justify-content: flex-end">
+                <a-pagination
+                  v-model:current="paginationProps.current"
+                  :page-size="paginationProps.pageSize"
+                  :total="paginationProps.total"
+                  :show-size-changer="false"
+                  :show-quick-jumper="false"
+                  @change="pageChange"
+                />
+              </a-col>
+            </a-row>
+          </a-affix>
+          <BasicModal v-bind="popupConfig.containerProps" @register="registerModal" @cancel="closeModal" @ok="okModal">
+            <component
+              v-if="popupConfig.componentProps.is"
+              v-bind="popupConfig.componentProps"
+              :is="popupConfig.componentProps.is"
+              @cancel="closeModal"
+              @refresh="formSearch"
+              v-on="popupConfig.componentEvents"
+              ref="modalComponentRef"
             />
-          </Col>
-        </Row>
-      </Affix>
-      <BasicModal v-bind="popupConfig.containerProps" @register="registerModal" @cancel="closeModal" @ok="okModal">
-        <component
-          v-if="popupConfig.componentProps.is"
-          v-bind="popupConfig.componentProps"
-          :is="popupConfig.componentProps.is"
-          @cancel="closeModal"
-          @refresh="formSearch"
-          v-on="popupConfig.componentEvents"
-          ref="modalComponentRef"
-        />
-      </BasicModal>
-      <BasicDrawer v-bind="popupConfig.containerProps" @register="registerDrawer" @close="closeDrawer" @ok="okDrawer">
-        <component
-          v-if="popupConfig.componentProps.is"
-          v-bind="popupConfig.componentProps"
-          :is="popupConfig.componentProps.is"
-          @cancel="closeDrawer"
-          @refresh="formSearch"
-          v-on="popupConfig.componentEvents"
-          ref="drawerComponentRef"
-        />
-      </BasicDrawer>
-    </Card>
+          </BasicModal>
+          <BasicDrawer v-bind="popupConfig.containerProps" @register="registerDrawer" @close="closeDrawer" @ok="okDrawer">
+            <component
+              v-if="popupConfig.componentProps.is"
+              v-bind="popupConfig.componentProps"
+              :is="popupConfig.componentProps.is"
+              @cancel="closeDrawer"
+              @refresh="formSearch"
+              v-on="popupConfig.componentEvents"
+              ref="drawerComponentRef"
+            />
+          </BasicDrawer>
+        </a-card>
+      </SplitPane>
+    </SplitPanes>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, getCurrentInstance, shallowRef, onMounted, computed, toRaw } from 'vue';
-import {
-  Modal,
-  Card,
-  Space,
-  Row,
-  Col,
-  Input,
-  message,
-  List,
-  Tooltip,
-  Upload,
-  Slider,
-  Avatar,
-  Image,
-  Badge,
-  Checkbox,
-  Affix,
-  Pagination,
-  Alert,
-  Dropdown,
-  MenuItem,
-  Menu,
-  Tag,
-} from 'ant-design-vue';
+import { Modal, message } from 'ant-design-vue';
 import { breakpointsAntDesign, useBreakpoints } from '@vueuse/core';
-import { debounce, isArray, upperFirst } from 'lodash-es';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
-import {
-  useModalInner,
-  BasicModal,
-  useDrawerInner,
-  BasicDrawer,
-  Icon,
-  Button,
-  SearchForm,
-  ButtonGroup,
-  ImageUpload,
-  clearSearchFieldValue,
-} from '@begcode/components';
+import { useDrawer } from '@/components/Drawer';
+import { useModal } from '@/components/Modal';
+import { ButtonGroup } from '@/components/Button';
+import { clearSearchFieldValue } from '@/components/SearchForm';
 import { useGo } from '@/hooks/web/usePage';
 import ServerProvider from '@/api-service/index';
 import UploadImageForm from './components/form-component.vue';
@@ -221,10 +214,15 @@ import UploadImageDetail from './components/detail-component.vue';
 import { IUploadImage } from '@/models/files/upload-image.model';
 import config from './config/list-config';
 import { useSetShortcutButtons, useSlider } from '@/components/VxeTable/src/helper';
+import { transformToFilterTree } from '@/components/VxeTable/src/helper';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
 const props = defineProps({
+  query: {
+    type: Object,
+    default: () => ({}),
+  },
   baseData: {
     type: Object,
     default: () => ({}),
@@ -249,12 +247,8 @@ const props = defineProps({
   },
 });
 
-const [registerModal, { closeModal, setModalProps }] = useModalInner(data => {
-  console.log(data);
-});
-const [registerDrawer, { closeDrawer, setDrawerProps }] = useDrawerInner(data => {
-  console.log(data);
-});
+const [registerModal, { closeModal, setModalProps }] = useModal();
+const [registerDrawer, { closeDrawer, setDrawerProps }] = useDrawer();
 const shallowRefs = {
   UploadImageEdit: shallowRef(UploadImageForm),
   UploadImageDetail: shallowRef(UploadImageDetail),
@@ -275,7 +269,7 @@ function sliderChange(n) {
 }
 const metaConfig = reactive({
   titleValue: item => {
-    return item.url;
+    return item.fullName;
   },
   showAvatar: false,
   showDesc: true,
@@ -302,22 +296,21 @@ const drawerComponentRef = ref<any>(null);
 const ctx = getCurrentInstance()?.proxy;
 const go = useGo();
 const apiService = ctx?.$apiService as typeof ServerProvider;
-const relationshipApis: any = {
-  category: apiService.files.resourceCategoryService.tree,
-};
 const apis = {
   find: apiService.files.uploadImageService.retrieve,
   deleteById: apiService.files.uploadImageService.delete,
   deleteByIds: apiService.files.uploadImageService.deleteByIds,
   update: apiService.files.uploadImageService.update,
+  categoryList: apiService.files.resourceCategoryService.tree,
+  category: apiService.files.resourceCategoryService.tree,
 };
 const pageConfig = {
   title: '上传图片列表',
   baseRouteName: 'ossUploadImage',
 };
 const searchFormRef = ref<any>(null);
-const searchFormConfig = reactive<any>({
-  fieldList: config.searchForm(),
+const searchFormConfig = reactive<Record<string, any>>({
+  fieldList: config.searchForm(apis),
   toggleSearchStatus: false,
   useOr: false,
   disabled: false,
@@ -329,7 +322,9 @@ const fieldSearchValues = computed(() => {
   return searchFormConfig.fieldList
     .filter(field => !field.hidden)
     .filter(field => {
-      return field.value !== null && field.value !== undefined && field.value !== '' && !(isArray(field.value) && field.value.length === 0);
+      return (
+        field.value !== null && field.value !== undefined && field.value !== '' && !(_isArray(field.value) && field.value.length === 0)
+      );
     });
 });
 const rowOperations: any[] = [
@@ -390,6 +385,23 @@ const batchOperationClick = ({ key }) => {
   }
 };
 
+const mapOfFilter = ref({});
+const filterTreeConfig = reactive({
+  treeFilterData: [] as any[],
+  expandedKeys: [],
+  checkedKeys: [],
+  selectedKeys: [],
+  autoExpandParent: true,
+});
+apis.categoryList().then(data => {
+  filterTreeConfig.treeFilterData.push(
+    transformToFilterTree(
+      data.records,
+      { key: 'id', title: 'title', children: 'children' },
+      { filterName: 'categoryId.equals', title: '资源分类' },
+    ),
+  );
+});
 const popupConfig = reactive<any>({
   needSubmit: false,
   containerProps: {
@@ -481,11 +493,16 @@ const okDrawer = async () => {
 };
 const formSearch = () => {
   selectedRows.value = [];
-  let params: any = {};
+  let params: any = { ...(props.query || {}) };
   if (searchFormConfig.jhiCommonSearchKeywords) {
     params['jhiCommonSearchKeywords'] = searchFormConfig.jhiCommonSearchKeywords;
   } else {
-    params = Object.assign({}, cardListOptions.params, getSearchQueryData(searchFormConfig));
+    params = Object.assign(params, cardListOptions.params, getSearchQueryData(searchFormConfig));
+  }
+  if (Object.keys(mapOfFilter.value).length) {
+    params.and = mapOfFilter.value;
+  } else {
+    delete params.and;
   }
   params.page = paginationProps.current;
   params.size = paginationProps.pageSize;
@@ -498,7 +515,7 @@ const formSearch = () => {
   });
 };
 
-const inputSearch = debounce(formSearch, 700);
+const inputSearch = _debounce(formSearch, 700);
 
 const closeSearchFieldTag = field => {
   clearSearchFieldValue(field);
@@ -524,6 +541,18 @@ const showSearchFormSetting = () => {
   if (searchFormRef.value) {
     searchFormRef.value.showSettingModal();
   }
+};
+
+const filterTreeSelect = (selectedKeys, info) => {
+  const filterData = info.node.dataRef;
+  mapOfFilter.value = {};
+  if (selectedKeys && selectedKeys.length > 0) {
+    if (filterData.type === 'filterItem') {
+      mapOfFilter.value[info.node.dataRef.filterName] = info.node.dataRef.filterValue;
+      filterTreeConfig.selectedKeys = selectedKeys;
+    }
+  }
+  formSearch();
 };
 
 //分页相关
@@ -630,7 +659,7 @@ const rowClick = ({ name, data }) => {
 };
 
 const getSelectRows = () => {
-  return toRaw(selectedRows);
+  return selectedRows.value;
 };
 
 onMounted(() => {

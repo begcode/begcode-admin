@@ -1,7 +1,6 @@
-import { getCurrentInstance, onBeforeUnmount, ref, Ref, shallowRef, unref } from 'vue';
-import { isDef } from '@begcode/components';
 import { useRafThrottle } from '@/utils/domUtils';
 import { addResizeListener, removeResizeListener } from '@/utils/event';
+import { isDef } from '@/utils/is';
 
 const watermarkSymbol = 'watermark-dom';
 

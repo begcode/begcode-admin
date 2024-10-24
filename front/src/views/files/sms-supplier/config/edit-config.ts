@@ -1,5 +1,5 @@
-import { FormSchema } from '@begcode/components';
 import { useI18n } from '@/hooks/web/useI18n';
+import { FormSchema } from '@/components/Form';
 import apiService from '@/api-service/index';
 
 const smsSupplierService = apiService.files.smsSupplierService;

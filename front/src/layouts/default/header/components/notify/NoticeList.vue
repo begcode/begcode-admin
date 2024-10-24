@@ -1,42 +1,42 @@
 <template>
-  <List :class="prefixCls" bordered :pagination="getPagination">
+  <a-list :class="prefixCls" bordered :pagination="getPagination">
     <template v-for="item in getData" :key="item.id">
-      <List.Item class="list-item" @click="handleTitleClick(item)" :style="{ cursor: isTitleClickable ? 'pointer' : '' }">
-        <List.Item.Meta>
+      <a-list-item class="list-item" @click="handleTitleClick(item)" :style="{ cursor: isTitleClickable ? 'pointer' : '' }">
+        <a-list-item-meta>
           <template #title>
             <div class="title">
-              <Typography.Paragraph
+              <a-typography-paragraph
                 style="width: 100%; margin-bottom: 0 !important"
                 :delete="!!item.titleDelete"
                 :ellipsis="$props.titleRows && $props.titleRows > 0 ? { rows: $props.titleRows, tooltip: !!item.title } : false"
                 :content="item.title"
               />
               <div class="extra" v-if="item.extra">
-                <Tag class="tag" :color="item.color">
+                <a-tag class="tag" :color="item.color">
                   {{ item.extra }}
-                </Tag>
+                </a-tag>
               </div>
             </div>
           </template>
 
           <template #avatar>
-            <Avatar v-if="item.avatar" class="avatar" :src="item.avatar" />
+            <a-avatar v-if="item.avatar" class="avatar" :src="item.avatar" />
             <template v-else-if="item.priority">
-              <Avatar v-if="item.priority === PriorityTypes.L" class="avatar priority-L" title="一般消息">
+              <a-avatar v-if="item.priority === PriorityTypes.L" class="avatar priority-L" title="一般消息">
                 <template #icon>
                   <Icon icon="entypo:info" />
                 </template>
-              </Avatar>
-              <Avatar v-if="item.priority === PriorityTypes.M" class="avatar priority-M" title="重要消息">
+              </a-avatar>
+              <a-avatar v-if="item.priority === PriorityTypes.M" class="avatar priority-M" title="重要消息">
                 <template #icon>
                   <Icon icon="bi:exclamation-lg" />
                 </template>
-              </Avatar>
-              <Avatar v-if="item.priority === PriorityTypes.H" class="avatar priority-H" title="紧急消息">
+              </a-avatar>
+              <a-avatar v-if="item.priority === PriorityTypes.H" class="avatar priority-H" title="紧急消息">
                 <template #icon>
                   <Icon icon="ant-design:warning-filled" />
                 </template>
-              </Avatar>
+              </a-avatar>
             </template>
             <span v-else> {{ item.avatar }}</span>
           </template>
@@ -44,7 +44,7 @@
           <template #description>
             <div>
               <div class="description" v-if="item.description">
-                <Typography.Paragraph
+                <a-typography-paragraph
                   style="width: 100%; margin-bottom: 0 !important"
                   :ellipsis="descRows && descRows > 0 ? { rows: descRows, tooltip: !!item.description } : false"
                   :content="item.description"
@@ -55,22 +55,18 @@
               </div>
             </div>
           </template>
-        </List.Item.Meta>
-      </List.Item>
+        </a-list-item-meta>
+      </a-list-item>
     </template>
-  </List>
+  </a-list>
 </template>
 <script lang="ts" setup>
-import { computed, PropType, ref, watch, unref } from 'vue';
-import { List, Avatar, Tag, Typography } from 'ant-design-vue';
-import { isNumber } from 'lodash-es';
-import { useDesign } from '@begcode/components';
-import { Time } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
+import { Time } from '@/components/Time';
 import { PriorityTypes, ListItem } from './data';
 
 // types
 import type { StyleValue } from '@/utils/types';
-import type { FunctionalComponent } from 'vue';
 import type { ParagraphProps } from 'ant-design-vue/es/typography/Paragraph';
 
 const props = defineProps({
@@ -106,7 +102,7 @@ const current = ref(props.currentPage || 1);
 const getData = computed(() => {
   const { pageSize, list } = props;
   if (pageSize === false) return [];
-  let size = isNumber(pageSize) ? pageSize : 5;
+  let size = _isNumber(pageSize) ? pageSize : 5;
   return list.slice(size * (unref(current) - 1), size * unref(current));
 });
 
@@ -121,7 +117,7 @@ const getPagination = computed(() => {
   const { list, pageSize } = props;
   // compatible line 104
   // if typeof pageSize is boolean, Number(true) && 5 = 5, Number(false) && 5 = 0
-  const size = isNumber(pageSize) ? pageSize : Number(pageSize) && 5;
+  const size = _isNumber(pageSize) ? pageSize : Number(pageSize) && 5;
 
   if (size > 0 && list && list.length > size) {
     return {

@@ -1,0 +1,43 @@
+{
+  "aigcs": [],
+  "annotations": {
+    "changelogDate": "20241024122406",
+    "entityPackage": "system",
+    "extendAbstractAuditingEntity": true,
+    "importData": true,
+    "moduleName": "system",
+    "skipFakeData": true,
+    "skipMenu": true,
+    "skipMobile": true
+  },
+  "applications": "*",
+  "clientRootFolder": "settings",
+  "documentation": "表单数据",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "documentation": "表单数据",
+      "fieldName": "formData",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "text",
+      "options": {
+        "endUsed": "codeEditor"
+      }
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "FormSaveData",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "documentation": "表单配置",
+      "otherEntityField": "formName",
+      "otherEntityName": "formConfig",
+      "relationshipName": "formConfig",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

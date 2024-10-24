@@ -4,6 +4,7 @@
 @skipServer
 @skipClient
 @skipSoftDelete
+@skipMobile
 entity AbstractAuditingEntity (jhi_auditing) {
   /**
    * 创建者Id

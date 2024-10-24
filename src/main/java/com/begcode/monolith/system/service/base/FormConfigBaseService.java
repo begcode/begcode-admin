@@ -1,11 +1,15 @@
 package com.begcode.monolith.system.service.base;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.begcode.monolith.SpringBootUtil;
 import com.begcode.monolith.system.domain.FormConfig;
+import com.begcode.monolith.system.domain.FormSaveData;
 import com.begcode.monolith.system.repository.FormConfigRepository;
+import com.begcode.monolith.system.repository.FormSaveDataRepository;
 import com.begcode.monolith.system.service.dto.FormConfigDTO;
 import com.begcode.monolith.system.service.mapper.FormConfigMapper;
 import com.diboot.core.binding.Binder;
@@ -53,7 +57,9 @@ public class FormConfigBaseService<R extends FormConfigRepository, E extends For
         log.debug("Request to save FormConfig : {}", formConfigDTO);
         FormConfig formConfig = formConfigMapper.toEntity(formConfigDTO);
         formConfig.setBusinessTypeId(
-            Optional.ofNullable(formConfigDTO.getBusinessType()).map(businessTypeDTO -> businessTypeDTO.getId()).orElse(null)
+            Optional.ofNullable(formConfigDTO.getBusinessType())
+                .map(businessTypeBusinessTypeDTO -> businessTypeBusinessTypeDTO.getId())
+                .orElse(null)
         );
         this.saveOrUpdate(formConfig);
         return findOne(formConfig.getId()).orElseThrow();
@@ -70,7 +76,9 @@ public class FormConfigBaseService<R extends FormConfigRepository, E extends For
         log.debug("Request to update FormConfig : {}", formConfigDTO);
         FormConfig formConfig = formConfigMapper.toEntity(formConfigDTO);
         formConfig.setBusinessTypeId(
-            Optional.ofNullable(formConfigDTO.getBusinessType()).map(businessTypeDTO -> businessTypeDTO.getId()).orElse(null)
+            Optional.ofNullable(formConfigDTO.getBusinessType())
+                .map(businessTypeBusinessTypeDTO -> businessTypeBusinessTypeDTO.getId())
+                .orElse(null)
         );
         this.saveOrUpdate(formConfig);
         return findOne(formConfig.getId()).orElseThrow();
@@ -136,6 +144,18 @@ public class FormConfigBaseService<R extends FormConfigRepository, E extends For
         log.debug("Request to delete FormConfig : {}", id);
 
         formConfigRepository.deleteById(id);
+    }
+
+    public List<String> getFormDataByKey(String formKey) {
+        FormConfig formConfig = this.baseMapper.selectOne(new LambdaQueryWrapper<FormConfig>().eq(FormConfig::getFormKey, formKey));
+        if (Objects.isNull(formConfig)) {
+            return new ArrayList<>();
+        }
+        FormSaveDataRepository saveDataRepository = SpringBootUtil.getBean(FormSaveDataRepository.class);
+        List<FormSaveData> formDataList = saveDataRepository.selectList(
+            new LambdaQueryWrapper<FormSaveData>().eq(FormSaveData::getFormConfigId, formConfig.getId())
+        );
+        return formDataList.stream().map(FormSaveData::getFormData).toList();
     }
 
     /**

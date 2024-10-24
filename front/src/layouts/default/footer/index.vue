@@ -1,29 +1,21 @@
 <template>
-  <Layout.Footer :class="prefixCls" v-if="getShowLayoutFooter" ref="footerRef">
+  <a-layout-footer :class="prefixCls" v-if="getShowLayoutFooter" ref="footerRef">
     <div :class="`${prefixCls}__links`">
       <a @click="openWindow(SITE_URL)">{{ t('layout.footer.onlinePreview') }}</a>
-
-      <GithubFilled @click="openWindow(GITHUB_URL)" :class="`${prefixCls}__github`" />
-
+      <Icon icon="ant-design:github-filled" @click="openWindow(GITHUB_URL)" :class="`${prefixCls}__github`" />
       <a @click="openWindow(DOC_URL)">{{ t('layout.footer.onlineDocument') }}</a>
     </div>
-    <div>Copyright &copy;2023 BegCode</div>
-  </Layout.Footer>
+    <div>Copyright &copy;2024 BegCode</div>
+  </a-layout-footer>
 </template>
 
 <script lang="ts" setup>
-import { computed, unref, ref } from 'vue';
-import { Layout } from 'ant-design-vue';
-
-import { GithubFilled } from '@ant-design/icons-vue';
-
 import { DOC_URL, GITHUB_URL, SITE_URL } from '@/settings/siteSetting';
-import { openWindow } from '@begcode/components';
-
+import { openWindow } from '@/utils/util';
 import { useI18n } from '@/hooks/web/useI18n';
 import { useRootSetting } from '@/hooks/setting/useRootSetting';
 import { useRouter } from 'vue-router';
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 import { useLayoutHeight } from '../content/useContentViewHeight';
 import { ThemeEnum } from '@/enums/appEnum';
 

@@ -18,8 +18,6 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, unref } from 'vue';
-
 import FrameLayout from '@/layouts/iframe/index.vue';
 
 import { useRootSetting } from '@/hooks/setting/useRootSetting';

@@ -4,6 +4,7 @@
     "changelogDate": "20240101061806",
     "moduleName": "system",
     "skipFakeData": true,
+    "skipMobile": true,
     "skipWebsite": true
   },
   "applications": "*",

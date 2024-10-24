@@ -1,6 +1,6 @@
 <template>
   <BasicMenuItem v-if="!menuHasChildren(item) && getShowMenu" v-bind="$props" />
-  <Menu.SubMenu v-if="menuHasChildren(item) && getShowMenu" :class="[theme]" :key="`submenu-${item.path}`" :popupClassName="prefixCls">
+  <a-menu-sub-menu v-if="menuHasChildren(item) && getShowMenu" :class="[theme]" :key="`submenu-${item.path}`" :popupClassName="prefixCls">
     <template #title>
       <MenuItemContent v-bind="$props" :item="item" />
     </template>
@@ -8,13 +8,11 @@
     <template v-for="childrenItem in item.children || []" :key="childrenItem.path">
       <BasicSubMenuItem v-bind="$props" :item="childrenItem" />
     </template>
-  </Menu.SubMenu>
+  </a-menu-sub-menu>
 </template>
 <script lang="ts" setup>
 import type { Menu as MenuType } from '@/router/types';
-import { computed, watch } from 'vue';
-import { Menu } from 'ant-design-vue';
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 import { checkChildrenHidden } from '@/utils/common/compUtils';
 import { itemProps } from '../props';
 import BasicMenuItem from './BasicMenuItem.vue';

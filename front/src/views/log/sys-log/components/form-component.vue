@@ -1,12 +1,10 @@
 <template>
   <div :class="containerType === 'page' ? ['pb-44px'] : []">
-    <BasicForm ref="formRef" v-bind="formProps"></BasicForm>
+    <BasicForm ref="formRef" v-bind="formProps" />
   </div>
 </template>
 <script lang="ts" setup>
-import { getCurrentInstance, reactive, computed, h, ref, watch } from 'vue';
 import { message } from 'ant-design-vue';
-import { BasicForm } from '@begcode/components';
 import config from '../config/edit-config';
 import { SysLog, ISysLog } from '@/models/log/sys-log.model';
 import ServerProvider from '@/api-service/index';
@@ -35,24 +33,26 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+
+const emit = defineEmits(['cancel', 'update-save-button']);
+
 const ctx = getCurrentInstance()?.proxy;
 const formRef = ref<any>(null);
 const apiService = ctx?.$apiService as typeof ServerProvider;
+const sysLogId = ref<any>(null);
 const sysLog = reactive<ISysLog>(new SysLog());
-watch(
-  () => props.entityId,
-  async val => {
-    if (val) {
-      const data = await apiService.log.sysLogService.find(Number(val)).catch(() => null);
-      if (data) {
-        Object.assign(sysLog, data);
-      }
-    } else {
-      Object.assign(sysLog, props.baseData);
+const getEntityData = async (entityId: string | number) => {
+  if (entityId) {
+    sysLogId.value = entityId;
+    const data = await apiService.log.sysLogService.find(Number(entityId)).catch(() => null);
+    if (data) {
+      Object.assign(sysLog, data);
     }
-  },
-  { immediate: true },
-);
+  } else {
+    Object.assign(sysLog, props.baseData);
+  }
+};
+watch(() => props.entityId, getEntityData, { immediate: true });
 const formItemsConfig = config.fields();
 
 const isEdit = computed(() => {
@@ -61,10 +61,16 @@ const isEdit = computed(() => {
 
 const submitButtonTitlePrefix = props.entityId ? '更新' : '保存';
 const saveOrUpdateApi = props.entityId ? apiService.log.sysLogService.update : apiService.log.sysLogService.create;
-const submit = async () => {
-  const result = await validate().catch(() => ({ success: false, data: {} }));
+const submit = async (config = { submitToServer: true }) => {
+  const result = await validate().catch(err => {
+    console.log('validate.error:', err);
+    return { success: false, data: {} };
+  });
   if (result.success) {
     Object.assign(sysLog, result.data);
+    if (!config.submitToServer) {
+      return sysLog;
+    }
     const saveData = await saveOrUpdateApi(sysLog).catch(() => false);
     if (saveData) {
       Object.assign(sysLog, saveData);
@@ -85,7 +91,7 @@ const validate = async () => {
     data: {},
     errors: [] as any[],
   };
-  const formValidResult = await formRef.value.validate();
+  const formValidResult = await formRef.value?.validate();
   if (!formValidResult) {
     result.success = false;
     result.errors.push('表单校验未通过！');
@@ -129,7 +135,7 @@ const formProps = reactive({
     preIcon: null,
   },
   resetFunc: () => {
-    ctx?.$emit('cancel', { update: false, containerType: props.containerType });
+    emit('cancel', { update: false, containerType: props.containerType });
   },
   submitFunc: submit,
 });

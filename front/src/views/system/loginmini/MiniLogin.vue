@@ -36,35 +36,35 @@
                   </div>
                 </div>
                 <div class="aui-form-box" style="height: 180px">
-                  <Form ref="loginRef" :model="formData" v-if="activeIndex === 'accountLogin'" @keyup.enter.native="loginHandleClick">
+                  <a-form ref="loginRef" :model="formData" v-if="activeIndex === 'accountLogin'" @keyup.enter.native="loginHandleClick">
                     <div class="aui-account">
                       <div class="aui-inputClear">
                         <i class="icon icon-code"></i>
-                        <FormItem>
-                          <Input class="fix-auto-fill" :placeholder="t('sys.login.userName')" v-model:value="formData.username" />
-                        </FormItem>
+                        <a-form-item>
+                          <a-input class="fix-auto-fill" :placeholder="t('sys.login.userName')" v-model:value="formData.username" />
+                        </a-form-item>
                       </div>
                       <div class="aui-inputClear">
                         <i class="icon icon-password"></i>
-                        <FormItem>
-                          <Input
+                        <a-form-item>
+                          <a-input
                             class="fix-auto-fill"
                             type="password"
                             :placeholder="t('sys.login.password')"
                             v-model:value="formData.password"
                           />
-                        </FormItem>
+                        </a-form-item>
                       </div>
                       <div class="aui-inputClear">
                         <i class="icon icon-code"></i>
-                        <FormItem>
-                          <Input
+                        <a-form-item>
+                          <a-input
                             class="fix-auto-fill"
                             type="text"
                             :placeholder="t('sys.login.inputCode')"
                             v-model:value="formData.inputCode"
                           />
-                        </FormItem>
+                        </a-form-item>
                         <div class="aui-code">
                           <img v-if="randCodeData.requestCodeSuccess" :src="randCodeData.randCodeImage" @click="handleChangeCheckCode" />
                           <img v-else style="margin-top: 2px; max-width: initial" :src="codeImg" @click="handleChangeCheckCode" />
@@ -73,7 +73,7 @@
                       <div class="aui-flex">
                         <div class="aui-flex-box">
                           <div class="aui-choice">
-                            <Input class="fix-auto-fill" type="checkbox" v-model:value="rememberMe" />
+                            <a-input class="fix-auto-fill" type="checkbox" v-model:value="rememberMe" />
                             <span style="margin-left: 5px">{{ t('sys.login.rememberMe') }}</span>
                           </div>
                         </div>
@@ -82,14 +82,14 @@
                         </div>
                       </div>
                     </div>
-                  </Form>
-                  <Form v-else ref="phoneFormRef" :model="phoneFormData" @keyup.enter.native="loginHandleClick">
+                  </a-form>
+                  <a-form v-else ref="phoneFormRef" :model="phoneFormData" @keyup.enter.native="loginHandleClick">
                     <div class="aui-account phone">
                       <div class="aui-inputClear phoneClear">
-                        <Input class="fix-auto-fill" :placeholder="t('sys.login.mobile')" v-model:value="phoneFormData.mobile" />
+                        <a-input class="fix-auto-fill" :placeholder="t('sys.login.mobile')" v-model:value="phoneFormData.mobile" />
                       </div>
                       <div class="aui-inputClear">
-                        <Input
+                        <a-input
                           class="fix-auto-fill"
                           :maxlength="6"
                           :placeholder="t('sys.login.smsCode')"
@@ -103,12 +103,12 @@
                         </div>
                       </div>
                     </div>
-                  </Form>
+                  </a-form>
                 </div>
                 <div class="aui-formButton">
                   <div class="aui-flex">
-                    <Button :loading="loginLoading" class="aui-link-login" type="primary" @click="loginHandleClick">
-                      {{ t('sys.login.loginButton') }}</Button
+                    <a-button :loading="loginLoading" class="aui-link-login" type="primary" @click="loginHandleClick">
+                      {{ t('sys.login.loginButton') }}</a-button
                     >
                   </div>
                   <div class="aui-flex">
@@ -119,7 +119,7 @@
                   </div>
                 </div>
               </div>
-              <Form @keyup.enter.native="loginHandleClick">
+              <a-form @keyup.enter.native="loginHandleClick">
                 <div class="aui-flex aui-third-text">
                   <div class="aui-flex-box aui-third-border">
                     <span>{{ t('sys.login.otherSignIn') }}</span>
@@ -149,7 +149,7 @@
                     </div>
                   </div>
                 </div>
-              </Form>
+              </a-form>
             </div>
           </div>
         </div>
@@ -171,8 +171,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { onMounted, reactive, ref, toRaw, unref } from 'vue';
-import { Form, FormItem, Button, Input } from 'ant-design-vue';
 import { getImageCaptcha, getCodeInfo } from '@/api-service/sys/user';
 import codeImg from '@/assets/images/checkcode.png';
 import { useUserStore } from '@/store/modules/user';
@@ -187,7 +185,10 @@ import MiniCodelogin from './MiniCodelogin.vue';
 import logoImg from '@/assets/loginmini/icon/jeecg_logo.png';
 import adTextImg from '@/assets/loginmini/icon/jeecg_ad_text.png';
 import { AppLocalePicker, AppDarkModeToggle } from '@/components/Application';
-import { useDesign, useAppInject, useModal, CaptchaModal } from '@begcode/components';
+import { useAppInject } from '@/hooks/useAppInject';
+import { useModal } from '@/components/Modal';
+import { CaptchaModal } from '@/components/Captcha';
+import { useDesign } from '@/hooks/web/useDesign';
 import { GithubFilled, WechatFilled, DingtalkCircleFilled, createFromIconfontCN } from '@ant-design/icons-vue';
 import { ExceptionEnum } from '@/enums/exceptionEnum';
 

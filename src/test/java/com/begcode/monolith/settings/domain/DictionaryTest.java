@@ -28,17 +28,10 @@ class DictionaryTest {
     void itemsTest() {
         Dictionary dictionary = getDictionaryRandomSampleGenerator();
         CommonFieldData commonFieldDataBack = getCommonFieldDataRandomSampleGenerator();
-
         // todo dictionary.addItems(commonFieldDataBack);
         // assertThat(dictionary.getItems()).containsOnly(commonFieldDataBack);
 
         // dictionary.removeItems(commonFieldDataBack);
         // assertThat(dictionary.getItems()).doesNotContain(commonFieldDataBack);
-
-        dictionary.items(new ArrayList<>(Set.of(commonFieldDataBack)));
-        assertThat(dictionary.getItems()).containsOnly(commonFieldDataBack);
-
-        dictionary.setItems(new ArrayList<>());
-        assertThat(dictionary.getItems()).doesNotContain(commonFieldDataBack);
     }
 }

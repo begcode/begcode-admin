@@ -1,17 +1,15 @@
 <template>
-  <Card title="快捷导航">
+  <a-card title="快捷导航">
     <template v-for="item in navItems" :key="item.title">
-      <CardGrid>
+      <a-card-grid>
         <span class="flex flex-col items-center">
           <Icon :icon="item.icon" :color="item.color" size="20" />
           <span class="text-md mt-2 truncate">{{ item.title }}</span>
         </span>
-      </CardGrid>
+      </a-card-grid>
     </template>
-  </Card>
+  </a-card>
 </template>
 <script lang="ts" setup>
-import { Card, CardGrid } from 'ant-design-vue';
 import { navItems } from './data';
-import { Icon } from '@begcode/components';
 </script>

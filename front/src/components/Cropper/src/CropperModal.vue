@@ -15,58 +15,64 @@
         </div>
 
         <div :class="`${prefixCls}-toolbar`">
-          <Upload :fileList="[]" accept="image/*" :beforeUpload="handleBeforeUpload">
-            <Tooltip :title="t('component.cropper.selectImage')" placement="bottom">
-              <Button size="small" preIcon="ant-design:upload-outlined" type="primary" />
-            </Tooltip>
-          </Upload>
-          <Space>
-            <Tooltip :title="t('component.cropper.btn_reset')" placement="bottom">
-              <Button type="primary" preIcon="ant-design:reload-outlined" size="small" :disabled="!src" @click="handlerToolbar('reset')" />
-            </Tooltip>
-            <Tooltip :title="t('component.cropper.btn_rotate_left')" placement="bottom">
-              <Button
+          <a-upload :fileList="[]" accept="image/*" :beforeUpload="handleBeforeUpload">
+            <a-tooltip :title="t('component.cropper.selectImage')" placement="bottom">
+              <BasicButton size="small" preIcon="ant-design:upload-outlined" type="primary" />
+            </a-tooltip>
+          </a-upload>
+          <a-space>
+            <a-tooltip :title="t('component.cropper.btn_reset')" placement="bottom">
+              <BasicButton
+                type="primary"
+                preIcon="ant-design:reload-outlined"
+                size="small"
+                :disabled="!src"
+                @click="handlerToolbar('reset')"
+              />
+            </a-tooltip>
+            <a-tooltip :title="t('component.cropper.btn_rotate_left')" placement="bottom">
+              <BasicButton
                 type="primary"
                 preIcon="ant-design:rotate-left-outlined"
                 size="small"
                 :disabled="!src"
                 @click="handlerToolbar('rotate', -45)"
               />
-            </Tooltip>
-            <Tooltip :title="t('component.cropper.btn_rotate_right')" placement="bottom">
-              <Button
+            </a-tooltip>
+            <a-tooltip :title="t('component.cropper.btn_rotate_right')" placement="bottom">
+              <BasicButton
                 type="primary"
                 preIcon="ant-design:rotate-right-outlined"
                 size="small"
                 :disabled="!src"
                 @click="handlerToolbar('rotate', 45)"
               />
-            </Tooltip>
-            <Tooltip :title="t('component.cropper.btn_scale_x')" placement="bottom">
-              <Button type="primary" preIcon="vaadin:arrows-long-h" size="small" :disabled="!src" @click="handlerToolbar('scaleX')" />
-            </Tooltip>
-            <Tooltip :title="t('component.cropper.btn_scale_y')" placement="bottom">
-              <Button type="primary" preIcon="vaadin:arrows-long-v" size="small" :disabled="!src" @click="handlerToolbar('scaleY')" />
-            </Tooltip>
-            <Tooltip :title="t('component.cropper.btn_zoom_in')" placement="bottom">
-              <Button
+            </a-tooltip>
+            <a-tooltip :title="t('component.cropper.btn_scale_x')" placement="bottom">
+              <BasicButton type="primary" preIcon="vaadin:arrows-long-h" size="small" :disabled="!src" @click="handlerToolbar('scaleX')" />
+            </a-tooltip>
+            <a-tooltip :title="t('component.cropper.btn_scale_y')" placement="bottom">
+              <BasicButton type="primary" preIcon="vaadin:arrows-long-v" size="small" :disabled="!src" @click="handlerToolbar('scaleY')" />
+            </a-tooltip>
+            <a-tooltip :title="t('component.cropper.btn_zoom_in')" placement="bottom">
+              <BasicButton
                 type="primary"
                 preIcon="ant-design:zoom-in-outlined"
                 size="small"
                 :disabled="!src"
                 @click="handlerToolbar('zoom', 0.1)"
               />
-            </Tooltip>
-            <Tooltip :title="t('component.cropper.btn_zoom_out')" placement="bottom">
-              <Button
+            </a-tooltip>
+            <a-tooltip :title="t('component.cropper.btn_zoom_out')" placement="bottom">
+              <BasicButton
                 type="primary"
                 preIcon="ant-design:zoom-out-outlined"
                 size="small"
                 :disabled="!src"
                 @click="handlerToolbar('zoom', -0.1)"
               />
-            </Tooltip>
-          </Space>
+            </a-tooltip>
+          </a-space>
         </div>
       </div>
       <div :class="`${prefixCls}-right`">
@@ -75,10 +81,10 @@
         </div>
         <template v-if="previewSource">
           <div :class="`${prefixCls}-group`">
-            <Avatar :src="previewSource" size="large" />
-            <Avatar :src="previewSource" :size="48" />
-            <Avatar :src="previewSource" :size="64" />
-            <Avatar :src="previewSource" :size="80" />
+            <a-avatar :src="previewSource" size="large" />
+            <a-avatar :src="previewSource" :size="48" />
+            <a-avatar :src="previewSource" :size="64" />
+            <a-avatar :src="previewSource" :size="80" />
           </div>
         </template>
       </div>
@@ -88,12 +94,10 @@
 <script lang="ts" setup>
 import type { CropendResult, Cropper } from './typing';
 
-import { ref, PropType } from 'vue';
 import CropperImage from './Cropper.vue';
-import { Space, Upload, Avatar, Tooltip } from 'ant-design-vue';
-import { useDesign } from '@begcode/components';
-import { BasicModal, useModalInner, dataURLtoBlob, Button } from '@begcode/components';
-import { isFunction } from 'lodash-es';
+import { useDesign } from '@/hooks/web/useDesign';
+import { BasicModal, useModalInner } from '@/components/Modal';
+import { dataURLtoBlob } from '@/utils/file/base64Conver';
 import { useI18n } from '@/hooks/web/useI18n';
 
 type apiFunParams = { file: Blob; name: string; filename: string };
@@ -166,7 +170,7 @@ function handlerToolbar(event: string, arg?: number) {
 
 async function handleOk() {
   const uploadApi = props.uploadApi;
-  if (uploadApi && isFunction(uploadApi)) {
+  if (uploadApi && _isFunction(uploadApi)) {
     const blob = dataURLtoBlob(previewSource.value);
     try {
       setModalProps({ confirmLoading: true });

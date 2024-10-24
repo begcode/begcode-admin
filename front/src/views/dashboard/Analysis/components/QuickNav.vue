@@ -1,21 +1,18 @@
 <template>
-  <Card title="快捷导航" v-bind="$attrs">
+  <a-card title="快捷导航" v-bind="$attrs">
     <template v-for="item in navItems" :key="item">
-      <CardGrid @click="goPage">
+      <a-card-grid @click="goPage">
         <span class="flex flex-col items-center">
           <Icon :icon="item.icon" :color="item.color" size="20" />
           <span class="text-md mt-2">{{ item.title }}</span>
         </span>
-      </CardGrid>
+      </a-card-grid>
     </template>
-  </Card>
+  </a-card>
 </template>
 <script lang="ts" setup>
-import { Card } from 'ant-design-vue';
 import { useMessage } from '@/hooks/web/useMessage';
-import { Icon } from '@begcode/components';
 
-const CardGrid = Card.Grid;
 const $message = useMessage();
 const navItems = [
   {

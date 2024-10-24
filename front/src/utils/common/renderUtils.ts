@@ -1,6 +1,5 @@
-import { h } from 'vue';
 import { Avatar, Tag, Tooltip, Image } from 'ant-design-vue';
-import { getFileAccessHttpUrl } from '@begcode/components';
+import { getFileAccessHttpUrl } from '@/utils/util';
 import { Tinymce } from '@/components/Tinymce';
 import Icon from '@/components/Icon/Icon.vue';
 import { getDictItemsByCode } from '@/utils/dict/index';

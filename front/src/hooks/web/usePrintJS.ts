@@ -1,4 +1,3 @@
-import { nextTick } from 'vue';
 import $printJS, { Configuration } from 'print-js';
 import Print from 'vue-print-nb-jeecg/src/printarea';
 

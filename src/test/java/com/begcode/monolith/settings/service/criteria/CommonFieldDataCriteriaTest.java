@@ -84,8 +84,6 @@ class CommonFieldDataCriteriaTest {
         commonFieldDataCriteria.disabled();
         commonFieldDataCriteria.ownerEntityName();
         commonFieldDataCriteria.ownerEntityId();
-        commonFieldDataCriteria.siteConfigId();
-        commonFieldDataCriteria.dictionaryId();
         commonFieldDataCriteria.distinct();
     }
 
@@ -102,8 +100,6 @@ class CommonFieldDataCriteriaTest {
                 condition.apply(criteria.getDisabled()) &&
                 condition.apply(criteria.getOwnerEntityName()) &&
                 condition.apply(criteria.getOwnerEntityId()) &&
-                condition.apply(criteria.getSiteConfigId()) &&
-                condition.apply(criteria.getDictionaryId()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
         );
@@ -125,8 +121,6 @@ class CommonFieldDataCriteriaTest {
                 condition.apply(criteria.getDisabled(), copy.getDisabled()) &&
                 condition.apply(criteria.getOwnerEntityName(), copy.getOwnerEntityName()) &&
                 condition.apply(criteria.getOwnerEntityId(), copy.getOwnerEntityId()) &&
-                condition.apply(criteria.getSiteConfigId(), copy.getSiteConfigId()) &&
-                condition.apply(criteria.getDictionaryId(), copy.getDictionaryId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"
         );

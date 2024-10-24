@@ -2,23 +2,20 @@
   <BasicModal :title="t('layout.header.dropdownChangeApi')" v-bind="$attrs" @register="register" @ok="handelSubmit" @cancel="handelCancel">
     <BasicForm @register="registerForm">
       <template #api="{ model, field }">
-        <RadioGroup v-model:value="model[field]">
-          <Radio :style="radioStyle" :value="key" v-for="(val, key) in addresses" :key="key">{{ key }}: {{ val }}</Radio>
-        </RadioGroup>
+        <a-radio-group v-model:value="model[field]">
+          <a-radio :style="radioStyle" :value="key" v-for="(val, key) in addresses" :key="key">{{ key }}: {{ val }}</a-radio>
+        </a-radio-group>
       </template>
     </BasicForm>
   </BasicModal>
 </template>
 <script lang="ts" setup>
-import { Radio } from 'ant-design-vue';
 import { useI18n } from '@/hooks/web/useI18n';
-import { BasicModal, useModalInner } from '@begcode/components';
-import { BasicForm, useForm } from '@begcode/components';
-import { ref } from 'vue';
+import { BasicModal, useModalInner } from '@/components/Modal';
+import { BasicForm, useForm } from '@/components/Form';
 import { useAppStore } from '@/store/modules/app';
 import type { ApiAddress } from '#/store';
 const appStore = useAppStore();
-const RadioGroup = Radio.Group;
 const { t } = useI18n();
 const [register, { closeModal }] = useModalInner(async () => {
   initData();

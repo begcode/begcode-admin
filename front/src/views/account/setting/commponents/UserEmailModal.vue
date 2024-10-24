@@ -1,20 +1,20 @@
 <template>
   <BasicModal v-bind="$attrs" @register="registerModal" width="500px" :title="title" :showCancelBtn="false" :showOkBtn="false">
-    <Form class="antd-modal-form" ref="formRef" :model="formState" :rules="validatorRules">
-      <FormItem name="email">
-        <Input size="large" v-model:value="formState.email" placeholder="请输入邮箱" />
-      </FormItem>
-      <FormItem>
-        <Button size="large" type="primary" block @click="updateEmail"> 确认 </Button>
-      </FormItem>
-    </Form>
+    <a-form class="antd-modal-form" ref="formRef" :model="formState" :rules="validatorRules">
+      <a-form-item name="email">
+        <a-input size="large" v-model:value="formState.email" placeholder="请输入邮箱" />
+      </a-form-item>
+      <a-form-item>
+        <a-button size="large" type="primary" block @click="updateEmail"> 确认 </a-button>
+      </a-form-item>
+    </a-form>
   </BasicModal>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
-import { Form, FormItem, Input, Button } from 'ant-design-vue';
-import { BasicModal, useModalInner, Rule } from '@begcode/components';
+import { Form } from 'ant-design-vue';
+import { BasicModal, useModalInner } from '@/components/Modal';
+import type { Rule } from '@/components/Form';
 import { useUserStore } from '@/store/modules/user';
 import { useMessage } from '@/hooks/web/useMessage';
 import { getSmsCaptcha } from '@/api-service/sys/user';

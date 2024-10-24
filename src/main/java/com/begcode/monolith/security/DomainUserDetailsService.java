@@ -3,6 +3,7 @@ package com.begcode.monolith.security;
 import com.begcode.monolith.domain.Authority;
 import com.begcode.monolith.domain.User;
 import com.begcode.monolith.repository.UserRepository;
+import com.begcode.monolith.util.MobileNumberValidator;
 import com.diboot.core.binding.Binder;
 import java.util.*;
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
@@ -35,13 +36,25 @@ public class DomainUserDetailsService implements UserDetailsService {
         log.debug("Authenticating {}", login);
 
         if (new EmailValidator().isValid(login, null)) {
-            this.userRepository.findOneByEmailIgnoreCase(login)
+            return this.userRepository.findOneByEmailIgnoreCase(login)
                 .map(user -> {
                     Binder.bindRelations(user);
                     return user;
                 })
                 .map(user -> createSpringSecurityUser(login, user))
                 .orElseThrow(() -> new UsernameNotFoundException("User with email " + login + " was not found in the database"));
+        }
+        if (MobileNumberValidator.isValidChinaMobileNumber(login)) {
+            Optional<UserDetails> result =
+                this.userRepository.findByMobile(login)
+                    .map(user -> {
+                        Binder.bindRelations(user);
+                        return user;
+                    })
+                    .map(user -> createSpringSecurityUser(user.getLogin(), user));
+            if (result.isPresent()) {
+                return result.get();
+            }
         }
 
         String lowercaseLogin = login.toLowerCase(Locale.ENGLISH);

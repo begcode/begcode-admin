@@ -86,6 +86,7 @@ public class UserResource {
     );
 
     private static final Logger log = LoggerFactory.getLogger(UserResource.class);
+    private static final String ENTITY_NAME = "systemUser";
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
@@ -277,6 +278,52 @@ public class UserResource {
         log.debug("REST request to delete User: {}", login);
         userService.deleteUser(login);
         return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, "userManagement.deleted", login)).build();
+    }
+
+    /**
+     * {@code PUT  /users/id/:id} : Updates an existing user.
+     *
+     * @param id the id of the userDTO to save.
+     * @param userDTO the userDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated userDTO,
+     * or with status {@code 400 (Bad Request)} if the userDTO is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the userDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PutMapping("/users/id/{id}")
+    @Operation(tags = "更新用户", description = "根据主键更新并返回一个更新后的用户")
+    @AutoLog(value = "更新用户", logType = LogType.OPERATE, operateType = OperateType.EDIT)
+    public ResponseEntity<UserDTO> updateUser(
+        @PathVariable(value = "id", required = false) final Long id,
+        @Valid @RequestBody UserDTO userDTO,
+        @RequestParam(value = "batchIds", required = false) ArrayList<Long> batchIds,
+        @RequestParam(value = "batchFields", required = false) ArrayList<String> batchFields
+    ) {
+        log.debug("REST request to update User : {}, {}", id, userDTO);
+        if (userDTO.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(id, userDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (userRepository.findById(id).isEmpty()) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        if (CollectionUtils.isNotEmpty(batchFields) && CollectionUtils.isNotEmpty(batchIds)) {
+            batchIds = new ArrayList<>(batchIds);
+            if (!batchIds.contains(id)) {
+                batchIds.add(id);
+            }
+            userService.updateBatch(userDTO, batchFields, batchIds);
+            userDTO = userService.findOne(id).orElseThrow();
+        } else {
+            userDTO = userService.update(userDTO);
+        }
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, userDTO.getId().toString()))
+            .body(userDTO);
     }
 
     /**

@@ -1,33 +1,33 @@
 <template>
   <LoginFormTitle v-show="getShow" class="enter-x" />
-  <Form class="p-4 enter-x" :model="formData" :rules="getFormRules" ref="formRef" v-show="getShow" @keypress.enter="handleLogin">
-    <FormItem name="account" class="enter-x">
-      <Input
+  <a-form class="p-4 enter-x" :model="formData" :rules="getFormRules" ref="formRef" v-show="getShow" @keypress.enter="handleLogin">
+    <a-form-item name="account" class="enter-x">
+      <a-input
         size="large"
         v-model:value="formData.account"
         :placeholder="t('sys.login.userName')"
         class="fix-auto-fill"
         data-cy="username"
       />
-    </FormItem>
-    <FormItem name="password" class="enter-x">
-      <InputPassword
+    </a-form-item>
+    <a-form-item name="password" class="enter-x">
+      <a-input-password
         size="large"
         visibilityToggle
         v-model:value="formData.password"
         :placeholder="t('sys.login.password')"
         data-cy="password"
       />
-    </FormItem>
+    </a-form-item>
     <!--验证码-->
-    <ARow class="enter-x">
-      <ACol :span="12">
-        <FormItem name="inputCode" class="enter-x">
-          <Input size="large" v-model:value="formData.inputCode" :placeholder="t('sys.login.inputCode')" style="min-width: 100px" />
-        </FormItem>
-      </ACol>
-      <ACol :span="8">
-        <FormItem :style="{ 'text-align': 'right', 'margin-left': '20px' }" class="enter-x">
+    <a-row class="enter-x">
+      <a-col :span="12">
+        <a-form-item name="inputCode" class="enter-x">
+          <a-input size="large" v-model:value="formData.inputCode" :placeholder="t('sys.login.inputCode')" style="min-width: 100px" />
+        </a-form-item>
+      </a-col>
+      <a-col :span="8">
+        <a-form-item :style="{ 'text-align': 'right', 'margin-left': '20px' }" class="enter-x">
           <img
             v-if="randCodeData.requestCodeSuccess"
             style="margin-top: 2px; max-width: initial"
@@ -35,55 +35,55 @@
             @click="handleChangeCheckCode"
           />
           <img v-else style="margin-top: 2px; max-width: initial" :src="checkcodePng" @click="handleChangeCheckCode" />
-        </FormItem>
-      </ACol>
-    </ARow>
-    <ARow class="enter-x">
-      <ACol :span="12">
-        <FormItem>
+        </a-form-item>
+      </a-col>
+    </a-row>
+    <a-row class="enter-x">
+      <a-col :span="12">
+        <a-form-item>
           <!-- No logic, you need to deal with it yourself -->
-          <Checkbox v-model:checked="rememberMe" size="small">
+          <a-checkbox v-model:checked="rememberMe" size="small">
             {{ t('sys.login.rememberMe') }}
-          </Checkbox>
-        </FormItem>
-      </ACol>
-      <ACol :span="12">
-        <FormItem :style="{ 'text-align': 'right' }">
+          </a-checkbox>
+        </a-form-item>
+      </a-col>
+      <a-col :span="12">
+        <a-form-item :style="{ 'text-align': 'right' }">
           <!-- No logic, you need to deal with it yourself -->
-          <Button type="link" size="small" @click="setLoginState(LoginStateEnum.RESET_PASSWORD)">
+          <a-button type="link" size="small" @click="setLoginState(LoginStateEnum.RESET_PASSWORD)">
             {{ t('sys.login.forgetPassword') }}
-          </Button>
-        </FormItem>
-      </ACol>
-    </ARow>
+          </a-button>
+        </a-form-item>
+      </a-col>
+    </a-row>
 
-    <FormItem class="enter-x">
-      <Button type="primary" size="large" block @click="handleLogin" :loading="loading" data-cy="submit">
+    <a-form-item class="enter-x">
+      <a-button type="primary" size="large" block @click="handleLogin" :loading="loading" data-cy="submit">
         {{ t('sys.login.loginButton') }}
-      </Button>
-      <!-- <Button size="large" class="mt-4 enter-x" block @click="handleRegister">
+      </a-button>
+      <!-- <a-button size="large" class="mt-4 enter-x" block @click="handleRegister">
         {{ t('sys.login.registerButton') }}
-      </Button> -->
-    </FormItem>
-    <ARow class="enter-x" :gutter="[16, 16]">
-      <ACol :md="8" :xs="24">
-        <Button block @click="setLoginState(LoginStateEnum.MOBILE)">
+      </a-button> -->
+    </a-form-item>
+    <a-row class="enter-x" :gutter="[16, 16]">
+      <a-col :md="8" :xs="24">
+        <a-button block @click="setLoginState(LoginStateEnum.MOBILE)">
           {{ t('sys.login.mobileSignInFormTitle') }}
-        </Button>
-      </ACol>
-      <ACol :md="8" :xs="24">
-        <Button block @click="setLoginState(LoginStateEnum.QR_CODE)">
+        </a-button>
+      </a-col>
+      <a-col :md="8" :xs="24">
+        <a-button block @click="setLoginState(LoginStateEnum.QR_CODE)">
           {{ t('sys.login.qrSignInFormTitle') }}
-        </Button>
-      </ACol>
-      <ACol :md="8" :xs="24">
-        <Button block @click="setLoginState(LoginStateEnum.REGISTER)">
+        </a-button>
+      </a-col>
+      <a-col :md="8" :xs="24">
+        <a-button block @click="setLoginState(LoginStateEnum.REGISTER)">
           {{ t('sys.login.registerButton') }}
-        </Button>
-      </ACol>
-    </ARow>
+        </a-button>
+      </a-col>
+    </a-row>
 
-    <Divider class="enter-x">{{ t('sys.login.otherSignIn') }}</Divider>
+    <a-divider class="enter-x">{{ t('sys.login.otherSignIn') }}</a-divider>
 
     <div class="flex justify-evenly enter-x" :class="`${prefixCls}-sign-in-way`">
       <a @click="onThirdLogin('github')" title="github"><GithubFilled /></a>
@@ -91,14 +91,11 @@
       <a @click="onThirdLogin('dingtalk')" title="钉钉"><DingtalkCircleFilled /></a>
       <a @click="onThirdLogin('wechat_open')" title="微信"><WechatFilled /></a>
     </div>
-  </Form>
+  </a-form>
   <!-- 第三方登录相关弹框 -->
   <ThirdModal ref="thirdModalRef"></ThirdModal>
 </template>
 <script lang="ts" setup>
-import { reactive, ref, toRaw, unref, computed, onMounted } from 'vue';
-
-import { Checkbox, Form, Input, Row, Col, Button, Divider } from 'ant-design-vue';
 import { GithubFilled, WechatFilled, DingtalkCircleFilled, createFromIconfontCN } from '@ant-design/icons-vue';
 import LoginFormTitle from './LoginFormTitle.vue';
 import ThirdModal from './ThirdModal.vue';
@@ -108,17 +105,13 @@ import { useMessage } from '@/hooks/web/useMessage';
 
 import { useUserStore } from '@/store/modules/user';
 import { LoginStateEnum, useLoginState, useFormRules, useFormValid } from './useLogin';
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 import { getCodeInfo } from '@/api-service/sys/user';
 import checkcodePng from '@/assets/images/checkcode.png';
 //import { onKeyStroke } from '@vueuse/core';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
-const ACol = Col;
-const ARow = Row;
-const FormItem = Form.Item;
-const InputPassword = Input.Password;
 const IconFont = createFromIconfontCN({
   scriptUrl: '//at.alicdn.com/t/font_2316098_umqusozousr.js',
 });

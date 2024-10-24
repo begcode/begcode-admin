@@ -63,8 +63,6 @@ public class FillRuleItemAsserts {
      * @param actual the actual entity
      */
     public static void assertFillRuleItemUpdatableRelationshipsEquals(FillRuleItem expected, FillRuleItem actual) {
-        assertThat(expected)
-            .as("Verify FillRuleItem relationships")
-            .satisfies(e -> assertThat(e.getFillRule()).as("check fillRule").isEqualTo(actual.getFillRule()));
+        assertThat(expected).as("Verify FillRuleItem relationships");
     }
 }

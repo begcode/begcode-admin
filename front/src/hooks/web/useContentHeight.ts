@@ -1,6 +1,5 @@
-import { ComputedRef, isRef, nextTick, Ref, ref, unref, watch } from 'vue';
-import { onMountedOrActivated, useWindowSizeFn, getViewportOffset } from '@begcode/components';
-import { isNumber, isString } from 'lodash-es';
+import { getViewportOffset } from '@/utils/domUtils';
+import { onMountedOrActivated, useWindowSizeFn } from '@/hooks/vben';
 import { useLayoutHeight } from '@/layouts/default/content/useContentViewHeight';
 
 export interface CompensationHeight {
@@ -114,14 +113,14 @@ export function useContentHeight(
       if (element && upwardLvlOrClass) {
         const parent = element.parentElement;
         if (parent) {
-          if (isString(upwardLvlOrClass)) {
+          if (_isString(upwardLvlOrClass)) {
             if (!parent.classList.contains(upwardLvlOrClass)) {
               upwardSpaceHeight += calcSubtractSpace(parent, 'bottom');
               upward(parent, upwardLvlOrClass);
             } else {
               upwardSpaceHeight += calcSubtractSpace(parent, 'bottom');
             }
-          } else if (isNumber(upwardLvlOrClass)) {
+          } else if (_isNumber(upwardLvlOrClass)) {
             if (upwardLvlOrClass > 0) {
               upwardSpaceHeight += calcSubtractSpace(parent, 'bottom');
               upward(parent, --upwardLvlOrClass);

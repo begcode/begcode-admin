@@ -7,6 +7,7 @@
     "importDataFile": "jhi_authority-rel_jhi_authority__view_permissions",
     "moduleName": "system",
     "skipFakeData": true,
+    "skipMobile": true,
     "skipWebsite": true
   },
   "applications": "*",
@@ -118,12 +119,12 @@
     {
       "documentation": "用户列表",
       "options": {
-        "annotationOnSource": "importData",
+        "annotationOnSource": "importData-editInList-editBySelectDrawer",
         "destination": {
           "annotationOnDestination": "editInList-editByTableModal"
         },
         "source": {
-          "annotationOnSource": "importData"
+          "annotationOnSource": "importData-editInList-editBySelectDrawer"
         }
       },
       "otherEntityField": "firstName",

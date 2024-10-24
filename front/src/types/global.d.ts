@@ -1,4 +1,3 @@
-import type { ComponentRenderProxy, VNode, ComponentPublicInstance, FunctionalComponent, PropType as VuePropType } from 'vue';
 import apiService from '@/api-service/index';
 
 declare global {

@@ -31,7 +31,6 @@
       "UploadImage",
       "OssConfig",
       "Dictionary",
-      "SiteConfig",
       "CommonFieldData",
       "RegionCode",
       "SysFillRule",
@@ -42,7 +41,9 @@
       "AnnouncementRecord",
       "TaskJobConfig",
       "SysLog",
-      "FormConfig"
+      "FormConfig",
+      "SystemConfig",
+      "FormSaveData"
     ],
     "feignClient": false,
     "frontOrBack": ["front", "back"],

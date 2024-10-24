@@ -1,4 +1,4 @@
-import { ISiteConfig } from '@/models/settings/site-config.model';
+import { ISystemConfig } from '@/models/settings/system-config.model';
 import { IDictionary } from '@/models/settings/dictionary.model';
 
 import { CommonFieldType } from '@/models/enumerations/common-field-type.model';
@@ -13,7 +13,7 @@ export interface ICommonFieldData {
   disabled?: boolean | null; //是否禁用
   ownerEntityName?: string | null; //实体名称
   ownerEntityId?: number | null; //使用实体ID
-  siteConfig?: ISiteConfig | null; //Site Config
+  systemConfig?: ISystemConfig | null; //System Config
   dictionary?: IDictionary | null; //Dictionary
 }
 
@@ -29,7 +29,7 @@ export class CommonFieldData implements ICommonFieldData {
     public disabled?: boolean | null,
     public ownerEntityName?: string | null,
     public ownerEntityId?: number | null,
-    public siteConfig?: ISiteConfig | null,
+    public systemConfig?: ISystemConfig | null,
     public dictionary?: IDictionary | null,
   ) {
     this.disabled = this.disabled ?? false;

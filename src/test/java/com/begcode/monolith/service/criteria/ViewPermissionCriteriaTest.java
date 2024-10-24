@@ -97,7 +97,6 @@ class ViewPermissionCriteriaTest {
         viewPermissionCriteria.redirect();
         viewPermissionCriteria.childrenId();
         viewPermissionCriteria.parentId();
-        viewPermissionCriteria.authoritiesId();
         viewPermissionCriteria.distinct();
     }
 
@@ -127,7 +126,6 @@ class ViewPermissionCriteriaTest {
                 condition.apply(criteria.getRedirect()) &&
                 condition.apply(criteria.getChildrenId()) &&
                 condition.apply(criteria.getParentId()) &&
-                condition.apply(criteria.getAuthoritiesId()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
         );
@@ -162,7 +160,6 @@ class ViewPermissionCriteriaTest {
                 condition.apply(criteria.getRedirect(), copy.getRedirect()) &&
                 condition.apply(criteria.getChildrenId(), copy.getChildrenId()) &&
                 condition.apply(criteria.getParentId(), copy.getParentId()) &&
-                condition.apply(criteria.getAuthoritiesId(), copy.getAuthoritiesId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"
         );

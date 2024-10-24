@@ -1,12 +1,10 @@
 <template>
   <div :class="containerType === 'page' ? ['pb-44px'] : []">
-    <BasicForm ref="formRef" v-bind="formProps"></BasicForm>
+    <BasicForm ref="formRef" v-bind="formProps" />
   </div>
 </template>
 <script lang="ts" setup>
-import { getCurrentInstance, reactive, computed, h, ref, watch } from 'vue';
 import { message } from 'ant-design-vue';
-import { BasicForm } from '@begcode/components';
 import config from '../config/edit-config';
 import { SmsTemplate, ISmsTemplate } from '@/models/files/sms-template.model';
 import ServerProvider from '@/api-service/index';
@@ -35,24 +33,26 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+
+const emit = defineEmits(['cancel', 'update-save-button']);
+
 const ctx = getCurrentInstance()?.proxy;
 const formRef = ref<any>(null);
 const apiService = ctx?.$apiService as typeof ServerProvider;
+const smsTemplateId = ref<any>(null);
 const smsTemplate = reactive<ISmsTemplate>(new SmsTemplate());
-watch(
-  () => props.entityId,
-  async val => {
-    if (val) {
-      const data = await apiService.files.smsTemplateService.find(Number(val)).catch(() => null);
-      if (data) {
-        Object.assign(smsTemplate, data);
-      }
-    } else {
-      Object.assign(smsTemplate, props.baseData);
+const getEntityData = async (entityId: string | number) => {
+  if (entityId) {
+    smsTemplateId.value = entityId;
+    const data = await apiService.files.smsTemplateService.find(Number(entityId)).catch(() => null);
+    if (data) {
+      Object.assign(smsTemplate, data);
     }
-  },
-  { immediate: true },
-);
+  } else {
+    Object.assign(smsTemplate, props.baseData);
+  }
+};
+watch(() => props.entityId, getEntityData, { immediate: true });
 const formItemsConfig = config.fields();
 
 const isEdit = computed(() => {
@@ -61,10 +61,16 @@ const isEdit = computed(() => {
 
 const submitButtonTitlePrefix = props.entityId ? '更新' : '保存';
 const saveOrUpdateApi = props.entityId ? apiService.files.smsTemplateService.update : apiService.files.smsTemplateService.create;
-const submit = async () => {
-  const result = await validate().catch(() => ({ success: false, data: {} }));
+const submit = async (config = { submitToServer: true }) => {
+  const result = await validate().catch(err => {
+    console.log('validate.error:', err);
+    return { success: false, data: {} };
+  });
   if (result.success) {
     Object.assign(smsTemplate, result.data);
+    if (!config.submitToServer) {
+      return smsTemplate;
+    }
     const saveData = await saveOrUpdateApi(smsTemplate).catch(() => false);
     if (saveData) {
       Object.assign(smsTemplate, saveData);
@@ -85,7 +91,7 @@ const validate = async () => {
     data: {},
     errors: [] as any[],
   };
-  const formValidResult = await formRef.value.validate();
+  const formValidResult = await formRef.value?.validate();
   if (!formValidResult) {
     result.success = false;
     result.errors.push('表单校验未通过！');
@@ -129,7 +135,7 @@ const formProps = reactive({
     preIcon: null,
   },
   resetFunc: () => {
-    ctx?.$emit('cancel', { update: false, containerType: props.containerType });
+    emit('cancel', { update: false, containerType: props.containerType });
   },
   submitFunc: submit,
 });

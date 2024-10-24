@@ -2,26 +2,24 @@
   <div class="p-4">
     <ChartGroupCard class="enter-y" :loading="loading" type="chart" />
     <SaleTabCard class="!my-4 enter-y" :loading="loading" />
-    <Row>
-      <Col :span="24">
-        <Card :loading="loading" :bordered="false" title="最近一周访问量统计" :style="{ marginTop: '24px' }">
+    <a-row>
+      <a-col :span="24">
+        <a-card :loading="loading" :bordered="false" title="最近一周访问量统计" :style="{ marginTop: '24px' }">
           <div class="infoArea">
             <HeadInfo title="今日IP" :iconColor="ipColor" :content="loginfo.todayIp" icon="environment" />
             <HeadInfo title="今日访问" :iconColor="visitColor" :content="loginfo.todayVisitCount" icon="team" />
             <HeadInfo title="总访问量" :iconColor="seriesColor" :content="loginfo.totalVisitCount" icon="rise" />
           </div>
           <LineMulti :chartData="lineMultiData" height="50vh" type="line" :option="{ legend: { top: 'bottom' } }"></LineMulti>
-        </Card>
-      </Col>
-    </Row>
+        </a-card>
+      </a-col>
+    </a-row>
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
-import { Row, Col, Card } from 'ant-design-vue';
 import ChartGroupCard from '../components/ChartGroupCard.vue';
 import SaleTabCard from '../components/SaleTabCard.vue';
-import { HeadInfo, LineMulti } from '@begcode/components';
+import { HeadInfo, LineMulti } from '@/components/chart';
 import { getLoginfo, getVisitInfo } from '../api';
 import { useRootSetting } from '@/hooks/setting/useRootSetting';
 

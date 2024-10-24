@@ -1,9 +1,9 @@
 <template>
   <CollapseContainer title="安全设置" :canExpand="false">
-    <List>
+    <a-list>
       <template v-for="item in secureSettingList" :key="item.key">
-        <List.Item>
-          <List.Item.Meta>
+        <a-list-item>
+          <a-list-item-meta>
             <template #title>
               {{ item.title }}
               <div
@@ -17,18 +17,16 @@
             <template #description>
               <div>{{ item.description }}</div>
             </template>
-          </List.Item.Meta>
-        </List.Item>
+          </a-list-item-meta>
+        </a-list-item>
       </template>
-    </List>
+    </a-list>
   </CollapseContainer>
   <UpdatePassword ref="updatePasswordRef" />
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { List } from 'ant-design-vue';
-import { CollapseContainer, createAsyncComponent } from '@begcode/components';
-
+import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
+import { CollapseContainer } from '@/components/Container';
 import { secureSettingList } from './data';
 import { useUserStore } from '@/store/modules/user';
 import { useMessage } from '@/hooks/web/useMessage';

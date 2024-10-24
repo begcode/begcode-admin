@@ -1,14 +1,9 @@
 import type { VxeGridPropTypes, VxeGridProps } from 'vxe-table/types/grid';
 import dayjs from 'dayjs';
-import apiService from '@/api-service/index';
-
-const relationshipApis: any = {
-  category: apiService.files.resourceCategoryService.tree,
-};
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
 
-const searchForm = (): any[] => {
+const searchForm = (relationshipApis): any[] => {
   return [
     {
       title: 'ID',
@@ -21,8 +16,8 @@ const searchForm = (): any[] => {
       componentProps: {},
     },
     {
-      title: 'Url地址',
-      field: 'url',
+      title: '完整文件名',
+      field: 'fullName',
       componentType: 'Text',
       value: '',
       type: 'String',
@@ -31,8 +26,38 @@ const searchForm = (): any[] => {
       componentProps: {},
     },
     {
-      title: '完整文件名',
-      field: 'fullName',
+      title: '业务标题',
+      field: 'businessTitle',
+      componentType: 'Text',
+      value: '',
+      type: 'String',
+      operator: '',
+      span: 8,
+      componentProps: {},
+    },
+    {
+      title: '业务自定义描述内容',
+      field: 'businessDesc',
+      componentType: 'Text',
+      value: '',
+      type: 'String',
+      operator: '',
+      span: 8,
+      componentProps: {},
+    },
+    {
+      title: '业务状态',
+      field: 'businessStatus',
+      componentType: 'Text',
+      value: '',
+      type: 'String',
+      operator: '',
+      span: 8,
+      componentProps: {},
+    },
+    {
+      title: 'Url地址',
+      field: 'url',
       componentType: 'Text',
       value: '',
       type: 'String',
@@ -56,6 +81,16 @@ const searchForm = (): any[] => {
       componentType: 'Text',
       value: '',
       type: 'String',
+      operator: '',
+      span: 8,
+      componentProps: {},
+    },
+    {
+      title: '文件大小',
+      field: 'fileSize',
+      componentType: 'Text',
+      value: '',
+      type: 'Long',
       operator: '',
       span: 8,
       componentProps: {},
@@ -121,36 +156,6 @@ const searchForm = (): any[] => {
       componentProps: {},
     },
     {
-      title: '业务标题',
-      field: 'businessTitle',
-      componentType: 'Text',
-      value: '',
-      type: 'String',
-      operator: '',
-      span: 8,
-      componentProps: {},
-    },
-    {
-      title: '业务自定义描述内容',
-      field: 'businessDesc',
-      componentType: 'Text',
-      value: '',
-      type: 'String',
-      operator: '',
-      span: 8,
-      componentProps: {},
-    },
-    {
-      title: '业务状态',
-      field: 'businessStatus',
-      componentType: 'Text',
-      value: '',
-      type: 'String',
-      operator: '',
-      span: 8,
-      componentProps: {},
-    },
-    {
       title: '创建时间',
       field: 'createAt',
       componentType: 'DateTimeRange',
@@ -158,16 +163,6 @@ const searchForm = (): any[] => {
       span: 8,
       type: 'ZonedDateTime',
       componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
-    },
-    {
-      title: '文件大小',
-      field: 'fileSize',
-      componentType: 'Text',
-      value: '',
-      type: 'Long',
-      operator: '',
-      span: 8,
-      componentProps: {},
     },
     {
       title: '被引次数',
@@ -245,8 +240,8 @@ const columns = (): VxeGridPropTypes.Columns => {
       params: { type: 'LONG' },
     },
     {
-      title: 'Url地址',
-      field: 'url',
+      title: '完整文件名',
+      field: 'fullName',
       minWidth: 160,
       visible: true,
       treeNode: false,
@@ -254,8 +249,35 @@ const columns = (): VxeGridPropTypes.Columns => {
       editRender: { name: 'AInput', enabled: false },
     },
     {
-      title: '完整文件名',
-      field: 'fullName',
+      title: '业务标题',
+      field: 'businessTitle',
+      minWidth: 160,
+      visible: true,
+      treeNode: false,
+      params: { type: 'STRING' },
+      editRender: { name: 'AInput', enabled: false },
+    },
+    {
+      title: '业务自定义描述内容',
+      field: 'businessDesc',
+      minWidth: 160,
+      visible: true,
+      treeNode: false,
+      params: { type: 'STRING' },
+      editRender: { name: 'AInput', enabled: false },
+    },
+    {
+      title: '业务状态',
+      field: 'businessStatus',
+      minWidth: 160,
+      visible: true,
+      treeNode: false,
+      params: { type: 'STRING' },
+      editRender: { name: 'AInput', enabled: false },
+    },
+    {
+      title: 'Url地址',
+      field: 'url',
       minWidth: 160,
       visible: true,
       treeNode: false,
@@ -279,6 +301,14 @@ const columns = (): VxeGridPropTypes.Columns => {
       treeNode: false,
       params: { type: 'STRING' },
       editRender: { name: 'AInput', enabled: false },
+    },
+    {
+      title: '文件大小',
+      field: 'fileSize',
+      minWidth: 80,
+      visible: true,
+      treeNode: false,
+      params: { type: 'LONG' },
     },
     {
       title: '扩展名',
@@ -334,33 +364,6 @@ const columns = (): VxeGridPropTypes.Columns => {
       params: { type: 'LONG' },
     },
     {
-      title: '业务标题',
-      field: 'businessTitle',
-      minWidth: 160,
-      visible: true,
-      treeNode: false,
-      params: { type: 'STRING' },
-      editRender: { name: 'AInput', enabled: false },
-    },
-    {
-      title: '业务自定义描述内容',
-      field: 'businessDesc',
-      minWidth: 160,
-      visible: true,
-      treeNode: false,
-      params: { type: 'STRING' },
-      editRender: { name: 'AInput', enabled: false },
-    },
-    {
-      title: '业务状态',
-      field: 'businessStatus',
-      minWidth: 160,
-      visible: true,
-      treeNode: false,
-      params: { type: 'STRING' },
-      editRender: { name: 'AInput', enabled: false },
-    },
-    {
       title: '创建时间',
       field: 'createAt',
       minWidth: 140,
@@ -368,14 +371,6 @@ const columns = (): VxeGridPropTypes.Columns => {
       treeNode: false,
       params: { type: 'ZONED_DATE_TIME' },
       formatter: ({ cellValue }) => (cellValue ? dayjs(cellValue).format('YYYY-MM-DD hh:mm:ss') : ''),
-    },
-    {
-      title: '文件大小',
-      field: 'fileSize',
-      minWidth: 80,
-      visible: true,
-      treeNode: false,
-      params: { type: 'LONG' },
     },
     {
       title: '被引次数',
@@ -438,7 +433,7 @@ const columns = (): VxeGridPropTypes.Columns => {
   ];
 };
 
-const baseGridOptions = (ajax, toolbarButtons, toolbarTools, pagerLeft): VxeGridProps => {
+const baseGridOptions = (ajax, toolbarButtons, toolbarTools): VxeGridProps => {
   return {
     rowConfig: {
       keyField: 'id',
@@ -480,9 +475,9 @@ const baseGridOptions = (ajax, toolbarButtons, toolbarTools, pagerLeft): VxeGrid
       total: 0,
       pagerCount: 5,
       currentPage: 1,
-      autoHidden: true,
+      autoHidden: false,
       slots: {
-        left: pagerLeft,
+        left: 'pagerLeft',
       },
     },
     importConfig: {
@@ -550,6 +545,10 @@ const ListProps = {
     type: Object,
     default: () => ({}),
   },
+  cardSlots: {
+    type: Array,
+    default: ['title', 'rightExtra'],
+  },
   cardExtra: {
     type: Array,
     default: ['import', 'export', 'print'],
@@ -575,6 +574,10 @@ const ListProps = {
       hideSlots: [],
       hideColumns: [],
     }),
+  },
+  parentContainer: {
+    type: String,
+    default: '',
   },
 };
 

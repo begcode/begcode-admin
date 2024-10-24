@@ -22,14 +22,13 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { onMounted, ref, reactive, unref } from 'vue';
 import { bindThirdAppAccount, deleteThirdAccount, getThirdAccountByUserId } from './UserSetting.api';
 import { useUserStore } from '@/store/modules/user';
 import { DingtalkCircleFilled, createFromIconfontCN, WechatFilled } from '@ant-design/icons-vue';
 import { useGlobSetting } from '@/hooks/setting';
 import { useMessage } from '@/hooks/web/useMessage';
 import { Modal } from 'ant-design-vue';
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 
 defineOptions({
   name: 'WeChatDingSetting',
@@ -236,7 +235,6 @@ onMounted(() => {
 });
 </script>
 <style lang="less">
-// update-begin-author:liusq date:20230625 for: [issues/563]暗色主题部分失效
 @prefix-cls: ~'@{namespace}-j-user-tenant-setting-container';
 .@{prefix-cls} {
   padding: 30px 40px 0 20px;
@@ -296,5 +294,4 @@ onMounted(() => {
     font-size: 16px !important;
   }
 }
-// update-end-author:liusq date:20230625 for: [issues/563]暗色主题部分失效
 </style>

@@ -1,16 +1,8 @@
 import type { VxeGridPropTypes, VxeGridProps } from 'vxe-table/types/grid';
-import apiService from '@/api-service/index';
-
-const relationshipApis: any = {
-  children: apiService.settings.departmentService.tree,
-  authorities: apiService.system.authorityService.tree,
-  parent: apiService.settings.departmentService.tree,
-  users: apiService.system.userService.retrieve,
-};
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
 
-const searchForm = (): any[] => {
+const searchForm = (relationshipApis): any[] => {
   return [
     {
       title: 'ID',
@@ -192,7 +184,6 @@ const columns = (): VxeGridPropTypes.Columns => {
       field: 'users',
       minWidth: 120,
       slots: { default: 'users_default' },
-      editRender: { name: 'ASelectModal' },
     },
     {
       title: '操作',
@@ -207,7 +198,7 @@ const columns = (): VxeGridPropTypes.Columns => {
   ];
 };
 
-const baseGridOptions = (ajax, toolbarButtons, toolbarTools, pagerLeft): VxeGridProps => {
+const baseGridOptions = (ajax, toolbarButtons, toolbarTools): VxeGridProps => {
   return {
     rowConfig: {
       keyField: 'id',
@@ -250,9 +241,9 @@ const baseGridOptions = (ajax, toolbarButtons, toolbarTools, pagerLeft): VxeGrid
       total: 0,
       pagerCount: 5,
       currentPage: 1,
-      autoHidden: true,
+      autoHidden: false,
       slots: {
-        left: pagerLeft,
+        left: 'pagerLeft',
       },
     },
     importConfig: {
@@ -328,6 +319,10 @@ const ListProps = {
     type: Object,
     default: () => ({}),
   },
+  cardSlots: {
+    type: Array,
+    default: ['title', 'rightExtra'],
+  },
   cardExtra: {
     type: Array,
     default: ['import', 'export', 'print'],
@@ -353,6 +348,10 @@ const ListProps = {
       hideSlots: [],
       hideColumns: [],
     }),
+  },
+  parentContainer: {
+    type: String,
+    default: '',
   },
 };
 

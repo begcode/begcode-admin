@@ -1,21 +1,18 @@
 <template>
-  <ConfigProvider :locale="getAntdLocale" :theme="appTheme">
+  <a-config-provider :locale="getAntdLocale" :theme="appTheme">
     <AppProvider>
       <RouterView />
     </AppProvider>
-  </ConfigProvider>
+  </a-config-provider>
 </template>
 
 <script lang="ts" setup>
-import { provide, computed, watch, ref } from 'vue';
-import { ConfigProvider, theme } from 'ant-design-vue';
+import { theme } from 'ant-design-vue';
 import { AppProvider } from '@/components/Application';
 import { useTitle } from '@/hooks/web/useTitle';
 import { useLocale } from '@/i18n/useLocale';
 
 import 'dayjs/locale/zh-cn';
-import { useContentHeight } from '@/hooks/web/useContentHeight';
-import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
 import { getViewComponent } from '@/views/getViews';
 import { useAppStore } from '@/store/modules/app';
 import { useRootSetting } from '@/hooks/setting/useRootSetting';
@@ -29,10 +26,7 @@ import VXETable from 'vxe-table';
 const { getAntdLocale } = useLocale();
 const appStore = useAppStore();
 
-const { getCalcContentWidth } = useMenuSetting();
 const { getDarkMode } = useRootSetting();
-provide('CALC_CONTENT_WIDTH', getCalcContentWidth.value);
-provide('USE_CONTENT_HEIGHT', useContentHeight);
 provide('GET_VIEW_COMPONENT', getViewComponent);
 provide('APP_DARK_MODE', getDarkMode);
 

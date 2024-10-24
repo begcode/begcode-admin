@@ -1,10 +1,10 @@
 <template>
-  <List :class="prefixCls">
-    <Row :gutter="16">
+  <a-list :class="prefixCls">
+    <a-row :gutter="16">
       <template v-for="item in projectList" :key="item.title">
-        <Col :span="6">
-          <ListItem>
-            <Card :hoverable="true" :class="`${prefixCls}__card`">
+        <a-col :span="6">
+          <a-list-item>
+            <a-card :hoverable="true" :class="`${prefixCls}__card`">
               <img :src="demoImg" />
               <div :class="`${prefixCls}__card-title`">
                 {{ item.title }}
@@ -12,19 +12,17 @@
               <div :class="`${prefixCls}__card-content`">
                 {{ item.content }}
               </div>
-            </Card>
-          </ListItem>
-        </Col>
+            </a-card>
+          </a-list-item>
+        </a-col>
       </template>
-    </Row>
-  </List>
+    </a-row>
+  </a-list>
 </template>
 <script lang="ts" setup>
-import { List, Card, Row, Col } from 'ant-design-vue';
 import demoImg from '@/assets/images/demo.png';
 import { projectList } from './data';
 
-const ListItem = List.Item;
 const prefixCls = 'account-center-project';
 </script>
 <style lang="less">

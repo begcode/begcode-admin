@@ -1,4 +1,3 @@
-import { merge } from 'lodash-es';
 import type { LocaleType } from '#/config';
 
 export const loadLocalePool: LocaleType[] = [];
@@ -15,7 +14,7 @@ export function genMessage(langs: Record<string, Record<string, any>>, _prefix =
   const obj: Recordable = {};
 
   Object.keys(langs).forEach(key => {
-    merge(obj, langs[key].default);
+    _merge(obj, langs[key].default);
   });
   return obj;
 }

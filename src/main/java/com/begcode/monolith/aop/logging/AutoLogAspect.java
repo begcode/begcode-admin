@@ -50,12 +50,12 @@ public class AutoLogAspect {
     @Around("logPointCut()")
     public Object around(ProceedingJoinPoint point) throws Throwable {
         long beginTime = System.currentTimeMillis();
-        //执行方法
+        // 执行方法
         Object result = point.proceed();
-        //执行时长(毫秒)
+        // 执行时长(毫秒)
         long time = System.currentTimeMillis() - beginTime;
 
-        //保存日志
+        // 保存日志
         saveSysLog(point, time, result);
 
         return result;
@@ -71,39 +71,38 @@ public class AutoLogAspect {
             /*if(syslog.module() == ModuleType.ONLINE){
                 content = getOnlineLogContent(obj, content);
             }*/
-            //注解上的描述,操作日志内容
+            // 注解上的描述,操作日志内容
             dto.setLogType(syslog.logType());
             dto.setLogContent(content);
         }
 
-        //请求的方法名
+        // 请求的方法名
         String className = joinPoint.getTarget().getClass().getName();
         String methodName = signature.getName();
         dto.setMethod(className + "." + methodName + "()");
 
-        //设置操作类型
+        // 设置操作类型
         if (dto.getLogType() == LogType.OPERATE) {
             dto.setOperateType(syslog.operateType());
         }
 
-        //获取request
+        // 获取request
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        //请求的参数
+        // 请求的参数
         dto.setRequestParam(getReqestParams(request, joinPoint));
-        //设置IP地址
+        // 设置IP地址
         dto.setIp(IPUtils.getIpAddr(request));
-        //获取登录用户信息
+        // 获取登录用户信息
         SecurityUtils.getCurrentUserLogin().ifPresent(dto::setUserid);
-        //耗时
+        // 耗时
         dto.setCostTime(time);
-        //保存系统日志
+        dto.setRequestUrl(request.getRequestURI());
+        // 保存系统日志
         sysLogService.save(dto);
     }
 
     /**
      * @Description: 获取请求参数
-     * @author: scott
-     * @date: 2020/4/16 0:10
      * @param request:  request
      * @param joinPoint:  joinPoint
      * @Return: java.lang.String
@@ -134,7 +133,6 @@ public class AutoLogAspect {
             } catch (JsonProcessingException e) {
                 params = new StringBuilder("参数序列化失败");
             }
-            //update-end-author:taoyan date:20200724 for:日志数据太长的直接过滤掉
         } else {
             MethodSignature signature = (MethodSignature) joinPoint.getSignature();
             Method method = signature.getMethod();

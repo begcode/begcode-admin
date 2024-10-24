@@ -14,9 +14,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
 import ThirdAppDingTalkConfigForm from './ThirdAppDingTalkConfigForm.vue';
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 
 export default defineComponent({
   name: 'ThirdAppConfigList',
@@ -97,7 +96,6 @@ export default defineComponent({
 </style>
 
 <style lang="less">
-/* update-begin-author:liusq date:20230625 for: [issues/563]暗色主题部分失效*/
 @prefix-cls: ~'@{namespace}-j-dd-container';
 /*begin 兼容暗夜模式*/
 .@{prefix-cls} {
@@ -124,5 +122,4 @@ export default defineComponent({
   }
 }
 /*end 兼容暗夜模式*/
-/* update-end-author:liusq date:20230625 for: [issues/563]暗色主题部分失效*/
 </style>

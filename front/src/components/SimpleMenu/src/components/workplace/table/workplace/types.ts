@@ -1,5 +1,3 @@
-import { Ref } from 'vue';
-
 export interface Props {
   theme: string;
   activeName?: string | number | undefined;

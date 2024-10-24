@@ -1,8 +1,8 @@
 <template>
-  <List item-layout="vertical" :class="prefixCls">
+  <a-list item-layout="vertical" :class="prefixCls">
     <template v-for="item in articleList" :key="item.title">
-      <ListItem>
-        <ListItemMeta>
+      <a-list-item>
+        <a-list-item-meta>
           <template #description>
             <div :class="`${prefixCls}__content`">
               {{ item.content }}
@@ -14,13 +14,13 @@
             </p>
             <div>
               <template v-for="tag in item.description" :key="tag">
-                <Tag class="mb-2">
+                <a-tag class="mb-2">
                   {{ tag }}
-                </Tag>
+                </a-tag>
               </template>
             </div>
           </template>
-        </ListItemMeta>
+        </a-list-item-meta>
         <div>
           <template v-for="action in actions" :key="action.text">
             <div :class="`${prefixCls}__action`">
@@ -30,17 +30,12 @@
           </template>
           <span :class="`${prefixCls}__time`">{{ item.time }}</span>
         </div>
-      </ListItem>
+      </a-list-item>
     </template>
-  </List>
+  </a-list>
 </template>
 <script lang="ts" setup>
-import { List, Tag } from 'ant-design-vue';
-import { Icon } from '@begcode/components';
 import { actions, articleList } from './data';
-
-const ListItem = List.Item;
-const ListItemMeta = List.Item.Meta;
 const prefixCls = 'account-center-article';
 </script>
 <style lang="less" scoped>

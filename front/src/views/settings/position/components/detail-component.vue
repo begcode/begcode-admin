@@ -1,11 +1,9 @@
 <template>
-  <div>
+  <div class="w-100%">
     <Descriptions ref="positionDetailRef" v-bind="descriptionsProps"></Descriptions>
   </div>
 </template>
 <script lang="ts" setup>
-import { getCurrentInstance, ref, reactive, h } from 'vue';
-import { Descriptions } from '@begcode/components';
 import ServerProvider from '@/api-service/index';
 import config from '../config/detail-config';
 import { IPosition } from '@/models/settings/position.model';
@@ -22,28 +20,36 @@ const props = defineProps({
     default: '',
     required: true,
   },
+  columns: {
+    type: Number,
+    default: 1,
+  },
+  hideColumns: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+  },
 });
 
 const positionDetailRef = ref(null);
 const ctx = getCurrentInstance()?.proxy;
 const apiService = ctx?.$apiService as typeof ServerProvider;
 const position = reactive<IPosition>({});
-if (props.entityId) {
-  apiService.settings.positionService.find(Number(props.entityId)).then(data => {
-    if (data) {
-      Object.assign(position, data);
-    }
-  });
-}
-const formItemsConfig = reactive(config.fields);
-//获得关联表属性。
-
+const getEntityData = async () => {
+  if (props.entityId) {
+    apiService.settings.positionService.find(Number(props.entityId)).then(data => {
+      if (data) {
+        Object.assign(position, data);
+      }
+    });
+  }
+};
+watch(() => props.entityId, getEntityData, { immediate: true });
 const descriptionsProps = reactive({
-  schema: formItemsConfig,
+  schema: config.fields(props.hideColumns),
   isEdit: () => false,
   // formConfig,
   labelWidth: '120px',
   data: position,
-  column: 1,
+  column: props.columns || 1,
 });
 </script>

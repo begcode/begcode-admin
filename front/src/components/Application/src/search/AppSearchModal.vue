@@ -4,11 +4,11 @@
       <div :class="getClass" @click.stop v-if="visible">
         <div :class="`${prefixCls}-content`" v-click-outside="handleClose">
           <div :class="`${prefixCls}-input__wrapper`">
-            <Input :class="`${prefixCls}-input`" :placeholder="t('common.searchText')" ref="inputRef" allow-clear @change="handleSearch">
+            <a-input :class="`${prefixCls}-input`" :placeholder="t('common.searchText')" ref="inputRef" allow-clear @change="handleSearch">
               <template #prefix>
                 <SearchOutlined />
               </template>
-            </Input>
+            </a-input>
             <span :class="`${prefixCls}-cancel`" @click="handleClose">
               {{ t('common.cancelText') }}
             </span>
@@ -52,17 +52,16 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, unref, ref, watch, nextTick } from 'vue';
 import { SearchOutlined } from '@ant-design/icons-vue';
-import { Input } from 'ant-design-vue';
 import AppSearchFooter from './AppSearchFooter.vue';
-import { Icon } from '@begcode/components';
 import vClickOutside from '@/directives/clickOutside';
 import { useMenuSearch } from './useMenuSearch';
 
 import { useI18n } from '@/hooks/web/useI18n';
 
-import { useAppInject, useRefs, useDesign } from '@begcode/components';
+import { useAppInject } from '@/hooks/useAppInject';
+import { useRefs } from '@/hooks/vben';
+import { useDesign } from '@/hooks/web/useDesign';
 
 const props = defineProps({
   visible: { type: Boolean },

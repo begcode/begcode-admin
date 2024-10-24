@@ -1,8 +1,5 @@
 // copy from element-plus
 
-import { warn } from 'vue';
-import { fromPairs, isObject } from 'lodash-es';
-import type { ExtractPropTypes, PropType } from 'vue';
 import type { Mutable } from './types';
 
 const wrapperKey = Symbol();
@@ -78,7 +75,7 @@ export function buildProp<T = never, D extends BuildPropType<T, V, C> = never, R
   key?: string,
 ): BuildPropReturn<T, D, R, V, C> {
   // filter native prop type and nested prop, e.g `null`, `undefined` (from `buildProps`)
-  if (!isObject(option) || !!option[propKey]) return option as any;
+  if (!_isObject(option) || !!option[propKey]) return option as any;
 
   const { values, required, default: defaultValue, type, validator } = option;
 
@@ -132,7 +129,7 @@ export const buildProps = <
 >(
   props: O,
 ) =>
-  fromPairs(Object.entries(props).map(([key, option]) => [key, buildProp(option as any, key)])) as unknown as {
+  _fromPairs(Object.entries(props).map(([key, option]) => [key, buildProp(option as any, key)])) as unknown as {
     [K in keyof O]: O[K] extends { [propKey]: boolean }
       ? O[K]
       : [O[K]] extends NativePropType

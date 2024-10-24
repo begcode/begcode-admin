@@ -37,6 +37,9 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockMyUser
 public class SysLogResourceIT {
 
+    private static final String DEFAULT_REQUEST_URL = "AAAAAAAAAA";
+    private static final String UPDATED_REQUEST_URL = "BBBBBBBBBB";
+
     private static final LogType DEFAULT_LOG_TYPE = LogType.LOGIN;
     private static final LogType UPDATED_LOG_TYPE = LogType.OPERATE;
 
@@ -57,9 +60,6 @@ public class SysLogResourceIT {
 
     private static final String DEFAULT_METHOD = "AAAAAAAAAA";
     private static final String UPDATED_METHOD = "BBBBBBBBBB";
-
-    private static final String DEFAULT_REQUEST_URL = "AAAAAAAAAA";
-    private static final String UPDATED_REQUEST_URL = "BBBBBBBBBB";
 
     private static final String DEFAULT_REQUEST_PARAM = "AAAAAAAAAA";
     private static final String UPDATED_REQUEST_PARAM = "BBBBBBBBBB";
@@ -115,6 +115,7 @@ public class SysLogResourceIT {
      */
     public static SysLog createEntity() {
         SysLog sysLog = new SysLog()
+            .requestUrl(DEFAULT_REQUEST_URL)
             .logType(DEFAULT_LOG_TYPE)
             .logContent(DEFAULT_LOG_CONTENT)
             .operateType(DEFAULT_OPERATE_TYPE)
@@ -122,7 +123,6 @@ public class SysLogResourceIT {
             .username(DEFAULT_USERNAME)
             .ip(DEFAULT_IP)
             .method(DEFAULT_METHOD)
-            .requestUrl(DEFAULT_REQUEST_URL)
             .requestParam(DEFAULT_REQUEST_PARAM)
             .requestType(DEFAULT_REQUEST_TYPE)
             .costTime(DEFAULT_COST_TIME)
@@ -141,6 +141,7 @@ public class SysLogResourceIT {
      */
     public static SysLog createUpdatedEntity() {
         SysLog sysLog = new SysLog()
+            .requestUrl(UPDATED_REQUEST_URL)
             .logType(UPDATED_LOG_TYPE)
             .logContent(UPDATED_LOG_CONTENT)
             .operateType(UPDATED_OPERATE_TYPE)
@@ -148,7 +149,6 @@ public class SysLogResourceIT {
             .username(UPDATED_USERNAME)
             .ip(UPDATED_IP)
             .method(UPDATED_METHOD)
-            .requestUrl(UPDATED_REQUEST_URL)
             .requestParam(UPDATED_REQUEST_PARAM)
             .requestType(UPDATED_REQUEST_TYPE)
             .costTime(UPDATED_COST_TIME)
@@ -226,6 +226,7 @@ public class SysLogResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(sysLog.getId().intValue())))
+            .andExpect(jsonPath("$.[*].requestUrl").value(hasItem(DEFAULT_REQUEST_URL)))
             .andExpect(jsonPath("$.[*].logType").value(hasItem(DEFAULT_LOG_TYPE.toString())))
             .andExpect(jsonPath("$.[*].logContent").value(hasItem(DEFAULT_LOG_CONTENT)))
             .andExpect(jsonPath("$.[*].operateType").value(hasItem(DEFAULT_OPERATE_TYPE.toString())))
@@ -233,7 +234,6 @@ public class SysLogResourceIT {
             .andExpect(jsonPath("$.[*].username").value(hasItem(DEFAULT_USERNAME)))
             .andExpect(jsonPath("$.[*].ip").value(hasItem(DEFAULT_IP)))
             .andExpect(jsonPath("$.[*].method").value(hasItem(DEFAULT_METHOD)))
-            .andExpect(jsonPath("$.[*].requestUrl").value(hasItem(DEFAULT_REQUEST_URL)))
             .andExpect(jsonPath("$.[*].requestParam").value(hasItem(DEFAULT_REQUEST_PARAM.toString())))
             .andExpect(jsonPath("$.[*].requestType").value(hasItem(DEFAULT_REQUEST_TYPE)))
             .andExpect(jsonPath("$.[*].costTime").value(hasItem(DEFAULT_COST_TIME.intValue())))
@@ -255,6 +255,7 @@ public class SysLogResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(sysLog.getId().intValue()))
+            .andExpect(jsonPath("$.requestUrl").value(DEFAULT_REQUEST_URL))
             .andExpect(jsonPath("$.logType").value(DEFAULT_LOG_TYPE.toString()))
             .andExpect(jsonPath("$.logContent").value(DEFAULT_LOG_CONTENT))
             .andExpect(jsonPath("$.operateType").value(DEFAULT_OPERATE_TYPE.toString()))
@@ -262,7 +263,6 @@ public class SysLogResourceIT {
             .andExpect(jsonPath("$.username").value(DEFAULT_USERNAME))
             .andExpect(jsonPath("$.ip").value(DEFAULT_IP))
             .andExpect(jsonPath("$.method").value(DEFAULT_METHOD))
-            .andExpect(jsonPath("$.requestUrl").value(DEFAULT_REQUEST_URL))
             .andExpect(jsonPath("$.requestParam").value(DEFAULT_REQUEST_PARAM.toString()))
             .andExpect(jsonPath("$.requestType").value(DEFAULT_REQUEST_TYPE))
             .andExpect(jsonPath("$.costTime").value(DEFAULT_COST_TIME.intValue()))
@@ -285,6 +285,56 @@ public class SysLogResourceIT {
         defaultSysLogFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
         defaultSysLogFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllSysLogsByRequestUrlIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
+
+        // Get all the sysLogList where requestUrl equals to
+        defaultSysLogFiltering("requestUrl.equals=" + DEFAULT_REQUEST_URL, "requestUrl.equals=" + UPDATED_REQUEST_URL);
+    }
+
+    @Test
+    @Transactional
+    void getAllSysLogsByRequestUrlIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
+
+        // Get all the sysLogList where requestUrl in
+        defaultSysLogFiltering("requestUrl.in=" + DEFAULT_REQUEST_URL + "," + UPDATED_REQUEST_URL, "requestUrl.in=" + UPDATED_REQUEST_URL);
+    }
+
+    @Test
+    @Transactional
+    void getAllSysLogsByRequestUrlIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
+
+        // Get all the sysLogList where requestUrl is not null
+        defaultSysLogFiltering("requestUrl.specified=true", "requestUrl.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSysLogsByRequestUrlContainsSomething() throws Exception {
+        // Initialize the database
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
+
+        // Get all the sysLogList where requestUrl contains
+        defaultSysLogFiltering("requestUrl.contains=" + DEFAULT_REQUEST_URL, "requestUrl.contains=" + UPDATED_REQUEST_URL);
+    }
+
+    @Test
+    @Transactional
+    void getAllSysLogsByRequestUrlNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
+
+        // Get all the sysLogList where requestUrl does not contain
+        defaultSysLogFiltering("requestUrl.doesNotContain=" + UPDATED_REQUEST_URL, "requestUrl.doesNotContain=" + DEFAULT_REQUEST_URL);
     }
 
     @Test
@@ -598,56 +648,6 @@ public class SysLogResourceIT {
 
         // Get all the sysLogList where method does not contain
         defaultSysLogFiltering("method.doesNotContain=" + UPDATED_METHOD, "method.doesNotContain=" + DEFAULT_METHOD);
-    }
-
-    @Test
-    @Transactional
-    void getAllSysLogsByRequestUrlIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
-
-        // Get all the sysLogList where requestUrl equals to
-        defaultSysLogFiltering("requestUrl.equals=" + DEFAULT_REQUEST_URL, "requestUrl.equals=" + UPDATED_REQUEST_URL);
-    }
-
-    @Test
-    @Transactional
-    void getAllSysLogsByRequestUrlIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
-
-        // Get all the sysLogList where requestUrl in
-        defaultSysLogFiltering("requestUrl.in=" + DEFAULT_REQUEST_URL + "," + UPDATED_REQUEST_URL, "requestUrl.in=" + UPDATED_REQUEST_URL);
-    }
-
-    @Test
-    @Transactional
-    void getAllSysLogsByRequestUrlIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
-
-        // Get all the sysLogList where requestUrl is not null
-        defaultSysLogFiltering("requestUrl.specified=true", "requestUrl.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllSysLogsByRequestUrlContainsSomething() throws Exception {
-        // Initialize the database
-        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
-
-        // Get all the sysLogList where requestUrl contains
-        defaultSysLogFiltering("requestUrl.contains=" + DEFAULT_REQUEST_URL, "requestUrl.contains=" + UPDATED_REQUEST_URL);
-    }
-
-    @Test
-    @Transactional
-    void getAllSysLogsByRequestUrlNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedSysLog = sysLogRepository.saveAndGet(sysLog);
-
-        // Get all the sysLogList where requestUrl does not contain
-        defaultSysLogFiltering("requestUrl.doesNotContain=" + UPDATED_REQUEST_URL, "requestUrl.doesNotContain=" + DEFAULT_REQUEST_URL);
     }
 
     @Test
@@ -1011,6 +1011,7 @@ public class SysLogResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(sysLog.getId().intValue())))
+            .andExpect(jsonPath("$.[*].requestUrl").value(hasItem(DEFAULT_REQUEST_URL)))
             .andExpect(jsonPath("$.[*].logType").value(hasItem(DEFAULT_LOG_TYPE.toString())))
             .andExpect(jsonPath("$.[*].logContent").value(hasItem(DEFAULT_LOG_CONTENT)))
             .andExpect(jsonPath("$.[*].operateType").value(hasItem(DEFAULT_OPERATE_TYPE.toString())))
@@ -1018,7 +1019,6 @@ public class SysLogResourceIT {
             .andExpect(jsonPath("$.[*].username").value(hasItem(DEFAULT_USERNAME)))
             .andExpect(jsonPath("$.[*].ip").value(hasItem(DEFAULT_IP)))
             .andExpect(jsonPath("$.[*].method").value(hasItem(DEFAULT_METHOD)))
-            .andExpect(jsonPath("$.[*].requestUrl").value(hasItem(DEFAULT_REQUEST_URL)))
             .andExpect(jsonPath("$.[*].requestParam").value(hasItem(DEFAULT_REQUEST_PARAM.toString())))
             .andExpect(jsonPath("$.[*].requestType").value(hasItem(DEFAULT_REQUEST_TYPE)))
             .andExpect(jsonPath("$.[*].costTime").value(hasItem(DEFAULT_COST_TIME.intValue())))
@@ -1072,6 +1072,7 @@ public class SysLogResourceIT {
         // Update the sysLog
         SysLog updatedSysLog = sysLogRepository.findById(sysLog.getId()).orElseThrow();
         updatedSysLog
+            .requestUrl(UPDATED_REQUEST_URL)
             .logType(UPDATED_LOG_TYPE)
             .logContent(UPDATED_LOG_CONTENT)
             .operateType(UPDATED_OPERATE_TYPE)
@@ -1079,7 +1080,6 @@ public class SysLogResourceIT {
             .username(UPDATED_USERNAME)
             .ip(UPDATED_IP)
             .method(UPDATED_METHOD)
-            .requestUrl(UPDATED_REQUEST_URL)
             .requestParam(UPDATED_REQUEST_PARAM)
             .requestType(UPDATED_REQUEST_TYPE)
             .costTime(UPDATED_COST_TIME)
@@ -1173,10 +1173,10 @@ public class SysLogResourceIT {
         partialUpdatedSysLog.setId(sysLog.getId());
 
         partialUpdatedSysLog
+            .logType(UPDATED_LOG_TYPE)
             .logContent(UPDATED_LOG_CONTENT)
             .operateType(UPDATED_OPERATE_TYPE)
-            .userid(UPDATED_USERID)
-            .requestUrl(UPDATED_REQUEST_URL)
+            .method(UPDATED_METHOD)
             .requestParam(UPDATED_REQUEST_PARAM)
             .createdBy(UPDATED_CREATED_BY)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY);
@@ -1208,6 +1208,7 @@ public class SysLogResourceIT {
         partialUpdatedSysLog.setId(sysLog.getId());
 
         partialUpdatedSysLog
+            .requestUrl(UPDATED_REQUEST_URL)
             .logType(UPDATED_LOG_TYPE)
             .logContent(UPDATED_LOG_CONTENT)
             .operateType(UPDATED_OPERATE_TYPE)
@@ -1215,7 +1216,6 @@ public class SysLogResourceIT {
             .username(UPDATED_USERNAME)
             .ip(UPDATED_IP)
             .method(UPDATED_METHOD)
-            .requestUrl(UPDATED_REQUEST_URL)
             .requestParam(UPDATED_REQUEST_PARAM)
             .requestType(UPDATED_REQUEST_TYPE)
             .costTime(UPDATED_COST_TIME)

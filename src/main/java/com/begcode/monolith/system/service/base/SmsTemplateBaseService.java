@@ -63,7 +63,7 @@ public class SmsTemplateBaseService<R extends SmsTemplateRepository, E extends S
         log.debug("Request to save SmsTemplate : {}", smsTemplateDTO);
         SmsTemplate smsTemplate = smsTemplateMapper.toEntity(smsTemplateDTO);
         smsTemplate.setSupplierId(
-            Optional.ofNullable(smsTemplateDTO.getSupplier()).map(smsSupplierDTO -> smsSupplierDTO.getId()).orElse(null)
+            Optional.ofNullable(smsTemplateDTO.getSupplier()).map(supplierSmsSupplierDTO -> supplierSmsSupplierDTO.getId()).orElse(null)
         );
         this.saveOrUpdate(smsTemplate);
         return findOne(smsTemplate.getId()).orElseThrow();
@@ -80,7 +80,7 @@ public class SmsTemplateBaseService<R extends SmsTemplateRepository, E extends S
         log.debug("Request to update SmsTemplate : {}", smsTemplateDTO);
         SmsTemplate smsTemplate = smsTemplateMapper.toEntity(smsTemplateDTO);
         smsTemplate.setSupplierId(
-            Optional.ofNullable(smsTemplateDTO.getSupplier()).map(smsSupplierDTO -> smsSupplierDTO.getId()).orElse(null)
+            Optional.ofNullable(smsTemplateDTO.getSupplier()).map(supplierSmsSupplierDTO -> supplierSmsSupplierDTO.getId()).orElse(null)
         );
         this.saveOrUpdate(smsTemplate);
         return findOne(smsTemplate.getId()).orElseThrow();

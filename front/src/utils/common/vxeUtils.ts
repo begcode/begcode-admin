@@ -1,4 +1,4 @@
-import { getValueType } from '@begcode/components';
+import { getValueType } from '@/utils/util';
 
 export const VALIDATE_FAILED = Symbol();
 /**

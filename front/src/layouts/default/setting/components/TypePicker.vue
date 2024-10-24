@@ -1,7 +1,7 @@
 <template>
   <div :class="prefixCls">
     <template v-for="item in menuTypeList || []" :key="item.title">
-      <Tooltip :title="item.title" placement="bottom">
+      <a-tooltip :title="item.title" placement="bottom">
         <div
           @click="handler(item)"
           :class="[
@@ -14,15 +14,12 @@
         >
           <div class="mix-sidebar"></div>
         </div>
-      </Tooltip>
+      </a-tooltip>
     </template>
   </div>
 </template>
 <script lang="ts" setup>
-import type { PropType } from 'vue';
-
-import { Tooltip } from 'ant-design-vue';
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 
 import { menuTypeListEnum } from '../enum';
 

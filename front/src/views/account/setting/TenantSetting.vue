@@ -123,9 +123,9 @@
         </div>
       </div>
     </div>
-    <Empty v-else description="暂无数据" style="position: relative; top: 50px" />
+    <a-empty v-else description="暂无数据" style="position: relative; top: 50px" />
   </div>
-  <Modal v-model:open="tenantVisible" width="400px" wrapClassName="edit-tenant-setting">
+  <a-modal v-model:open="tenantVisible" width="400px" wrapClassName="edit-tenant-setting">
     <template #title>
       <div style="font-size: 17px; font-weight: 700">查看名片</div>
       <div style="color: #9e9e9e; margin-top: 10px; font-size: 13px">名片是您在该组织下的个人信息，只在本组织中展示。</div>
@@ -142,41 +142,41 @@
       <div>工号</div>
       <div class="margin-top6 margin-bottom-16">{{ userDetail.workNo ? userDetail.workNo : '未填写' }}</div>
     </div>
-  </Modal>
+  </a-modal>
 
   <!-- 退出租户 -->
-  <Modal v-model:open="cancelVisible" width="800" destroy-on-close>
+  <a-modal v-model:open="cancelVisible" width="800" destroy-on-close>
     <template #title>
       <div class="cancellation">
         <Icon icon="ant-design:warning-outlined" style="font-size: 20px; color: red" />
         退出租户 {{ myTenantInfo.name }}
       </div>
     </template>
-    <Form :model="formCancelState" ref="cancelTenantRef">
-      <FormItem name="tenantName">
-        <Row :span="24" style="padding: 20px 20px 0; font-size: 13px">
-          <Col :span="24"> 请输入租户名称 </Col>
-          <Col :span="24" style="margin-top: 10px">
-            <Input v-model:value="formCancelState.tenantName" @change="tenantNameChange" />
-          </Col>
-        </Row>
-      </FormItem>
-      <FormItem name="loginPassword">
-        <Row :span="24" style="padding: 0 20px; font-size: 13px">
-          <Col :span="24"> 请输入您的登录密码 </Col>
-          <Col :span="24" style="margin-top: 10px">
-            <InputPassword v-model:value="formCancelState.loginPassword" />
-          </Col>
-        </Row>
-      </FormItem>
-    </Form>
+    <a-form :model="formCancelState" ref="cancelTenantRef">
+      <a-form-item name="tenantName">
+        <a-row :span="24" style="padding: 20px 20px 0; font-size: 13px">
+          <a-col :span="24"> 请输入租户名称 </a-col>
+          <a-col :span="24" style="margin-top: 10px">
+            <a-input v-model:value="formCancelState.tenantName" @change="tenantNameChange" />
+          </a-col>
+        </a-row>
+      </a-form-item>
+      <a-form-item name="loginPassword">
+        <a-row :span="24" style="padding: 0 20px; font-size: 13px">
+          <a-col :span="24"> 请输入您的登录密码 </a-col>
+          <a-col :span="24" style="margin-top: 10px">
+            <a-input-password v-model:value="formCancelState.loginPassword" />
+          </a-col>
+        </a-row>
+      </a-form-item>
+    </a-form>
     <template #footer>
-      <Button type="primary" @click="handleOutClick" :disabled="outBtnDisabled">确定</Button>
-      <Button @click="handleCancelOutClick">取消</Button>
+      <a-button type="primary" @click="handleOutClick" :disabled="outBtnDisabled">确定</a-button>
+      <a-button @click="handleCancelOutClick">取消</a-button>
     </template>
-  </Modal>
+  </a-modal>
 
-  <Modal
+  <a-modal
     title="变更拥有者"
     v-model:open="owenVisible"
     width="800"
@@ -185,43 +185,42 @@
     @ok="changeOwen"
   >
     <div style="padding: 20px">
-      <Row :span="24">
+      <a-row :span="24">
         <div class="change-owen">只有变更拥有着之后,才能退出</div>
-      </Row>
-      <Row :span="24" style="margin-top: 10px">
+      </a-row>
+      <a-row :span="24" style="margin-top: 10px">
         <!--        <UserSelect v-model:value="tenantOwen" izExcludeMy/>-->
-      </Row>
+      </a-row>
     </div>
-  </Modal>
+  </a-modal>
 
   <!-- begin 我的受邀信息 -->
-  <Modal title="我的受邀信息" v-model:open="invitedVisible" :footer="null">
-    <Row :span="24" class="invited-row">
-      <Col :span="16"> 组织 </Col>
-      <Col :span="8"> 操作 </Col>
-    </Row>
-    <Row :span="24" class="invited-row-list" v-for="item in invitedList">
-      <Col :span="16">
+  <a-modal title="我的受邀信息" v-model:open="invitedVisible" :footer="null">
+    <a-row :span="24" class="invited-row">
+      <a-col :span="16"> 组织 </a-col>
+      <a-col :span="8"> 操作 </a-col>
+    </a-row>
+    <a-row :span="24" class="invited-row-list" v-for="item in invitedList">
+      <a-col :span="16">
         {{ item.name }}
-      </Col>
-      <Col :span="8">
+      </a-col>
+      <a-col :span="8">
         <span class="common" @click="joinOrRefuseClick(item.tenantUserId, '1')">加入</span>
         <span class="common refuse" @click="joinOrRefuseClick(item.tenantUserId, '4')">拒绝</span>
-      </Col>
-    </Row>
+      </a-col>
+    </a-row>
     <div style="height: 20px"></div>
-  </Modal>
+  </a-modal>
   <!-- end 我的受邀信息 -->
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, unref } from 'vue';
 import { getTenantListByUserId, cancelApplyTenant, exitUserTenant, changeOwenUserTenant, agreeOrRefuseJoinTenant } from './UserSetting.api';
 import { useUserStore } from '@/store/modules/user';
 import { useMessage } from '@/hooks/web/useMessage';
-import { Modal, Row, Col, Empty, Form, FormItem, Button, Input, InputPassword } from 'ant-design-vue';
+import { Modal } from 'ant-design-vue';
 import { router } from '@/router';
-import { useDesign } from '@begcode/components';
+import { useDesign } from '@/hooks/web/useDesign';
 
 defineOptions({
   name: 'TenantSetting',

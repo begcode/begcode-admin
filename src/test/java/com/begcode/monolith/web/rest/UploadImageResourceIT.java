@@ -47,11 +47,20 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockMyUser
 public class UploadImageResourceIT {
 
-    private static final String DEFAULT_URL = "AAAAAAAAAA";
-    private static final String UPDATED_URL = "BBBBBBBBBB";
-
     private static final String DEFAULT_FULL_NAME = "AAAAAAAAAA";
     private static final String UPDATED_FULL_NAME = "BBBBBBBBBB";
+
+    private static final String DEFAULT_BUSINESS_TITLE = "AAAAAAAAAA";
+    private static final String UPDATED_BUSINESS_TITLE = "BBBBBBBBBB";
+
+    private static final String DEFAULT_BUSINESS_DESC = "AAAAAAAAAA";
+    private static final String UPDATED_BUSINESS_DESC = "BBBBBBBBBB";
+
+    private static final String DEFAULT_BUSINESS_STATUS = "AAAAAAAAAA";
+    private static final String UPDATED_BUSINESS_STATUS = "BBBBBBBBBB";
+
+    private static final String DEFAULT_URL = "AAAAAAAAAA";
+    private static final String UPDATED_URL = "BBBBBBBBBB";
 
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
@@ -68,6 +77,10 @@ public class UploadImageResourceIT {
     private static final String DEFAULT_FOLDER = "AAAAAAAAAA";
     private static final String UPDATED_FOLDER = "BBBBBBBBBB";
 
+    private static final Long DEFAULT_FILE_SIZE = 1L;
+    private static final Long UPDATED_FILE_SIZE = 2L;
+    private static final Long SMALLER_FILE_SIZE = 1L - 1L;
+
     private static final String DEFAULT_OWNER_ENTITY_NAME = "AAAAAAAAAA";
     private static final String UPDATED_OWNER_ENTITY_NAME = "BBBBBBBBBB";
 
@@ -75,22 +88,9 @@ public class UploadImageResourceIT {
     private static final Long UPDATED_OWNER_ENTITY_ID = 2L;
     private static final Long SMALLER_OWNER_ENTITY_ID = 1L - 1L;
 
-    private static final String DEFAULT_BUSINESS_TITLE = "AAAAAAAAAA";
-    private static final String UPDATED_BUSINESS_TITLE = "BBBBBBBBBB";
-
-    private static final String DEFAULT_BUSINESS_DESC = "AAAAAAAAAA";
-    private static final String UPDATED_BUSINESS_DESC = "BBBBBBBBBB";
-
-    private static final String DEFAULT_BUSINESS_STATUS = "AAAAAAAAAA";
-    private static final String UPDATED_BUSINESS_STATUS = "BBBBBBBBBB";
-
     private static final ZonedDateTime DEFAULT_CREATE_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
     private static final ZonedDateTime UPDATED_CREATE_AT = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
     private static final ZonedDateTime SMALLER_CREATE_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
-
-    private static final Long DEFAULT_FILE_SIZE = 1L;
-    private static final Long UPDATED_FILE_SIZE = 2L;
-    private static final Long SMALLER_FILE_SIZE = 1L - 1L;
 
     private static final String DEFAULT_SMART_URL = "AAAAAAAAAA";
     private static final String UPDATED_SMART_URL = "BBBBBBBBBB";
@@ -152,20 +152,20 @@ public class UploadImageResourceIT {
      */
     public static UploadImage createEntity() {
         UploadImage uploadImage = new UploadImage()
-            .url(DEFAULT_URL)
             .fullName(DEFAULT_FULL_NAME)
+            .businessTitle(DEFAULT_BUSINESS_TITLE)
+            .businessDesc(DEFAULT_BUSINESS_DESC)
+            .businessStatus(DEFAULT_BUSINESS_STATUS)
+            .url(DEFAULT_URL)
             .name(DEFAULT_NAME)
             .ext(DEFAULT_EXT)
             .type(DEFAULT_TYPE)
             .path(DEFAULT_PATH)
             .folder(DEFAULT_FOLDER)
+            .fileSize(DEFAULT_FILE_SIZE)
             .ownerEntityName(DEFAULT_OWNER_ENTITY_NAME)
             .ownerEntityId(DEFAULT_OWNER_ENTITY_ID)
-            .businessTitle(DEFAULT_BUSINESS_TITLE)
-            .businessDesc(DEFAULT_BUSINESS_DESC)
-            .businessStatus(DEFAULT_BUSINESS_STATUS)
             .createAt(DEFAULT_CREATE_AT)
-            .fileSize(DEFAULT_FILE_SIZE)
             .smartUrl(DEFAULT_SMART_URL)
             .mediumUrl(DEFAULT_MEDIUM_URL)
             .referenceCount(DEFAULT_REFERENCE_COUNT)
@@ -184,20 +184,20 @@ public class UploadImageResourceIT {
      */
     public static UploadImage createUpdatedEntity() {
         UploadImage uploadImage = new UploadImage()
-            .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
+            .businessTitle(UPDATED_BUSINESS_TITLE)
+            .businessDesc(UPDATED_BUSINESS_DESC)
+            .businessStatus(UPDATED_BUSINESS_STATUS)
+            .url(UPDATED_URL)
             .name(UPDATED_NAME)
             .ext(UPDATED_EXT)
             .type(UPDATED_TYPE)
             .path(UPDATED_PATH)
             .folder(UPDATED_FOLDER)
+            .fileSize(UPDATED_FILE_SIZE)
             .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
             .ownerEntityId(UPDATED_OWNER_ENTITY_ID)
-            .businessTitle(UPDATED_BUSINESS_TITLE)
-            .businessDesc(UPDATED_BUSINESS_DESC)
-            .businessStatus(UPDATED_BUSINESS_STATUS)
             .createAt(UPDATED_CREATE_AT)
-            .fileSize(UPDATED_FILE_SIZE)
             .smartUrl(UPDATED_SMART_URL)
             .mediumUrl(UPDATED_MEDIUM_URL)
             .referenceCount(UPDATED_REFERENCE_COUNT)
@@ -292,20 +292,20 @@ public class UploadImageResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(uploadImage.getId().intValue())))
-            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)))
             .andExpect(jsonPath("$.[*].fullName").value(hasItem(DEFAULT_FULL_NAME)))
+            .andExpect(jsonPath("$.[*].businessTitle").value(hasItem(DEFAULT_BUSINESS_TITLE)))
+            .andExpect(jsonPath("$.[*].businessDesc").value(hasItem(DEFAULT_BUSINESS_DESC)))
+            .andExpect(jsonPath("$.[*].businessStatus").value(hasItem(DEFAULT_BUSINESS_STATUS)))
+            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].ext").value(hasItem(DEFAULT_EXT)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE)))
             .andExpect(jsonPath("$.[*].path").value(hasItem(DEFAULT_PATH)))
             .andExpect(jsonPath("$.[*].folder").value(hasItem(DEFAULT_FOLDER)))
+            .andExpect(jsonPath("$.[*].fileSize").value(hasItem(DEFAULT_FILE_SIZE.intValue())))
             .andExpect(jsonPath("$.[*].ownerEntityName").value(hasItem(DEFAULT_OWNER_ENTITY_NAME)))
             .andExpect(jsonPath("$.[*].ownerEntityId").value(hasItem(DEFAULT_OWNER_ENTITY_ID.intValue())))
-            .andExpect(jsonPath("$.[*].businessTitle").value(hasItem(DEFAULT_BUSINESS_TITLE)))
-            .andExpect(jsonPath("$.[*].businessDesc").value(hasItem(DEFAULT_BUSINESS_DESC)))
-            .andExpect(jsonPath("$.[*].businessStatus").value(hasItem(DEFAULT_BUSINESS_STATUS)))
             .andExpect(jsonPath("$.[*].createAt").value(hasItem(sameInstant(DEFAULT_CREATE_AT))))
-            .andExpect(jsonPath("$.[*].fileSize").value(hasItem(DEFAULT_FILE_SIZE.intValue())))
             .andExpect(jsonPath("$.[*].smartUrl").value(hasItem(DEFAULT_SMART_URL)))
             .andExpect(jsonPath("$.[*].mediumUrl").value(hasItem(DEFAULT_MEDIUM_URL)))
             .andExpect(jsonPath("$.[*].referenceCount").value(hasItem(DEFAULT_REFERENCE_COUNT.intValue())))
@@ -344,20 +344,20 @@ public class UploadImageResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(uploadImage.getId().intValue()))
-            .andExpect(jsonPath("$.url").value(DEFAULT_URL))
             .andExpect(jsonPath("$.fullName").value(DEFAULT_FULL_NAME))
+            .andExpect(jsonPath("$.businessTitle").value(DEFAULT_BUSINESS_TITLE))
+            .andExpect(jsonPath("$.businessDesc").value(DEFAULT_BUSINESS_DESC))
+            .andExpect(jsonPath("$.businessStatus").value(DEFAULT_BUSINESS_STATUS))
+            .andExpect(jsonPath("$.url").value(DEFAULT_URL))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.ext").value(DEFAULT_EXT))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE))
             .andExpect(jsonPath("$.path").value(DEFAULT_PATH))
             .andExpect(jsonPath("$.folder").value(DEFAULT_FOLDER))
+            .andExpect(jsonPath("$.fileSize").value(DEFAULT_FILE_SIZE.intValue()))
             .andExpect(jsonPath("$.ownerEntityName").value(DEFAULT_OWNER_ENTITY_NAME))
             .andExpect(jsonPath("$.ownerEntityId").value(DEFAULT_OWNER_ENTITY_ID.intValue()))
-            .andExpect(jsonPath("$.businessTitle").value(DEFAULT_BUSINESS_TITLE))
-            .andExpect(jsonPath("$.businessDesc").value(DEFAULT_BUSINESS_DESC))
-            .andExpect(jsonPath("$.businessStatus").value(DEFAULT_BUSINESS_STATUS))
             .andExpect(jsonPath("$.createAt").value(sameInstant(DEFAULT_CREATE_AT)))
-            .andExpect(jsonPath("$.fileSize").value(DEFAULT_FILE_SIZE.intValue()))
             .andExpect(jsonPath("$.smartUrl").value(DEFAULT_SMART_URL))
             .andExpect(jsonPath("$.mediumUrl").value(DEFAULT_MEDIUM_URL))
             .andExpect(jsonPath("$.referenceCount").value(DEFAULT_REFERENCE_COUNT.intValue()))
@@ -380,56 +380,6 @@ public class UploadImageResourceIT {
         defaultUploadImageFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
         defaultUploadImageFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByUrlIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where url equals to
-        defaultUploadImageFiltering("url.equals=" + DEFAULT_URL, "url.equals=" + UPDATED_URL);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByUrlIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where url in
-        defaultUploadImageFiltering("url.in=" + DEFAULT_URL + "," + UPDATED_URL, "url.in=" + UPDATED_URL);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByUrlIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where url is not null
-        defaultUploadImageFiltering("url.specified=true", "url.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByUrlContainsSomething() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where url contains
-        defaultUploadImageFiltering("url.contains=" + DEFAULT_URL, "url.contains=" + UPDATED_URL);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByUrlNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where url does not contain
-        defaultUploadImageFiltering("url.doesNotContain=" + UPDATED_URL, "url.doesNotContain=" + DEFAULT_URL);
     }
 
     @Test
@@ -480,6 +430,227 @@ public class UploadImageResourceIT {
 
         // Get all the uploadImageList where fullName does not contain
         defaultUploadImageFiltering("fullName.doesNotContain=" + UPDATED_FULL_NAME, "fullName.doesNotContain=" + DEFAULT_FULL_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByBusinessTitleIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where businessTitle equals to
+        defaultUploadImageFiltering("businessTitle.equals=" + DEFAULT_BUSINESS_TITLE, "businessTitle.equals=" + UPDATED_BUSINESS_TITLE);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByBusinessTitleIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where businessTitle in
+        defaultUploadImageFiltering(
+            "businessTitle.in=" + DEFAULT_BUSINESS_TITLE + "," + UPDATED_BUSINESS_TITLE,
+            "businessTitle.in=" + UPDATED_BUSINESS_TITLE
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByBusinessTitleIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where businessTitle is not null
+        defaultUploadImageFiltering("businessTitle.specified=true", "businessTitle.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByBusinessTitleContainsSomething() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where businessTitle contains
+        defaultUploadImageFiltering("businessTitle.contains=" + DEFAULT_BUSINESS_TITLE, "businessTitle.contains=" + UPDATED_BUSINESS_TITLE);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByBusinessTitleNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where businessTitle does not contain
+        defaultUploadImageFiltering(
+            "businessTitle.doesNotContain=" + UPDATED_BUSINESS_TITLE,
+            "businessTitle.doesNotContain=" + DEFAULT_BUSINESS_TITLE
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByBusinessDescIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where businessDesc equals to
+        defaultUploadImageFiltering("businessDesc.equals=" + DEFAULT_BUSINESS_DESC, "businessDesc.equals=" + UPDATED_BUSINESS_DESC);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByBusinessDescIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where businessDesc in
+        defaultUploadImageFiltering(
+            "businessDesc.in=" + DEFAULT_BUSINESS_DESC + "," + UPDATED_BUSINESS_DESC,
+            "businessDesc.in=" + UPDATED_BUSINESS_DESC
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByBusinessDescIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where businessDesc is not null
+        defaultUploadImageFiltering("businessDesc.specified=true", "businessDesc.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByBusinessDescContainsSomething() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where businessDesc contains
+        defaultUploadImageFiltering("businessDesc.contains=" + DEFAULT_BUSINESS_DESC, "businessDesc.contains=" + UPDATED_BUSINESS_DESC);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByBusinessDescNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where businessDesc does not contain
+        defaultUploadImageFiltering(
+            "businessDesc.doesNotContain=" + UPDATED_BUSINESS_DESC,
+            "businessDesc.doesNotContain=" + DEFAULT_BUSINESS_DESC
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByBusinessStatusIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where businessStatus equals to
+        defaultUploadImageFiltering("businessStatus.equals=" + DEFAULT_BUSINESS_STATUS, "businessStatus.equals=" + UPDATED_BUSINESS_STATUS);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByBusinessStatusIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where businessStatus in
+        defaultUploadImageFiltering(
+            "businessStatus.in=" + DEFAULT_BUSINESS_STATUS + "," + UPDATED_BUSINESS_STATUS,
+            "businessStatus.in=" + UPDATED_BUSINESS_STATUS
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByBusinessStatusIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where businessStatus is not null
+        defaultUploadImageFiltering("businessStatus.specified=true", "businessStatus.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByBusinessStatusContainsSomething() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where businessStatus contains
+        defaultUploadImageFiltering(
+            "businessStatus.contains=" + DEFAULT_BUSINESS_STATUS,
+            "businessStatus.contains=" + UPDATED_BUSINESS_STATUS
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByBusinessStatusNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where businessStatus does not contain
+        defaultUploadImageFiltering(
+            "businessStatus.doesNotContain=" + UPDATED_BUSINESS_STATUS,
+            "businessStatus.doesNotContain=" + DEFAULT_BUSINESS_STATUS
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByUrlIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where url equals to
+        defaultUploadImageFiltering("url.equals=" + DEFAULT_URL, "url.equals=" + UPDATED_URL);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByUrlIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where url in
+        defaultUploadImageFiltering("url.in=" + DEFAULT_URL + "," + UPDATED_URL, "url.in=" + UPDATED_URL);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByUrlIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where url is not null
+        defaultUploadImageFiltering("url.specified=true", "url.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByUrlContainsSomething() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where url contains
+        defaultUploadImageFiltering("url.contains=" + DEFAULT_URL, "url.contains=" + UPDATED_URL);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByUrlNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where url does not contain
+        defaultUploadImageFiltering("url.doesNotContain=" + UPDATED_URL, "url.doesNotContain=" + DEFAULT_URL);
     }
 
     @Test
@@ -734,6 +905,76 @@ public class UploadImageResourceIT {
 
     @Test
     @Transactional
+    void getAllUploadImagesByFileSizeIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where fileSize equals to
+        defaultUploadImageFiltering("fileSize.equals=" + DEFAULT_FILE_SIZE, "fileSize.equals=" + UPDATED_FILE_SIZE);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByFileSizeIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where fileSize in
+        defaultUploadImageFiltering("fileSize.in=" + DEFAULT_FILE_SIZE + "," + UPDATED_FILE_SIZE, "fileSize.in=" + UPDATED_FILE_SIZE);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByFileSizeIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where fileSize is not null
+        defaultUploadImageFiltering("fileSize.specified=true", "fileSize.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByFileSizeIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where fileSize is greater than or equal to
+        defaultUploadImageFiltering("fileSize.greaterThanOrEqual=" + DEFAULT_FILE_SIZE, "fileSize.greaterThanOrEqual=" + UPDATED_FILE_SIZE);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByFileSizeIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where fileSize is less than or equal to
+        defaultUploadImageFiltering("fileSize.lessThanOrEqual=" + DEFAULT_FILE_SIZE, "fileSize.lessThanOrEqual=" + SMALLER_FILE_SIZE);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByFileSizeIsLessThanSomething() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where fileSize is less than
+        defaultUploadImageFiltering("fileSize.lessThan=" + UPDATED_FILE_SIZE, "fileSize.lessThan=" + DEFAULT_FILE_SIZE);
+    }
+
+    @Test
+    @Transactional
+    void getAllUploadImagesByFileSizeIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
+
+        // Get all the uploadImageList where fileSize is greater than
+        defaultUploadImageFiltering("fileSize.greaterThan=" + SMALLER_FILE_SIZE, "fileSize.greaterThan=" + DEFAULT_FILE_SIZE);
+    }
+
+    @Test
+    @Transactional
     void getAllUploadImagesByOwnerEntityNameIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
@@ -881,177 +1122,6 @@ public class UploadImageResourceIT {
 
     @Test
     @Transactional
-    void getAllUploadImagesByBusinessTitleIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where businessTitle equals to
-        defaultUploadImageFiltering("businessTitle.equals=" + DEFAULT_BUSINESS_TITLE, "businessTitle.equals=" + UPDATED_BUSINESS_TITLE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByBusinessTitleIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where businessTitle in
-        defaultUploadImageFiltering(
-            "businessTitle.in=" + DEFAULT_BUSINESS_TITLE + "," + UPDATED_BUSINESS_TITLE,
-            "businessTitle.in=" + UPDATED_BUSINESS_TITLE
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByBusinessTitleIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where businessTitle is not null
-        defaultUploadImageFiltering("businessTitle.specified=true", "businessTitle.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByBusinessTitleContainsSomething() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where businessTitle contains
-        defaultUploadImageFiltering("businessTitle.contains=" + DEFAULT_BUSINESS_TITLE, "businessTitle.contains=" + UPDATED_BUSINESS_TITLE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByBusinessTitleNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where businessTitle does not contain
-        defaultUploadImageFiltering(
-            "businessTitle.doesNotContain=" + UPDATED_BUSINESS_TITLE,
-            "businessTitle.doesNotContain=" + DEFAULT_BUSINESS_TITLE
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByBusinessDescIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where businessDesc equals to
-        defaultUploadImageFiltering("businessDesc.equals=" + DEFAULT_BUSINESS_DESC, "businessDesc.equals=" + UPDATED_BUSINESS_DESC);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByBusinessDescIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where businessDesc in
-        defaultUploadImageFiltering(
-            "businessDesc.in=" + DEFAULT_BUSINESS_DESC + "," + UPDATED_BUSINESS_DESC,
-            "businessDesc.in=" + UPDATED_BUSINESS_DESC
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByBusinessDescIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where businessDesc is not null
-        defaultUploadImageFiltering("businessDesc.specified=true", "businessDesc.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByBusinessDescContainsSomething() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where businessDesc contains
-        defaultUploadImageFiltering("businessDesc.contains=" + DEFAULT_BUSINESS_DESC, "businessDesc.contains=" + UPDATED_BUSINESS_DESC);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByBusinessDescNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where businessDesc does not contain
-        defaultUploadImageFiltering(
-            "businessDesc.doesNotContain=" + UPDATED_BUSINESS_DESC,
-            "businessDesc.doesNotContain=" + DEFAULT_BUSINESS_DESC
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByBusinessStatusIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where businessStatus equals to
-        defaultUploadImageFiltering("businessStatus.equals=" + DEFAULT_BUSINESS_STATUS, "businessStatus.equals=" + UPDATED_BUSINESS_STATUS);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByBusinessStatusIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where businessStatus in
-        defaultUploadImageFiltering(
-            "businessStatus.in=" + DEFAULT_BUSINESS_STATUS + "," + UPDATED_BUSINESS_STATUS,
-            "businessStatus.in=" + UPDATED_BUSINESS_STATUS
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByBusinessStatusIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where businessStatus is not null
-        defaultUploadImageFiltering("businessStatus.specified=true", "businessStatus.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByBusinessStatusContainsSomething() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where businessStatus contains
-        defaultUploadImageFiltering(
-            "businessStatus.contains=" + DEFAULT_BUSINESS_STATUS,
-            "businessStatus.contains=" + UPDATED_BUSINESS_STATUS
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByBusinessStatusNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where businessStatus does not contain
-        defaultUploadImageFiltering(
-            "businessStatus.doesNotContain=" + UPDATED_BUSINESS_STATUS,
-            "businessStatus.doesNotContain=" + DEFAULT_BUSINESS_STATUS
-        );
-    }
-
-    @Test
-    @Transactional
     void getAllUploadImagesByCreateAtIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
@@ -1118,76 +1188,6 @@ public class UploadImageResourceIT {
 
         // Get all the uploadImageList where createAt is greater than
         defaultUploadImageFiltering("createAt.greaterThan=" + SMALLER_CREATE_AT, "createAt.greaterThan=" + DEFAULT_CREATE_AT);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByFileSizeIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where fileSize equals to
-        defaultUploadImageFiltering("fileSize.equals=" + DEFAULT_FILE_SIZE, "fileSize.equals=" + UPDATED_FILE_SIZE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByFileSizeIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where fileSize in
-        defaultUploadImageFiltering("fileSize.in=" + DEFAULT_FILE_SIZE + "," + UPDATED_FILE_SIZE, "fileSize.in=" + UPDATED_FILE_SIZE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByFileSizeIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where fileSize is not null
-        defaultUploadImageFiltering("fileSize.specified=true", "fileSize.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByFileSizeIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where fileSize is greater than or equal to
-        defaultUploadImageFiltering("fileSize.greaterThanOrEqual=" + DEFAULT_FILE_SIZE, "fileSize.greaterThanOrEqual=" + UPDATED_FILE_SIZE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByFileSizeIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where fileSize is less than or equal to
-        defaultUploadImageFiltering("fileSize.lessThanOrEqual=" + DEFAULT_FILE_SIZE, "fileSize.lessThanOrEqual=" + SMALLER_FILE_SIZE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByFileSizeIsLessThanSomething() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where fileSize is less than
-        defaultUploadImageFiltering("fileSize.lessThan=" + UPDATED_FILE_SIZE, "fileSize.lessThan=" + DEFAULT_FILE_SIZE);
-    }
-
-    @Test
-    @Transactional
-    void getAllUploadImagesByFileSizeIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        insertedUploadImage = uploadImageRepository.saveAndGet(uploadImage);
-
-        // Get all the uploadImageList where fileSize is greater than
-        defaultUploadImageFiltering("fileSize.greaterThan=" + SMALLER_FILE_SIZE, "fileSize.greaterThan=" + DEFAULT_FILE_SIZE);
     }
 
     @Test
@@ -1633,20 +1633,20 @@ public class UploadImageResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(uploadImage.getId().intValue())))
-            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)))
             .andExpect(jsonPath("$.[*].fullName").value(hasItem(DEFAULT_FULL_NAME)))
+            .andExpect(jsonPath("$.[*].businessTitle").value(hasItem(DEFAULT_BUSINESS_TITLE)))
+            .andExpect(jsonPath("$.[*].businessDesc").value(hasItem(DEFAULT_BUSINESS_DESC)))
+            .andExpect(jsonPath("$.[*].businessStatus").value(hasItem(DEFAULT_BUSINESS_STATUS)))
+            .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL)))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].ext").value(hasItem(DEFAULT_EXT)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE)))
             .andExpect(jsonPath("$.[*].path").value(hasItem(DEFAULT_PATH)))
             .andExpect(jsonPath("$.[*].folder").value(hasItem(DEFAULT_FOLDER)))
+            .andExpect(jsonPath("$.[*].fileSize").value(hasItem(DEFAULT_FILE_SIZE.intValue())))
             .andExpect(jsonPath("$.[*].ownerEntityName").value(hasItem(DEFAULT_OWNER_ENTITY_NAME)))
             .andExpect(jsonPath("$.[*].ownerEntityId").value(hasItem(DEFAULT_OWNER_ENTITY_ID.intValue())))
-            .andExpect(jsonPath("$.[*].businessTitle").value(hasItem(DEFAULT_BUSINESS_TITLE)))
-            .andExpect(jsonPath("$.[*].businessDesc").value(hasItem(DEFAULT_BUSINESS_DESC)))
-            .andExpect(jsonPath("$.[*].businessStatus").value(hasItem(DEFAULT_BUSINESS_STATUS)))
             .andExpect(jsonPath("$.[*].createAt").value(hasItem(sameInstant(DEFAULT_CREATE_AT))))
-            .andExpect(jsonPath("$.[*].fileSize").value(hasItem(DEFAULT_FILE_SIZE.intValue())))
             .andExpect(jsonPath("$.[*].smartUrl").value(hasItem(DEFAULT_SMART_URL)))
             .andExpect(jsonPath("$.[*].mediumUrl").value(hasItem(DEFAULT_MEDIUM_URL)))
             .andExpect(jsonPath("$.[*].referenceCount").value(hasItem(DEFAULT_REFERENCE_COUNT.intValue())))
@@ -1700,20 +1700,20 @@ public class UploadImageResourceIT {
         // Update the uploadImage
         UploadImage updatedUploadImage = uploadImageRepository.findById(uploadImage.getId()).orElseThrow();
         updatedUploadImage
-            .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
+            .businessTitle(UPDATED_BUSINESS_TITLE)
+            .businessDesc(UPDATED_BUSINESS_DESC)
+            .businessStatus(UPDATED_BUSINESS_STATUS)
+            .url(UPDATED_URL)
             .name(UPDATED_NAME)
             .ext(UPDATED_EXT)
             .type(UPDATED_TYPE)
             .path(UPDATED_PATH)
             .folder(UPDATED_FOLDER)
+            .fileSize(UPDATED_FILE_SIZE)
             .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
             .ownerEntityId(UPDATED_OWNER_ENTITY_ID)
-            .businessTitle(UPDATED_BUSINESS_TITLE)
-            .businessDesc(UPDATED_BUSINESS_DESC)
-            .businessStatus(UPDATED_BUSINESS_STATUS)
             .createAt(UPDATED_CREATE_AT)
-            .fileSize(UPDATED_FILE_SIZE)
             .smartUrl(UPDATED_SMART_URL)
             .mediumUrl(UPDATED_MEDIUM_URL)
             .referenceCount(UPDATED_REFERENCE_COUNT)
@@ -1811,11 +1811,11 @@ public class UploadImageResourceIT {
         partialUpdatedUploadImage.setId(uploadImage.getId());
 
         partialUpdatedUploadImage
-            .fullName(UPDATED_FULL_NAME)
-            .path(UPDATED_PATH)
-            .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
             .businessTitle(UPDATED_BUSINESS_TITLE)
-            .createAt(UPDATED_CREATE_AT)
+            .name(UPDATED_NAME)
+            .type(UPDATED_TYPE)
+            .folder(UPDATED_FOLDER)
+            .ownerEntityId(UPDATED_OWNER_ENTITY_ID)
             .referenceCount(UPDATED_REFERENCE_COUNT);
 
         restUploadImageMockMvc
@@ -1848,20 +1848,20 @@ public class UploadImageResourceIT {
         partialUpdatedUploadImage.setId(uploadImage.getId());
 
         partialUpdatedUploadImage
-            .url(UPDATED_URL)
             .fullName(UPDATED_FULL_NAME)
+            .businessTitle(UPDATED_BUSINESS_TITLE)
+            .businessDesc(UPDATED_BUSINESS_DESC)
+            .businessStatus(UPDATED_BUSINESS_STATUS)
+            .url(UPDATED_URL)
             .name(UPDATED_NAME)
             .ext(UPDATED_EXT)
             .type(UPDATED_TYPE)
             .path(UPDATED_PATH)
             .folder(UPDATED_FOLDER)
+            .fileSize(UPDATED_FILE_SIZE)
             .ownerEntityName(UPDATED_OWNER_ENTITY_NAME)
             .ownerEntityId(UPDATED_OWNER_ENTITY_ID)
-            .businessTitle(UPDATED_BUSINESS_TITLE)
-            .businessDesc(UPDATED_BUSINESS_DESC)
-            .businessStatus(UPDATED_BUSINESS_STATUS)
             .createAt(UPDATED_CREATE_AT)
-            .fileSize(UPDATED_FILE_SIZE)
             .smartUrl(UPDATED_SMART_URL)
             .mediumUrl(UPDATED_MEDIUM_URL)
             .referenceCount(UPDATED_REFERENCE_COUNT)

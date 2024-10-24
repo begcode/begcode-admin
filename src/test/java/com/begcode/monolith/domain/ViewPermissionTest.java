@@ -58,26 +58,4 @@ class ViewPermissionTest {
         viewPermission.parent(null);
         assertThat(viewPermission.getParent()).isNull();
     }
-
-    @Test
-    void authoritiesTest() {
-        ViewPermission viewPermission = getViewPermissionRandomSampleGenerator();
-        Authority authorityBack = getAuthorityRandomSampleGenerator();
-
-        // todo viewPermission.addAuthorities(authorityBack);
-        // assertThat(viewPermission.getAuthorities()).containsOnly(authorityBack);
-        assertThat(authorityBack.getViewPermissions()).containsOnly(viewPermission);
-
-        // viewPermission.removeAuthorities(authorityBack);
-        // assertThat(viewPermission.getAuthorities()).doesNotContain(authorityBack);
-        assertThat(authorityBack.getViewPermissions()).doesNotContain(viewPermission);
-
-        viewPermission.authorities(new ArrayList<>(Set.of(authorityBack)));
-        assertThat(viewPermission.getAuthorities()).containsOnly(authorityBack);
-        assertThat(authorityBack.getViewPermissions()).containsOnly(viewPermission);
-
-        viewPermission.setAuthorities(new ArrayList<>());
-        assertThat(viewPermission.getAuthorities()).doesNotContain(authorityBack);
-        assertThat(authorityBack.getViewPermissions()).doesNotContain(viewPermission);
-    }
 }

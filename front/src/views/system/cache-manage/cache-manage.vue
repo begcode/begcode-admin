@@ -1,22 +1,20 @@
 <template>
-  <Card :bordered="false">
-    <Table :columns="columns" :data-source="data" rowKey="name">
+  <a-card :bordered="false">
+    <a-table :columns="columns" :data-source="data" rowKey="name">
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.dataIndex === 'action'">
-          <Button type="primary" @click="clear(text)">
-            <template #icon><ClearOutlined /></template>
+          <a-button type="primary" @click="clear(text)">
+            <template #icon><Icon icon="ant-design:clear-outlined" /></template>
             清除
-          </Button>
+          </a-button>
         </template>
       </template>
-    </Table>
-  </Card>
+    </a-table>
+  </a-card>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
-import { ClearOutlined } from '@ant-design/icons-vue';
-import { Card, Table, Button, message } from 'ant-design-vue';
+import { message } from 'ant-design-vue';
 import apiService from '@/api-service';
 
 const columns = [

@@ -1,5 +1,3 @@
-import { onUnmounted, ref, watchEffect } from 'vue';
-
 import type { UseRequestPlugin } from '../types';
 import type { CachedData } from '../utils/cache';
 import { getCache, setCache } from '../utils/cache';

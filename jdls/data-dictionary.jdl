@@ -8,6 +8,7 @@
 @addCustomMethod(service)
 @skipWebsite
 @importData
+@skipComponent(appEditPage-appDetailPage-appListPage)
 entity Dictionary {
 	dictName String required /** 字典名称 */
 	dictKey String required unique /** 字典Key */
@@ -27,7 +28,9 @@ entity Dictionary {
 @moduleName(system)
 @skipWebsite
 @addCustomMethod(service)
-entity SiteConfig {
+@importData
+@skipComponent(appListPage-appDetailPage-appEditPage)
+entity SystemConfig {
     categoryName String required /** 分类名称 */
     categoryKey String required /** 分类Key */
     disabled Boolean /** 是否禁用 */
@@ -39,7 +42,7 @@ entity SiteConfig {
 relationship OneToMany {
     @annotationOnSource(editInForm-editByTable-unidirectional-relateByIdEntity)
     /** 配置项列表 */
-    SiteConfig{items(name)}
+    SystemConfig{items(name)}
     to
     CommonFieldData
     @annotationOnSource(editInForm-editByTable-unidirectional-relateByIdEntity)
@@ -55,6 +58,7 @@ relationship OneToMany {
 @skipMenu
 @skipWebsite
 @importData
+@skipMobile
 entity CommonFieldData {
     name String /** 名称 */
     value String /** 字段值 */
@@ -80,6 +84,9 @@ entity CommonFieldData {
 @entityPackage(settings)
 @skipFakeData
 @skipWebsite
+@importData
+@publicApiBy("none")
+@skipComponent(appEditPage-appDetailPage-appListPage)
 entity RegionCode {
 	name String /** 名称 */
 	areaCode String /** 地区代码 */
@@ -124,6 +131,7 @@ enum RegionCodeLevel {
 @entityPackage(settings)
 @addCustomMethod(service)
 @skipWebsite
+@skipMobile
 entity SysFillRule {
   name String /** 规则名称 */
   code String /** 规则Code */
@@ -145,6 +153,7 @@ entity SysFillRule {
 @skipMenu
 @entityPackage(settings)
 @skipWebsite
+@skipMobile
 entity FillRuleItem {
   @sortField(asc)
   sortValue Integer /** 排序值 */
@@ -217,13 +226,43 @@ relationship OneToMany {
 @extendAbstractAuditingEntity
 @moduleName(system)
 @entityPackage(system)
-@addCustomMethod(listComponent)
+@addCustomMethod(listComponent-service)
 @skipMobile
+@importData
 entity FormConfig {
-    formKey String maxlength(100) /** 表单Key */
-    formName String maxlength(100) /** 名称 */
+    formKey String maxlength(100) unique required /** 表单Key */
+    formName String maxlength(100) unique required /** 名称 */
     @endUsed(codeEditor)
+    @fieldConfig(hideInList-hideInForm)
     formJson TextBlob /** 表单配置 */
+    formType FormConfigType /** 表单类型 */
+    @showBy("formType=DATA_FORM")
+    multiItems Boolean /** 多条数据 */
+}
+/**
+ * 表单配置类型
+ */
+enum FormConfigType {
+    /** 模型表单 */
+    MODEL_FORM,
+    /** 数据表单 */
+    DATA_FORM
+}
+
+
+/**
+ * 表单数据
+ */
+@skipFakeData
+@extendAbstractAuditingEntity
+@moduleName(system)
+@entityPackage(system)
+@skipMobile
+@skipMenu
+@importData
+entity FormSaveData {
+    @endUsed(codeEditor)
+    formData TextBlob /** 表单数据 */
 }
 
 /**
@@ -234,6 +273,10 @@ relationship ManyToOne {
     FormConfig{businessType(name)}
     to
     BusinessType with builtInEntity
+    /** 表单配置 */
+    FormSaveData{formConfig(formName)}
+    to
+    FormConfig
 }
 
 
@@ -241,4 +284,4 @@ service all with serviceClass
 filter *
 dto all with mapstruct
 paginate all with pagination
-clientRootFolder Dictionary, SysFillRule, FillRuleItem, RegionCode, SiteConfig, CommonFieldData, FormConfig with settings
+clientRootFolder Dictionary, SysFillRule, FillRuleItem, RegionCode, SystemConfig, CommonFieldData, FormConfig, FormSaveData with settings
