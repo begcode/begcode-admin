@@ -24,14 +24,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
     {
       label: '是否已读',
       field: 'hasRead',
-      render: (value, data) =>
-        h(Switch, {
-          disabled: true,
-          checked: value,
-          onChange: checked => {
-            data.hasRead = checked;
-          },
-        }),
+      render: (value, data) => h(Switch, { disabled: true, checked: value }),
     },
     {
       label: '阅读时间',

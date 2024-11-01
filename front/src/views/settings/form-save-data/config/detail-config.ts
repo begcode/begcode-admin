@@ -1,5 +1,4 @@
 import type { DescItem } from '@/components/Descriptions';
-import { CodeEditor } from '@/components/CodeEditor';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
@@ -15,14 +14,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
     {
       label: '表单数据',
       field: 'formData',
-      render: (value, _data) =>
-        h(CodeEditor, {
-          value,
-          options: { mode: 'application/json' },
-          onInput: value => {
-            _data.formData = value;
-          },
-        }),
+      render: (value, _data) => h('pre', [h('code', {}, value)]),
     },
     {
       label: '创建者Id',

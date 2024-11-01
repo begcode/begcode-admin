@@ -43,9 +43,6 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockMyUser
 public class FormSaveDataResourceIT {
 
-    private static final String DEFAULT_FORM_DATA = "AAAAAAAAAA";
-    private static final String UPDATED_FORM_DATA = "BBBBBBBBBB";
-
     private static final Long DEFAULT_CREATED_BY = 1L;
     private static final Long UPDATED_CREATED_BY = 2L;
     private static final Long SMALLER_CREATED_BY = 1L - 1L;
@@ -96,7 +93,6 @@ public class FormSaveDataResourceIT {
      */
     public static FormSaveData createEntity() {
         FormSaveData formSaveData = new FormSaveData()
-            .formData(DEFAULT_FORM_DATA)
             .createdBy(DEFAULT_CREATED_BY)
             .createdDate(DEFAULT_CREATED_DATE)
             .lastModifiedBy(DEFAULT_LAST_MODIFIED_BY)
@@ -112,7 +108,6 @@ public class FormSaveDataResourceIT {
      */
     public static FormSaveData createUpdatedEntity() {
         FormSaveData formSaveData = new FormSaveData()
-            .formData(UPDATED_FORM_DATA)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
@@ -187,7 +182,6 @@ public class FormSaveDataResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(formSaveData.getId().intValue())))
-            .andExpect(jsonPath("$.[*].formData").value(hasItem(DEFAULT_FORM_DATA.toString())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
@@ -223,7 +217,6 @@ public class FormSaveDataResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(formSaveData.getId().intValue()))
-            .andExpect(jsonPath("$.formData").value(DEFAULT_FORM_DATA.toString()))
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.intValue()))
             .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()))
             .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY.intValue()))
@@ -503,7 +496,6 @@ public class FormSaveDataResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(formSaveData.getId().intValue())))
-            .andExpect(jsonPath("$.[*].formData").value(hasItem(DEFAULT_FORM_DATA.toString())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
@@ -554,7 +546,6 @@ public class FormSaveDataResourceIT {
         // Update the formSaveData
         FormSaveData updatedFormSaveData = formSaveDataRepository.findById(formSaveData.getId()).orElseThrow();
         updatedFormSaveData
-            .formData(UPDATED_FORM_DATA)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
@@ -648,7 +639,7 @@ public class FormSaveDataResourceIT {
         FormSaveData partialUpdatedFormSaveData = new FormSaveData();
         partialUpdatedFormSaveData.setId(formSaveData.getId());
 
-        partialUpdatedFormSaveData.lastModifiedBy(UPDATED_LAST_MODIFIED_BY).lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
+        partialUpdatedFormSaveData.lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restFormSaveDataMockMvc
             .perform(
@@ -680,7 +671,6 @@ public class FormSaveDataResourceIT {
         partialUpdatedFormSaveData.setId(formSaveData.getId());
 
         partialUpdatedFormSaveData
-            .formData(UPDATED_FORM_DATA)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)

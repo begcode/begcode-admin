@@ -83,6 +83,9 @@ watch(
             url: item,
           };
         } else if (item && _isObject(item)) {
+          if (item.uid === undefined) {
+            item.uid = -i + '';
+          }
           return item;
         } else {
           return;
@@ -180,7 +183,15 @@ function getValue() {
   const list = (fileList.value || [])
     .filter(item => item?.status === UploadResultStatus.DONE)
     .map((item: any) => {
-      return item?.url || item?.response?.url;
+      if (props.fileValueType === 'object') {
+        if (item?.response?.url) {
+          return item.response;
+        } else {
+          return item;
+        }
+      } else {
+        return item?.url || item?.response?.url;
+      }
     });
   return props.multiple ? list : list.length > 0 ? list[0] : '';
 }

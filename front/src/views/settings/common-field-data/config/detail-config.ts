@@ -44,14 +44,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
     {
       label: '是否禁用',
       field: 'disabled',
-      render: (value, data) =>
-        h(Switch, {
-          disabled: true,
-          checked: value,
-          onChange: checked => {
-            data.disabled = checked;
-          },
-        }),
+      render: (value, data) => h(Switch, { disabled: true, checked: value }),
     },
     {
       label: '实体名称',

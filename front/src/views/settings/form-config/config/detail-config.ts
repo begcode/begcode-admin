@@ -1,7 +1,6 @@
 import { Switch } from 'ant-design-vue';
 import type { DescItem } from '@/components/Descriptions';
 import { useI18n } from '@/hooks/web/useI18n';
-import { CodeEditor } from '@/components/CodeEditor';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
@@ -25,14 +24,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
     {
       label: '表单配置',
       field: 'formJson',
-      render: (value, _data) =>
-        h(CodeEditor, {
-          value,
-          options: { mode: 'application/json' },
-          onInput: value => {
-            _data.formJson = value;
-          },
-        }),
+      render: (value, _data) => h('pre', [h('code', {}, value)]),
     },
     {
       label: '表单类型',
@@ -48,14 +40,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       show: values => {
         return values && values.formType === 'DATA_FORM';
       },
-      render: (value, data) =>
-        h(Switch, {
-          disabled: true,
-          checked: value,
-          onChange: checked => {
-            data.multiItems = checked;
-          },
-        }),
+      render: (value, data) => h(Switch, { disabled: true, checked: value }),
     },
     {
       label: '创建者Id',

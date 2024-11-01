@@ -24,14 +24,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
     {
       label: '是否禁用',
       field: 'disabled',
-      render: (value, data) =>
-        h(Switch, {
-          disabled: true,
-          checked: value,
-          onChange: checked => {
-            data.disabled = checked;
-          },
-        }),
+      render: (value, data) => h(Switch, { disabled: true, checked: value }),
     },
     {
       label: '排序',
@@ -40,26 +33,12 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
     {
       label: '是否内置',
       field: 'builtIn',
-      render: (value, data) =>
-        h(Switch, {
-          disabled: true,
-          checked: value,
-          onChange: checked => {
-            data.builtIn = checked;
-          },
-        }),
+      render: (value, data) => h(Switch, { disabled: true, checked: value }),
     },
     {
       label: '更新枚举',
       field: 'syncEnum',
-      render: (value, data) =>
-        h(Switch, {
-          disabled: true,
-          checked: value,
-          onChange: checked => {
-            data.syncEnum = checked;
-          },
-        }),
+      render: (value, data) => h(Switch, { disabled: true, checked: value }),
     },
   ].filter(item => !hideColumns.includes(item.field));
 };

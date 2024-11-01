@@ -52,14 +52,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
     {
       label: '启用',
       field: 'enabled',
-      render: (value, data) =>
-        h(Switch, {
-          disabled: true,
-          checked: value,
-          onChange: checked => {
-            data.enabled = checked;
-          },
-        }),
+      render: (value, data) => h(Switch, { disabled: true, checked: value }),
     },
     {
       label: '创建者Id',

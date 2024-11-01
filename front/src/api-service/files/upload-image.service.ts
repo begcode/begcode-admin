@@ -1,4 +1,5 @@
 import qs from 'qs';
+import { AxiosProgressEvent } from 'axios';
 import { defHttp } from '@/utils/http/axios';
 import buildPaginationQueryOpts from '@/utils/jhipster/sorts';
 import { PageRecord } from '@/models/baseModel';
@@ -62,17 +63,17 @@ export default {
     }
     return defHttp.patch({ url: `${apiUrl}/copy/${uploadImage.id}?${queryParams}`, data: uploadImage });
   },
-  create(uploadImage: IUploadImage, onUploadProgress?: (progressEvent: ProgressEvent) => void, success?) {
+  create(uploadImage: IUploadImage, onUploadProgress?: (progressEvent: AxiosProgressEvent) => void, success?) {
     const params: UploadFileParams = <UploadFileParams>{};
     params.name = 'image';
-    params.file = uploadImage.file as File;
-    if (uploadImage.filename) {
-      params.filename = uploadImage.filename;
+    params.file = uploadImage['file'] as File;
+    if (uploadImage['filename']) {
+      params.filename = uploadImage['filename'];
     } else {
-      params.filename = uploadImage!.file!.name;
+      params.filename = uploadImage['file']?.name || 'noFileName';
     }
     const newUploadImage = { ...uploadImage };
-    delete newUploadImage.file;
+    delete newUploadImage['file'];
     params.data = { uploadImageDTO: _pickBy(newUploadImage, value => !!value) };
     return defHttp.uploadFile<IUploadImage>(
       {

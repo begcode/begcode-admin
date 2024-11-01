@@ -1,7 +1,6 @@
 import { Switch } from 'ant-design-vue';
 import type { DescItem } from '@/components/Descriptions';
 import { useI18n } from '@/hooks/web/useI18n';
-import { CodeEditor } from '@/components/CodeEditor';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
@@ -25,7 +24,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
     {
       label: '配置数据',
       field: 'configData',
-      render: (value, _data) => h(CodeEditor, { src: value, style: 'width: 100px; height: 100px; object-fit: cover; border-radius: 50%;' }),
+      render: (value, _data) => h('pre', [h('code', {}, value)]),
     },
     {
       label: '短信签名',
@@ -38,14 +37,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
     {
       label: '启用',
       field: 'enabled',
-      render: (value, data) =>
-        h(Switch, {
-          disabled: true,
-          checked: value,
-          onChange: checked => {
-            data.enabled = checked;
-          },
-        }),
+      render: (value, data) => h(Switch, { disabled: true, checked: value }),
     },
   ].filter(item => !hideColumns.includes(item.field));
 };

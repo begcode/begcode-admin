@@ -556,51 +556,6 @@ const rowClick = ({ name, data, params }) => {
         }
         break;
       }
-      case 'itemsColumnEdit': {
-        popupConfig.containerProps.title = '关联通用字段数据';
-        popupConfig.containerProps.okText = '';
-        popupConfig.containerProps.cancelText = '关闭';
-        popupConfig.needSubmit = false;
-        popupConfig.containerProps.showOkBtn = false;
-        popupConfig.containerProps.showCancelBtn = true;
-        popupConfig.componentProps.is = shallowRefs.CommonFieldDataList;
-        const rowParams = {
-          ...params,
-          containerType: 'modal',
-          cardExtra: [],
-          cardSlots: [],
-          selectType: 'none',
-          gridOptions: {
-            toolbarConfig: {
-              import: false,
-              print: false,
-              export: false,
-              custom: false,
-              tools: [],
-              buttons: [],
-            },
-          },
-          source: 'SystemConfig',
-          gridCustomConfig: {
-            rowOperations: ['detail'],
-            hideColumns: ['systemConfig', 'dictionary'],
-          },
-          field: 'items',
-          query: {
-            'id.in': row.items.map(item => item.id),
-          },
-        };
-        Object.assign(popupConfig.componentProps, rowParams);
-        if (rowParams.containerType === 'drawer') {
-          popupConfig.containerProps.width = '45%';
-          popupConfig.containerProps.showFooter = true;
-          setDrawerProps({ open: true });
-        } else {
-          popupConfig.containerProps.width = '80%';
-          setModalProps({ open: true });
-        }
-        break;
-      }
       default:
         console.log('error', `${name}未定义`);
     }

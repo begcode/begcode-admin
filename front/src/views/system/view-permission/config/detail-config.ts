@@ -33,14 +33,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
     {
       label: '显示分组名',
       field: 'group',
-      render: (value, data) =>
-        h(Switch, {
-          disabled: true,
-          checked: value,
-          onChange: checked => {
-            data.group = checked;
-          },
-        }),
+      render: (value, data) => h(Switch, { disabled: true, checked: value }),
     },
     {
       label: '路由',
@@ -75,14 +68,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
     {
       label: '禁用菜单',
       field: 'disabled',
-      render: (value, data) =>
-        h(Switch, {
-          disabled: true,
-          checked: value,
-          onChange: checked => {
-            data.disabled = checked;
-          },
-        }),
+      render: (value, data) => h(Switch, { disabled: true, checked: value }),
     },
     {
       label: '隐藏菜单',
@@ -90,14 +76,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       show: values => {
         return values && values.type === 'MENU';
       },
-      render: (value, data) =>
-        h(Switch, {
-          disabled: true,
-          checked: value,
-          onChange: checked => {
-            data.hide = checked;
-          },
-        }),
+      render: (value, data) => h(Switch, { disabled: true, checked: value }),
     },
     {
       label: '隐藏面包屑',
@@ -105,14 +84,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       show: values => {
         return values && values.type === 'MENU';
       },
-      render: (value, data) =>
-        h(Switch, {
-          disabled: true,
-          checked: value,
-          onChange: checked => {
-            data.hideInBreadcrumb = checked;
-          },
-        }),
+      render: (value, data) => h(Switch, { disabled: true, checked: value }),
     },
     {
       label: '快捷菜单项',
@@ -120,14 +92,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       show: values => {
         return values && values.type === 'MENU';
       },
-      render: (value, data) =>
-        h(Switch, {
-          disabled: true,
-          checked: value,
-          onChange: checked => {
-            data.shortcut = checked;
-          },
-        }),
+      render: (value, data) => h(Switch, { disabled: true, checked: value }),
     },
     {
       label: '菜单根节点',
@@ -135,14 +100,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       show: values => {
         return values && values.type === 'MENU';
       },
-      render: (value, data) =>
-        h(Switch, {
-          disabled: true,
-          checked: value,
-          onChange: checked => {
-            data.shortcutRoot = checked;
-          },
-        }),
+      render: (value, data) => h(Switch, { disabled: true, checked: value }),
     },
     {
       label: '允许复用',
@@ -150,14 +108,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       show: values => {
         return values && values.type === 'MENU';
       },
-      render: (value, data) =>
-        h(Switch, {
-          disabled: true,
-          checked: value,
-          onChange: checked => {
-            data.reuse = checked;
-          },
-        }),
+      render: (value, data) => h(Switch, { disabled: true, checked: value }),
     },
     {
       label: '权限代码',

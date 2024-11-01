@@ -61,9 +61,6 @@ public class SysLogResourceIT {
     private static final String DEFAULT_METHOD = "AAAAAAAAAA";
     private static final String UPDATED_METHOD = "BBBBBBBBBB";
 
-    private static final String DEFAULT_REQUEST_PARAM = "AAAAAAAAAA";
-    private static final String UPDATED_REQUEST_PARAM = "BBBBBBBBBB";
-
     private static final String DEFAULT_REQUEST_TYPE = "AAAAAAAAAA";
     private static final String UPDATED_REQUEST_TYPE = "BBBBBBBBBB";
 
@@ -123,7 +120,6 @@ public class SysLogResourceIT {
             .username(DEFAULT_USERNAME)
             .ip(DEFAULT_IP)
             .method(DEFAULT_METHOD)
-            .requestParam(DEFAULT_REQUEST_PARAM)
             .requestType(DEFAULT_REQUEST_TYPE)
             .costTime(DEFAULT_COST_TIME)
             .createdBy(DEFAULT_CREATED_BY)
@@ -149,7 +145,6 @@ public class SysLogResourceIT {
             .username(UPDATED_USERNAME)
             .ip(UPDATED_IP)
             .method(UPDATED_METHOD)
-            .requestParam(UPDATED_REQUEST_PARAM)
             .requestType(UPDATED_REQUEST_TYPE)
             .costTime(UPDATED_COST_TIME)
             .createdBy(UPDATED_CREATED_BY)
@@ -234,7 +229,6 @@ public class SysLogResourceIT {
             .andExpect(jsonPath("$.[*].username").value(hasItem(DEFAULT_USERNAME)))
             .andExpect(jsonPath("$.[*].ip").value(hasItem(DEFAULT_IP)))
             .andExpect(jsonPath("$.[*].method").value(hasItem(DEFAULT_METHOD)))
-            .andExpect(jsonPath("$.[*].requestParam").value(hasItem(DEFAULT_REQUEST_PARAM.toString())))
             .andExpect(jsonPath("$.[*].requestType").value(hasItem(DEFAULT_REQUEST_TYPE)))
             .andExpect(jsonPath("$.[*].costTime").value(hasItem(DEFAULT_COST_TIME.intValue())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
@@ -263,7 +257,6 @@ public class SysLogResourceIT {
             .andExpect(jsonPath("$.username").value(DEFAULT_USERNAME))
             .andExpect(jsonPath("$.ip").value(DEFAULT_IP))
             .andExpect(jsonPath("$.method").value(DEFAULT_METHOD))
-            .andExpect(jsonPath("$.requestParam").value(DEFAULT_REQUEST_PARAM.toString()))
             .andExpect(jsonPath("$.requestType").value(DEFAULT_REQUEST_TYPE))
             .andExpect(jsonPath("$.costTime").value(DEFAULT_COST_TIME.intValue()))
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.intValue()))
@@ -1019,7 +1012,6 @@ public class SysLogResourceIT {
             .andExpect(jsonPath("$.[*].username").value(hasItem(DEFAULT_USERNAME)))
             .andExpect(jsonPath("$.[*].ip").value(hasItem(DEFAULT_IP)))
             .andExpect(jsonPath("$.[*].method").value(hasItem(DEFAULT_METHOD)))
-            .andExpect(jsonPath("$.[*].requestParam").value(hasItem(DEFAULT_REQUEST_PARAM.toString())))
             .andExpect(jsonPath("$.[*].requestType").value(hasItem(DEFAULT_REQUEST_TYPE)))
             .andExpect(jsonPath("$.[*].costTime").value(hasItem(DEFAULT_COST_TIME.intValue())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
@@ -1080,7 +1072,6 @@ public class SysLogResourceIT {
             .username(UPDATED_USERNAME)
             .ip(UPDATED_IP)
             .method(UPDATED_METHOD)
-            .requestParam(UPDATED_REQUEST_PARAM)
             .requestType(UPDATED_REQUEST_TYPE)
             .costTime(UPDATED_COST_TIME)
             .createdBy(UPDATED_CREATED_BY)
@@ -1177,9 +1168,9 @@ public class SysLogResourceIT {
             .logContent(UPDATED_LOG_CONTENT)
             .operateType(UPDATED_OPERATE_TYPE)
             .method(UPDATED_METHOD)
-            .requestParam(UPDATED_REQUEST_PARAM)
-            .createdBy(UPDATED_CREATED_BY)
-            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY);
+            .requestType(UPDATED_REQUEST_TYPE)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restSysLogMockMvc
             .perform(
@@ -1216,7 +1207,6 @@ public class SysLogResourceIT {
             .username(UPDATED_USERNAME)
             .ip(UPDATED_IP)
             .method(UPDATED_METHOD)
-            .requestParam(UPDATED_REQUEST_PARAM)
             .requestType(UPDATED_REQUEST_TYPE)
             .costTime(UPDATED_COST_TIME)
             .createdBy(UPDATED_CREATED_BY)

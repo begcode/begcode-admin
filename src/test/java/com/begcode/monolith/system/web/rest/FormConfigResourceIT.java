@@ -51,9 +51,6 @@ public class FormConfigResourceIT {
     private static final String DEFAULT_FORM_NAME = "AAAAAAAAAA";
     private static final String UPDATED_FORM_NAME = "BBBBBBBBBB";
 
-    private static final String DEFAULT_FORM_JSON = "AAAAAAAAAA";
-    private static final String UPDATED_FORM_JSON = "BBBBBBBBBB";
-
     private static final FormConfigType DEFAULT_FORM_TYPE = FormConfigType.MODEL_FORM;
     private static final FormConfigType UPDATED_FORM_TYPE = FormConfigType.DATA_FORM;
 
@@ -112,7 +109,6 @@ public class FormConfigResourceIT {
         FormConfig formConfig = new FormConfig()
             .formKey(DEFAULT_FORM_KEY)
             .formName(DEFAULT_FORM_NAME)
-            .formJson(DEFAULT_FORM_JSON)
             .formType(DEFAULT_FORM_TYPE)
             .multiItems(DEFAULT_MULTI_ITEMS)
             .createdBy(DEFAULT_CREATED_BY)
@@ -132,7 +128,6 @@ public class FormConfigResourceIT {
         FormConfig formConfig = new FormConfig()
             .formKey(UPDATED_FORM_KEY)
             .formName(UPDATED_FORM_NAME)
-            .formJson(UPDATED_FORM_JSON)
             .formType(UPDATED_FORM_TYPE)
             .multiItems(UPDATED_MULTI_ITEMS)
             .createdBy(UPDATED_CREATED_BY)
@@ -245,7 +240,6 @@ public class FormConfigResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(formConfig.getId().intValue())))
             .andExpect(jsonPath("$.[*].formKey").value(hasItem(DEFAULT_FORM_KEY)))
             .andExpect(jsonPath("$.[*].formName").value(hasItem(DEFAULT_FORM_NAME)))
-            .andExpect(jsonPath("$.[*].formJson").value(hasItem(DEFAULT_FORM_JSON.toString())))
             .andExpect(jsonPath("$.[*].formType").value(hasItem(DEFAULT_FORM_TYPE.toString())))
             .andExpect(jsonPath("$.[*].multiItems").value(hasItem(DEFAULT_MULTI_ITEMS.booleanValue())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
@@ -285,7 +279,6 @@ public class FormConfigResourceIT {
             .andExpect(jsonPath("$.id").value(formConfig.getId().intValue()))
             .andExpect(jsonPath("$.formKey").value(DEFAULT_FORM_KEY))
             .andExpect(jsonPath("$.formName").value(DEFAULT_FORM_NAME))
-            .andExpect(jsonPath("$.formJson").value(DEFAULT_FORM_JSON.toString()))
             .andExpect(jsonPath("$.formType").value(DEFAULT_FORM_TYPE.toString()))
             .andExpect(jsonPath("$.multiItems").value(DEFAULT_MULTI_ITEMS.booleanValue()))
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.intValue()))
@@ -732,7 +725,6 @@ public class FormConfigResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(formConfig.getId().intValue())))
             .andExpect(jsonPath("$.[*].formKey").value(hasItem(DEFAULT_FORM_KEY)))
             .andExpect(jsonPath("$.[*].formName").value(hasItem(DEFAULT_FORM_NAME)))
-            .andExpect(jsonPath("$.[*].formJson").value(hasItem(DEFAULT_FORM_JSON.toString())))
             .andExpect(jsonPath("$.[*].formType").value(hasItem(DEFAULT_FORM_TYPE.toString())))
             .andExpect(jsonPath("$.[*].multiItems").value(hasItem(DEFAULT_MULTI_ITEMS.booleanValue())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
@@ -787,7 +779,6 @@ public class FormConfigResourceIT {
         updatedFormConfig
             .formKey(UPDATED_FORM_KEY)
             .formName(UPDATED_FORM_NAME)
-            .formJson(UPDATED_FORM_JSON)
             .formType(UPDATED_FORM_TYPE)
             .multiItems(UPDATED_MULTI_ITEMS)
             .createdBy(UPDATED_CREATED_BY)
@@ -884,11 +875,10 @@ public class FormConfigResourceIT {
         partialUpdatedFormConfig.setId(formConfig.getId());
 
         partialUpdatedFormConfig
-            .formJson(UPDATED_FORM_JSON)
             .formType(UPDATED_FORM_TYPE)
             .multiItems(UPDATED_MULTI_ITEMS)
             .createdBy(UPDATED_CREATED_BY)
-            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
+            .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restFormConfigMockMvc
@@ -923,7 +913,6 @@ public class FormConfigResourceIT {
         partialUpdatedFormConfig
             .formKey(UPDATED_FORM_KEY)
             .formName(UPDATED_FORM_NAME)
-            .formJson(UPDATED_FORM_JSON)
             .formType(UPDATED_FORM_TYPE)
             .multiItems(UPDATED_MULTI_ITEMS)
             .createdBy(UPDATED_CREATED_BY)

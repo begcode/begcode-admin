@@ -185,6 +185,7 @@ entity AnnouncementRecord {
 @addCustomMethod(service)
 @importData
 @skipMobile
+@skipWebsite
 entity TaskJobConfig {
     name String /** 任务名称 */
     jobClassName String /** 任务类名 */

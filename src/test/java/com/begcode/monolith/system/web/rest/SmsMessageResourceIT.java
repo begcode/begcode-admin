@@ -53,9 +53,6 @@ public class SmsMessageResourceIT {
     private static final String DEFAULT_PARAMS = "AAAAAAAAAA";
     private static final String UPDATED_PARAMS = "BBBBBBBBBB";
 
-    private static final String DEFAULT_CONTENT = "AAAAAAAAAA";
-    private static final String UPDATED_CONTENT = "BBBBBBBBBB";
-
     private static final ZonedDateTime DEFAULT_SEND_TIME = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
     private static final ZonedDateTime UPDATED_SEND_TIME = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
     private static final ZonedDateTime SMALLER_SEND_TIME = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
@@ -121,7 +118,6 @@ public class SmsMessageResourceIT {
             .sendType(DEFAULT_SEND_TYPE)
             .receiver(DEFAULT_RECEIVER)
             .params(DEFAULT_PARAMS)
-            .content(DEFAULT_CONTENT)
             .sendTime(DEFAULT_SEND_TIME)
             .sendStatus(DEFAULT_SEND_STATUS)
             .retryNum(DEFAULT_RETRY_NUM)
@@ -146,7 +142,6 @@ public class SmsMessageResourceIT {
             .sendType(UPDATED_SEND_TYPE)
             .receiver(UPDATED_RECEIVER)
             .params(UPDATED_PARAMS)
-            .content(UPDATED_CONTENT)
             .sendTime(UPDATED_SEND_TIME)
             .sendStatus(UPDATED_SEND_STATUS)
             .retryNum(UPDATED_RETRY_NUM)
@@ -230,7 +225,6 @@ public class SmsMessageResourceIT {
             .andExpect(jsonPath("$.[*].sendType").value(hasItem(DEFAULT_SEND_TYPE.toString())))
             .andExpect(jsonPath("$.[*].receiver").value(hasItem(DEFAULT_RECEIVER)))
             .andExpect(jsonPath("$.[*].params").value(hasItem(DEFAULT_PARAMS)))
-            .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT.toString())))
             .andExpect(jsonPath("$.[*].sendTime").value(hasItem(sameInstant(DEFAULT_SEND_TIME))))
             .andExpect(jsonPath("$.[*].sendStatus").value(hasItem(DEFAULT_SEND_STATUS.toString())))
             .andExpect(jsonPath("$.[*].retryNum").value(hasItem(DEFAULT_RETRY_NUM)))
@@ -258,7 +252,6 @@ public class SmsMessageResourceIT {
             .andExpect(jsonPath("$.sendType").value(DEFAULT_SEND_TYPE.toString()))
             .andExpect(jsonPath("$.receiver").value(DEFAULT_RECEIVER))
             .andExpect(jsonPath("$.params").value(DEFAULT_PARAMS))
-            .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT.toString()))
             .andExpect(jsonPath("$.sendTime").value(sameInstant(DEFAULT_SEND_TIME)))
             .andExpect(jsonPath("$.sendStatus").value(DEFAULT_SEND_STATUS.toString()))
             .andExpect(jsonPath("$.retryNum").value(DEFAULT_RETRY_NUM))
@@ -989,7 +982,6 @@ public class SmsMessageResourceIT {
             .andExpect(jsonPath("$.[*].sendType").value(hasItem(DEFAULT_SEND_TYPE.toString())))
             .andExpect(jsonPath("$.[*].receiver").value(hasItem(DEFAULT_RECEIVER)))
             .andExpect(jsonPath("$.[*].params").value(hasItem(DEFAULT_PARAMS)))
-            .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT.toString())))
             .andExpect(jsonPath("$.[*].sendTime").value(hasItem(sameInstant(DEFAULT_SEND_TIME))))
             .andExpect(jsonPath("$.[*].sendStatus").value(hasItem(DEFAULT_SEND_STATUS.toString())))
             .andExpect(jsonPath("$.[*].retryNum").value(hasItem(DEFAULT_RETRY_NUM)))
@@ -1049,7 +1041,6 @@ public class SmsMessageResourceIT {
             .sendType(UPDATED_SEND_TYPE)
             .receiver(UPDATED_RECEIVER)
             .params(UPDATED_PARAMS)
-            .content(UPDATED_CONTENT)
             .sendTime(UPDATED_SEND_TIME)
             .sendStatus(UPDATED_SEND_STATUS)
             .retryNum(UPDATED_RETRY_NUM)
@@ -1152,9 +1143,8 @@ public class SmsMessageResourceIT {
             .sendType(UPDATED_SEND_TYPE)
             .receiver(UPDATED_RECEIVER)
             .params(UPDATED_PARAMS)
-            .retryNum(UPDATED_RETRY_NUM)
             .failResult(UPDATED_FAIL_RESULT)
-            .createdDate(UPDATED_CREATED_DATE)
+            .remark(UPDATED_REMARK)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
             .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
@@ -1192,7 +1182,6 @@ public class SmsMessageResourceIT {
             .sendType(UPDATED_SEND_TYPE)
             .receiver(UPDATED_RECEIVER)
             .params(UPDATED_PARAMS)
-            .content(UPDATED_CONTENT)
             .sendTime(UPDATED_SEND_TIME)
             .sendStatus(UPDATED_SEND_STATUS)
             .retryNum(UPDATED_RETRY_NUM)

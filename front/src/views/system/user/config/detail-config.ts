@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { Switch, Select } from 'ant-design-vue';
+import { Switch, Tag } from 'ant-design-vue';
 import type { DescItem } from '@/components/Descriptions';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
@@ -47,14 +47,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
     {
       label: '激活状态',
       field: 'activated',
-      render: (value, data) =>
-        h(Switch, {
-          disabled: true,
-          checked: value,
-          onChange: checked => {
-            data.activated = checked;
-          },
-        }),
+      render: (value, data) => h(Switch, { disabled: true, checked: value }),
     },
     {
       label: '语言Key',
@@ -104,14 +97,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
     {
       label: '角色列表',
       field: 'authorities',
-      render: value =>
-        h(Select, {
-          disabled: true,
-          labelInValue: true,
-          mode: 'multiple',
-          fieldNames: { label: 'id', value: 'name' },
-          value: (value || []).map(item => ({ value: item.id, label: item.name })),
-        }),
+      render: value => h('div', () => (value || []).map(item => h(Tag, [item.name]))),
     },
   ].filter(item => !hideColumns.includes(item.field));
 };

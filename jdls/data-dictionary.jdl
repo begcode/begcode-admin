@@ -228,6 +228,7 @@ relationship OneToMany {
 @entityPackage(system)
 @addCustomMethod(listComponent-service)
 @skipMobile
+@skipWebsite
 @importData
 entity FormConfig {
     formKey String maxlength(100) unique required /** 表单Key */
@@ -258,6 +259,7 @@ enum FormConfigType {
 @moduleName(system)
 @entityPackage(system)
 @skipMobile
+@skipWebsite
 @skipMenu
 @importData
 entity FormSaveData {

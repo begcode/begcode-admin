@@ -1,4 +1,4 @@
-import { Select } from 'ant-design-vue';
+import { Tag } from 'ant-design-vue';
 import type { DescItem } from '@/components/Descriptions';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
@@ -40,14 +40,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
     {
       label: '角色列表',
       field: 'authorities',
-      render: value =>
-        h(Select, {
-          disabled: true,
-          labelInValue: true,
-          mode: 'multiple',
-          fieldNames: { label: 'id', value: 'name' },
-          value: (value || []).map(item => ({ value: item.id, label: item.name })),
-        }),
+      render: value => h('div', () => (value || []).map(item => h(Tag, [item.name]))),
     },
     {
       label: '上级',

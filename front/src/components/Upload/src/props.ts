@@ -1,5 +1,6 @@
 import type { Options } from 'sortablejs';
 import type { Merge, PromiseFn } from '#/types';
+import apiService from '@/api-service';
 
 export type SortOptions = Merge<
   Omit<Options, 'onEnd'>,
@@ -23,7 +24,7 @@ export const basicProps = {
   // 文件最大多少MB
   maxSize: {
     type: Number as PropType<number>,
-    default: 2,
+    default: 10,
   },
   // 最大数量的文件，Infinity不限制
   maxNumber: {
@@ -45,7 +46,7 @@ export const basicProps = {
   },
   api: {
     type: [Function, String] as PropType<PromiseFn | string>,
-    default: null,
+    default: () => apiService.files.uploadImageService.create,
   },
   name: {
     type: String as PropType<string>,
@@ -63,6 +64,11 @@ export const basicProps = {
   fileListDragOptions: {
     type: Object as PropType<SortOptions>,
     default: () => ({}),
+  },
+
+  fileValueType: {
+    type: String, // 'string' | 'object'
+    default: 'string',
   },
 };
 

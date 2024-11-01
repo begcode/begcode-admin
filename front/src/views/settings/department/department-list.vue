@@ -596,51 +596,6 @@ const rowClick = ({ name, data, params }) => {
         }
         break;
       }
-      case 'usersColumnEdit': {
-        popupConfig.containerProps.title = '关联用户';
-        popupConfig.containerProps.okText = '';
-        popupConfig.containerProps.cancelText = '关闭';
-        popupConfig.needSubmit = false;
-        popupConfig.containerProps.showOkBtn = false;
-        popupConfig.containerProps.showCancelBtn = true;
-        popupConfig.componentProps.is = shallowRefs.UserList;
-        const rowParams = {
-          ...params,
-          containerType: 'modal',
-          cardExtra: [],
-          cardSlots: [],
-          selectType: 'none',
-          gridOptions: {
-            toolbarConfig: {
-              import: false,
-              print: false,
-              export: false,
-              custom: false,
-              tools: [],
-              buttons: [],
-            },
-          },
-          source: 'Department',
-          gridCustomConfig: {
-            rowOperations: ['detail'],
-            hideColumns: ['department', 'position', 'authorities'],
-          },
-          field: 'users',
-          query: {
-            departmentId: row.id,
-          },
-        };
-        Object.assign(popupConfig.componentProps, rowParams);
-        if (rowParams.containerType === 'drawer') {
-          popupConfig.containerProps.width = '45%';
-          popupConfig.containerProps.showFooter = true;
-          setDrawerProps({ open: true });
-        } else {
-          popupConfig.containerProps.width = '80%';
-          setModalProps({ open: true });
-        }
-        break;
-      }
       default:
         console.log('error', `${name}未定义`);
     }
