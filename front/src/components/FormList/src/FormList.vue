@@ -35,10 +35,10 @@
         <template #renderItem="{ item, index }">
           <a-list-item>
             <a-row justify="center" align="middle">
-              <a-col :span="21">
+              <a-col :span="multiple ? 21 : 24">
                 <BasicForm v-bind="item" :ref="el => setFormRef(el, index)"></BasicForm>
               </a-col>
-              <a-col :span="3" justify="center" align="middle">
+              <a-col :span="3" justify="center" align="middle" v-if="multiple">
                 <a-space direction="vertical" :size="18">
                   <a-tooltip>
                     <template #title>插入</template>
@@ -124,12 +124,16 @@ const props = defineProps({
     default: '',
   },
   fieldData: {
-    type: Array as PropType<any[]>,
+    type: Array || Object,
     default: [],
   },
   sortFieldName: {
     type: String,
     default: '',
+  },
+  multiple: {
+    type: Boolean,
+    default: true,
   },
 });
 // 暴露内部方法
@@ -163,7 +167,8 @@ const data = ref<any[]>([]);
 
 watchEffect(() => {
   const result: any[] = [];
-  props.fieldData.forEach(item => {
+  const allData = _isArray(props.fieldData) ? props.fieldData : props.fieldData ? [props.fieldData] : [];
+  allData.forEach(item => {
     if (item) {
       const formConfig = { model: item, ...baseFormConfig, ...props.formConfig };
       result.push(formConfig);
@@ -284,7 +289,7 @@ async function validate() {
     }
   }
   return new Promise(resolve => {
-    return resolve(success ? { [props.fieldName]: data } : success);
+    return resolve(success ? { [props.fieldName]: props.multiple ? data : data[0] } : success);
   });
 }
 

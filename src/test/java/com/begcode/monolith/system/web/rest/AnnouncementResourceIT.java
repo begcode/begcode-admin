@@ -48,6 +48,12 @@ public class AnnouncementResourceIT {
     private static final String DEFAULT_TITLE = "AAAAAAAAAA";
     private static final String UPDATED_TITLE = "BBBBBBBBBB";
 
+    private static final String DEFAULT_SUMMARY = "AAAAAAAAAA";
+    private static final String UPDATED_SUMMARY = "BBBBBBBBBB";
+
+    private static final String DEFAULT_CONTENT = "AAAAAAAAAA";
+    private static final String UPDATED_CONTENT = "BBBBBBBBBB";
+
     private static final ZonedDateTime DEFAULT_START_TIME = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
     private static final ZonedDateTime UPDATED_START_TIME = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
     private static final ZonedDateTime SMALLER_START_TIME = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
@@ -92,6 +98,9 @@ public class AnnouncementResourceIT {
 
     private static final String DEFAULT_OPEN_PAGE = "AAAAAAAAAA";
     private static final String UPDATED_OPEN_PAGE = "BBBBBBBBBB";
+
+    private static final String DEFAULT_RECEIVER_IDS = "AAAAAAAAAA";
+    private static final String UPDATED_RECEIVER_IDS = "BBBBBBBBBB";
 
     private static final Long DEFAULT_CREATED_BY = 1L;
     private static final Long UPDATED_CREATED_BY = 2L;
@@ -138,6 +147,8 @@ public class AnnouncementResourceIT {
     public static Announcement createEntity() {
         Announcement announcement = new Announcement()
             .title(DEFAULT_TITLE)
+            .summary(DEFAULT_SUMMARY)
+            .content(DEFAULT_CONTENT)
             .startTime(DEFAULT_START_TIME)
             .endTime(DEFAULT_END_TIME)
             .senderId(DEFAULT_SENDER_ID)
@@ -151,6 +162,7 @@ public class AnnouncementResourceIT {
             .businessId(DEFAULT_BUSINESS_ID)
             .openType(DEFAULT_OPEN_TYPE)
             .openPage(DEFAULT_OPEN_PAGE)
+            .receiverIds(DEFAULT_RECEIVER_IDS)
             .createdBy(DEFAULT_CREATED_BY)
             .createdDate(DEFAULT_CREATED_DATE)
             .lastModifiedBy(DEFAULT_LAST_MODIFIED_BY)
@@ -167,6 +179,8 @@ public class AnnouncementResourceIT {
     public static Announcement createUpdatedEntity() {
         Announcement announcement = new Announcement()
             .title(UPDATED_TITLE)
+            .summary(UPDATED_SUMMARY)
+            .content(UPDATED_CONTENT)
             .startTime(UPDATED_START_TIME)
             .endTime(UPDATED_END_TIME)
             .senderId(UPDATED_SENDER_ID)
@@ -180,6 +194,7 @@ public class AnnouncementResourceIT {
             .businessId(UPDATED_BUSINESS_ID)
             .openType(UPDATED_OPEN_TYPE)
             .openPage(UPDATED_OPEN_PAGE)
+            .receiverIds(UPDATED_RECEIVER_IDS)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
@@ -289,6 +304,8 @@ public class AnnouncementResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(announcement.getId().intValue())))
             .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE)))
+            .andExpect(jsonPath("$.[*].summary").value(hasItem(DEFAULT_SUMMARY.toString())))
+            .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT.toString())))
             .andExpect(jsonPath("$.[*].startTime").value(hasItem(sameInstant(DEFAULT_START_TIME))))
             .andExpect(jsonPath("$.[*].endTime").value(hasItem(sameInstant(DEFAULT_END_TIME))))
             .andExpect(jsonPath("$.[*].senderId").value(hasItem(DEFAULT_SENDER_ID.intValue())))
@@ -302,6 +319,7 @@ public class AnnouncementResourceIT {
             .andExpect(jsonPath("$.[*].businessId").value(hasItem(DEFAULT_BUSINESS_ID.intValue())))
             .andExpect(jsonPath("$.[*].openType").value(hasItem(DEFAULT_OPEN_TYPE.toString())))
             .andExpect(jsonPath("$.[*].openPage").value(hasItem(DEFAULT_OPEN_PAGE)))
+            .andExpect(jsonPath("$.[*].receiverIds").value(hasItem(DEFAULT_RECEIVER_IDS.toString())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
@@ -321,6 +339,8 @@ public class AnnouncementResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(announcement.getId().intValue()))
             .andExpect(jsonPath("$.title").value(DEFAULT_TITLE))
+            .andExpect(jsonPath("$.summary").value(DEFAULT_SUMMARY.toString()))
+            .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT.toString()))
             .andExpect(jsonPath("$.startTime").value(sameInstant(DEFAULT_START_TIME)))
             .andExpect(jsonPath("$.endTime").value(sameInstant(DEFAULT_END_TIME)))
             .andExpect(jsonPath("$.senderId").value(DEFAULT_SENDER_ID.intValue()))
@@ -334,6 +354,7 @@ public class AnnouncementResourceIT {
             .andExpect(jsonPath("$.businessId").value(DEFAULT_BUSINESS_ID.intValue()))
             .andExpect(jsonPath("$.openType").value(DEFAULT_OPEN_TYPE.toString()))
             .andExpect(jsonPath("$.openPage").value(DEFAULT_OPEN_PAGE))
+            .andExpect(jsonPath("$.receiverIds").value(DEFAULT_RECEIVER_IDS.toString()))
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.intValue()))
             .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()))
             .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY.intValue()))
@@ -1336,6 +1357,8 @@ public class AnnouncementResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(announcement.getId().intValue())))
             .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE)))
+            .andExpect(jsonPath("$.[*].summary").value(hasItem(DEFAULT_SUMMARY.toString())))
+            .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT.toString())))
             .andExpect(jsonPath("$.[*].startTime").value(hasItem(sameInstant(DEFAULT_START_TIME))))
             .andExpect(jsonPath("$.[*].endTime").value(hasItem(sameInstant(DEFAULT_END_TIME))))
             .andExpect(jsonPath("$.[*].senderId").value(hasItem(DEFAULT_SENDER_ID.intValue())))
@@ -1349,6 +1372,7 @@ public class AnnouncementResourceIT {
             .andExpect(jsonPath("$.[*].businessId").value(hasItem(DEFAULT_BUSINESS_ID.intValue())))
             .andExpect(jsonPath("$.[*].openType").value(hasItem(DEFAULT_OPEN_TYPE.toString())))
             .andExpect(jsonPath("$.[*].openPage").value(hasItem(DEFAULT_OPEN_PAGE)))
+            .andExpect(jsonPath("$.[*].receiverIds").value(hasItem(DEFAULT_RECEIVER_IDS.toString())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.intValue())))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
@@ -1400,6 +1424,8 @@ public class AnnouncementResourceIT {
         Announcement updatedAnnouncement = announcementRepository.findById(announcement.getId()).orElseThrow();
         updatedAnnouncement
             .title(UPDATED_TITLE)
+            .summary(UPDATED_SUMMARY)
+            .content(UPDATED_CONTENT)
             .startTime(UPDATED_START_TIME)
             .endTime(UPDATED_END_TIME)
             .senderId(UPDATED_SENDER_ID)
@@ -1413,6 +1439,7 @@ public class AnnouncementResourceIT {
             .businessId(UPDATED_BUSINESS_ID)
             .openType(UPDATED_OPEN_TYPE)
             .openPage(UPDATED_OPEN_PAGE)
+            .receiverIds(UPDATED_RECEIVER_IDS)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
@@ -1507,15 +1534,17 @@ public class AnnouncementResourceIT {
         partialUpdatedAnnouncement.setId(announcement.getId());
 
         partialUpdatedAnnouncement
+            .startTime(UPDATED_START_TIME)
             .senderId(UPDATED_SENDER_ID)
             .category(UPDATED_CATEGORY)
-            .sendStatus(UPDATED_SEND_STATUS)
+            .receiverType(UPDATED_RECEIVER_TYPE)
             .sendTime(UPDATED_SEND_TIME)
+            .cancelTime(UPDATED_CANCEL_TIME)
             .businessType(UPDATED_BUSINESS_TYPE)
-            .businessId(UPDATED_BUSINESS_ID)
             .openType(UPDATED_OPEN_TYPE)
+            .receiverIds(UPDATED_RECEIVER_IDS)
             .createdBy(UPDATED_CREATED_BY)
-            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
+            .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restAnnouncementMockMvc
@@ -1549,6 +1578,8 @@ public class AnnouncementResourceIT {
 
         partialUpdatedAnnouncement
             .title(UPDATED_TITLE)
+            .summary(UPDATED_SUMMARY)
+            .content(UPDATED_CONTENT)
             .startTime(UPDATED_START_TIME)
             .endTime(UPDATED_END_TIME)
             .senderId(UPDATED_SENDER_ID)
@@ -1562,6 +1593,7 @@ public class AnnouncementResourceIT {
             .businessId(UPDATED_BUSINESS_ID)
             .openType(UPDATED_OPEN_TYPE)
             .openPage(UPDATED_OPEN_PAGE)
+            .receiverIds(UPDATED_RECEIVER_IDS)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)

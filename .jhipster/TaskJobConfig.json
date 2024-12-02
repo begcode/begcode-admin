@@ -8,7 +8,8 @@
     "importData": true,
     "moduleName": "taskjob",
     "skipFakeData": true,
-    "skipMobile": true
+    "skipMobile": true,
+    "skipWebsite": true
   },
   "applications": "*",
   "clientRootFolder": "taskjob",

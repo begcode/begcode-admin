@@ -1,4 +1,5 @@
 import type { RouteLocationNormalized } from 'vue-router';
+import { pick as _pick } from 'lodash-es';
 import { Memory } from './memory';
 import type { LockInfo, UserInfo, LoginInfo } from '#/store';
 import type { ProjectConfig } from '#/config';

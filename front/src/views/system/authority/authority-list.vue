@@ -563,7 +563,7 @@ const rowClick = ({ name, data, params }) => {
         break;
       case 'addChildren':
         popupConfig.containerProps.title = '添加下级';
-        popupConfig.containerProps.okText = '更新';
+        popupConfig.containerProps.okText = '保存';
         popupConfig.containerProps.cancelText = '取消';
         popupConfig.needSubmit = true;
         popupConfig.containerProps.showOkBtn = true;

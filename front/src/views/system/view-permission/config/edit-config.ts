@@ -200,7 +200,7 @@ const fields = (): FormSchema[] => {
         api: relationshipApis.parent,
         style: 'width: 100%',
         labelInValue: true,
-        fieldNames: { children: 'children', key: 'id', title: 'text' },
+        fieldNames: { children: 'children', value: 'id', label: 'text' },
         resultField: 'records',
         placeholder: '请选择上级',
       },

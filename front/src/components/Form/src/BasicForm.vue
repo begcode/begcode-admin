@@ -1,5 +1,5 @@
 <template>
-  <a-form v-bind="getBindValue" :class="getFormClass" ref="formElRef" :model="formModel" @keypress.enter="handleEnterPress">
+  <a-form v-bind="getBindValue" :class="getFormClass" ref="formElRef" :model="formModel" @keydown.enter="handleEnterPress">
     <a-row v-bind="getRow">
       <slot name="formHeader"></slot>
       <template v-for="schema in getSchema" :key="schema.field">

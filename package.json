@@ -25,7 +25,7 @@
     "components:build": "cd ./front/ && pnpm run components:build",
     "docker:db:down": "docker compose -f src/main/docker/mysql.yml down -v",
     "docker:db:up": "docker compose -f src/main/docker/mysql.yml up --wait",
-    "postinstall": "cd ./front/ && pnpm install",
+    "postinstall": "concurrently \"pnpm install -C ./front/\"",
     "java:docker": "./mvnw -ntp verify -DskipTests -Pprod jib:dockerBuild",
     "java:docker:arm64": "pnpm run java:docker -- -Djib-maven-plugin.architecture=arm64",
     "java:docker:dev": "pnpm run java:docker -- -Pdev,webapp",
