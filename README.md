@@ -2,6 +2,60 @@
 
 本应用程序由BegCode8.6.8生成, 你可以在 [https://www.begcode.com](https://www.begcode.com) 找到文档和帮助。
 
+## 截图展示
+
+### 登录
+
+![登录](./doc/images/login.png)
+
+### 首页
+
+![首页](./doc/images/index.png)
+
+### 菜单列表
+
+![菜单列表](./doc/images/view_permission.png)
+
+### 角色列表
+
+![角色列表](./doc/images/authority.png)
+
+### 用户列表
+
+![用户列表](./doc/images/user-list.png)
+
+### 短信配置
+
+![短信配置](./doc/images/sms_config.png)
+
+### 图片上传
+
+![图片上传](./doc/images/upload_image.png)
+
+### 字典管理
+
+![字典管理](./doc/images/dictionary.png)
+
+### 操作日志
+
+![操作日志](./doc/images/sys_log.png)
+
+### 消息发布
+
+![消息发布](./doc/images/announcement.png)
+
+### Api列表
+
+![Api列表](./doc/images/api.png)
+
+### Icon选择参考
+
+![Icon选择参考](./doc/images/icon_picker.png)
+
+### 查看通知
+
+![查看通知](./doc/images/notice.png)
+
 ## 项目结构
 
 生成时需要 Node，并建议在开发过程中使用它。package.json 文件始终会生成，以提供更好的开发体验，包括 prettier、commit hooks、脚本等等。
