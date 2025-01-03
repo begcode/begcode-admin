@@ -83,7 +83,7 @@
                   <BasicButton v-if="!button.dropdowns">{{ button.name }}</BasicButton>
                   <a-dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
                     <template #overlay>
-                      <a-menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
+                      <a-menu @click="gridEvents.toolbarButtonClick?.(subButton as any)" v-for="subButton of button.dropdowns">
                         <a-menu-item :key="subButton.name + 's'">
                           <Icon :icon="subButton.icon"></Icon>
                           {{ subButton.name }}
@@ -198,6 +198,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -207,6 +208,7 @@ const config = {
         value: '',
         operator: '',
         span: 8,
+        hidden: true,
         type: 'Boolean',
         componentProps: {
           optionType: 'button',
@@ -225,6 +227,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -235,6 +238,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -243,6 +247,7 @@ const config = {
         componentType: 'Select',
         value: '',
         span: 8,
+        hidden: true,
         operator: '',
         type: 'Enum',
         componentProps: () => {
@@ -256,6 +261,7 @@ const config = {
         value: '',
         operator: '',
         span: 8,
+        hidden: true,
         type: 'Boolean',
         componentProps: {
           optionType: 'button',
@@ -273,6 +279,7 @@ const config = {
         value: '',
         operator: '',
         span: 8,
+        hidden: true,
         type: 'Boolean',
         componentProps: {
           optionType: 'button',
@@ -290,6 +297,7 @@ const config = {
         value: '',
         operator: '',
         span: 8,
+        hidden: true,
         type: 'Boolean',
         componentProps: {
           optionType: 'button',
@@ -307,6 +315,7 @@ const config = {
         value: '',
         operator: '',
         span: 8,
+        hidden: true,
         type: 'Boolean',
         componentProps: {
           optionType: 'button',
@@ -324,6 +333,7 @@ const config = {
         value: '',
         operator: '',
         span: 8,
+        hidden: true,
         type: 'Boolean',
         componentProps: {
           optionType: 'button',
@@ -341,6 +351,7 @@ const config = {
         value: '',
         operator: '',
         span: 8,
+        hidden: true,
         type: 'Boolean',
         componentProps: {
           optionType: 'button',
@@ -359,6 +370,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -369,6 +381,18 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
+        componentProps: {},
+      },
+      {
+        title: '排序',
+        field: 'order',
+        componentType: 'Text',
+        value: '',
+        type: 'Integer',
+        operator: '',
+        span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -379,6 +403,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -389,6 +414,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -399,6 +425,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {

@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tech.jhipster.service.filter.*;
+import tech.jhipster.service.mybatis.CriteriaUtil;
 import tech.jhipster.service.mybatis.QueryService;
 
 /**
@@ -115,7 +116,7 @@ public class AuthorityQueryService implements QueryService<Authority> {
     }
 
     public <T> List<T> getFieldByCriteria(Class<T> clazz, String fieldName, Boolean distinct, AuthorityCriteria criteria) {
-        return (List<T>) authorityRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
+        return authorityRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
     }
 
     public long countByFieldNameAndCriteria(String fieldName, Boolean distinct, AuthorityCriteria criteria) {
@@ -146,7 +147,8 @@ public class AuthorityQueryService implements QueryService<Authority> {
             }
             tempCriteria.setAnd(keywordsCriteria);
         }
-        QueryWrapper<Authority> queryWrapper = new DynamicJoinQueryWrapper<>(AuthorityCriteria.class, null);
+        List<String> fields = CriteriaUtil.getNonNullBindQueryFields(criteria);
+        QueryWrapper<Authority> queryWrapper = new DynamicJoinQueryWrapper<>(AuthorityCriteria.class, fields);
         return createQueryWrapper(queryWrapper, criteria.getUseOr(), criteria, Authority.class);
     }
 
@@ -182,6 +184,7 @@ public class AuthorityQueryService implements QueryService<Authority> {
         fieldNameMap.put("self.info", criteria.getInfo());
         fieldNameMap.put("self.order", criteria.getOrder());
         fieldNameMap.put("self.display", criteria.getDisplay());
+        fieldNameMap.put("self.parent_id", criteria.getParentId());
         fieldNameMap
             .entrySet()
             .stream()

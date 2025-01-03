@@ -83,7 +83,7 @@
                   <BasicButton v-if="!button.dropdowns">{{ button.name }}</BasicButton>
                   <a-dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
                     <template #overlay>
-                      <a-menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
+                      <a-menu @click="gridEvents.toolbarButtonClick?.(subButton as any)" v-for="subButton of button.dropdowns">
                         <a-menu-item :key="subButton.name + 's'">
                           <Icon :icon="subButton.icon"></Icon>
                           {{ subButton.name }}
@@ -187,6 +187,17 @@ const config = {
         componentProps: {},
       },
       {
+        title: '排序',
+        field: 'sortNo',
+        componentType: 'Text',
+        value: '',
+        type: 'Integer',
+        operator: '',
+        span: 8,
+        hidden: true,
+        componentProps: {},
+      },
+      {
         title: '描述',
         field: 'description',
         componentType: 'Text',
@@ -194,6 +205,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {

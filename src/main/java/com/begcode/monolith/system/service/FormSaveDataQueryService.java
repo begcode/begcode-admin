@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tech.jhipster.service.filter.*;
+import tech.jhipster.service.mybatis.CriteriaUtil;
 import tech.jhipster.service.mybatis.QueryService;
 
 /**
@@ -79,7 +80,7 @@ public class FormSaveDataQueryService implements QueryService<FormSaveData> {
     }
 
     public <T> List<T> getFieldByCriteria(Class<T> clazz, String fieldName, Boolean distinct, FormSaveDataCriteria criteria) {
-        return (List<T>) formSaveDataRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
+        return formSaveDataRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
     }
 
     public long countByFieldNameAndCriteria(String fieldName, Boolean distinct, FormSaveDataCriteria criteria) {
@@ -108,7 +109,8 @@ public class FormSaveDataQueryService implements QueryService<FormSaveData> {
             }
             tempCriteria.setAnd(keywordsCriteria);
         }
-        QueryWrapper<FormSaveData> queryWrapper = new DynamicJoinQueryWrapper<>(FormSaveDataCriteria.class, null);
+        List<String> fields = CriteriaUtil.getNonNullBindQueryFields(criteria);
+        QueryWrapper<FormSaveData> queryWrapper = new DynamicJoinQueryWrapper<>(FormSaveDataCriteria.class, fields);
         return createQueryWrapper(queryWrapper, criteria.getUseOr(), criteria, FormSaveData.class);
     }
 
@@ -143,6 +145,7 @@ public class FormSaveDataQueryService implements QueryService<FormSaveData> {
         fieldNameMap.put("self.created_date", criteria.getCreatedDate());
         fieldNameMap.put("self.last_modified_by", criteria.getLastModifiedBy());
         fieldNameMap.put("self.last_modified_date", criteria.getLastModifiedDate());
+        fieldNameMap.put("self.form_config_id", criteria.getFormConfigId());
         fieldNameMap
             .entrySet()
             .stream()

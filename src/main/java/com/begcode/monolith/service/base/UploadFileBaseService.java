@@ -6,6 +6,7 @@ import cn.xuyanwu.spring.file.storage.FileStorageService;
 import com.baomidou.mybatisplus.core.conditions.update.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.begcode.monolith.domain.ResourceCategory;
 import com.begcode.monolith.domain.UploadFile;
 import com.begcode.monolith.repository.UploadFileRepository;
 import com.begcode.monolith.service.dto.UploadFileDTO;
@@ -70,11 +71,7 @@ public class UploadFileBaseService<R extends UploadFileRepository, E extends Upl
     public UploadFileDTO update(UploadFileDTO uploadFileDTO) {
         log.debug("Request to update UploadFile : {}", uploadFileDTO);
         UploadFile uploadFile = uploadFileMapper.toEntity(uploadFileDTO);
-        uploadFile.setCategoryId(
-            Optional.ofNullable(uploadFileDTO.getCategory())
-                .map(categoryResourceCategoryDTO -> categoryResourceCategoryDTO.getId())
-                .orElse(null)
-        );
+        uploadFile.setCategoryId(Optional.ofNullable(uploadFile.getCategory()).map(ResourceCategory::getId).orElse(null));
         this.saveOrUpdate(uploadFile);
         return findOne(uploadFile.getId()).orElseThrow();
     }

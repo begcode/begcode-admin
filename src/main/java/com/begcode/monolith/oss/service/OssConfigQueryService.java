@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tech.jhipster.service.filter.*;
+import tech.jhipster.service.mybatis.CriteriaUtil;
 import tech.jhipster.service.mybatis.QueryService;
 
 /**
@@ -79,7 +80,7 @@ public class OssConfigQueryService implements QueryService<OssConfig> {
     }
 
     public <T> List<T> getFieldByCriteria(Class<T> clazz, String fieldName, Boolean distinct, OssConfigCriteria criteria) {
-        return (List<T>) ossConfigRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
+        return ossConfigRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
     }
 
     public long countByFieldNameAndCriteria(String fieldName, Boolean distinct, OssConfigCriteria criteria) {
@@ -109,7 +110,8 @@ public class OssConfigQueryService implements QueryService<OssConfig> {
             }
             tempCriteria.setAnd(keywordsCriteria);
         }
-        QueryWrapper<OssConfig> queryWrapper = new DynamicJoinQueryWrapper<>(OssConfigCriteria.class, null);
+        List<String> fields = CriteriaUtil.getNonNullBindQueryFields(criteria);
+        QueryWrapper<OssConfig> queryWrapper = new DynamicJoinQueryWrapper<>(OssConfigCriteria.class, fields);
         return createQueryWrapper(queryWrapper, criteria.getUseOr(), criteria, OssConfig.class);
     }
 

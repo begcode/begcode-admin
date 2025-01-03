@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tech.jhipster.service.filter.*;
+import tech.jhipster.service.mybatis.CriteriaUtil;
 import tech.jhipster.service.mybatis.QueryService;
 
 /**
@@ -79,7 +80,7 @@ public class SysFillRuleQueryService implements QueryService<SysFillRule> {
     }
 
     public <T> List<T> getFieldByCriteria(Class<T> clazz, String fieldName, Boolean distinct, SysFillRuleCriteria criteria) {
-        return (List<T>) sysFillRuleRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
+        return sysFillRuleRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
     }
 
     public long countByFieldNameAndCriteria(String fieldName, Boolean distinct, SysFillRuleCriteria criteria) {
@@ -113,7 +114,8 @@ public class SysFillRuleQueryService implements QueryService<SysFillRule> {
             }
             tempCriteria.setAnd(keywordsCriteria);
         }
-        QueryWrapper<SysFillRule> queryWrapper = new DynamicJoinQueryWrapper<>(SysFillRuleCriteria.class, null);
+        List<String> fields = CriteriaUtil.getNonNullBindQueryFields(criteria);
+        QueryWrapper<SysFillRule> queryWrapper = new DynamicJoinQueryWrapper<>(SysFillRuleCriteria.class, fields);
         return createQueryWrapper(queryWrapper, criteria.getUseOr(), criteria, SysFillRule.class);
     }
 

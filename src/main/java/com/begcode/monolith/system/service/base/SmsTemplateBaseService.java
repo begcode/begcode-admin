@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.begcode.monolith.system.domain.SmsSupplier;
 import com.begcode.monolith.system.domain.SmsTemplate;
 import com.begcode.monolith.system.repository.SmsTemplateRepository;
 import com.begcode.monolith.system.service.SmsSupplierService;
@@ -62,9 +63,7 @@ public class SmsTemplateBaseService<R extends SmsTemplateRepository, E extends S
     public SmsTemplateDTO save(SmsTemplateDTO smsTemplateDTO) {
         log.debug("Request to save SmsTemplate : {}", smsTemplateDTO);
         SmsTemplate smsTemplate = smsTemplateMapper.toEntity(smsTemplateDTO);
-        smsTemplate.setSupplierId(
-            Optional.ofNullable(smsTemplateDTO.getSupplier()).map(supplierSmsSupplierDTO -> supplierSmsSupplierDTO.getId()).orElse(null)
-        );
+        smsTemplate.setSupplierId(Optional.ofNullable(smsTemplate.getSupplier()).map(SmsSupplier::getId).orElse(null));
         this.saveOrUpdate(smsTemplate);
         return findOne(smsTemplate.getId()).orElseThrow();
     }
@@ -79,9 +78,7 @@ public class SmsTemplateBaseService<R extends SmsTemplateRepository, E extends S
     public SmsTemplateDTO update(SmsTemplateDTO smsTemplateDTO) {
         log.debug("Request to update SmsTemplate : {}", smsTemplateDTO);
         SmsTemplate smsTemplate = smsTemplateMapper.toEntity(smsTemplateDTO);
-        smsTemplate.setSupplierId(
-            Optional.ofNullable(smsTemplateDTO.getSupplier()).map(supplierSmsSupplierDTO -> supplierSmsSupplierDTO.getId()).orElse(null)
-        );
+        smsTemplate.setSupplierId(Optional.ofNullable(smsTemplate.getSupplier()).map(SmsSupplier::getId).orElse(null));
         this.saveOrUpdate(smsTemplate);
         return findOne(smsTemplate.getId()).orElseThrow();
     }

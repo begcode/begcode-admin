@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tech.jhipster.service.filter.*;
+import tech.jhipster.service.mybatis.CriteriaUtil;
 import tech.jhipster.service.mybatis.QueryService;
 
 /**
@@ -115,7 +116,7 @@ public class ViewPermissionQueryService implements QueryService<ViewPermission> 
     }
 
     public <T> List<T> getFieldByCriteria(Class<T> clazz, String fieldName, Boolean distinct, ViewPermissionCriteria criteria) {
-        return (List<T>) viewPermissionRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
+        return viewPermissionRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
     }
 
     public long countByFieldNameAndCriteria(String fieldName, Boolean distinct, ViewPermissionCriteria criteria) {
@@ -153,7 +154,8 @@ public class ViewPermissionQueryService implements QueryService<ViewPermission> 
             }
             tempCriteria.setAnd(keywordsCriteria);
         }
-        QueryWrapper<ViewPermission> queryWrapper = new DynamicJoinQueryWrapper<>(ViewPermissionCriteria.class, null);
+        List<String> fields = CriteriaUtil.getNonNullBindQueryFields(criteria);
+        QueryWrapper<ViewPermission> queryWrapper = new DynamicJoinQueryWrapper<>(ViewPermissionCriteria.class, fields);
         return createQueryWrapper(queryWrapper, criteria.getUseOr(), criteria, ViewPermission.class);
     }
 
@@ -204,6 +206,7 @@ public class ViewPermissionQueryService implements QueryService<ViewPermission> 
         fieldNameMap.put("self.api_permission_codes", criteria.getApiPermissionCodes());
         fieldNameMap.put("self.component_file", criteria.getComponentFile());
         fieldNameMap.put("self.redirect", criteria.getRedirect());
+        fieldNameMap.put("self.parent_id", criteria.getParentId());
         fieldNameMap
             .entrySet()
             .stream()

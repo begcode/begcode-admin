@@ -101,7 +101,7 @@
                       <BasicButton v-if="!button.dropdowns">{{ button.name }}</BasicButton>
                       <a-dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
                         <template #overlay>
-                          <a-menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
+                          <a-menu @click="gridEvents.toolbarButtonClick?.(subButton as any)" v-for="subButton of button.dropdowns">
                             <a-menu-item :key="subButton.name + 's'">
                               <Icon :icon="subButton.icon"></Icon>
                               {{ subButton.name }}
@@ -212,7 +212,7 @@
                     <BasicButton v-if="!button.dropdowns">{{ button.name }}</BasicButton>
                     <a-dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
                       <template #overlay>
-                        <a-menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
+                        <a-menu @click="gridEvents.toolbarButtonClick?.(subButton as any)" v-for="subButton of button.dropdowns">
                           <a-menu-item :key="subButton.name + 's'">
                             <Icon :icon="subButton.icon"></Icon>
                             {{ subButton.name }}
@@ -324,6 +324,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -334,6 +335,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -344,6 +346,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -354,6 +357,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -364,6 +368,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -374,6 +379,7 @@ const config = {
         type: 'Long',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -384,6 +390,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -394,6 +401,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -404,6 +412,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -414,6 +423,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -424,6 +434,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -434,6 +445,7 @@ const config = {
         type: 'Long',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -442,6 +454,7 @@ const config = {
         componentType: 'DateTimeRange',
         operator: '',
         span: 8,
+        hidden: true,
         type: 'ZonedDateTime',
         componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
       },
@@ -453,17 +466,19 @@ const config = {
         type: 'Long',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
         title: '创建者Id',
         field: 'createdBy',
-        componentType: 'Text',
+        componentType: 'ApiSelect',
         value: '',
         type: 'Long',
         operator: '',
         span: 8,
-        componentProps: {},
+        hidden: true,
+        componentProps: { api: relationshipApis.auditingUser, style: 'width: 100%', valueField: 'id', labelField: 'firstName' },
       },
       {
         title: '创建时间',
@@ -471,6 +486,7 @@ const config = {
         componentType: 'DateTimeRange',
         operator: '',
         span: 8,
+        hidden: true,
         type: 'Instant',
         componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
       },
@@ -482,6 +498,7 @@ const config = {
         type: 'Long',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -490,6 +507,7 @@ const config = {
         componentType: 'DateTimeRange',
         operator: '',
         span: 8,
+        hidden: true,
         type: 'Instant',
         componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
       },

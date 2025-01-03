@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.begcode.monolith.SpringBootUtil;
+import com.begcode.monolith.domain.BusinessType;
 import com.begcode.monolith.system.domain.FormConfig;
 import com.begcode.monolith.system.domain.FormSaveData;
 import com.begcode.monolith.system.repository.FormConfigRepository;
@@ -56,11 +57,7 @@ public class FormConfigBaseService<R extends FormConfigRepository, E extends For
     public FormConfigDTO save(FormConfigDTO formConfigDTO) {
         log.debug("Request to save FormConfig : {}", formConfigDTO);
         FormConfig formConfig = formConfigMapper.toEntity(formConfigDTO);
-        formConfig.setBusinessTypeId(
-            Optional.ofNullable(formConfigDTO.getBusinessType())
-                .map(businessTypeBusinessTypeDTO -> businessTypeBusinessTypeDTO.getId())
-                .orElse(null)
-        );
+        formConfig.setBusinessTypeId(Optional.ofNullable(formConfig.getBusinessType()).map(BusinessType::getId).orElse(null));
         this.saveOrUpdate(formConfig);
         return findOne(formConfig.getId()).orElseThrow();
     }
@@ -75,11 +72,7 @@ public class FormConfigBaseService<R extends FormConfigRepository, E extends For
     public FormConfigDTO update(FormConfigDTO formConfigDTO) {
         log.debug("Request to update FormConfig : {}", formConfigDTO);
         FormConfig formConfig = formConfigMapper.toEntity(formConfigDTO);
-        formConfig.setBusinessTypeId(
-            Optional.ofNullable(formConfigDTO.getBusinessType())
-                .map(businessTypeBusinessTypeDTO -> businessTypeBusinessTypeDTO.getId())
-                .orElse(null)
-        );
+        formConfig.setBusinessTypeId(Optional.ofNullable(formConfig.getBusinessType()).map(BusinessType::getId).orElse(null));
         this.saveOrUpdate(formConfig);
         return findOne(formConfig.getId()).orElseThrow();
     }

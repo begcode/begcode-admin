@@ -47,6 +47,7 @@ const searchForm = (relationshipApis): any[] => {
       type: 'String',
       operator: '',
       span: 8,
+      hidden: true,
       componentProps: {},
     },
     {
@@ -55,6 +56,7 @@ const searchForm = (relationshipApis): any[] => {
       componentType: 'Select',
       value: '',
       span: 8,
+      hidden: true,
       operator: '',
       type: 'Enum',
       componentProps: () => {
@@ -69,6 +71,18 @@ const searchForm = (relationshipApis): any[] => {
       type: 'String',
       operator: '',
       span: 8,
+      hidden: true,
+      componentProps: {},
+    },
+    {
+      title: '排序',
+      field: 'sortValue',
+      componentType: 'Text',
+      value: '',
+      type: 'Integer',
+      operator: '',
+      span: 8,
+      hidden: true,
       componentProps: {},
     },
     {
@@ -78,6 +92,7 @@ const searchForm = (relationshipApis): any[] => {
       value: '',
       operator: '',
       span: 8,
+      hidden: true,
       type: 'Boolean',
       componentProps: {
         optionType: 'button',
@@ -96,6 +111,7 @@ const searchForm = (relationshipApis): any[] => {
       type: 'String',
       operator: '',
       span: 8,
+      hidden: true,
       componentProps: {},
     },
     {
@@ -106,6 +122,7 @@ const searchForm = (relationshipApis): any[] => {
       type: 'Long',
       operator: '',
       span: 8,
+      hidden: true,
       componentProps: {},
     },
   ];

@@ -35,6 +35,17 @@ const searchForm = (relationshipApis): any[] => {
       componentProps: {},
     },
     {
+      title: '排序',
+      field: 'orderNumber',
+      componentType: 'Text',
+      value: '',
+      type: 'Integer',
+      operator: '',
+      span: 8,
+      hidden: true,
+      componentProps: {},
+    },
+    {
       title: '下级列表',
       field: 'children',
       componentType: 'ApiSelect',

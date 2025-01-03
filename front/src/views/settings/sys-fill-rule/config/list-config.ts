@@ -45,6 +45,7 @@ const searchForm = (relationshipApis): any[] => {
       type: 'String',
       operator: '',
       span: 8,
+      hidden: true,
       componentProps: {},
     },
     {
@@ -54,6 +55,7 @@ const searchForm = (relationshipApis): any[] => {
       value: '',
       operator: '',
       span: 8,
+      hidden: true,
       type: 'Boolean',
       componentProps: {
         optionType: 'button',
@@ -70,6 +72,7 @@ const searchForm = (relationshipApis): any[] => {
       componentType: 'Select',
       value: '',
       span: 8,
+      hidden: true,
       operator: '',
       type: 'Enum',
       componentProps: () => {
@@ -84,6 +87,7 @@ const searchForm = (relationshipApis): any[] => {
       type: 'Long',
       operator: '',
       span: 8,
+      hidden: true,
       componentProps: {},
     },
     {
@@ -94,6 +98,7 @@ const searchForm = (relationshipApis): any[] => {
       type: 'String',
       operator: '',
       span: 8,
+      hidden: true,
       componentProps: {},
     },
     {
@@ -104,6 +109,7 @@ const searchForm = (relationshipApis): any[] => {
       type: 'String',
       operator: '',
       span: 8,
+      hidden: true,
       componentProps: {},
     },
     {
@@ -114,6 +120,7 @@ const searchForm = (relationshipApis): any[] => {
       type: 'String',
       operator: '',
       span: 8,
+      hidden: true,
       componentProps: {},
     },
     {
@@ -122,6 +129,7 @@ const searchForm = (relationshipApis): any[] => {
       componentType: 'DateTimeRange',
       operator: '',
       span: 8,
+      hidden: true,
       type: 'ZonedDateTime',
       componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
     },
@@ -131,6 +139,7 @@ const searchForm = (relationshipApis): any[] => {
       componentType: 'DateTimeRange',
       operator: '',
       span: 8,
+      hidden: true,
       type: 'ZonedDateTime',
       componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
     },
@@ -140,6 +149,7 @@ const searchForm = (relationshipApis): any[] => {
       componentType: 'DateTimeRange',
       operator: '',
       span: 8,
+      hidden: true,
       type: 'ZonedDateTime',
       componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
     },

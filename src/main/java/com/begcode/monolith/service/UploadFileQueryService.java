@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tech.jhipster.service.filter.*;
+import tech.jhipster.service.mybatis.CriteriaUtil;
 import tech.jhipster.service.mybatis.QueryService;
 
 /**
@@ -79,7 +80,7 @@ public class UploadFileQueryService implements QueryService<UploadFile> {
     }
 
     public <T> List<T> getFieldByCriteria(Class<T> clazz, String fieldName, Boolean distinct, UploadFileCriteria criteria) {
-        return (List<T>) uploadFileRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
+        return uploadFileRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
     }
 
     public long countByFieldNameAndCriteria(String fieldName, Boolean distinct, UploadFileCriteria criteria) {
@@ -123,7 +124,8 @@ public class UploadFileQueryService implements QueryService<UploadFile> {
             }
             tempCriteria.setAnd(keywordsCriteria);
         }
-        QueryWrapper<UploadFile> queryWrapper = new DynamicJoinQueryWrapper<>(UploadFileCriteria.class, null);
+        List<String> fields = CriteriaUtil.getNonNullBindQueryFields(criteria);
+        QueryWrapper<UploadFile> queryWrapper = new DynamicJoinQueryWrapper<>(UploadFileCriteria.class, fields);
         return createQueryWrapper(queryWrapper, criteria.getUseOr(), criteria, UploadFile.class);
     }
 
@@ -174,6 +176,7 @@ public class UploadFileQueryService implements QueryService<UploadFile> {
         fieldNameMap.put("self.created_date", criteria.getCreatedDate());
         fieldNameMap.put("self.last_modified_by", criteria.getLastModifiedBy());
         fieldNameMap.put("self.last_modified_date", criteria.getLastModifiedDate());
+        fieldNameMap.put("self.category_id", criteria.getCategoryId());
         fieldNameMap
             .entrySet()
             .stream()

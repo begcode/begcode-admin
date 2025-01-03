@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tech.jhipster.service.filter.*;
+import tech.jhipster.service.mybatis.CriteriaUtil;
 import tech.jhipster.service.mybatis.QueryService;
 
 /**
@@ -118,7 +119,7 @@ public class ResourceCategoryQueryService implements QueryService<ResourceCatego
     }
 
     public <T> List<T> getFieldByCriteria(Class<T> clazz, String fieldName, Boolean distinct, ResourceCategoryCriteria criteria) {
-        return (List<T>) resourceCategoryRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
+        return resourceCategoryRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
     }
 
     public long countByFieldNameAndCriteria(String fieldName, Boolean distinct, ResourceCategoryCriteria criteria) {
@@ -148,7 +149,8 @@ public class ResourceCategoryQueryService implements QueryService<ResourceCatego
             }
             tempCriteria.setAnd(keywordsCriteria);
         }
-        QueryWrapper<ResourceCategory> queryWrapper = new DynamicJoinQueryWrapper<>(ResourceCategoryCriteria.class, null);
+        List<String> fields = CriteriaUtil.getNonNullBindQueryFields(criteria);
+        QueryWrapper<ResourceCategory> queryWrapper = new DynamicJoinQueryWrapper<>(ResourceCategoryCriteria.class, fields);
         return createQueryWrapper(queryWrapper, criteria.getUseOr(), criteria, ResourceCategory.class);
     }
 
@@ -182,6 +184,7 @@ public class ResourceCategoryQueryService implements QueryService<ResourceCatego
         fieldNameMap.put("self.title", criteria.getTitle());
         fieldNameMap.put("self.code", criteria.getCode());
         fieldNameMap.put("self.order_number", criteria.getOrderNumber());
+        fieldNameMap.put("self.parent_id", criteria.getParentId());
         fieldNameMap
             .entrySet()
             .stream()

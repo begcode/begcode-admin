@@ -38,6 +38,17 @@ const searchForm = (relationshipApis): any[] => {
       componentProps: {},
     },
     {
+      title: '排序',
+      field: 'sortNo',
+      componentType: 'Text',
+      value: '',
+      type: 'Integer',
+      operator: '',
+      span: 8,
+      hidden: true,
+      componentProps: {},
+    },
+    {
       title: '描述',
       field: 'description',
       componentType: 'Text',
@@ -45,6 +56,7 @@ const searchForm = (relationshipApis): any[] => {
       type: 'String',
       operator: '',
       span: 8,
+      hidden: true,
       componentProps: {},
     },
     {

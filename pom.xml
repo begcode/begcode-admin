@@ -39,7 +39,7 @@
         <aliyun-sdk-oss.version>3.17.1</aliyun-sdk-oss.version>
         <archunit-junit5.version>1.3.0</archunit-junit5.version>
         <caffeine.version>2.7.0</caffeine.version>
-        <captcha.version>8.6.2</captcha.version>
+        <captcha.version>8.6.3</captcha.version>
         <checkstyle.version>10.17.0</checkstyle.version>
         <checksum-maven-plugin.version>1.11</checksum-maven-plugin.version>
         <commons-collections.version>3.2.2</commons-collections.version>
@@ -54,7 +54,7 @@
         <git-commit-id-maven-plugin.version>9.0.0</git-commit-id-maven-plugin.version>
         <hutool-core.version>5.8.28</hutool-core.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
-        <jhipster-framework.version>8.6.2</jhipster-framework.version>
+        <jhipster-framework.version>8.6.3</jhipster-framework.version>
         <jib-maven-plugin.architecture>amd64</jib-maven-plugin.architecture>
         <jib-maven-plugin.image>eclipse-temurin:17-jre-focal</jib-maven-plugin.image>
         <jib-maven-plugin.version>3.4.3</jib-maven-plugin.version>

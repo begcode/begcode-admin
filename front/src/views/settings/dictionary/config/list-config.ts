@@ -44,6 +44,7 @@ const searchForm = (relationshipApis): any[] => {
       value: '',
       operator: '',
       span: 8,
+      hidden: true,
       type: 'Boolean',
       componentProps: {
         optionType: 'button',
@@ -55,12 +56,24 @@ const searchForm = (relationshipApis): any[] => {
       },
     },
     {
+      title: '排序',
+      field: 'sortValue',
+      componentType: 'Text',
+      value: '',
+      type: 'Integer',
+      operator: '',
+      span: 8,
+      hidden: true,
+      componentProps: {},
+    },
+    {
       title: '是否内置',
       field: 'builtIn',
       componentType: 'RadioGroup',
       value: '',
       operator: '',
       span: 8,
+      hidden: true,
       type: 'Boolean',
       componentProps: {
         optionType: 'button',
@@ -78,6 +91,7 @@ const searchForm = (relationshipApis): any[] => {
       value: '',
       operator: '',
       span: 8,
+      hidden: true,
       type: 'Boolean',
       componentProps: {
         optionType: 'button',

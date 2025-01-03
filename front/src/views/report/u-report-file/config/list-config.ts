@@ -40,6 +40,7 @@ const searchForm = (relationshipApis): any[] => {
       componentType: 'DateTimeRange',
       operator: '',
       span: 8,
+      hidden: true,
       type: 'ZonedDateTime',
       componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
     },

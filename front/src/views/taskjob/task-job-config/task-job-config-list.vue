@@ -62,7 +62,7 @@
                   <BasicButton v-if="!button.dropdowns">{{ button.name }}</BasicButton>
                   <a-dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
                     <template #overlay>
-                      <a-menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
+                      <a-menu @click="gridEvents.toolbarButtonClick?.(subButton as any)" v-for="subButton of button.dropdowns">
                         <a-menu-item :key="subButton.name + 's'">
                           <Icon :icon="subButton.icon" />
                           {{ subButton.name }}
@@ -156,6 +156,7 @@ const go = useGo();
 const apiService = ctx?.$apiService as typeof ServerProvider;
 const apis = {
   taskJobConfigService: apiService.taskjob.taskJobConfigService,
+  auditingUser: apiService.system.userService.retrieve,
   find: apiService.taskjob.taskJobConfigService.retrieve,
   deleteById: apiService.taskjob.taskJobConfigService.delete,
   deleteByIds: apiService.taskjob.taskJobConfigService.deleteByIds,

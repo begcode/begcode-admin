@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tech.jhipster.service.filter.*;
+import tech.jhipster.service.mybatis.CriteriaUtil;
 import tech.jhipster.service.mybatis.QueryService;
 
 /**
@@ -115,7 +116,7 @@ public class RegionCodeQueryService implements QueryService<RegionCode> {
     }
 
     public <T> List<T> getFieldByCriteria(Class<T> clazz, String fieldName, Boolean distinct, RegionCodeCriteria criteria) {
-        return (List<T>) regionCodeRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
+        return regionCodeRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
     }
 
     public long countByFieldNameAndCriteria(String fieldName, Boolean distinct, RegionCodeCriteria criteria) {
@@ -150,7 +151,8 @@ public class RegionCodeQueryService implements QueryService<RegionCode> {
             }
             tempCriteria.setAnd(keywordsCriteria);
         }
-        QueryWrapper<RegionCode> queryWrapper = new DynamicJoinQueryWrapper<>(RegionCodeCriteria.class, null);
+        List<String> fields = CriteriaUtil.getNonNullBindQueryFields(criteria);
+        QueryWrapper<RegionCode> queryWrapper = new DynamicJoinQueryWrapper<>(RegionCodeCriteria.class, fields);
         return createQueryWrapper(queryWrapper, criteria.getUseOr(), criteria, RegionCode.class);
     }
 
@@ -190,6 +192,7 @@ public class RegionCodeQueryService implements QueryService<RegionCode> {
         fieldNameMap.put("self.level", criteria.getLevel());
         fieldNameMap.put("self.lng", criteria.getLng());
         fieldNameMap.put("self.lat", criteria.getLat());
+        fieldNameMap.put("self.parent_id", criteria.getParentId());
         fieldNameMap
             .entrySet()
             .stream()

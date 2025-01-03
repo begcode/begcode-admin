@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tech.jhipster.service.filter.*;
+import tech.jhipster.service.mybatis.CriteriaUtil;
 import tech.jhipster.service.mybatis.QueryService;
 
 /**
@@ -115,7 +116,7 @@ public class ApiPermissionQueryService implements QueryService<ApiPermission> {
     }
 
     public <T> List<T> getFieldByCriteria(Class<T> clazz, String fieldName, Boolean distinct, ApiPermissionCriteria criteria) {
-        return (List<T>) apiPermissionRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
+        return apiPermissionRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
     }
 
     public long countByFieldNameAndCriteria(String fieldName, Boolean distinct, ApiPermissionCriteria criteria) {
@@ -148,7 +149,8 @@ public class ApiPermissionQueryService implements QueryService<ApiPermission> {
             }
             tempCriteria.setAnd(keywordsCriteria);
         }
-        QueryWrapper<ApiPermission> queryWrapper = new DynamicJoinQueryWrapper<>(ApiPermissionCriteria.class, null);
+        List<String> fields = CriteriaUtil.getNonNullBindQueryFields(criteria);
+        QueryWrapper<ApiPermission> queryWrapper = new DynamicJoinQueryWrapper<>(ApiPermissionCriteria.class, fields);
         return createQueryWrapper(queryWrapper, criteria.getUseOr(), criteria, ApiPermission.class);
     }
 
@@ -187,6 +189,7 @@ public class ApiPermissionQueryService implements QueryService<ApiPermission> {
         fieldNameMap.put("self.method", criteria.getMethod());
         fieldNameMap.put("self.url", criteria.getUrl());
         fieldNameMap.put("self.status", criteria.getStatus());
+        fieldNameMap.put("self.parent_id", criteria.getParentId());
         fieldNameMap
             .entrySet()
             .stream()

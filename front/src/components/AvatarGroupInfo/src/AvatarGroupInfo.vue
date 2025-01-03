@@ -1,12 +1,12 @@
 <template>
   <div class="flex items-center justify-between">
     <a-avatar-group v-if="avatarGroupData.length" size="small" :max-count="maxCount" :shape="shape">
-      <a-tooltip :title="tipPrefix + (item[avatarTipField] || item)" placement="top" v-for="item in avatarGroupData">
+      <a-tooltip :title="tipPrefix + item[avatarTipField]" placement="top" v-for="item in avatarGroupData">
         <a-avatar :src="avatarSlotName === 'src' ? item[avatarSlotField] : undefined">
           <template #icon v-if="avatarSlotName === 'icon' && item[avatarSlotField]">
             <Icon :icon="item[avatarSlotField]" />
           </template>
-          <span v-if="avatarSlotName === 'default'">{{ (avatarTipField && item[avatarTipField]) || item }}</span>
+          <span v-if="avatarSlotName === 'default'">{{ avatarTipField ? item[avatarTipField] : item }}</span>
         </a-avatar>
       </a-tooltip>
     </a-avatar-group>
@@ -39,7 +39,7 @@ const props = defineProps({
     type: [Array, Object, String, Number],
   },
   shape: {
-    type: String,
+    type: String as PropType<'circle' | 'square'>,
     default: 'square',
   },
   maxCount: {

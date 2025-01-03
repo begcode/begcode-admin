@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tech.jhipster.service.filter.*;
+import tech.jhipster.service.mybatis.CriteriaUtil;
 import tech.jhipster.service.mybatis.QueryService;
 
 /**
@@ -79,7 +80,7 @@ public class SmsMessageQueryService implements QueryService<SmsMessage> {
     }
 
     public <T> List<T> getFieldByCriteria(Class<T> clazz, String fieldName, Boolean distinct, SmsMessageCriteria criteria) {
-        return (List<T>) smsMessageRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
+        return smsMessageRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
     }
 
     public long countByFieldNameAndCriteria(String fieldName, Boolean distinct, SmsMessageCriteria criteria) {
@@ -114,7 +115,8 @@ public class SmsMessageQueryService implements QueryService<SmsMessage> {
             }
             tempCriteria.setAnd(keywordsCriteria);
         }
-        QueryWrapper<SmsMessage> queryWrapper = new DynamicJoinQueryWrapper<>(SmsMessageCriteria.class, null);
+        List<String> fields = CriteriaUtil.getNonNullBindQueryFields(criteria);
+        QueryWrapper<SmsMessage> queryWrapper = new DynamicJoinQueryWrapper<>(SmsMessageCriteria.class, fields);
         return createQueryWrapper(queryWrapper, criteria.getUseOr(), criteria, SmsMessage.class);
     }
 

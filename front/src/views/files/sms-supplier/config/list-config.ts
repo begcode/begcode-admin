@@ -46,6 +46,7 @@ const searchForm = (relationshipApis): any[] => {
       type: 'String',
       operator: '',
       span: 8,
+      hidden: true,
       componentProps: {},
     },
     {
@@ -55,6 +56,7 @@ const searchForm = (relationshipApis): any[] => {
       value: '',
       operator: '',
       span: 8,
+      hidden: true,
       type: 'Boolean',
       componentProps: {
         optionType: 'button',

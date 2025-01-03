@@ -43,6 +43,7 @@ const searchForm = (relationshipApis): any[] => {
       componentType: 'Select',
       value: '',
       span: 8,
+      hidden: true,
       operator: '',
       type: 'Enum',
       componentProps: () => {
@@ -56,6 +57,7 @@ const searchForm = (relationshipApis): any[] => {
       value: '',
       operator: '',
       span: 8,
+      hidden: true,
       type: 'Boolean',
       componentProps: {
         optionType: 'button',
@@ -69,12 +71,13 @@ const searchForm = (relationshipApis): any[] => {
     {
       title: '创建者Id',
       field: 'createdBy',
-      componentType: 'Text',
+      componentType: 'ApiSelect',
       value: '',
       type: 'Long',
       operator: '',
       span: 8,
-      componentProps: {},
+      hidden: true,
+      componentProps: { api: relationshipApis.auditingUser, style: 'width: 100%', valueField: 'id', labelField: 'firstName' },
     },
     {
       title: '创建时间',
@@ -82,6 +85,7 @@ const searchForm = (relationshipApis): any[] => {
       componentType: 'DateTimeRange',
       operator: '',
       span: 8,
+      hidden: true,
       type: 'Instant',
       componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
     },
@@ -93,6 +97,7 @@ const searchForm = (relationshipApis): any[] => {
       type: 'Long',
       operator: '',
       span: 8,
+      hidden: true,
       componentProps: {},
     },
     {
@@ -101,6 +106,7 @@ const searchForm = (relationshipApis): any[] => {
       componentType: 'DateTimeRange',
       operator: '',
       span: 8,
+      hidden: true,
       type: 'Instant',
       componentProps: { type: 'date', format: 'YYYY-MM-DD hh:mm:ss', style: 'width: 100%' },
     },

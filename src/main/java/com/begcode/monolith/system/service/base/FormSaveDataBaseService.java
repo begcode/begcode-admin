@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.update.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.begcode.monolith.system.domain.FormConfig;
 import com.begcode.monolith.system.domain.FormSaveData;
 import com.begcode.monolith.system.repository.FormSaveDataRepository;
 import com.begcode.monolith.system.service.dto.FormSaveDataDTO;
@@ -56,11 +57,7 @@ public class FormSaveDataBaseService<R extends FormSaveDataRepository, E extends
     public FormSaveDataDTO save(FormSaveDataDTO formSaveDataDTO) {
         log.debug("Request to save FormSaveData : {}", formSaveDataDTO);
         FormSaveData formSaveData = formSaveDataMapper.toEntity(formSaveDataDTO);
-        formSaveData.setFormConfigId(
-            Optional.ofNullable(formSaveDataDTO.getFormConfig())
-                .map(formConfigFormConfigDTO -> formConfigFormConfigDTO.getId())
-                .orElse(null)
-        );
+        formSaveData.setFormConfigId(Optional.ofNullable(formSaveData.getFormConfig()).map(FormConfig::getId).orElse(null));
         this.saveOrUpdate(formSaveData);
         return findOne(formSaveData.getId()).orElseThrow();
     }
@@ -75,11 +72,7 @@ public class FormSaveDataBaseService<R extends FormSaveDataRepository, E extends
     public FormSaveDataDTO update(FormSaveDataDTO formSaveDataDTO) {
         log.debug("Request to update FormSaveData : {}", formSaveDataDTO);
         FormSaveData formSaveData = formSaveDataMapper.toEntity(formSaveDataDTO);
-        formSaveData.setFormConfigId(
-            Optional.ofNullable(formSaveDataDTO.getFormConfig())
-                .map(formConfigFormConfigDTO -> formConfigFormConfigDTO.getId())
-                .orElse(null)
-        );
+        formSaveData.setFormConfigId(Optional.ofNullable(formSaveData.getFormConfig()).map(FormConfig::getId).orElse(null));
         this.saveOrUpdate(formSaveData);
         return findOne(formSaveData.getId()).orElseThrow();
     }

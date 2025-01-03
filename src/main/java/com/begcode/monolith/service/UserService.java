@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.begcode.monolith.config.Constants;
 import com.begcode.monolith.domain.Authority;
+import com.begcode.monolith.domain.Department;
+import com.begcode.monolith.domain.Position;
 import com.begcode.monolith.domain.User;
 import com.begcode.monolith.repository.AuthorityRepository;
 import com.begcode.monolith.repository.UserRepository;
@@ -394,10 +396,8 @@ public class UserService extends BaseServiceImpl<UserRepository, User> {
     public UserDTO update(UserDTO userDTO) {
         log.debug("Request to update User : {}", userDTO);
         User user = userMapper.toEntity(userDTO);
-        user.setDepartmentId(
-            Optional.ofNullable(userDTO.getDepartment()).map(departmentDepartmentDTO -> departmentDepartmentDTO.getId()).orElse(null)
-        );
-        user.setPositionId(Optional.ofNullable(userDTO.getPosition()).map(positionPositionDTO -> positionPositionDTO.getId()).orElse(null));
+        user.setDepartmentId(Optional.ofNullable(user.getDepartment()).map(Department::getId).orElse(null));
+        user.setPositionId(Optional.ofNullable(user.getPosition()).map(Position::getId).orElse(null));
         this.createOrUpdateAndRelatedRelations(user, List.of("authorities"));
         return findOne(user.getId()).orElseThrow();
     }

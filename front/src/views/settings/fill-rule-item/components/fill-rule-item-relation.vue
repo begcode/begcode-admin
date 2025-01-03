@@ -83,7 +83,7 @@
                   <BasicButton v-if="!button.dropdowns">{{ button.name }}</BasicButton>
                   <a-dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
                     <template #overlay>
-                      <a-menu @click="gridEvents.toolbarButtonClick(subButton)" v-for="subButton of button.dropdowns">
+                      <a-menu @click="gridEvents.toolbarButtonClick?.(subButton as any)" v-for="subButton of button.dropdowns">
                         <a-menu-item :key="subButton.name + 's'">
                           <Icon :icon="subButton.icon"></Icon>
                           {{ subButton.name }}
@@ -167,6 +167,16 @@ const config = {
         componentProps: {},
       },
       {
+        title: '排序值',
+        field: 'sortValue',
+        componentType: 'Text',
+        value: '',
+        type: 'Integer',
+        operator: '',
+        span: 8,
+        componentProps: {},
+      },
+      {
         title: '字段参数类型',
         field: 'fieldParamType',
         componentType: 'Select',
@@ -186,6 +196,7 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
         componentProps: {},
       },
       {
@@ -196,6 +207,40 @@ const config = {
         type: 'String',
         operator: '',
         span: 8,
+        hidden: true,
+        componentProps: {},
+      },
+      {
+        title: '序列长度',
+        field: 'seqLength',
+        componentType: 'Text',
+        value: '',
+        type: 'Integer',
+        operator: '',
+        span: 8,
+        hidden: true,
+        componentProps: {},
+      },
+      {
+        title: '序列增量',
+        field: 'seqIncrement',
+        componentType: 'Text',
+        value: '',
+        type: 'Integer',
+        operator: '',
+        span: 8,
+        hidden: true,
+        componentProps: {},
+      },
+      {
+        title: '序列起始值',
+        field: 'seqStartValue',
+        componentType: 'Text',
+        value: '',
+        type: 'Integer',
+        operator: '',
+        span: 8,
+        hidden: true,
         componentProps: {},
       },
     ];

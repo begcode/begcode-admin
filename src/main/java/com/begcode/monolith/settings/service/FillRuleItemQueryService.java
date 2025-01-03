@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tech.jhipster.service.filter.*;
+import tech.jhipster.service.mybatis.CriteriaUtil;
 import tech.jhipster.service.mybatis.QueryService;
 
 /**
@@ -79,7 +80,7 @@ public class FillRuleItemQueryService implements QueryService<FillRuleItem> {
     }
 
     public <T> List<T> getFieldByCriteria(Class<T> clazz, String fieldName, Boolean distinct, FillRuleItemCriteria criteria) {
-        return (List<T>) fillRuleItemRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
+        return fillRuleItemRepository.selectObjs(createQueryWrapperNoJoin(criteria).select(fieldName));
     }
 
     public long countByFieldNameAndCriteria(String fieldName, Boolean distinct, FillRuleItemCriteria criteria) {
@@ -112,7 +113,8 @@ public class FillRuleItemQueryService implements QueryService<FillRuleItem> {
             }
             tempCriteria.setAnd(keywordsCriteria);
         }
-        QueryWrapper<FillRuleItem> queryWrapper = new DynamicJoinQueryWrapper<>(FillRuleItemCriteria.class, null);
+        List<String> fields = CriteriaUtil.getNonNullBindQueryFields(criteria);
+        QueryWrapper<FillRuleItem> queryWrapper = new DynamicJoinQueryWrapper<>(FillRuleItemCriteria.class, fields);
         return createQueryWrapper(queryWrapper, criteria.getUseOr(), criteria, FillRuleItem.class);
     }
 
@@ -150,6 +152,7 @@ public class FillRuleItemQueryService implements QueryService<FillRuleItem> {
         fieldNameMap.put("self.seq_length", criteria.getSeqLength());
         fieldNameMap.put("self.seq_increment", criteria.getSeqIncrement());
         fieldNameMap.put("self.seq_start_value", criteria.getSeqStartValue());
+        fieldNameMap.put("self.fill_rule_id", criteria.getFillRuleId());
         fieldNameMap
             .entrySet()
             .stream()
