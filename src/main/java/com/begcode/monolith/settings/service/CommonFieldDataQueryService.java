@@ -9,7 +9,9 @@ import com.begcode.monolith.settings.service.criteria.CommonFieldDataCriteria;
 import com.begcode.monolith.settings.service.dto.CommonFieldDataDTO;
 import com.begcode.monolith.settings.service.mapper.CommonFieldDataMapper;
 import com.diboot.core.binding.Binder;
+import com.diboot.core.binding.query.BindQuery;
 import com.diboot.core.binding.query.dynamic.DynamicJoinQueryWrapper;
+import com.google.common.base.CaseFormat;
 import java.util.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -144,22 +146,32 @@ public class CommonFieldDataQueryService implements QueryService<CommonFieldData
         QueryWrapper<CommonFieldData> queryWrapper = createQueryWrapper(criteria);
         List<String> selectFields = new ArrayList<>();
         List<String> groupByFields = new ArrayList<>();
-        Map<String, Filter<?>> fieldNameMap = new HashMap<>();
-        fieldNameMap.put("self.id", criteria.getId());
-        fieldNameMap.put("self.name", criteria.getName());
-        fieldNameMap.put("self.value", criteria.getValue());
-        fieldNameMap.put("self.label", criteria.getLabel());
-        fieldNameMap.put("self.value_type", criteria.getValueType());
-        fieldNameMap.put("self.remark", criteria.getRemark());
-        fieldNameMap.put("self.sort_value", criteria.getSortValue());
-        fieldNameMap.put("self.disabled", criteria.getDisabled());
-        fieldNameMap.put("self.owner_entity_name", criteria.getOwnerEntityName());
-        fieldNameMap.put("self.owner_entity_id", criteria.getOwnerEntityId());
-        fieldNameMap
-            .entrySet()
-            .stream()
-            .filter(entry -> entry.getValue() != null)
-            .forEach(entry -> getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields));
+        Map<String, Map<String, Object>> fieldNameMap = CriteriaUtil.getNonIgnoredAndNonNullFields(criteria);
+        fieldNameMap.forEach((key, value) -> {
+            // 获得value 对象BindQuery 注解的column属性值
+            Filter<?> filter = (Filter<?>) value.get("value");
+            BindQuery bindQuery = (BindQuery) value.get("bindQuery");
+            String column = bindQuery.column();
+            if (column.startsWith("self.")) {
+                getAggregateAndGroupBy(filter, column, "", selectFields, groupByFields);
+            } else {
+                if (queryWrapper instanceof DynamicJoinQueryWrapper) {
+                    DynamicJoinQueryWrapper<CommonFieldDataCriteria, CommonFieldData> dynamicQuery = (DynamicJoinQueryWrapper<
+                            CommonFieldDataCriteria,
+                            CommonFieldData
+                        >) queryWrapper;
+                    dynamicQuery
+                        .getAnnoJoiners()
+                        .stream()
+                        .filter(annoJoiner -> annoJoiner.getColumnName().equals(column) && annoJoiner.getFieldName().equals(key))
+                        .findFirst()
+                        .ifPresent(annoJoiner -> {
+                            String alias = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, annoJoiner.getFieldName());
+                            getAggregateAndGroupBy(filter, annoJoiner.getAlias() + "." + column, alias, selectFields, groupByFields);
+                        });
+                }
+            }
+        });
         if (CollectionUtils.isNotEmpty(selectFields)) {
             queryWrapper.select(selectFields.toArray(new String[0])).groupBy(CollectionUtils.isNotEmpty(groupByFields), groupByFields);
             return Binder.joinQueryMapsPage(queryWrapper, CommonFieldData.class, null).getRecords();

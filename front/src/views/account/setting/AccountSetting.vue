@@ -3,7 +3,7 @@
     <div class="my-account">账户</div>
     <div class="account-row-item clearfix">
       <div class="account-label gray-75">手机</div>
-      <span class="gray" v-if="userDetail.mobileText">{{ userDetail.mobile }}</span>
+      <span class="gray" v-if="userDetail.mobileText">{{ userDetail.mobileText }}</span>
       <span class="pointer blue-e5 phone-margin" @click="updatePhone" v-if="userDetail.mobile">修改</span>
       <span class="pointer blue-e5 phone-margin" @click="bindPhone" v-else>绑定</span>
       <span class="pointer blue-e5" @click="unbindPhone" v-if="userDetail.mobile">解绑</span>
@@ -13,8 +13,6 @@
       <div class="account-label gray-75">邮箱</div>
       <span class="gray">{{ userDetail.email ? userDetail.email : '未填写' }}</span>
       <span class="pointer blue-e5 phone-margin" @click="updateEmail">修改</span>
-      <span class="pointer blue-e5" @click="unbindEmail" v-if="userDetail.email">解绑</span>
-      <span class="pointer blue-e5" @click="unbindEmail" v-else>绑定</span>
       <span class="pointer blue-e5" style="margin-left: 5px" @click="checkEmail" v-if="userDetail.email">验证</span>
     </div>
   </div>
@@ -47,10 +45,10 @@ const wechatData = reactive<any>({
 function initUserDetail() {
   //获取用户数据
   accountService.getAccount().then(data => {
+    userDetail.value = data;
     if (data.mobile) {
       userDetail.value.mobileText = data.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
     }
-    userDetail.value = data;
   });
 }
 
@@ -82,13 +80,6 @@ function updateEmail() {
  */
 function unbindPhone() {
   console.log('手机号解绑');
-}
-
-/**
- * 邮箱解绑
- */
-function unbindEmail() {
-  console.log('邮箱解绑');
 }
 
 /**

@@ -10,6 +10,8 @@
       "dropdownItemLoginOut": "Log Out",
       "dropdownItemSwitchDepart": "Switch Department",
       "dropdownItemRefreshCache": "Clean cache",
+      "dropdownItemSwitchPassword": "Password Change",
+      "dropdownItemSwitchAccount": "Account Setting",
       "tooltipErrorLog": "Error log",
       "tooltipLock": "Lock screen",
       "tooltipNotify": "Notification",

@@ -10,7 +10,9 @@ import com.begcode.monolith.settings.service.criteria.RegionCodeCriteria;
 import com.begcode.monolith.settings.service.dto.RegionCodeDTO;
 import com.begcode.monolith.settings.service.mapper.RegionCodeMapper;
 import com.diboot.core.binding.Binder;
+import com.diboot.core.binding.query.BindQuery;
 import com.diboot.core.binding.query.dynamic.DynamicJoinQueryWrapper;
+import com.google.common.base.CaseFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
@@ -181,23 +183,32 @@ public class RegionCodeQueryService implements QueryService<RegionCode> {
         QueryWrapper<RegionCode> queryWrapper = createQueryWrapper(criteria);
         List<String> selectFields = new ArrayList<>();
         List<String> groupByFields = new ArrayList<>();
-        Map<String, Filter<?>> fieldNameMap = new HashMap<>();
-        fieldNameMap.put("self.id", criteria.getId());
-        fieldNameMap.put("self.name", criteria.getName());
-        fieldNameMap.put("self.area_code", criteria.getAreaCode());
-        fieldNameMap.put("self.city_code", criteria.getCityCode());
-        fieldNameMap.put("self.merger_name", criteria.getMergerName());
-        fieldNameMap.put("self.short_name", criteria.getShortName());
-        fieldNameMap.put("self.zip_code", criteria.getZipCode());
-        fieldNameMap.put("self.level", criteria.getLevel());
-        fieldNameMap.put("self.lng", criteria.getLng());
-        fieldNameMap.put("self.lat", criteria.getLat());
-        fieldNameMap.put("self.parent_id", criteria.getParentId());
-        fieldNameMap
-            .entrySet()
-            .stream()
-            .filter(entry -> entry.getValue() != null)
-            .forEach(entry -> getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields));
+        Map<String, Map<String, Object>> fieldNameMap = CriteriaUtil.getNonIgnoredAndNonNullFields(criteria);
+        fieldNameMap.forEach((key, value) -> {
+            // 获得value 对象BindQuery 注解的column属性值
+            Filter<?> filter = (Filter<?>) value.get("value");
+            BindQuery bindQuery = (BindQuery) value.get("bindQuery");
+            String column = bindQuery.column();
+            if (column.startsWith("self.")) {
+                getAggregateAndGroupBy(filter, column, "", selectFields, groupByFields);
+            } else {
+                if (queryWrapper instanceof DynamicJoinQueryWrapper) {
+                    DynamicJoinQueryWrapper<RegionCodeCriteria, RegionCode> dynamicQuery = (DynamicJoinQueryWrapper<
+                            RegionCodeCriteria,
+                            RegionCode
+                        >) queryWrapper;
+                    dynamicQuery
+                        .getAnnoJoiners()
+                        .stream()
+                        .filter(annoJoiner -> annoJoiner.getColumnName().equals(column) && annoJoiner.getFieldName().equals(key))
+                        .findFirst()
+                        .ifPresent(annoJoiner -> {
+                            String alias = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, annoJoiner.getFieldName());
+                            getAggregateAndGroupBy(filter, annoJoiner.getAlias() + "." + column, alias, selectFields, groupByFields);
+                        });
+                }
+            }
+        });
         if (CollectionUtils.isNotEmpty(selectFields)) {
             queryWrapper.select(selectFields.toArray(new String[0])).groupBy(CollectionUtils.isNotEmpty(groupByFields), groupByFields);
             return Binder.joinQueryMapsPage(queryWrapper, RegionCode.class, null).getRecords();

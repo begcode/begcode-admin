@@ -10,7 +10,9 @@ import com.begcode.monolith.log.service.criteria.SysLogCriteria;
 import com.begcode.monolith.log.service.dto.SysLogDTO;
 import com.begcode.monolith.log.service.mapper.SysLogMapper;
 import com.diboot.core.binding.Binder;
+import com.diboot.core.binding.query.BindQuery;
 import com.diboot.core.binding.query.dynamic.DynamicJoinQueryWrapper;
+import com.google.common.base.CaseFormat;
 import java.util.*;
 import java.util.Calendar;
 import java.util.Date;
@@ -152,27 +154,32 @@ public class SysLogQueryService implements QueryService<SysLog> {
         QueryWrapper<SysLog> queryWrapper = createQueryWrapper(criteria);
         List<String> selectFields = new ArrayList<>();
         List<String> groupByFields = new ArrayList<>();
-        Map<String, Filter<?>> fieldNameMap = new HashMap<>();
-        fieldNameMap.put("self.id", criteria.getId());
-        fieldNameMap.put("self.request_url", criteria.getRequestUrl());
-        fieldNameMap.put("self.log_type", criteria.getLogType());
-        fieldNameMap.put("self.log_content", criteria.getLogContent());
-        fieldNameMap.put("self.operate_type", criteria.getOperateType());
-        fieldNameMap.put("self.userid", criteria.getUserid());
-        fieldNameMap.put("self.username", criteria.getUsername());
-        fieldNameMap.put("self.ip", criteria.getIp());
-        fieldNameMap.put("self.method", criteria.getMethod());
-        fieldNameMap.put("self.request_type", criteria.getRequestType());
-        fieldNameMap.put("self.cost_time", criteria.getCostTime());
-        fieldNameMap.put("self.created_by", criteria.getCreatedBy());
-        fieldNameMap.put("self.created_date", criteria.getCreatedDate());
-        fieldNameMap.put("self.last_modified_by", criteria.getLastModifiedBy());
-        fieldNameMap.put("self.last_modified_date", criteria.getLastModifiedDate());
-        fieldNameMap
-            .entrySet()
-            .stream()
-            .filter(entry -> entry.getValue() != null)
-            .forEach(entry -> getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields));
+        Map<String, Map<String, Object>> fieldNameMap = CriteriaUtil.getNonIgnoredAndNonNullFields(criteria);
+        fieldNameMap.forEach((key, value) -> {
+            // 获得value 对象BindQuery 注解的column属性值
+            Filter<?> filter = (Filter<?>) value.get("value");
+            BindQuery bindQuery = (BindQuery) value.get("bindQuery");
+            String column = bindQuery.column();
+            if (column.startsWith("self.")) {
+                getAggregateAndGroupBy(filter, column, "", selectFields, groupByFields);
+            } else {
+                if (queryWrapper instanceof DynamicJoinQueryWrapper) {
+                    DynamicJoinQueryWrapper<SysLogCriteria, SysLog> dynamicQuery = (DynamicJoinQueryWrapper<
+                            SysLogCriteria,
+                            SysLog
+                        >) queryWrapper;
+                    dynamicQuery
+                        .getAnnoJoiners()
+                        .stream()
+                        .filter(annoJoiner -> annoJoiner.getColumnName().equals(column) && annoJoiner.getFieldName().equals(key))
+                        .findFirst()
+                        .ifPresent(annoJoiner -> {
+                            String alias = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, annoJoiner.getFieldName());
+                            getAggregateAndGroupBy(filter, annoJoiner.getAlias() + "." + column, alias, selectFields, groupByFields);
+                        });
+                }
+            }
+        });
         if (CollectionUtils.isNotEmpty(selectFields)) {
             queryWrapper.select(selectFields.toArray(new String[0])).groupBy(CollectionUtils.isNotEmpty(groupByFields), groupByFields);
             return Binder.joinQueryMapsPage(queryWrapper, SysLog.class, null).getRecords();

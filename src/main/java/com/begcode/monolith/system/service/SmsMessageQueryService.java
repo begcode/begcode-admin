@@ -9,7 +9,9 @@ import com.begcode.monolith.system.service.criteria.SmsMessageCriteria;
 import com.begcode.monolith.system.service.dto.SmsMessageDTO;
 import com.begcode.monolith.system.service.mapper.SmsMessageMapper;
 import com.diboot.core.binding.Binder;
+import com.diboot.core.binding.query.BindQuery;
 import com.diboot.core.binding.query.dynamic.DynamicJoinQueryWrapper;
+import com.google.common.base.CaseFormat;
 import java.util.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -145,26 +147,32 @@ public class SmsMessageQueryService implements QueryService<SmsMessage> {
         QueryWrapper<SmsMessage> queryWrapper = createQueryWrapper(criteria);
         List<String> selectFields = new ArrayList<>();
         List<String> groupByFields = new ArrayList<>();
-        Map<String, Filter<?>> fieldNameMap = new HashMap<>();
-        fieldNameMap.put("self.id", criteria.getId());
-        fieldNameMap.put("self.title", criteria.getTitle());
-        fieldNameMap.put("self.send_type", criteria.getSendType());
-        fieldNameMap.put("self.receiver", criteria.getReceiver());
-        fieldNameMap.put("self.params", criteria.getParams());
-        fieldNameMap.put("self.send_time", criteria.getSendTime());
-        fieldNameMap.put("self.send_status", criteria.getSendStatus());
-        fieldNameMap.put("self.retry_num", criteria.getRetryNum());
-        fieldNameMap.put("self.fail_result", criteria.getFailResult());
-        fieldNameMap.put("self.remark", criteria.getRemark());
-        fieldNameMap.put("self.created_by", criteria.getCreatedBy());
-        fieldNameMap.put("self.created_date", criteria.getCreatedDate());
-        fieldNameMap.put("self.last_modified_by", criteria.getLastModifiedBy());
-        fieldNameMap.put("self.last_modified_date", criteria.getLastModifiedDate());
-        fieldNameMap
-            .entrySet()
-            .stream()
-            .filter(entry -> entry.getValue() != null)
-            .forEach(entry -> getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields));
+        Map<String, Map<String, Object>> fieldNameMap = CriteriaUtil.getNonIgnoredAndNonNullFields(criteria);
+        fieldNameMap.forEach((key, value) -> {
+            // 获得value 对象BindQuery 注解的column属性值
+            Filter<?> filter = (Filter<?>) value.get("value");
+            BindQuery bindQuery = (BindQuery) value.get("bindQuery");
+            String column = bindQuery.column();
+            if (column.startsWith("self.")) {
+                getAggregateAndGroupBy(filter, column, "", selectFields, groupByFields);
+            } else {
+                if (queryWrapper instanceof DynamicJoinQueryWrapper) {
+                    DynamicJoinQueryWrapper<SmsMessageCriteria, SmsMessage> dynamicQuery = (DynamicJoinQueryWrapper<
+                            SmsMessageCriteria,
+                            SmsMessage
+                        >) queryWrapper;
+                    dynamicQuery
+                        .getAnnoJoiners()
+                        .stream()
+                        .filter(annoJoiner -> annoJoiner.getColumnName().equals(column) && annoJoiner.getFieldName().equals(key))
+                        .findFirst()
+                        .ifPresent(annoJoiner -> {
+                            String alias = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, annoJoiner.getFieldName());
+                            getAggregateAndGroupBy(filter, annoJoiner.getAlias() + "." + column, alias, selectFields, groupByFields);
+                        });
+                }
+            }
+        });
         if (CollectionUtils.isNotEmpty(selectFields)) {
             queryWrapper.select(selectFields.toArray(new String[0])).groupBy(CollectionUtils.isNotEmpty(groupByFields), groupByFields);
             return Binder.joinQueryMapsPage(queryWrapper, SmsMessage.class, null).getRecords();

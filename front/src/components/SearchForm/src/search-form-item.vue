@@ -42,14 +42,14 @@
       </a-col>
       <a-col :md="field.showOperator || field.showFieldNames ? 24 - (field.showFieldNamesSpan || 8) : 24">
         <a-datePicker
-          v-bind="field.componentProps"
+          v-bind="componentProps"
           v-if="field.componentType === 'Date'"
           v-model="field.value"
           :placeholder="field?.componentProps?.placeholder || '请选择日期'"
           style="width: 100%"
         />
         <a-datePicker
-          v-bind="field.componentProps"
+          v-bind="componentProps"
           v-else-if="field.componentType === 'DateTime'"
           v-model:value="field.value"
           :placeholder="field?.componentProps?.placeholder || '请选择时间'"
@@ -58,7 +58,7 @@
           style="width: 100%"
         />
         <a-time-picker
-          v-bind="field.componentProps"
+          v-bind="componentProps"
           v-else-if="field.componentType === 'Time'"
           v-model:value="field.value"
           format="HH:mm:ss"
@@ -66,60 +66,60 @@
           style="width: 100%"
         />
         <a-range-picker
-          v-bind="field.componentProps"
+          v-bind="componentProps"
           v-else-if="field.componentType === 'DateRange'"
           v-model:value="field.value"
           style="width: 100%"
         />
         <RangeDate
-          v-bind="field.componentProps"
+          v-bind="componentProps"
           v-else-if="field.componentType === 'RangeDate'"
           v-model:value="field.value"
           style="width: 100%"
         />
         <a-range-picker
-          v-bind="field.componentProps"
+          v-bind="componentProps"
           v-else-if="field.componentType === 'DateTimeRange'"
           v-model:value="field.value"
           style="width: 100%"
           show-time
         />
         <a-range-picker
-          v-bind="field.componentProps"
+          v-bind="componentProps"
           v-else-if="field.componentType === 'WeekRange'"
           v-model:value="field.value"
           style="width: 100%"
           picker="week"
         />
         <a-range-picker
-          v-bind="field.componentProps"
+          v-bind="componentProps"
           v-else-if="field.componentType === 'MonthRange'"
           v-model:value="field.value"
           style="width: 100%"
           picker="month"
         />
         <a-range-picker
-          v-bind="field.componentProps"
+          v-bind="componentProps"
           v-else-if="field.componentType === 'YearRange'"
           v-model:value="field.value"
           style="width: 100%"
           picker="year"
         />
         <a-input-number
-          v-bind="field.componentProps"
+          v-bind="componentProps"
           v-else-if="field.componentType === 'Number'"
           style="width: 100%"
           :placeholder="field?.componentProps?.placeholder || '请输入数值'"
           v-model:value="field.value"
         />
-        <a-switch v-bind="field.componentProps" v-model="field.value" v-else-if="field.componentType === 'Switch'">
+        <a-switch v-bind="componentProps" v-model="field.value" v-else-if="field.componentType === 'Switch'">
           <Icon icon="ant-design:check-outlined" slot="checkedChildren" />
           <Icon icon="ant-design:close-outlined" slot="unCheckedChildren" />
         </a-switch>
-        <a-radio-group v-bind="field.componentProps" v-model:value="field.value" v-else-if="field.componentType === 'RadioGroup'">
+        <a-radio-group v-bind="componentProps" v-model:value="field.value" v-else-if="field.componentType === 'RadioGroup'">
         </a-radio-group>
         <a-select
-          v-bind="field.componentProps"
+          v-bind="componentProps"
           v-else-if="field.componentType === 'Select'"
           :placeholder="field?.componentProps?.placeholder || '请选择'"
           v-model:value="field.value"
@@ -138,12 +138,12 @@
         />
         <ApiTreeSelect
           v-else-if="field.componentType === 'ApiTreeSelect'"
-          v-bind="field.componentProps"
+          v-bind="componentProps"
           :placeholder="field?.componentProps?.placeholder || '请选择'"
           v-model:value="field.value"
         />
         <a-select
-          v-bind="field.componentProps"
+          v-bind="componentProps"
           v-else-if="field.componentType === 'TagsInput'"
           mode="tags"
           v-model="field.value"
@@ -151,7 +151,7 @@
           :placeholder="field?.componentProps?.placeholder || '请输入值并回车'"
         />
         <a-input
-          v-bind="field.componentProps"
+          v-bind="componentProps"
           v-else
           v-model:value="field.value"
           :placeholder="field?.componentProps?.placeholder || '请输入'"

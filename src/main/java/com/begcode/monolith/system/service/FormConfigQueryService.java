@@ -9,7 +9,9 @@ import com.begcode.monolith.system.service.criteria.FormConfigCriteria;
 import com.begcode.monolith.system.service.dto.FormConfigDTO;
 import com.begcode.monolith.system.service.mapper.FormConfigMapper;
 import com.diboot.core.binding.Binder;
+import com.diboot.core.binding.query.BindQuery;
 import com.diboot.core.binding.query.dynamic.DynamicJoinQueryWrapper;
+import com.google.common.base.CaseFormat;
 import java.util.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -141,22 +143,32 @@ public class FormConfigQueryService implements QueryService<FormConfig> {
         QueryWrapper<FormConfig> queryWrapper = createQueryWrapper(criteria);
         List<String> selectFields = new ArrayList<>();
         List<String> groupByFields = new ArrayList<>();
-        Map<String, Filter<?>> fieldNameMap = new HashMap<>();
-        fieldNameMap.put("self.id", criteria.getId());
-        fieldNameMap.put("self.form_key", criteria.getFormKey());
-        fieldNameMap.put("self.form_name", criteria.getFormName());
-        fieldNameMap.put("self.form_type", criteria.getFormType());
-        fieldNameMap.put("self.multi_items", criteria.getMultiItems());
-        fieldNameMap.put("self.created_by", criteria.getCreatedBy());
-        fieldNameMap.put("self.created_date", criteria.getCreatedDate());
-        fieldNameMap.put("self.last_modified_by", criteria.getLastModifiedBy());
-        fieldNameMap.put("self.last_modified_date", criteria.getLastModifiedDate());
-        fieldNameMap.put("self.business_type_id", criteria.getBusinessTypeId());
-        fieldNameMap
-            .entrySet()
-            .stream()
-            .filter(entry -> entry.getValue() != null)
-            .forEach(entry -> getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields));
+        Map<String, Map<String, Object>> fieldNameMap = CriteriaUtil.getNonIgnoredAndNonNullFields(criteria);
+        fieldNameMap.forEach((key, value) -> {
+            // 获得value 对象BindQuery 注解的column属性值
+            Filter<?> filter = (Filter<?>) value.get("value");
+            BindQuery bindQuery = (BindQuery) value.get("bindQuery");
+            String column = bindQuery.column();
+            if (column.startsWith("self.")) {
+                getAggregateAndGroupBy(filter, column, "", selectFields, groupByFields);
+            } else {
+                if (queryWrapper instanceof DynamicJoinQueryWrapper) {
+                    DynamicJoinQueryWrapper<FormConfigCriteria, FormConfig> dynamicQuery = (DynamicJoinQueryWrapper<
+                            FormConfigCriteria,
+                            FormConfig
+                        >) queryWrapper;
+                    dynamicQuery
+                        .getAnnoJoiners()
+                        .stream()
+                        .filter(annoJoiner -> annoJoiner.getColumnName().equals(column) && annoJoiner.getFieldName().equals(key))
+                        .findFirst()
+                        .ifPresent(annoJoiner -> {
+                            String alias = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, annoJoiner.getFieldName());
+                            getAggregateAndGroupBy(filter, annoJoiner.getAlias() + "." + column, alias, selectFields, groupByFields);
+                        });
+                }
+            }
+        });
         if (CollectionUtils.isNotEmpty(selectFields)) {
             queryWrapper.select(selectFields.toArray(new String[0])).groupBy(CollectionUtils.isNotEmpty(groupByFields), groupByFields);
             return Binder.joinQueryMapsPage(queryWrapper, FormConfig.class, null).getRecords();

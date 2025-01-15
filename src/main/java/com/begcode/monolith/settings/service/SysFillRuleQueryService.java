@@ -9,7 +9,9 @@ import com.begcode.monolith.settings.service.criteria.SysFillRuleCriteria;
 import com.begcode.monolith.settings.service.dto.SysFillRuleDTO;
 import com.begcode.monolith.settings.service.mapper.SysFillRuleMapper;
 import com.diboot.core.binding.Binder;
+import com.diboot.core.binding.query.BindQuery;
 import com.diboot.core.binding.query.dynamic.DynamicJoinQueryWrapper;
+import com.google.common.base.CaseFormat;
 import java.util.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -144,25 +146,32 @@ public class SysFillRuleQueryService implements QueryService<SysFillRule> {
         QueryWrapper<SysFillRule> queryWrapper = createQueryWrapper(criteria);
         List<String> selectFields = new ArrayList<>();
         List<String> groupByFields = new ArrayList<>();
-        Map<String, Filter<?>> fieldNameMap = new HashMap<>();
-        fieldNameMap.put("self.id", criteria.getId());
-        fieldNameMap.put("self.name", criteria.getName());
-        fieldNameMap.put("self.code", criteria.getCode());
-        fieldNameMap.put("self.desc", criteria.getDesc());
-        fieldNameMap.put("self.enabled", criteria.getEnabled());
-        fieldNameMap.put("self.reset_frequency", criteria.getResetFrequency());
-        fieldNameMap.put("self.seq_value", criteria.getSeqValue());
-        fieldNameMap.put("self.fill_value", criteria.getFillValue());
-        fieldNameMap.put("self.impl_class", criteria.getImplClass());
-        fieldNameMap.put("self.params", criteria.getParams());
-        fieldNameMap.put("self.reset_start_time", criteria.getResetStartTime());
-        fieldNameMap.put("self.reset_end_time", criteria.getResetEndTime());
-        fieldNameMap.put("self.reset_time", criteria.getResetTime());
-        fieldNameMap
-            .entrySet()
-            .stream()
-            .filter(entry -> entry.getValue() != null)
-            .forEach(entry -> getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields));
+        Map<String, Map<String, Object>> fieldNameMap = CriteriaUtil.getNonIgnoredAndNonNullFields(criteria);
+        fieldNameMap.forEach((key, value) -> {
+            // 获得value 对象BindQuery 注解的column属性值
+            Filter<?> filter = (Filter<?>) value.get("value");
+            BindQuery bindQuery = (BindQuery) value.get("bindQuery");
+            String column = bindQuery.column();
+            if (column.startsWith("self.")) {
+                getAggregateAndGroupBy(filter, column, "", selectFields, groupByFields);
+            } else {
+                if (queryWrapper instanceof DynamicJoinQueryWrapper) {
+                    DynamicJoinQueryWrapper<SysFillRuleCriteria, SysFillRule> dynamicQuery = (DynamicJoinQueryWrapper<
+                            SysFillRuleCriteria,
+                            SysFillRule
+                        >) queryWrapper;
+                    dynamicQuery
+                        .getAnnoJoiners()
+                        .stream()
+                        .filter(annoJoiner -> annoJoiner.getColumnName().equals(column) && annoJoiner.getFieldName().equals(key))
+                        .findFirst()
+                        .ifPresent(annoJoiner -> {
+                            String alias = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, annoJoiner.getFieldName());
+                            getAggregateAndGroupBy(filter, annoJoiner.getAlias() + "." + column, alias, selectFields, groupByFields);
+                        });
+                }
+            }
+        });
         if (CollectionUtils.isNotEmpty(selectFields)) {
             queryWrapper.select(selectFields.toArray(new String[0])).groupBy(CollectionUtils.isNotEmpty(groupByFields), groupByFields);
             return Binder.joinQueryMapsPage(queryWrapper, SysFillRule.class, null).getRecords();

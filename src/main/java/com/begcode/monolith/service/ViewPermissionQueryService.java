@@ -10,7 +10,9 @@ import com.begcode.monolith.service.criteria.ViewPermissionCriteria;
 import com.begcode.monolith.service.dto.ViewPermissionDTO;
 import com.begcode.monolith.service.mapper.ViewPermissionMapper;
 import com.diboot.core.binding.Binder;
+import com.diboot.core.binding.query.BindQuery;
 import com.diboot.core.binding.query.dynamic.DynamicJoinQueryWrapper;
+import com.google.common.base.CaseFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
@@ -184,34 +186,32 @@ public class ViewPermissionQueryService implements QueryService<ViewPermission> 
         QueryWrapper<ViewPermission> queryWrapper = createQueryWrapper(criteria);
         List<String> selectFields = new ArrayList<>();
         List<String> groupByFields = new ArrayList<>();
-        Map<String, Filter<?>> fieldNameMap = new HashMap<>();
-        fieldNameMap.put("self.id", criteria.getId());
-        fieldNameMap.put("self.text", criteria.getText());
-        fieldNameMap.put("self.type", criteria.getType());
-        fieldNameMap.put("self.locale_key", criteria.getLocaleKey());
-        fieldNameMap.put("self.group", criteria.getGroup());
-        fieldNameMap.put("self.link", criteria.getLink());
-        fieldNameMap.put("self.external_link", criteria.getExternalLink());
-        fieldNameMap.put("self.target", criteria.getTarget());
-        fieldNameMap.put("self.icon", criteria.getIcon());
-        fieldNameMap.put("self.disabled", criteria.getDisabled());
-        fieldNameMap.put("self.hide", criteria.getHide());
-        fieldNameMap.put("self.hide_in_breadcrumb", criteria.getHideInBreadcrumb());
-        fieldNameMap.put("self.shortcut", criteria.getShortcut());
-        fieldNameMap.put("self.shortcut_root", criteria.getShortcutRoot());
-        fieldNameMap.put("self.reuse", criteria.getReuse());
-        fieldNameMap.put("self.code", criteria.getCode());
-        fieldNameMap.put("self.description", criteria.getDescription());
-        fieldNameMap.put("self.order", criteria.getOrder());
-        fieldNameMap.put("self.api_permission_codes", criteria.getApiPermissionCodes());
-        fieldNameMap.put("self.component_file", criteria.getComponentFile());
-        fieldNameMap.put("self.redirect", criteria.getRedirect());
-        fieldNameMap.put("self.parent_id", criteria.getParentId());
-        fieldNameMap
-            .entrySet()
-            .stream()
-            .filter(entry -> entry.getValue() != null)
-            .forEach(entry -> getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields));
+        Map<String, Map<String, Object>> fieldNameMap = CriteriaUtil.getNonIgnoredAndNonNullFields(criteria);
+        fieldNameMap.forEach((key, value) -> {
+            // 获得value 对象BindQuery 注解的column属性值
+            Filter<?> filter = (Filter<?>) value.get("value");
+            BindQuery bindQuery = (BindQuery) value.get("bindQuery");
+            String column = bindQuery.column();
+            if (column.startsWith("self.")) {
+                getAggregateAndGroupBy(filter, column, "", selectFields, groupByFields);
+            } else {
+                if (queryWrapper instanceof DynamicJoinQueryWrapper) {
+                    DynamicJoinQueryWrapper<ViewPermissionCriteria, ViewPermission> dynamicQuery = (DynamicJoinQueryWrapper<
+                            ViewPermissionCriteria,
+                            ViewPermission
+                        >) queryWrapper;
+                    dynamicQuery
+                        .getAnnoJoiners()
+                        .stream()
+                        .filter(annoJoiner -> annoJoiner.getColumnName().equals(column) && annoJoiner.getFieldName().equals(key))
+                        .findFirst()
+                        .ifPresent(annoJoiner -> {
+                            String alias = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, annoJoiner.getFieldName());
+                            getAggregateAndGroupBy(filter, annoJoiner.getAlias() + "." + column, alias, selectFields, groupByFields);
+                        });
+                }
+            }
+        });
         if (CollectionUtils.isNotEmpty(selectFields)) {
             queryWrapper.select(selectFields.toArray(new String[0])).groupBy(CollectionUtils.isNotEmpty(groupByFields), groupByFields);
             return Binder.joinQueryMapsPage(queryWrapper, ViewPermission.class, null).getRecords();

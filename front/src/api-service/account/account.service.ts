@@ -33,7 +33,7 @@ export default {
     return defHttp.post({ url: `${baseApiUrl}/mobile/reset-password/finish`, params }, { errorMessageMode: 'none' });
   },
   checkExistUser(params: any): Promise<boolean> {
-    return defHttp.get({ url: `${baseApiUrl}/users/check`, paramss }, { errorMessageMode: 'none' });
+    return defHttp.get({ url: `${baseApiUrl}/users/check`, params }, { errorMessageMode: 'none' });
   },
 
   // jhipster-needle-service-add-method - BegCode will add getters and setters here, do not remove

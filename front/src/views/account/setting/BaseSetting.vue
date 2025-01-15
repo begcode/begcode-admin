@@ -34,14 +34,6 @@
           <span class="gray-75 item-label">生日</span>
           <span class="gray-3">{{ userInfo.birthday }}</span>
         </div>
-        <div class="margin-bottom-10 font-size-13">
-          <span class="gray-75 item-label">性别</span>
-          <span class="gray-3">{{ userInfo.sexText }}</span>
-        </div>
-        <div class="margin-bottom-10 nowarp font-size-13">
-          <span class="gray-75 item-label">职位</span>
-          <span class="gray-3">{{ userInfo.postText ? userInfo.postText : '未填写' }}</span>
-        </div>
         <div class="font-size-13">
           <span class="item-label"></span>
           <span class="item-label pointer" style="color: #1e88e5" @click="openEditModal">编辑</span>
@@ -56,7 +48,7 @@
         </div>
         <div class="margin-bottom-10 font-size-13">
           <span class="gray-75 item-label">手机</span>
-          <span class="gray-3">{{ userInfo.phone ? userInfo.phone : '未填写' }}</span>
+          <span class="gray-3">{{ userInfo.mobile ? userInfo.mobile : '未填写' }}</span>
         </div>
       </div>
     </div>
@@ -68,7 +60,6 @@ import { CropperAvatar } from '@/components/Cropper';
 import { useMessage } from '@/hooks/web/useMessage';
 import headerImg from '@/assets/images/header.jpg';
 import { useUserStore } from '@/store/modules/user';
-import { uploadImg } from '@/api-service/sys/upload';
 import dayjs from 'dayjs';
 import { getDictItemsByCode } from '@/utils/dict';
 import { userEdit } from './UserSetting.api';
@@ -81,7 +72,7 @@ import uploadImageService from '@/api-service/files/upload-image.service';
 import { message } from 'ant-design-vue';
 import { IUploadImage } from '@/models/files/upload-image.model';
 
-const uploadApi = ({ file, name, filename }) => uploadImageService.create({ uploadFile: file, name, filename } as IUploadImage);
+const uploadApi = ({ file, name, filename }) => uploadImageService.create({ file, name, filename } as IUploadImage);
 
 const sexOption = getDictItemsByCode('sex') || [
   { text: '男', value: '1' },

@@ -9,7 +9,9 @@ import com.begcode.monolith.taskjob.service.criteria.TaskJobConfigCriteria;
 import com.begcode.monolith.taskjob.service.dto.TaskJobConfigDTO;
 import com.begcode.monolith.taskjob.service.mapper.TaskJobConfigMapper;
 import com.diboot.core.binding.Binder;
+import com.diboot.core.binding.query.BindQuery;
 import com.diboot.core.binding.query.dynamic.DynamicJoinQueryWrapper;
+import com.google.common.base.CaseFormat;
 import java.util.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -144,23 +146,32 @@ public class TaskJobConfigQueryService implements QueryService<TaskJobConfig> {
         QueryWrapper<TaskJobConfig> queryWrapper = createQueryWrapper(criteria);
         List<String> selectFields = new ArrayList<>();
         List<String> groupByFields = new ArrayList<>();
-        Map<String, Filter<?>> fieldNameMap = new HashMap<>();
-        fieldNameMap.put("self.id", criteria.getId());
-        fieldNameMap.put("self.name", criteria.getName());
-        fieldNameMap.put("self.job_class_name", criteria.getJobClassName());
-        fieldNameMap.put("self.cron_expression", criteria.getCronExpression());
-        fieldNameMap.put("self.parameter", criteria.getParameter());
-        fieldNameMap.put("self.description", criteria.getDescription());
-        fieldNameMap.put("self.job_status", criteria.getJobStatus());
-        fieldNameMap.put("self.created_by", criteria.getCreatedBy());
-        fieldNameMap.put("self.created_date", criteria.getCreatedDate());
-        fieldNameMap.put("self.last_modified_by", criteria.getLastModifiedBy());
-        fieldNameMap.put("self.last_modified_date", criteria.getLastModifiedDate());
-        fieldNameMap
-            .entrySet()
-            .stream()
-            .filter(entry -> entry.getValue() != null)
-            .forEach(entry -> getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields));
+        Map<String, Map<String, Object>> fieldNameMap = CriteriaUtil.getNonIgnoredAndNonNullFields(criteria);
+        fieldNameMap.forEach((key, value) -> {
+            // 获得value 对象BindQuery 注解的column属性值
+            Filter<?> filter = (Filter<?>) value.get("value");
+            BindQuery bindQuery = (BindQuery) value.get("bindQuery");
+            String column = bindQuery.column();
+            if (column.startsWith("self.")) {
+                getAggregateAndGroupBy(filter, column, "", selectFields, groupByFields);
+            } else {
+                if (queryWrapper instanceof DynamicJoinQueryWrapper) {
+                    DynamicJoinQueryWrapper<TaskJobConfigCriteria, TaskJobConfig> dynamicQuery = (DynamicJoinQueryWrapper<
+                            TaskJobConfigCriteria,
+                            TaskJobConfig
+                        >) queryWrapper;
+                    dynamicQuery
+                        .getAnnoJoiners()
+                        .stream()
+                        .filter(annoJoiner -> annoJoiner.getColumnName().equals(column) && annoJoiner.getFieldName().equals(key))
+                        .findFirst()
+                        .ifPresent(annoJoiner -> {
+                            String alias = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, annoJoiner.getFieldName());
+                            getAggregateAndGroupBy(filter, annoJoiner.getAlias() + "." + column, alias, selectFields, groupByFields);
+                        });
+                }
+            }
+        });
         if (CollectionUtils.isNotEmpty(selectFields)) {
             queryWrapper.select(selectFields.toArray(new String[0])).groupBy(CollectionUtils.isNotEmpty(groupByFields), groupByFields);
             return Binder.joinQueryMapsPage(queryWrapper, TaskJobConfig.class, null).getRecords();

@@ -9,7 +9,9 @@ import com.begcode.monolith.settings.service.criteria.FillRuleItemCriteria;
 import com.begcode.monolith.settings.service.dto.FillRuleItemDTO;
 import com.begcode.monolith.settings.service.mapper.FillRuleItemMapper;
 import com.diboot.core.binding.Binder;
+import com.diboot.core.binding.query.BindQuery;
 import com.diboot.core.binding.query.dynamic.DynamicJoinQueryWrapper;
+import com.google.common.base.CaseFormat;
 import java.util.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -143,21 +145,32 @@ public class FillRuleItemQueryService implements QueryService<FillRuleItem> {
         QueryWrapper<FillRuleItem> queryWrapper = createQueryWrapper(criteria);
         List<String> selectFields = new ArrayList<>();
         List<String> groupByFields = new ArrayList<>();
-        Map<String, Filter<?>> fieldNameMap = new HashMap<>();
-        fieldNameMap.put("self.id", criteria.getId());
-        fieldNameMap.put("self.sort_value", criteria.getSortValue());
-        fieldNameMap.put("self.field_param_type", criteria.getFieldParamType());
-        fieldNameMap.put("self.field_param_value", criteria.getFieldParamValue());
-        fieldNameMap.put("self.date_pattern", criteria.getDatePattern());
-        fieldNameMap.put("self.seq_length", criteria.getSeqLength());
-        fieldNameMap.put("self.seq_increment", criteria.getSeqIncrement());
-        fieldNameMap.put("self.seq_start_value", criteria.getSeqStartValue());
-        fieldNameMap.put("self.fill_rule_id", criteria.getFillRuleId());
-        fieldNameMap
-            .entrySet()
-            .stream()
-            .filter(entry -> entry.getValue() != null)
-            .forEach(entry -> getAggregateAndGroupBy(entry.getValue(), entry.getKey(), selectFields, groupByFields));
+        Map<String, Map<String, Object>> fieldNameMap = CriteriaUtil.getNonIgnoredAndNonNullFields(criteria);
+        fieldNameMap.forEach((key, value) -> {
+            // 获得value 对象BindQuery 注解的column属性值
+            Filter<?> filter = (Filter<?>) value.get("value");
+            BindQuery bindQuery = (BindQuery) value.get("bindQuery");
+            String column = bindQuery.column();
+            if (column.startsWith("self.")) {
+                getAggregateAndGroupBy(filter, column, "", selectFields, groupByFields);
+            } else {
+                if (queryWrapper instanceof DynamicJoinQueryWrapper) {
+                    DynamicJoinQueryWrapper<FillRuleItemCriteria, FillRuleItem> dynamicQuery = (DynamicJoinQueryWrapper<
+                            FillRuleItemCriteria,
+                            FillRuleItem
+                        >) queryWrapper;
+                    dynamicQuery
+                        .getAnnoJoiners()
+                        .stream()
+                        .filter(annoJoiner -> annoJoiner.getColumnName().equals(column) && annoJoiner.getFieldName().equals(key))
+                        .findFirst()
+                        .ifPresent(annoJoiner -> {
+                            String alias = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, annoJoiner.getFieldName());
+                            getAggregateAndGroupBy(filter, annoJoiner.getAlias() + "." + column, alias, selectFields, groupByFields);
+                        });
+                }
+            }
+        });
         if (CollectionUtils.isNotEmpty(selectFields)) {
             queryWrapper.select(selectFields.toArray(new String[0])).groupBy(CollectionUtils.isNotEmpty(groupByFields), groupByFields);
             return Binder.joinQueryMapsPage(queryWrapper, FillRuleItem.class, null).getRecords();
