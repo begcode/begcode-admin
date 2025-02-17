@@ -14,12 +14,13 @@
   </div>
 </template>
 <script lang="ts" setup>
+import type { CSSProperties } from 'vue';
+import type { ButtonProps } from '@/components/Button';
 import { useModal } from '@/components/Modal';
 import CropperModal from './CropperModal.vue';
 import { useDesign } from '@/hooks/web/useDesign';
 import { useMessage } from '@/hooks/web/useMessage';
 import { useI18n } from '@/hooks/web/useI18n';
-import type { ButtonProps } from '@/components/Button';
 
 defineOptions({ name: 'CropperAvatar' });
 
@@ -33,6 +34,7 @@ const props = defineProps({
     type: Function as PropType<({ file, name }: { file: Blob; name: string }) => Promise<void>>,
   },
   size: { type: Number, default: 5 },
+  disableChangeEvent: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['update:value', 'change']);
@@ -60,7 +62,9 @@ watch(
 );
 function handleUploadSuccess({ source, data }) {
   sourceValue.value = source;
-  emit('change', { source, data });
+  if (!props.disableChangeEvent) {
+    emit('change', { source, data });
+  }
   createMessage.success(t('component.cropper.uploadSuccess'));
 }
 

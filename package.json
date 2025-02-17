@@ -56,11 +56,11 @@
     "concurrently": "8.2.2",
     "husky": "9.0.11",
     "lint-staged": "15.2.2",
-    "prettier": "3.2.5",
+    "prettier": "3.4.2",
     "prettier-plugin-java": "2.6.0",
     "prettier-plugin-packagejson": "2.4.12",
     "prettier-plugin-properties": "0.3.0",
-    "rimraf": "5.0.5",
+    "rimraf": "5.0.10",
     "wait-on": "7.2.0"
   }
 }

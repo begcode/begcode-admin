@@ -56,17 +56,19 @@ function handleClose() {
 }
 </script>
 
-<style>
-.vben-basic-drawer-footer {
+<style lang="less">
+@prefix-cls: ~'@{namespace}-basic-drawer-footer';
+@footer-height: 60px;
+.@{prefix-cls} {
   position: absolute;
   bottom: 0;
   width: 100%;
   padding: 0 12px 0 20px;
+  text-align: right;
   border-top: 1px solid v-bind('token["colorBorder"]');
   background-color: v-bind('token["component-background"]');
-  text-align: right;
-}
-.vben-basic-drawer-footer > * {
-  margin-right: 8px;
+  > * {
+    margin-right: 8px;
+  }
 }
 </style>

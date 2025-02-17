@@ -174,6 +174,13 @@ export function isOAuth2AppEnv() {
 }
 
 /**
+ * 判断是否是钉钉环境
+ */
+export function isOAuth2DingAppEnv() {
+  return /dingtalk/i.test(navigator.userAgent);
+}
+
+/**
  * 后台构造oauth2登录地址
  * @param source
  * @param tenantId
@@ -181,6 +188,20 @@ export function isOAuth2AppEnv() {
 export function sysOAuth2Login(source) {
   let url = `${window._CONFIG['domianURL']}/sys/thirdLogin/oauth2/${source}/login`;
   url += `?state=${encodeURIComponent(window.location.origin)}`;
+  let tenantId = getAuthCache(OAUTH2_THIRD_LOGIN_TENANT_ID);
+  if (tenantId) {
+    url += `&tenantId=${tenantId}`;
+  }
+  window.location.href = url;
+}
+
+/**
+ * 后台callBack
+ * @param code
+ */
+export function sysOAuth2Callback(code: string) {
+  let url = `${window._CONFIG['domianURL']}/sys/thirdLogin/oauth2/dingding/login`;
+  url += `?state=${encodeURIComponent(window.location.origin)}&authCode=${code}`;
   let tenantId = getAuthCache(OAUTH2_THIRD_LOGIN_TENANT_ID);
   if (tenantId) {
     url += `&tenantId=${tenantId}`;

@@ -1,10 +1,10 @@
 export interface IResourceCategory {
-  id?: number; //ID
-  title?: string | null; //标题
-  code?: string | null; //代码
-  orderNumber?: number | null; //排序
+  id?: number; // ID
+  title?: string | null; // 标题
+  code?: string | null; // 代码
+  orderNumber?: number | null; // 排序
   parentId?: number | null;
-  parent?: IResourceCategory | null; //上级
+  parent?: IResourceCategory | null; // 上级
   expand?: boolean;
   nzAddLevel?: number;
 }

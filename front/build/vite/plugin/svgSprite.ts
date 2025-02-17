@@ -7,11 +7,9 @@ import path from 'path';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 
 export function configSvgIconsPlugin(isBuild: boolean) {
-  const svgIconsPlugin = createSvgIconsPlugin({
-    iconDirs: [path.resolve(process.cwd(), 'src/assets/icons')],
+  return createSvgIconsPlugin({
+    iconDirs: [path.resolve(process.cwd(), 'src/assets/svg')],
     svgoOptions: isBuild,
-    // default
     symbolId: 'icon-[dir]-[name]',
   });
-  return svgIconsPlugin;
 }

@@ -15,6 +15,7 @@ import { createBEM } from '@/utils/bem';
 import type { TreeProps } from 'ant-design-vue/es/tree/Tree';
 import type { Recordable } from '#/utils';
 import { CreateContextOptions } from '@/components/ContextMenu';
+import { CSSProperties } from 'vue';
 
 export default defineComponent({
   name: 'BasicTree',
@@ -218,7 +219,7 @@ export default defineComponent({
       searchState.searchData = filter(
         unref(treeDataRef),
         node => {
-          const result = filterFn ? filterFn(searchValue, node, unref(getFieldNames)) : node[titleField]?.includes(searchValue) ?? false;
+          const result = filterFn ? filterFn(searchValue, node, unref(getFieldNames)) : (node[titleField]?.includes(searchValue) ?? false);
           if (result) {
             matchedKeys.push(node[keyField]);
           }
@@ -444,70 +445,3 @@ export default defineComponent({
   },
 });
 </script>
-<style>
-.vben-tree {
-  background-color: #fff;
-}
-
-.vben-tree .ant-tree-node-content-wrapper {
-  position: relative;
-}
-
-.vben-tree .ant-tree .ant-tree-checkbox {
-  margin-block-start: 0;
-  margin-inline: 4px 4px;
-}
-
-.vben-tree .ant-tree .ant-tree-checkbox + span {
-  padding-left: 4px;
-}
-
-.vben-tree .ant-tree-node-content-wrapper .ant-tree-title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.vben-tree__title {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding-right: 10px;
-}
-
-.vben-tree__title:hover .vben-tree__action {
-  visibility: visible;
-}
-
-.vben-tree__content {
-  overflow: hidden;
-}
-
-.vben-tree__actions {
-  position: absolute;
-  right: 3px;
-  display: flex;
-}
-
-.vben-tree__action {
-  margin-left: 4px;
-  visibility: hidden;
-}
-
-.vben-tree-header {
-  border-bottom: 1px solid #d9d9d9;
-}
-
-.\!mt-4 {
-  margin-top: 1rem !important;
-}
-
-.h-full {
-  height: 100%;
-}
-
-.mr-2 {
-  margin-right: 0.4rem;
-}
-</style>

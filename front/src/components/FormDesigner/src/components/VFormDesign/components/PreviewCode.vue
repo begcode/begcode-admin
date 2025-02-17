@@ -72,13 +72,13 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="css" scoped>
+<style lang="less" scoped>
 .copy-btn-box {
   padding-top: 8px;
   text-align: center;
-}
-.copy-btn-box .copy-btn {
-  margin-right: 8px;
+
+  .copy-btn {
+    margin-right: 8px;
+  }
 }
 </style>

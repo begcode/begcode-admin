@@ -184,7 +184,7 @@ const config = {
         componentType: 'Select',
         value: '',
         span: 8,
-        operator: '',
+        operator: 'equals',
         type: 'Enum',
         componentProps: () => {
           return { options: getEnumDict('ViewPermissionType'), style: 'width: 100%' };
@@ -248,7 +248,7 @@ const config = {
         value: '',
         span: 8,
         hidden: true,
-        operator: '',
+        operator: 'equals',
         type: 'Enum',
         componentProps: () => {
           return { options: getEnumDict('TargetType'), style: 'width: 100%' };

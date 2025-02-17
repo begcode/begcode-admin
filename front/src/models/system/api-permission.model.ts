@@ -3,18 +3,18 @@ import { IAuthority } from '@/models/system/authority.model';
 import { ApiPermissionType } from '@/models/enumerations/api-permission-type.model';
 import { ApiPermissionState } from '@/models/enumerations/api-permission-state.model';
 export interface IApiPermission {
-  id?: number; //ID
-  serviceName?: string | null; //服务名称
-  name?: string | null; //权限名称
-  code?: string | null; //Code
-  description?: string | null; //权限描述
-  type?: keyof typeof ApiPermissionType | null; //类型
-  method?: string | null; //请求类型
-  url?: string | null; //url 地址
-  status?: keyof typeof ApiPermissionState | null; //状态
+  id?: number; // ID
+  serviceName?: string | null; // 服务名称
+  name?: string | null; // 权限名称
+  code?: string | null; // Code
+  description?: string | null; // 权限描述
+  type?: keyof typeof ApiPermissionType | null; // 类型
+  method?: string | null; // 请求类型
+  url?: string | null; // url 地址
+  status?: keyof typeof ApiPermissionState | null; // 状态
   parentId?: number | null;
-  parent?: IApiPermission | null; //上级
-  authorities?: IAuthority[] | null; //角色列表
+  parent?: IApiPermission | null; // 上级
+  authorities?: IAuthority[] | null; // 角色列表
   expand?: boolean;
   nzAddLevel?: number;
 }

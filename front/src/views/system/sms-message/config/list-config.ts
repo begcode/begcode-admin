@@ -33,7 +33,7 @@ const searchForm = (relationshipApis): any[] => {
       componentType: 'Select',
       value: '',
       span: 8,
-      operator: '',
+      operator: 'equals',
       type: 'Enum',
       componentProps: () => {
         return { options: getEnumDict('MessageSendType'), style: 'width: 100%' };
@@ -78,7 +78,7 @@ const searchForm = (relationshipApis): any[] => {
       value: '',
       span: 8,
       hidden: true,
-      operator: '',
+      operator: 'equals',
       type: 'Enum',
       componentProps: () => {
         return { options: getEnumDict('SendStatus'), style: 'width: 100%' };

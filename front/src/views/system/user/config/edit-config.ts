@@ -2,15 +2,10 @@ import { FormSchema } from '@/components/Form';
 import apiService from '@/api-service/index';
 
 const userService = apiService.system.userService;
-const relationshipApis: any = {
-  department: apiService.settings.departmentService.tree,
-  position: apiService.settings.positionService.retrieve,
-  authorities: apiService.system.authorityService.tree,
-};
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
-const fields = (): FormSchema[] => {
+const fields = (relationshipApis: any): FormSchema[] => {
   return [
     {
       label: '用户ID',
@@ -90,6 +85,7 @@ const fields = (): FormSchema[] => {
       label: '头像地址',
       field: 'imageUrl',
       component: 'Avatar',
+      componentProps: { size: 5, showBtn: false },
       rules: [],
     },
     {

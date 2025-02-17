@@ -111,8 +111,7 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="css" scoped>
+<style lang="less" scoped>
 .upload-button {
   margin: 0 10px;
 }

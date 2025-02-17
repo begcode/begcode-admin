@@ -29,8 +29,10 @@
           <a-menu>
             <a-menu-item key="0" :disabled="disabledMoveUp" @click="handleRowMoveUp">向上移</a-menu-item>
             <a-menu-item key="1" :disabled="disabledMoveDown" @click="handleRowMoveDown">向下移</a-menu-item>
-            <a-menu-divider v-if="!disabled" />
-            <a-menu-item key="3" @click="handleRowInsertDown" v-if="!disabled">插入一行</a-menu-item>
+            <template v-if="!disabled">
+              <a-menu-divider />
+              <a-menu-item key="3" @click="handleRowInsertDown">插入一行</a-menu-item>
+            </template>
           </a-menu>
         </template>
       </a-dropdown>

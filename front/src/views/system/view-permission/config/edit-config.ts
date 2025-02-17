@@ -3,15 +3,10 @@ import { FormSchema } from '@/components/Form';
 import apiService from '@/api-service/index';
 
 const viewPermissionService = apiService.system.viewPermissionService;
-const relationshipApis: any = {
-  children: apiService.system.viewPermissionService.tree,
-  parent: apiService.system.viewPermissionService.tree,
-  authorities: apiService.system.authorityService.tree,
-};
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
-const fields = (): FormSchema[] => {
+const fields = (relationshipApis: any): FormSchema[] => {
   const { getEnumDict } = useI18n();
   return [
     {

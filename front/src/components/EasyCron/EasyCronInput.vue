@@ -60,14 +60,6 @@ function showConfigModal() {
   }
 }
 </script>
-
-<style>
-.vben-easy-cron-input a.open-btn {
-  cursor: pointer;
-}
-.vben-easy-cron-input a.open-btn .app-iconify {
-  position: relative;
-  top: 1px;
-  right: 2px;
-}
+<style lang="less">
+@import 'easy.cron.input';
 </style>

@@ -10,7 +10,6 @@
         :sider="false"
       />
       <LayoutBreadcrumb v-if="getShowContent && getShowBread" :theme="getHeaderTheme" />
-      <!-- 欢迎语 -->
       <span
         v-if="getShowContent && getShowBreadTitle && !getIsMobile"
         :class="[prefixCls, `${prefixCls}--${getHeaderTheme}`, 'headerIntroductionClass']"
@@ -58,8 +57,8 @@ import { useAppInject } from '@/hooks/useAppInject';
 import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
 import { useDesign } from '@/hooks/web/useDesign';
 import { useLocale } from '@/i18n/useLocale';
-import { useGlobSetting } from '@/hooks/setting';
 import { useI18n } from '@/hooks/web/useI18n';
+import { useGlobSetting } from '@/hooks/setting';
 
 import LayoutMenu from '../menu/index.vue';
 import LayoutTrigger from '../trigger/index.vue';

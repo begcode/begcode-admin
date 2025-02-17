@@ -12,7 +12,7 @@
 </template>
 <script lang="ts" setup>
 import LoginFormTitle from './LoginFormTitle.vue';
-import { useUserStore } from '@/store/modules/user'; // todo 可能不存在
+import { useUserStore } from '@/store/modules/user';
 import { useI18n } from '@/hooks/web/useI18n';
 import { useLoginState, LoginStateEnum } from './useLogin';
 

@@ -99,14 +99,25 @@ export default defineComponent({
   },
 });
 </script>
-<style>
-.vben-basic-help {
+
+<style lang="less">
+@prefix-cls: ~'@{namespace}-basic-help';
+
+.@{prefix-cls} {
   display: inline-block;
   margin-left: 6px;
   font-size: 14px;
+  color: @text-color-help-dark;
   cursor: pointer;
-}
-.vben-basic-help__wrap p {
-  margin-bottom: 0;
+
+  &:hover {
+    color: @primary-color;
+  }
+
+  &__wrap {
+    p {
+      margin-bottom: 0;
+    }
+  }
 }
 </style>

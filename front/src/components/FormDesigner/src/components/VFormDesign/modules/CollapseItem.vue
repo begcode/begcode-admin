@@ -64,32 +64,44 @@ export default defineComponent({
   },
 });
 </script>
-<style lang="css" scoped>
-.vben-form-design-collapse-item ul {
-  display: flex;
-  flex-wrap: wrap;
-  margin-bottom: 0;
-  padding: 5px;
-  list-style: none;
-}
-.vben-form-design-collapse-item ul li {
-  width: calc(50% - 6px);
-  height: 36px;
-  margin: 2.7px;
-  padding: 8px 12px;
-  transition: all 0.3s;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  line-height: 20px;
-  cursor: move;
-}
-.vben-form-design-collapse-item ul li:hover {
-  position: relative;
-  border: 1px solid #13c2c2;
-  box-shadow: 0 2px 6px #13c2c2;
-  color: #13c2c2;
-}
-.vben-form-design-collapse-item svg {
-  display: inline !important;
+
+<style lang="less" scoped>
+@prefix-cls: ~'@{namespace}-form-design-collapse-item';
+
+@import url('../styles/variable.less');
+
+.@{prefix-cls} {
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+    padding: 5px;
+    list-style: none;
+    // background: #efefef;
+
+    li {
+      width: calc(50% - 6px);
+      height: 36px;
+      margin: 2.7px;
+      padding: 8px 12px;
+      transition: all 0.3s;
+      border: 1px solid @border-color;
+      border-radius: 3px;
+      line-height: 20px;
+      cursor: move;
+
+      &:hover {
+        position: relative;
+        border: 1px solid @primary-color;
+        // z-index: 1;
+        box-shadow: 0 2px 6px @primary-color;
+        color: @primary-color;
+      }
+    }
+  }
+
+  svg {
+    display: inline !important;
+  }
 }
 </style>

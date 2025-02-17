@@ -79,7 +79,6 @@ public class CacheConfiguration {
             createCache(cm, com.begcode.monolith.settings.domain.SysFillRule.class.getName());
             createCache(cm, com.begcode.monolith.settings.domain.SysFillRule.class.getName() + ".ruleItems");
             createCache(cm, com.begcode.monolith.settings.domain.FillRuleItem.class.getName());
-            createCache(cm, com.begcode.monolith.domain.UReportFile.class.getName());
             createCache(cm, com.begcode.monolith.system.domain.SmsMessage.class.getName());
             createCache(cm, com.begcode.monolith.system.domain.Announcement.class.getName());
             createCache(cm, com.begcode.monolith.system.domain.AnnouncementRecord.class.getName());

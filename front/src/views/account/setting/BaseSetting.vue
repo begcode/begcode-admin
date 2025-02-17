@@ -101,7 +101,7 @@ const avatar = computed(() => {
 /**
  * 更新用户头像
  */
-function updateAvatar({ src, data }) {
+function updateAvatar({ source, data }) {
   const userinfo = userStore.getUserInfo;
   userinfo.imageUrl = data;
   userStore.setUserInfo(userinfo);

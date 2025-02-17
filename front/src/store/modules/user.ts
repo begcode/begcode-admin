@@ -236,11 +236,6 @@ export const useUserStore = defineStore({
         this.setRoleList([]);
       }
       this.setUserInfo(userInfo);
-      /**
-       * 添加字典信息到缓存
-       * @updateBy:lsq
-       * @updateDate:2021-09-08
-       */
       // if (sysAllDictItems) {
       //   this.setAllDictItems(sysAllDictItems);
       // }

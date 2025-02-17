@@ -74,7 +74,7 @@ export default defineComponent({
 
     const getWrapperStyle = computed((): CSSProperties => {
       return {
-        height: `calc(100% - ${unref(getIsShowLogo) ? '48px' : '0px'})`,
+        height: `calc(100% - ${unref(getIsShowLogo) ? '60px' : '0px'})`,
       };
     });
 

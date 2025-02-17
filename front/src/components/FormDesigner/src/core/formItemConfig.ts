@@ -1,6 +1,3 @@
-/**
- * @description：表单配置
- */
 import { IVFormComponent } from '../typings/v-form-component';
 import { componentMap as Cmp } from '../components';
 import { componentMap as VbenCmp, add } from '@/components/Form/src/componentMap';

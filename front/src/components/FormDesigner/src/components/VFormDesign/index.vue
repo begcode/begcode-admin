@@ -336,12 +336,18 @@ provide<IFormDesignMethods>('formDesignMethods', {
 
 // endregion
 </script>
+<style lang="less" scoped>
+@prefix-cls: ~'@{namespace}-form-design';
 
-<style lang="css" scoped>
-[data-theme='dark'] .vben-form-design-sider {
-  background-color: #1f1f1f;
+[data-theme='dark'] {
+  .@{prefix-cls}-sider {
+    background-color: #1f1f1f;
+  }
 }
-[data-theme='light'] .vben-form-design-sider {
-  background-color: #fff;
+
+[data-theme='light'] {
+  .@{prefix-cls}-sider {
+    background-color: #fff;
+  }
 }
 </style>

@@ -1,6 +1,3 @@
-<!--
- * @Description: 工具栏
--->
 <template>
   <div class="operating-area">
     <!-- 头部操作按钮区域 start -->
@@ -105,32 +102,37 @@ export default defineComponent({
   },
 });
 </script>
+<style lang="less" scoped>
+@import url('../styles/variable.less');
 
-<style lang="css" scoped>
 .operating-area {
   display: flex;
   place-content: center space-between;
-  height: 45px;
+  height: @operating-area-height;
   padding: 0 12px;
   padding-left: 30px;
-  border-bottom: 2px solid #ccc;
+  border-bottom: 2px solid @border-color;
   font-size: 16px;
-  line-height: 45px;
+  line-height: @operating-area-height;
   text-align: left;
-}
-.operating-area a {
-  margin: 0 5px;
-  color: #666;
-}
-.operating-area a.disabled,
-.operating-area a.disabled:hover {
-  color: #ccc;
-}
-.operating-area a:hover {
-  color: #13c2c2;
-}
-.operating-area a > span {
-  padding-left: 2px;
-  font-size: 14px;
+
+  a {
+    margin: 0 5px;
+    color: #666;
+
+    &.disabled,
+    &.disabled:hover {
+      color: #ccc;
+    }
+
+    &:hover {
+      color: @primary-color;
+    }
+
+    > span {
+      padding-left: 2px;
+      font-size: 14px;
+    }
+  }
 }
 </style>

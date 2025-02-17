@@ -64,7 +64,7 @@ const searchForm = (relationshipApis): any[] => {
       value: '',
       span: 8,
       hidden: true,
-      operator: '',
+      operator: 'equals',
       type: 'Enum',
       componentProps: () => {
         return { options: getEnumDict('PriorityLevel'), style: 'width: 100%' };
@@ -77,7 +77,7 @@ const searchForm = (relationshipApis): any[] => {
       value: '',
       span: 8,
       hidden: true,
-      operator: '',
+      operator: 'equals',
       type: 'Enum',
       componentProps: () => {
         return { options: getEnumDict('AnnoCategory'), style: 'width: 100%' };
@@ -90,7 +90,7 @@ const searchForm = (relationshipApis): any[] => {
       value: '',
       span: 8,
       hidden: true,
-      operator: '',
+      operator: 'equals',
       type: 'Enum',
       componentProps: () => {
         return { options: getEnumDict('ReceiverType'), style: 'width: 100%' };
@@ -103,7 +103,7 @@ const searchForm = (relationshipApis): any[] => {
       value: '',
       span: 8,
       hidden: true,
-      operator: '',
+      operator: 'equals',
       type: 'Enum',
       componentProps: () => {
         return { options: getEnumDict('AnnoSendStatus'), style: 'width: 100%' };
@@ -136,7 +136,7 @@ const searchForm = (relationshipApis): any[] => {
       value: '',
       span: 8,
       hidden: true,
-      operator: '',
+      operator: 'equals',
       type: 'Enum',
       componentProps: () => {
         return { options: getEnumDict('AnnoBusinessType'), style: 'width: 100%' };
@@ -160,7 +160,7 @@ const searchForm = (relationshipApis): any[] => {
       value: '',
       span: 8,
       hidden: true,
-      operator: '',
+      operator: 'equals',
       type: 'Enum',
       componentProps: () => {
         return { options: getEnumDict('AnnoOpenType'), style: 'width: 100%' };

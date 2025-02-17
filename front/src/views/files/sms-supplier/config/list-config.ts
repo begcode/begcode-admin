@@ -22,7 +22,7 @@ const searchForm = (relationshipApis): any[] => {
       componentType: 'Select',
       value: '',
       span: 8,
-      operator: '',
+      operator: 'equals',
       type: 'Enum',
       componentProps: () => {
         return { options: getEnumDict('SmsProvider'), style: 'width: 100%' };

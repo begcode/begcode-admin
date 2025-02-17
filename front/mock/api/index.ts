@@ -16,7 +16,6 @@ import { setCommonFieldDataMock } from 'mock/api/settings/common-field-data.mock
 import { setRegionCodeMock } from 'mock/api/settings/region-code.mock';
 import { setSysFillRuleMock } from 'mock/api/settings/sys-fill-rule.mock';
 import { setFillRuleItemMock } from 'mock/api/settings/fill-rule-item.mock';
-import { setUReportFileMock } from 'mock/api/report/u-report-file.mock';
 import { setSmsMessageMock } from 'mock/api/system/sms-message.mock';
 import { setAnnouncementMock } from 'mock/api/system/announcement.mock';
 import { setAnnouncementRecordMock } from 'mock/api/system/announcement-record.mock';
@@ -48,7 +47,6 @@ export function setupMockServer(mock) {
   setRegionCodeMock(mock);
   setSysFillRuleMock(mock);
   setFillRuleItemMock(mock);
-  setUReportFileMock(mock);
   setSmsMessageMock(mock);
   setAnnouncementMock(mock);
   setAnnouncementRecordMock(mock);

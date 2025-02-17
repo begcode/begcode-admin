@@ -1,16 +1,16 @@
 import { IAuthority } from '@/models/system/authority.model';
 
 export interface IDepartment {
-  id?: number; //ID
-  name?: string | null; //名称
-  code?: string | null; //代码
-  address?: string | null; //地址
-  phoneNum?: string | null; //联系电话
-  logo?: string | null; //logo地址
-  contact?: string | null; //联系人
-  authorities?: IAuthority[] | null; //角色列表
+  id?: number; // ID
+  name?: string | null; // 名称
+  code?: string | null; // 代码
+  address?: string | null; // 地址
+  phoneNum?: string | null; // 联系电话
+  logo?: string | null; // logo地址
+  contact?: string | null; // 联系人
+  authorities?: IAuthority[] | null; // 角色列表
   parentId?: number | null;
-  parent?: IDepartment | null; //上级
+  parent?: IDepartment | null; // 上级
   expand?: boolean;
   nzAddLevel?: number;
 }

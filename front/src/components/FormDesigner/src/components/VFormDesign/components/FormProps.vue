@@ -1,6 +1,3 @@
-<!--
- * @Description: 右侧属性面板控件 表单属性面板
--->
 <template>
   <div class="properties-content">
     <a-form class="properties-body" label-align="left" layout="vertical">

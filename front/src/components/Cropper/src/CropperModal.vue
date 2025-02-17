@@ -99,6 +99,8 @@ import { useDesign } from '@/hooks/web/useDesign';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { dataURLtoBlob } from '@/utils/file/base64Conver';
 import { useI18n } from '@/hooks/web/useI18n';
+import uploadImageService from '@/api-service/files/upload-image.service';
+import { IUploadImage } from '@/models/files/upload-image.model';
 
 type apiFunParams = { file: Blob; name: string; filename: string };
 
@@ -169,7 +171,10 @@ function handlerToolbar(event: string, arg?: number) {
 }
 
 async function handleOk() {
-  const uploadApi = props.uploadApi;
+  let uploadApi = props.uploadApi;
+  if (!uploadApi) {
+    uploadApi = ({ file, name, filename }) => uploadImageService.create({ file, name, filename } as IUploadImage);
+  }
   if (uploadApi && _isFunction(uploadApi)) {
     const blob = dataURLtoBlob(previewSource.value);
     try {

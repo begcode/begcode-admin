@@ -29,7 +29,7 @@
   </ScrollContainer>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { ScrollContainer } from '@/components/Container';
 import { useDesign } from '@/hooks/web/useDesign';
 import { settingList } from './UserSetting.data';
@@ -40,65 +40,49 @@ import WeChatDingSetting from './WeChatDingSetting.vue';
 import { useRouter } from 'vue-router';
 import { useRootSetting } from '@/hooks/setting/useRootSetting';
 import { ThemeEnum } from '@/enums/appEnum';
-export default defineComponent({
-  components: {
-    ScrollContainer,
-    BaseSetting,
-    AccountSetting,
-    TenantSetting,
-    WeChatDingSetting,
-  },
-  props: {
-    componentList: {
-      type: Array,
-      default: settingList,
-    },
-  },
-  setup() {
-    const { prefixCls } = useDesign('user-account-setting-container');
-    const { getDarkMode } = useRootSetting();
-    const isDark = computed(() => getDarkMode.value === ThemeEnum.DARK);
-    const activeKey = ref<string>('1');
-    //是否为vip
-    const showVip = ref<boolean>(false);
-    //vip编码
-    const vipCode = ref<string>('');
-    const router = useRouter();
-    const componentList = computed(() => {
-      if (showVip.value) {
-        return settingList;
-      }
-      return settingList.filter(item => item.component != 'MyVipSetting');
-    });
 
-    /**
-     * 组件标题点击事件,解决第二次不加载数据
-     * @param key
-     */
-    function componentClick(key) {
-      activeKey.value = key;
-    }
-
-    function goToMyTeantPage() {
-      //如果请求参数包含我的租户，直接跳转过去
-      let query = router.currentRoute.value.query;
-      if (query && query.page === 'tenantSetting') {
-        activeKey.value = '2';
-      }
-    }
-    return {
-      prefixCls,
-      settingList,
-      tabBarStyle: {
-        width: '220px',
-        marginBottom: '200px',
-      },
-      componentClick,
-      activeKey,
-      isDark,
-    };
+const props = defineProps({
+  componentList: {
+    type: Array,
+    default: settingList,
   },
 });
+
+const { prefixCls } = useDesign('user-account-setting-container');
+const { getDarkMode } = useRootSetting();
+const isDark = computed(() => getDarkMode.value === ThemeEnum.DARK);
+const activeKey = ref<string>('1');
+//是否为vip
+const showVip = ref<boolean>(false);
+//vip编码
+const vipCode = ref<string>('');
+const router = useRouter();
+const tabBarStyle = reactive({
+  width: '220px',
+  marginBottom: '200px',
+});
+const componentList = computed(() => {
+  if (showVip.value) {
+    return settingList;
+  }
+  return settingList.filter(item => item.component != 'MyVipSetting');
+});
+
+/**
+ * 组件标题点击事件,解决第二次不加载数据
+ * @param key
+ */
+function componentClick(key) {
+  activeKey.value = key;
+}
+
+function goToMyTeantPage() {
+  //如果请求参数包含我的租户，直接跳转过去
+  let query = router.currentRoute.value.query;
+  if (query && query.page === 'tenantSetting') {
+    activeKey.value = '2';
+  }
+}
 </script>
 <style lang="less" scoped>
 .user-account-setting {

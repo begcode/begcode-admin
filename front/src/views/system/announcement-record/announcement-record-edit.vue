@@ -9,10 +9,10 @@
     </template>
     <template #rightFooter>
       <a-space>
-        <BasicButton v-for="operation in operations" :type="operation.type" @click="operation.click">
+        <basic-button v-for="operation in operations" :type="operation.type" @click="operation.click">
           <Icon :icon="operation.icon" v-if="operation.icon" />
           {{ operation.title }}
-        </BasicButton>
+        </basic-button>
       </a-space>
     </template>
   </PageWrapper>
@@ -45,7 +45,7 @@ const pageProps = reactive({
 });
 let announcementRecordId = ref(route.params?.entityId as string);
 
-const saveOrUpdate = async () => {
+async function saveOrUpdate() {
   const result = await announcementRecordFormRef.value.submit();
   if (result) {
     if (!announcementRecordId.value) {
@@ -55,7 +55,7 @@ const saveOrUpdate = async () => {
       });
     }
   }
-};
+}
 
 const formProps = reactive({
   entityId: announcementRecordId.value,

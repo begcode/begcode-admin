@@ -62,7 +62,6 @@ export default defineComponent({
   setup(_props) {},
 });
 </script>
-
 <style>
 .v-form-render-item {
   overflow: hidden;

@@ -35,7 +35,7 @@
       </a-col>
     </a-row>
     <a-card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
-      <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents" data-cy="entityTable">
+      <vxe-grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents" data-cy="entityTable">
         <template #toolbar_buttons>
           <a-row :gutter="16">
             <a-col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
@@ -85,7 +85,7 @@
         <template #pagerLeft>
           <a-alert type="warning" banner :message="'已选择 ' + selectedRows.length + ' 项'" style="height: 30px" />
         </template>
-      </Grid>
+      </vxe-grid>
       <BasicModal
         v-bind="popupConfig.containerProps"
         @register="registerModal"
@@ -126,7 +126,7 @@
 
 <script lang="ts" setup>
 import { Modal, message } from 'ant-design-vue';
-import { VxeGridInstance, VxeGridListeners, VxeGridProps, Grid } from 'vxe-table';
+import { VxeGridInstance, VxeGridListeners, VxeGridProps } from 'vxe-table';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { transVxeSorts } from '@/utils/jhipster/sorts';
 import { useDrawer } from '@/components/Drawer';
@@ -325,7 +325,7 @@ const gridOptions = reactive<VxeGridProps>({
   columns,
 });
 useMergeGridProps(gridOptions, props.gridOptions);
-const toolbarClick = ({ code }) => {
+function toolbarClick({ code }) {
   const $grid = xGrid.value;
   switch (code) {
     case 'batchDelete': {
@@ -391,13 +391,13 @@ const toolbarClick = ({ code }) => {
       }
       break;
   }
-};
+}
 
-const checkboxChange = () => {
+function checkboxChange() {
   const $grid = xGrid.value;
   selectedRows.length = 0;
   selectedRows.push(...$grid.getCheckboxRecords());
-};
+}
 const gridEvents = reactive<VxeGridListeners>({
   checkboxAll: checkboxChange,
   checkboxChange: checkboxChange,
@@ -417,7 +417,7 @@ const gridEvents = reactive<VxeGridListeners>({
   // 表格右上角自定义按钮事件
   toolbarToolClick: toolbarClick,
 });
-const okModal = async () => {
+async function okModal() {
   if (popupConfig.needSubmit && modalComponentRef.value) {
     const result = await modalComponentRef.value.submit();
     if (result) {
@@ -425,8 +425,8 @@ const okModal = async () => {
       closeModal();
     }
   }
-};
-const okDrawer = async () => {
+}
+async function okDrawer() {
   if (popupConfig.needSubmit && drawerComponentRef.value) {
     const result = await drawerComponentRef.value.submit();
     if (result) {
@@ -434,25 +434,25 @@ const okDrawer = async () => {
       closeDrawer();
     }
   }
-};
-const formSearch = () => {
+}
+function formSearch() {
   xGrid.value.commitProxy('reload');
-};
-const closeSearchFieldTag = field => {
+}
+function closeSearchFieldTag(field) {
   clearSearchFieldValue(field);
   formSearch();
-};
+}
 const inputSearch = _debounce(formSearch, 700);
-const handleToggleSearch = () => {
+function handleToggleSearch() {
   searchFormConfig.toggleSearchStatus = !searchFormConfig.toggleSearchStatus;
-};
-const showSearchFormSetting = () => {
+}
+function showSearchFormSetting() {
   if (searchFormRef.value) {
     searchFormRef.value.showSettingModal();
   }
-};
+}
 
-const rowClick = ({ name, data, params }) => {
+function rowClick({ name, data, params }) {
   const row = data;
   const operation = rowOperations.value.find(operation => operation.name === name);
   if (operation?.click) {
@@ -557,7 +557,7 @@ const rowClick = ({ name, data, params }) => {
         console.log('error', `${name}未定义`);
     }
   }
-};
+}
 
 const getSelectRows = () => {
   return toRaw(selectedRows);

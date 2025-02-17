@@ -2,7 +2,6 @@
 2;分析页;;false;/dashboard/analysis;;BLANK;;false;false;false;false;false;false;dashboard-analysis;;MENU;0;;1;dashboard/Analysis;
 3;系统设置;;false;/settings/system;;NULL;ion:settings-outline;false;false;false;false;false;false;settings-system;;MENU;1;;;LAYOUT;
 4;缓存管理;;false;/system/cache-manage;;SELF;;false;false;false;false;false;false;system-cache-manage;;MENU;1;;3;system/cache-manage/cache-manage;
-5;数据可视;;false;/entities/report;;SELF;ant-design:bar-chart-outlined;false;false;false;false;false;false;report;;MENU;1;;;LAYOUT;
 6;可视权限;;false;/system/view-permission;;SELF;;false;false;false;false;false;false;systemViewPermissionList;;MENU;1;;3;system/view-permission/view-permission-list;
 7;新建可视权限;;false;;;SELF;;false;true;false;false;false;false;system:viewPermission:new;;BUTTON;1;;6;;
 8;编辑可视权限;;false;;;SELF;;false;true;false;false;false;false;system:viewPermission:edit;;BUTTON;1;;6;;
@@ -209,18 +208,6 @@
 209;编辑填充规则;;false;/settings/sys-fill-rule/:entityId/edit;;SELF;;false;true;false;false;false;false;systemSysFillRuleEdit;;MENU;1;;54;settings/sys-fill-rule/sys-fill-rule-edit;
 210;新建填充规则;;false;/settings/sys-fill-rule/new;;SELF;;false;true;false;false;false;false;systemSysFillRuleNew;;MENU;1;;54;settings/sys-fill-rule/sys-fill-rule-edit;
 211;查看填充规则;;false;/settings/sys-fill-rule/:entityId/detail;;SELF;;false;true;false;false;false;false;systemSysFillRuleDetail;;MENU;1;;54;settings/sys-fill-rule/sys-fill-rule-detail;
-212;报表存储;;false;/report/u-report-file;;SELF;;false;false;false;false;false;false;reportUReportFileList;;MENU;1;;5;report/u-report-file/u-report-file-list;
-213;新建报表存储;;false;;;SELF;;false;true;false;false;false;false;report:uReportFile:new;;BUTTON;1;;212;;
-214;编辑报表存储;;false;;;SELF;;false;true;false;false;false;false;report:uReportFile:edit;;BUTTON;1;;212;;
-215;查看报表存储;;false;;;SELF;;false;true;false;false;false;false;report:uReportFile:detail;;BUTTON;1;;212;;
-216;删除报表存储;;false;;;SELF;;false;true;false;false;false;false;report:uReportFile:delete;;BUTTON;1;;212;;
-217;导入报表存储;;false;;;SELF;;false;true;false;false;false;false;report:uReportFile:import;;BUTTON;1;;212;;
-218;导出报表存储;;false;;;SELF;;false;true;false;false;false;false;report:uReportFile:export;;BUTTON;1;;212;;
-219;打印报表存储;;false;;;SELF;;false;true;false;false;false;false;report:uReportFile:print;;BUTTON;1;;212;;
-220;列配置报表存储;;false;;;SELF;;false;true;false;false;false;false;report:uReportFile:customColumn;;BUTTON;1;;212;;
-221;编辑报表存储;;false;/report/u-report-file/:entityId/edit;;SELF;;false;true;false;false;false;false;reportUReportFileEdit;;MENU;1;;5;report/u-report-file/u-report-file-edit;
-222;新建报表存储;;false;/report/u-report-file/new;;SELF;;false;true;false;false;false;false;reportUReportFileNew;;MENU;1;;5;report/u-report-file/u-report-file-edit;
-223;查看报表存储;;false;/report/u-report-file/:entityId/detail;;SELF;;false;true;false;false;false;false;reportUReportFileDetail;;MENU;1;;5;report/u-report-file/u-report-file-detail;
 224;短信消息;;false;/system/sms-message;;SELF;;false;false;false;false;false;false;systemSmsMessageList;;MENU;1;;3;system/sms-message/sms-message-list;
 225;新建短信消息;;false;;;SELF;;false;true;false;false;false;false;system:smsMessage:new;;BUTTON;1;;224;;
 226;编辑短信消息;;false;;;SELF;;false;true;false;false;false;false;system:smsMessage:edit;;BUTTON;1;;224;;

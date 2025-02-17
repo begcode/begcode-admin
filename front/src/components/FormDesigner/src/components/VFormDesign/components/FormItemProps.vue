@@ -1,6 +1,3 @@
-<!--
- * @Description: 表单项属性，控件属性面板
--->
 <template>
   <div class="properties-content">
     <div class="properties-body" v-if="formConfig.currentItem?.itemProps">

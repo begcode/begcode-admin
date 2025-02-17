@@ -57,7 +57,7 @@ const searchForm = (relationshipApis): any[] => {
       value: '',
       span: 8,
       hidden: true,
-      operator: '',
+      operator: 'equals',
       type: 'Enum',
       componentProps: () => {
         return { options: getEnumDict('CommonFieldType'), style: 'width: 100%' };

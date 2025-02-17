@@ -5,14 +5,17 @@ import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static com.begcode.monolith.web.rest.TestUtil.sameInstant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.begcode.monolith.IntegrationTest;
 import com.begcode.monolith.config.WithMockMyUser;
 import com.begcode.monolith.domain.enumeration.ResetFrequency;
 import com.begcode.monolith.settings.domain.SysFillRule;
 import com.begcode.monolith.settings.repository.SysFillRuleRepository;
+import com.begcode.monolith.settings.service.SysFillRuleService;
 import com.begcode.monolith.settings.service.dto.SysFillRuleDTO;
 import com.begcode.monolith.settings.service.mapper.SysFillRuleMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,6 +28,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
@@ -35,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Integration tests for the {@link SysFillRuleResource} REST controller.
  */
 @IntegrationTest
+@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockMyUser
 public class SysFillRuleResourceIT {
@@ -91,8 +98,14 @@ public class SysFillRuleResourceIT {
     @Autowired
     private SysFillRuleRepository sysFillRuleRepository;
 
+    @Mock
+    private SysFillRuleRepository sysFillRuleRepositoryMock;
+
     @Autowired
     private SysFillRuleMapper sysFillRuleMapper;
+
+    @Mock
+    private SysFillRuleService sysFillRuleServiceMock;
 
     @Autowired
     private MockMvc restSysFillRuleMockMvc;
@@ -226,6 +239,23 @@ public class SysFillRuleResourceIT {
             .andExpect(jsonPath("$.[*].resetStartTime").value(hasItem(sameInstant(DEFAULT_RESET_START_TIME))))
             .andExpect(jsonPath("$.[*].resetEndTime").value(hasItem(sameInstant(DEFAULT_RESET_END_TIME))))
             .andExpect(jsonPath("$.[*].resetTime").value(hasItem(sameInstant(DEFAULT_RESET_TIME))));
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllSysFillRulesWithEagerRelationshipsIsEnabled() throws Exception {
+        when(sysFillRuleServiceMock.findAll(any())).thenReturn(new Page().setRecords(new ArrayList<>()));
+
+        restSysFillRuleMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
+
+        verify(sysFillRuleServiceMock, times(1)).findAll(any());
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllSysFillRulesWithEagerRelationshipsIsNotEnabled() throws Exception {
+        when(sysFillRuleServiceMock.findAll(any())).thenReturn(new Page().setRecords(new ArrayList<>()));
+
+        restSysFillRuleMockMvc.perform(get(ENTITY_API_URL + "?eagerload=false")).andExpect(status().isOk());
+        verify(sysFillRuleRepositoryMock, times(1)).findAll();
     }
 
     @Test

@@ -4,6 +4,7 @@
       name="image"
       multiple
       @change="handleChange"
+      :before-upload="beforeUpload"
       :action="action"
       :showUploadList="false"
       :headers="headers"
@@ -39,14 +40,15 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['uploading', 'done', 'error']);
+const emit = defineEmits(['uploading', 'done', 'error', 'loading']);
 
 const { t } = useI18n();
-let uploading = false;
 
 const { uploadUrl } = props;
 const { uploadImageUrl, getToken } = useUpload();
 const action = uploadUrl || uploadImageUrl;
+//文件列表
+const uploadFileList = ref<any[]>([]);
 
 const headers = computed(() => {
   return { Authorization: `Bearer ${getToken}` };
@@ -61,42 +63,55 @@ const getButtonProps = computed(() => {
   };
 });
 
-function handleChange(info: Record<string, any>) {
-  const file = info.file;
-  const status = file?.status;
-  // const url = file?.response?.url;
-  const name = file?.name;
-
-  if (status === 'uploading') {
-    if (!uploading) {
-      emit('uploading', name);
-      uploading = true;
-    }
-  } else if (status === 'done') {
-    let realUrl = getFileAccessHttpUrl(file.response.url);
-    emit('done', name, realUrl);
-    uploading = false;
-  } else if (status === 'error') {
-    emit('error');
-    uploading = false;
+let uploadLength = 0;
+function handleChange({ file, fileList }) {
+  // 过滤掉已经存在的文件
+  fileList = fileList.filter(file => {
+    const existFile = uploadFileList.value.find(({ uid }) => uid === file.uid);
+    return !existFile;
+  });
+  uploadLength === 0 && (uploadLength = fileList.length);
+  if (file.status !== 'uploading') {
+    emit('loading', uploadLength, true);
+  }
+  // 处理上传好的文件
+  if (file.status !== 'uploading') {
+    fileList.forEach(file => {
+      if (file.status === 'done') {
+        const name = file?.name;
+        let realUrl = getFileAccessHttpUrl(file.response.url);
+        uploadFileList.value.push(file);
+        emit('done', name, realUrl);
+      }
+    });
   }
 }
-</script>
-<style scoped>
-.vben-tinymce-img-upload {
-  margin: 0 3px;
-}
 
-.vben-tinymce-img-upload .ant-btn {
-  padding: 2px 4px;
-  font-size: 12px;
-  height: 24px;
+//上传之前
+function beforeUpload() {
+  uploadLength = 0;
+  emit('loading', null, true);
+  setTimeout(() => {
+    emit('loading', null, false);
+  }, 10000);
 }
-.vben-tinymce-img-upload .ant-btn.is-disabled {
-  color: rgba(255, 255, 255, 0.5);
-}
-.vben-tinymce-img-upload.fullscreen {
-  position: fixed;
-  z-index: 10000;
+</script>
+<style lang="less" scoped>
+@prefix-cls: ~'@{namespace}-tinymce-img-upload';
+
+.@{prefix-cls} {
+  margin: 0 3px;
+  &.fullscreen {
+    position: fixed;
+    z-index: 10000;
+  }
+  .ant-btn {
+    padding: 2px 4px;
+    font-size: 12px;
+    height: 24px;
+    &.is-disabled {
+      color: rgba(255, 255, 255, 0.5);
+    }
+  }
 }
 </style>

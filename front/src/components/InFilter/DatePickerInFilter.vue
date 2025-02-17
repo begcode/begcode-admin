@@ -125,9 +125,10 @@ async function openDatePicker() {
   datePickerIsOpen.value = true;
 }
 </script>
+<style lang="less">
+@prefix-cls: ~'@{namespace}-j-data-picker-in-filter';
 
-<style>
-.vben-data-picker-in-filter {
+.@{prefix-cls} {
   width: 100%;
 }
 </style>

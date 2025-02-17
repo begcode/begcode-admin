@@ -56,9 +56,7 @@ import { SearchOutlined } from '@ant-design/icons-vue';
 import AppSearchFooter from './AppSearchFooter.vue';
 import vClickOutside from '@/directives/clickOutside';
 import { useMenuSearch } from './useMenuSearch';
-
 import { useI18n } from '@/hooks/web/useI18n';
-
 import { useAppInject } from '@/hooks/useAppInject';
 import { useRefs } from '@/hooks/vben';
 import { useDesign } from '@/hooks/web/useDesign';

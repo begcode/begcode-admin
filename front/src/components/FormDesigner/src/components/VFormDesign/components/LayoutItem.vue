@@ -1,8 +1,3 @@
-<!--
- * @Description: 表单项布局控件
- * 千万不要在template下面的第一行加注释，因为这里拖动的第一个元素
--->
-
 <template>
   <a-col v-bind="colPropsComputed">
     <template v-if="['Grid'].includes(schema.component)">
@@ -99,7 +94,9 @@ export default defineComponent({
   },
 });
 </script>
-<style lang="css">
+<style lang="less">
+@import url('../styles/variable.less');
+
 .layout-width {
   width: 100%;
 }

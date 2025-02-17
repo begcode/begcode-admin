@@ -82,12 +82,7 @@ export function useAdvanced({ advanceState, emit, getProps, getSchema, formModel
     let autoAdvancedCol = unref(getProps).autoAdvancedCol ?? 3;
 
     if (isLastAction) {
-      advanceState.hideAdvanceBtn = unref(getSchema).length <= autoAdvancedCol;
-      if (itemColSum > BASIC_COL_LEN * 2 && itemColSum <= BASIC_COL_LEN * (unref(getProps).autoAdvancedLine || 3)) {
-        advanceState.hideAdvanceBtn = false;
-
-        // More than 3 lines collapsed by default
-      } else if (!advanceState.isLoad) {
+      if (!advanceState.isLoad) {
         advanceState.isLoad = true;
         advanceState.isAdvanced = !advanceState.isAdvanced;
         if (unref(getSchema).length > autoAdvancedCol) {

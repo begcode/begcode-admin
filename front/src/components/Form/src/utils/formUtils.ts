@@ -35,8 +35,8 @@ export function handleRangeTimeValue(props, values) {
       timeValue = timeValue.split(',');
     }
     const [startTime, endTime]: string[] = timeValue;
-    values[startTimeKey] = dateUtil(startTime).format(format);
-    values[endTimeKey] = dateUtil(endTime).format(format);
+    startTime && (values[startTimeKey] = dateUtil(startTime).format(format));
+    endTime && (values[endTimeKey] = dateUtil(endTime).format(format));
     Reflect.deleteProperty(values, field);
   }
   return values;

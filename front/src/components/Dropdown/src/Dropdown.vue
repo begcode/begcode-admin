@@ -89,11 +89,16 @@ const getPopConfirmAttrs = computed(() => {
 
 const getAttr = (key: string | number) => ({ key });
 </script>
-<style>
-.vben-basic-dropdown-menu .ant-dropdown-menu-item.is-pop-confirm {
-  padding: 0;
-}
-.vben-basic-dropdown-menu .ant-dropdown-menu-item.is-pop-confirm .dropdown-event-area {
-  padding: 5px 12px;
+<style lang="less">
+@prefix-cls: ~'@{namespace}-basic-dropdown';
+
+.@{prefix-cls} {
+  &-menu .ant-dropdown-menu-item.is-pop-confirm {
+    padding: 0;
+
+    .dropdown-event-area {
+      padding: 5px 12px;
+    }
+  }
 }
 </style>

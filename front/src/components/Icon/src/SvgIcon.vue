@@ -39,8 +39,11 @@ const getStyle = computed((): CSSProperties => {
   };
 });
 </script>
-<style scoped>
-.vben-svg-icon {
+
+<style lang="less" scoped>
+@prefix-cls: ~'@{namespace}-svg-icon';
+
+.@{prefix-cls} {
   display: inline-block;
   overflow: hidden;
   vertical-align: -0.15em;

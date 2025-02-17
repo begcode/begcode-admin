@@ -4,20 +4,31 @@
       <ImgUpload
         :fullscreen="fullscreen"
         @uploading="handleImageUploading"
+        @loading="handleLoading"
         @done="handleDone"
         v-if="showImageUpload"
         v-show="editorRef"
         :disabled="disabled"
       />
     </Teleport>
-    <textarea :id="tinymceId" ref="elRef" :style="{ visibility: 'hidden' }" v-if="!initOptions.inline"></textarea>
+    <Editor
+      :id="tinymceId"
+      ref="elRef"
+      :disabled="disabled"
+      :init="initOptions"
+      :style="{ visibility: 'hidden' }"
+      v-if="!initOptions.inline"
+    />
     <slot v-else></slot>
+    <ProcessMask ref="processMaskRef" :show="showUploadMask" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import type { Editor, RawEditorSettings } from 'tinymce';
+import type { RawEditorOptions } from 'tinymce';
 import tinymce from 'tinymce/tinymce';
+import Editor from '@tinymce/tinymce-vue';
+import ProcessMask from './ProcessMask.vue';
 import 'tinymce/themes/silver';
 import 'tinymce/icons/default/icons';
 import 'tinymce/plugins/advlist';
@@ -28,31 +39,21 @@ import 'tinymce/plugins/code';
 import 'tinymce/plugins/codesample';
 import 'tinymce/plugins/directionality';
 import 'tinymce/plugins/fullscreen';
-import 'tinymce/plugins/hr';
 import 'tinymce/plugins/insertdatetime';
 import 'tinymce/plugins/link';
 import 'tinymce/plugins/lists';
 import 'tinymce/plugins/media';
 import 'tinymce/plugins/nonbreaking';
-import 'tinymce/plugins/noneditable';
 import 'tinymce/plugins/pagebreak';
-import 'tinymce/plugins/paste';
 import 'tinymce/plugins/preview';
-import 'tinymce/plugins/print';
 import 'tinymce/plugins/save';
 import 'tinymce/plugins/searchreplace';
-import 'tinymce/plugins/spellchecker';
-import 'tinymce/plugins/tabfocus';
-// import 'tinymce/plugins/table';
-import 'tinymce/plugins/template';
-import 'tinymce/plugins/textpattern';
+import 'tinymce/plugins/table';
 import 'tinymce/plugins/visualblocks';
 import 'tinymce/plugins/visualchars';
 import 'tinymce/plugins/wordcount';
 import 'tinymce/plugins/image';
 import 'tinymce/plugins/table';
-import 'tinymce/plugins/textcolor';
-import 'tinymce/plugins/contextmenu';
 import ImgUpload from './ImgUpload.vue';
 import { plugins as defaultPlugins, toolbar as defaultToolbar, simplePlugins, simpleToolbar, menubar as defaultMenubar } from './tinymce';
 import { buildShortUUID } from '@/utils/uuid';
@@ -68,7 +69,7 @@ defineOptions({ name: 'Tinymce', inheritAttrs: false });
 
 const props = defineProps({
   options: {
-    type: Object as PropType<Partial<RawEditorSettings>>,
+    type: Object as PropType<Partial<RawEditorOptions>>,
     default: () => ({}),
   },
   value: {
@@ -103,6 +104,14 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  showUploadMask: {
+    type: Boolean,
+    default: false,
+  },
+  autoFocus: {
+    type: Boolean,
+    default: true,
+  },
   mini: {
     type: Boolean,
     default: false,
@@ -124,6 +133,7 @@ const { uploadImage } = useUpload();
 const uploadApi = uploadFile || uploadImage;
 const attrs = useAttrs();
 const editorRef = ref<Editor | null>(null);
+const processMaskRef = ref<any>(null);
 const fullscreen = ref(false);
 const tinymceId = ref<string>(props.editorId || buildShortUUID('tiny-vue'));
 const elRef = ref<HTMLElement | null>(null);
@@ -174,7 +184,7 @@ const initOptions = computed((): RawEditorSettings => {
     link_title: false,
     object_resizing: true,
     toolbar_mode: 'sliding',
-    auto_focus: true,
+    auto_focus: props.autoFocus,
     toolbar_groups: true,
     skin: skinName.value,
     skin_url: publicPath + 'resource/tinymce/skins/ui/' + skinName.value,
@@ -203,7 +213,7 @@ const disabled = computed(() => {
   const { options } = props;
   const getdDisabled = options && Reflect.get(options, 'readonly');
   const editor = unref(editorRef);
-  if (editor) {
+  if (editor && editor.setMode) {
     editor.setMode(getdDisabled || attrs.disabled === true ? 'readonly' : 'design');
   }
   if (attrs.disabled === true) {
@@ -216,10 +226,7 @@ watch(
   () => attrs.disabled,
   () => {
     const editor = unref(editorRef);
-    if (!editor) {
-      return;
-    }
-    editor.setMode(attrs.disabled ? 'readonly' : 'design');
+    editor?.setMode?.(attrs?.disabled ? 'readonly' : 'design');
   },
 );
 
@@ -250,7 +257,7 @@ function destory() {
 
 function initEditor() {
   const el = unref(elRef);
-  if (el) {
+  if (el?.style?.visibility) {
     el.style.visibility = '';
   }
   tinymce
@@ -307,6 +314,22 @@ function bindModelHandlers(editor: any) {
     fullscreen.value = e.state;
   });
 }
+
+/**
+ * 上传进度计算
+ * @param file
+ * @param fileList
+ */
+function handleLoading(fileLength, showMask) {
+  if (fileLength && fileLength > 0) {
+    setTimeout(() => {
+      props?.showUploadMask && processMaskRef.value.calcProcess(fileLength);
+    }, 100);
+  } else {
+    props?.showUploadMask && (processMaskRef.value.showMask = showMask);
+  }
+}
+
 function handleImageUploading(name: string) {
   const editor = unref(editorRef);
   if (!editor) {
@@ -317,11 +340,12 @@ function handleImageUploading(name: string) {
   setValue(editor, content);
 }
 
-function handleDone(name: string, url: string) {
+async function handleDone(name: string, url: string) {
   const editor = unref(editorRef);
   if (!editor) {
     return;
   }
+  await handleImageUploading(name);
   const content = editor?.getContent() ?? '';
   const val = content?.replace(getUploadingImgName(name), `<img src="${url}"/>`) ?? '';
   setValue(editor, val);
@@ -330,7 +354,9 @@ function handleDone(name: string, url: string) {
 function getUploadingImgName(name: string) {
   return `[uploading:${name}]`;
 }
+
 let executeCount = 0;
+
 watch(
   () => props.showImageUpload,
   () => {
@@ -380,26 +406,34 @@ watch(
   () => changeColor(),
 );
 </script>
-<style>
-.vben-tinymce-container {
+<style lang="less" scoped>
+@prefix-cls: ~'@{namespace}-tinymce-container';
+
+.@{prefix-cls} {
   position: relative;
   line-height: normal;
+
+  textarea {
+    z-index: -1;
+    visibility: hidden;
+  }
+  .tox:not(.tox-tinymce-inline) .tox-editor-header {
+    padding: 0;
+  }
+  .tox .tox-tbtn--disabled,
+  .tox .tox-tbtn--disabled:hover,
+  .tox .tox-tbtn:disabled,
+  .tox .tox-tbtn:disabled:hover {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg height='39px' viewBox='0 0 40 39px' width='40' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0' y='38px' width='100' height='1' fill='%23d9d9d9'/%3E%3C/svg%3E");
+    background-position: left 0;
+  }
 }
-.vben-tinymce-container textarea {
-  z-index: -1;
-  visibility: hidden;
-}
-.vben-tinymce-container .tox:not(.tox-tinymce-inline) .tox-editor-header {
-  padding: 0;
-}
-.vben-tinymce-container .tox .tox-tbtn--disabled,
-.vben-tinymce-container .tox .tox-tbtn--disabled:hover,
-.vben-tinymce-container .tox .tox-tbtn:disabled,
-.vben-tinymce-container .tox .tox-tbtn:disabled:hover {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg height='39px' viewBox='0 0 40 39px' width='40' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0' y='38px' width='100' height='1' fill='%23d9d9d9'/%3E%3C/svg%3E");
-  background-position: left 0;
-}
-html[data-theme='dark'] .vben-tinymce-container .tox .tox-edit-area__iframe {
-  background-color: #141414;
+
+html[data-theme='dark'] {
+  .@{prefix-cls} {
+    .tox .tox-edit-area__iframe {
+      background-color: #141414;
+    }
+  }
 }
 </style>

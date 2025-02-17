@@ -1,6 +1,3 @@
-<!--
- * @Description: 拖拽节点控件
--->
 <template>
   <div class="drag-move-box" @click.stop="handleSelectItem" :class="{ active: schema.key === formConfig.currentItem?.key }">
     <div class="form-item-box">

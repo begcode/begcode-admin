@@ -1,6 +1,7 @@
 package com.begcode.monolith.settings.repository.base;
 
 import com.begcode.monolith.settings.domain.SystemConfig;
+import com.diboot.core.binding.Binder;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.util.List;
 import java.util.Objects;
@@ -13,9 +14,15 @@ import org.springframework.data.repository.NoRepositoryBean;
 /**
  * Spring Data JPA repository for the SystemConfig entity.
  */
-@SuppressWarnings("unused")
 @NoRepositoryBean
 public interface SystemConfigBaseRepository<E extends SystemConfig> extends BaseCrudMapper<SystemConfig> {
+    default Optional<SystemConfig> findOneWithEagerRelationships(Long id) {
+        return Optional.ofNullable(this.selectById(id)).map(systemConfig -> {
+            Binder.bindRelations(systemConfig, new String[] { "items" });
+            return systemConfig;
+        });
+    }
+
     default List<SystemConfig> findAll() {
         return this.selectList(null);
     }

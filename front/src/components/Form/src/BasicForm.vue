@@ -286,30 +286,57 @@ onMounted(() => {
   emit('register', formActionType);
 });
 </script>
-<style>
-.vben-basic-form .ant-form-item-label label::after {
-  margin: 0 6px 0 2px;
-}
-.vben-basic-form .ant-form-item-with-help {
-  margin-bottom: 0;
-}
-.vben-basic-form .ant-form-item:not(.ant-form-item-with-help) {
-  margin-bottom: 24px;
-}
-.vben-basic-form .ant-form-item.suffix-item .ant-form-item-children {
-  display: flex;
-}
-.vben-basic-form .ant-form-item.suffix-item .suffix {
-  display: inline-flex;
-  align-items: center;
-  margin-top: 1px;
-  padding-left: 6px;
-  line-height: 1;
-}
-.vben-basic-form .ant-form-explain {
-  font-size: 14px;
-}
-.vben-basic-form--compact .ant-form-item {
-  margin-bottom: 8px !important;
+
+<style lang="less">
+@prefix-cls: ~'@{namespace}-basic-form';
+
+.@{prefix-cls} {
+  .ant-form-item {
+    &-label label::after {
+      margin: 0 6px 0 2px;
+    }
+
+    &-with-help {
+      margin-bottom: 0;
+    }
+
+    &-has-error {
+      margin-bottom: 24px;
+    }
+    &.suffix-item {
+      .ant-form-item-children {
+        display: flex;
+      }
+
+      .ant-form-item-control {
+        margin-top: 4px;
+      }
+
+      .suffix {
+        display: inline-flex;
+        padding-left: 6px;
+        margin-top: 1px;
+        line-height: 1;
+        align-items: center;
+      }
+    }
+  }
+
+  .ant-form-explain {
+    font-size: 14px;
+  }
+
+  &--compact {
+    .ant-form-item {
+      margin-bottom: 8px !important;
+    }
+  }
+  &.ant-form-inline {
+    & > .ant-row {
+      .ant-col {
+        width: auto !important;
+      }
+    }
+  }
 }
 </style>

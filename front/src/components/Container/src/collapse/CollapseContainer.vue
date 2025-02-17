@@ -8,6 +8,7 @@ import { useDesign } from '@/hooks/web/useDesign';
 
 const collapseContainerProps = {
   title: { type: String, default: '' },
+  defaultExpan: { type: Boolean, default: true },
   loading: { type: Boolean },
   /**
    *  Can it be expanded
@@ -41,7 +42,7 @@ export default defineComponent({
   setup(props, { expose, slots }) {
     const { prefixCls } = useDesign('collapse-container');
 
-    const show = ref(true);
+    const show = ref(props.defaultExpan);
 
     const handleExpand = (val: boolean) => {
       show.value = _isNil(val) ? !show.value : val;
@@ -97,25 +98,31 @@ export default defineComponent({
   },
 });
 </script>
-
-<style>
-.vben-collapse-container {
-  transition: all 0.3s ease-in-out;
+<style lang="less">
+@prefix-cls: ~'@{namespace}-collapse-container';
+.@{prefix-cls} {
+  background-color: @component-background;
   border-radius: 2px;
-}
+  transition: all 0.3s ease-in-out;
 
-.vben-collapse-container__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 32px;
-}
+  &__header {
+    display: flex;
+    height: 32px;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid @border-color-light;
+  }
 
-.vben-collapse-container__action {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: flex-end;
-  text-align: right;
+  &__footer {
+    border-top: 1px solid @border-color-light;
+  }
+
+  &__action {
+    display: flex;
+    text-align: right;
+    flex: 1;
+    align-items: center;
+    justify-content: flex-end;
+  }
 }
 </style>

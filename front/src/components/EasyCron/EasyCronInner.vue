@@ -26,72 +26,74 @@
       </a-tabs>
       <a-divider />
       <!-- 执行时间预览 -->
-      <a-row :gutter="8">
-        <a-col :span="18" style="margin-top: 22px">
-          <a-row :gutter="8">
-            <a-col :span="8" style="margin-bottom: 12px">
-              <a-input v-model:value="inputValues.second" @blur="onInputBlur">
-                <template #addonBefore>
-                  <span class="allow-click" @click="activeKey = 'second'">秒</span>
-                </template>
-              </a-input>
-            </a-col>
-            <a-col :span="8" style="margin-bottom: 12px">
-              <a-input v-model:value="inputValues.minute" @blur="onInputBlur">
-                <template #addonBefore>
-                  <span class="allow-click" @click="activeKey = 'minute'">分</span>
-                </template>
-              </a-input>
-            </a-col>
-            <a-col :span="8" style="margin-bottom: 12px">
-              <a-input v-model:value="inputValues.hour" @blur="onInputBlur">
-                <template #addonBefore>
-                  <span class="allow-click" @click="activeKey = 'hour'">时</span>
-                </template>
-              </a-input>
-            </a-col>
-            <a-col :span="8" style="margin-bottom: 12px">
-              <a-input v-model:value="inputValues.day" @blur="onInputBlur">
-                <template #addonBefore>
-                  <span class="allow-click" @click="activeKey = 'day'">日</span>
-                </template>
-              </a-input>
-            </a-col>
-            <a-col :span="8" style="margin-bottom: 12px">
-              <a-input v-model:value="inputValues.month" @blur="onInputBlur">
-                <template #addonBefore>
-                  <span class="allow-click" @click="activeKey = 'month'">月</span>
-                </template>
-              </a-input>
-            </a-col>
-            <a-col :span="8" style="margin-bottom: 12px">
-              <a-input v-model:value="inputValues.week" @blur="onInputBlur">
-                <template #addonBefore>
-                  <span class="allow-click" @click="activeKey = 'week'">周</span>
-                </template>
-              </a-input>
-            </a-col>
-            <a-col :span="8">
-              <a-input v-model:value="inputValues.year" @blur="onInputBlur">
-                <template #addonBefore>
-                  <span class="allow-click" @click="activeKey = 'year'">年</span>
-                </template>
-              </a-input>
-            </a-col>
-            <a-col :span="16">
-              <a-input v-model:value="inputValues.cron" @blur="onInputCronBlur">
-                <template #addonBefore>
-                  <a-tooltip title="Cron表达式">式</a-tooltip>
-                </template>
-              </a-input>
-            </a-col>
-          </a-row>
-        </a-col>
-        <a-col :span="6">
-          <div>近十次执行时间（不含年）</div>
-          <a-textarea :value="preTimeList" :rows="5" />
-        </a-col>
-      </a-row>
+      <div style="overflow: hidden">
+        <a-row :gutter="8">
+          <a-col :span="18" style="margin-top: 22px">
+            <a-row :gutter="8">
+              <a-col :span="8" style="margin-bottom: 12px">
+                <a-input v-model:value="inputValues.second" @blur="onInputBlur">
+                  <template #addonBefore>
+                    <span class="allow-click" @click="activeKey = 'second'">秒</span>
+                  </template>
+                </a-input>
+              </a-col>
+              <a-col :span="8" style="margin-bottom: 12px">
+                <a-input v-model:value="inputValues.minute" @blur="onInputBlur">
+                  <template #addonBefore>
+                    <span class="allow-click" @click="activeKey = 'minute'">分</span>
+                  </template>
+                </a-input>
+              </a-col>
+              <a-col :span="8" style="margin-bottom: 12px">
+                <a-input v-model:value="inputValues.hour" @blur="onInputBlur">
+                  <template #addonBefore>
+                    <span class="allow-click" @click="activeKey = 'hour'">时</span>
+                  </template>
+                </a-input>
+              </a-col>
+              <a-col :span="8" style="margin-bottom: 12px">
+                <a-input v-model:value="inputValues.day" @blur="onInputBlur">
+                  <template #addonBefore>
+                    <span class="allow-click" @click="activeKey = 'day'">日</span>
+                  </template>
+                </a-input>
+              </a-col>
+              <a-col :span="8" style="margin-bottom: 12px">
+                <a-input v-model:value="inputValues.month" @blur="onInputBlur">
+                  <template #addonBefore>
+                    <span class="allow-click" @click="activeKey = 'month'">月</span>
+                  </template>
+                </a-input>
+              </a-col>
+              <a-col :span="8" style="margin-bottom: 12px">
+                <a-input v-model:value="inputValues.week" @blur="onInputBlur">
+                  <template #addonBefore>
+                    <span class="allow-click" @click="activeKey = 'week'">周</span>
+                  </template>
+                </a-input>
+              </a-col>
+              <a-col :span="8">
+                <a-input v-model:value="inputValues.year" @blur="onInputBlur">
+                  <template #addonBefore>
+                    <span class="allow-click" @click="activeKey = 'year'">年</span>
+                  </template>
+                </a-input>
+              </a-col>
+              <a-col :span="16">
+                <a-input v-model:value="inputValues.cron" @blur="onInputCronBlur">
+                  <template #addonBefore>
+                    <a-tooltip title="Cron表达式">式</a-tooltip>
+                  </template>
+                </a-input>
+              </a-col>
+            </a-row>
+          </a-col>
+          <a-col :span="6">
+            <div>近十次执行时间（不含年）</div>
+            <a-textarea :value="preTimeList" :rows="5" />
+          </a-col>
+        </a-row>
+      </div>
     </div>
   </div>
 </template>
@@ -313,46 +315,6 @@ function emitValue(value) {
   emit('update:value', value);
 }
 </script>
-<style>
-.vben-easy-cron-inner .content .ant-checkbox-wrapper + .ant-checkbox-wrapper {
-  margin-left: 0;
-}
-.vben-easy-cron-inner-config-list {
-  text-align: left;
-  margin: 0 10px 10px 10px;
-}
-.vben-easy-cron-inner-config-list .item {
-  margin-top: 5px;
-  font-size: 14px;
-}
-.vben-easy-cron-inner-config-list .item span {
-  padding: 0 2px;
-}
-.vben-easy-cron-inner-config-list .choice {
-  padding: 5px 8px;
-}
-.vben-easy-cron-inner-config-list .w60 {
-  width: 60px;
-  min-width: 60px;
-}
-.vben-easy-cron-inner-config-list .w80 {
-  width: 80px;
-  min-width: 80px;
-}
-.vben-easy-cron-inner-config-list .list {
-  margin: 0 20px;
-}
-.vben-easy-cron-inner-config-list .list-check-item {
-  padding: 1px 3px;
-  width: 4em;
-}
-.vben-easy-cron-inner-config-list .list-cn .list-check-item {
-  width: 5em;
-}
-.vben-easy-cron-inner-config-list .tip-info {
-  color: #999;
-}
-.vben-easy-cron-inner .allow-click {
-  cursor: pointer;
-}
+<style lang="less">
+@import 'easy.cron.inner';
 </style>

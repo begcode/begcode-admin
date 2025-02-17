@@ -46,27 +46,29 @@ function handleClose() {
   emit('close');
 }
 </script>
-
-<style>
-.vben-basic-drawer-header {
+<style lang="less">
+@prefix-cls: ~'@{namespace}-basic-drawer-header';
+@footer-height: 60px;
+.@{prefix-cls} {
   display: flex;
   height: 100%;
   align-items: center;
-}
-.vben-basic-drawer-header__back {
-  padding: 0 12px;
-  cursor: pointer;
-}
 
-.vben-basic-drawer-header:hover {
-  color: v-bind('token["colorPrimary"]');
-}
+  &__back {
+    padding: 0 12px;
+    cursor: pointer;
 
-.vben-basic-drawer-header__twrap {
-  flex: 1;
-}
+    &:hover {
+      color: v-bind('token["colorPrimary"]');
+    }
+  }
 
-.vben-basic-drawer-header__toolbar {
-  padding-right: 50px;
+  &__twrap {
+    flex: 1;
+  }
+
+  &__toolbar {
+    padding-right: 50px;
+  }
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="h-full">
-    <CodeMirrorEditor :value="getValue" @change="handleValueChange" :mode="mode" :readonly="readonly" />
+    <CodeMirrorEditor ref="codeMirrorRef" :value="getValue" @change="handleValueChange" :mode="mode" :readonly="readonly" />
   </div>
 </template>
 <script lang="ts" setup>
@@ -15,6 +15,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['change', 'update:value', 'format-error']);
+
+const codeMirrorRef = ref<any>(null);
 
 const getValue = computed(() => {
   const { value, mode, autoFormat } = props;
@@ -31,6 +33,14 @@ const getValue = computed(() => {
     }
   }
   return JSON.stringify(result, null, 2);
+});
+
+function getEditor() {
+  return codeMirrorRef.value?.getEditor();
+}
+
+defineExpose({
+  getEditor,
 });
 
 function handleValueChange(v) {

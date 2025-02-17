@@ -87,7 +87,7 @@ const searchForm = (relationshipApis): any[] => {
       value: '',
       span: 8,
       hidden: true,
-      operator: '',
+      operator: 'equals',
       type: 'Enum',
       componentProps: () => {
         return { options: getEnumDict('RegionCodeLevel'), style: 'width: 100%' };

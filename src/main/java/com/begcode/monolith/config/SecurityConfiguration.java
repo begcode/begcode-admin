@@ -80,7 +80,6 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/*.js"), mvc.pattern("/*.txt"), mvc.pattern("/*.json"), mvc.pattern("/*.map"), mvc.pattern("/*.css")).permitAll()
                     .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"), mvc.pattern("/*.webapp")).permitAll()
                     .requestMatchers(mvc.pattern("/assets/**")).permitAll()
-                    .requestMatchers(mvc.pattern("/avatar/**")).permitAll()
                     .requestMatchers(mvc.pattern("/resource/**")).permitAll()
                     .requestMatchers(mvc.pattern("/js/**")).permitAll()
                     .requestMatchers(mvc.pattern("/content/**")).permitAll()

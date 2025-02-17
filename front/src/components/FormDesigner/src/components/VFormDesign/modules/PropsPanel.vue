@@ -1,6 +1,3 @@
-<!--
- * @Description: 右侧属性配置面板
--->
 <template>
   <div>
     <a-tabs v-model:activeKey="formConfig.activeKey" :tabBarStyle="{ margin: 0 }">
@@ -51,34 +48,42 @@ export default defineComponent({
   },
 });
 </script>
+<style lang="less" scoped>
+@import url('../styles/variable.less');
 
-<style lang="css" scoped>
 :deep(.ant-tabs) {
   box-sizing: border-box;
-}
-:deep(.ant-tabs) form {
-  width: 100%;
-  height: 85vh;
-  margin-right: 10px;
-  overflow: hidden auto;
-}
-:deep(.ant-tabs) .hint-box {
-  margin-top: 200px;
-}
-:deep(.ant-tabs) .ant-form-item,
-:deep(.ant-tabs) .ant-slider-with-marks {
-  margin-right: 20px;
-  margin-bottom: 0;
-  margin-left: 10px;
-}
-:deep(.ant-tabs) .ant-form-item {
-  margin-bottom: 0;
-}
-:deep(.ant-tabs) .ant-form-item .ant-form-item-label {
-  line-height: 2;
-  vertical-align: text-top;
-}
-:deep(.ant-tabs) .ant-input-number {
-  width: 100%;
+
+  form {
+    width: 100%;
+    height: 85vh;
+    margin-right: 10px;
+    overflow: hidden auto;
+  }
+
+  .hint-box {
+    margin-top: 200px;
+  }
+
+  .ant-form-item,
+  .ant-slider-with-marks {
+    margin-right: 20px;
+    margin-bottom: 0;
+    margin-left: 10px;
+  }
+
+  .ant-form-item {
+    // width: 100%;
+    margin-bottom: 0;
+
+    .ant-form-item-label {
+      line-height: 2;
+      vertical-align: text-top;
+    }
+  }
+
+  .ant-input-number {
+    width: 100%;
+  }
 }
 </style>

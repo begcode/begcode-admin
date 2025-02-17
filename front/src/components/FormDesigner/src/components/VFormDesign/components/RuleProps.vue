@@ -1,6 +1,3 @@
-<!--
- * @Description: 正则校验选项组件
--->
 <template>
   <div class="rule-props-content">
     <a-form v-if="formConfig.currentItem && formConfig.currentItem['rules']">
@@ -218,8 +215,7 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="css" scoped>
+<style lang="less" scoped>
 :deep(.icon) {
   width: 1em;
   height: 1em;
@@ -227,30 +223,37 @@ export default defineComponent({
   fill: currentcolor;
   vertical-align: -0.15em;
 }
-.rule-props-content :deep(.ant-form-item) {
-  margin-bottom: 0;
-}
-.rule-props-content .rule-props-item {
-  position: relative;
-  margin-bottom: 5px;
-  padding: 3px 2px;
-  border-radius: 5px;
-  background-color: #f0eded;
-}
-.rule-props-content .rule-props-item :deep(.ant-form-item) {
-  border: 0 !important;
-}
-.rule-props-content .rule-props-item-close {
-  position: absolute;
-  z-index: 999;
-  top: -5px;
-  right: -5px;
-  border-radius: 7px;
-  background-color: #a3a0a0;
-  color: #ccc;
-  cursor: pointer;
-}
-.rule-props-content .rule-props-item-close:hover {
-  color: #00c;
+
+.rule-props-content {
+  :deep(.ant-form-item) {
+    margin-bottom: 0;
+  }
+
+  .rule-props-item {
+    position: relative;
+    margin-bottom: 5px;
+    padding: 3px 2px;
+    border-radius: 5px;
+    background-color: #f0eded;
+
+    :deep(.ant-form-item) {
+      border: 0 !important;
+    }
+
+    &-close {
+      position: absolute;
+      z-index: 999;
+      top: -5px;
+      right: -5px;
+      border-radius: 7px;
+      background-color: #a3a0a0;
+      color: #ccc;
+      cursor: pointer;
+
+      &:hover {
+        color: #00c;
+      }
+    }
+  }
 }
 </style>

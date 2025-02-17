@@ -29,7 +29,6 @@
     <include file="config/liquibase/changelog/20240101062906_added_entity_RegionCode.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240101063006_added_entity_SysFillRule.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240101063106_added_entity_FillRuleItem.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20240101063206_added_entity_UReportFile.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240101063306_added_entity_SmsMessage.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240101063406_added_entity_Announcement.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240101063506_added_entity_AnnouncementRecord.xml" relativeToChangelogFile="false"/>

@@ -194,74 +194,29 @@ function handleSearchChange(e: Event) {
   currentList.value = icons.filter(item => item.includes(value));
 }
 </script>
-<style>
-.border {
-  border-width: 1px;
-}
-.border-solid {
-  border-style: solid;
-}
-.border-t-0 {
-  border-top-width: 0;
-}
-.justify-between {
-  justify-content: space-between;
-}
-.flex {
-  display: flex;
-}
-.flex-wrap {
-  flex-wrap: wrap;
-}
-.px-2 {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-.pr-0 {
-  padding-right: 0;
-}
-.p-2 {
-  padding: 0.5rem;
-}
-.w-1\/8 {
-  width: 12.5%;
-}
-.cursor-pointer {
-  cursor: pointer;
-}
-.mr-1 {
-  margin-right: 0.25rem;
-}
-.mt-1 {
-  margin-top: 0.25rem;
-}
-.justify-center {
-  justify-content: center;
-}
-.items-center {
-  align-items: center;
-}
-.py-2 {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-.py-1 {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
-.vben-icon-picker .ant-input-group-addon {
-  padding: 0;
-}
-.vben-icon-picker .ant-input {
-  cursor: pointer;
-}
-.vben-icon-picker-popover {
-  width: 300px;
-}
-.vben-icon-picker-popover .ant-popover-inner-content {
-  padding: 0;
-}
-.vben-icon-picker-popover .scrollbar {
-  height: 220px;
+<style lang="less">
+@prefix-cls: ~'@{namespace}-icon-picker';
+
+.@{prefix-cls} {
+  // 输入框手势图标
+  .ant-input:not([disabled]) {
+    cursor: pointer;
+  }
+
+  .ant-input-group-addon {
+    padding: 0;
+  }
+
+  &-popover {
+    width: 400px;
+
+    .ant-popover-inner-content {
+      padding: 0;
+    }
+
+    .scrollbar {
+      height: 220px;
+    }
+  }
 }
 </style>

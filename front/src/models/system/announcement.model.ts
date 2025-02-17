@@ -5,28 +5,28 @@ import { AnnoSendStatus } from '@/models/enumerations/anno-send-status.model';
 import { AnnoBusinessType } from '@/models/enumerations/anno-business-type.model';
 import { AnnoOpenType } from '@/models/enumerations/anno-open-type.model';
 export interface IAnnouncement {
-  id?: number; //ID
-  title?: string; //标题
-  summary?: string | null; //摘要
-  content?: string | null; //内容
-  startTime?: Date | null; //开始时间
-  endTime?: Date | null; //结束时间
-  senderId?: number | null; //发布人Id
-  priority?: keyof typeof PriorityLevel | null; //优先级
-  category?: keyof typeof AnnoCategory | null; //消息类型
-  receiverType?: keyof typeof ReceiverType; //通告对象类型
-  sendStatus?: keyof typeof AnnoSendStatus | null; //发布状态
-  sendTime?: Date | null; //发布时间
-  cancelTime?: Date | null; //撤销时间
-  businessType?: keyof typeof AnnoBusinessType | null; //业务类型
-  businessId?: number | null; //业务id
-  openType?: keyof typeof AnnoOpenType | null; //打开方式
-  openPage?: string | null; //组件/路由 地址
-  receiverIds?: string | null; //指定接收者id
-  createdBy?: number | null; //创建者Id
-  createdDate?: Date | null; //创建时间
-  lastModifiedBy?: number | null; //修改者Id
-  lastModifiedDate?: Date | null; //修改时间
+  id?: number; // ID
+  title?: string; // 标题
+  summary?: string | null; // 摘要
+  content?: string | null; // 内容
+  startTime?: Date | null; // 开始时间
+  endTime?: Date | null; // 结束时间
+  senderId?: number | null; // 发布人Id
+  priority?: keyof typeof PriorityLevel | null; // 优先级
+  category?: keyof typeof AnnoCategory | null; // 消息类型
+  receiverType?: keyof typeof ReceiverType; // 通告对象类型
+  sendStatus?: keyof typeof AnnoSendStatus | null; // 发布状态
+  sendTime?: Date | null; // 发布时间
+  cancelTime?: Date | null; // 撤销时间
+  businessType?: keyof typeof AnnoBusinessType | null; // 业务类型
+  businessId?: number | null; // 业务id
+  openType?: keyof typeof AnnoOpenType | null; // 打开方式
+  openPage?: string | null; // 组件/路由 地址
+  receiverIds?: string | null; // 指定接收者id
+  createdBy?: number | null; // 创建者Id
+  createdDate?: Date | null; // 创建时间
+  lastModifiedBy?: number | null; // 修改者Id
+  lastModifiedDate?: Date | null; // 修改时间
 }
 
 export class Announcement implements IAnnouncement {

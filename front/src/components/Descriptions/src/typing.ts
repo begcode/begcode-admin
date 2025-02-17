@@ -45,7 +45,4 @@ export interface DescInstance {
 
 export type Register = (descInstance: DescInstance) => void;
 
-/**
- * @description:
- */
 export type UseDescReturnType = [Register, DescInstance];

@@ -44,6 +44,7 @@ import { IconPicker } from '@/components/Icon';
 import { StrengthMeter } from '@/components/StrengthMeter';
 import { BasicUpload, ImageUpload } from '@/components/Upload';
 import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
+import { CropperAvatar } from '@/components/Cropper';
 
 const componentMap = new Map<ComponentType | string, Component>();
 
@@ -87,6 +88,7 @@ componentMap.set('InputCountDown', CountdownInput);
 componentMap.set('Upload', BasicUpload);
 componentMap.set('SelectFile', SelectFile);
 componentMap.set('Divider', Divider);
+componentMap.set('Avatar', CropperAvatar);
 componentMap.set('BasicTitle', BasicTitle);
 componentMap.set('ImageUpload', ImageUpload);
 componentMap.set('ColorPicker', ColorPicker);

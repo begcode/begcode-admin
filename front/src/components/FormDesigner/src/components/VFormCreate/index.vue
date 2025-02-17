@@ -127,8 +127,7 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="css" scoped>
+<style lang="less" scoped>
 .v-form-model {
   overflow: hidden;
 }

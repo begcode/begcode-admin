@@ -1,7 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router';
-
-import { createRouter, createWebHistory } from 'vue-router';
+import type { App } from 'vue';
 import { basicRoutes } from './routes';
+import { createRouter as createVueRouter, destroyRouter, router } from './router';
 
 // 白名单应该包含基本静态路由
 const WHITE_NAME_LIST: string[] = [];
@@ -12,17 +12,26 @@ const getRouteNames = (array: any[]) =>
   });
 getRouteNames(basicRoutes);
 
-// app router
-// 创建一个可以被 Vue 应用程序使用的路由实例
-export const router = createRouter({
-  // 创建一个 hash 历史记录。
-  history: createWebHistory(import.meta.env.VITE_PUBLIC_PATH),
-  // 应该添加到路由的初始路由列表。
-  routes: basicRoutes as unknown as RouteRecordRaw[],
-  // 是否应该禁止尾部斜杠。默认为假
-  strict: true,
-  scrollBehavior: () => ({ left: 0, top: 0 }),
-});
+/**
+ * 创建路由实例
+ */
+export function createRouter() {
+  let router = createVueRouter({
+    routes: basicRoutes as unknown as RouteRecordRaw[],
+    strict: true,
+    scrollBehavior: () => ({ left: 0, top: 0 }),
+  });
+
+  // TODO 【QQYUN-4517】【表单设计器】记录分享路由守卫测试
+  // @ts-ignore
+  router.beforeEach(async (to, from, next) => {
+    //console.group('【QQYUN-4517】beforeEach');
+    //console.warn('from', from);
+    //console.warn('to', to);
+    //console.groupEnd();
+    next();
+  });
+}
 
 // reset router
 export function resetRouter() {
@@ -39,3 +48,5 @@ export function resetRouter() {
 export function setupRouter(app: App<Element>) {
   app.use(router);
 }
+
+export { router, destroyRouter };

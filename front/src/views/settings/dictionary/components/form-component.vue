@@ -1,6 +1,17 @@
 <template>
   <div :class="containerType === 'page' ? ['pb-44px'] : []">
-    <BasicForm ref="formRef" v-bind="formProps" />
+    <basic-form ref="formRef" v-bind="formProps">
+      <template #resetBefore>
+        <teleport to='[data-teleport="settings/dictionary-edit-append-button"]' defer>
+          <a-space>
+            <basic-button v-for="operation in operations" :type="operation.type" @click="operation.click" v-bind="operation.attrs">
+              <Icon :icon="operation.icon" v-if="operation.icon" />
+              {{ operation.title }}
+            </basic-button>
+          </a-space>
+        </teleport>
+      </template>
+    </basic-form>
     <a-tabs v-model:active-key="relationTables.activeKey" @change="changeActiveKey">
       <a-tab-pane
         :tab="relationTables.itemsRelation.title"
@@ -51,10 +62,15 @@ const props = defineProps({
 
 const emit = defineEmits(['cancel', 'update-save-button']);
 
+const operations = ref<any[]>([]);
+
 const ctx = getCurrentInstance()?.proxy;
 const formRef = ref<any>(null);
 const itemsRelationRef = ref<any>(null);
 const apiService = ctx?.$apiService as typeof ServerProvider;
+const relationshipApis: any = {
+  items: apiService.settings.commonFieldDataService.retrieve,
+};
 const dictionaryId = ref<any>(null);
 const dictionary = reactive<IDictionary>(new Dictionary());
 const getEntityData = async (entityId: string | number) => {
@@ -69,7 +85,7 @@ const getEntityData = async (entityId: string | number) => {
   }
 };
 watch(() => props.entityId, getEntityData, { immediate: true });
-const formItemsConfig = config.fields();
+const formItemsConfig = config.fields(relationshipApis);
 
 const isEdit = computed(() => {
   return true;

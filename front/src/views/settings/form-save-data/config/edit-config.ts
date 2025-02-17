@@ -2,13 +2,10 @@ import { FormSchema } from '@/components/Form';
 import apiService from '@/api-service/index';
 
 const formSaveDataService = apiService.settings.formSaveDataService;
-const relationshipApis: any = {
-  formConfig: apiService.settings.formConfigService.retrieve,
-};
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
-const fields = (): FormSchema[] => {
+const fields = (relationshipApis: any): FormSchema[] => {
   return [
     {
       label: 'ID',

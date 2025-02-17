@@ -8,9 +8,10 @@ import { useUserStoreWithOut } from '@/store/modules/user';
 import { PAGE_NOT_FOUND_ROUTE } from '@/router/routes/basic';
 
 import { RootRoute } from '@/router/routes';
-import { isOAuth2AppEnv } from '@/views/account/login/useLogin';
+import { isOAuth2AppEnv, isOAuth2DingAppEnv } from '@/views/account/login/useLogin';
 import { OAUTH2_THIRD_LOGIN_TENANT_ID } from '@/enums/cacheEnum';
 import { setAuthCache } from '@/utils/auth';
+import { PAGE_NOT_FOUND_NAME_404 } from '/@/router/constant';
 
 const LOGIN_PATH = PageEnum.BASE_LOGIN;
 
@@ -114,13 +115,17 @@ export function createPermissionGuard(router: Router) {
     }
 
     if (isOAuth2AppEnv() && to.path.indexOf('/tenantId/') != -1) {
-      next(userStore.getUserInfo.homePath || PageEnum.BASE_HOME);
+      if (isOAuth2DingAppEnv()) {
+        next(OAUTH2_LOGIN_PAGE_PATH);
+      } else {
+        next(userStore.getUserInfo.homePath || PageEnum.BASE_HOME);
+      }
       return;
     }
     // Jump to the 404 page after processing the login
     if (
       from.path === LOGIN_PATH &&
-      to.name === PAGE_NOT_FOUND_ROUTE.name &&
+      to.name === PAGE_NOT_FOUND_NAME_404 &&
       to.fullPath !== (userStore.getUserInfo.homePath || PageEnum.BASE_HOME)
     ) {
       next(userStore.getUserInfo.homePath || PageEnum.BASE_HOME);
@@ -142,7 +147,7 @@ export function createPermissionGuard(router: Router) {
 
     permissionStore.setDynamicAddedRoute(true);
 
-    if (to.name === PAGE_NOT_FOUND_ROUTE.name) {
+    if (to.name === PAGE_NOT_FOUND_NAME_404) {
       // 动态添加路由后，此处应当重定向到fullPath，否则会加载404页面内容
       next({ path: to.fullPath, replace: true, query: to.query });
     } else {

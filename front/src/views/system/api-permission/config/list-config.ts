@@ -65,7 +65,7 @@ const searchForm = (relationshipApis): any[] => {
       value: '',
       span: 8,
       hidden: true,
-      operator: '',
+      operator: 'equals',
       type: 'Enum',
       componentProps: () => {
         return { options: getEnumDict('ApiPermissionType'), style: 'width: 100%' };
@@ -100,7 +100,7 @@ const searchForm = (relationshipApis): any[] => {
       value: '',
       span: 8,
       hidden: true,
-      operator: '',
+      operator: 'equals',
       type: 'Enum',
       componentProps: () => {
         return { options: getEnumDict('ApiPermissionState'), style: 'width: 100%' };

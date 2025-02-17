@@ -346,7 +346,7 @@ const gridOptions = reactive<VxeGridProps>({
   columns,
 });
 useMergeGridProps(gridOptions, props.gridOptions);
-const toolbarClick = ({ code }) => {
+function toolbarClick({ code }) {
   const $grid = xGrid.value;
   switch (code) {
     case 'batchDelete': {
@@ -369,13 +369,13 @@ const toolbarClick = ({ code }) => {
       xGrid.value.openCustom();
       break;
   }
-};
+}
 
-const checkboxChange = () => {
+function checkboxChange() {
   const $grid = xGrid.value;
   selectedRows.length = 0;
   selectedRows.push(...$grid.getCheckboxRecords());
-};
+}
 const gridEvents = reactive<VxeGridListeners>({
   checkboxAll: checkboxChange,
   checkboxChange: checkboxChange,
@@ -395,7 +395,7 @@ const gridEvents = reactive<VxeGridListeners>({
   // 表格右上角自定义按钮事件
   toolbarToolClick: toolbarClick,
 });
-const okModal = async () => {
+async function okModal() {
   if (popupConfig.needSubmit && modalComponentRef.value) {
     const result = await modalComponentRef.value.submit();
     if (result) {
@@ -403,8 +403,8 @@ const okModal = async () => {
       closeModal();
     }
   }
-};
-const okDrawer = async () => {
+}
+async function okDrawer() {
   if (popupConfig.needSubmit && drawerComponentRef.value) {
     const result = await drawerComponentRef.value.submit();
     if (result) {
@@ -412,25 +412,25 @@ const okDrawer = async () => {
       closeDrawer();
     }
   }
-};
-const formSearch = () => {
+}
+function formSearch() {
   xGrid.value.commitProxy('reload');
-};
-const closeSearchFieldTag = field => {
+}
+function closeSearchFieldTag(field) {
   clearSearchFieldValue(field);
   formSearch();
-};
+}
 const inputSearch = _debounce(formSearch, 700);
-const handleToggleSearch = () => {
+function handleToggleSearch() {
   searchFormConfig.toggleSearchStatus = !searchFormConfig.toggleSearchStatus;
-};
-const showSearchFormSetting = () => {
+}
+function showSearchFormSetting() {
   if (searchFormRef.value) {
     searchFormRef.value.showSettingModal();
   }
-};
+}
 
-const filterTreeSelect = (selectedKeys, info) => {
+function filterTreeSelect(selectedKeys, info) {
   const filterData = info.node.dataRef;
   mapOfFilter.value = {};
   if (selectedKeys && selectedKeys.length > 0) {
@@ -440,9 +440,9 @@ const filterTreeSelect = (selectedKeys, info) => {
     }
   }
   formSearch();
-};
+}
 
-const rowClick = ({ name, data, params }) => {
+function rowClick({ name, data, params }) {
   const row = data;
   const operation = rowOperations.value.find(operation => operation.name === name);
   if (operation?.click) {
@@ -492,7 +492,7 @@ const rowClick = ({ name, data, params }) => {
         console.log('error', `${name}未定义`);
     }
   }
-};
+}
 
 const getSelectRows = () => {
   return toRaw(selectedRows);

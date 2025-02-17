@@ -1,6 +1,3 @@
-<!--
- * @Description: 渲染代码
--->
 <template>
   <a-modal
     title="代码"

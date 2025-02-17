@@ -1,5 +1,6 @@
 import basicModal from './src/BasicModal.vue';
 import { withInstall } from '@/utils/util';
+import './src/index.less';
 
 export const BasicModal = withInstall(basicModal);
 export { useModalContext } from './src/hooks/useModalContext';

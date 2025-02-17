@@ -45,16 +45,13 @@ public class DomainUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User with email " + login + " was not found in the database"));
         }
         if (MobileNumberValidator.isValidChinaMobileNumber(login)) {
-            Optional<UserDetails> result =
-                this.userRepository.findByMobile(login)
-                    .map(user -> {
-                        Binder.bindRelations(user);
-                        return user;
-                    })
-                    .map(user -> createSpringSecurityUser(user.getLogin(), user));
-            if (result.isPresent()) {
-                return result.get();
-            }
+            return this.userRepository.findByMobile(login)
+                .map(user -> {
+                    Binder.bindRelations(user);
+                    return user;
+                })
+                .map(user -> createSpringSecurityUser(user.getLogin(), user))
+                .orElseThrow(() -> new UsernameNotFoundException("User with mobile " + login + " was not found in the database"));
         }
 
         String lowercaseLogin = login.toLowerCase(Locale.ENGLISH);

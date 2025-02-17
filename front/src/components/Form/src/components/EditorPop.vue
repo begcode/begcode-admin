@@ -38,7 +38,7 @@ import { useDesign } from '@/hooks/web/useDesign';
 import CodeEditor from '@/components/CodeEditor/src/CodeEditor.vue';
 import { TooltipPlacement } from 'ant-design-vue/es/tooltip';
 
-const { prefixCls } = useDesign('j-input-popup');
+const { prefixCls } = useDesign('editor-pop');
 const props = defineProps({
   // v-model:value
   value: {
@@ -123,13 +123,26 @@ function emitValue(value) {
 }
 </script>
 
-<style>
-.vben-j-input-popup-input .app-iconify {
-  cursor: pointer;
-  color: #666666;
-  transition: color 0.3s;
-}
-.vben-j-input-popup-input .app-iconify:hover {
-  color: black;
+<style lang="less">
+@prefix-cls: ~'@{namespace}-editor-pop';
+
+.@{prefix-cls} {
+  &-popover {
+    .ant-popover-title:has(.emptyTitle) {
+      border-bottom: none;
+    }
+  }
+
+  &-input {
+    .app-iconify {
+      cursor: pointer;
+      color: #666666;
+      transition: color 0.3s;
+
+      &:hover {
+        color: black;
+      }
+    }
+  }
 }
 </style>

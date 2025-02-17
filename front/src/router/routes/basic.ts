@@ -1,9 +1,10 @@
 import type { AppRouteRecordRaw } from '@/router/types';
-import { REDIRECT_NAME, LAYOUT, EXCEPTION_COMPONENT, PAGE_NOT_FOUND_NAME } from '@/router/constant';
+import { REDIRECT_NAME, LAYOUT, EXCEPTION_COMPONENT, PAGE_NOT_FOUND_NAME, PAGE_NOT_FOUND_NAME_404 } from '@/router/constant';
 
 // 404 on a page
 export const PAGE_NOT_FOUND_ROUTE: AppRouteRecordRaw = {
   path: '/:path(.*)*',
+
   name: PAGE_NOT_FOUND_NAME,
   component: LAYOUT,
   meta: {
@@ -14,7 +15,7 @@ export const PAGE_NOT_FOUND_ROUTE: AppRouteRecordRaw = {
   children: [
     {
       path: '/:path(.*)*',
-      name: PAGE_NOT_FOUND_NAME,
+      name: PAGE_NOT_FOUND_NAME_404,
       component: EXCEPTION_COMPONENT,
       meta: {
         title: 'ErrorPage',

@@ -1,6 +1,7 @@
 package com.begcode.monolith.settings.repository.base;
 
 import com.begcode.monolith.settings.domain.Dictionary;
+import com.diboot.core.binding.Binder;
 import com.diboot.core.mapper.BaseCrudMapper;
 import java.util.List;
 import java.util.Objects;
@@ -13,9 +14,15 @@ import org.springframework.data.repository.NoRepositoryBean;
 /**
  * Spring Data JPA repository for the Dictionary entity.
  */
-@SuppressWarnings("unused")
 @NoRepositoryBean
 public interface DictionaryBaseRepository<E extends Dictionary> extends BaseCrudMapper<Dictionary> {
+    default Optional<Dictionary> findOneWithEagerRelationships(Long id) {
+        return Optional.ofNullable(this.selectById(id)).map(dictionary -> {
+            Binder.bindRelations(dictionary, new String[] { "items" });
+            return dictionary;
+        });
+    }
+
     default List<Dictionary> findAll() {
         return this.selectList(null);
     }

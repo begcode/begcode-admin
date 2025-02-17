@@ -103,11 +103,6 @@ export const basicProps = {
     type: Number,
     default: 3,
   },
-  // 超过3行自动折叠
-  autoAdvancedLine: {
-    type: Number,
-    default: 3,
-  },
   // 不受折叠影响的行数
   alwaysShowLines: {
     type: Number,

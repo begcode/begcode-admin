@@ -1,6 +1,3 @@
-<!--
- * @Description: 渲染组件，无法使用Vben的组件
--->
 <template>
   <a-modal
     title="预览(支持布局)"

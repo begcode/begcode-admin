@@ -4,13 +4,16 @@ import static com.begcode.monolith.settings.domain.DictionaryAsserts.*;
 import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.begcode.monolith.IntegrationTest;
 import com.begcode.monolith.config.WithMockMyUser;
 import com.begcode.monolith.settings.domain.Dictionary;
 import com.begcode.monolith.settings.repository.DictionaryRepository;
+import com.begcode.monolith.settings.service.DictionaryService;
 import com.begcode.monolith.settings.service.dto.DictionaryDTO;
 import com.begcode.monolith.settings.service.mapper.DictionaryMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,6 +22,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
@@ -29,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Integration tests for the {@link DictionaryResource} REST controller.
  */
 @IntegrationTest
+@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockMyUser
 public class DictionaryResourceIT {
@@ -64,8 +71,14 @@ public class DictionaryResourceIT {
     @Autowired
     private DictionaryRepository dictionaryRepository;
 
+    @Mock
+    private DictionaryRepository dictionaryRepositoryMock;
+
     @Autowired
     private DictionaryMapper dictionaryMapper;
+
+    @Mock
+    private DictionaryService dictionaryServiceMock;
 
     @Autowired
     private MockMvc restDictionaryMockMvc;
@@ -215,6 +228,23 @@ public class DictionaryResourceIT {
             .andExpect(jsonPath("$.[*].sortValue").value(hasItem(DEFAULT_SORT_VALUE)))
             .andExpect(jsonPath("$.[*].builtIn").value(hasItem(DEFAULT_BUILT_IN.booleanValue())))
             .andExpect(jsonPath("$.[*].syncEnum").value(hasItem(DEFAULT_SYNC_ENUM.booleanValue())));
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllDictionariesWithEagerRelationshipsIsEnabled() throws Exception {
+        when(dictionaryServiceMock.findAll(any())).thenReturn(new Page().setRecords(new ArrayList<>()));
+
+        restDictionaryMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
+
+        verify(dictionaryServiceMock, times(1)).findAll(any());
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllDictionariesWithEagerRelationshipsIsNotEnabled() throws Exception {
+        when(dictionaryServiceMock.findAll(any())).thenReturn(new Page().setRecords(new ArrayList<>()));
+
+        restDictionaryMockMvc.perform(get(ENTITY_API_URL + "?eagerload=false")).andExpect(status().isOk());
+        verify(dictionaryRepositoryMock, times(1)).findAll();
     }
 
     @Test

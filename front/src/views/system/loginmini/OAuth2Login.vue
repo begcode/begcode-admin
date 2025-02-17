@@ -3,14 +3,17 @@
 </template>
 
 <script lang="ts" setup>
-import { isOAuth2AppEnv, sysOAuth2Login } from '@/views/account/login/useLogin';
+import { isOAuth2AppEnv, sysOAuth2Callback, sysOAuth2Login } from '@/views/account/login/useLogin';
 import { useRouter } from 'vue-router';
 import { PageEnum } from '@/enums/pageEnum';
 import { router } from '@/router';
 import { useUserStore } from '@/store/modules/user';
 import { useMessage } from '@/hooks/web/useMessage';
 import { useI18n } from '@/hooks/web/useI18n';
-import { getTenantId } from '@/utils/auth';
+import { getAuthCache, getTenantId, getToken } from '@/utils/auth';
+import { requestAuthCode } from 'dingtalk-jsapi';
+import { defHttp } from '/@/utils/http/axios';
+import { OAUTH2_THIRD_LOGIN_TENANT_ID } from '/@/enums/cacheEnum';
 
 const isOAuth = ref<boolean>(isOAuth2AppEnv());
 const env = ref<any>({ thirdApp: false, wxWork: false, dingtalk: false });
@@ -48,12 +51,13 @@ function doOAuth2Login() {
     // 判断是否携带了Token，是就说明登录成功
     if (route.query.oauth2LoginToken) {
       let token = route.query.oauth2LoginToken;
-      //执行登录操作
+      // 执行登录操作
       thirdLogin({ token, thirdType: route.query.thirdType, tenantId: getTenantId });
     } else if (env.value.wxWork) {
       sysOAuth2Login('wechat_enterprise');
     } else if (env.value.dingtalk) {
-      sysOAuth2Login('dingtalk');
+      // 新版钉钉登录
+      dingdingLogin();
     }
   }
 }
@@ -81,5 +85,45 @@ function thirdLogin(params) {
       });
     }
   });
+}
+
+/**
+ * 钉钉登录
+ */
+function dingdingLogin() {
+  // 先获取钉钉的企业id，如果没有配置 还是走原来的逻辑，走原来的逻辑 需要判断存不存在token，存在token直接去首页
+  let tenantId = getAuthCache(OAUTH2_THIRD_LOGIN_TENANT_ID) || 0;
+  let url = `/sys/thirdLogin/get/corpId/clientId?tenantId=${tenantId}`;
+  defHttp
+    .get({ url: url }, { isTransformResponse: false })
+    .then(res => {
+      if (res.success) {
+        if (res.result && res.result.corpId && res.result.clientId) {
+          requestAuthCode({ corpId: res.result.corpId, clientId: res.result.clientId }).then(res => {
+            let { code } = res;
+            sysOAuth2Callback(code);
+          });
+        } else {
+          toOldAuthLogin();
+        }
+      } else {
+        toOldAuthLogin();
+      }
+    })
+    .catch(err => {
+      toOldAuthLogin();
+    });
+}
+
+/**
+ * 旧版钉钉登录
+ */
+function toOldAuthLogin() {
+  let token = getToken();
+  if (token) {
+    router.replace({ path: PageEnum.BASE_HOME });
+  } else {
+    sysOAuth2Login('dingtalk');
+  }
 }
 </script>

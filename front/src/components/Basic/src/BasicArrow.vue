@@ -1,7 +1,3 @@
-<!--
- * @Author: Vben
- * @Description: Arrow component with animation
--->
 <template>
   <span :class="getClass">
     <Icon icon="ion:chevron-forward" :style="$attrs.iconStyle" />
@@ -45,30 +41,38 @@ const getClass = computed(() => {
   ];
 });
 </script>
-<style scoped>
-.vben-basic-arrow {
+<style lang="less" scoped>
+@prefix-cls: ~'@{namespace}-basic-arrow';
+
+.@{prefix-cls} {
   display: inline-block;
-  transform: rotate(0deg);
-  transform-origin: center center;
-  transition: all 0.3s ease 0.1s;
   cursor: pointer;
-}
-.vben-basic-arrow--active {
-  transform: rotate(90deg);
-}
-.vben-basic-arrow.inset {
-  line-height: 0px;
-}
-.vben-basic-arrow.up {
-  transform: rotate(-90deg);
-}
-.vben-basic-arrow.down {
-  transform: rotate(90deg);
-}
-.vben-basic-arrow.up.vben-basic-arrow--active {
-  transform: rotate(90deg);
-}
-.vben-basic-arrow.down.vben-basic-arrow--active {
-  transform: rotate(-90deg);
+  transform: rotate(0deg);
+  transition: all 0.3s ease 0.1s;
+  transform-origin: center center;
+
+  &--active {
+    transform: rotate(90deg);
+  }
+
+  &.inset {
+    line-height: 0;
+  }
+
+  &.up {
+    transform: rotate(-90deg);
+  }
+
+  &.down {
+    transform: rotate(90deg);
+  }
+
+  &.up.@{prefix-cls}--active {
+    transform: rotate(90deg);
+  }
+
+  &.down.@{prefix-cls}--active {
+    transform: rotate(-90deg);
+  }
 }
 </style>

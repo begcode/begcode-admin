@@ -1,6 +1,3 @@
-<!--
- * @Description: 渲染JSON数据
--->
 <template>
   <a-modal
     title="JSON数据"

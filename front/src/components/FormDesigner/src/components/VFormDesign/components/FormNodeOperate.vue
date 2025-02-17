@@ -1,6 +1,3 @@
-<!--
- * @Description: 节点操作复制删除控件
--->
 <template>
   <div class="copy-delete-box">
     <a class="copy" :class="activeClass" @click.stop="handleCopy">

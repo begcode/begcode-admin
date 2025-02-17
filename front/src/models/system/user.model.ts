@@ -3,29 +3,29 @@ import { IPosition } from '@/models/settings/position.model';
 import { IAuthority } from '@/models/system/authority.model';
 
 export interface IUser {
-  id?: number; //用户ID
-  login?: string; //账户名
-  password?: string | null; //密码
-  firstName?: string | null; //名字
-  lastName?: string | null; //姓氏
-  email?: string; //电子邮箱
-  mobile?: string | null; //手机号码
-  birthday?: Date | null; //出生日期
-  activated?: boolean | null; //激活状态
-  langKey?: string | null; //语言Key
-  imageUrl?: string | null; //头像地址
-  activationKey?: string | null; //激活Key
-  resetKey?: string | null; //重置码
-  resetDate?: Date | null; //重置时间
-  createdBy?: number | null; //创建者Id
-  createdDate?: Date | null; //创建时间
-  lastModifiedBy?: number | null; //修改者Id
-  lastModifiedDate?: Date | null; //修改时间
+  id?: number; // 用户ID
+  login?: string; // 账户名
+  password?: string | null; // 密码
+  firstName?: string | null; // 名字
+  lastName?: string | null; // 姓氏
+  email?: string; // 电子邮箱
+  mobile?: string | null; // 手机号码
+  birthday?: Date | null; // 出生日期
+  activated?: boolean | null; // 激活状态
+  langKey?: string | null; // 语言Key
+  imageUrl?: string | null; // 头像地址
+  activationKey?: string | null; // 激活Key
+  resetKey?: string | null; // 重置码
+  resetDate?: Date | null; // 重置时间
+  createdBy?: number | null; // 创建者Id
+  createdDate?: Date | null; // 创建时间
+  lastModifiedBy?: number | null; // 修改者Id
+  lastModifiedDate?: Date | null; // 修改时间
   departmentId?: number | null;
-  department?: IDepartment | null; //部门
+  department?: IDepartment | null; // 部门
   positionId?: number | null;
-  position?: IPosition | null; //岗位
-  authorities?: IAuthority[] | null; //角色列表
+  position?: IPosition | null; // 岗位
+  authorities?: IAuthority[] | null; // 角色列表
 }
 
 export class User implements IUser {

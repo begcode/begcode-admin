@@ -173,8 +173,7 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="css" scoped>
+<style lang="less" scoped>
 .ml-5 {
   margin-left: 5px;
 }

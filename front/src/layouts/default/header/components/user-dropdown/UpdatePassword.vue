@@ -1,7 +1,7 @@
 <template>
-  <BasicModal v-bind="$attrs" @register="registerModal" :title="title" @ok="handleSubmit" width="600px" data-cy="changePasswordModal">
-    <BasicForm @register="registerForm" />
-  </BasicModal>
+  <basic-modal v-bind="$attrs" @register="registerModal" :title="title" @ok="handleSubmit" width="600px" data-cy="changePasswordModal">
+    <basic-form @register="registerForm" />
+  </basic-modal>
 </template>
 <script lang="ts" setup>
 import { rules } from '@/utils/helper/validator';
@@ -9,15 +9,15 @@ import { BasicModal, useModalInner } from '@/components/Modal';
 import { useForm, BasicForm } from '@/components/Form';
 import { useMessage } from '@/hooks/web/useMessage';
 import accountService from '@/api-service/account/account.service';
-import { useLocaleStore } from '@/store/modules/locale';
 import { useI18n } from '@/hooks/web/useI18n';
+import { useLocaleStore } from '@/store/modules/locale';
+
 const localeStore = useLocaleStore();
 const { t } = useI18n();
 
 // 声明Emits
 const emit = defineEmits(['register']);
 const $message = useMessage();
-const formRef = ref();
 const username = ref('');
 const title = ref(t('layout.changePassword.changePassword'));
 //表单配置

@@ -100,8 +100,6 @@ export interface FormProps {
   autoFocusFirstItem?: boolean;
   // 如果 showAdvancedButton 为 true，超过指定列数默认折叠，默认为3
   autoAdvancedCol?: number;
-  // Automatically collapse over the specified number of rows
-  autoAdvancedLine?: number;
   // Always show lines
   alwaysShowLines?: number;
   // Whether to show the operation button

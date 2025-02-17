@@ -176,9 +176,6 @@ export function useFormEvents({
     validateFields(validKeys).catch(_ => {});
   }
 
-  /**
-   * @description: Delete based on field name
-   */
   async function removeSchemaByField(fields: string | string[]): Promise<void> {
     const schemaList: FormSchema[] = _cloneDeep(unref(getSchema));
     if (!fields) {
@@ -195,9 +192,6 @@ export function useFormEvents({
     schemaRef.value = schemaList;
   }
 
-  /**
-   * @description: Delete based on field name
-   */
   function _removeSchemaByField(field: string, schemaList: FormSchema[]): void {
     if (_isString(field)) {
       const index = schemaList.findIndex(schema => schema.field === field);
@@ -208,9 +202,6 @@ export function useFormEvents({
     }
   }
 
-  /**
-   * @description: Insert after a certain field, if not insert the last
-   */
   async function appendSchemaByField(schema: FormSchema | FormSchema[], prefixField?: string, first = false) {
     const schemaList: FormSchema[] = _cloneDeep(unref(getSchema));
     const addSchemaIds: string[] = Array.isArray(schema) ? schema.map(item => item.field) : [schema.field];
@@ -318,9 +309,6 @@ export function useFormEvents({
     return handleFormValues(toRaw(unref(formModel)));
   }
 
-  /**
-   * @description: Is it time
-   */
   function itemIsDateType(key: string) {
     return unref(getSchema).some(item => {
       return item.field === key && item.component ? dateItemType.includes(item.component) : false;
@@ -355,9 +343,6 @@ export function useFormEvents({
     await unref(formElRef)?.scrollToField(name, options);
   }
 
-  /**
-   * @description: Form submission
-   */
   async function handleSubmit(e?: Event): Promise<void> {
     e && e.preventDefault();
     const { submitFunc } = unref(getProps);

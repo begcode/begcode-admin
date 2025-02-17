@@ -52,7 +52,6 @@ import ModalWrapper from './components/ModalWrapper.vue';
 import ModalClose from './components/ModalClose.vue';
 import ModalFooter from './components/ModalFooter.vue';
 import ModalHeader from './components/ModalHeader.vue';
-import { deepMerge } from '@/utils/util';
 import { omit as _omit } from 'lodash-es';
 import { useFullScreen } from './hooks/useModalFullScreen';
 import { useDesign } from '@/hooks/web/useDesign';
@@ -192,7 +191,7 @@ async function handleCancel(e: Event) {
  */
 function setModalProps(props: Partial<ModalProps>): void {
   // Keep the last setModalProps
-  propsRef.value = deepMerge(unref(propsRef) || ({} as any), props);
+  propsRef.value = _mergeWith(unref(propsRef) || ({} as any), props);
   if (Reflect.has(props, 'open')) {
     openRef.value = !!props.open;
   }
@@ -226,120 +225,3 @@ watch(fullScreenRef, val => {
   emit('fullScreen', val);
 });
 </script>
-<style>
-.fullscreen-modal {
-  overflow: hidden;
-}
-.fullscreen-modal .ant-modal {
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100%;
-  max-width: 100% !important;
-  max-height: 100% !important;
-}
-.fullscreen-modal .ant-modal-content {
-  height: 100%;
-  overflow: hidden;
-  border-radius: 0;
-}
-.fullscreen-modal .ant-modal .ant-modal-body > .scrollbar {
-  padding: 0;
-}
-.fullscreen-modal .ant-modal .ant-modal-header,
-.fullscreen-modal .ant-modal .vben-basic-title {
-  cursor: default !important;
-}
-.fullscreen-modal .ant-modal-footer {
-  margin-top: 0;
-}
-.ant-modal {
-  width: 520px;
-  padding-bottom: 0;
-}
-.vben-basic-modal-wrap .ant-modal .ant-modal-body > .scrollbar {
-  padding: 14px;
-}
-.vben-basic-modal-wrap .ant-modal-title {
-  font-size: 16px;
-  font-weight: bold;
-}
-.vben-basic-modal-wrap .ant-modal-title .base-title {
-  cursor: move !important;
-}
-.vben-basic-modal-wrap .ant-modal .ant-modal-body {
-  padding: 0;
-}
-.vben-basic-modal-wrap .ant-modal .ant-modal-body > .scrollbar > .scrollbar__bar.is-horizontal {
-  display: none;
-}
-.vben-basic-modal-wrap .ant-modal-large {
-  top: 60px;
-}
-.vben-basic-modal-wrap .ant-modal-large--mini {
-  top: 16px;
-}
-.vben-basic-modal-wrap .ant-modal-header {
-  padding: 16px;
-  border-bottom: 1px solid #d9d9d9;
-}
-.vben-basic-modal-wrap .ant-modal-content {
-  padding: 0 !important;
-  box-shadow:
-    0 4px 8px 0 rgba(0, 0, 0, 0.2),
-    0 6px 20px 0 rgba(0, 0, 0, 0.19);
-}
-.vben-basic-modal-wrap .ant-modal-footer {
-  padding: 10px 16px;
-  border-top: 1px solid #d9d9d9;
-}
-.vben-basic-modal-wrap .ant-modal-footer button + button {
-  margin-left: 10px;
-}
-.vben-basic-modal-wrap .ant-modal-close {
-  top: 0 !important;
-  right: 0 !important;
-  width: auto !important;
-  outline: none;
-  background: transparent !important;
-  font-weight: normal;
-}
-.vben-basic-modal-wrap .ant-modal-close-x {
-  display: inline-block;
-  width: 96px;
-  height: 56px;
-  line-height: 56px !important;
-}
-.vben-basic-modal-wrap .ant-modal-confirm-body .ant-modal-confirm-content > * {
-  color: #909399;
-}
-.vben-basic-modal-wrap .ant-modal-confirm-confirm.error .ant-modal-confirm-body > .anticon {
-  color: #ff4d4f;
-}
-.vben-basic-modal-wrap .ant-modal-confirm-btns .ant-btn:last-child {
-  margin-right: 0;
-}
-.vben-basic-modal-wrap .ant-modal-confirm-info .ant-modal-confirm-body > .anticon {
-  color: #faad14;
-}
-.vben-basic-modal-wrap .ant-modal-confirm-confirm.success .ant-modal-confirm-body > .anticon {
-  color: #52c41a;
-}
-.ant-modal-confirm .ant-modal-body {
-  padding: 24px !important;
-}
-@media screen and (max-height: 600px) {
-  .ant-modal {
-    top: 60px;
-  }
-}
-@media screen and (max-height: 540px) {
-  .ant-modal {
-    top: 30px;
-  }
-}
-@media screen and (max-height: 480px) {
-  .ant-modal {
-    top: 10px;
-  }
-}
-</style>

@@ -148,6 +148,8 @@ const setting: ProjectConfig = {
     // Menu theme
     // 菜单主题
     theme: ThemeEnum.DARK,
+    // 左侧导航栏文字颜色调整区分彩色和暗黑 (不对应配置)
+    isThemeBright: false,
     // Split menu
     // 分割菜单
     split: false,

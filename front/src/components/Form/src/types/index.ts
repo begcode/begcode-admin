@@ -1,3 +1,5 @@
+import { VNodeProps } from '@vue/runtime-core';
+
 type ColSpanType = number | string;
 export interface ColEx {
   style?: any;
@@ -106,7 +108,7 @@ interface _CustomComponents {
   ImageUpload: ExtractPropTypes<(typeof import('@/components/Upload/src/components/ImageUpload.vue'))['default']>;
   IconPicker: ExtractPropTypes<(typeof import('@/components/Icon/src/IconPicker.vue'))['default']>;
   ApiTransfer: ExtractPropTypes<(typeof import('../components/ApiTransfer.vue'))['default']>;
-  // CropperAvatar: ExtractPropTypes<(typeof import('@/components/Cropper/src/CropperAvatar.vue'))['default']>;
+  CropperAvatar: ExtractPropTypes<(typeof import('@/components/Cropper/src/CropperAvatar.vue'))['default']>;
   BasicTitle: ExtractPropTypes<(typeof import('@/components/Basic/src/BasicTitle.vue'))['default']>;
   InputCountDown: ExtractPropTypes<(typeof import('@/components/CountDown/src/CountdownInput.vue'))['default']>;
   SelectFile: ExtractPropTypes<(typeof import('../components/SelectFile.vue'))['default']>;
@@ -124,9 +126,6 @@ interface _CustomComponents {
   Time: ExtractPropTypes<(typeof import('@/components/Time/src/Time.vue'))['default']>;
   EditorPop: ExtractPropTypes<(typeof import('../components/EditorPop.vue'))['default']>;
   SelectModal: ExtractPropTypes<(typeof import('@/components/SelectModal/src/SelectModal.vue'))['default']>;
-  // todo CropperAvatar: ExtractPropTypes<
-  //     (typeof import('@/components/Cropper/src/CropperAvatar.vue'))['default']
-  //   >;
 }
 
 type CustomComponents<T = _CustomComponents> = {
@@ -172,7 +171,7 @@ export interface ComponentProps {
   Divider: ExtractPropTypes<(typeof import('ant-design-vue/es/divider'))['default']>;
   ApiTransfer: CustomComponents['ApiTransfer'] & ComponentProps['Transfer'];
   Transfer: ExtractPropTypes<(typeof import('ant-design-vue/es/transfer'))['default']>;
-  // CropperAvatar: CustomComponents['CropperAvatar'];
+  CropperAvatar: CustomComponents['CropperAvatar'];
   BasicTitle: CustomComponents['BasicTitle'];
   ColorPicker: CustomComponents['ColorPicker'];
   RangeDate: CustomComponents['RangeDate'];

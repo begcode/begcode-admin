@@ -6,15 +6,7 @@
 import { useDebounceFn } from '@vueuse/core';
 import { useAppStore } from '@/store/modules/app';
 import { useWindowSizeFn } from '@/hooks/vben/useWindowSizeFn';
-import CodeMirror from 'codemirror';
-// css
-import './codemirror.css';
-import 'codemirror/theme/idea.css';
-import 'codemirror/theme/material-palenight.css';
-// modes
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/mode/css/css';
-import 'codemirror/mode/htmlmixed/htmlmixed';
+import { CodeMirror } from './codeMirror';
 
 const props = defineProps({
   mode: { type: String, default: 'application/json' },
@@ -88,6 +80,12 @@ async function init() {
     emit('change', editor?.getValue());
   });
 }
+
+function getEditor() {
+  return editor;
+}
+
+defineExpose({ getEditor });
 
 onMounted(async () => {
   await nextTick();

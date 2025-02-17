@@ -79,27 +79,29 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="css" scoped>
+<style lang="less" scoped>
 .options-box {
   display: flex;
   align-items: center;
   margin-bottom: 5px;
-}
-.options-box .options-value {
-  margin: 0 8px;
-}
-.options-box .options-delete {
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #f5f5f5;
-  color: #666;
-  line-height: 30px;
-  text-align: center;
-}
-.options-box .options-delete:hover {
-  background: #ff4d4f;
+
+  .options-value {
+    margin: 0 8px;
+  }
+
+  .options-delete {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #f5f5f5;
+    color: #666;
+    line-height: 30px;
+    text-align: center;
+
+    &:hover {
+      background: #ff4d4f;
+    }
+  }
 }
 </style>

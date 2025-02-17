@@ -1,7 +1,7 @@
 <template>
   <div :class="[`${prefixCls}__placeholder`]" :style="getPlaceholderDomStyle" v-if="getIsShowPlaceholderDom"></div>
   <div :style="getWrapStyle" :class="getClass">
-    <LayoutHeader v-if="getShowInsetHeaderRef" />
+    <LayoutHeader v-if="getShowHeader" />
     <MultipleTabs v-if="getShowTabs" :key="tabStore.getLastDragEndIndex" />
   </div>
 </template>
@@ -9,6 +9,8 @@
 import LayoutHeader from './index.vue';
 import MultipleTabs from '../tabs/index.vue';
 
+import { useAppStore } from '@/store/modules/app';
+import { useGlobSetting } from '@/hooks/setting';
 import { useHeaderSetting } from '@/hooks/setting/useHeaderSetting';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
 import { useFullContent } from '@/hooks/web/useFullContent';
@@ -17,6 +19,7 @@ import { useAppInject } from '@/hooks/useAppInject';
 import { useDesign } from '@/hooks/web/useDesign';
 import { useLayoutHeight } from '../content/useContentViewHeight';
 import { TabsThemeEnum } from '@/enums/appEnum';
+import { MenuTypeEnum } from '@/enums/menuEnum';
 import { useMultipleTabStore } from '@/store/modules/multipleTab';
 
 const HEADER_HEIGHT = 64;
@@ -31,7 +34,9 @@ const { setHeaderHeight } = useLayoutHeight();
 const tabStore = useMultipleTabStore();
 const { prefixCls } = useDesign('layout-multiple-header');
 
-const { getCalcContentWidth, getSplit, getShowMenu } = useMenuSetting();
+const appStore = useAppStore();
+const glob = useGlobSetting();
+const { getCalcContentWidth, getSplit, getShowMenu, getMenuType } = useMenuSetting();
 const { getIsMobile } = useAppInject();
 const { getFixed, getShowInsetHeaderRef, getShowFullHeaderRef, getHeaderTheme, getShowHeader } = useHeaderSetting();
 
@@ -67,10 +72,13 @@ const getIsUnFold = computed(() => !unref(getShowMenu) && !unref(getShowHeader))
 const getPlaceholderDomStyle = computed((): CSSProperties => {
   let height = 0;
   if (!(unref(getAutoCollapse) && unref(getIsUnFold))) {
-    if ((unref(getShowFullHeaderRef) || !unref(getSplit)) && unref(getShowHeader) && !unref(getFullContent)) {
+    if (
+      ((unref(getShowFullHeaderRef) || !unref(getSplit)) && unref(getShowHeader) && !unref(getFullContent)) ||
+      unref(getMenuType) == MenuTypeEnum.MIX
+    ) {
       height += HEADER_HEIGHT;
     }
-    if (unref(getShowMultipleTab) && !unref(getFullContent)) {
+    if (unref(getShowTabs) && !unref(getFullContent)) {
       height += unref(getTabsThemeHeight);
     }
     setHeaderHeight(height);

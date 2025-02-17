@@ -4,13 +4,16 @@ import static com.begcode.monolith.settings.domain.SystemConfigAsserts.*;
 import static com.begcode.monolith.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.begcode.monolith.IntegrationTest;
 import com.begcode.monolith.config.WithMockMyUser;
 import com.begcode.monolith.settings.domain.SystemConfig;
 import com.begcode.monolith.settings.repository.SystemConfigRepository;
+import com.begcode.monolith.settings.service.SystemConfigService;
 import com.begcode.monolith.settings.service.dto.SystemConfigDTO;
 import com.begcode.monolith.settings.service.mapper.SystemConfigMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +24,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
@@ -31,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Integration tests for the {@link SystemConfigResource} REST controller.
  */
 @IntegrationTest
+@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockMyUser
 public class SystemConfigResourceIT {
@@ -77,8 +84,14 @@ public class SystemConfigResourceIT {
     @Autowired
     private SystemConfigRepository systemConfigRepository;
 
+    @Mock
+    private SystemConfigRepository systemConfigRepositoryMock;
+
     @Autowired
     private SystemConfigMapper systemConfigMapper;
+
+    @Mock
+    private SystemConfigService systemConfigServiceMock;
 
     @Autowired
     private MockMvc restSystemConfigMockMvc;
@@ -237,6 +250,23 @@ public class SystemConfigResourceIT {
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.intValue())))
             .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(DEFAULT_LAST_MODIFIED_DATE.toString())));
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllSystemConfigsWithEagerRelationshipsIsEnabled() throws Exception {
+        when(systemConfigServiceMock.findAll(any())).thenReturn(new Page().setRecords(new ArrayList<>()));
+
+        restSystemConfigMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
+
+        verify(systemConfigServiceMock, times(1)).findAll(any());
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllSystemConfigsWithEagerRelationshipsIsNotEnabled() throws Exception {
+        when(systemConfigServiceMock.findAll(any())).thenReturn(new Page().setRecords(new ArrayList<>()));
+
+        restSystemConfigMockMvc.perform(get(ENTITY_API_URL + "?eagerload=false")).andExpect(status().isOk());
+        verify(systemConfigRepositoryMock, times(1)).findAll();
     }
 
     @Test

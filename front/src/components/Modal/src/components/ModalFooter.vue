@@ -1,19 +1,18 @@
 <template>
   <div>
     <slot name="insertFooter"></slot>
-    <Button v-bind="cancelButtonProps" @click="handleCancel" v-if="showCancelBtn">
+    <basic-button v-bind="cancelButtonProps" @click="handleCancel" v-if="showCancelBtn">
       {{ cancelText }}
-    </Button>
+    </basic-button>
     <slot name="centerFooter"></slot>
-    <Button :type="okType" @click="handleOk" :loading="confirmLoading" v-bind="okButtonProps" v-if="showOkBtn">
+    <basic-button :type="okType" @click="handleOk" :loading="confirmLoading" v-bind="okButtonProps" v-if="showOkBtn">
       {{ okText }}
-    </Button>
+    </basic-button>
     <slot name="appendFooter"></slot>
   </div>
 </template>
 <script lang="ts" setup>
 import { basicProps } from '../props';
-import { Button } from '@/components/Button';
 
 defineOptions({ name: 'BasicModalFooter' });
 

@@ -30,13 +30,18 @@ const props = defineProps({
 const { prefixCls } = useDesign('countdown-input');
 const [state] = useRuleFormItem(props) as [WritableComputedRef<string>, (val: string) => void, DeepReadonly<any>, FormItemContext];
 </script>
-<style>
-.vben-countdown-input .ant-input-group-addon {
-  padding-right: 0;
-  border: none;
-  background-color: transparent;
-}
-.vben-countdown-input .ant-input-group-addon button {
-  font-size: 14px;
+<style lang="less">
+@prefix-cls: ~'@{namespace}-countdown-input';
+
+.@{prefix-cls} {
+  .ant-input-group-addon {
+    padding-right: 0;
+    background-color: transparent;
+    border: none;
+
+    button {
+      font-size: 14px;
+    }
+  }
 }
 </style>

@@ -41,36 +41,43 @@ const getClass = computed(() => [
   { [`${prefixCls}-normal`]: props.normal },
 ]);
 </script>
-<style scoped>
-.vben-basic-title {
-  display: flex;
+
+<style lang="less" scoped>
+@prefix-cls: ~'@{namespace}-basic-title';
+
+.@{prefix-cls} {
   position: relative;
+  display: flex;
   padding-left: 7px;
-  color: v-bind('token["colorText"]');
   font-size: 16px;
   font-weight: 500;
   line-height: 24px;
-  cursor: pointer;
+  color: v-bind('token["colorText"]');
+  cursor: move;
   user-select: none;
-}
-.vben-basic-title-normal {
-  font-size: 14px;
-  font-weight: 500;
-}
-.vben-basic-title.is-drawer {
-  cursor: default;
-}
-.vben-basic-title-show-span::before {
-  content: '';
-  position: absolute;
-  top: 4px;
-  left: 0;
-  width: 3px;
-  height: 16px;
-  margin-right: 4px;
-  background-color: v-bind('token.colorPrimary');
-}
-.vben-basic-title-help {
-  margin-left: 10px;
+
+  &.is-drawer {
+    cursor: default;
+  }
+
+  &-normal {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  &-show-span::before {
+    position: absolute;
+    top: 4px;
+    left: 0;
+    width: 3px;
+    height: 16px;
+    margin-right: 4px;
+    background-color: v-bind('token.colorPrimary');
+    content: '';
+  }
+
+  &-help {
+    margin-left: 10px;
+  }
 }
 </style>

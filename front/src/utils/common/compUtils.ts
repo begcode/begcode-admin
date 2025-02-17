@@ -10,9 +10,9 @@ import { useI18n } from '@/hooks/web/useI18n';
 const globSetting = useGlobSetting();
 const baseApiUrl = globSetting.domainUrl;
 /**
- *  获取文件服务访问路径
+ * 获取文件服务访问路径
  * @param fileUrl 文件路径
- * @param prefix(默认http)  文件路径前缀 http/https
+ * @param prefix 文件路径前缀 http/https (默认http)
  */
 export const getFileAccessHttpUrl = (fileUrl, prefix = 'http') => {
   let result = fileUrl;
@@ -543,7 +543,6 @@ export function sameDay(dateStr) {
 
 /**
  * 翻译菜单名称
- * 2024-02-28
  * @param data
  */
 export function translateTitle(data) {

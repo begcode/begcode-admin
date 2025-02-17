@@ -211,6 +211,7 @@ declare module 'vue' {
     PopConfirmButton: typeof import('./../components/Button/src/PopConfirmButton.vue')['default']
     Preview: typeof import('./../components/Preview/src/Preview.vue')['default']
     PreviewCode: typeof import('./../components/FormDesigner/src/components/VFormDesign/components/PreviewCode.vue')['default']
+    ProcessMask: typeof import('./../components/Tinymce/src/ProcessMask.vue')['default']
     PromptForm: typeof import('./../components/PromptForm/PromptForm.vue')['default']
     PropsPanel: typeof import('./../components/FormDesigner/src/components/VFormDesign/modules/PropsPanel.vue')['default']
     Radar: typeof import('./../components/chart/Radar.vue')['default']

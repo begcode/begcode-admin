@@ -11,20 +11,20 @@ devDependencies:
     specifier: 15.2.2
     version: 15.2.2
   prettier:
-    specifier: 3.2.5
-    version: 3.2.5
+    specifier: 3.4.2
+    version: 3.4.2
   prettier-plugin-java:
     specifier: 2.6.0
     version: 2.6.0
   prettier-plugin-packagejson:
     specifier: 2.4.12
-    version: 2.4.12(prettier@3.2.5)
+    version: 2.4.12(prettier@3.4.2)
   prettier-plugin-properties:
     specifier: 0.3.0
-    version: 0.3.0(prettier@3.2.5)
+    version: 0.3.0(prettier@3.4.2)
   rimraf:
-    specifier: 5.0.5
-    version: 5.0.5
+    specifier: 5.0.10
+    version: 5.0.10
   wait-on:
     specifier: 7.2.0
     version: 7.2.0
@@ -771,7 +771,7 @@ packages:
       prettier: 3.2.5
     dev: true
 
-  /prettier-plugin-packagejson@2.4.12(prettier@3.2.5):
+  /prettier-plugin-packagejson@2.4.12(prettier@3.4.2):
     resolution: {integrity: sha512-hifuuOgw5rHHTdouw9VrhT8+Nd7UwxtL1qco8dUfd4XUFQL6ia3xyjSxhPQTsGnSYFraTWy5Omb+MZm/OWDTpQ==}
     peerDependencies:
       prettier: '>= 1.16.0'
@@ -779,22 +779,28 @@ packages:
       prettier:
         optional: true
     dependencies:
-      prettier: 3.2.5
+      prettier: 3.4.2
       sort-package-json: 2.8.0
       synckit: 0.9.0
     dev: true
 
-  /prettier-plugin-properties@0.3.0(prettier@3.2.5):
+  /prettier-plugin-properties@0.3.0(prettier@3.4.2):
     resolution: {integrity: sha512-j2h4NbG6hIaRx0W7CDPUH+yDbzXHmI2urPC1EC8pYrsS5R5AYgAmcSDN0oea+C5mBiN6BK0AkiSKPj0RC17NDQ==}
     peerDependencies:
       prettier: '>= 2.3.0'
     dependencies:
       dot-properties: 1.0.1
-      prettier: 3.2.5
+      prettier: 3.4.2
     dev: true
 
   /prettier@3.2.5:
     resolution: {integrity: sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dev: true
+
+  /prettier@3.4.2:
+    resolution: {integrity: sha512-e9MewbtFo+Fevyuxn/4rrcDAaq0IYxPGLvObpQjiZBMAzB9IGmzlnG9RZy3FFas+eBMu2vA0CszMeduow5dIuQ==}
     engines: {node: '>=14'}
     hasBin: true
     dev: true
@@ -833,9 +839,8 @@ packages:
     resolution: {integrity: sha512-V2hovdzFbOi77/WajaSMXk2OLm+xNIeQdMMuB7icj7bk6zi2F8GGAxigcnDFpJHbNyNcgyJDiP+8nOrY5cZGrA==}
     dev: true
 
-  /rimraf@5.0.5:
-    resolution: {integrity: sha512-CqDakW+hMe/Bz202FPEymy68P+G50RfMQK+Qo5YUqc9SPipvbGjCGKd0RSKEelbsfQuw3g5NZDSrlZZAJurH1A==}
-    engines: {node: '>=14'}
+  /rimraf@5.0.10:
+    resolution: {integrity: sha512-l0OE8wL34P4nJH/H2ffoaniAokM2qSmrtXHmlpvYr5AVVX8msAyW0l8NVJFDxlSK4u3Uh/f41cQheDVdnYijwQ==}
     hasBin: true
     dependencies:
       glob: 10.3.10

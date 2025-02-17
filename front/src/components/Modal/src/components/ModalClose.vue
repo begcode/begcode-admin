@@ -53,36 +53,46 @@ function handleFullScreen(e: Event) {
   emit('fullscreen');
 }
 </script>
-<style>
-.vben-basic-modal-close {
+<style lang="less">
+@prefix-cls: ~'@{namespace}-basic-modal-close';
+.@{prefix-cls} {
   display: flex;
-  align-items: center;
   height: 95%;
-}
-.vben-basic-modal-close > span {
-  margin-left: 48px;
-  font-size: 16px;
-}
-.vben-basic-modal-close--can-full > span {
-  margin-left: 12px;
-}
-.vben-basic-modal-close:not(.vben-basic-modal-close--can-full) > span:nth-child(1):hover {
-  font-weight: 700;
-}
-.vben-basic-modal-close span:nth-child(1) {
-  display: inline-block;
-  padding: 10px;
-}
-.vben-basic-modal-close span:nth-child(1):hover {
-  color: v-bind('token.colorPrimary');
-}
-.vben-basic-modal-close span:last-child:hover {
-  color: v-bind('token.colorError');
-}
-.grid-items-center {
   align-items: center;
-}
-.h-95\% {
-  height: 95%;
+  margin-top: -2px;
+  > span {
+    margin-left: 48px;
+    font-size: 16px;
+  }
+
+  &--can-full {
+    > span {
+      margin-left: 12px;
+    }
+  }
+
+  &:not(&--can-full) {
+    > span:nth-child(1) {
+      &:hover {
+        font-weight: 700;
+      }
+    }
+  }
+
+  & span:nth-child(1) {
+    display: inline-block;
+    padding: 10px;
+
+    &:hover {
+      color: v-bind('token.colorPrimary');
+    }
+  }
+
+  & span:last-child {
+    padding: 10px 10px 10px 0;
+    &:hover {
+      color: v-bind('token.colorError');
+    }
+  }
 }
 </style>
