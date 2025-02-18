@@ -7,6 +7,7 @@
     "cacheProvider": "ehcache",
     "clientFramework": "vue",
     "clientTheme": "vben",
+    "clientTestFrameworks": ["cypress"],
     "creationTimestamp": 1704089466889,
     "databaseType": "sql",
     "devDatabaseType": "mysql",
