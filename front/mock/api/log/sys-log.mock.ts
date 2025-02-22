@@ -27,7 +27,7 @@ const updateById = (id, data) => {
 };
 
 const getIdFromUrl = url => {
-  const regExp = new RegExp(`${baseApiUrl}/`.replace('/', '\\/') + '(?<id>\\d+)');
+  const regExp = new RegExp(`${`${baseApiUrl}/`.replace('/', '\\/')}(?<id>\\d+)`);
   const match = regExp.exec(url);
   if (match) {
     const { id } = match.groups as any;

@@ -25,7 +25,7 @@ let closeBtn = true;
 
 function localPrint(domId) {
   if (typeof domId === 'string' && !domId.startsWith('#')) {
-    domId = '#' + domId;
+    domId = `#${domId}`;
   }
   nextTick(() => {
     if (closeBtn) {

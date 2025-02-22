@@ -33,10 +33,10 @@ function createConfig(params: CreateConfigParams) {
     fs.mkdirp(getRootPath(OUTPUT_DIR));
     writeFileSync(getRootPath(`${OUTPUT_DIR}/${configFileName}`), configStr);
 
-    console.log(colors.cyan(`✨ [${pkg.name}]`) + ` - configuration file is build successfully:`);
-    console.log(colors.gray(OUTPUT_DIR + '/' + colors.green(configFileName)) + '\n');
+    console.log(`${colors.cyan(`✨ [${pkg.name}]`)} - configuration file is build successfully:`);
+    console.log(`${colors.gray(`${OUTPUT_DIR}/${colors.green(configFileName)}`)}\n`);
   } catch (error) {
-    console.log(colors.red('configuration file configuration file failed to package:\n' + error));
+    console.log(colors.red(`configuration file configuration file failed to package:\n${error}`));
   }
 }
 

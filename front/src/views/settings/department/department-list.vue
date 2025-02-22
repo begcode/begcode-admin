@@ -1,6 +1,6 @@
 <template>
   <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
-  <div style="height: 100%; padding-bottom: 10px">
+  <div data-cy="DepartmentHeading" style="height: 100%; padding-bottom: 10px">
     <SplitPanes class="default-theme">
       <SplitPane size="40">
         <a-card :bordered="false" class="bc-list-result-card">
@@ -224,11 +224,17 @@ const rowOperations = ref<any[]>([
     name: 'addChildren',
     containerType: 'modal',
     type: 'link',
+    attrs: {
+      'data-cy': 'entityNewChildrenButton',
+    },
   },
   {
     title: '删除',
     name: 'delete',
     type: 'link',
+    attrs: {
+      'data-cy': 'entityDeleteButton',
+    },
   },
 ]);
 
@@ -239,6 +245,9 @@ const extraButtons = ref([
     name: 'import',
     icon: 'ant-design:cloud-upload-outlined',
     click: () => {},
+    attrs: {
+      'data-cy': 'entityImportButton',
+    },
   },
   {
     show: props.cardExtra?.includes('export'),
@@ -246,6 +255,9 @@ const extraButtons = ref([
     title: '导出',
     icon: 'ant-design:download-outlined',
     click: () => {},
+    attrs: {
+      'data-cy': 'entityExportButton',
+    },
   },
   {
     show: props.cardExtra?.includes('print'),
@@ -253,6 +265,9 @@ const extraButtons = ref([
     name: 'print',
     icon: 'ant-design:printer-outlined',
     click: () => {},
+    attrs: {
+      'data-cy': 'entityPrintButton',
+    },
   },
 ]);
 useSetShortcutButtons('SystemDepartmentList', extraButtons);
@@ -320,6 +335,10 @@ const toolbarClick = ({ code }) => {
               formSearch();
             });
           },
+          okButtonProps: {
+            'data-cy': 'entityConfirmDeleteButton',
+            'data-cy-heading': 'departmentDeleteDialogHeading',
+          } as any,
         });
       }
       break;
@@ -465,6 +484,10 @@ const rowClick = ({ name, data, params }) => {
               formSearch();
             });
           },
+          okButtonProps: {
+            'data-cy': 'entityConfirmDeleteButton',
+            'data-cy-heading': 'departmentDeleteDialogHeading',
+          } as any,
         });
         break;
       case 'authoritiesColumnView': {

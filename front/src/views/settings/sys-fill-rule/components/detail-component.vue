@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100%">
+  <div class="w-100%" data-cy="sysFillRuleDetailsHeading">
     <Descriptions ref="sysFillRuleDetailRef" v-bind="descriptionsProps"></Descriptions>
     <a-tabs>
       <a-tab-pane :tab="relationTables.ruleItemsGrid.title" :key="relationTables.ruleItemsGrid.name">

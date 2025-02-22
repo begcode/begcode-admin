@@ -5,7 +5,7 @@ import type { AppRouteRecordRaw, Menu } from '@/router/types';
 import { store } from '@/store';
 import { useI18n } from '@/hooks/web/useI18n';
 import viewPermissionService from '@/api-service/system/view-permission.service';
-import { transformObjToRoute, flatMultiLevelRoutes, addSlashToRouteComponent } from '@/router/helper/routeHelper';
+import { addSlashToRouteComponent, flatMultiLevelRoutes, transformObjToRoute } from '@/router/helper/routeHelper';
 import { transformRouteToMenu } from '@/router/helper/menuHelper';
 
 import projectSetting from '@/settings/projectSetting';
@@ -178,7 +178,7 @@ export const usePermissionStore = defineStore({
         let homePath: string = userStore.getUserInfo.homePath || PageEnum.BASE_HOME;
 
         function patcher(routes: AppRouteRecordRaw[], parentPath = '') {
-          if (parentPath) parentPath = parentPath + '/';
+          if (parentPath) parentPath = `${parentPath}/`;
           routes.forEach((route: AppRouteRecordRaw) => {
             const { path, children, redirect } = route;
             const currentPath = path.startsWith('/') ? path : parentPath + path;
@@ -186,7 +186,7 @@ export const usePermissionStore = defineStore({
               if (redirect) {
                 homePath = route.redirect! as string;
               } else {
-                route.meta = Object.assign({}, route.meta, { affix: true });
+                route.meta = { ...route.meta, affix: true };
                 throw new Error('end');
               }
             }
@@ -199,7 +199,6 @@ export const usePermissionStore = defineStore({
         } catch (e) {
           // 已处理完毕跳出循环
         }
-        return;
       };
 
       switch (permissionMode) {

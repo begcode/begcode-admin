@@ -11,7 +11,7 @@ export default function buildPaginationQueryOpts(paginationQuery) {
       for (const idx of Object.keys(paginationQuery.sort)) {
         sort.push(paginationQuery.sort[idx]);
       }
-      result['sort'] = sort;
+      result.sort = sort;
     }
     if (paginationQuery.filter) {
       // 遍历对象
@@ -27,7 +27,7 @@ export function transVxeSorts(sorts: any) {
   const result: string[] = [];
   (sorts || []).forEach(sort => {
     if (sort && sort.field) {
-      const sortValue = sort.field + ',' + (sort.order === 'desc' ? 'DESC' : 'ASC');
+      const sortValue = `${sort.field},${sort.order === 'desc' ? 'DESC' : 'ASC'}`;
       if (!result.includes(sortValue)) {
         result.push(sortValue);
       }

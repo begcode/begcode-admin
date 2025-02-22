@@ -1,4 +1,4 @@
-import { useTimeoutFn, useDebounceFn } from '@vueuse/core';
+import { useDebounceFn, useTimeoutFn } from '@vueuse/core';
 import type { MenuState } from './types';
 import type { Menu as MenuType } from '@/router/types';
 import { getAllParentPath } from '@/router/helper/menuHelper';

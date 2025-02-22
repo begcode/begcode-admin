@@ -43,19 +43,17 @@ export function useTabDropdown(tabContentProps: TabContentProps, getIsTabs: Comp
     const closeLeftDisabled = () => {
       if (index === 0) {
         return true;
-      } else {
-        const validTabList = tabStore.getTabList.filter(item => !item?.meta?.affix);
-        return validTabList[0].path === state.current?.path;
       }
+      const validTabList = tabStore.getTabList.filter(item => !item?.meta?.affix);
+      return validTabList[0].path === state.current?.path;
     };
 
     const closeOtherDisabled = () => {
       if (tabStore.getTabList.length === 1) {
         return true;
-      } else {
-        const validTabList = tabStore.getTabList.filter(item => !item?.meta?.affix);
-        return validTabList.length == 1;
       }
+      const validTabList = tabStore.getTabList.filter(item => !item?.meta?.affix);
+      return validTabList.length == 1;
     };
 
     // Close right
@@ -99,7 +97,7 @@ export function useTabDropdown(tabContentProps: TabContentProps, getIsTabs: Comp
         icon: 'clarity:minus-line',
         event: MenuEventEnum.CLOSE_ALL,
         text: t('layout.multipleTab.closeAll'),
-        disabled: disabled,
+        disabled,
       },
     ];
 

@@ -50,8 +50,8 @@ export const downloadFile = (url, fileName?, parameter?) => {
       // @ts-ignore
       window.navigator.msSaveBlob(new Blob([data]), fileName);
     } else {
-      let url = window.URL.createObjectURL(new Blob([data]));
-      let link = document.createElement('a');
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement('a');
       link.style.display = 'none';
       link.href = url;
       link.setAttribute('download', fileName);
@@ -72,7 +72,7 @@ export const downloadFile = (url, fileName?, parameter?) => {
 export const getFileblob = (url, parameter) => {
   return defHttp.get(
     {
-      url: url,
+      url,
       params: parameter,
       responseType: 'blob',
     },

@@ -64,7 +64,5 @@ public class CommonFieldDataAsserts {
      * @param expected the expected entity
      * @param actual the actual entity
      */
-    public static void assertCommonFieldDataUpdatableRelationshipsEquals(CommonFieldData expected, CommonFieldData actual) {
-        assertThat(expected).as("Verify CommonFieldData relationships");
-    }
+    public static void assertCommonFieldDataUpdatableRelationshipsEquals(CommonFieldData expected, CommonFieldData actual) {}
 }

@@ -21,7 +21,7 @@ export function createTableColumns(): any[] {
       title: t('component.upload.fileSize'),
       width: 100,
       formatter: ({ cellValue = 0 }) => {
-        return cellValue && (cellValue / 1024).toFixed(2) + 'KB';
+        return cellValue && `${(cellValue / 1024).toFixed(2)}KB`;
       },
     },
     // {

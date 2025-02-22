@@ -13,9 +13,8 @@ export function createPlaceholderMessage(component: ComponentType) {
   }
   if (component.includes('Input') || component.includes('Complete') || component.includes('Rate')) {
     return t('common.inputText');
-  } else {
-    return t('common.chooseText');
   }
+  return t('common.chooseText');
 }
 
 export function useSetOperationColumn(gridCustomConfig, rowOperations, xGrid) {
@@ -28,7 +27,7 @@ export function useSetOperationColumn(gridCustomConfig, rowOperations, xGrid) {
       rowOperations.value = [];
     } else {
       rowOperations.value = rowOperations.value.filter(item =>
-        gridCustomConfig.rowOperations.some(rowItem => (_isObject(rowItem) ? item.name === rowItem['name'] : item.name === rowItem)),
+        gridCustomConfig.rowOperations.some(rowItem => (_isObject(rowItem) ? item.name === rowItem.name : item.name === rowItem)),
       );
     }
   }
@@ -109,7 +108,7 @@ export function useMergeGridProps(gridOptions, componentGridOptions) {
         const newObjValue: any[] = [];
         srcValue.forEach((srcItem: any) => {
           if (_isObject(srcItem)) {
-            const objItem = objValue.find(item => item.code === srcItem['code']) || {};
+            const objItem = objValue.find(item => item.code === srcItem.code) || {};
             newObjValue.push(Object.assign(objItem, srcItem));
           } else if (_isString(srcItem)) {
             const objItem = objValue.find(item => item.code === srcItem);

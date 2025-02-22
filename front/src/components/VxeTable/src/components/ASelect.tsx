@@ -1,7 +1,7 @@
 import { VxeColumnPropTypes, VxeGlobalRendererHandles } from 'vxe-table';
-import { Select, SelectOption, SelectOptGroup } from 'ant-design-vue';
+import { Select, SelectOptGroup, SelectOption } from 'ant-design-vue';
 import XEUtils from 'xe-utils';
-import { cellText, createCellRender, createEvents, createProps, isEmptyValue, createExportMethod, createFormItemRender } from './common';
+import { cellText, createCellRender, createEvents, createExportMethod, createFormItemRender, createProps, isEmptyValue } from './common';
 
 function renderOptions(options: any[], optionProps: VxeGlobalRendererHandles.RenderOptionProps) {
   const labelProp = optionProps.label || 'label';

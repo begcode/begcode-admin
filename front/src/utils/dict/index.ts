@@ -13,7 +13,7 @@ export const getDictItemsByCode = code => {
 };
 /**
  * 获取字典数组
- * @param dictCode 字典Code
+ * @param code 字典Code
  * @return List<Map>
  */
 export const initDictOptions = code => {

@@ -18,7 +18,7 @@ export function isEmptyValue(cellValue: any) {
 }
 
 export function formatText(cellValue: any) {
-  return '' + (isEmptyValue(cellValue) ? '' : cellValue);
+  return `${isEmptyValue(cellValue) ? '' : cellValue}`;
 }
 
 export function cellText(cellValue: any): string[] {
@@ -29,7 +29,7 @@ export function cellText(cellValue: any): string[] {
  * @description: 方法名转换
  */
 export function getOnName(type: string) {
-  return 'on' + type.substring(0, 1).toLocaleUpperCase() + type.substring(1);
+  return `on${type.substring(0, 1).toLocaleUpperCase()}${type.substring(1)}`;
 }
 
 /**

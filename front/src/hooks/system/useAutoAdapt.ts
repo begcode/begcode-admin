@@ -24,7 +24,7 @@ export function useAdapt(props?: AdaptOptions) {
   useWindowSizeFn(calcWidth, 100, { immediate: true });
   //计算宽度
   function calcWidth() {
-    let windowWidth = document.documentElement.clientWidth;
+    const windowWidth = document.documentElement.clientWidth;
     switch (true) {
       case windowWidth > ScreenSizeEnum.XL:
         width.value = props?.xl || '600px';

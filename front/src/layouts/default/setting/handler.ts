@@ -1,5 +1,4 @@
 import { HandlerEnum, tabsThemeOptions } from './enum';
-import { MenuTypeEnum, MenuModeEnum } from '@/enums/menuEnum';
 import { updateHeaderBgColor, updateSidebarBgColor } from '@/logics/theme/updateBackground';
 import { updateColorWeak } from '@/logics/theme/updateColorWeak';
 import { updateGrayMode } from '@/logics/theme/updateGrayMode';
@@ -11,7 +10,8 @@ import { updateDarkTheme } from '@/logics/theme/dark';
 import { useRootSetting } from '@/hooks/setting/useRootSetting';
 import projectSetting from '@/settings/projectSetting';
 
-import { HEADER_PRESET_BG_COLOR_LIST, APP_PRESET_COLOR_LIST, SIDE_BAR_BG_COLOR_LIST } from '@/settings/designSetting';
+import { MenuModeEnum, MenuTypeEnum } from '@/enums/menuEnum';
+import { APP_PRESET_COLOR_LIST, HEADER_PRESET_BG_COLOR_LIST, SIDE_BAR_BG_COLOR_LIST } from '@/settings/designSetting';
 import { ThemeEnum } from '@/enums/appEnum';
 import { APP__THEME__COLOR } from '@/enums/cacheEnum';
 

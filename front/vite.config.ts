@@ -1,5 +1,5 @@
 import { resolve } from 'path';
-import type { UserConfig, ConfigEnv } from 'vite';
+import type { ConfigEnv, UserConfig } from 'vite';
 import dayjs from 'dayjs';
 import { loadEnv } from 'vite';
 import pkg from './package.json';
@@ -33,7 +33,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
 
   return {
     base: VITE_PUBLIC_PATH,
-    root: root,
+    root,
     publicDir: 'public',
     resolve: {
       alias: [
@@ -44,16 +44,16 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         // @/xxxx => src/xxxx
         {
           find: /@\//,
-          replacement: pathResolve('src') + '/',
+          replacement: `${pathResolve('src')}/`,
         },
         {
           find: /mock\//,
-          replacement: pathResolve('mock') + '/',
+          replacement: `${pathResolve('mock')}/`,
         },
         // #/xxxx => types/xxxx
         {
           find: /#\//,
-          replacement: pathResolve('src/types') + '/',
+          replacement: `${pathResolve('src/types')}/`,
         },
       ],
     },

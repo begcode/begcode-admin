@@ -35,7 +35,7 @@ export const rules = {
   phone(required) {
     return [
       {
-        required: required,
+        required,
         validator: async (_, value) => {
           if (required && !value) {
             return Promise.reject('请输入手机号码!');

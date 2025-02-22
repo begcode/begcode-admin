@@ -13,7 +13,7 @@ const DEFAULT_CONFIG: TreeHelperConfig = {
 };
 
 // 获取配置。  Object.assign 从一个或多个源对象复制到目标对象
-const getConfig = (config: Partial<TreeHelperConfig>) => Object.assign({}, DEFAULT_CONFIG, config);
+const getConfig = (config: Partial<TreeHelperConfig>) => ({ ...DEFAULT_CONFIG, ...config });
 
 // tree from list
 // 列表中的树
@@ -175,11 +175,10 @@ export function treeMapEach(data: any, { children = 'children', conversion }: { 
         }),
       ),
     };
-  } else {
-    return {
-      ...conversionData,
-    };
   }
+  return {
+    ...conversionData,
+  };
 }
 
 /**

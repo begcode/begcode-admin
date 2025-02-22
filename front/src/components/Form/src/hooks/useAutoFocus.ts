@@ -1,4 +1,4 @@
-import { type FormSchemaInner as FormSchema, type FormActionType, type FormProps } from '../types/form';
+import type { FormActionType, FormProps, FormSchemaInner as FormSchema } from '../types/form';
 import type { Nullable } from '#/utils';
 
 interface UseAutoFocusContext {

@@ -1,7 +1,7 @@
 import type { ModalFuncProps } from 'ant-design-vue/lib/modal/Modal';
-import { Modal, message as Message, notification } from 'ant-design-vue';
-import { InfoCircleFilled, CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons-vue';
-import { NotificationArgsProps, ConfigProps } from 'ant-design-vue/lib/notification';
+import { message as Message, Modal, notification } from 'ant-design-vue';
+import { CheckCircleFilled, CloseCircleFilled, InfoCircleFilled } from '@ant-design/icons-vue';
+import { ConfigProps, NotificationArgsProps } from 'ant-design-vue/lib/notification';
 import { useI18n } from './useI18n';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
@@ -33,9 +33,8 @@ function getIcon(iconType: string) {
       return h(CheckCircleFilled, { class: 'modal-icon-success' });
     } else if (iconType === 'info') {
       return h(InfoCircleFilled, { class: 'modal-icon-info' });
-    } else {
-      return h(CloseCircleFilled, { class: 'modal-icon-error' });
     }
+    return h(CloseCircleFilled, { class: 'modal-icon-error' });
   } catch (e) {
     console.log(e);
   }
@@ -45,9 +44,8 @@ function renderContent({ content }: Pick<ModalOptionsEx, 'content'>) {
   try {
     if (_isString(content)) {
       return h('div', h('div', { innerHTML: content as string }));
-    } else {
-      return content;
     }
+    return content;
   } catch (e) {
     console.log(e);
     return content;

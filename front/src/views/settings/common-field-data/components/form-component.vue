@@ -1,5 +1,5 @@
 <template>
-  <div :class="containerType === 'page' ? ['pb-44px'] : []">
+  <div :class="containerType === 'page' ? ['pb-44px'] : []" data-cy="CommonFieldDataCreateUpdateHeading">
     <basic-form ref="formRef" v-bind="formProps">
       <template #resetBefore>
         <teleport to='[data-teleport="settings/common-field-data-edit-append-button"]' defer>
@@ -52,10 +52,7 @@ const operations = ref<any[]>([]);
 const ctx = getCurrentInstance()?.proxy;
 const formRef = ref<any>(null);
 const apiService = ctx?.$apiService as typeof ServerProvider;
-const relationshipApis: any = {
-  systemConfig: apiService.settings.systemConfigService.retrieve,
-  dictionary: apiService.settings.dictionaryService.retrieve,
-};
+const relationshipApis: any = {};
 const commonFieldDataId = ref<any>(null);
 const commonFieldData = reactive<ICommonFieldData>(new CommonFieldData());
 const getEntityData = async (entityId: string | number) => {

@@ -9,7 +9,7 @@
     </template>
     <template #rightFooter>
       <a-space>
-        <basic-button v-for="operation in operations" :type="operation.type" @click="operation.click">
+        <basic-button v-for="operation in operations" :type="operation.type" @click="operation.click" v-bind="operation.attrs">
           <Icon :icon="operation.icon" v-if="operation.icon" />
           {{ operation.title }}
         </basic-button>
@@ -71,6 +71,9 @@ const operationsConfig = ref<any>([
       const { fullPath } = route;
       await tabStore.closeTabByKey(fullPath, router);
     },
+    attrs: {
+      'data-cy': 'entityCreateCancelButton',
+    },
   },
   {
     title: announcementRecordId.value ? '更新' : '保存',
@@ -79,6 +82,9 @@ const operationsConfig = ref<any>([
     name: 'save',
     click: saveOrUpdate,
     hide: () => !showSaveButton.value,
+    attrs: {
+      'data-cy': 'entityCreateSaveButton',
+    },
   },
 ]);
 const showSaveButton = ref<boolean>(true);

@@ -1,4 +1,4 @@
-import { LoginParams, MobileLoginParams, LoginResultModel, GetUserInfoModel } from './model/userModel';
+import { GetUserInfoModel, LoginParams, LoginResultModel, MobileLoginParams } from './model/userModel';
 import { defHttp } from '@/utils/http/axios';
 
 import { ErrorMessageMode } from '#/axios';
@@ -105,8 +105,7 @@ export function getImageCaptcha(currdatetime) {
 }
 
 export function getCodeInfo(currdatetime) {
-  let url = Api.getInputCode + `/${currdatetime}`;
-  return defHttp.get({ url: url });
+  return defHttp.get({ url: `${Api.getInputCode}/${currdatetime}` });
 }
 
 /**

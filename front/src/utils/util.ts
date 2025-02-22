@@ -26,7 +26,7 @@ export function getPopupContainer(node?: HTMLElement): HTMLElement {
 export function setObjToUrlParams(baseUrl: string, obj: any): string {
   let parameters = '';
   for (const key in obj) {
-    parameters += key + '=' + encodeURIComponent(obj[key]) + '&';
+    parameters += `${key}=${encodeURIComponent(obj[key])}&`;
   }
   parameters = parameters.replace(/&$/, '');
   return /\?$/.test(baseUrl) ? baseUrl + parameters : baseUrl.replace(/\/?$/, '?') + parameters;
@@ -147,11 +147,11 @@ export const withInstall = <T extends CustomComponent>(component: T, alias?: str
  * @param paraName
  */
 export function getUrlParam(paraName) {
-  let url = document.location.toString();
-  let arrObj = url.split('?');
+  const url = document.location.toString();
+  const arrObj = url.split('?');
 
   if (arrObj.length > 1) {
-    let arrPara = arrObj[1].split('&');
+    const arrPara = arrObj[1].split('&');
     let arr;
 
     for (let i = 0; i < arrPara.length; i++) {
@@ -162,9 +162,8 @@ export function getUrlParam(paraName) {
       }
     }
     return '';
-  } else {
-    return '';
   }
+  return '';
 }
 
 /**
@@ -190,7 +189,7 @@ export function sleep(ms: number, fn?: Fn) {
  * @returns {String} 替换后的字符串
  */
 export function replaceAll(text, checker, replacer) {
-  let lastText = text;
+  const lastText = text;
   text = text.replace(checker, replacer);
   if (lastText !== text) {
     return replaceAll(text, checker, replacer);
@@ -205,14 +204,14 @@ export function replaceAll(text, checker, replacer) {
 export function getQueryVariable(url) {
   if (!url) return;
 
-  var t,
+  let t,
     n,
     r,
     i = url.split('?')[1],
     s = {};
   (t = i.split('&')), (r = null), (n = null);
-  for (var o in t) {
-    var u = t[o].indexOf('=');
+  for (const o in t) {
+    const u = t[o].indexOf('=');
     u !== -1 && ((r = t[o].substr(0, u)), (n = t[o].substr(u + 1)), (s[r] = n));
   }
   return s;
@@ -234,7 +233,7 @@ export function showDealBtn(bpmStatus) {
  */
 export function numToUpper(value) {
   if (value != '') {
-    let unit = new Array('仟', '佰', '拾', '', '仟', '佰', '拾', '', '角', '分');
+    const unit = new Array('仟', '佰', '拾', '', '仟', '佰', '拾', '', '角', '分');
     const toDx = n => {
       switch (n) {
         case '0':
@@ -259,22 +258,22 @@ export function numToUpper(value) {
           return '玖';
       }
     };
-    let lth = value.toString().length;
+    const lth = value.toString().length;
     value = new Big(value).times(100);
     value += '';
-    let length = value.length;
+    const length = value.length;
     if (lth <= 8) {
       let result = '';
       for (let i = 0; i < length; i++) {
         if (i == 2) {
-          result = '元' + result;
+          result = `元${result}`;
         } else if (i == 6) {
-          result = '万' + result;
+          result = `万${result}`;
         }
         if (value.charAt(length - i - 1) == 0) {
           if (i != 0 && i != 1) {
             if (result.charAt(0) != '零' && result.charAt(0) != '元' && result.charAt(0) != '万') {
-              result = '零' + result;
+              result = `零${result}`;
             }
           }
           continue;
@@ -283,9 +282,8 @@ export function numToUpper(value) {
       }
       result += result.charAt(result.length - 1) == '元' ? '整' : '';
       return result;
-    } else {
-      return null;
     }
+    return null;
   }
   return null;
 }
@@ -297,10 +295,10 @@ export function numToUpper(value) {
  * @updateBy:zyf
  */
 export function getValueType(props, field) {
-  let formSchema = unref(unref(props)?.schemas);
+  const formSchema = unref(unref(props)?.schemas);
   let valueType = 'string';
   if (formSchema) {
-    let schema = formSchema.filter(item => item.field === field)[0];
+    const schema = formSchema.filter(item => item.field === field)[0];
     valueType = schema.componentProps && schema.componentProps.valueType ? schema.componentProps.valueType : valueType;
   }
   return valueType;
@@ -394,7 +392,7 @@ export function _eval(str: string) {
 export function simpleDebounce(fn, delay = 100) {
   let timer: any | null = null;
   return function () {
-    let args = arguments;
+    const args = arguments;
     if (timer) {
       clearTimeout(timer);
     }
@@ -452,10 +450,10 @@ export const getFileAccessHttpUrl = (fileUrl, prefix = 'http', baseApiUrl = '/')
   let result = fileUrl;
   try {
     if (fileUrl && fileUrl.length > 0 && !fileUrl.startsWith(prefix)) {
-      //判断是否是数组格式
-      let isArray = fileUrl.indexOf('[') != -1;
+      // 判断是否是数组格式
+      const isArray = fileUrl.indexOf('[') != -1;
       if (!isArray) {
-        let prefix = `${baseApiUrl}`;
+        const prefix = `${baseApiUrl}`;
         // 判断是否已包含前缀
         if (!fileUrl.startsWith(prefix)) {
           result = `${prefix}${fileUrl}`;
@@ -471,7 +469,7 @@ export const getFileAccessHttpUrl = (fileUrl, prefix = 'http', baseApiUrl = '/')
  *  @param length 数字位数
  */
 export const getRandom = (length: number = 1) => {
-  return '-' + parseInt(String(Math.random() * 10000 + 1), length);
+  return `-${parseInt(String(Math.random() * 10000 + 1), length)}`;
 };
 
 /**
@@ -516,24 +514,20 @@ export const setPopContainer = (node, selector) => {
           if (findParentNode) {
             ele = null;
             return findParentNode;
-          } else {
-            ele = ele.parentNode;
           }
+          ele = ele.parentNode;
         }
         return null;
       };
       const elem = retrospect(node, targetEles);
       if (elem) {
         return elem;
-      } else {
-        return document.querySelector(selector);
       }
-    } else {
       return document.querySelector(selector);
     }
-  } else {
-    return selector;
+    return document.querySelector(selector);
   }
+  return selector;
 };
 
 // 获取url中的参数

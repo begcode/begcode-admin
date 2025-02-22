@@ -34,7 +34,7 @@
         </a-button>
       </a-upload>
     </div>
-    <Grid ref="xGrid" :columns="columns" :data="fileListRef">
+    <vxe-grid ref="xGrid" :columns="columns" :data="fileListRef">
       <template #thumbUrl="{ row }">
         <ThumbUrl :fileUrl="row.thumbUrl" />
       </template>
@@ -60,12 +60,11 @@
           <span>预览</span>
         </a-button>
       </template>
-    </Grid>
+    </vxe-grid>
   </BasicModal>
 </template>
 <script lang="ts" setup>
 import { message } from 'ant-design-vue';
-import { Grid } from 'vxe-table';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import ThumbUrl from './ThumbUrl.vue';
 // hooks

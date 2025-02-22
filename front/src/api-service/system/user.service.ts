@@ -33,7 +33,7 @@ export default {
       defHttp
         .get({ url: `${apiUrl}/stats?`, params: options })
         .then(res => {
-          resolve(res && res[0] && res[0]['id_count'] > 0);
+          resolve(res && res[0] && res[0].id_count > 0);
         })
         .catch(err => reject(err));
     });
@@ -75,9 +75,8 @@ export default {
     const options = buildPaginationQueryOpts(paginationQuery);
     if (isXlsx) {
       return handleExportXlsx(fileName, `${apiUrl}/export`, options);
-    } else {
-      return handleExportXls(fileName, `${apiUrl}/export`, options);
     }
+    return handleExportXls(fileName, `${apiUrl}/export`, options);
   },
 
   /**

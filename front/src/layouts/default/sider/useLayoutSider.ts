@@ -83,7 +83,7 @@ export function useDragLine(siderRef: Ref<any>, dragBarRef: Ref<any>, mix = fals
       iT < 0 && (iT = 0);
       iT > maxT && (iT = maxT);
       iT < minT && (iT = minT);
-      ele.style.left = wrap.style.width = iT + 'px';
+      ele.style.left = wrap.style.width = `${iT}px`;
       return false;
     };
   }

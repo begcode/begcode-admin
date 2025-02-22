@@ -1,22 +1,21 @@
 import * as echarts from 'echarts/core';
-
-import { BarChart, LineChart, PieChart, MapChart, PictorialBarChart, RadarChart, ScatterChart } from 'echarts/charts';
+import { BarChart, LineChart, MapChart, PictorialBarChart, PieChart, RadarChart, ScatterChart } from 'echarts/charts';
 
 import {
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  PolarComponent,
   AriaComponent,
-  ParallelComponent,
-  LegendComponent,
-  RadarComponent,
-  ToolboxComponent,
-  DataZoomComponent,
-  VisualMapComponent,
-  TimelineComponent,
   CalendarComponent,
+  DataZoomComponent,
   GraphicComponent,
+  GridComponent,
+  LegendComponent,
+  ParallelComponent,
+  PolarComponent,
+  RadarComponent,
+  TimelineComponent,
+  TitleComponent,
+  ToolboxComponent,
+  TooltipComponent,
+  VisualMapComponent,
 } from 'echarts/components';
 
 // TODO 如果想换成SVG渲染，就导出SVGRenderer，

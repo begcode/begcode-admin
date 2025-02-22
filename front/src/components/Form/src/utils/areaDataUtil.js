@@ -137,7 +137,7 @@ for (const prop in provinceObject) {
  * @returns []
  */
 function getDataByCode(code) {
-  let data = [];
+  const data = [];
   for (const prop in REGION_DATA[code]) {
     data.push({
       value: prop, // 省份code值
@@ -173,12 +173,12 @@ Object.keys(provinceObject).map(province => {
  * @returns {Array}
  */
 function getRealCode(code, level) {
-  let arr = [];
+  const arr = [];
   getPcode(code, arr, level);
   return arr;
 }
 function getPcode(id, arr, index) {
-  for (let item of pca) {
+  for (const item of pca) {
     if (item.id === id && item.index == index) {
       arr.unshift(id);
       if (item.pid != '86') {

@@ -93,7 +93,6 @@ export function useSplitMenu(splitType: Ref<MenuSplitTyeEnum>) {
     // split-top
     if (unref(getSpiltTop)) {
       menusRef.value = await getShallowMenus();
-      return;
     }
   }
 

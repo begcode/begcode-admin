@@ -1,5 +1,5 @@
-import { Persistent, BasicKeys } from '@/utils/cache/persistent';
-import { CacheTypeEnum, TOKEN_KEY, LOGIN_INFO_KEY, TENANT_ID } from '@/enums/cacheEnum';
+import { BasicKeys, Persistent } from '@/utils/cache/persistent';
+import { CacheTypeEnum, LOGIN_INFO_KEY, TENANT_ID, TOKEN_KEY } from '@/enums/cacheEnum';
 import projectSetting from '@/settings/projectSetting';
 
 const { permissionCacheType } = projectSetting;

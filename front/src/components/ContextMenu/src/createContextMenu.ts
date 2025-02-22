@@ -1,5 +1,5 @@
 import contextMenuVue from './ContextMenu.vue';
-import { CreateContextOptions, ContextMenuProps } from './typing';
+import { ContextMenuProps, CreateContextOptions } from './typing';
 import { isClient } from '@/utils/is';
 import type { Fn } from '#/types';
 

@@ -1,7 +1,7 @@
-import { renderThumbStyle, BAR_MAP } from './util';
+import { BAR_MAP, renderThumbStyle } from './util';
 import type { Nullable } from '#/types';
 import type { Recordable } from '#/utils';
-import { on, off } from '@/utils/domUtils';
+import { off, on } from '@/utils/domUtils';
 
 export default defineComponent({
   name: 'Bar',
@@ -74,7 +74,7 @@ export default defineComponent({
       h(
         'div',
         {
-          class: ['scrollbar__bar', 'is-' + bar.value.key],
+          class: ['scrollbar__bar', `is-${bar.value.key}`],
           onMousedown: clickTrackHandler,
         },
         h('div', {

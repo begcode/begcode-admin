@@ -79,7 +79,7 @@ export function useAdvanced({ advanceState, emit, getProps, getSchema, formModel
       itemColSum += xxlWidth;
     }
 
-    let autoAdvancedCol = unref(getProps).autoAdvancedCol ?? 3;
+    const autoAdvancedCol = unref(getProps).autoAdvancedCol ?? 3;
 
     if (isLastAction) {
       if (!advanceState.isLoad) {
@@ -97,10 +97,9 @@ export function useAdvanced({ advanceState, emit, getProps, getSchema, formModel
     } else if (!advanceState.isAdvanced && index + 1 > autoAdvancedCol) {
       // 如果当前是收起状态，并且当前列下标 > autoAdvancedCol，就隐藏
       return { isAdvanced: false, itemColSum };
-    } else {
-      // The first line is always displayed
-      return { isAdvanced: true, itemColSum };
     }
+    // The first line is always displayed
+    return { isAdvanced: true, itemColSum };
   }
 
   const fieldsIsAdvancedMap: any = shallowReactive({});
@@ -122,7 +121,7 @@ export function useAdvanced({ advanceState, emit, getProps, getSchema, formModel
 
       if (_isFunction(show)) {
         isShow = show({
-          schema: schema,
+          schema,
           model: formModel,
           field: schema.field,
           values: {

@@ -1,4 +1,4 @@
-import type { DescriptionProps, DescInstance, UseDescReturnType } from './typing';
+import type { DescInstance, DescriptionProps, UseDescReturnType } from './typing';
 import { isProdMode } from '@/utils/env';
 import type { Nullable } from '#/utils';
 

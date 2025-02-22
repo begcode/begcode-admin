@@ -1,4 +1,4 @@
-import type { Router, RouteLocationNormalized } from 'vue-router';
+import type { RouteLocationNormalized, Router } from 'vue-router';
 import { Modal, notification } from 'ant-design-vue';
 import nProgress from 'nprogress';
 import { createPermissionGuard } from './permissionGuard';
@@ -123,7 +123,7 @@ export function createMessageGuard(router: Router) {
         notification.destroy();
       }
     } catch (error) {
-      warn('message guard error:' + error);
+      warn(`message guard error:${error}`);
     }
     return true;
   });

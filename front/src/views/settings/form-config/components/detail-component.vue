@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100%">
+  <div class="w-100%" data-cy="formConfigDetailsHeading">
     <Descriptions ref="formConfigDetailRef" v-bind="descriptionsProps"></Descriptions>
   </div>
 </template>

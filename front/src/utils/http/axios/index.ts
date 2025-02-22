@@ -7,14 +7,14 @@ import qs from 'qs';
 import type { AxiosTransform, CreateAxiosOptions } from './axiosTransform';
 import { VAxios } from './Axios';
 import { checkStatus } from './checkStatus';
-import { joinTimestamp, formatRequestDate } from './helper';
+import { formatRequestDate, joinTimestamp } from './helper';
 import type { RequestOptions, Result } from '#/axios';
 import { useGlobSetting } from '@/hooks/setting';
 import { useMessage } from '@/hooks/web/useMessage';
-import { RequestEnum, ResultEnum, ContentTypeEnum, ConfigEnum } from '@/enums/httpEnum';
-import { getToken, getTenantId } from '@/utils/auth';
+import { ConfigEnum, ContentTypeEnum, RequestEnum, ResultEnum } from '@/enums/httpEnum';
+import { getTenantId, getToken } from '@/utils/auth';
 import { isUndefined } from '@/utils/is';
-import { setObjToUrlParams, deepMerge } from '@/utils/util';
+import { deepMerge, setObjToUrlParams } from '@/utils/util';
 import signMd5Utils from '@/utils/encryption/signMd5Utils';
 import { useErrorLogStoreWithOut } from '@/store/modules/errorLog';
 import { useI18n } from '@/hooks/web/useI18n';
@@ -127,7 +127,7 @@ const transform: AxiosTransform = {
         let timestampstr = joinTimestamp(joinTime, true);
         if (params) {
           timestampstr = timestampstr.replace('?', '&');
-          config.url = config.url + '?' + params + `${timestampstr}`;
+          config.url = `${config.url}?${params}${timestampstr}`;
         } else {
           config.url = config.url + timestampstr;
         }
@@ -145,11 +145,11 @@ const transform: AxiosTransform = {
           config.params = undefined;
         }
         if (joinParamsToUrl) {
-          config.url = setObjToUrlParams(config.url as string, Object.assign({}, config.params, config.data));
+          config.url = setObjToUrlParams(config.url as string, { ...config.params, ...config.data });
         }
       } else {
         // 兼容restful风格
-        config.url = config.url + '?' + params;
+        config.url = `${config.url}?${params}`;
         config.params = undefined;
       }
     }
@@ -281,7 +281,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
           // 接口地址
           apiUrl: globSetting.apiUrl,
           // 接口拼接地址
-          urlPrefix: urlPrefix,
+          urlPrefix,
           //  是否加入时间戳
           joinTime: true,
           // 忽略重复请求
@@ -294,7 +294,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
             waitTime: 100,
           },
         },
-        paramsSerializer: function (params) {
+        paramsSerializer(params) {
           return qs.stringify(params, { arrayFormat: 'repeat', allowDots: true });
         },
       },

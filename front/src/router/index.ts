@@ -16,7 +16,7 @@ getRouteNames(basicRoutes);
  * 创建路由实例
  */
 export function createRouter() {
-  let router = createVueRouter({
+  const router = createVueRouter({
     routes: basicRoutes as unknown as RouteRecordRaw[],
     strict: true,
     scrollBehavior: () => ({ left: 0, top: 0 }),

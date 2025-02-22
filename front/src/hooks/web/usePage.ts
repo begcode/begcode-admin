@@ -2,9 +2,7 @@ import type { RouteLocationRaw, Router } from 'vue-router';
 
 import { useRouter } from 'vue-router';
 import { PageEnum } from '@/enums/pageEnum';
-
 import { REDIRECT_NAME } from '@/router/constant';
-
 import { useMultipleTabStore } from '@/store/modules/multipleTab';
 
 export type PathAsPageEnum<T> = T extends { path: string } ? T & { path: PageEnum } : T;
@@ -84,14 +82,14 @@ export const useRedo = (_router?: Router) => {
           params,
           query,
         });
-        params['path'] = String(name);
+        params.path = String(name);
       } else {
         tabStore.setRedirectPageParam({
           redirect_type: 'path',
           path: fullPath,
           query,
         });
-        params['path'] = fullPath;
+        params.path = fullPath;
       }
       replace({ name: REDIRECT_NAME, params, query }).then(() => resolve(true));
     });
@@ -105,10 +103,10 @@ export const useRedo = (_router?: Router) => {
  * @param name
  */
 function isDynamicRoute(params, name) {
-  let arr = Object.keys(params);
+  const arr = Object.keys(params);
   let flag = false;
   for (let i = 0; i < arr.length; i++) {
-    let key = '@' + arr[i];
+    const key = `@${arr[i]}`;
     if ((name as string).indexOf(key) > 0) {
       flag = true;
       break;

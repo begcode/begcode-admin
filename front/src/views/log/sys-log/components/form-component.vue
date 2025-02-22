@@ -1,5 +1,5 @@
 <template>
-  <div :class="containerType === 'page' ? ['pb-44px'] : []">
+  <div :class="containerType === 'page' ? ['pb-44px'] : []" data-cy="SysLogCreateUpdateHeading">
     <basic-form ref="formRef" v-bind="formProps">
       <template #resetBefore>
         <teleport to='[data-teleport="log/sys-log-edit-append-button"]' defer>

@@ -7,7 +7,7 @@ export function getSearchQueryData(searchFormConfig: any) {
     .filter(seachField => seachField.value !== undefined && seachField.value !== null && seachField.value !== '')
     .forEach(seachField => {
       if (seachField.operator) {
-        result[seachField.field + '.' + seachField.operator] = seachField.value;
+        result[`${seachField.field}.${seachField.operator}`] = seachField.value;
       } else {
         result[seachField.field] = seachField.value;
       }
@@ -18,7 +18,7 @@ export function getSearchQueryData(searchFormConfig: any) {
 export function getFilter(searchValue: string, mapOfFilter: { [key: string]: any }) {
   const result: { [key: string]: any } = {};
   if (searchValue) {
-    result['jhiCommonSearchKeywords'] = searchValue;
+    result.jhiCommonSearchKeywords = searchValue;
     return result;
   }
   Object.keys(mapOfFilter).forEach(key => {
@@ -27,22 +27,22 @@ export function getFilter(searchValue: string, mapOfFilter: { [key: string]: any
       mapOfFilter[key].value.forEach(value => {
         filterResult.push(value);
       });
-      result[key + '.in'] = filterResult;
+      result[`${key}.in`] = filterResult;
     }
     if (mapOfFilter[key].type === 'BOOLEAN' && mapOfFilter[key].value) {
       mapOfFilter[key].value.forEach(value => {
         filterResult.push(value);
       });
-      result[key + '.in'] = filterResult;
+      result[`${key}.in`] = filterResult;
     }
     if (['one-to-one', 'many-to-many', 'many-to-one', 'one-to-many'].includes(mapOfFilter[key].type)) {
       mapOfFilter[key].value.forEach(value => {
         filterResult.push(value);
       });
-      result[key + 'Id.in'] = filterResult;
+      result[`${key}Id.in`] = filterResult;
     }
     if (mapOfFilter[key].type === 'STRING' && mapOfFilter[key].value) {
-      result[key + '.contains'] = mapOfFilter[key].value;
+      result[`${key}.contains`] = mapOfFilter[key].value;
     }
     if (
       (mapOfFilter[key].type === 'LONG' ||
@@ -51,13 +51,13 @@ export function getFilter(searchValue: string, mapOfFilter: { [key: string]: any
         mapOfFilter[key].type === 'DOUBLE') &&
       mapOfFilter[key].value
     ) {
-      result[key + '.greaterThanOrEqual'] = mapOfFilter[key].value[0];
-      result[key + '.lessThanOrEqual'] = mapOfFilter[key].value[1];
+      result[`${key}.greaterThanOrEqual`] = mapOfFilter[key].value[0];
+      result[`${key}.lessThanOrEqual`] = mapOfFilter[key].value[1];
     }
     if (mapOfFilter[key].type === 'ZONED_DATE_TIME' && mapOfFilter[key].value) {
-      result[key + '.greaterThanOrEqual'] =
+      result[`${key}.greaterThanOrEqual`] =
         mapOfFilter[key].value[0] && mapOfFilter[key].value[0].isValid() ? mapOfFilter[key].value[0].toJSON() : null;
-      result[key + '.lessThanOrEqual'] =
+      result[`${key}.lessThanOrEqual`] =
         mapOfFilter[key].value[1] && mapOfFilter[key].value[1].isValid() ? mapOfFilter[key].value[1].toJSON() : null;
     }
   });
@@ -79,7 +79,7 @@ export function idsToIdObjectArray(ids: any): any[] {
   }
   if (Object.prototype.toString.call(ids) === '[object Array]') {
     ids.forEach(id => {
-      result.push({ id: id });
+      result.push({ id });
     });
   }
   return result;

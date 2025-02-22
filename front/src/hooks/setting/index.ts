@@ -20,7 +20,7 @@ export const useGlobSetting = (): Readonly<GlobConfig> => {
     domainUrl: VITE_GLOB_DOMAIN_URL,
     apiUrl: VITE_GLOB_API_URL,
     shortName: VITE_GLOB_APP_TITLE.replace(/\s/g, '_').replace(/-/g, '_'),
-    shortTitle: shortTitle,
+    shortTitle,
     openSso: VITE_GLOB_APP_OPEN_SSO,
     urlPrefix: VITE_GLOB_API_URL_PREFIX,
     uploadUrl: VITE_GLOB_DOMAIN_URL,

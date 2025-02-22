@@ -33,9 +33,8 @@ export const useCodeHinting = (CodeMirror, keywords, language) => {
           .sort((a, b) => {
             if (findIdx(a, str) < findIdx(b, str)) {
               return -1;
-            } else {
-              return 1;
             }
+            return 1;
           });
 
         // 有点去掉点
@@ -50,7 +49,7 @@ export const useCodeHinting = (CodeMirror, keywords, language) => {
         }
         if (list.length) {
           callback({
-            list: list,
+            list,
             from: CodeMirror.Pos(cur.line, start),
             to: CodeMirror.Pos(cur.line, end),
           });

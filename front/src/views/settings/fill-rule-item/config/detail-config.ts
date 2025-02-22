@@ -21,7 +21,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       field: 'fieldParamType',
       format: (value, _data) => {
         const { getEnumDict } = useI18n();
-        return (getEnumDict('FieldParamType').find(item => item.value === value) || { value: value, label: value }).label;
+        return (getEnumDict('FieldParamType').find(item => item.value === value) || { value, label: value }).label;
       },
     },
     {

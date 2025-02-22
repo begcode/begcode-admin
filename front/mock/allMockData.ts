@@ -20,7 +20,7 @@ for (const path in allFakeDataModules) {
           header: true,
           transformHeader: header => _camelCase(header),
           skipEmptyLines: true,
-          complete: function (results: any) {
+          complete(results: any) {
             allData[name].push(...(results.data as any[]));
           },
         });
@@ -44,7 +44,7 @@ for (const path in allDataModules) {
         header: true,
         transformHeader: header => _camelCase(header),
         skipEmptyLines: true,
-        complete: function (results: any) {
+        complete(results: any) {
           allData[name].push(...(results.data as any[]));
         },
       });

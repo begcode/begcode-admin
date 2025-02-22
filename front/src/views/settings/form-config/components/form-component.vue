@@ -1,5 +1,5 @@
 <template>
-  <div :class="containerType === 'page' ? ['pb-44px'] : []">
+  <div :class="containerType === 'page' ? ['pb-44px'] : []" data-cy="FormConfigCreateUpdateHeading">
     <basic-form ref="formRef" v-bind="formProps">
       <template #resetBefore>
         <teleport to='[data-teleport="settings/form-config-edit-append-button"]' defer>

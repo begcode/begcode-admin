@@ -48,7 +48,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       field: 'priority',
       format: (value, _data) => {
         const { getEnumDict } = useI18n();
-        return (getEnumDict('PriorityLevel').find(item => item.value === value) || { value: value, label: value }).label;
+        return (getEnumDict('PriorityLevel').find(item => item.value === value) || { value, label: value }).label;
       },
     },
     {
@@ -56,7 +56,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       field: 'category',
       format: (value, _data) => {
         const { getEnumDict } = useI18n();
-        return (getEnumDict('AnnoCategory').find(item => item.value === value) || { value: value, label: value }).label;
+        return (getEnumDict('AnnoCategory').find(item => item.value === value) || { value, label: value }).label;
       },
     },
     {
@@ -64,7 +64,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       field: 'receiverType',
       format: (value, _data) => {
         const { getEnumDict } = useI18n();
-        return (getEnumDict('ReceiverType').find(item => item.value === value) || { value: value, label: value }).label;
+        return (getEnumDict('ReceiverType').find(item => item.value === value) || { value, label: value }).label;
       },
     },
     {
@@ -72,7 +72,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       field: 'sendStatus',
       format: (value, _data) => {
         const { getEnumDict } = useI18n();
-        return (getEnumDict('AnnoSendStatus').find(item => item.value === value) || { value: value, label: value }).label;
+        return (getEnumDict('AnnoSendStatus').find(item => item.value === value) || { value, label: value }).label;
       },
     },
     {
@@ -94,7 +94,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       field: 'businessType',
       format: (value, _data) => {
         const { getEnumDict } = useI18n();
-        return (getEnumDict('AnnoBusinessType').find(item => item.value === value) || { value: value, label: value }).label;
+        return (getEnumDict('AnnoBusinessType').find(item => item.value === value) || { value, label: value }).label;
       },
     },
     {
@@ -106,7 +106,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       field: 'openType',
       format: (value, _data) => {
         const { getEnumDict } = useI18n();
-        return (getEnumDict('AnnoOpenType').find(item => item.value === value) || { value: value, label: value }).label;
+        return (getEnumDict('AnnoOpenType').find(item => item.value === value) || { value, label: value }).label;
       },
     },
     {

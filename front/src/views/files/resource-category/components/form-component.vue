@@ -1,5 +1,5 @@
 <template>
-  <div :class="containerType === 'page' ? ['pb-44px'] : []">
+  <div :class="containerType === 'page' ? ['pb-44px'] : []" data-cy="ResourceCategoryCreateUpdateHeading">
     <basic-form ref="formRef" v-bind="formProps">
       <template #resetBefore>
         <teleport to='[data-teleport="files/resource-category-edit-append-button"]' defer>

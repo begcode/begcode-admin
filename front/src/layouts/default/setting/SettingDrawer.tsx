@@ -1,5 +1,15 @@
+import { InputNumberItem, SelectItem, SettingFooter, SwitchItem, ThemeColorPicker, TypePicker } from './components';
+import { layoutHandler } from './handler';
+import {
+  HandlerEnum,
+  contentModeOptions,
+  getMenuTriggerOptions,
+  menuTypeListEnum,
+  mixSidebarTriggerOptions,
+  routerTransitionOptions,
+  topMenuAlignOptions,
+} from './enum';
 import { BasicDrawer } from '@/components/Drawer';
-import { TypePicker, ThemeColorPicker, SettingFooter, SwitchItem, SelectItem, InputNumberItem } from './components';
 
 import { AppDarkModeToggle } from '@/components/Application';
 
@@ -12,19 +22,7 @@ import { useMultipleTabSetting } from '@/hooks/setting/useMultipleTabSetting';
 import { useTransitionSetting } from '@/hooks/setting/useTransitionSetting';
 import { useI18n } from '@/hooks/web/useI18n';
 
-import { layoutHandler } from './handler';
-
-import {
-  HandlerEnum,
-  contentModeOptions,
-  topMenuAlignOptions,
-  getMenuTriggerOptions,
-  routerTransitionOptions,
-  menuTypeListEnum,
-  mixSidebarTriggerOptions,
-} from './enum';
-
-import { HEADER_PRESET_BG_COLOR_LIST, SIDE_BAR_BG_COLOR_LIST, APP_PRESET_COLOR_LIST } from '@/settings/designSetting';
+import { APP_PRESET_COLOR_LIST, HEADER_PRESET_BG_COLOR_LIST, SIDE_BAR_BG_COLOR_LIST } from '@/settings/designSetting';
 
 export default defineComponent({
   name: 'SettingDrawer',

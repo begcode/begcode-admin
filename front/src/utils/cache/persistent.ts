@@ -1,23 +1,23 @@
 import type { RouteLocationNormalized } from 'vue-router';
 import { pick as _pick } from 'lodash-es';
 import { Memory } from './memory';
-import type { LockInfo, UserInfo, LoginInfo } from '#/store';
+import type { LockInfo, LoginInfo, UserInfo } from '#/store';
 import type { ProjectConfig } from '#/config';
 
 import { createLocalStorage, createSessionStorage } from '@/utils/cache';
 import {
-  TOKEN_KEY,
-  USER_INFO_KEY,
-  ROLES_KEY,
-  LOCK_INFO_KEY,
-  PROJ_CFG_KEY,
   APP_LOCAL_CACHE_KEY,
   APP_SESSION_CACHE_KEY,
-  MULTIPLE_TABS_KEY,
   DB_DICT_DATA_KEY,
-  TENANT_ID,
+  LOCK_INFO_KEY,
   LOGIN_INFO_KEY,
+  MULTIPLE_TABS_KEY,
   OAUTH2_THIRD_LOGIN_TENANT_ID,
+  PROJ_CFG_KEY,
+  ROLES_KEY,
+  TENANT_ID,
+  TOKEN_KEY,
+  USER_INFO_KEY,
 } from '@/enums/cacheEnum';
 import { DEFAULT_CACHE_TIME } from '@/settings/encryptionSetting';
 

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div data-cy="DepartmentRelationHeading">
     <a-card
       v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
       title="高级搜索"
@@ -56,7 +56,7 @@
           <!--          <BasicButton type="default" pre-icon="ant-design:setting-outlined" shape="circle" size="small"></Button>-->
         </a-space>
       </template>
-      <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
+      <vxe-grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
         <template #toolbar_buttons>
           <a-row :gutter="16">
             <a-col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
@@ -106,7 +106,7 @@
         <template #pagerLeft>
           <a-alert type="warning" banner :message="'已选择 ' + selectedRows.length + ' 项'" style="height: 30px" />
         </template>
-      </Grid>
+      </vxe-grid>
     </a-card>
     <BasicModal v-bind="popupConfig.containerProps" @register="registerModal" @cancel="closeModal" v-on="popupConfig.containerEvents">
       <component
@@ -135,7 +135,6 @@
 
 <script lang="ts" setup>
 import { Modal, message } from 'ant-design-vue';
-import { Grid } from 'vxe-table';
 import type { VxeGridPropTypes, VxeGridInstance, VxeGridListeners, VxeGridProps } from 'vxe-table/types/grid';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { transVxeSorts } from '@/utils/jhipster/sorts';

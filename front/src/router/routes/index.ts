@@ -1,4 +1,4 @@
-import type { AppRouteRecordRaw, AppRouteModule } from '@/router/types';
+import type { AppRouteModule, AppRouteRecordRaw } from '@/router/types';
 
 import { PAGE_NOT_FOUND_ROUTE, REDIRECT_ROUTE } from '@/router/routes/basic';
 

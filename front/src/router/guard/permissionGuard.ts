@@ -1,4 +1,4 @@
-import type { Router, RouteRecordRaw } from 'vue-router';
+import type { RouteRecordRaw, Router } from 'vue-router';
 
 import { usePermissionStoreWithOut } from '@/store/modules/permission';
 
@@ -79,9 +79,9 @@ export function createPermissionGuard(router: Router) {
           next();
         }
       } else {
-        let href = window.location.href;
-        if (isOAuth2AppEnv() && href.indexOf('/tenantId/') != -1) {
-          let params = to.params;
+        const href = window.location.href;
+        if (isOAuth2AppEnv() && href.indexOf('/tenantId/') !== -1) {
+          const params = to.params;
           if (params && params.path && params.path.length > 0) {
             setAuthCache(OAUTH2_THIRD_LOGIN_TENANT_ID, params.path[params.path.length - 1]);
           }
@@ -95,7 +95,7 @@ export function createPermissionGuard(router: Router) {
         replace: true,
       };
       if (to.fullPath) {
-        let getFullPath = to.fullPath;
+        const getFullPath = to.fullPath;
         if (
           getFullPath == '/' ||
           getFullPath == '/500' ||

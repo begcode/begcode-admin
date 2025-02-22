@@ -959,6 +959,31 @@
             </dependencies>
         </profile>
         <profile>
+            <id>e2e</id>
+            <properties>
+                <profile.e2e>,e2e</profile.e2e>
+            </properties>
+            <build>
+                <finalName>e2e</finalName>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>repackage</id>
+                                    <goals>
+                                        <goal>repackage</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
             <!-- This is automatically activated when working in Eclipse -->
             <id>eclipse</id>
             <activation>

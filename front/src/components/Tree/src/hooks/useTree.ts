@@ -1,5 +1,5 @@
 import type { TreeDataItem } from 'ant-design-vue/es/tree/Tree';
-import type { InsertNodeParams, KeyType, FieldNames, TreeItem } from '../types/tree';
+import type { FieldNames, InsertNodeParams, KeyType, TreeItem } from '../types/tree';
 
 import { forEach } from '@/utils/helper/treeHelper';
 
@@ -139,7 +139,6 @@ export function useTree(treeDataRef: Ref<TreeDataItem[]>, getFieldNames: Compute
         treeData[push](list[i]);
       }
       treeDataRef.value = treeData;
-      return;
     } else {
       const { key: keyField, children: childrenField } = unref(getFieldNames);
       if (!childrenField || !keyField) return;

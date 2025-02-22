@@ -18,7 +18,7 @@ const { createMessage, createConfirm } = useMessage();
 
 /** 创建复制弹窗 */
 function createCopyModal(options: Partial<IOptions>) {
-  let modal = createConfirm({
+  const modal = createConfirm({
     ...options,
     iconType: options.iconType ?? 'info',
     width: options.width ?? 500,
@@ -32,7 +32,7 @@ function createCopyModal(options: Partial<IOptions>) {
     } as any,
     onOk() {
       return new Promise((resolve: any) => {
-        const clipboard = new Clipboard('.' + COPY_CLASS);
+        const clipboard = new Clipboard(`.${COPY_CLASS}`);
         clipboard.on('success', () => {
           clipboard.destroy();
           createMessage.success('复制成功');

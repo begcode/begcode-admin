@@ -31,6 +31,11 @@ public interface UploadFileBaseRepository<E extends UploadFile> extends BaseCrud
         return Optional.ofNullable(this.selectById(id));
     }
 
+    @Select(
+        "delete from upload_file upload_file where upload_file.owner_entity_name = #{ownerEntityName} and upload_file.owner_entity_id = #{ownerEntityId}"
+    )
+    void deleteAllByIdEntity(@Param("ownerEntityName") String ownerEntityName, @Param("ownerEntityId") Long ownerEntityId);
+
     @Select("delete from upload_file upload_file where upload_file.category_id = #{categoryId}")
     void deleteAllByCategoryId(@Param("categoryId") Long categoryId);
 

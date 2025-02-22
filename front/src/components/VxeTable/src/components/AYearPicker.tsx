@@ -1,5 +1,5 @@
 import { getDatePickerCellValue } from './ADatePicker';
-import { createEditRender, createCellRender, createFormItemRender, createExportMethod } from './common';
+import { createCellRender, createEditRender, createExportMethod, createFormItemRender } from './common';
 
 export default {
   renderEdit: createEditRender(),

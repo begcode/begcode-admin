@@ -1,5 +1,5 @@
 import { useEventListener } from '@/hooks/event/useEventListener';
-import { screenMap, sizeEnum, screenEnum } from '@/enums/breakpointEnum';
+import { screenEnum, screenMap, sizeEnum } from '@/enums/breakpointEnum';
 
 // 可以用这个替换，优化项
 // import { Grid } from 'ant-design-vue';

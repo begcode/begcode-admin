@@ -6,7 +6,7 @@ import 'vxe-table/lib/style.css';
 // 注册图标
 import 'virtual:svg-icons-register';
 
-// import { registerGlobComp } from './components/registerGlobComp';
+import { registerGlobComp } from './components/registerGlobComp';
 import { setupGlobDirectives } from './directives';
 import { setupI18n } from './i18n/setupI18n';
 import { setupErrorHandle } from './logics/error-handle';
@@ -14,7 +14,6 @@ import { initAppConfigStore } from './logics/initAppConfig';
 import { createRouter, router, setupRouter } from './router';
 import { setupRouterGuard } from './router/guard';
 import { setupStore } from './store';
-import 'xe-utils';
 
 import App from './App.vue';
 
@@ -23,7 +22,6 @@ import Log from '@/utils/Log';
 // import { registerPackages } from '@/utils/monorepo/registerPackages';
 import apiService from '@/api-service/index';
 import { useUserStore } from '@/store/modules/user';
-import { registerGlobComp } from '@/components/registerGlobComp';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
@@ -40,16 +38,6 @@ async function bootstrap() {
   // 配置 store
   setupStore(app);
 
-  const userStore = useUserStore();
-  app.config.globalProperties.$getToken = userStore.getToken;
-
-  // Initialize internal system configuration
-  // 初始化内部系统配置
-  initAppConfigStore();
-
-  //CAS单点登录
-  await useSso().ssoLogin();
-
   // Multilingual configuration
   // 多语言配置
   // Asynchronous case: language files may be obtained from the server side
@@ -57,12 +45,22 @@ async function bootstrap() {
   // 多语言配置,异步情况:语言文件可以从服务器端获得
   await setupI18n(app);
 
+  const userStore = useUserStore();
+  app.config.globalProperties.$getToken = userStore.getToken;
+
+  // Initialize internal system configuration
+  // 初始化内部系统配置
+  initAppConfigStore();
+
   // 注册外部模块路由
   // registerPackages(app);
 
   // Register global components
   // 注册全局组件
   registerGlobComp(app);
+
+  //CAS单点登录
+  await useSso().ssoLogin();
 
   // Configure routing
   // 配置路由

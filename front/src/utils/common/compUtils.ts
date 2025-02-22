@@ -18,10 +18,10 @@ export const getFileAccessHttpUrl = (fileUrl, prefix = 'http') => {
   let result = fileUrl;
   try {
     if (fileUrl && fileUrl.length > 0 && !fileUrl.startsWith(prefix)) {
-      //判断是否是数组格式
-      let isArray = fileUrl.indexOf('[') != -1;
+      // 判断是否是数组格式
+      const isArray = fileUrl.indexOf('[') != -1;
       if (!isArray) {
-        let prefix = `${baseApiUrl}`;
+        const prefix = `${baseApiUrl}`;
         // 判断是否已包含前缀
         if (!fileUrl.startsWith(prefix)) {
           result = `${prefix}${fileUrl}`;
@@ -36,7 +36,7 @@ export const getFileAccessHttpUrl = (fileUrl, prefix = 'http') => {
  * 触发 window.resize
  */
 export function triggerWindowResizeEvent() {
-  let event: any = document.createEvent('HTMLEvents');
+  const event: any = document.createEvent('HTMLEvents');
   event.initEvent('resize', true, true);
   event.eventType = 'message';
   window.dispatchEvent(event);
@@ -47,7 +47,7 @@ export function triggerWindowResizeEvent() {
  *  @param length 数字位数
  */
 export const getRandom = (length: number = 1) => {
-  return '-' + parseInt(String(Math.random() * 10000 + 1), length);
+  return `-${parseInt(String(Math.random() * 10000 + 1), length)}`;
 };
 
 /**
@@ -64,7 +64,7 @@ export function randomString(length: number, chats?: string) {
   }
   let str = '';
   for (let i = 0; i < length; i++) {
-    let num = _random(0, chats.length - 1);
+    const num = _random(0, chats.length - 1);
     str += chats[num];
   }
   return str;
@@ -113,15 +113,15 @@ export const toTree = (array, startPid, currentDept, opt) => {
           const nextChild = toTree(array, item[opt.primaryKey], currentDept + 1, opt);
           // 节点信息保存
           if (nextChild.length > 0) {
-            item['isLeaf'] = false;
+            item.isLeaf = false;
             item[opt.childKey] = nextChild;
           } else {
-            item['isLeaf'] = true;
+            item.isLeaf = true;
           }
-          item['title'] = item[opt.titleKey];
-          item['label'] = item[opt.titleKey];
-          item['key'] = item[opt.primaryKey];
-          item['value'] = item[opt.primaryKey];
+          item.title = item[opt.titleKey];
+          item.label = item[opt.titleKey];
+          item.key = item[opt.primaryKey];
+          item.value = item[opt.primaryKey];
           return item;
         }
       })
@@ -138,7 +138,7 @@ export const toTree = (array, startPid, currentDept, opt) => {
  * @param fieldKeys 要计算合计的列字段
  */
 export function mapTableTotalSummary(tableData: Recordable[], fieldKeys: string[]) {
-  let totals: any = { _row: '合计', _index: '合计' };
+  const totals: any = { _row: '合计', _index: '合计' };
   fieldKeys.forEach(key => {
     totals[key] = tableData.reduce((prev, next) => {
       const value = Number(next[key]);
@@ -165,7 +165,7 @@ export function mapTableTotalSummary(tableData: Recordable[], fieldKeys: string[
 export function simpleDebounce(fn, delay = 100) {
   let timer: any | null = null;
   return function () {
-    let args = arguments;
+    const args = arguments;
     if (timer) {
       clearTimeout(timer);
     }
@@ -220,8 +220,8 @@ export function dateFormat(date, block) {
  * 目前使用的地方：JVxeTable Span模式
  */
 export function getEventPath(event) {
-  let target = event.target;
-  let path = (event.composedPath && event.composedPath()) || event.path;
+  const target = event.target;
+  const path = (event.composedPath && event.composedPath()) || event.path;
 
   if (path != null) {
     return path.indexOf(window) < 0 ? path.concat(window) : path;
@@ -231,14 +231,13 @@ export function getEventPath(event) {
     return [window];
   }
 
-  let getParents = (node, memo) => {
+  const getParents = (node, memo) => {
     const parentNode = node.parentNode;
 
     if (!parentNode) {
       return memo;
-    } else {
-      return getParents(parentNode, memo.concat(parentNode));
     }
+    return getParents(parentNode, memo.concat(parentNode));
   };
   return [target].concat(getParents(target, []), window);
 }
@@ -251,7 +250,7 @@ export function getEventPath(event) {
  * @returns {boolean} 成功 push 返回 true，不处理返回 false
  */
 export function pushIfNotExist(array, value, key?) {
-  for (let item of array) {
+  for (const item of array) {
     if (key && item[key] === value[key]) {
       return false;
     } else if (item === value) {
@@ -267,11 +266,11 @@ export function pushIfNotExist(array, value, key?) {
  * @returns {*}
  */
 export function filterObj(obj) {
-  if (!(typeof obj == 'object')) {
+  if (!(typeof obj === 'object')) {
     return;
   }
 
-  for (let key in obj) {
+  for (const key in obj) {
     if (obj.hasOwnProperty(key) && (obj[key] == null || obj[key] == undefined || obj[key] === '')) {
       delete obj[key];
     }
@@ -295,13 +294,13 @@ export function underLine2CamelCase(string: string) {
  */
 export function findTree(treeList: any[], fn: Fn, childrenKey = 'children') {
   for (let i = 0; i < treeList.length; i++) {
-    let item = treeList[i];
+    const item = treeList[i];
     if (fn(item, i, treeList)) {
       return item;
     }
-    let children = item[childrenKey];
+    const children = item[childrenKey];
     if (_isArray(children)) {
-      let findResult = findTree(children, fn, childrenKey);
+      const findResult = findTree(children, fn, childrenKey);
       if (findResult) {
         return findResult;
       }
@@ -345,13 +344,11 @@ export function getAutoScrollContainer(node: HTMLElement) {
       if (element.clientHeight < element.scrollHeight) {
         // 有滚动条时，挂载到父级，解决滚动问题
         return node.parentElement;
-      } else {
-        // 无滚动条时，挂载到body上，解决下拉框遮盖问题
-        return document.body;
       }
-    } else {
-      element = element.parentElement;
+      // 无滚动条时，挂载到body上，解决下拉框遮盖问题
+      return document.body;
     }
+    element = element.parentElement;
   }
   // 不在弹窗内，走默认逻辑
   return node.parentElement;
@@ -362,8 +359,8 @@ export function getAutoScrollContainer(node: HTMLElement) {
  * @param menuTreeItem
  */
 export function checkChildrenHidden(menuTreeItem) {
-  //是否是聚合路由
-  let alwaysShow = menuTreeItem.alwaysShow;
+  // 是否是聚合路由
+  const alwaysShow = menuTreeItem.alwaysShow;
   if (alwaysShow) {
     return false;
   }
@@ -399,7 +396,7 @@ export function calculateFileSize(fileSize, unit?) {
  * 获取上传header
  */
 export function getHeaders() {
-  let tenantId = getTenantId();
+  const tenantId = getTenantId();
   return reactive({
     'X-Access-Token': getToken(),
     'X-Tenant-Id': tenantId ? tenantId : '0',
@@ -412,7 +409,7 @@ export function getUserInfoByExpression(expression) {
     return expression;
   }
   const userStore = useUserStoreWithOut();
-  let userInfo = userStore.getUserInfo;
+  const userInfo = userStore.getUserInfo;
   if (userInfo) {
     switch (expression) {
       case 'sysUserId':
@@ -451,10 +448,10 @@ export function replaceUserInfoByExpression(expression: string | any[]) {
     if (typeof str !== 'string') {
       return str;
     }
-    let result = str.match(reg);
+    const result = str.match(reg);
     if (result && result.length > 0) {
       result.forEach(item => {
-        let userInfo = getUserInfoByExpression(item.substring(2, item.length - 1));
+        const userInfo = getUserInfoByExpression(item.substring(2, item.length - 1));
         str = str.replace(item, userInfo);
       });
     }
@@ -471,16 +468,16 @@ export function replaceUserInfoByExpression(expression: string | any[]) {
  */
 export async function userExitChangeLoginTenantId(tenantId) {
   const userStore = useUserStoreWithOut();
-  //step 1 获取用户租户
+  // step 1 获取用户租户
   const url = '/sys/tenant/getCurrentUserTenant';
   let currentTenantId = null;
   const data = await defHttp.get({ url });
   if (data && data.list) {
-    let arr = data.list;
+    const arr = data.list;
     if (arr.length > 0) {
       //step 2.判断当前id是否存在用户租户中
-      let filterTenantId = arr.filter(item => item.id == tenantId);
-      //存在说明不是退出的不是当前租户，还用用来的租户即可
+      const filterTenantId = arr.filter(item => item.id == tenantId);
+      // 存在说明不是退出的不是当前租户，还用用来的租户即可
       if (filterTenantId && filterTenantId.length > 0) {
         currentTenantId = tenantId;
       } else {
@@ -489,7 +486,7 @@ export async function userExitChangeLoginTenantId(tenantId) {
       }
     }
   }
-  let loginTenantId = getTenantId();
+  const loginTenantId = getTenantId();
   userStore.setTenant(currentTenantId);
 
   //租户为空，说明没有租户了，需要刷新页面。或者当前租户和退出的租户一致则需要刷新浏览器
@@ -504,10 +501,10 @@ export async function userExitChangeLoginTenantId(tenantId) {
  * @param title 标题
  */
 export function tenantSaasMessage(title) {
-  let tenantId = getTenantId();
+  const tenantId = getTenantId();
   if (!tenantId) {
     Modal.confirm({
-      title: title,
+      title,
       content: '此菜单需要在多租户模式下使用，否则数据会出现混乱',
       okText: '确认',
       okType: 'danger',
@@ -526,18 +523,18 @@ export function sameDay(dateStr) {
     return false;
   }
   // 获取当前日期
-  let currentDate = new Date();
-  let currentDay = currentDate.getDate();
-  let currentMonth = currentDate.getMonth();
-  let currentYear = currentDate.getFullYear();
+  const currentDate = new Date();
+  const currentDay = currentDate.getDate();
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
 
-  //创建另一个日期进行比较
-  let otherDate = new Date(dateStr);
-  let otherDay = otherDate.getDate();
-  let otherMonth = otherDate.getMonth();
-  let otherYear = otherDate.getFullYear();
+  // 创建另一个日期进行比较
+  const otherDate = new Date(dateStr);
+  const otherDay = otherDate.getDate();
+  const otherMonth = otherDate.getMonth();
+  const otherYear = otherDate.getFullYear();
 
-  //比较日期
+  // 比较日期
   return currentDay === otherDay && currentMonth === otherMonth && currentYear === otherYear;
 }
 

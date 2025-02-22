@@ -21,23 +21,22 @@ export function useMethods() {
    * @param url
    */
   async function exportXls(name, url, params, isXlsx = false) {
-    const data = await defHttp.get({ url: url, params: params, responseType: 'blob', timeout: 60000 }, { isTransformResponse: false });
+    const data = await defHttp.get({ url, params, responseType: 'blob', timeout: 60000 }, { isTransformResponse: false });
     if (!data) {
       createMessage.warning('文件下载失败');
       return;
     }
-    let reader = new FileReader();
+    const reader = new FileReader();
     reader.readAsText(data, 'utf-8');
     reader.onload = async () => {
       if (reader.result) {
         if (reader.result.toString().indexOf('success') != -1) {
           const { success, message } = JSON.parse(reader.result.toString());
           if (!success) {
-            createMessage.warning('导出失败，失败原因：' + message);
+            createMessage.warning(`导出失败，失败原因：${message}`);
           } else {
             exportExcel(name, isXlsx, data);
           }
-          return;
         }
       }
     };
@@ -53,11 +52,11 @@ export function useMethods() {
     const isReturn = fileInfo => {
       try {
         if (fileInfo.code === 201) {
-          let {
+          const {
             message,
             result: { msg, fileUrl, fileName },
           } = fileInfo;
-          let href = glob.uploadUrl + fileUrl;
+          const href = glob.uploadUrl + fileUrl;
           createWarningModal({
             title: message,
             centered: false,
@@ -93,20 +92,20 @@ export function useMethods() {
    * @param data
    */
   function exportExcel(name, isXlsx, data) {
-    if (!name || typeof name != 'string') {
+    if (!name || typeof name !== 'string') {
       name = '导出文件';
     }
-    let blobOptions = { type: 'application/vnd.ms-excel' };
+    const blobOptions = { type: 'application/vnd.ms-excel' };
     let fileSuffix = '.xls';
     if (isXlsx) {
-      blobOptions['type'] = XLSX_MIME_TYPE;
+      blobOptions.type = XLSX_MIME_TYPE;
       fileSuffix = XLSX_FILE_SUFFIX;
     }
     if (typeof window.navigator.msSaveBlob !== 'undefined') {
       window.navigator.msSaveBlob(new Blob([data], blobOptions), name + fileSuffix);
     } else {
-      let url = window.URL.createObjectURL(new Blob([data], blobOptions));
-      let link = document.createElement('a');
+      const url = window.URL.createObjectURL(new Blob([data], blobOptions));
+      const link = document.createElement('a');
       link.style.display = 'none';
       link.href = url;
       link.setAttribute('download', name + fileSuffix);

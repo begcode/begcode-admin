@@ -1,4 +1,4 @@
-import { IVFormComponent, IFormConfig, AForm } from '../typings/v-form-component';
+import { AForm, IFormConfig, IVFormComponent } from '../typings/v-form-component';
 import { findFormItem, formItemsForEach } from '../utils';
 import { IAnyObject } from '../typings/base-type';
 

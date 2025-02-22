@@ -7,7 +7,7 @@
     @register="register"
     :showOkBtn="false"
   >
-    <Grid ref="xGrid" :columns="columns" :data="fileListRef">
+    <vxe-grid ref="xGrid" :columns="columns" :data="fileListRef">
       <template #url="{ row }">
         <ThumbUrl v-if="isImgTypeByName(row.url)" :fileUrl="row.url" />
         <span v-else>{{ row.url }}</span>
@@ -23,11 +23,10 @@
           <span>下载</span>
         </a-button>
       </template>
-    </Grid>
+    </vxe-grid>
   </BasicModal>
 </template>
 <script lang="ts" setup>
-import { Grid } from 'vxe-table';
 import { BasicModal, useModalInner } from '@/components/Modal';
 import { previewProps } from '../props';
 import { PreviewFileItem } from '../types/typing';

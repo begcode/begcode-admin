@@ -54,11 +54,11 @@ const fields = (relationshipApis: any): FormSchema[] => {
 
       componentProps: ({ formModel }) => ({
         onSelectFile: (file: any) => {
-          formModel['file'] = file;
+          formModel.file = file;
         },
         onChange: (file: any) => {
           if (file instanceof File) {
-            formModel['url'] = file.name;
+            formModel.url = file.name;
           }
         },
       }),

@@ -157,9 +157,7 @@ export const table = {
     current: 1,
     pageSize: 5,
     pageSizeOptions: ['10', '20', '30'],
-    showTotal: (total, range) => {
-      return range[0] + '-' + range[1] + ' 共' + total + '条';
-    },
+    showTotal: (total, range) => `${range[0]}-${range[1]} 共${total}条`,
     showQuickJumper: true,
     showSizeChanger: true,
     total: 0,
@@ -211,9 +209,7 @@ export const table1 = {
     current: 1,
     pageSize: 5,
     pageSizeOptions: ['10', '20', '30'],
-    showTotal: (total, range) => {
-      return range[0] + '-' + range[1] + ' 共' + total + '条';
-    },
+    showTotal: (total, range) => `${range[0]}-${range[1]} 共${total}条`,
     showQuickJumper: true,
     showSizeChanger: true,
     total: 0,

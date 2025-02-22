@@ -2,7 +2,6 @@ package com.begcode.monolith.settings.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.diboot.core.binding.annotation.*;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.*;
@@ -71,7 +70,6 @@ public class Dictionary implements Serializable {
         condition = "id=owner_entity_id AND owner_entity_name = 'Dictionary' ",
         orderBy = "sortValue:ASC"
     )
-    @JsonIgnoreProperties(value = { "systemConfig", "dictionary" }, allowSetters = true)
     private List<CommonFieldData> items = new ArrayList<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

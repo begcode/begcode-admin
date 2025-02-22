@@ -1,6 +1,6 @@
 <template>
   <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
-  <div>
+  <div data-cy="UploadFileHeading">
     <SplitPanes class="default-theme">
       <SplitPane size="20">
         <a-card
@@ -651,6 +651,10 @@ const rowClick = ({ name, data }) => {
                 });
             }
           },
+          okButtonProps: {
+            'data-cy': 'entityConfirmDeleteButton',
+            'data-cy-heading': 'uploadFileDeleteDialogHeading',
+          } as any,
         });
         break;
       default:

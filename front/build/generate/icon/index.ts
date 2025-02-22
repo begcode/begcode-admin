@@ -30,7 +30,7 @@ async function generateIcon() {
       {
         type: 'list',
         name: 'iconSet',
-        choices: choices,
+        choices,
         message: 'Select the icon set that needs to be generated?',
       },
       {

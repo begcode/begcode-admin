@@ -1113,17 +1113,17 @@ function deleteProps(list: Omit<IBaseFormAttrs, 'tag'>[], key: string) {
   });
 }
 
-componentAttrs['StrengthMeter'] = componentAttrs['Input'];
-componentAttrs['StrengthMeter'].push({
+componentAttrs.StrengthMeter = componentAttrs.Input;
+componentAttrs.StrengthMeter.push({
   name: 'visibilityToggle',
   label: '是否显示切换按钮',
   component: 'Checkbox',
 });
 
-deleteProps(componentAttrs['StrengthMeter'], 'type');
-deleteProps(componentAttrs['StrengthMeter'], 'prefix');
-deleteProps(componentAttrs['StrengthMeter'], 'defaultValue');
-deleteProps(componentAttrs['StrengthMeter'], 'suffix');
+deleteProps(componentAttrs.StrengthMeter, 'type');
+deleteProps(componentAttrs.StrengthMeter, 'prefix');
+deleteProps(componentAttrs.StrengthMeter, 'defaultValue');
+deleteProps(componentAttrs.StrengthMeter, 'suffix');
 //组件属性
 // name 控件的属性
 export const baseComponentAttrs: IBaseComponentProps = componentAttrs;
@@ -1143,11 +1143,11 @@ export const componentPropsFuncs: any = {
   RadioGroup: (compProp, options: BaseFormAttrs[]) => {
     const props = findCompoentProps(options, 'size');
     if (props) {
-      if (compProp['optionType'] && compProp['optionType'] != 'button') {
-        props['disabled'] = true;
-        compProp['size'] = null;
+      if (compProp.optionType && compProp.optionType !== 'button') {
+        props.disabled = true;
+        compProp.size = null;
       } else {
-        props['disabled'] = false;
+        props.disabled = false;
       }
     }
   },

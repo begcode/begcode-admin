@@ -1,6 +1,6 @@
 import { tryOnUnmounted } from '@vueuse/core';
-import type { UseModalReturnType, ModalMethods, ModalProps, ReturnMethods, UseModalInnerReturnType } from '../typing';
-import type { Nullable, Fn } from '#/types';
+import type { ModalMethods, ModalProps, ReturnMethods, UseModalInnerReturnType, UseModalReturnType } from '../typing';
+import type { Fn, Nullable } from '#/types';
 import { isProdMode } from '@/utils/env';
 import { useLog } from '@/hooks/useLog';
 

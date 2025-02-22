@@ -48,7 +48,7 @@ export function useTabSetup(props, context, options) {
 
   // 根据不同的类型计算出的value
   const computeValue = computed(() => {
-    let valueArray: any[] = [];
+    const valueArray: any[] = [];
     switch (type.value) {
       case TypeEnum.unset:
         valueArray.push('?');
@@ -82,7 +82,7 @@ export function useTabSetup(props, context, options) {
   });
   // 指定值范围区间，介于最小值和最大值之间
   const specifyRange = computed(() => {
-    let range: number[] = [];
+    const range: number[] = [];
     if (maxValue.value != null) {
       for (let i = minValue.value; i <= maxValue.value; i++) {
         range.push(i);

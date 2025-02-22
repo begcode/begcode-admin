@@ -96,7 +96,7 @@ export function useTabs(_router?: Router) {
     if (path.indexOf('?') > 0) {
       path = path.split('?')[0];
     }
-    let tab = tabStore.getTabList.find(item => item.path.indexOf(path) >= 0)!;
+    const tab = tabStore.getTabList.find(item => item.path.indexOf(path) >= 0)!;
     if (tab) {
       tabStore.closeTab(tab, router);
     }

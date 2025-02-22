@@ -1,5 +1,5 @@
 import { useTimeoutFn } from '@vueuse/core';
-import type { MenuState, Key } from './types';
+import type { Key, MenuState } from './types';
 import { MenuModeEnum } from '@/enums/menuEnum';
 import type { Menu as MenuType } from '@/router/types';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';

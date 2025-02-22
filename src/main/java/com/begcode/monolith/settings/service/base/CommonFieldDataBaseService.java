@@ -19,7 +19,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,12 +32,7 @@ public class CommonFieldDataBaseService<R extends CommonFieldDataRepository, E e
     extends BaseServiceImpl<CommonFieldDataRepository, CommonFieldData> {
 
     private static final Logger log = LoggerFactory.getLogger(CommonFieldDataBaseService.class);
-
-    private final List<String> relationCacheNames = List.of(
-        com.begcode.monolith.settings.domain.SystemConfig.class.getName() + ".items",
-        com.begcode.monolith.settings.domain.Dictionary.class.getName() + ".items"
-    );
-    private final List<String> relationNames = List.of("systemConfig", "dictionary");
+    private final List<String> relationNames = List.of();
 
     protected final CommonFieldDataRepository commonFieldDataRepository;
 
@@ -180,10 +174,6 @@ public class CommonFieldDataBaseService<R extends CommonFieldDataRepository, E e
                 });
             }
         }
-    }
-
-    protected void clearRelationsCache() {
-        this.relationCacheNames.forEach(cacheName -> Optional.ofNullable(cacheManager.getCache(cacheName)).ifPresent(Cache::clear));
     }
 
     @Transactional

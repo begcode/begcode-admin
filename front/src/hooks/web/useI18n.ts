@@ -64,7 +64,7 @@ export function useI18n(namespace?: string): {
     const enumDictKeys = allEnums[enumType];
     const result: any[] = [];
     Object.keys(enumDictKeys).forEach(key => {
-      result.push({ label: tFn(`monolithMybatisApp.${enumType}.` + key), value: key });
+      result.push({ label: tFn(`monolithMybatisApp.${enumType}.${key}`), value: key });
     });
     return result;
   };

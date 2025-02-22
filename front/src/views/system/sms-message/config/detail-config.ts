@@ -22,7 +22,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       field: 'sendType',
       format: (value, _data) => {
         const { getEnumDict } = useI18n();
-        return (getEnumDict('MessageSendType').find(item => item.value === value) || { value: value, label: value }).label;
+        return (getEnumDict('MessageSendType').find(item => item.value === value) || { value, label: value }).label;
       },
     },
     {
@@ -49,7 +49,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       field: 'sendStatus',
       format: (value, _data) => {
         const { getEnumDict } = useI18n();
-        return (getEnumDict('SendStatus').find(item => item.value === value) || { value: value, label: value }).label;
+        return (getEnumDict('SendStatus').find(item => item.value === value) || { value, label: value }).label;
       },
     },
     {

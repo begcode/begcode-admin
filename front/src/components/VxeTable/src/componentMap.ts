@@ -1,23 +1,23 @@
 import {
-  Input,
-  Select,
-  Radio,
-  Checkbox,
   AutoComplete,
+  Avatar,
   Cascader,
+  Checkbox,
   DatePicker,
+  Empty,
+  Image,
+  Input,
   InputNumber,
+  Radio,
+  Rate,
+  Select,
   Switch,
   TimePicker,
   TreeSelect,
-  Rate,
-  Empty,
-  Avatar,
-  Image,
 } from 'ant-design-vue';
 import type { ComponentType } from './componentType';
 import { Button } from '@/components/Button';
-import { IconPicker, Icon } from '@/components/Icon';
+import { Icon, IconPicker } from '@/components/Icon';
 import { SelectModal } from '@/components/SelectModal';
 import { DragSort } from '@/components/DragSort';
 import { ApiSelect, ApiTreeSelect } from '@/components/Form';

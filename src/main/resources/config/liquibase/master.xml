@@ -47,7 +47,6 @@
     <include file="config/liquibase/changelog/20240101062206_added_entity_constraints_ResourceCategory.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240101062306_added_entity_constraints_UploadFile.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240101062406_added_entity_constraints_UploadImage.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20240101062806_added_entity_constraints_CommonFieldData.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240101062906_added_entity_constraints_RegionCode.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240101063106_added_entity_constraints_FillRuleItem.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240405165934_added_entity_constraints_FormConfig.xml" relativeToChangelogFile="false"/>

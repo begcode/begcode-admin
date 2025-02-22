@@ -1,15 +1,15 @@
 import {
-  replaceStyleVariables,
+  appendCssToDom,
+  darkCssIsReady,
+  getStyleDom,
+  linkID,
   loadDarkThemeCss,
   replaceCssColors,
-  darkCssIsReady,
-  linkID,
+  replaceStyleVariables,
   styleTagId,
-  appendCssToDom,
-  getStyleDom,
 } from '@rys-fe/vite-plugin-theme/es/client';
-import { mixLighten, mixDarken, tinycolor } from '@rys-fe/vite-plugin-theme/es/colorUtils';
-import { getThemeColors, generateColors } from '../../../build/config/themeConfig';
+import { mixDarken, mixLighten, tinycolor } from '@rys-fe/vite-plugin-theme/es/colorUtils';
+import { generateColors, getThemeColors } from '../../../build/config/themeConfig';
 import { useAppStore } from '@/store/modules/app';
 import { defHttp } from '@/utils/http/axios';
 
@@ -38,7 +38,7 @@ export async function changeTheme(color: string) {
       appendCssToDom(getStyleDom(styleTagId) as HTMLStyleElement, processCss);
     }
   } else {
-    let res = await replaceStyleVariables({
+    const res = await replaceStyleVariables({
       colorVariables: [...getThemeColors(color), ...colors],
     });
     fixDark();

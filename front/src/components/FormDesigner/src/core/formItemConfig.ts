@@ -30,12 +30,12 @@ export function setFormDesignComponents(config: IVFormComponent | IVFormComponen
     config.forEach(item => {
       const { componentInstance: component, ...rest } = item;
       componentMap[item.component] = component;
-      customComponents.push(Object.assign({ props: {} }, rest));
+      customComponents.push({ props: {}, ...rest });
     });
   } else {
     const { componentInstance: component, ...rest } = config;
     componentMap[config.component] = component;
-    customComponents.push(Object.assign({ props: {} }, rest));
+    customComponents.push({ props: {}, ...rest });
   }
 }
 

@@ -42,7 +42,7 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://localhost:3308/monolithMybatis2025?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&createDatabaseIfNotExist=true&nullCatalogMeansCurrent=true
+    url: jdbc:mysql://localhost:3306/monolithMybatis?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&createDatabaseIfNotExist=true&nullCatalogMeansCurrent=true
     username: root
     password:
     hikari:

@@ -1,11 +1,11 @@
-import type { AxiosRequestConfig, AxiosInstance, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
+import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import axios from 'axios';
 import qs from 'qs';
 import MockAdapter from 'axios-mock-adapter';
 import { setupMockServer } from 'mock/api';
 import type { CreateAxiosOptions } from './axiosTransform';
 import { AxiosCanceler } from './axiosCancel';
-import type { RequestOptions, Result, UploadFileParams, UploadFileCallBack } from '#/axios';
+import type { RequestOptions, Result, UploadFileCallBack, UploadFileParams } from '#/axios';
 import { ContentTypeEnum, RequestEnum } from '@/enums/httpEnum';
 import { useGlobSetting } from '@/hooks/setting';
 import { useMessage } from '@/hooks/web/useMessage';
@@ -244,7 +244,7 @@ export class VAxios {
 
     const { requestOptions } = this.options;
 
-    const opt: RequestOptions = Object.assign({}, requestOptions, options);
+    const opt: RequestOptions = { ...requestOptions, ...options };
 
     const { beforeRequestHook, requestCatchHook, transformResponseHook } = transform || {};
     if (beforeRequestHook && _isFunction(beforeRequestHook)) {
@@ -291,7 +291,7 @@ export class VAxios {
   uploadMyFile<T = any>(url, formData) {
     const glob = useGlobSetting();
     return this.axiosInstance.request<T>({
-      url: url,
+      url,
       baseURL: glob.uploadUrl,
       method: 'POST',
       data: formData,

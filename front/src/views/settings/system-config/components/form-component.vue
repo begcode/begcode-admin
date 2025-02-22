@@ -1,5 +1,5 @@
 <template>
-  <div :class="containerType === 'page' ? ['pb-44px'] : []">
+  <div :class="containerType === 'page' ? ['pb-44px'] : []" data-cy="SystemConfigCreateUpdateHeading">
     <a-tabs v-model:active-key="relationTables.activeKey" @change="changeActiveKey">
       <a-tab-pane tab="基本信息" key="baseInfo">
         <basic-form ref="formRef" v-bind="formProps">

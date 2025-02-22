@@ -27,7 +27,7 @@ export function useMenuItem(instance: ComponentInternalInstance | null) {
         parent = parent.parent;
       }
     }
-    return { paddingLeft: padding + 'px' };
+    return { paddingLeft: `${padding}px` };
   });
 
   function findParentMenu(name: string[]) {

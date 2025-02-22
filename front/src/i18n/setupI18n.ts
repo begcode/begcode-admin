@@ -1,10 +1,10 @@
 import type { I18nOptions } from 'vue-i18n';
+import { App } from 'vue';
 
 import { createI18n } from 'vue-i18n';
 import { setHtmlPageLang, setLoadLocalePool } from './helper';
 import { localeSetting } from '@/settings/localeSetting';
 import { useLocaleStoreWithOut } from '@/store/modules/locale';
-import { App } from 'vue';
 
 const { fallback, availableLocales } = localeSetting;
 
@@ -28,8 +28,8 @@ async function createI18nOptions(): Promise<I18nOptions> {
     messages: {
       [locale]: message,
     },
-    availableLocales: availableLocales,
-    sync: true, //If you don’t want to inherit locale from global scope, you need to set sync of i18n component option to false.
+    availableLocales,
+    sync: true, // If you don’t want to inherit locale from global scope, you need to set sync of i18n component option to false.
     silentTranslationWarn: true, // true - warning off
     missingWarn: false,
     silentFallbackWarn: true,

@@ -1,6 +1,6 @@
 import { RouteParams } from 'vue-router';
 import { AppRouteModule } from '@/router/types';
-import type { MenuModule, Menu, AppRouteRecordRaw } from '@/router/types';
+import type { AppRouteRecordRaw, Menu, MenuModule } from '@/router/types';
 import { findPath, treeMap } from '@/utils/helper/treeHelper';
 import { isHttpUrl } from '@/utils/is';
 

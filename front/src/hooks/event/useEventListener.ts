@@ -1,4 +1,4 @@
-import { useThrottleFn, useDebounceFn } from '@vueuse/core';
+import { useDebounceFn, useThrottleFn } from '@vueuse/core';
 
 export type RemoveEventFn = () => void;
 export interface UseEventParams {

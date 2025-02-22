@@ -27,8 +27,6 @@
       "disabled": "Disabled",
       "ownerEntityName": "Owner Entity Name",
       "ownerEntityId": "Owner Entity Id",
-      "systemConfig": "System Config",
-      "dictionary": "Dictionary",
       "help": {
         "name": "名称",
         "value": "字段值",

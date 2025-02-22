@@ -2,21 +2,21 @@
  * Component list, register here to setting it in the form
  */
 import {
-  Input,
-  Select,
-  Radio,
-  Checkbox,
   AutoComplete,
   Cascader,
+  Checkbox,
   DatePicker,
+  Divider,
+  Input,
   InputNumber,
+  Radio,
+  Rate,
+  Select,
+  Slider,
   Switch,
   TimePicker,
-  TreeSelect,
-  Slider,
-  Rate,
-  Divider,
   Transfer,
+  TreeSelect,
 } from 'ant-design-vue';
 import type { ComponentType } from './types';
 

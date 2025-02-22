@@ -16,7 +16,6 @@ import com.begcode.monolith.service.dto.AdminUserDTO;
 import com.begcode.monolith.service.mapper.UserMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
-import java.util.Objects;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;

@@ -1,5 +1,5 @@
 import type { EChartsOption } from 'echarts';
-import { useTimeoutFn, tryOnUnmounted, useDebounceFn } from '@vueuse/core';
+import { tryOnUnmounted, useDebounceFn, useTimeoutFn } from '@vueuse/core';
 import { useEventListener } from '@/hooks/event/useEventListener';
 import { useBreakpoint } from '@/hooks/event/useBreakpoint';
 import echarts from '@/utils/lib/echarts';

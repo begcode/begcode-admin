@@ -38,7 +38,7 @@ function getEventTargetNode(evnt: any, container: HTMLElement, className: string
     if (className && target.className && target.className.split && target.className.split(' ').indexOf(className) > -1) {
       targetElem = target;
     } else if (target === container) {
-      return { flag: className ? !!targetElem : true, container, targetElem: targetElem };
+      return { flag: className ? !!targetElem : true, container, targetElem };
     }
     target = target.parentNode;
   }

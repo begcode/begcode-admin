@@ -41,7 +41,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       field: 'level',
       format: (value, _data) => {
         const { getEnumDict } = useI18n();
-        return (getEnumDict('RegionCodeLevel').find(item => item.value === value) || { value: value, label: value }).label;
+        return (getEnumDict('RegionCodeLevel').find(item => item.value === value) || { value, label: value }).label;
       },
     },
     {

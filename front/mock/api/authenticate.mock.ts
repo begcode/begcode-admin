@@ -18,10 +18,9 @@ export function setAuthMock(mock) {
     const { username = '', password = '' } = JSON.parse(config.data);
     // return an array in the form of [status, data, headers]
     if ((username === 'admin' && password === 'admin') || (username === 'user' && password === 'user')) {
-      return [200, { id_token: 'id_token:' + username }];
-    } else {
-      return [401, {}];
+      return [200, { id_token: `id_token:${username}` }];
     }
+    return [401, {}];
   });
   const urlRegex = new RegExp(`${baseApiUrl}randomImage/\\d+`);
   mock?.onGet(urlRegex).reply(config => {

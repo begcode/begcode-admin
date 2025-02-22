@@ -146,8 +146,8 @@ export const useUserStore = defineStore({
         const { goHome = true, mode, ...loginParams } = params;
         const res = await loginApi(loginParams, mode);
         // save token
-        this.setToken(res['id_token']);
-        this.setTenant(res['tenant_id']);
+        this.setToken(res.id_token);
+        this.setTenant(res.tenant_id);
         return this.afterLoginAction(goHome);
       } catch (error) {
         return Promise.reject(error);

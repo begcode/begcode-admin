@@ -1,7 +1,7 @@
 import type { NamePath, ValidateOptions } from 'ant-design-vue/lib/form/interface';
-import type { FormProps, FormSchemaInner as FormSchema, FormActionType } from '../types/form';
+import type { FormActionType, FormProps, FormSchemaInner as FormSchema } from '../types/form';
 import { dateItemType, handleInputNumberValue, defaultValueComponents, isIncludeSimpleComponents } from '../helper';
-import type { Fn, EmitType } from '#/types';
+import type { EmitType, Fn } from '#/types';
 import type { Recordable } from '#/utils';
 
 import { isDef, isNil } from '@/utils/is';
@@ -354,9 +354,9 @@ export function useFormEvents({
     if (!formEl) return;
     try {
       const values = await validate();
-      for (let key in values) {
+      for (const key in values) {
         if (values[key] instanceof Array) {
-          let valueType = getValueType(getProps, key);
+          const valueType = getValueType(getProps, key);
           if (valueType === 'string') {
             values[key] = values[key].join(',');
           }
@@ -387,7 +387,7 @@ export function useFormEvents({
     validateFields,
     validate,
     submit: handleSubmit,
-    scrollToField: scrollToField,
+    scrollToField,
   };
 
   return {

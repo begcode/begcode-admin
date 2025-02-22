@@ -1,4 +1,4 @@
-import type { DebouncedFunc, DebounceSettings } from 'lodash-es';
+import type { DebounceSettings, DebouncedFunc } from 'lodash-es';
 
 import type { UseRequestPlugin } from '../types';
 

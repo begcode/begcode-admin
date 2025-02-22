@@ -23,15 +23,13 @@ export const getEnabledTypes = async () => {
   // 获取缓存
   if (enabledTypes != null) {
     return cloneObject(enabledTypes);
-  } else {
-    let { success, result } = await defHttp.get({ url: backEndUrl.getEnabledType }, { isTransformResponse: false });
-    if (success) {
-      // 在此缓存
-      enabledTypes = cloneObject(result);
-      return result;
-    } else {
-      console.warn('getEnabledType查询失败：');
-    }
   }
+  const { success, result } = await defHttp.get({ url: backEndUrl.getEnabledType }, { isTransformResponse: false });
+  if (success) {
+    // 在此缓存
+    enabledTypes = cloneObject(result);
+    return result;
+  }
+  console.warn('getEnabledType查询失败：');
   return {};
 };

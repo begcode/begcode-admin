@@ -2,7 +2,6 @@ package com.begcode.monolith.settings.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.begcode.monolith.domain.enumeration.CommonFieldType;
-import com.diboot.core.binding.annotation.*;
 import java.io.Serializable;
 import lombok.*;
 

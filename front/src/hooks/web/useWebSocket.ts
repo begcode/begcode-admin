@@ -1,6 +1,6 @@
 // noinspection JSUnusedGlobalSymbols
 
-import { useWebSocket, UseWebSocketReturn } from '@vueuse/core';
+import { UseWebSocketReturn, useWebSocket } from '@vueuse/core';
 import { getToken } from '@/utils/auth';
 
 let result: UseWebSocketReturn<any>;
@@ -11,7 +11,7 @@ const listeners = new Map();
  * @param url
  */
 export function connectWebSocket(url: string) {
-  let token = (getToken() || '') as string;
+  const token = (getToken() || '') as string;
   result = useWebSocket(url, {
     // 自动重连 (遇到错误最多重复连接10次)
     autoReconnect: {

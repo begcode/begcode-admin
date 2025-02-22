@@ -134,7 +134,7 @@ export function getButtonConfig(item) {
     if (/^batch/.test(item.theme)) {
       text = `批量${text || ''}`;
     }
-    const option = Object.assign({ loading: false, hide: false }, themeConfig, { text }, item);
+    const option = { loading: false, hide: false, ...themeConfig, text, ...item };
     if (typeof item.action === 'function' || (downTHeme.includes(item.theme) && item.api)) {
       option.action = function (...arg) {
         if (downTHeme.includes(item.theme) && item.api) {
@@ -156,15 +156,12 @@ export function getButtonConfig(item) {
       };
     }
     return option;
-  } else {
-    const option = Object.assign({ loading: false }, item, {
-      icon: item.icon || '',
-    });
-    if (typeof item.action === 'function') {
-      option.action = function (...arg) {
-        item.action && item.action(option, ...arg);
-      };
-    }
-    return option;
   }
+  const option = { loading: false, ...item, icon: item.icon || '' };
+  if (typeof item.action === 'function') {
+    option.action = function (...arg) {
+      item.action && item.action(option, ...arg);
+    };
+  }
+  return option;
 }

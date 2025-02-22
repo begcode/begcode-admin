@@ -1,4 +1,4 @@
-import { useRouter, useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { defHttp } from '@/utils/http/axios';
 import { getDictItemsByCode } from '@/utils/dict/index';
 import { useAppStore } from '@/store/modules/app';
@@ -11,13 +11,10 @@ import { AnnoCategory } from '@/models/enumerations/anno-category.model';
  */
 export function useSysMessage() {
   const rangeDateArray = getDictItemsByCode('rangeDate');
-  console.log('+++++++++++++++++++++');
-  console.log('rangeDateArray', rangeDateArray);
-  console.log('+++++++++++++++++++++');
 
   const messageList = ref<any[]>([]);
   const pageNo = ref(1);
-  let pageSize = 10;
+  const pageSize = 10;
 
   const searchParams = reactive({
     fromUser: '',
@@ -27,8 +24,8 @@ export function useSysMessage() {
   });
 
   function getQueryParams() {
-    let { fromUser, rangeDateKey, rangeDate, starFlag } = searchParams;
-    let params = {
+    const { fromUser, rangeDateKey, rangeDate, starFlag } = searchParams;
+    const params = {
       fromUser,
       starFlag,
       rangeDateKey,
@@ -38,8 +35,8 @@ export function useSysMessage() {
       pageSize,
     };
     if (rangeDateKey == 'zdy') {
-      params.beginDate = rangeDate[0] + ' 00:00:00';
-      params.endDate = rangeDate[1] + ' 23:59:59';
+      params.beginDate = `${rangeDate[0]} 00:00:00`;
+      params.endDate = `${rangeDate[1]} 23:59:59`;
     }
     return params;
   }
@@ -52,7 +49,7 @@ export function useSysMessage() {
     if (loadEndStatus.value === true) {
       return;
     }
-    let params = getQueryParams();
+    const params = getQueryParams();
     const pageRecord = await announcementService.retrieveUnread(AnnoCategory.SYSTEM_INFO, params);
     if (!pageRecord.records || pageRecord.records.length <= 0) {
       loadEndStatus.value = true;
@@ -62,7 +59,7 @@ export function useSysMessage() {
       loadEndStatus.value = true;
     }
     pageNo.value = pageNo.value + 1;
-    let temp: any[] = messageList.value;
+    const temp: any[] = messageList.value;
     temp.push(...pageRecord.records);
     messageList.value = temp;
   }
@@ -164,21 +161,21 @@ export function useMessageHref(emit) {
    */
   async function goPageWithBusType(record) {
     const { busType, busId, msgAbstract } = record;
-    let temp = messageHrefArray.filter(item => item.value === busType);
+    const temp = messageHrefArray.filter(item => item.value === busType);
     if (!temp || temp.length == 0) {
       console.error('当前业务类型不识别', busType);
       return;
     }
     let path = temp[0].text;
     path = path.replace('{DETAIL_ID}', busId);
-    //固定参数 detailId 用于查询表单数据
-    let query: any = {
+    // 固定参数 detailId 用于查询表单数据
+    const query: any = {
       detailId: busId,
     };
     // 额外参数处理
     if (msgAbstract) {
       try {
-        let json = JSON.parse(msgAbstract);
+        const json = JSON.parse(msgAbstract);
         Object.keys(json).map(k => {
           query[k] = json[k];
         });
@@ -190,10 +187,10 @@ export function useMessageHref(emit) {
     appStore.setMessageHrefParams(query);
     if (rt.path.indexOf(path) >= 0) {
       await closeTab();
-      await router.replace({ path: path, query: { time: new Date().getTime() } });
+      await router.replace({ path, query: { time: new Date().getTime() } });
     } else {
       closeSameRoute(path);
-      await router.push({ path: path });
+      await router.push({ path });
     }
   }
 

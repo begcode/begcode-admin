@@ -1,4 +1,4 @@
-import type { RouteLocationNormalized, RouteLocationRaw, Router, LocationQueryRaw, RouteParamsRaw } from 'vue-router';
+import type { LocationQueryRaw, RouteLocationNormalized, RouteLocationRaw, RouteParamsRaw, Router } from 'vue-router';
 
 import { defineStore } from 'pinia';
 import { store } from '@/store';

@@ -18,7 +18,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       field: 'provider',
       format: (value, _data) => {
         const { getEnumDict } = useI18n();
-        return (getEnumDict('OssProvider').find(item => item.value === value) || { value: value, label: value }).label;
+        return (getEnumDict('OssProvider').find(item => item.value === value) || { value, label: value }).label;
       },
     },
     {

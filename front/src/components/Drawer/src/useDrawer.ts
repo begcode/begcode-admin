@@ -1,5 +1,5 @@
 import { tryOnUnmounted } from '@vueuse/core';
-import type { UseDrawerReturnType, DrawerInstance, ReturnMethods, DrawerProps, UseDrawerInnerReturnType } from './typing';
+import type { DrawerInstance, DrawerProps, ReturnMethods, UseDrawerInnerReturnType, UseDrawerReturnType } from './typing';
 import type { Fn, Nullable } from '#/types';
 import { isProdMode } from '@/utils/env';
 import { useLog } from '@/hooks/useLog';

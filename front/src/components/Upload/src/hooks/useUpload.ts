@@ -27,9 +27,8 @@ export function useUploadType({
       .map(item => {
         if (item.indexOf('/') > 0 || item.startsWith('.')) {
           return item;
-        } else {
-          return `.${item}`;
         }
+        return `.${item}`;
       })
       .join(',');
   });
@@ -49,12 +48,12 @@ export function useUploadType({
 
     const maxSize = unref(maxSizeRef);
     if (maxSize) {
-      helpTexts.push(t('component.upload.maxSize', { maxSize: maxSize }));
+      helpTexts.push(t('component.upload.maxSize', { maxSize }));
     }
 
     const maxNumber = unref(maxNumberRef);
     if (maxNumber && maxNumber !== Infinity) {
-      helpTexts.push(t('component.upload.maxNumber', { maxNumber: maxNumber }));
+      helpTexts.push(t('component.upload.maxNumber', { maxNumber }));
     }
     return helpTexts.join('，');
   });

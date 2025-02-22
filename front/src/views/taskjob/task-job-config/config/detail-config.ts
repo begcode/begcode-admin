@@ -37,7 +37,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       field: 'jobStatus',
       format: (value, _data) => {
         const { getEnumDict } = useI18n();
-        return (getEnumDict('JobStatus').find(item => item.value === value) || { value: value, label: value }).label;
+        return (getEnumDict('JobStatus').find(item => item.value === value) || { value, label: value }).label;
       },
     },
     {

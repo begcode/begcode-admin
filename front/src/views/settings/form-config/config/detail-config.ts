@@ -31,7 +31,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       field: 'formType',
       format: (value, _data) => {
         const { getEnumDict } = useI18n();
-        return (getEnumDict('FormConfigType').find(item => item.value === value) || { value: value, label: value }).label;
+        return (getEnumDict('FormConfigType').find(item => item.value === value) || { value, label: value }).label;
       },
     },
     {

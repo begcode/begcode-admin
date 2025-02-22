@@ -144,25 +144,23 @@ function checkUsername(_rule, value, _callback) {
   const { t } = useI18n();
   if (!value) {
     return Promise.reject(t('sys.login.accountPlaceholder'));
-  } else {
-    return new Promise((resolve, reject) => {
-      accountService.checkExistUser({ 'login.equals': value }).then(exist => {
-        !exist ? resolve(true) : reject('用户名已存在!');
-      });
-    });
   }
+  return new Promise((resolve, reject) => {
+    accountService.checkExistUser({ 'login.equals': value }).then(exist => {
+      !exist ? resolve(true) : reject('用户名已存在!');
+    });
+  });
 }
 async function checkPhone(_rule, value, _callback) {
   const reg = /^1[3456789]\d{9}$/;
   if (!reg.test(value)) {
     return Promise.reject(new Error('请输入正确手机号'));
-  } else {
-    return new Promise((resolve, reject) => {
-      accountService.checkExistUser({ 'mobile.equals': value }).then(exist => {
-        !exist ? resolve(true) : reject('手机号已存在!');
-      });
-    });
   }
+  return new Promise((resolve, reject) => {
+    accountService.checkExistUser({ 'mobile.equals': value }).then(exist => {
+      !exist ? resolve(true) : reject('手机号已存在!');
+    });
+  });
 }
 
 /**
@@ -186,9 +184,9 @@ export function isOAuth2DingAppEnv() {
  * @param tenantId
  */
 export function sysOAuth2Login(source) {
-  let url = `${window._CONFIG['domianURL']}/sys/thirdLogin/oauth2/${source}/login`;
+  let url = `${window._CONFIG.domianURL}/sys/thirdLogin/oauth2/${source}/login`;
   url += `?state=${encodeURIComponent(window.location.origin)}`;
-  let tenantId = getAuthCache(OAUTH2_THIRD_LOGIN_TENANT_ID);
+  const tenantId = getAuthCache(OAUTH2_THIRD_LOGIN_TENANT_ID);
   if (tenantId) {
     url += `&tenantId=${tenantId}`;
   }
@@ -200,9 +198,9 @@ export function sysOAuth2Login(source) {
  * @param code
  */
 export function sysOAuth2Callback(code: string) {
-  let url = `${window._CONFIG['domianURL']}/sys/thirdLogin/oauth2/dingding/login`;
+  let url = `${window._CONFIG.domianURL}/sys/thirdLogin/oauth2/dingding/login`;
   url += `?state=${encodeURIComponent(window.location.origin)}&authCode=${code}`;
-  let tenantId = getAuthCache(OAUTH2_THIRD_LOGIN_TENANT_ID);
+  const tenantId = getAuthCache(OAUTH2_THIRD_LOGIN_TENANT_ID);
   if (tenantId) {
     url += `&tenantId=${tenantId}`;
   }

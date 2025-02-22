@@ -1,4 +1,4 @@
-import { TOKEN_KEY, ROLES_KEY, USER_INFO_KEY, DB_DICT_DATA_KEY, TENANT_ID, LOGIN_INFO_KEY, PROJ_CFG_KEY } from '@/enums/cacheEnum';
+import { DB_DICT_DATA_KEY, LOGIN_INFO_KEY, PROJ_CFG_KEY, ROLES_KEY, TENANT_ID, TOKEN_KEY, USER_INFO_KEY } from '@/enums/cacheEnum';
 
 export interface Cache<V = any> {
   value?: V;

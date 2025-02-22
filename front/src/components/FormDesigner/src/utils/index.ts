@@ -1,4 +1,4 @@
-import { IVFormComponent, IFormConfig, IValidationRule } from '../typings/v-form-component';
+import { IFormConfig, IVFormComponent, IValidationRule } from '../typings/v-form-component';
 // import { del } from '@vue/composition-api';
 // import { withInstall } from '@/utils/util';
 
@@ -160,8 +160,8 @@ export const formatRules = (schemas: IVFormComponent[]): void => {
     if ('required' in item) {
       !_isArray(item.rules) && (item.rules = []);
       item.rules.push({ required: true, message: item.message });
-      delete item['required'];
-      delete item['message'];
+      delete item.required;
+      delete item.message;
     }
   });
 };

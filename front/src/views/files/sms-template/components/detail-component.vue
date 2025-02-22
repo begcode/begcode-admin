@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100%">
+  <div class="w-100%" data-cy="smsTemplateDetailsHeading">
     <Descriptions ref="smsTemplateDetailRef" v-bind="descriptionsProps"></Descriptions>
   </div>
 </template>

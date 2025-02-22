@@ -1,6 +1,6 @@
 <template>
   <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
-  <div>
+  <div data-cy="SmsMessageHeading">
     <a-card
       v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
       title="高级搜索"
@@ -35,7 +35,7 @@
       </a-col>
     </a-row>
     <a-card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
-      <Grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents" data-cy="entityTable">
+      <vxe-grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents" data-cy="entityTable">
         <template #toolbar_buttons>
           <a-row :gutter="16">
             <a-col v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
@@ -85,7 +85,7 @@
         <template #pagerLeft>
           <a-alert type="warning" banner :message="'已选择 ' + selectedRows.length + ' 项'" style="height: 30px" />
         </template>
-      </Grid>
+      </vxe-grid>
       <BasicModal
         v-bind="popupConfig.containerProps"
         @register="registerModal"
@@ -126,7 +126,7 @@
 
 <script lang="ts" setup>
 import { Modal, message } from 'ant-design-vue';
-import { VxeGridInstance, VxeGridListeners, VxeGridProps, Grid } from 'vxe-table';
+import { VxeGridInstance, VxeGridListeners, VxeGridProps } from 'vxe-table';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { transVxeSorts } from '@/utils/jhipster/sorts';
 import { useDrawer } from '@/components/Drawer';
@@ -195,18 +195,27 @@ const rowOperations = ref<any[]>([
     hide: row => !xGrid.value.isEditByRow(row) || !xGrid.value.props.editConfig?.mode === 'row',
     name: 'save',
     type: 'link',
+    attrs: {
+      'data-cy': 'entitySaveButton',
+    },
   },
   {
     title: '编辑',
     hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig?.mode === 'row',
     name: 'edit',
     type: 'link',
+    attrs: {
+      'data-cy': 'entityEditButton',
+    },
   },
   {
     title: '删除',
     hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig?.mode === 'row',
     name: 'delete',
     type: 'link',
+    attrs: {
+      'data-cy': 'entityDeleteButton',
+    },
   },
   {
     title: '详情',
@@ -214,6 +223,9 @@ const rowOperations = ref<any[]>([
     hide: row => xGrid.value.isEditByRow(row) && xGrid.value.props.editConfig?.mode === 'row',
     containerType: 'drawer',
     type: 'link',
+    attrs: {
+      'data-cy': 'entityDetailsButton',
+    },
   },
 ]);
 const { rowOperationRef } = useSetOperationColumn(props.gridCustomConfig, rowOperations, xGrid);
@@ -227,6 +239,9 @@ const extraButtons = ref([
     click: () => {
       xGrid.value.openImport();
     },
+    attrs: {
+      'data-cy': 'entityImportButton',
+    },
   },
   {
     show: props.cardExtra?.includes('export'),
@@ -236,6 +251,9 @@ const extraButtons = ref([
     click: () => {
       xGrid.value.openExport();
     },
+    attrs: {
+      'data-cy': 'entityExportButton',
+    },
   },
   {
     show: props.cardExtra?.includes('print'),
@@ -244,6 +262,9 @@ const extraButtons = ref([
     icon: 'ant-design:printer-outlined',
     click: () => {
       xGrid.value.openPrint();
+    },
+    attrs: {
+      'data-cy': 'entityPrintButton',
     },
   },
 ]);
@@ -329,6 +350,10 @@ function toolbarClick({ code }) {
               formSearch();
             });
           },
+          okButtonProps: {
+            'data-cy': 'entityConfirmDeleteButton',
+            'data-cy-heading': 'smsMessageDeleteDialogHeading',
+          } as any,
         });
       }
       break;
@@ -492,6 +517,10 @@ function rowClick({ name, data, params }) {
               formSearch();
             });
           },
+          okButtonProps: {
+            'data-cy': 'entityConfirmDeleteButton',
+            'data-cy-heading': 'smsMessageDeleteDialogHeading',
+          } as any,
         });
         break;
       default:

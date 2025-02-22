@@ -26,7 +26,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       field: 'sendType',
       format: (value, _data) => {
         const { getEnumDict } = useI18n();
-        return (getEnumDict('MessageSendType').find(item => item.value === value) || { value: value, label: value }).label;
+        return (getEnumDict('MessageSendType').find(item => item.value === value) || { value, label: value }).label;
       },
     },
     {
@@ -42,7 +42,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       field: 'type',
       format: (value, _data) => {
         const { getEnumDict } = useI18n();
-        return (getEnumDict('SmsTemplateType').find(item => item.value === value) || { value: value, label: value }).label;
+        return (getEnumDict('SmsTemplateType').find(item => item.value === value) || { value, label: value }).label;
       },
     },
     {

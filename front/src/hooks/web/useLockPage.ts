@@ -66,9 +66,8 @@ export function useLockPage() {
   return computed(() => {
     if (unref(getLockTime)) {
       return { onKeyup: keyupFn, onMousemove: keyupFn };
-    } else {
-      clear();
-      return {};
     }
+    clear();
+    return {};
   });
 }

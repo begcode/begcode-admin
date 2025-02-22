@@ -20,7 +20,7 @@ export const useLockStore = defineStore({
   },
   actions: {
     setLockInfo(info: LockInfo) {
-      this.lockInfo = Object.assign({}, this.lockInfo, info);
+      this.lockInfo = { ...this.lockInfo, ...info };
       Persistent.setLocal(LOCK_INFO_KEY, this.lockInfo, true);
     },
     resetLockInfo() {

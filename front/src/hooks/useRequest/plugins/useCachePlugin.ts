@@ -25,7 +25,7 @@ const useCachePlugin: UseRequestPlugin<any, any[]> = (
 
     // get data from cache when init
     const cacheData = _getCache(cacheKey);
-    if (cacheData && Object.hasOwnProperty.call(cacheData, 'data')) {
+    if (cacheData && Object.hasOwn(cacheData, 'data')) {
       fetchInstance.state.data = cacheData.data;
       fetchInstance.state.params = cacheData.params;
 
@@ -52,7 +52,7 @@ const useCachePlugin: UseRequestPlugin<any, any[]> = (
     onBefore: params => {
       const cacheData = _getCache(cacheKey, params);
 
-      if (!cacheData || !Object.hasOwnProperty.call(cacheData, 'data')) {
+      if (!cacheData || !Object.hasOwn(cacheData, 'data')) {
         return {};
       }
 
@@ -64,10 +64,9 @@ const useCachePlugin: UseRequestPlugin<any, any[]> = (
           error: undefined,
           returnNow: true,
         };
-      } else {
-        // If the data is stale, return data, and request continue
-        return { data: cacheData?.data, error: undefined };
       }
+      // If the data is stale, return data, and request continue
+      return { data: cacheData?.data, error: undefined };
     },
     onRequest: (service, args) => {
       let servicePromise = getCachePromise(cacheKey);

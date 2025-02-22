@@ -27,7 +27,7 @@ function processStackMsg(error: Error) {
     .replace(/\?[^:]+/gi, ''); // Remove redundant parameters of js file links (?x=1 and the like)
   const msg = error.toString();
   if (stack.indexOf(msg) < 0) {
-    stack = msg + '@' + stack;
+    stack = `${msg}@${stack}`;
   }
   return stack;
 }
@@ -53,7 +53,7 @@ function formatComponentName(vm: any) {
   }
   const name = options.name || options._componentTag;
   return {
-    name: name,
+    name,
     path: options.__file,
   };
 }
@@ -95,9 +95,9 @@ export function scriptErrorHandler(event: Event | string, source?: string, linen
   const errorLogStore = useErrorLogStoreWithOut();
   errorLogStore.addErrorLogInfo({
     type: ErrorTypeEnum.SCRIPT,
-    name: name,
+    name,
     file: source as string,
-    detail: 'lineno' + lineno,
+    detail: `lineno${lineno}`,
     url: window.location.href,
     ...(errorInfo as Pick<ErrorLogInfo, 'message' | 'stack'>),
   });
@@ -147,7 +147,7 @@ function registerResourceErrorHandler() {
         }),
         url: window.location.href,
         stack: 'resource is not found',
-        message: (e.target || ({} as any)).localName + ' is load error',
+        message: `${(e.target || ({} as any)).localName} is load error`,
       });
     },
     true,

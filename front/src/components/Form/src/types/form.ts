@@ -1,7 +1,7 @@
 import type { NamePath, RuleObject, ValidateOptions } from 'ant-design-vue/lib/form/interface';
 import type { RowProps } from 'ant-design-vue/lib/grid/Row';
 import type { FormItem } from './formItem';
-import type { ColEx, ComponentType, ComponentProps } from './';
+import type { ColEx, ComponentProps, ComponentType } from './';
 import type { ButtonProps } from '@/components/Button';
 import type { Recordable } from '#/utils';
 

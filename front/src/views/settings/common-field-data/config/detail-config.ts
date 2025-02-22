@@ -30,7 +30,7 @@ const fields = (hideColumns: string[] = []): DescItem[] => {
       field: 'valueType',
       format: (value, _data) => {
         const { getEnumDict } = useI18n();
-        return (getEnumDict('CommonFieldType').find(item => item.value === value) || { value: value, label: value }).label;
+        return (getEnumDict('CommonFieldType').find(item => item.value === value) || { value, label: value }).label;
       },
     },
     {

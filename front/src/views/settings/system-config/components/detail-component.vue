@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100%">
+  <div class="w-100%" data-cy="systemConfigDetailsHeading">
     <Descriptions ref="systemConfigDetailRef" v-bind="descriptionsProps"></Descriptions>
     <a-tabs>
       <a-tab-pane :tab="relationTables.itemsGrid.title" :key="relationTables.itemsGrid.name">

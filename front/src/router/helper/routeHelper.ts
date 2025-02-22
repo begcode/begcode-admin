@@ -1,8 +1,7 @@
-import type { Router, RouteRecordNormalized } from 'vue-router';
+import type { RouteRecordNormalized, Router } from 'vue-router';
 import { createRouter, createWebHashHistory } from 'vue-router';
 import type { AppRouteModule, AppRouteRecordRaw } from '@/router/types';
-
-import { getParentLayout, LAYOUT, EXCEPTION_COMPONENT } from '@/router/constant';
+import { EXCEPTION_COMPONENT, LAYOUT, getParentLayout } from '@/router/constant';
 import { warn } from '@/utils/Log';
 import { getToken } from '@/utils/auth';
 import { _eval } from '@/utils/util';
@@ -44,7 +43,7 @@ function asyncImportRoute(routes: AppRouteRecordRaw[] | undefined) {
       item.meta.ignoreRoute = true;
     }
     item.meta.ignoreKeepAlive = !item?.meta.keepAlive;
-    let token = getToken();
+    const token = getToken();
     item.component = (item.component || '').replace(/{{([^}}]+)?}}/g, (_s1, s2) => _eval(s2)).replace('${token}', token);
     if (/^\/?http(s)?/.test(item.component as string)) {
       item.component = item.component.substring(1, item.component.length);
@@ -72,7 +71,7 @@ function asyncImportRoute(routes: AppRouteRecordRaw[] | undefined) {
         if (component.indexOf('dashboard/') > -1) {
           //当数据标sys_permission中component没有拼接index时前端需要拼接
           if (component.indexOf('/index') < 0) {
-            component = component + '/index';
+            component = `${component}/index`;
           }
         }
         item.component = dynamicImport(dynamicViewsModules, component as string);
@@ -101,9 +100,8 @@ function dynamicImport(dynamicViewsModules: Record<string, () => Promise<Recorda
     warn(
       'Please do not create `.vue` and `.TSX` files with the same file name in the same hierarchical directory under the views folder. This will cause dynamic introduction failure',
     );
-    return;
   } else {
-    warn('在src/views/下找不到`' + component + '.vue` 或 `' + component + '.tsx`, 请自行创建!');
+    warn(`在src/views/下找不到\`${component}.vue\` 或 \`${component}.tsx\`, 请自行创建!`);
     return EXCEPTION_COMPONENT;
   }
 }
@@ -121,7 +119,7 @@ export function transformObjToRoute<T = AppRouteModule>(routeList: AppRouteModul
         route.component = LAYOUT;
         //某些情况下如果name如果没有值， 多个一级路由菜单会导致页面404
         if (!route.name) {
-          warn('找不到菜单对应的name, 请检查数据!' + JSON.stringify(route));
+          warn(`找不到菜单对应的name, 请检查数据!${JSON.stringify(route)}`);
         }
         route.name = `${route.name}Parent`;
         route.path = '';
@@ -131,7 +129,7 @@ export function transformObjToRoute<T = AppRouteModule>(routeList: AppRouteModul
         route.meta = meta;
       }
     } else {
-      warn('请正确配置路由：' + route?.name + '的component属性');
+      warn(`请正确配置路由：${route?.name}的component属性`);
     }
     route.children && asyncImportRoute(route.children);
   });
@@ -224,7 +222,7 @@ function isMultipleRoute(routeModule: AppRouteModule) {
  */
 export function addSlashToRouteComponent<T = AppRouteModule>(routeList: AppRouteRecordRaw[]) {
   routeList.forEach(route => {
-    let component = route.component as string;
+    const component = route.component as string;
     if (component) {
       const layoutFound = LayoutMap.get(component);
       if (!layoutFound) {

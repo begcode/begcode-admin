@@ -3,7 +3,6 @@ package com.begcode.monolith.settings.domain;
 import com.baomidou.mybatisplus.annotation.*;
 import com.begcode.monolith.domain.AbstractAuditingEntity;
 import com.diboot.core.binding.annotation.*;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.*;
@@ -66,7 +65,6 @@ public class SystemConfig extends AbstractAuditingEntity<Long, SystemConfig> imp
         condition = "id=owner_entity_id AND owner_entity_name = 'SystemConfig' ",
         orderBy = "sortValue:ASC"
     )
-    @JsonIgnoreProperties(value = { "systemConfig", "dictionary" }, allowSetters = true)
     private List<CommonFieldData> items = new ArrayList<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

@@ -1,5 +1,5 @@
 import type { NamePath, ValidateOptions } from 'ant-design-vue/lib/form/interface';
-import type { FormProps, FormActionType, UseFormReturnType, FormSchemaInner as FormSchema } from '../types/form';
+import type { FormActionType, FormProps, FormSchemaInner as FormSchema, UseFormReturnType } from '../types/form';
 import { handleRangeValue } from '../utils/formUtils';
 import type { Recordable } from '#/utils';
 import type { DynamicProps, Nullable } from '#/types';
@@ -70,11 +70,11 @@ export function useForm(props?: Props): UseFormReturnType {
 
     // TODO promisify
     getFieldsValue: <T>() => {
-      let values = unref(formRef)?.getFieldsValue() as T;
+      const values = unref(formRef)?.getFieldsValue() as T;
       if (values) {
         Object.keys(values).map(key => {
           if (values[key] instanceof Array) {
-            let isObject = typeof (values[key][0] || '') === 'object';
+            const isObject = typeof (values[key][0] || '') === 'object';
             if (!isObject) {
               values[key] = values[key].join(',');
             }
@@ -123,11 +123,11 @@ export function useForm(props?: Props): UseFormReturnType {
      */
     validate: async <T = Recordable>(nameList?: NamePath[] | false): Promise<T> => {
       const form = await getForm();
-      let getProps = props || form.getProps;
-      let values = form.validate(nameList).then(values => {
-        for (let key in values) {
+      const getProps = props || form.getProps;
+      return form.validate(nameList).then(values => {
+        for (const key in values) {
           if (values[key] instanceof Array) {
-            let valueType = getValueType(getProps, key);
+            const valueType = getValueType(getProps, key);
             if (valueType === 'string') {
               values[key] = values[key].join(',');
             }
@@ -135,7 +135,6 @@ export function useForm(props?: Props): UseFormReturnType {
         }
         return handleRangeValue(getProps, values);
       });
-      return values;
     },
 
     validateFields: async (nameList?: NamePath[], options?: ValidateOptions): Promise<Recordable> => {

@@ -19,7 +19,7 @@ let webHistory: Nullable<RouterHistory> = null;
 export function createRouter(options: Partial<RouterOptions>) {
   webHistory = createWebHistory(import.meta.env.VITE_PUBLIC_PATH);
   // app router
-  let router = createVueRouter({
+  const router = createVueRouter({
     history: webHistory,
     routes: [],
     ...options,

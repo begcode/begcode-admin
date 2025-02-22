@@ -1,4 +1,4 @@
-import { Input, Select, RadioGroup, Slider } from 'ant-design-vue';
+import { Input, RadioGroup, Select, Slider } from 'ant-design-vue';
 import { IAnyObject } from '../../../typings/base-type';
 import { baseComponents, customComponents } from '../../../core/formItemConfig';
 
