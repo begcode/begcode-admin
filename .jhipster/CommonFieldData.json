@@ -100,34 +100,7 @@
   "jpaMetamodelFiltering": true,
   "name": "CommonFieldData",
   "pagination": "pagination",
-  "relationships": [
-    {
-      "options": {
-        "annotationOnSource": "editInForm-editByTable-unidirectional-relateByIdEntity",
-        "source": {
-          "annotationOnSource": "editInForm-editByTable-unidirectional-relateByIdEntity"
-        }
-      },
-      "otherEntityName": "systemConfig",
-      "otherEntityRelationshipName": "items",
-      "relationshipName": "systemConfig",
-      "relationshipSide": "right",
-      "relationshipType": "many-to-one"
-    },
-    {
-      "options": {
-        "annotationOnSource": "editInForm-editByTable-unidirectional-relateByIdEntity",
-        "source": {
-          "annotationOnSource": "editInForm-editByTable-unidirectional-relateByIdEntity"
-        }
-      },
-      "otherEntityName": "dictionary",
-      "otherEntityRelationshipName": "items",
-      "relationshipName": "dictionary",
-      "relationshipSide": "right",
-      "relationshipType": "many-to-one"
-    }
-  ],
+  "relationships": [],
   "searchEngine": "no",
   "service": "serviceClass"
 }

@@ -1,3 +1,4 @@
+id;text;locale_key;group;link;external_link;target;icon;disabled;hide;hide_in_breadcrumb;shortcut;shortcut_root;reuse;code;description;type;order;api_permission_codes;parent_id;component_file;redirect
 1;仪表盘;;false;/dashboard;;PARENT;ant-design:appstore-outlined;false;false;false;false;false;false;dashboard;;MENU;1;;;LAYOUT;/dashboard/analysis
 2;分析页;;false;/dashboard/analysis;;BLANK;;false;false;false;false;false;false;dashboard-analysis;;MENU;0;;1;dashboard/Analysis;
 3;系统设置;;false;/settings/system;;NULL;ion:settings-outline;false;false;false;false;false;false;settings-system;;MENU;1;;;LAYOUT;
@@ -172,18 +173,6 @@
 173;编辑数据字典;;false;/settings/dictionary/:entityId/edit;;SELF;;false;true;false;false;false;false;systemDictionaryEdit;;MENU;1;;54;settings/dictionary/dictionary-edit;
 174;新建数据字典;;false;/settings/dictionary/new;;SELF;;false;true;false;false;false;false;systemDictionaryNew;;MENU;1;;54;settings/dictionary/dictionary-edit;
 175;查看数据字典;;false;/settings/dictionary/:entityId/detail;;SELF;;false;true;false;false;false;false;systemDictionaryDetail;;MENU;1;;54;settings/dictionary/dictionary-detail;
-176;网站配置;;false;/settings/site-config;;SELF;;false;false;false;false;false;false;systemSiteConfigList;;MENU;1;;54;settings/site-config/site-config-list;
-177;新建网站配置;;false;;;SELF;;false;true;false;false;false;false;system:siteConfig:new;;BUTTON;1;;176;;
-178;编辑网站配置;;false;;;SELF;;false;true;false;false;false;false;system:siteConfig:edit;;BUTTON;1;;176;;
-179;查看网站配置;;false;;;SELF;;false;true;false;false;false;false;system:siteConfig:detail;;BUTTON;1;;176;;
-180;删除网站配置;;false;;;SELF;;false;true;false;false;false;false;system:siteConfig:delete;;BUTTON;1;;176;;
-181;导入网站配置;;false;;;SELF;;false;true;false;false;false;false;system:siteConfig:import;;BUTTON;1;;176;;
-182;导出网站配置;;false;;;SELF;;false;true;false;false;false;false;system:siteConfig:export;;BUTTON;1;;176;;
-183;打印网站配置;;false;;;SELF;;false;true;false;false;false;false;system:siteConfig:print;;BUTTON;1;;176;;
-184;列配置网站配置;;false;;;SELF;;false;true;false;false;false;false;system:siteConfig:customColumn;;BUTTON;1;;176;;
-185;编辑网站配置;;false;/settings/site-config/:entityId/edit;;SELF;;false;true;false;false;false;false;systemSiteConfigEdit;;MENU;1;;54;settings/site-config/site-config-edit;
-186;新建网站配置;;false;/settings/site-config/new;;SELF;;false;true;false;false;false;false;systemSiteConfigNew;;MENU;1;;54;settings/site-config/site-config-edit;
-187;查看网站配置;;false;/settings/site-config/:entityId/detail;;SELF;;false;true;false;false;false;false;systemSiteConfigDetail;;MENU;1;;54;settings/site-config/site-config-detail;
 188;行政区划码;;false;/settings/region-code;;SELF;;false;false;false;false;false;false;systemRegionCodeList;;MENU;1;;54;settings/region-code/region-code-list;
 189;新建行政区划码;;false;;;SELF;;false;true;false;false;false;false;system:regionCode:new;;BUTTON;1;;188;;
 190;编辑行政区划码;;false;;;SELF;;false;true;false;false;false;false;system:regionCode:edit;;BUTTON;1;;188;;

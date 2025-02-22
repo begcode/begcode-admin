@@ -10,8 +10,8 @@ import { ossConfigRoutes } from '@/router/routes/modules/files/oss-config.route'
 // jhipster-needle-add-entity-to-client-root-folder-router-import - JHipster will import entities to the client root folder router here
 
 const files: AppRouteModule = {
-  path: '/system',
-  name: 'system',
+  path: '/files',
+  name: 'files',
   component: LAYOUT,
   meta: {
     orderNo: 5000,
