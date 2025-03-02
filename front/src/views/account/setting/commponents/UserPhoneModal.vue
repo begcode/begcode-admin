@@ -1,5 +1,5 @@
 <template>
-  <BasicModal v-bind="$attrs" @register="registerModal" width="500px" :title="title" :showCancelBtn="false" :showOkBtn="false">
+  <basic-modal v-bind="$attrs" @register="registerModal" width="500px" :title="title" :showCancelBtn="false" :showOkBtn="false">
     <a-form
       v-if="type === 'updatePhone'"
       class="antd-modal-form"
@@ -61,7 +61,7 @@
         <a-button size="large" type="primary" block @click="updatePhone"> 确认 </a-button>
       </a-form-item>
     </a-form>
-  </BasicModal>
+  </basic-modal>
 </template>
 
 <script lang="ts" setup>

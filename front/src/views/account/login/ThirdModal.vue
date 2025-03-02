@@ -8,7 +8,7 @@
   <a-modal :footer="null" :closable="false" v-model:open="thirdConfirmShow" :class="'ant-modal-confirm'">
     <div class="ant-modal-confirm-body-wrapper">
       <div class="ant-modal-confirm-body">
-        <QuestionCircleFilled style="color: #faad14" />
+        <Icon icon="ant-design:question-circle-filled" style="color: #faad14" />
         <span class="ant-modal-confirm-title">提示</span>
         <div class="ant-modal-confirm-content">已有同名账号存在,请确认是否绑定该账号？</div>
       </div>
@@ -50,7 +50,6 @@
 </template>
 <script lang="ts" setup>
 import { CountdownInput } from '@/components/CountDown';
-import { QuestionCircleFilled } from '@ant-design/icons-vue';
 import { defHttp } from '@/utils/http/axios';
 import { useGlobSetting } from '@/hooks/setting';
 import { useMessage } from '@/hooks/web/useMessage';

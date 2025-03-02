@@ -1,5 +1,5 @@
 <template>
-  <BasicModal
+  <basic-modal
     :canFullscreen="false"
     :draggable="false"
     :closable="false"
@@ -28,7 +28,7 @@
                           <span class="clear-user-icon"><close-outlined style="font-size: 12px" @click="clearSearchParamsUser" /></span>
                         </div>
                         <a-button v-else type="dashed" shape="circle" @click="openSelectPerson">
-                          <PlusOutlined />
+                          <Icon icon="ant-design:plus-outlined" />
                         </a-button>
                       </span>
                     </div>
@@ -52,13 +52,13 @@
                   </template>
 
                   <span v-if="conditionStr" class="anticon filtera">
-                    <FilterOutlined />
+                    <Icon icon="ant-design:filter-outlined" />
                     <span style="font-size: 12px; margin-left: 3px">{{ conditionStr }}</span>
                     <span style="display: flex; margin: 0 5px"><close-outlined style="font-size: 12px" @click="clearAll" /></span>
                   </span>
-                  <FilterOutlined v-else />
+                  <Icon icon="ant-design:filter-outlined" v-else />
                 </a-popover>
-                <CloseOutlined @click="closeModal" />
+                <Icon icon="ant-design:close-outlined" @click="closeModal" />
               </div>
             </div>
           </div>
@@ -81,14 +81,13 @@
         </a-tab-pane>
       </a-tabs>
     </div>
-  </BasicModal>
+  </basic-modal>
   <DetailModal @register="registerDetail" />
 </template>
 
 <script lang="ts" setup>
 import { BasicModal, useModalInner, useModal } from '@/components/Modal';
 import { createAsyncComponent } from '@/utils/factory/createAsyncComponent';
-import { FilterOutlined, CloseOutlined, BellFilled, ExclamationOutlined, PlusOutlined } from '@ant-design/icons-vue';
 // import SysMessageList from './SysMessageList.vue';
 import { SelectModal } from '@/components/SelectModal';
 import DetailModal from '@/views/monitor/mynews/DetailModal.vue';

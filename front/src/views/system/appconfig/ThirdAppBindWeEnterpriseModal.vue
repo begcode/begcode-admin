@@ -1,6 +1,6 @@
 <!--弹窗绑定企业微信页面-->
 <template>
-  <BasicModal @register="registerModal" :width="800" :title="title" destroyOnClose>
+  <basic-modal @register="registerModal" :width="800" :title="title" destroyOnClose>
     <a-spin :spinning="loading">
       <div class="we-bind">
         <a-row :span="24" class="we-title-background">
@@ -45,7 +45,7 @@
     <template #footer>
       <a-button v-if="!izBind" type="primary" @click="handleSubmit">同步</a-button>
     </template>
-  </BasicModal>
+  </basic-modal>
 </template>
 
 <script lang="ts" setup>

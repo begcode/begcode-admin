@@ -1,5 +1,5 @@
 <template>
-  <BasicModal
+  <basic-modal
     v-bind="$attrs"
     :canFullscreen="false"
     :okText="t('component.cropper.okText')"
@@ -17,12 +17,12 @@
         <div :class="`${prefixCls}-toolbar`">
           <a-upload :fileList="[]" accept="image/*" :beforeUpload="handleBeforeUpload">
             <a-tooltip :title="t('component.cropper.selectImage')" placement="bottom">
-              <BasicButton size="small" preIcon="ant-design:upload-outlined" type="primary" />
+              <basic-button size="small" preIcon="ant-design:upload-outlined" type="primary" />
             </a-tooltip>
           </a-upload>
           <a-space>
             <a-tooltip :title="t('component.cropper.btn_reset')" placement="bottom">
-              <BasicButton
+              <basic-button
                 type="primary"
                 preIcon="ant-design:reload-outlined"
                 size="small"
@@ -31,7 +31,7 @@
               />
             </a-tooltip>
             <a-tooltip :title="t('component.cropper.btn_rotate_left')" placement="bottom">
-              <BasicButton
+              <basic-button
                 type="primary"
                 preIcon="ant-design:rotate-left-outlined"
                 size="small"
@@ -40,7 +40,7 @@
               />
             </a-tooltip>
             <a-tooltip :title="t('component.cropper.btn_rotate_right')" placement="bottom">
-              <BasicButton
+              <basic-button
                 type="primary"
                 preIcon="ant-design:rotate-right-outlined"
                 size="small"
@@ -49,13 +49,13 @@
               />
             </a-tooltip>
             <a-tooltip :title="t('component.cropper.btn_scale_x')" placement="bottom">
-              <BasicButton type="primary" preIcon="vaadin:arrows-long-h" size="small" :disabled="!src" @click="handlerToolbar('scaleX')" />
+              <basic-button type="primary" preIcon="vaadin:arrows-long-h" size="small" :disabled="!src" @click="handlerToolbar('scaleX')" />
             </a-tooltip>
             <a-tooltip :title="t('component.cropper.btn_scale_y')" placement="bottom">
-              <BasicButton type="primary" preIcon="vaadin:arrows-long-v" size="small" :disabled="!src" @click="handlerToolbar('scaleY')" />
+              <basic-button type="primary" preIcon="vaadin:arrows-long-v" size="small" :disabled="!src" @click="handlerToolbar('scaleY')" />
             </a-tooltip>
             <a-tooltip :title="t('component.cropper.btn_zoom_in')" placement="bottom">
-              <BasicButton
+              <basic-button
                 type="primary"
                 preIcon="ant-design:zoom-in-outlined"
                 size="small"
@@ -64,7 +64,7 @@
               />
             </a-tooltip>
             <a-tooltip :title="t('component.cropper.btn_zoom_out')" placement="bottom">
-              <BasicButton
+              <basic-button
                 type="primary"
                 preIcon="ant-design:zoom-out-outlined"
                 size="small"
@@ -89,7 +89,7 @@
         </template>
       </div>
     </div>
-  </BasicModal>
+  </basic-modal>
 </template>
 <script lang="ts" setup>
 import type { CropendResult, Cropper } from './typing';

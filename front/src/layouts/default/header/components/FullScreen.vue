@@ -1,14 +1,13 @@
 <template>
   <a-tooltip :title="getTitle" placement="bottom" :mouseEnterDelay="0.5">
     <span @click="toggle">
-      <FullscreenOutlined v-if="!isFullscreen" />
-      <FullscreenExitOutlined v-else />
+      <Icon icon="ant-design:fullscreen-outlined" v-if="!isFullscreen" />
+      <Icon icon="ant-design:fullscreen-exit-outlined" v-else />
     </span>
   </a-tooltip>
 </template>
 <script lang="ts" setup>
 import { useFullscreen } from '@vueuse/core';
-import { FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons-vue';
 import { useI18n } from '@/hooks/web/useI18n';
 
 defineOptions({ name: 'FullScreen' });

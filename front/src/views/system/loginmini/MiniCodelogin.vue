@@ -33,24 +33,24 @@
           <div class="aui-flex" :class="`${prefixCls}-sign-in-way`">
             <div class="aui-flex-box">
               <div class="aui-third-login">
-                <a href="" title="github" @click="onThirdLogin('github')"><GithubFilled /></a>
+                <a href="" title="github" @click="onThirdLogin('github')"><Icon icon="ant-design:github-filled" /></a>
               </div>
             </div>
             <div class="aui-flex-box">
               <div class="aui-third-login">
                 <a href="" title="企业微信" @click="onThirdLogin('wechat_enterprise')"
-                  ><icon-font class="item-icon" type="icon-qiyeweixin3"
+                  ><Icon class="item-icon" icon="icon-qiyeweixin3|font"
                 /></a>
               </div>
             </div>
             <div class="aui-flex-box">
               <div class="aui-third-login">
-                <a href="" title="钉钉" @click="onThirdLogin('dingtalk')"><DingtalkCircleFilled /></a>
+                <a href="" title="钉钉" @click="onThirdLogin('dingtalk')"><Icon icon="ant-design:dingtalk-circle-filled" /></a>
               </div>
             </div>
             <div class="aui-flex-box">
               <div class="aui-third-login">
-                <a href="" title="微信" @click="onThirdLogin('wechat_open')"><WechatFilled /></a>
+                <a href="" title="微信" @click="onThirdLogin('wechat_open')"><Icon icon="ant-design:wechat-filled" /></a>
               </div>
             </div>
           </div>
@@ -62,18 +62,16 @@
   <ThirdModal ref="thirdModalRef"></ThirdModal>
 </template>
 
-<script lang="ts" setup name="mini-code-login">
+<script lang="ts" setup>
 import { getLoginQrcode, getQrcodeToken } from '@/api-service/sys/user';
 import { useUserStore } from '@/store/modules/user';
 import ThirdModal from '@/views/account/login/ThirdModal.vue';
 import adTextImg from '@/assets/loginmini/icon/jeecg_ad_text.png';
 import { useI18n } from '@/hooks/web/useI18n';
 import { useDesign } from '@/hooks/web/useDesign';
-import { GithubFilled, WechatFilled, DingtalkCircleFilled, createFromIconfontCN } from '@ant-design/icons-vue';
 
-const IconFont = createFromIconfontCN({
-  scriptUrl: '//at.alicdn.com/t/font_2316098_umqusozousr.js',
-});
+defineOptions({ name: 'MiniCodeLogin' });
+
 const { prefixCls } = useDesign('minilogin');
 const { t } = useI18n();
 const qrCodeUrl = ref<string>('');

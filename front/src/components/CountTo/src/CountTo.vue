@@ -5,7 +5,6 @@
 </template>
 <script lang="ts" setup>
 import { useTransition, TransitionPresets } from '@vueuse/core';
-import { isNumber } from '@/utils/is';
 
 defineOptions({ name: 'CountTo' });
 

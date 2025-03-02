@@ -2,8 +2,8 @@
   <div ref="chartRef" :style="{ height, width }"></div>
 </template>
 <script lang="ts" setup>
+import type { EChartsOption } from 'echarts';
 import { useECharts } from '@/hooks/web/useECharts';
-import { EChartsOption } from 'echarts';
 
 defineOptions({
   name: 'Bar',

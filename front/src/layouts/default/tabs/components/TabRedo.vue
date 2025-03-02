@@ -1,10 +1,9 @@
 <template>
   <span :class="`${prefixCls}__extra-redo`" @click="handleRedo">
-    <RedoOutlined :spin="loading" :size="18" />
+    <Icon icon="ant-design:redo-outlined" :spin="loading" :size="18" />
   </span>
 </template>
 <script lang="ts" setup>
-import { RedoOutlined } from '@ant-design/icons-vue';
 import { useDesign } from '@/hooks/web/useDesign';
 import { useTabs } from '@/hooks/web/useTabs';
 

@@ -22,12 +22,13 @@
   </div>
 </template>
 <script lang="ts">
+import { Row, Col } from 'ant-design-vue';
+import { useVModel } from '@vueuse/core';
 import FormRender from './components/FormRender.vue';
 import { IFormConfig, AForm } from '../../typings/v-form-component';
-import { Row, Col } from 'ant-design-vue';
 import { useFormInstanceMethods } from '../../hooks/useFormInstanceMethods';
 import { IProps, IVFormMethods, useVFormMethods } from '../../hooks/useVFormMethods';
-import { useVModel } from '@vueuse/core';
+
 import type { Recordable } from '#/utils';
 
 export default defineComponent({

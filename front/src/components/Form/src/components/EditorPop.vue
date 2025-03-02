@@ -14,7 +14,7 @@
     </template>
     <template #content>
       <div style="height: 400px; width: 500px">
-        <CodeEditor />
+        <code-editor />
       </div>
     </template>
     <a-input
@@ -35,7 +35,6 @@
 <script lang="ts" setup>
 import { useAttrs } from '@/hooks/vben/useAttrs';
 import { useDesign } from '@/hooks/web/useDesign';
-import CodeEditor from '@/components/CodeEditor/src/CodeEditor.vue';
 import { TooltipPlacement } from 'ant-design-vue/es/tooltip';
 
 const { prefixCls } = useDesign('editor-pop');

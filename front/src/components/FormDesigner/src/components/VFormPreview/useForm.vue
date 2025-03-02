@@ -10,7 +10,7 @@
     :destroyOnClose="true"
     :width="900"
   >
-    <BasicForm v-bind="attrs" @register="registerForm" />
+    <basic-form v-bind="attrs" @register="registerForm" />
     <JsonModal ref="jsonModal" />
   </a-modal>
 </template>

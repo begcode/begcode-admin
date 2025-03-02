@@ -1,5 +1,5 @@
 <template>
-  <BasicModal
+  <basic-modal
     width="800px"
     :title="t('component.upload.upload')"
     :okText="t('component.upload.upload')"
@@ -61,7 +61,7 @@
         </a-button>
       </template>
     </vxe-grid>
-  </BasicModal>
+  </basic-modal>
 </template>
 <script lang="ts" setup>
 import { message } from 'ant-design-vue';

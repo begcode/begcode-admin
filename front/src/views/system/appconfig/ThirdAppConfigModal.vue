@@ -1,7 +1,7 @@
 <template>
-  <BasicModal @register="registerModal" :width="800" :title="title" @ok="handleSubmit">
-    <BasicForm @register="registerForm" />
-  </BasicModal>
+  <basic-modal @register="registerModal" :width="800" :title="title" @ok="handleSubmit">
+    <basic-form @register="registerForm" />
+  </basic-modal>
 </template>
 
 <script lang="ts">

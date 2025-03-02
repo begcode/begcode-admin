@@ -10,22 +10,22 @@
         </a-avatar>
       </a-tooltip>
     </a-avatar-group>
-    <BasicButton
+    <basic-button
       v-if="(avatarGroupData.length || statsValue > 0) && disabled"
       pre-icon="ant-design:file-search-outlined"
       type="link"
       size="small"
       @click.stop="openModal('view')"
       style="padding: 0"
-    ></BasicButton>
-    <BasicButton
+    ></basic-button>
+    <basic-button
       v-if="!disabled"
       pre-icon="ant-design:edit-outlined"
       type="link"
       size="small"
       @click.stop="openModal('edit')"
       style="padding: 0"
-    ></BasicButton>
+    ></basic-button>
   </div>
 </template>
 <script lang="ts" setup>

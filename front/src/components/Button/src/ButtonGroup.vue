@@ -60,7 +60,7 @@ defineExpose({
 
 <template>
   <a-space :size="spaceSize" v-if="showButtons.length">
-    <BasicButton
+    <basic-button
       v-for="operation in showButtons"
       :type="operation.type || 'link'"
       :title="getButtonTitle(operation.title, row)"
@@ -71,7 +71,7 @@ defineExpose({
     >
       <Icon icon="ant-design:save-outlined" #icon v-if="operation.icon" />
       <span v-else>{{ getButtonTitle(operation.title, row) }}</span>
-    </BasicButton>
+    </basic-button>
     <a-dropdown v-if="dropdownButtons && dropdownButtons.length">
       <template #overlay>
         <a-menu @click="menuClick($event, row)">

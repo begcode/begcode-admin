@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { MaybeElement, MaybeElementRef, onClickOutside } from '@vueuse/core';
-import Icon from '@/components/Icon/Icon.vue';
 
 defineOptions({
   name: 'ColorPicker',

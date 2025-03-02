@@ -1,5 +1,5 @@
 <template>
-  <BasicModal v-bind="config" @register="registerModal" :title="currTitle" wrapClassName="loginSelectModal" v-model:open="open">
+  <basic-modal v-bind="config" @register="registerModal" :title="currTitle" wrapClassName="loginSelectModal" v-model:open="open">
     <a-form ref="formRef" :model="formState" :rules="rules" v-bind="layout" :colon="false" class="loginSelectForm">
       <!--多租户选择-->
       <a-form-item v-if="isMultiTenant" name="tenantId" :validate-status="validate_status">
@@ -58,7 +58,7 @@
     <template #footer>
       <a-button @click="handleSubmit" type="primary">确认</a-button>
     </template>
-  </BasicModal>
+  </basic-modal>
 </template>
 
 <script lang="ts" setup>

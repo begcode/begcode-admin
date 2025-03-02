@@ -13,20 +13,17 @@
         ]"
         :style="{ background: color }"
       >
-        <CheckOutlined />
+        <Icon icon="ant-design:check-outlined" />
       </span>
     </template>
   </div>
 </template>
 <script lang="ts" setup>
-import { CheckOutlined } from '@ant-design/icons-vue';
-
 import { useDesign } from '@/hooks/web/useDesign';
-
-import { baseHandler } from '../handler';
-import { HandlerEnum } from '../enum';
 import { useRootSetting } from '@/hooks/setting/useRootSetting';
 import { ThemeEnum } from '@/enums/appEnum';
+import { baseHandler } from '../handler';
+import { HandlerEnum } from '../enum';
 
 defineOptions({ name: 'ThemeColorPicker' });
 

@@ -10,16 +10,16 @@
     >
       <template #extra>
         <a-space>
-          <BasicButton
+          <basic-button
             type="default"
             @click="showSearchFormSetting"
             pre-icon="ant-design:setting-outlined"
             shape="circle"
             size="small"
-          ></BasicButton>
+          ></basic-button>
         </a-space>
       </template>
-      <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" ref="searchFormRef" />
+      <search-form :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" ref="searchFormRef" />
     </a-card>
     <a-row
       v-if="fieldSearchValues && fieldSearchValues.length && !searchFormConfig.toggleSearchStatus"
@@ -53,13 +53,13 @@
                     <Icon icon="ant-design:search-outlined" />
                   </template>
                   <template #addonAfter>
-                    <BasicButton type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
+                    <basic-button type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
                       >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch" data-cy="listSearchMore" />
-                    </BasicButton>
+                    </basic-button>
                   </template>
                 </a-input>
                 <template v-for="button of gridOptions?.toolbarConfig?.buttons">
-                  <BasicButton v-if="!button.dropdowns">{{ button.name }}</BasicButton>
+                  <basic-button v-if="!button.dropdowns">{{ button.name }}</basic-button>
                   <a-dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
                     <template #overlay>
                       <a-menu @click="gridEvents.toolbarButtonClick?.(subButton as any)" v-for="subButton of button.dropdowns">
@@ -69,10 +69,10 @@
                         </a-menu-item>
                       </a-menu>
                     </template>
-                    <BasicButton>
+                    <basic-button>
                       {{ button.name }}
                       <Icon icon="ant-design:down-outlined" />
-                    </BasicButton>
+                    </basic-button>
                   </a-dropdown>
                 </template>
               </a-space>
@@ -80,7 +80,7 @@
           </a-row>
         </template>
         <template #recordAction="{ row }">
-          <ButtonGroup :row="row" :buttons="rowOperations" @click="rowClick" :ref="el => rowOperationRef('row_operation_' + row.id, el)" />
+          <button-group :row="row" :buttons="rowOperations" @click="rowClick" :ref="el => rowOperationRef('row_operation_' + row.id, el)" />
         </template>
 
         <template #users_default="{ row, column }">
@@ -99,7 +99,7 @@
           <a-alert type="warning" banner :message="'已选择 ' + selectedRows.length + ' 项'" style="height: 30px" />
         </template>
       </vxe-grid>
-      <BasicModal
+      <basic-modal
         v-bind="popupConfig.containerProps"
         @register="registerModal"
         @cancel="closeModal"
@@ -115,8 +115,8 @@
           v-on="popupConfig.componentEvents"
           ref="modalComponentRef"
         />
-      </BasicModal>
-      <BasicDrawer
+      </basic-modal>
+      <basic-drawer
         v-bind="popupConfig.containerProps"
         @register="registerDrawer"
         @close="closeDrawer"
@@ -132,7 +132,7 @@
           v-on="popupConfig.componentEvents"
           ref="drawerComponentRef"
         />
-      </BasicDrawer>
+      </basic-drawer>
     </a-card>
   </div>
 </template>
@@ -144,7 +144,6 @@ import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { transVxeSorts } from '@/utils/jhipster/sorts';
 import { useDrawer } from '@/components/Drawer';
 import { useModal } from '@/components/Modal';
-import { ButtonGroup } from '@/components/Button';
 import { clearSearchFieldValue } from '@/components/SearchForm';
 import { useGo } from '@/hooks/web/usePage';
 import ServerProvider from '@/api-service/index';

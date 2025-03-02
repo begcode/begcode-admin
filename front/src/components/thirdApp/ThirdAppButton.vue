@@ -7,10 +7,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
+import { Modal } from 'ant-design-vue';
+import { Icon } from '@/components/Icon';
 import { defHttp } from '@/utils/http/axios';
 import { backEndUrl, getEnabledTypes, doSyncThirdApp } from './ThirdApp.api';
-import { Modal } from 'ant-design-vue';
 import ThirdAppDropdown from './ThirdAppDropdown.vue';
 import { useMessage } from '@/hooks/web/useMessage';
 
@@ -81,7 +81,7 @@ function doSync(type, direction) {
   }
   return new Promise((resolve, reject) => {
     const model = Modal.confirm({
-      icon: createVNode(ExclamationCircleOutlined),
+      icon: createVNode(Icon, { icon: 'ant-design:exclamation-circle-outlined' }),
       title: '同步',
       content,
       onOk: () => {

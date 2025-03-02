@@ -13,12 +13,12 @@
                 <template v-for="button in toolButtons">
                   <a-tooltip v-if="!button.hidden">
                     <template #title>{{ button.title }}</template>
-                    <ImageUpload v-if="button.name === 'uploadImg'">{{ button.title }}</ImageUpload>
+                    <image-upload v-if="button.name === 'uploadImg'">{{ button.title }}</image-upload>
                     <a-upload v-else-if="button.name === 'uploadFile'">{{ button.title }}</a-upload>
-                    <BasicButton :disabled="button.disabled" @click="button.click" v-else>
+                    <basic-button :disabled="button.disabled" @click="button.click" v-else>
                       <Icon :icon="button.icon" v-if="button.icon"></Icon>
                       {{ button.title }}
-                    </BasicButton>
+                    </basic-button>
                   </a-tooltip>
                 </template>
                 <a-tooltip>
@@ -26,7 +26,7 @@
                     <div class="w-50">每行显示数量</div>
                     <a-slider id="slider" v-bind="sliderProp" v-model:value="grid" @change="sliderChange" />
                   </template>
-                  <BasicButton><Icon icon="ant-design:table-outlined" />列数</BasicButton>
+                  <basic-button><Icon icon="ant-design:table-outlined" />列数</basic-button>
                 </a-tooltip>
               </a-space>
             </div>
@@ -43,7 +43,7 @@
               </template>
               <template class="ant-card-actions" #actions>
                 <template v-for="operation in rowOperations">
-                  <BasicButton :type="operation.type" @click="operation.click(item)">{{ operation.title }}</BasicButton>
+                  <basic-button :type="operation.type" @click="operation.click(item)">{{ operation.title }}</basic-button>
                 </template>
                 <a-dropdown
                   :trigger="['hover']"
@@ -80,7 +80,6 @@
 </template>
 <script lang="ts" setup>
 import { useSlider, grid } from './data';
-import ImageUpload from '@/components/Upload/src/components/ImageUpload.vue';
 
 // 获取slider属性
 const sliderProp = computed(() => useSlider(4));

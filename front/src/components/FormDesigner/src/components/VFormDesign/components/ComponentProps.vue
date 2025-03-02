@@ -62,7 +62,6 @@
   </div>
 </template>
 <script lang="ts">
-import RadioButtonGroup from '@/components/Form/src/components/RadioButtonGroup.vue';
 import { useFormDesignState } from '../../../hooks/useFormDesignState';
 import {
   baseComponentControlAttrs,

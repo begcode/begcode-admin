@@ -1,7 +1,7 @@
 <template>
   <div :class="prefixCls">
     <a-badge :count="count" :overflowCount="9" :offset="[-6, -12]" dot @click="clickBadge">
-      <BellOutlined />
+      <Icon icon="ant-design:bell-outlined" />
     </a-badge>
     <DynamicNotice ref="dynamicNoticeRef" v-bind="dynamicNoticeProps" />
     <DetailModal @register="registerDetail" />
@@ -9,7 +9,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { BellOutlined } from '@ant-design/icons-vue';
 import { useModal } from '@/components/Modal';
 import { useDesign } from '@/hooks/web/useDesign';
 import { tabListData } from './data';

@@ -6,7 +6,7 @@
       @click="handleShowForm(false)"
       v-show="showDate"
     >
-      <LockOutlined />
+      <Icon icon="ant-design:lock-outlined" />
       <span>{{ t('sys.lock.unlock') }}</span>
     </div>
 
@@ -63,7 +63,6 @@ import { useLockStore } from '@/store/modules/lock';
 import { useI18n } from '@/hooks/web/useI18n';
 import { useNow } from './useNow';
 import { useDesign } from '@/hooks/web/useDesign';
-import { LockOutlined } from '@ant-design/icons-vue';
 import headerImg from '@/assets/images/header.jpg';
 
 const password = ref('');

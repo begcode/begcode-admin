@@ -8,11 +8,11 @@
     :displayRender="handleRenderDisplay"
   >
     <template #suffixIcon v-if="loading">
-      <LoadingOutlined spin />
+      <Icon icon="ant-design:loading-outlined" spin />
     </template>
     <template #notFoundContent v-if="loading">
       <span>
-        <LoadingOutlined spin class="mr-1" />
+        <Icon icon="ant-design:loading-outlined" spin class="mr-1" />
         {{ t('component.form.apiSelectNotFound') }}
       </span>
     </template>
@@ -22,7 +22,6 @@
 import { type Recordable } from '#/utils.d';
 import type { CascaderProps } from 'ant-design-vue';
 import { useRuleFormItem } from '@/hooks/component/useFormItem';
-import { LoadingOutlined } from '@ant-design/icons-vue';
 import { useI18n } from '@/hooks/web/useI18nOut';
 
 interface Option {

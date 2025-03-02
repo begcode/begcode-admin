@@ -1,13 +1,13 @@
 <template>
-  <BasicModal :title="t('layout.header.dropdownChangeApi')" v-bind="$attrs" @register="register" @ok="handelSubmit" @cancel="handelCancel">
-    <BasicForm @register="registerForm">
+  <basic-modal :title="t('layout.header.dropdownChangeApi')" v-bind="$attrs" @register="register" @ok="handelSubmit" @cancel="handelCancel">
+    <basic-form @register="registerForm">
       <template #api="{ model, field }">
         <a-radio-group v-model:value="model[field]">
           <a-radio :style="radioStyle" :value="key" v-for="(val, key) in addresses" :key="key">{{ key }}: {{ val }}</a-radio>
         </a-radio-group>
       </template>
-    </BasicForm>
-  </BasicModal>
+    </basic-form>
+  </basic-modal>
 </template>
 <script lang="ts" setup>
 import { useI18n } from '@/hooks/web/useI18n';

@@ -1,8 +1,8 @@
 <template>
   <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
   <div data-cy="BusinessTypeHeading" style="height: 100%; padding-bottom: 10px">
-    <SplitPanes class="default-theme">
-      <SplitPane size="60">
+    <split-panes class="default-theme">
+      <split-pane size="60">
         <a-card
           v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
           title="高级搜索"
@@ -12,16 +12,16 @@
         >
           <template #extra>
             <a-space>
-              <BasicButton
+              <basic-button
                 type="default"
                 @click="showSearchFormSetting"
                 preIcon="ant-design:setting-outlined"
                 shape="circle"
                 size="small"
-              ></BasicButton>
+              ></basic-button>
             </a-space>
           </template>
-          <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" ref="searchFormRef" />
+          <search-form :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" ref="searchFormRef" />
         </a-card>
         <a-row
           v-if="fieldSearchValues && fieldSearchValues.length && !searchFormConfig.toggleSearchStatus"
@@ -55,18 +55,18 @@
                         <Icon icon="ant-design:search-outlined" />
                       </template>
                       <template #addonAfter>
-                        <BasicButton type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
+                        <basic-button type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
                           >查询<Icon
                             icon="ant-design:filter-outlined"
                             @click="handleToggleSearch"
                             data-cy="listSearchMore"
                             v-if="searchFormConfig.allowSwitch"
                           ></Icon>
-                        </BasicButton>
+                        </basic-button>
                       </template>
                     </a-input>
                     <template v-for="button of gridOptions?.toolbarConfig?.buttons">
-                      <BasicButton v-if="!button.dropdowns">{{ button.name }}</BasicButton>
+                      <basic-button v-if="!button.dropdowns">{{ button.name }}</basic-button>
                       <a-dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
                         <template #overlay>
                           <a-menu @click="gridEvents.toolbarButtonClick?.(subButton as any)" v-for="subButton of button.dropdowns">
@@ -76,10 +76,10 @@
                             </a-menu-item>
                           </a-menu>
                         </template>
-                        <BasicButton>
+                        <basic-button>
                           {{ button.name }}
                           <Icon icon="ant-design:down-outlined" />
-                        </BasicButton>
+                        </basic-button>
                       </a-dropdown>
                     </template>
                   </a-space>
@@ -87,7 +87,7 @@
               </a-row>
             </template>
             <template #recordAction="{ row }">
-              <ButtonGroup
+              <button-group
                 :row="row"
                 :buttons="rowOperations"
                 @click="rowClick"
@@ -98,7 +98,7 @@
               <a-alert type="warning" banner :message="'已选择 ' + selectedRows.length + ' 项'" style="height: 30px" />
             </template>
           </vxe-grid>
-          <BasicModal
+          <basic-modal
             v-bind="popupConfig.containerProps"
             @register="registerModal"
             @cancel="closeModal"
@@ -114,8 +114,8 @@
               v-on="popupConfig.componentEvents"
               ref="modalComponentRef"
             />
-          </BasicModal>
-          <BasicDrawer
+          </basic-modal>
+          <basic-drawer
             v-bind="popupConfig.containerProps"
             @register="registerDrawer"
             @close="closeDrawer"
@@ -131,10 +131,10 @@
               v-on="popupConfig.componentEvents"
               ref="drawerComponentRef"
             />
-          </BasicDrawer>
+          </basic-drawer>
         </a-card>
-      </SplitPane>
-      <SplitPane>
+      </split-pane>
+      <split-pane>
         <a-card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '8px' }">
           <a-tabs defaultActiveKey="baseInfo" type="card" v-if="currentRow">
             <a-tab-pane key="baseInfo" tab="基本信息">
@@ -143,8 +143,8 @@
           </a-tabs>
           <a-empty description="尚未选择业务类型" v-else />
         </a-card>
-      </SplitPane>
-    </SplitPanes>
+      </split-pane>
+    </split-panes>
   </div>
 </template>
 
@@ -155,7 +155,6 @@ import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { transVxeSorts } from '@/utils/jhipster/sorts';
 import { useDrawer } from '@/components/Drawer';
 import { useModal } from '@/components/Modal';
-import { ButtonGroup } from '@/components/Button';
 import { clearSearchFieldValue } from '@/components/SearchForm';
 import { useGo } from '@/hooks/web/usePage';
 import ServerProvider from '@/api-service/index';

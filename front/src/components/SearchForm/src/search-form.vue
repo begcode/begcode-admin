@@ -5,7 +5,7 @@
         <search-form-item :field="item" />
       </a-col>
       <a-col v-for="index of formActionSlotsShow ? blankCols : 0" :key="'blank' + index" style="flex: 1"></a-col>
-      <FormAction v-bind="formActionConfig" @toggle-advanced="handleToggleAdvanced" v-if="config.compact && formActionSlotsShow">
+      <form-action v-bind="formActionConfig" @toggle-advanced="handleToggleAdvanced" v-if="config.compact && formActionSlotsShow">
         <template #[item]="data" v-for="item in Object.keys(formActionSlots)">
           <slot :name="item" v-bind="data || {}">
             <div class="mr-2 inline-block" :key="item" v-if="formActionSlots[item].includes('mathType')">
@@ -19,18 +19,18 @@
             </div>
           </slot>
         </template>
-      </FormAction>
+      </form-action>
     </a-row>
-    <BasicModal
+    <basic-modal
       title="高级搜索设置"
       :footer="null"
       :open="settingModalVisible"
       @ok="settingModalVisible = false"
       @cancel="settingModalVisible = false"
     >
-      <BasicForm v-bind="formConfig"></BasicForm>
-    </BasicModal>
-    <FormAction v-bind="formActionConfig" @toggle-advanced="handleToggleAdvanced" v-if="!config.compact && formActionSlotsShow">
+      <basic-form v-bind="formConfig"></basic-form>
+    </basic-modal>
+    <form-action v-bind="formActionConfig" @toggle-advanced="handleToggleAdvanced" v-if="!config.compact && formActionSlotsShow">
       <template #[item]="data" v-for="item in Object.keys(formActionSlots)">
         <slot :name="item" v-bind="data || {}" v-if="formActionSlots[item].length">
           <div class="mr-2 inline-block" :key="item" v-if="formActionSlots[item].includes('exportButton')">
@@ -38,16 +38,13 @@
           </div>
         </slot>
       </template>
-    </FormAction>
+    </form-action>
   </a-form>
 </template>
 
 <script lang="ts" setup>
 import SearchFormItem from './search-form-item.vue';
-import FormAction from '@/components/Form/src/components/FormAction.vue';
 import { createFormContext } from '@/components/Form/src/hooks/useFormContext';
-import BasicModal from '@/components/Modal/src/BasicModal.vue';
-import BasicForm from '@/components/Form/src/BasicForm.vue';
 
 defineOptions({
   name: 'BSearchForm',

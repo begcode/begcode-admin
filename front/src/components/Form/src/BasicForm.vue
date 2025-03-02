@@ -3,7 +3,7 @@
     <a-row v-bind="getRow">
       <slot name="formHeader"></slot>
       <template v-for="schema in getSchema" :key="schema.field">
-        <FormItem
+        <form-item
           :isAdvanced="fieldsIsAdvancedMap[schema.field]"
           :tableAction="tableAction"
           :formActionType="formActionType"
@@ -18,24 +18,23 @@
           <template #[item]="data" v-for="item in Object.keys($slots)">
             <slot :name="item" v-bind="data || {}"></slot>
           </template>
-        </FormItem>
+        </form-item>
       </template>
 
-      <FormAction v-bind="getFormActionBindProps" @toggle-advanced="handleToggleAdvanced">
+      <form-action v-bind="getFormActionBindProps" @toggle-advanced="handleToggleAdvanced">
         <template #[item]="data" v-for="item in ['resetBefore', 'submitBefore', 'advanceBefore', 'advanceAfter']">
           <slot :name="item" v-bind="data || {}"></slot>
         </template>
-      </FormAction>
+      </form-action>
       <slot name="formFooter"></slot>
     </a-row>
   </a-form>
 </template>
 <script lang="ts" setup>
+import { useDebounceFn } from '@vueuse/core';
 import type { FormActionType, FormProps, FormSchemaInner as FormSchema } from './types/form';
 import type { AdvanceState } from './types/hooks';
 import type { FormProps as AntFormProps } from 'ant-design-vue';
-import FormItem from './components/FormItem.vue';
-import FormAction from './components/FormAction.vue';
 import { dateItemType, isIncludeSimpleComponents } from './helper';
 import { dateUtil } from '@/utils/dateUtil';
 import { deepMerge } from '@/utils/util';
@@ -46,7 +45,6 @@ import { useFormEvents } from './hooks/useFormEvents';
 import { createFormContext } from './hooks/useFormContext';
 import { useAutoFocus } from './hooks/useAutoFocus';
 import { useModalContext } from '@/components/Modal';
-import { useDebounceFn } from '@vueuse/core';
 
 import { basicProps } from './props';
 import { useDesign } from '@/hooks/web/useDesign';

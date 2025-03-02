@@ -1,5 +1,5 @@
 <template>
-  <BasicModal
+  <basic-modal
     width="800px"
     :title="t('component.upload.preview')"
     class="upload-preview-modal"
@@ -24,7 +24,7 @@
         </a-button>
       </template>
     </vxe-grid>
-  </BasicModal>
+  </basic-modal>
 </template>
 <script lang="ts" setup>
 import { BasicModal, useModalInner } from '@/components/Modal';

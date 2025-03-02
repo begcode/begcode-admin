@@ -1,9 +1,9 @@
 <template>
   <div :class="bem()" class="flex mb-1 px-2 py-1.5 items-center">
     <slot name="headerTitle" v-if="slots.headerTitle"></slot>
-    <BasicTitle :helpMessage="helpMessage" v-if="!slots.headerTitle && title">
+    <basic-title :helpMessage="helpMessage" v-if="!slots.headerTitle && title">
       {{ title }}
-    </BasicTitle>
+    </basic-title>
     <div class="flex items-center flex-1 cursor-pointer justify-self-stretch" v-if="search || toolbar">
       <div :class="getInputSearchCls" v-if="search">
         <a-input-search :placeholder="t('common.searchText')" size="small" allowClear v-model:value="searchValue" />

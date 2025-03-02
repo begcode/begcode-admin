@@ -71,7 +71,7 @@
           v-model:value="field.value"
           style="width: 100%"
         />
-        <RangeDate
+        <range-date
           v-bind="componentProps"
           v-else-if="field.componentType === 'RangeDate'"
           v-model:value="field.value"
@@ -130,13 +130,13 @@
             {{ item.label }}
           </a-select-option>
         </a-select>
-        <ApiSelect
+        <api-select
           v-else-if="field.componentType === 'ApiSelect'"
           v-bind="componentProps"
           :placeholder="componentProps?.placeholder || '请选择'"
           v-model:value="field.value"
         />
-        <ApiTreeSelect
+        <api-tree-select
           v-else-if="field.componentType === 'ApiTreeSelect'"
           v-bind="componentProps"
           :placeholder="field?.componentProps?.placeholder || '请选择'"
@@ -165,17 +165,9 @@
 <script lang="ts">
 import { message } from 'ant-design-vue';
 import { TypeOperator } from './search-form-helper';
-import { ApiSelect } from '@/components/Form/index';
-import { ApiTreeSelect } from '@/components/Form/index';
-import RangeDate from '@/components/Form/src/components/RangeDate.vue';
 
 export default {
   name: 'SearchFormItem',
-  components: {
-    RangeDate,
-    ApiSelect,
-    ApiTreeSelect,
-  },
   props: {
     field: {
       type: Object,

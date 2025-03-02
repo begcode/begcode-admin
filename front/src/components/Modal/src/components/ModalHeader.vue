@@ -1,11 +1,9 @@
 <template>
-  <BasicTitle :helpMessage="helpMessage">
+  <basic-title :helpMessage="helpMessage">
     {{ title }}
-  </BasicTitle>
+  </basic-title>
 </template>
 <script lang="ts" setup>
-import { BasicTitle } from '@/components/Basic';
-
 defineOptions({ name: 'BasicModalHeader' });
 
 defineProps({

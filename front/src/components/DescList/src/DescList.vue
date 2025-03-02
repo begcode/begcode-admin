@@ -12,18 +12,18 @@
               <template v-for="button in toolButtons">
                 <a-tooltip @click="button.click" v-if="!button.hidden">
                   <template #title>{{ button.title }}</template>
-                  <BasicButton :disabled="button.disabled">
+                  <basic-button :disabled="button.disabled">
                     <Icon :icon="button.icon" v-if="button.icon" />
-                  </BasicButton>
+                  </basic-button>
                 </a-tooltip>
               </template>
               <a-tooltip>
                 <template #title>增加</template>
-                <BasicButton @click="addClick"><Icon icon="ant-design:plus-outlined" /></BasicButton>
+                <basic-button @click="addClick"><Icon icon="ant-design:plus-outlined" /></basic-button>
               </a-tooltip>
               <a-tooltip>
                 <template #title>刷新</template>
-                <BasicButton><Icon icon="ant-design:redo-outlined" /></BasicButton>
+                <basic-button><Icon icon="ant-design:redo-outlined" /></basic-button>
               </a-tooltip>
             </div>
           </div>
@@ -35,28 +35,28 @@
               <a-space direction="vertical" :size="4">
                 <a-tooltip placement="left">
                   <template #title>编辑</template>
-                  <BasicButton type="link" @click="editItem(item)">
+                  <basic-button type="link" @click="editItem(item)">
                     <Icon icon="ant-design:edit-outlined" />
-                  </BasicButton>
+                  </basic-button>
                 </a-tooltip>
                 <a-tooltip placement="left">
                   <template #title>删除</template>
-                  <BasicButton type="link" @click="deleteItem(item, index)">
+                  <basic-button type="link" @click="deleteItem(item, index)">
                     <Icon icon="ant-design:delete-outlined" />
-                  </BasicButton>
+                  </basic-button>
                 </a-tooltip>
                 <a-divider style="margin: 4px 0" />
                 <a-tooltip placement="left">
                   <template #title>上移</template>
-                  <BasicButton type="link" @click="moveUp(item, index)">
+                  <basic-button type="link" @click="moveUp(item, index)">
                     <Icon icon="ant-design:arrow-up-outlined" />
-                  </BasicButton>
+                  </basic-button>
                 </a-tooltip>
                 <a-tooltip placement="left">
                   <template #title>下移</template>
-                  <BasicButton type="link" @click="moveDown(item, index)">
+                  <basic-button type="link" @click="moveDown(item, index)">
                     <Icon icon="ant-design:arrow-down-outlined" />
-                  </BasicButton>
+                  </basic-button>
                 </a-tooltip>
               </a-space>
             </template>
@@ -67,7 +67,7 @@
         </template>
       </a-list>
     </div>
-    <BasicModal v-bind="modalConfig" @register="registerModal" @ok="okModal">
+    <basic-modal v-bind="modalConfig" @register="registerModal" @ok="okModal">
       <component
         :is="modalConfig.componentName"
         @cancel="closeModalOrDrawer"
@@ -75,8 +75,8 @@
         v-bind="modalConfig"
         ref="modalComponentRef"
       />
-    </BasicModal>
-    <BasicDrawer v-bind="drawerConfig" @register="registerDrawer" @ok="okDrawer">
+    </basic-modal>
+    <basic-drawer v-bind="drawerConfig" @register="registerDrawer" @ok="okDrawer">
       <component
         :is="drawerConfig.componentName"
         @cancel="closeModalOrDrawer"
@@ -84,12 +84,11 @@
         v-bind="drawerConfig"
         ref="drawerComponentRef"
       />
-    </BasicDrawer>
+    </basic-drawer>
   </div>
 </template>
 <script lang="ts" setup>
 import { Modal } from 'ant-design-vue';
-import { Icon } from '@/components/Icon';
 import { useModal } from '@/components/Modal';
 import { useDrawer } from '@/components/Drawer';
 // 组件接收参数

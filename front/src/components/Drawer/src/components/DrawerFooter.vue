@@ -20,7 +20,6 @@
 <script lang="ts" setup>
 import { theme } from 'ant-design-vue';
 import { useDesign } from '@/hooks/web/useDesign';
-
 import { footerProps } from '../props';
 
 defineOptions({ name: 'BasicDrawerFooter' });

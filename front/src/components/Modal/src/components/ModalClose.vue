@@ -2,20 +2,19 @@
   <div :class="getClass" class="flex grid-items-center h-95%">
     <template v-if="canFullscreen">
       <a-tooltip v-if="fullScreen" :title="t('component.modal.restore')" placement="bottom">
-        <FullscreenExitOutlined role="full" @click="handleFullScreen" />
+        <Icon icon="ant-design:fullscreen-exit-outlined" role="full" @click="handleFullScreen" />
       </a-tooltip>
       <a-tooltip v-else :title="t('component.modal.maximize')" placement="bottom">
-        <FullscreenOutlined role="close" @click="handleFullScreen" />
+        <Icon icon="ant-design:fullscreen-outlined" role="close" @click="handleFullScreen" />
       </a-tooltip>
     </template>
     <a-tooltip :title="t('component.modal.close')" placement="bottom">
-      <CloseOutlined @click="handleCancel" />
+      <Icon icon="ant-design:close-outlined" @click="handleCancel" />
     </a-tooltip>
   </div>
 </template>
 <script lang="ts" setup>
 import { theme } from 'ant-design-vue';
-import { FullscreenExitOutlined, FullscreenOutlined, CloseOutlined } from '@ant-design/icons-vue';
 import { useDesign } from '@/hooks/web/useDesign';
 import { useI18n } from '@/hooks/web/useI18nOut';
 

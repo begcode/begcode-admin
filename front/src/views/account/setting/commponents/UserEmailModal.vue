@@ -1,5 +1,5 @@
 <template>
-  <BasicModal v-bind="$attrs" @register="registerModal" width="500px" :title="title" :showCancelBtn="false" :showOkBtn="false">
+  <basic-modal v-bind="$attrs" @register="registerModal" width="500px" :title="title" :showCancelBtn="false" :showOkBtn="false">
     <a-form class="antd-modal-form" ref="formRef" :model="formState" :rules="validatorRules">
       <a-form-item name="email">
         <a-input size="large" v-model:value="formState.email" placeholder="请输入邮箱" />
@@ -8,7 +8,7 @@
         <a-button size="large" type="primary" block @click="updateEmail"> 确认 </a-button>
       </a-form-item>
     </a-form>
-  </BasicModal>
+  </basic-modal>
 </template>
 
 <script lang="ts" setup>

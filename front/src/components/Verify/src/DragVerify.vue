@@ -4,7 +4,6 @@ import { useTimeoutFn } from '@vueuse/core';
 import { useEventListener } from '@/hooks/event/useEventListener';
 import { basicProps } from './props';
 import { getSlot } from '@/utils/helper/tsxHelper';
-import { CheckOutlined, DoubleRightOutlined } from '@ant-design/icons-vue';
 
 export default defineComponent({
   name: 'BaseDragVerify',
@@ -256,12 +255,12 @@ export default defineComponent({
         }
         return (
           <div class={cls} onMousedown={handleDragStart} onTouchstart={handleDragStart} style={unref(getActionStyleRef)} ref={actionElRef}>
-            {getSlot(slots, 'actionIcon', isPassing) ||
-              (isPassing ? (
-                <CheckOutlined class={`drag-verify-action__icon`} />
-              ) : (
-                <DoubleRightOutlined class={`drag-verify-action__icon`} />
-              ))}
+            {getSlot(slots, 'actionIcon', isPassing) || (
+              <Icon
+                icon={isPassing ? 'ant-design:check-outlined' : 'ant-design:double-right-outlined'}
+                class={`drag-verify-action__icon`}
+              />
+            )}
           </div>
         );
       };

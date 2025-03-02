@@ -1,8 +1,8 @@
 import type { ModalFuncProps } from 'ant-design-vue/lib/modal/Modal';
 import { message as Message, Modal, notification } from 'ant-design-vue';
-import { CheckCircleFilled, CloseCircleFilled, InfoCircleFilled } from '@ant-design/icons-vue';
 import { ConfigProps, NotificationArgsProps } from 'ant-design-vue/lib/notification';
 import { useI18n } from './useI18n';
+import { Icon } from '@/components/Icon';
 
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
 
@@ -28,13 +28,13 @@ export type ModalOptionsPartial = Partial<ModalOptionsEx> & Pick<ModalOptionsEx,
 function getIcon(iconType: string) {
   try {
     if (iconType === 'warning') {
-      return h(InfoCircleFilled, { class: 'modal-icon-warning' });
+      return h(Icon, { class: 'modal-icon-warning', icon: 'ant-design:info-circle-filled' });
     } else if (iconType === 'success') {
-      return h(CheckCircleFilled, { class: 'modal-icon-success' });
+      return h(Icon, { class: 'modal-icon-success', icon: 'ant-design:check-circle-filled' });
     } else if (iconType === 'info') {
-      return h(InfoCircleFilled, { class: 'modal-icon-info' });
+      return h(Icon, { class: 'modal-icon-info', icon: 'ant-design:info-circle-filled' });
     }
-    return h(CloseCircleFilled, { class: 'modal-icon-error' });
+    return h(Icon, { class: 'modal-icon-error', icon: 'ant-design:close-circle-filled' });
   } catch (e) {
     console.log(e);
   }

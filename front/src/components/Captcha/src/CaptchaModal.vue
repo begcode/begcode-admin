@@ -1,5 +1,5 @@
 <template>
-  <BasicModal
+  <basic-modal
     @register="registerModal"
     width="450px"
     :minHeight="100"
@@ -8,7 +8,7 @@
     destroyOnClose
     :canFullscreen="false"
   >
-    <BasicForm @register="registerForm">
+    <basic-form @register="registerForm">
       <template #captchaSlot="{ model, field }">
         <div style="width: 100%; display: flex">
           <a-input style="width: 200px" v-model:value="model[field]" placeholder="请输入图片验证码" />
@@ -30,13 +30,13 @@
           </div>
         </div>
       </template>
-    </BasicForm>
-  </BasicModal>
+    </basic-form>
+  </basic-modal>
 </template>
 
 <script lang="ts" setup>
-import { BasicModal, useModalInner } from '@/components/Modal';
-import { BasicForm, FormSchema, useForm } from '@/components/Form';
+import { useModalInner } from '@/components/Modal';
+import { FormSchema, useForm } from '@/components/Form';
 import codeImage from '@/assets/images/checkcode.png';
 import { message } from 'ant-design-vue';
 

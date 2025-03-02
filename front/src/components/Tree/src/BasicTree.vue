@@ -219,7 +219,8 @@ export default defineComponent({
       searchState.searchData = filter(
         unref(treeDataRef),
         node => {
-          const result = filterFn ? filterFn(searchValue, node, unref(getFieldNames)) : (node[titleField]?.includes(searchValue) ?? false);
+          const noFilterFnValue = node[titleField]?.includes(searchValue) ?? false;
+          const result = filterFn ? filterFn(searchValue, node, unref(getFieldNames)) : noFilterFnValue;
           if (result) {
             matchedKeys.push(node[keyField]);
           }

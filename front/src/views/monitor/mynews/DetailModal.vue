@@ -1,5 +1,5 @@
 <template>
-  <BasicModal
+  <basic-modal
     v-bind="$attrs"
     @register="registerModal"
     title="查看详情"
@@ -13,7 +13,7 @@
       <a-divider />
       <div v-html="content.content" class="article-content"></div>
     </a-card>
-  </BasicModal>
+  </basic-modal>
 </template>
 <script lang="ts" setup>
 import { BasicModal, useModalInner } from '@/components/Modal';

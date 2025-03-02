@@ -9,13 +9,13 @@
     cancelText="取消"
   >
     <div class="pt-5 pr-3px">
-      <BasicForm @register="register" />
+      <basic-form @register="register" />
     </div>
   </a-modal>
 </template>
 
 <script lang="ts" setup>
-import { BasicForm, FormSchema, useForm } from '@/components/Form';
+import { FormSchema, useForm } from '@/components/Form';
 
 const props = defineProps<{
   title: string;
@@ -43,5 +43,3 @@ async function handleSubmit() {
   open.value = false;
 }
 </script>
-
-<style scoped></style>

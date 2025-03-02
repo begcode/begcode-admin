@@ -1,12 +1,11 @@
 <template>
   <span :class="getClass">
     <slot></slot>
-    <BasicHelp :class="`${prefixCls}-help`" v-if="helpMessage" :text="helpMessage" />
+    <basic-help :class="`${prefixCls}-help`" v-if="helpMessage" :text="helpMessage" />
   </span>
 </template>
 <script lang="ts" setup>
 import { theme } from 'ant-design-vue';
-import BasicHelp from './BasicHelp.vue';
 import { useDesign } from '@/hooks/web/useDesign';
 
 const props = defineProps({

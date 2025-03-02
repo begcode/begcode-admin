@@ -1,10 +1,10 @@
 <template>
   <div class="h-full">
-    <CodeMirrorEditor ref="codeMirrorRef" :value="getValue" @change="handleValueChange" :mode="mode" :readonly="readonly" />
+    <CodeMirror ref="codeMirrorRef" :value="getValue" @change="handleValueChange" :mode="mode" :readonly="readonly" />
   </div>
 </template>
 <script lang="ts" setup>
-import CodeMirrorEditor from './codemirror/CodeMirror.vue';
+import CodeMirror from './codemirror/CodeMirror.vue';
 import { MODE } from './typing';
 
 const props = defineProps({

@@ -2,7 +2,9 @@
   <div class="chart-trend">
     {{ term }}
     <span>{{ rate }}%</span>
-    <span :class="['trend-icon', trend]"><Icon :icon="'ant-design:caret-' + trend + '-outlined'" /></span>
+    <span :class="['trend-icon', trend]">
+      <Icon :icon="'ant-design:caret-' + trend + '-outlined'" />
+    </span>
   </div>
 </template>
 

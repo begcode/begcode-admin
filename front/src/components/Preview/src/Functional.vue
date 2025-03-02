@@ -1,5 +1,4 @@
 <script lang="tsx">
-import { CloseOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons-vue';
 import resumeSvg from '@/assets/svg/preview/resume.svg';
 import rotateSvg from '@/assets/svg/preview/p-rotate.svg';
 import scaleSvg from '@/assets/svg/preview/scale.svg';
@@ -330,7 +329,7 @@ export default defineComponent({
     const renderClose = () => {
       return (
         <div class={`${prefixCls}__close`} onClick={handleClose}>
-          <CloseOutlined class={`${prefixCls}__close-icon`} />
+          <Icon icon="ant-design:close-outlined" class={`${prefixCls}__close-icon`} />
         </div>
       );
     };
@@ -376,7 +375,7 @@ export default defineComponent({
       }
       return (
         <div class={[`${prefixCls}__arrow`, direction]} onClick={() => handleChange(direction)}>
-          {direction === 'left' ? <LeftOutlined /> : <RightOutlined />}
+          <Icon icon={direction === 'left' ? 'ant-design:left-outline' : 'ant-design:right-outline'} />
         </div>
       );
     };

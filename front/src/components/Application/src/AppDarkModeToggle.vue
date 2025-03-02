@@ -1,12 +1,11 @@
 <template>
   <div v-if="getShowDarkModeToggle" :class="getClass" @click="toggleDarkMode">
     <div :class="`${prefixCls}-inner`"></div>
-    <SvgIcon size="14" name="sun" />
-    <SvgIcon size="14" name="moon" />
+    <svg-icon size="14" name="sun" />
+    <svg-icon size="14" name="moon" />
   </div>
 </template>
 <script lang="ts" setup>
-import { SvgIcon } from '@/components/Icon';
 import { useDesign } from '@/hooks/web/useDesign';
 import { ThemeEnum } from '@/enums/appEnum';
 import { useRootSetting } from '@/hooks/setting/useRootSetting';

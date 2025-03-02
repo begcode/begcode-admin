@@ -3,17 +3,17 @@
     <div style="width: 100%" :style="{ textAlign: actionColOpt.style.textAlign }">
       <a-form-item :wrapperCol="{ span: 24 }">
         <slot name="resetBefore"></slot>
-        <BasicButton type="default" class="mr-2" v-bind="getResetBtnOptions" @click="resetAction" v-if="showResetButton">
+        <basic-button type="default" class="mr-2" v-bind="getResetBtnOptions" @click="resetAction" v-if="showResetButton">
           {{ getResetBtnOptions.text }}
-        </BasicButton>
+        </basic-button>
         <slot name="submitBefore"></slot>
 
-        <BasicButton type="primary" class="mr-2" v-bind="getSubmitBtnOptions" @click="submitAction" v-if="showSubmitButton">
+        <basic-button type="primary" class="mr-2" v-bind="getSubmitBtnOptions" @click="submitAction" v-if="showSubmitButton">
           {{ getSubmitBtnOptions.text }}
-        </BasicButton>
+        </basic-button>
 
         <slot name="advanceBefore"></slot>
-        <BasicButton
+        <basic-button
           type="link"
           size="small"
           @click="toggleAdvanced"
@@ -22,7 +22,7 @@
         >
           {{ isAdvanced ? t('component.form.putAway') : t('component.form.unfold') }}
           <BasicArrow class="ml-1" :expand="!isAdvanced" up />
-        </BasicButton>
+        </basic-button>
         <slot name="advanceAfter"></slot>
       </a-form-item>
     </div>

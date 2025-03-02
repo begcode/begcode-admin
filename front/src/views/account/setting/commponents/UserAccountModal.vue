@@ -1,7 +1,7 @@
 <template>
-  <BasicModal v-bind="$attrs" @register="registerModal" width="500px" :title="title" @ok="handleSubmit" destroyOnClose>
-    <BasicForm @register="registerForm" />
-  </BasicModal>
+  <basic-modal v-bind="$attrs" @register="registerModal" width="500px" :title="title" @ok="handleSubmit" destroyOnClose>
+    <basic-form @register="registerForm" />
+  </basic-modal>
 </template>
 
 <script lang="ts" setup>

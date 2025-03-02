@@ -6,7 +6,7 @@
           <div :class="`${prefixCls}-input__wrapper`">
             <a-input :class="`${prefixCls}-input`" :placeholder="t('common.searchText')" ref="inputRef" allow-clear @change="handleSearch">
               <template #prefix>
-                <SearchOutlined />
+                <Icon icon="search-outlined" />
               </template>
             </a-input>
             <span :class="`${prefixCls}-cancel`" @click="handleClose">
@@ -52,7 +52,6 @@
 </template>
 
 <script lang="ts" setup>
-import { SearchOutlined } from '@ant-design/icons-vue';
 import AppSearchFooter from './AppSearchFooter.vue';
 import vClickOutside from '@/directives/clickOutside';
 import { useMenuSearch } from './useMenuSearch';

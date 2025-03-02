@@ -1,7 +1,7 @@
 <template>
   <div data-cy="UploadFileRelationHeading">
-    <SplitPanes class="default-theme" v-if="cardSlots?.includes('split')">
-      <SplitPane size="20">
+    <split-panes class="default-theme" v-if="cardSlots?.includes('split')">
+      <split-pane size="20">
         <a-card
           title="高级搜索"
           class="bc-list-result-card"
@@ -16,8 +16,8 @@
             @select="onSelect"
           />
         </a-card>
-      </SplitPane>
-      <SplitPane>
+      </split-pane>
+      <split-pane>
         <a-card
           v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
           title="高级搜索"
@@ -27,51 +27,51 @@
         >
           <template #extra>
             <a-space>
-              <BasicButton
+              <basic-button
                 type="default"
                 @click="showSearchFormSetting"
                 pre-icon="ant-design:setting-outlined"
                 shape="circle"
                 size="small"
-              ></BasicButton>
+              ></basic-button>
             </a-space>
           </template>
-          <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" ref="searchFormRef" />
+          <search-form :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" ref="searchFormRef" />
         </a-card>
         <a-card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '1px' }">
           <template #title v-if="cardSlots?.includes('title')">
-            <BasicButton type="text" pre-icon="ant-design:unordered-list-outlined" shape="default" size="large" @click="formSearch"
-              >上传文件列表</BasicButton
+            <basic-button type="text" pre-icon="ant-design:unordered-list-outlined" shape="default" size="large" @click="formSearch"
+              >上传文件列表</basic-button
             >
           </template>
           <template #extra v-if="cardSlots?.includes('extra')">
             <a-space>
               <a-divider type="vertical" />
-              <BasicButton
+              <basic-button
                 v-if="cardExtra?.includes('import')"
                 type="default"
                 @click="xGrid.openImport()"
                 pre-icon="ant-design:cloud-upload-outlined"
                 shape="circle"
                 size="small"
-              ></BasicButton>
-              <BasicButton
+              ></basic-button>
+              <basic-button
                 v-if="cardExtra?.includes('export')"
                 type="default"
                 @click="xGrid.openExport()"
                 pre-icon="ant-design:download-outlined"
                 shape="circle"
                 size="small"
-              ></BasicButton>
-              <BasicButton
+              ></basic-button>
+              <basic-button
                 v-if="cardExtra?.includes('print')"
                 type="default"
                 @click="xGrid.openPrint()"
                 pre-icon="ant-design:printer-outlined"
                 shape="circle"
                 size="small"
-              ></BasicButton>
-              <!--          <BasicButton type="default" pre-icon="ant-design:setting-outlined" shape="circle" size="small"></Button>-->
+              ></basic-button>
+              <!--          <basic-button type="default" pre-icon="ant-design:setting-outlined" shape="circle" size="small"></basic-button>-->
             </a-space>
           </template>
           <vxe-grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
@@ -92,13 +92,13 @@
                         <Icon icon="ant-design:search-outlined" />
                       </template>
                       <template #addonAfter>
-                        <BasicButton type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
+                        <basic-button type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
                           >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch" data-cy="listSearchMore"></Icon>
-                        </BasicButton>
+                        </basic-button>
                       </template>
                     </a-input>
                     <template v-for="button of gridOptions?.toolbarConfig?.buttons">
-                      <BasicButton v-if="!button.dropdowns">{{ button.name }}</BasicButton>
+                      <basic-button v-if="!button.dropdowns">{{ button.name }}</basic-button>
                       <a-dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
                         <template #overlay>
                           <a-menu @click="gridEvents.toolbarButtonClick?.(subButton as any)" v-for="subButton of button.dropdowns">
@@ -108,10 +108,10 @@
                             </a-menu-item>
                           </a-menu>
                         </template>
-                        <BasicButton>
+                        <basic-button>
                           {{ button.name }}
                           <Icon icon="ant-design:down-outlined" />
-                        </BasicButton>
+                        </basic-button>
                       </a-dropdown>
                     </template>
                   </a-space>
@@ -119,15 +119,15 @@
               </a-row>
             </template>
             <template #recordAction="{ row }">
-              <ButtonGroup :row="row" :buttons="rowOperations" @click="rowClick" />
+              <button-group :row="row" :buttons="rowOperations" @click="rowClick" />
             </template>
             <template #pagerLeft>
               <a-alert type="warning" banner :message="'已选择 ' + selectedRows.length + ' 项'" style="height: 30px" />
             </template>
           </vxe-grid>
         </a-card>
-      </SplitPane>
-    </SplitPanes>
+      </split-pane>
+    </split-panes>
     <div v-else>
       <a-card
         v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
@@ -138,51 +138,51 @@
       >
         <template #extra>
           <a-space
-            ><BasicButton
+            ><basic-button
               type="default"
               @click="showSearchFormSetting"
               pre-icon="ant-design:setting-outlined"
               shape="circle"
               size="small"
-            ></BasicButton
+            ></basic-button
           ></a-space>
         </template>
-        <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" ref="searchFormRef" />
+        <search-form :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" ref="searchFormRef" />
       </a-card>
       <a-card :bordered="false" class="bc-list-result-card" :bodyStyle="{ padding: '1px 0 0 0' }">
         <template #title v-if="cardSlots?.includes('title')">
-          <BasicButton type="text" pre-icon="ant-design:unordered-list-outlined" shape="default" size="large" @click="formSearch"
-            >上传文件列表</BasicButton
+          <basic-button type="text" pre-icon="ant-design:unordered-list-outlined" shape="default" size="large" @click="formSearch"
+            >上传文件列表</basic-button
           >
         </template>
         <template #extra v-if="cardSlots?.includes('extra')">
           <a-space>
             <a-divider type="vertical" />
-            <BasicButton
+            <basic-button
               v-if="cardExtra?.includes('import')"
               type="default"
               @click="xGrid.openImport()"
               pre-icon="ant-design:cloud-upload-outlined"
               shape="circle"
               size="small"
-            ></BasicButton>
-            <BasicButton
+            ></basic-button>
+            <basic-button
               v-if="cardExtra?.includes('export')"
               type="default"
               @click="xGrid.openExport()"
               pre-icon="ant-design:download-outlined"
               shape="circle"
               size="small"
-            ></BasicButton>
-            <BasicButton
+            ></basic-button>
+            <basic-button
               v-if="cardExtra?.includes('print')"
               type="default"
               @click="xGrid.openPrint()"
               pre-icon="ant-design:printer-outlined"
               shape="circle"
               size="small"
-            ></BasicButton>
-            <!--          <BasicButton type="default" pre-icon="ant-design:setting-outlined" shape="circle" size="small"></BasicButton>-->
+            ></basic-button>
+            <!--          <basic-button type="default" pre-icon="ant-design:setting-outlined" shape="circle" size="small"></basic-button>-->
           </a-space>
         </template>
         <vxe-grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
@@ -203,13 +203,13 @@
                       <Icon icon="ant-design:search-outlined" />
                     </template>
                     <template #addonAfter>
-                      <BasicButton type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
+                      <basic-button type="link" @click="formSearch" style="height: 30px" data-cy="listSearchButton"
                         >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch" data-cy="listSearchMore"></Icon>
-                      </BasicButton>
+                      </basic-button>
                     </template>
                   </a-input>
                   <template v-for="button of gridOptions?.toolbarConfig?.buttons">
-                    <BasicButton v-if="!button.dropdowns">{{ button.name }}</BasicButton>
+                    <basic-button v-if="!button.dropdowns">{{ button.name }}</basic-button>
                     <a-dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
                       <template #overlay>
                         <a-menu @click="gridEvents.toolbarButtonClick?.(subButton as any)" v-for="subButton of button.dropdowns">
@@ -219,10 +219,10 @@
                           </a-menu-item>
                         </a-menu>
                       </template>
-                      <BasicButton>
+                      <basic-button>
                         {{ button.name }}
                         <Icon icon="ant-design:down-outlined" />
-                      </BasicButton>
+                      </basic-button>
                     </a-dropdown>
                   </template>
                 </a-space>
@@ -230,7 +230,7 @@
             </a-row>
           </template>
           <template #recordAction="{ row }">
-            <ButtonGroup :row="row" :buttons="rowOperations" @click="rowClick" />
+            <button-group :row="row" :buttons="rowOperations" @click="rowClick" />
           </template>
           <template #pagerLeft>
             <a-alert type="warning" banner :message="'已选择 ' + selectedRows.length + ' 项'" style="height: 30px" />
@@ -238,7 +238,7 @@
         </vxe-grid>
       </a-card>
     </div>
-    <BasicModal v-bind="popupConfig.containerProps" @register="registerModal" @cancel="closeModal" v-on="popupConfig.containerEvents">
+    <basic-modal v-bind="popupConfig.containerProps" @register="registerModal" @cancel="closeModal" v-on="popupConfig.containerEvents">
       <component
         v-if="popupConfig.componentProps.is"
         v-bind="popupConfig.componentProps"
@@ -248,8 +248,8 @@
         v-on="popupConfig.componentEvents"
         ref="modalComponentRef"
       />
-    </BasicModal>
-    <BasicDrawer v-bind="popupConfig.containerProps" @register="registerDrawer" @close="closeDrawer" v-on="popupConfig.containerEvents">
+    </basic-modal>
+    <basic-drawer v-bind="popupConfig.containerProps" @register="registerDrawer" @close="closeDrawer" v-on="popupConfig.containerEvents">
       <component
         v-if="popupConfig.componentProps.is"
         v-bind="popupConfig.componentProps"
@@ -259,7 +259,7 @@
         v-on="popupConfig.componentEvents"
         ref="drawerComponentRef"
       />
-    </BasicDrawer>
+    </basic-drawer>
   </div>
 </template>
 
@@ -270,7 +270,6 @@ import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { transVxeSorts } from '@/utils/jhipster/sorts';
 import { useDrawer } from '@/components/Drawer';
 import { useModal } from '@/components/Modal';
-import { ButtonGroup } from '@/components/Button';
 import ServerProvider from '@/api-service/index';
 import UploadFileDetail from './detail-component.vue';
 import UploadFileEdit from './form-component.vue';

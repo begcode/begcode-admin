@@ -1,11 +1,9 @@
 <template>
   <div @click.stop="toggleCollapsed">
-    <DoubleRightOutlined v-if="getCollapsed" />
-    <DoubleLeftOutlined v-else />
+    <Icon :icon="getCollapsed ? 'ant-design:double-right-outlined' : 'ant-design:double-left-outlined'" />
   </div>
 </template>
 <script lang="ts" setup>
-import { DoubleRightOutlined, DoubleLeftOutlined } from '@ant-design/icons-vue';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
 
 const { getCollapsed, toggleCollapsed } = useMenuSetting();

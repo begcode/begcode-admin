@@ -86,17 +86,16 @@
     <a-divider class="enter-x">{{ t('sys.login.otherSignIn') }}</a-divider>
 
     <div class="flex justify-evenly enter-x" :class="`${prefixCls}-sign-in-way`">
-      <a @click="onThirdLogin('github')" title="github"><GithubFilled /></a>
-      <a @click="onThirdLogin('wechat_enterprise')" title="企业微信"> <icon-font class="item-icon" type="icon-qiyeweixin3" /></a>
-      <a @click="onThirdLogin('dingtalk')" title="钉钉"><DingtalkCircleFilled /></a>
-      <a @click="onThirdLogin('wechat_open')" title="微信"><WechatFilled /></a>
+      <a @click="onThirdLogin('github')" title="github"><Icon icon="ant-design:github-filled" /></a>
+      <a @click="onThirdLogin('wechat_enterprise')" title="企业微信"><Icon class="item-icon" icon="icon-qiyeweixin3|font" /></a>
+      <a @click="onThirdLogin('dingtalk')" title="钉钉"><Icon icon="ant-design:dingtalk-circle-filled" /></a>
+      <a @click="onThirdLogin('wechat_open')" title="微信"><Icon icon="ant-design:wechat-filled" /></a>
     </div>
   </a-form>
   <!-- 第三方登录相关弹框 -->
   <ThirdModal ref="thirdModalRef"></ThirdModal>
 </template>
 <script lang="ts" setup>
-import { GithubFilled, WechatFilled, DingtalkCircleFilled, createFromIconfontCN } from '@ant-design/icons-vue';
 import LoginFormTitle from './LoginFormTitle.vue';
 import ThirdModal from './ThirdModal.vue';
 
@@ -109,12 +108,7 @@ import { useDesign } from '@/hooks/web/useDesign';
 import { getCodeInfo } from '@/api-service/sys/user';
 import checkcodePng from '@/assets/images/checkcode.png';
 //import { onKeyStroke } from '@vueuse/core';
-
 // begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！
-
-const IconFont = createFromIconfontCN({
-  scriptUrl: '//at.alicdn.com/t/font_2316098_umqusozousr.js',
-});
 const { t } = useI18n();
 const { notification, createErrorModal } = useMessage();
 const { prefixCls } = useDesign('login');

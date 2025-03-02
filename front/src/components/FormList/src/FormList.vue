@@ -12,22 +12,22 @@
               <template v-for="button in toolButtons">
                 <a-tooltip @click="button.click" v-if="!button.hidden">
                   <template #title>{{ button.title }}</template>
-                  <BasicButton :disabled="button.disabled">
+                  <basic-button :disabled="button.disabled">
                     <Icon :icon="button.icon" v-if="button.icon"></Icon>
-                  </BasicButton>
+                  </basic-button>
                 </a-tooltip>
               </template>
               <!--              <a-tooltip>-->
               <!--                <template #title>插入</template>-->
-              <!--                <BasicButton @click="insert"><Icon icon="ant-design:vertical-align-bottom-outlined" /></BasicButton>-->
+              <!--                <basic-button @click="insert"><Icon icon="ant-design:vertical-align-bottom-outlined" /></basic-button>-->
               <!--              </a-tooltip>-->
               <!--              <a-tooltip>-->
               <!--                <template #title>追加</template>-->
-              <!--                <BasicButton @click="add"><Icon icon="ant-design:vertical-align-top-outlined" /></BasicButton>-->
+              <!--                <basic-button @click="add"><Icon icon="ant-design:vertical-align-top-outlined" /></basic-button>-->
               <!--              </a-tooltip>-->
               <!--              <a-tooltip>-->
               <!--                <template #title>刷新</template>-->
-              <!--                <BasicButton><Icon icon="ant-design:redo-outlined" /></BasicButton>-->
+              <!--                <basic-button><Icon icon="ant-design:redo-outlined" /></basic-button>-->
               <!--              </a-tooltip>-->
             </div>
           </div>
@@ -36,31 +36,31 @@
           <a-list-item>
             <a-row justify="center" align="middle">
               <a-col :span="multiple ? 21 : 24">
-                <BasicForm v-bind="item" :ref="el => setFormRef(el, index)"></BasicForm>
+                <basic-form v-bind="item" :ref="el => setFormRef(el, index)"></basic-form>
               </a-col>
               <a-col :span="3" justify="center" align="middle" v-if="multiple">
                 <a-space direction="vertical" :size="18">
                   <a-tooltip>
                     <template #title>插入</template>
-                    <BasicButton type="link" @click="insertItem(item, index)"
+                    <basic-button type="link" @click="insertItem(item, index)"
                       ><Icon icon="ant-design:vertical-align-bottom-outlined"
-                    /></BasicButton>
+                    /></basic-button>
                   </a-tooltip>
                   <a-tooltip>
                     <template #title>追加</template>
-                    <BasicButton type="link" @click="appendItem(item, index)"><Icon icon="ant-design:plus-outlined" /></BasicButton>
+                    <basic-button type="link" @click="appendItem(item, index)"><Icon icon="ant-design:plus-outlined" /></basic-button>
                   </a-tooltip>
                   <a-tooltip>
                     <template #title>上移</template>
-                    <BasicButton type="link" @click="moveUp(item, index)"><Icon icon="ant-design:arrow-up-outlined" /></BasicButton>
+                    <basic-button type="link" @click="moveUp(item, index)"><Icon icon="ant-design:arrow-up-outlined" /></basic-button>
                   </a-tooltip>
                   <a-tooltip>
                     <template #title>下移</template>
-                    <BasicButton type="link" @click="moveDown(item, index)"><Icon icon="ant-design:arrow-down-outlined" /></BasicButton>
+                    <basic-button type="link" @click="moveDown(item, index)"><Icon icon="ant-design:arrow-down-outlined" /></basic-button>
                   </a-tooltip>
                   <a-tooltip>
                     <template #title>删除</template>
-                    <BasicButton type="link" @click="deleteItem(item, index)"><Icon icon="ant-design:delete-outlined" /></BasicButton>
+                    <basic-button type="link" @click="deleteItem(item, index)"><Icon icon="ant-design:delete-outlined" /></basic-button>
                   </a-tooltip>
                 </a-space>
               </a-col>
@@ -73,7 +73,6 @@
 </template>
 <script lang="ts" setup>
 import { Modal } from 'ant-design-vue';
-import { Icon } from '@/components/Icon';
 
 // 组件接收参数
 const props = defineProps({

@@ -47,7 +47,7 @@
   </li>
 </template>
 <script lang="ts" setup>
-import { type TimeoutHandle, type Recordable } from '#/utils.d';
+import type { TimeoutHandle, Recordable } from '#/utils.d';
 import type { SubMenuProvider } from './types';
 import { useDesign } from '@/hooks/web/useDesign';
 import { useMenuItem } from './useMenu';

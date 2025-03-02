@@ -1,8 +1,8 @@
 <template>
   <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
   <div data-cy="ResourceCategoryHeading" style="height: 100%; padding-bottom: 10px">
-    <SplitPanes class="default-theme">
-      <SplitPane size="40">
+    <split-panes class="default-theme">
+      <split-pane size="40">
         <a-card :bordered="false" class="bc-list-result-card">
           <a-row :gutter="16" style="margin-bottom: 10px">
             <a-col :span="12" v-if="!searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled">
@@ -18,8 +18,8 @@
                   data-cy="listSearchInput"
                 >
                   <template #addonAfter>
-                    <BasicButton type="link" @click="formSearch" style="height: 30px; padding: 4px 8px" data-cy="listSearchButton"
-                      ><Icon icon="ant-design:search-outlined" />查询</BasicButton
+                    <basic-button type="link" @click="formSearch" style="height: 30px; padding: 4px 8px" data-cy="listSearchButton"
+                      ><Icon icon="ant-design:search-outlined" />查询</basic-button
                     >
                   </template>
                 </a-input>
@@ -34,10 +34,10 @@
                         </a-menu-item>
                       </a-menu>
                     </template>
-                    <BasicButton>
+                    <basic-button>
                       {{ button.name }}
                       <Icon icon="ant-design:down-outlined" />
-                    </BasicButton>
+                    </basic-button>
                   </a-dropdown>
                 </template>
               </a-space>
@@ -45,7 +45,7 @@
             <a-col :span="12" style="display: flex; justify-content: flex-end">
               <a-space align="end">
                 <template v-for="button of toolbarTools">
-                  <BasicButton v-if="!button.dropdowns" @click="toolbarClick({ code: button.code })">{{ button.name }}</BasicButton>
+                  <basic-button v-if="!button.dropdowns" @click="toolbarClick({ code: button.code })">{{ button.name }}</basic-button>
                   <a-dropdown v-else-if="selectedRows.length" :key="button.name" :content="button.name">
                     <template #overlay>
                       <a-menu v-for="subButton of button.dropdowns">
@@ -55,10 +55,10 @@
                         </a-menu-item>
                       </a-menu>
                     </template>
-                    <BasicButton>
+                    <basic-button>
                       {{ button.name }}
                       <Icon icon="ant-design:down-outlined" />
-                    </BasicButton>
+                    </basic-button>
                   </a-dropdown>
                 </template>
               </a-space>
@@ -103,7 +103,7 @@
             </template>
           </BasicTree>
 
-          <BasicModal
+          <basic-modal
             v-bind="popupConfig.containerProps"
             @register="registerModal"
             @cancel="closeModal"
@@ -119,8 +119,8 @@
               v-on="popupConfig.componentEvents"
               ref="modalComponentRef"
             />
-          </BasicModal>
-          <BasicDrawer
+          </basic-modal>
+          <basic-drawer
             v-bind="popupConfig.containerProps"
             @register="registerDrawer"
             @close="closeDrawer"
@@ -136,10 +136,10 @@
               v-on="popupConfig.componentEvents"
               ref="drawerComponentRef"
             />
-          </BasicDrawer>
+          </basic-drawer>
         </a-card>
-      </SplitPane>
-      <SplitPane>
+      </split-pane>
+      <split-pane>
         <a-card :bordered="false" class="bc-list-result-card" :bodyStyle="{ 'padding-top': '8px' }">
           <a-tabs defaultActiveKey="baseInfo" type="card" v-if="currentRow">
             <a-tab-pane key="baseInfo" tab="基本信息">
@@ -148,8 +148,8 @@
           </a-tabs>
           <a-empty description="尚未选择资源分类" v-else />
         </a-card>
-      </SplitPane>
-    </SplitPanes>
+      </split-pane>
+    </split-panes>
   </div>
 </template>
 

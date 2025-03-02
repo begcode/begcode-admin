@@ -2,9 +2,9 @@
   <div>
     <a-row class="select-row" type="flex" :gutter="8">
       <a-col class="left" :class="{ full: true }">
-        <BasicButton v-if="showComponentName === 'Button'" :pre-icon="buttonIcon" @click="!disabled && openModal()">{{
+        <basic-button v-if="showComponentName === 'Button'" :pre-icon="buttonIcon" @click="!disabled && openModal()">{{
           modalTitle
-        }}</BasicButton>
+        }}</basic-button>
         <div class="flex items-center justify-between">
           <a-avatar-group v-bind="showComponentProps" v-if="avatarGroupData.length">
             <a-tooltip :title="item[avatarSlotField]" placement="top" v-for="item in avatarGroupData">
@@ -28,32 +28,32 @@
             @click="!disabled && openModal()"
           />
           <div>
-            <BasicButton
+            <basic-button
               v-if="disabled"
               pre-icon="ant-design:file-search-outlined"
               type="link"
               size="small"
               @click.stop="disabled && openModal()"
-            ></BasicButton>
-            <BasicButton
+            ></basic-button>
+            <basic-button
               v-else
               pre-icon="ant-design:edit-outlined"
               type="link"
               size="small"
               @click.stop="!disabled && openModal()"
-            ></BasicButton>
-            <BasicButton
+            ></basic-button>
+            <basic-button
               v-if="updateType === 'emitSelected' && avatarGroupData.length && !disabled"
               pre-icon="ant-design:close-outlined"
               type="link"
               size="small"
               @click.stop="!disabled && clear()"
-            ></BasicButton>
+            ></basic-button>
           </div>
         </div>
       </a-col>
     </a-row>
-    <BasicModal
+    <basic-modal
       :title="modalTitle"
       :mask-closable="false"
       :ok-button-props="okButtonProps"
@@ -68,8 +68,8 @@
       <a-form-item-rest>
         <component v-bind="componentProps" v-on="componentEvents" :is="dynamicComponent" ref="tableModalRef" />
       </a-form-item-rest>
-    </BasicModal>
-    <BasicDrawer
+    </basic-modal>
+    <basic-drawer
       :title="modalTitle"
       :mask-closable="false"
       :showFooter="!disabled"
@@ -85,15 +85,15 @@
       <a-form-item-rest>
         <component v-bind="componentProps" v-on="componentEvents" :is="dynamicComponent" ref="tableDrawerRef" />
       </a-form-item-rest>
-    </BasicDrawer>
+    </basic-drawer>
   </div>
 </template>
 <script lang="ts" setup>
 import type { SelectValue } from 'ant-design-vue/es/select';
 import type { VxeGridInstance } from 'vxe-table/types/grid';
 import { useAttrs } from '@/hooks/vben/useAttrs';
-import { BasicModal, useModalInner } from '@/components/Modal';
-import { BasicDrawer, useDrawerInner } from '@/components/Drawer';
+import { useModalInner } from '@/components/Modal';
+import { useDrawerInner } from '@/components/Drawer';
 import { ApiSelect, ApiTreeSelect, ApiCascader, ApiTree } from '@/components/Form';
 
 defineOptions({

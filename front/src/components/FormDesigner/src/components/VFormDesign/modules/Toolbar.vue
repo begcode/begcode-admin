@@ -48,9 +48,7 @@ interface IToolbarsConfig {
 export default defineComponent({
   name: 'OperatingArea',
   components: {
-    Tooltip,
     Icon,
-    Divider,
   },
   setup() {
     const state = reactive<{

@@ -4,7 +4,11 @@
     <div class="account-row-item">
       <div class="account-label gray-75">钉钉绑定</div>
       <span>
-        <DingtalkCircleFilled :style="!bindDingData.sysUserId ? { color: '#9e9e9e' } : { color: '#007FFF' }" class="item-icon" />
+        <Icon
+          icon="dingtalk-circle-filled"
+          :style="!bindDingData.sysUserId ? { color: '#9e9e9e' } : { color: '#007FFF' }"
+          class="item-icon"
+        />
         <span class="gray-75" style="margin-left: 12px">钉钉</span>
         <span class="gray-75" style="margin-left: 8px" v-if="bindDingData.realname">{{ '已绑定：' + bindDingData.realname }}</span>
         <span class="blue-e5 pointer" style="margin-left: 24px" @click="dingDingBind">{{ !bindDingData.sysUserId ? '绑定' : '解绑' }}</span>
@@ -13,7 +17,7 @@
     <div class="account-row-item">
       <div class="account-label gray-75">账号绑定</div>
       <span>
-        <WechatFilled :style="!bindWechatData.sysUserId ? { color: '#9e9e9e' } : { color: '#1ec563' }" class="item-icon" />
+        <Icon icon="wechat-filled" :style="!bindWechatData.sysUserId ? { color: '#9e9e9e' } : { color: '#1ec563' }" class="item-icon" />
         <span class="gray-75" style="margin-left: 12px">微信</span>
         <span class="gray-75" style="margin-left: 8px" v-if="bindWechatData.realname">{{ '已绑定：' + bindWechatData.realname }}</span>
         <span class="blue-e5 pointer" style="margin-left: 24px" @click="wechatBind">{{ !bindWechatData.sysUserId ? '绑定' : '解绑' }}</span>
@@ -24,7 +28,6 @@
 <script lang="ts" setup>
 import { bindThirdAppAccount, deleteThirdAccount, getThirdAccountByUserId } from './UserSetting.api';
 import { useUserStore } from '@/store/modules/user';
-import { DingtalkCircleFilled, createFromIconfontCN, WechatFilled } from '@ant-design/icons-vue';
 import { useGlobSetting } from '@/hooks/setting';
 import { useMessage } from '@/hooks/web/useMessage';
 import { Modal } from 'ant-design-vue';
@@ -36,9 +39,6 @@ defineOptions({
 
 const { prefixCls } = useDesign('j-user-tenant-setting-container');
 
-const IconFont = createFromIconfontCN({
-  scriptUrl: '//at.alicdn.com/t/font_2316098_umqusozousr.js',
-});
 const userStore = useUserStore();
 
 //绑定微信的数据
@@ -81,7 +81,6 @@ async function initUserDetail() {
  * 企业微信绑定解绑事件
  */
 function wechatEnterpriseBind() {
-  console.log('企业微信绑定解绑事件');
   let data = unref(bindEnterpriseData);
   if (!data.sysUserId) {
     onThirdLogin('wechat_enterprise');

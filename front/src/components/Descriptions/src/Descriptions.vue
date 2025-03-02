@@ -120,7 +120,7 @@ export default defineComponent({
             if (!_data) {
               return null;
             }
-            const getField = _get(_data, field);
+            const getField = _get(_data, field) ?? '';
             if (format && _isFunction(format)) {
               return format(_get(_data, field), _data);
             }
@@ -128,7 +128,7 @@ export default defineComponent({
             if (!getField && !toRefs(_data).hasOwnProperty(field)) {
               return _isFunction(render) ? render('', _data) : '';
             }
-            return _isFunction(render) ? render(getField, _data) : getField ?? '';
+            return _isFunction(render) ? render(getField, _data) : getField;
           };
 
           const width = contentMinWidth;

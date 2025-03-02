@@ -16,6 +16,7 @@
 import type { TransferDirection, TransferItem } from 'ant-design-vue/lib/transfer';
 
 defineOptions({ name: 'ApiTransfer' });
+
 const props = defineProps({
   value: { type: Array as PropType<Array<string>> },
   api: {

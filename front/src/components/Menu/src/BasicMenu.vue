@@ -27,7 +27,7 @@ import { RouteLocationNormalizedLoaded, useRouter } from 'vue-router';
 import { basicProps } from './props';
 import { useMenuSetting } from '@/hooks/setting/useMenuSetting';
 import { REDIRECT_NAME } from '@/router/constant';
-import { isUrl, isFunction } from '@/utils/is';
+import { isUrl } from '@/utils/is';
 import { useDesign } from '@/hooks/web/useDesign';
 import { getCurrentParentPath } from '@/router/menus';
 import { listenerRouteChange } from '@/logics/mitt/routeChange';

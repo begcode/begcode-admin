@@ -128,24 +128,24 @@
                 <div class="aui-flex" :class="`${prefixCls}-sign-in-way`">
                   <div class="aui-flex-box">
                     <div class="aui-third-login">
-                      <a title="github" @click="onThirdLogin('github')"><GithubFilled /></a>
+                      <a title="github" @click="onThirdLogin('github')"><Icon icon="ant-design:github-filled" /></a>
                     </div>
                   </div>
                   <div class="aui-flex-box">
                     <div class="aui-third-login">
                       <a title="企业微信" @click="onThirdLogin('wechat_enterprise')"
-                        ><icon-font class="item-icon" type="icon-qiyeweixin3"
+                        ><Icon class="item-icon" icon="icon-qiyeweixin3|font"
                       /></a>
                     </div>
                   </div>
                   <div class="aui-flex-box">
                     <div class="aui-third-login">
-                      <a title="钉钉" @click="onThirdLogin('dingtalk')"><DingtalkCircleFilled /></a>
+                      <a title="钉钉" @click="onThirdLogin('dingtalk')"><Icon icon="ant-design:dingtalk-circle-filled" /></a>
                     </div>
                   </div>
                   <div class="aui-flex-box">
                     <div class="aui-third-login">
-                      <a title="微信" @click="onThirdLogin('wechat_open')"><WechatFilled /></a>
+                      <a title="微信" @click="onThirdLogin('wechat_open')"><Icon icon="ant-design:wechat-filled" /></a>
                     </div>
                   </div>
                 </div>
@@ -189,7 +189,6 @@ import { useAppInject } from '@/hooks/useAppInject';
 import { useModal } from '@/components/Modal';
 import { CaptchaModal } from '@/components/Captcha';
 import { useDesign } from '@/hooks/web/useDesign';
-import { GithubFilled, WechatFilled, DingtalkCircleFilled, createFromIconfontCN } from '@ant-design/icons-vue';
 import { ExceptionEnum } from '@/enums/exceptionEnum';
 
 defineOptions({
@@ -202,9 +201,6 @@ defineProps({
   },
 });
 
-const IconFont = createFromIconfontCN({
-  scriptUrl: '//at.alicdn.com/t/font_2316098_umqusozousr.js',
-});
 const { prefixCls } = useDesign('mini-login');
 const { notification, createMessage } = useMessage();
 const userStore = useUserStore();

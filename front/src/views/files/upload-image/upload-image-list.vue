@@ -1,8 +1,8 @@
 <template>
   <!-- begcode-please-regenerate-this-file 如果您不希望重新生成代码时被覆盖，将please修改为don't ！！！-->
   <div data-cy="UploadImageHeading">
-    <SplitPanes class="default-theme">
-      <SplitPane size="20">
+    <split-panes class="default-theme">
+      <split-pane size="20">
         <a-card
           title="高级搜索"
           class="bc-list-result-card"
@@ -17,8 +17,8 @@
             @select="filterTreeSelect"
           />
         </a-card>
-      </SplitPane>
-      <SplitPane>
+      </split-pane>
+      <split-pane>
         <a-card
           v-if="searchFormConfig.toggleSearchStatus && !searchFormConfig.disabled"
           title="高级搜索"
@@ -28,16 +28,16 @@
         >
           <template #extra>
             <a-space>
-              <BasicButton
+              <basic-button
                 type="default"
                 @click="showSearchFormSetting"
                 pre-icon="ant-design:setting-outlined"
                 shape="circle"
                 size="small"
-              ></BasicButton>
+              ></basic-button>
             </a-space>
           </template>
-          <SearchForm :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" ref="searchFormRef" />
+          <search-form :config="searchFormConfig" @formSearch="formSearch" @close="handleToggleSearch" ref="searchFormRef" />
         </a-card>
         <a-row
           v-if="fieldSearchValues && fieldSearchValues.length && !searchFormConfig.toggleSearchStatus"
@@ -72,9 +72,9 @@
                             <Icon icon="ant-design:search-outlined" />
                           </template>
                           <template #addonAfter v-if="searchFormConfig.allowSwitch">
-                            <BasicButton type="link" @click="formSearch" style="height: 30px"
+                            <basic-button type="link" @click="formSearch" style="height: 30px"
                               >查询<Icon icon="ant-design:filter-outlined" @click="handleToggleSearch"></Icon
-                            ></BasicButton>
+                            ></basic-button>
                           </template>
                         </a-input>
                         <a-dropdown v-if="selectedRows.length && batchOperations.length">
@@ -86,10 +86,10 @@
                               </a-menu-item>
                             </a-menu>
                           </template>
-                          <BasicButton>
+                          <basic-button>
                             批量处理
                             <Icon icon="ant-design:down-outlined" />
-                          </BasicButton>
+                          </basic-button>
                         </a-dropdown>
                       </a-space>
                     </a-col>
@@ -100,10 +100,10 @@
                     <template v-for="button in cardListOptions.toolButtons">
                       <a-tooltip v-if="!button.hidden">
                         <template #title>{{ button.title }}</template>
-                        <BasicButton :disabled="button.disabled" @click="button.click">
+                        <basic-button :disabled="button.disabled" @click="button.click">
                           <Icon :icon="button.icon" v-if="button.icon"></Icon>
                           {{ button.title }}
-                        </BasicButton>
+                        </basic-button>
                       </a-tooltip>
                     </template>
                     <a-tooltip>
@@ -111,7 +111,7 @@
                         <div class="w-50">每行显示数量</div>
                         <a-slider id="slider" v-bind="sliderProp" :value="listColumns" @change="sliderChange" />
                       </template>
-                      <BasicButton><Icon icon="ant-design:table-outlined" />列数</BasicButton>
+                      <basic-button><Icon icon="ant-design:table-outlined" />列数</basic-button>
                     </a-tooltip>
                   </a-space>
                 </div>
@@ -140,7 +140,7 @@
                         </a-badge-ribbon>
                       </template>
                       <template class="ant-card-actions" #actions>
-                        <ButtonGroup :row="item" :buttons="rowOperations" @click="rowClick" />
+                        <button-group :row="item" :buttons="rowOperations" @click="rowClick" />
                       </template>
                       <a-card-meta>
                         <template #avatar>
@@ -171,7 +171,7 @@
               </a-col>
             </a-row>
           </a-affix>
-          <BasicModal v-bind="popupConfig.containerProps" @register="registerModal" @cancel="closeModal" @ok="okModal">
+          <basic-modal v-bind="popupConfig.containerProps" @register="registerModal" @cancel="closeModal" @ok="okModal">
             <component
               v-if="popupConfig.componentProps.is"
               v-bind="popupConfig.componentProps"
@@ -181,8 +181,8 @@
               v-on="popupConfig.componentEvents"
               ref="modalComponentRef"
             />
-          </BasicModal>
-          <BasicDrawer v-bind="popupConfig.containerProps" @register="registerDrawer" @close="closeDrawer" @ok="okDrawer">
+          </basic-modal>
+          <basic-drawer v-bind="popupConfig.containerProps" @register="registerDrawer" @close="closeDrawer" @ok="okDrawer">
             <component
               v-if="popupConfig.componentProps.is"
               v-bind="popupConfig.componentProps"
@@ -192,10 +192,10 @@
               v-on="popupConfig.componentEvents"
               ref="drawerComponentRef"
             />
-          </BasicDrawer>
+          </basic-drawer>
         </a-card>
-      </SplitPane>
-    </SplitPanes>
+      </split-pane>
+    </split-panes>
   </div>
 </template>
 
@@ -205,7 +205,6 @@ import { breakpointsAntDesign, useBreakpoints } from '@vueuse/core';
 import { getSearchQueryData } from '@/utils/jhipster/entity-utils';
 import { useDrawer } from '@/components/Drawer';
 import { useModal } from '@/components/Modal';
-import { ButtonGroup } from '@/components/Button';
 import { clearSearchFieldValue } from '@/components/SearchForm';
 import { useGo } from '@/hooks/web/usePage';
 import ServerProvider from '@/api-service/index';

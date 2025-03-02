@@ -1,8 +1,8 @@
 <template>
-  <BasicTitle v-if="!isDetail" :class="[prefixCls, 'is-drawer']">
+  <basic-title v-if="!isDetail" :class="[prefixCls, 'is-drawer']">
     <slot name="title"></slot>
     {{ !$slots.title ? title : '' }}
-  </BasicTitle>
+  </basic-title>
 
   <div :class="[prefixCls, `${prefixCls}--detail`]" v-else>
     <span :class="`${prefixCls}__twrap`">

@@ -6,8 +6,8 @@
 <script lang="ts" setup>
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import { useDesign } from '@/hooks/web/useDesign';
 import { useDebounceFn } from '@vueuse/core';
+import { useDesign } from '@/hooks/web/useDesign';
 
 type Options = Cropper.Options;
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <BasicModal
+    <basic-modal
       v-bind="$attrs"
       @register="register"
       title="导入EXCEL"
@@ -24,21 +24,21 @@
       </div>
       <!--上传-->
       <a-upload name="file" accept=".xls,.xlsx" :multiple="true" :fileList="fileList" :remove="handleRemove" :beforeUpload="beforeUpload">
-        <BasicButton pre-icon="ant-design:upload-outlined">选择导入文件</BasicButton>
+        <basic-button pre-icon="ant-design:upload-outlined">选择导入文件</basic-button>
       </a-upload>
       <!--页脚-->
       <template #footer>
-        <BasicButton @click="handleClose">关闭</BasicButton>
-        <BasicButton type="primary" @click="handleImport" :disabled="uploadDisabled" :loading="uploading">{{
+        <basic-button @click="handleClose">关闭</basic-button>
+        <basic-button type="primary" @click="handleImport" :disabled="uploadDisabled" :loading="uploading">{{
           uploading ? '上传中...' : '开始上传'
-        }}</BasicButton>
+        }}</basic-button>
       </template>
-    </BasicModal>
+    </basic-modal>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { BasicModal, useModalInner } from '@/components/Modal';
+import { useModalInner } from '@/components/Modal';
 import { useAttrs } from '@/hooks/vben/useAttrs';
 import { defHttp } from '@/utils/http/axios';
 import { useGlobSetting } from '@/hooks/setting';

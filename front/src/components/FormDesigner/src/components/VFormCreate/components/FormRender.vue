@@ -31,14 +31,11 @@
 <script lang="ts">
 import { IVFormComponent, IFormConfig } from '../../../typings/v-form-component';
 import VFormItem from '../../VFormItem/index.vue';
-import { Row, Col } from 'ant-design-vue';
 
 export default defineComponent({
   name: 'FormRender',
   components: {
     VFormItem,
-    Row,
-    Col,
   },
   props: {
     formData: {

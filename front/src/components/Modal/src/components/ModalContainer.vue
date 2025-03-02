@@ -1,5 +1,4 @@
 <script lang="tsx">
-import { Modal } from 'ant-design-vue';
 import { useModalDragMove } from '../hooks/useModalDrag';
 import type { Recordable } from '#/utils';
 import { extendSlots } from '@/utils/helper/tsxHelper';

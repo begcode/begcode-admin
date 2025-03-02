@@ -4,11 +4,11 @@
       <a-spin :spinning="loading">
         <div style="padding: 20px">
           <div v-html="options.content" style="margin-bottom: 8px"></div>
-          <BasicForm @register="registerForm">
+          <basic-form @register="registerForm">
             <template #customInput="{ model, field }">
               <a-input ref="inputRef" v-model:value="model[field]" :placeholder="placeholder" @pressEnter="onSubmit" @input="onChange" />
             </template>
-          </BasicForm>
+          </basic-form>
         </div>
       </a-spin>
     </a-modal>
@@ -18,14 +18,11 @@
 <script lang="ts">
 import type { PromptFormProps } from './typing';
 import type { ModalProps } from '@/components/Modal';
-import { BasicForm, useForm } from '@/components/Form';
+import { useForm } from '@/components/Form';
 import { useLocale } from '@/i18n/useLocale';
 
 export default defineComponent({
   name: 'PromptForm',
-  components: {
-    BasicForm,
-  },
   emits: ['register'],
   setup(props, { emit }) {
     const inputRef = ref();

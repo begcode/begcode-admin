@@ -25,7 +25,7 @@
           <template #title>
             <div style="position: relative">
               <span style="display: inline-block; position: absolute; left: -16px">
-                <ExclamationOutlined v-if="noRead(item)" title="未读消息" style="color: red" />
+                <Icon icon="exclamation-outlined" v-if="noRead(item)" title="未读消息" style="color: red" />
               </span>
               <span>{{ getMsgCategory(item) }}</span>
               <span v-if="item.busType == 'bpm'" class="bpm-cuiban-content" v-html="item.content"> </span>
@@ -42,30 +42,34 @@
           <template #avatar>
             <template v-if="item.busType == 'email'">
               <a-badge dot v-if="noRead(item)" class="msg-no-read">
-                <a-avatar style="background: #79919d"><MailOutlined style="font-size: 16px" title="未读消息" /></a-avatar>
+                <a-avatar style="background: #79919d"><Icon icon="mail-outlined" style="font-size: 16px" title="未读消息" /></a-avatar>
               </a-badge>
-              <a-avatar v-else style="background: #79919d"><MailOutlined style="font-size: 16px" /></a-avatar>
+              <a-avatar v-else style="background: #79919d"><Icon icon="mail-outlined" style="font-size: 16px" /></a-avatar>
             </template>
 
             <template v-else-if="item.busType == 'bpm_task'">
               <a-badge dot v-if="noRead(item)" class="msg-no-read">
-                <a-avatar style="background: #79919d"><InteractionOutlined style="font-size: 16px" title="未读消息" /></a-avatar>
+                <a-avatar style="background: #79919d"
+                  ><Icon icon="interaction-outlined" style="font-size: 16px" title="未读消息"
+                /></a-avatar>
               </a-badge>
-              <a-avatar v-else style="background: #79919d"><InteractionOutlined style="font-size: 16px" /></a-avatar>
+              <a-avatar v-else style="background: #79919d"><Icon icon="interaction-outlined" style="font-size: 16px" /></a-avatar>
             </template>
 
             <template v-else-if="item.busType == 'bpm'">
               <a-badge dot v-if="noRead(item)" class="msg-no-read">
-                <a-avatar style="background: #79919d"><AlertOutlined style="font-size: 16px" title="未读消息" /></a-avatar>
+                <a-avatar style="background: #79919d"><Icon icon="alert-outlined" style="font-size: 16px" title="未读消息" /></a-avatar>
               </a-badge>
-              <a-avatar v-else style="background: #79919d"><AlertOutlined style="font-size: 16px" /></a-avatar>
+              <a-avatar v-else style="background: #79919d"><Icon icon="alert-outlined" style="font-size: 16px" /></a-avatar>
             </template>
 
             <template v-else>
               <a-badge dot v-if="noRead(item)" class="msg-no-read">
-                <a-avatar style="background: #79919d"><BellFilled style="font-size: 16px" title="未读消息" /></a-avatar>
+                <a-avatar style="background: #79919d"
+                  ><Icon icon="ant-design:bell-filled" style="font-size: 16px" title="未读消息"
+                /></a-avatar>
               </a-badge>
-              <a-avatar v-else style="background: #79919d"><BellFilled style="font-size: 16px" /></a-avatar>
+              <a-avatar v-else style="background: #79919d"><Icon icon="ant-design:bell-filled" style="font-size: 16px" /></a-avatar>
             </template>
           </template>
         </a-list-item-meta>
@@ -75,15 +79,6 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  FilterOutlined,
-  CloseOutlined,
-  BellFilled,
-  ExclamationOutlined,
-  MailOutlined,
-  InteractionOutlined,
-  AlertOutlined,
-} from '@ant-design/icons-vue';
 import { useSysMessage, useMessageHref } from './useSysMessage';
 
 defineOptions({ name: 'SysMessageList' });

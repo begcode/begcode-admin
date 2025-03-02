@@ -1,7 +1,7 @@
 <template>
-  <BasicModal @register="registerModal" title="Cron表达式" width="1000px" @ok="onOk">
+  <basic-modal @register="registerModal" title="Cron表达式" width="1000px" @ok="onOk">
     <EasyCron v-bind="attrs" />
-  </BasicModal>
+  </basic-modal>
 </template>
 
 <script lang="ts" setup>

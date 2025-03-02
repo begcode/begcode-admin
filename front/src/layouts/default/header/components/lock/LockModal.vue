@@ -1,5 +1,5 @@
 <template>
-  <BasicModal
+  <basic-modal
     :footer="null"
     :title="t('layout.header.lockScreen')"
     v-bind="$attrs"
@@ -15,7 +15,7 @@
         </p>
       </div>
 
-      <BasicForm @register="registerForm" />
+      <basic-form @register="registerForm" />
 
       <div :class="`${prefixCls}__footer`">
         <a-button type="primary" block class="mt-2" @click="handleLock">
@@ -23,7 +23,7 @@
         </a-button>
       </div>
     </div>
-  </BasicModal>
+  </basic-modal>
 </template>
 <script lang="ts" setup>
 import { useI18n } from '@/hooks/web/useI18n';

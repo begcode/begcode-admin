@@ -7,7 +7,6 @@
     </template>
   </a-checkbox-group>
 </template>
-
 <script lang="ts" setup>
 defineOptions({ name: 'DictCheckbox' });
 
