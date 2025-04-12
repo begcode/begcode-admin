@@ -41,14 +41,18 @@ const { t } = useI18n();
 const localeStore = useLocaleStore();
 const getTitle = computed(() => {
   const { tabItem: { meta, fullPath, name } = {} } = props;
-  let title = localeStore.getPathTitle(fullPath);
-  if (title) {
-    return title;
-  } else if (meta) {
-    title = meta.title;
-    return title ? t(title) : '';
+  if (meta?.title) {
+    if (meta.title.includes('.')) {
+      return t(meta.title);
+    }
+    return meta.title;
   } else {
-    return name;
+    let title = localeStore.getPathTitle(fullPath);
+    if (title) {
+      return title;
+    } else {
+      return name;
+    }
   }
 });
 

@@ -25,7 +25,7 @@
                       <span style="display: inline-block">
                         <div v-if="searchParams.fromUser" class="selected-user">
                           <span>{{ searchParams.realname }}</span>
-                          <span class="clear-user-icon"><close-outlined style="font-size: 12px" @click="clearSearchParamsUser" /></span>
+                          <span class="clear-user-icon"><Icon icon="ant-design:close-outlined" style="font-size: 12px" @click="clearSearchParamsUser" /></span>
                         </div>
                         <a-button v-else type="dashed" shape="circle" @click="openSelectPerson">
                           <Icon icon="ant-design:plus-outlined" />
@@ -54,7 +54,7 @@
                   <span v-if="conditionStr" class="anticon filtera">
                     <Icon icon="ant-design:filter-outlined" />
                     <span style="font-size: 12px; margin-left: 3px">{{ conditionStr }}</span>
-                    <span style="display: flex; margin: 0 5px"><close-outlined style="font-size: 12px" @click="clearAll" /></span>
+                    <span style="display: flex; margin: 0 5px"><Icon icon="ant-design:close-outlined" style="font-size: 12px" @click="clearAll" /></span>
                   </span>
                   <Icon icon="ant-design:filter-outlined" v-else />
                 </a-popover>
